@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Bash and Shell Scripting</title>
+<meta name="description" content="Choosing a shell is not a matter of taste and it is not about features. It is about where the script will…. 1 chapters, 2 topics and 5 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/linux-shell.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Linux Bash and Shell Scripting">
+<meta property="og:description" content="Choosing a shell is not a matter of taste and it is not about features. It is about where the script will…. 1 chapters, 2 topics and 5 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/linux-shell.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Linux Bash and Shell Scripting">
+<meta name="twitter:description" content="Choosing a shell is not a matter of taste and it is not about features. It is about where the script will…. 1 chapters, 2 topics and 5 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/linux-shell.html#article","headline":"Linux Bash and Shell Scripting","name":"Linux Bash and Shell Scripting","description":"Choosing a shell is not a matter of taste and it is not about features. It is about where the script will…. 1 chapters, 2 topics and 5 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/linux-shell.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/linux-shell.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Linux Bash and Shell Scripting","item":"https://amin360it.github.io/quick-guides/linux-shell.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome · Linux Shell</a><ul>
+<li><a href="#orientation-why" data-target="orientation-why">0.1 Which shell, and what that decision costs</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Linux Bash and Shell Scripting</span>
+      <span class="am-band-s">1 chapters &middot; 2 topics &middot; 5 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="orientation" data-toc>Welcome · Linux Shell</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; Welcome · Linux Shell</button><div class="ch-toc-list"><a href="#orientation-why">0.1 Which shell, and what that decision costs</a></div></div>
+<h3 id="orientation-why" data-toc>0.1 Which shell, and what that decision costs</h3>
+
+<p class="topic-desc">Choosing a shell is not a matter of taste and it is not about features. It is about where the script will run, who will run it, and whether the shebang you write can be honoured — because the script that fails with "bad interpreter" on a machine you do not control is a bug you shipped.</p>
+
+<h4 id="orientation-why--section">The three that matter, and the one that does not</h4>
+<p><strong><code>bash</code></strong> is on every Linux distribution, is the default login shell on most, and is what the overwhelming majority of documentation assumes. <strong><code>sh</code></strong> is a POSIX specification rather than an implementation: on Debian and Ubuntu it is dash, on Red Hat it is bash in POSIX mode, and a script written for it runs on both plus busybox in a minimal container. <strong><code>zsh</code></strong> is the default on macOS and has a richer interactive feature set, which is a reason to use it at a prompt and emphatically not a reason to write a deployment script in it. <strong><code>fish</code></strong> is the one to be aware of precisely because it is <em>not</em> shell syntax — its variable expansion, quoting and command substitution all differ, so a fish script fails on Debian with a syntax error rather than a subtle misbehaviour.</p>
+
+<div class="codeWrap"><pre><code># Which one is /bin/sh on this machine?
+ls -l /bin/sh
+# lrwxrwxrwx 1 root root 4 ... /bin/sh -> dash     (Debian, Ubuntu)
+# lrwxrwxrwx 1 root root 9 ... /bin/sh -> bash     (Red Hat, Fedora)
+
+# what does the shebang on this file actually resolve to?
+head -1 script.sh
+# what is available under a name?
+command -v bash sh zsh fish dash busybox
+</code></pre></div>
+
+<h4 id="orientation-why--section-2">Which one to write in, decided by the constraint</h4>
+<p>The question is not "which is best" but "what is the most hostile environment this will run in". A script that must run on a minimal container, on a rescue image, or on a system where nobody installed anything, must be POSIX <code>sh</code> and must start <code>#!/bin/sh</code>. A script that runs on a machine you administer can be <code>bash</code> with <code>#!/usr/bin/env bash</code>. A script that runs on macOS must be <code>bash</code> version 3.2 — the one Apple ships, from 2007 — unless you check the version, which is the detail that catches people when they use associative arrays or <code>mapfile</code>.</p>
+
+<div class="codeWrap"><pre><code>#!/bin/sh
+# POSIX only: no arrays, no [[ ]], no == inside [ ]
+if [ -f "$1" ]; then
+    echo "found"
+fi
+n=0
+while [ $n -lt 3 ]; do
+    echo "$n"
+    n=$((n + 1))
+done
+
+# portable function
+log() {
+    printf '%s %s
+' "$(date -Is)" "$*"
+}
+log "this works on dash, busybox, bash and zsh"
+</code></pre></div>
+
+<h4 id="orientation-why--section-3">The version trap, which is the real difference between bash and sh</h4>
+<p>POSIX <code>sh</code> is a subset, and <code>bash</code> in POSIX mode is <code>sh</code> plus extensions that are simply absent otherwise. The extensions you will reach for and then miss are: arrays and <code>${arr[@]}</code>, associative arrays, <code>[[ ]]</code> with its own word-splitting rules, the <code>=~</code> regex operator, <code>mapfile</code> and <code>readarray</code>, <code>printf -v</code>, negative array indices, and <code>${var,,}</code> case conversion. Writing <code>bash</code> and shebanging it <code>sh</code> produces a script that passes a syntax check and fails at the first array, which is the worst possible outcome.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -euo pipefail
+
+# these four lines fail on dash, and only fail when reached
+declare -a files=("a.txt" "b.txt")     # dash: command not found
+declare -A conf                       # dash: syntax error
+[[ -n "$HOME" ]]                      # dash: [[: not found
+if [[ "$x" =~ ^[0-9]+$ ]]; then :; fi # dash: syntax error
+
+# the check that prevents it
+if [ -n "${BASH_VERSION:-}" ]; then
+    : # bashisms are safe here
+else
+    echo "this script needs bash" >&amp;2
+    exit 1
+fi
+</code></pre></div>
+
+<h4 id="orientation-why--section-4">A minimal script, in both dialects</h4>
+<p>The POSIX form is deliberately dull, because dull is what travels. The bash form adds the three options that turn a sequence of lines into a script that reports failures rather than ploughing through them: <code>-e</code> exits on an unhandled failure, <code>-u</code> turns an undefined variable into an error instead of an empty string, and <code>o pipefail</code> makes a pipeline fail if any stage does. Each has a documented list of exceptions, and section 1.1 covers the one that matters.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -euo pipefail
+
+name="${1:-World}"          # ${:-} supplies a default AND is safe
+                            # under set -u, unlike ${name}
+readonly script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &amp; pwd)"
+
+if [ ! -d "$script_dir/config" ]; then
+    echo "config directory not found next to $0" >&amp;2
+    exit 1
+fi
+
+for file in "$script_dir"/config/*.json; do
+    [ -e "$file" ] || continue        # the glob stays literal if
+    printf 'found %s
+' "$file"        # no match, so skip it
+done
+</code></pre></div>
+
+<h4 id="orientation-why--section-5">What the rest of this guide assumes</h4>
+<p>That the reader is comfortable with variables, conditionals, loops and pipes — the four things every language shares — and is new to what a shell does differently. The three differences that cause the most damage to code arriving from another language are worth naming now. <strong>The shell expands a line before it runs it,</strong> so what you wrote and what runs are not always the same text. <strong>Unquoted variables word-split and glob,</strong> so a single filename with a space becomes two arguments. And <strong>a pipeline is several processes,</strong> so a variable assigned inside one is lost when it ends. Every quoting rule, every <code>set -u</code> requirement and every "use process substitution instead" recommendation later in this guide traces back to one of those three.</p>
+
+<div class="codeWrap"><pre><code># all three in one example
+f="/tmp/my report.pdf"
+
+count=$(ls | wc -l)          # pipeline: count survives, because
+                             # the assignment is the last stage
+ls | while read -r x; do
+    n=$((n + 1))             # pipeline: n is LOST. the loop runs
+done                         # in a subshell that exits here.
+echo "n is $n"               # -> n is (empty or an old value)
+
+cp $f /backup/               # unquoted: 'my' and 'report.pdf'
+cp "$f" /backup/             # quoted: one argument, correct
+</code></pre></div>
+
+<p>Three disciplines: <strong>shebang with <code>/usr/bin/env</code> rather than an absolute path,</strong> because bash is at <code>/bin/bash</code> on some systems and <code>/usr/bin/bash</code> on others and only <code>env</code> finds it either way; <strong>write POSIX <code>sh</code> if the destination is unknown, and bash only if you control it,</strong> because a bashism in a sh script passes a syntax check and fails at run time in production; and <strong>quote every expansion from the first line of your first script,</strong> because the failure mode is invisible until a filename contains a space, which is always a filename a user chose.</p>
+
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Linux Shell.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

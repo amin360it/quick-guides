@@ -1,0 +1,488 @@
+  <section class="chapter">
+<h2 id="ch19" data-toc>19 · Project Structure and Shipping</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Project structure and shipping</button><div class="ch-toc-list"><a href="#ch19-folders">Folders by feature, not by type</a><a href="#ch19-boundaries">Module boundaries that hold</a><a href="#ch19-shared">Shared code and the component contract</a><a href="#ch19-pipeline">The pipeline: build, verify, ship</a><a href="#ch19-production">Production: deploy, observe, roll back</a></div></div>
+    <p class="topic-desc">Everything before this chapter makes one application work; this chapter is about making twenty of them work on one codebase with ten people in it — structure that survives parallel work, boundaries that stop a change in one feature from rippling through four others, and a pipeline where shipping is routine because rolling back is boring. The end-to-end walkthrough assembles the whole guide into a release.</p>
+    <h3 id="ch19-folders" data-toc>Folders by feature, not by type</h3>
+    <p>The folder question looks cosmetic and is actually the first architecture decision, because it determines what a change touches. Type-first structure — <code>components/</code>, <code>hooks/</code>, <code>utils/</code>, <code>pages/</code> — groups by what a file <em>is</em>, which means every feature is scattered across four directories: the page in one, its components in another, its hooks in a third, shared bits in a fourth. A single feature change is therefore four pull requests' worth of files in one diff, every other feature's files sit in the same directories, and ownership is folklore. Feature-first structure — <code>features/projects/</code>, <code>features/billing/</code> — groups by what a file is <em>for</em>: everything the projects feature needs lives together, a diff for a projects change touches the projects directory, and a new engineer can read one folder to understand one capability.</p>
+    <p>Feature-first does not mean no shared structure; it means shared structure earns its place explicitly. The shape that holds up at ten people: <code>app/</code> for composition only (router table, providers, entry point), <code>features/</code> for capabilities, <code>shared/</code> for the genuinely cross-cutting (design system, the query client, the key factories, formatters), and routes-and-loaders owned by the feature they serve (chapter 16's route fragments). The rule that keeps it from rotting: a file may import from <code>shared/</code> and from its own feature, and may import another feature only through that feature's public entry point — which is the next section's subject. Files that violate this start as conveniences and end as the coupling that makes every refactor a cross-team negotiation.</p>
+    <div class="codeWrap"><pre><code>// feature-first: one folder reads as one capability
+src/
+  app/
+    routes.tsx          // composition: imports feature route fragments
+    providers.tsx       // query client, theme, error boundaries (root)
+    main.tsx            // entry: mount and nothing else
+  features/
+    projects/
+      routes.tsx        // the feature's route fragment (ch16)
+      pages/            // screens this feature owns
+      components/       // used by nothing outside this folder
+      hooks/            // useProject, useProjectTasks
+      api.ts            // fetchers + key factories (ch15)
+      index.ts          // the PUBLIC surface - the only import path out
+    billing/
+      routes.tsx pages/ components/ hooks/ api.ts index.ts
+  shared/
+    ui/                 // design system: Button, Field, Table
+    query/              // queryClient, retry policy
+    format/             // money, dates, pure and unit-tested
+    api/                // the fetch wrapper, auth header
+
+// a type-first counterexample, and the diff it produces
+src/components/InvoiceTable.tsx        // touched by billing work
+src/hooks/useInvoices.ts               // touched by billing work
+src/pages/InvoicesPage.tsx             // touched by billing work
+src/utils/invoiceFormat.ts             // touched by billing work
+// one feature's change, four directories, no ownership boundary</code></pre></div>
+    <p>Two follow-up decisions teams get wrong early. First, pages versus components inside a feature: pages are the route elements — they read loaders and params, compose the screen — while components are the screen's parts; conflating them produces 800-line files where routing concerns and rendering concerns alternate. Second, the size threshold for promoting a folder to a feature: when two features genuinely share a domain concept (a document viewer used by projects and by support), it moves to <code>shared/</code> or a third feature — it does not live in one feature with the other importing across, because that import is the boundary violation wearing a reasonable name. Move code toward the level where its changes cluster.</p>
+    <div class="codeWrap"><pre><code>// pages compose routes; components render; the feature owns both
+features/projects/
+  pages/
+    ProjectListPage.tsx      // loader data + params -&gt; composes the screen
+    ProjectDetailPage.tsx    // &lt;ProjectHeader/&gt; + &lt;TaskBoard/&gt; + outlet panel
+  components/
+    ProjectHeader.tsx        // pure render of the record - no params, no loader
+    TaskBoard.tsx            // columns, drag handling, keyboard moves
+    TaskCard.tsx             // one row: could be unit-tested in isolation
+
+// a page reads the routing layer (ch16) and hands components render data:
+export function ProjectDetailPage() {
+  const { project } = useLoaderData();
+  return (
+    &lt;&gt;
+      &lt;ProjectHeader project={project} /&gt;
+      &lt;TaskBoard projectId={project.id} tasks={project.tasks} /&gt;
+    &lt;/&gt;
+  );
+}</code></pre></div>
+    <h4>The folder test in review</h4>
+    <p>A structural rule is only real if review enforces it, and the fastest enforcement is a question, not a tool: "which folder does this file belong to, and who owns it?" If the answer requires explanation, the structure has an ambiguity the next change will exploit. The heavier version — an import-boundary linter rule — is worth installing once the question starts recurring, because by then the violations are patterned and mechanical to block. Start with the review question; graduate to the rule when you can name the three import patterns it should forbid.</p>
+    <div class="codeWrap"><pre><code>// import boundaries as a lint rule: features reach each other only via index
+// .eslintrc.cjs - no-restricted-imports, paths relative to the rule
+module.exports = {
+  rules: {
+    'no-restricted-imports': ['error', {
+      patterns: [
+        {
+          group: ['@/features/projects/components/*'],
+          message: 'Import from @/features/projects (its index), not internals.',
+        },
+        {
+          group: ['@/shared/ui/*'],
+          message: 'Import from @/shared/ui - the barrel is the contract.',
+        },
+      ],
+    }],
+  },
+  overrides: [
+    // the feature itself may of course import its own internals
+    { files: ['src/features/projects/**'], rules: {
+        'no-restricted-imports': 'off' } },
+  ],
+};</code></pre></div>
+    <div class="note"><p>The index file of a feature is its API. Keeping it explicit — exporting the pages, the route fragment, and the handful of types other features legitimately need — means an import tells the reader exactly what cross-feature relationship exists, and a change to a feature's internals does not touch its consumers. Internal imports from other features are the single most common way a codebase's boundaries quietly cease to exist.</p></div>
+    <h3 id="ch19-boundaries" data-toc>Module boundaries that hold</h3>
+    <p>A boundary is a promise about the shape of a change: what happens inside a module must be changeable without touching its consumers, and what crosses the boundary must be small, stable and explicit. In React terms the promise has three surfaces. The props a component accepts are its contract — adding an optional prop is compatible, renaming or retyping one is not, and the discipline is to design props as if a stranger's code depends on them, because in a ten-person repo it does. The public entry point of a feature is the second surface: types, route fragments, and the components other features embed, with everything else private by omission rather than by convention. The third is the data contract: the shape returned by a feature's fetchers and actions, which travels through the cache (chapter 15) into other features' renders, and whose evolution needs the same care as an API's.</p>
+    <p>The failure boundaries cause is ripple, and it has a signature: a change that should be local appears in many directories. Three smells predict it before it arrives. Deep reaching — <code>import { Row } from '@/features/billing/components/Row'</code> — means another feature's internals are load-bearing somewhere, so refactoring Row is no longer billing's decision. Shared state — a context whose value three features write — means they cannot be reasoned about independently, and chapter 10's split-context advice applies at the architecture level: split it by ownership or replace it with the cache. And circular imports — feature A importing B while B imports A — mean the two are one module wearing two names; the fix is to extract what they actually share into <code>shared/</code> rather than to restructure the imports.</p>
+    <div class="codeWrap"><pre><code>// the three smells, and what each one means
+// 1. deep reaching: a refactor in billing now needs projects' review
+import { InvoiceRow } from '@/features/billing/components/InvoiceRow';
+//    fix: export it from billing/index.ts if it IS a public surface,
+//    or stop importing it if it is not.
+
+// 2. shared mutable context: features that write the same value are one
+//    feature split across folders (ch10 split fast/slow, or use the cache)
+const WorkspaceContext = createContext(null);   // three writers, no owner
+
+// 3. circular imports: A and B are one module with two directories
+// features/projects/api.ts   -&gt; import { formatMoney } from '@/features/billing/api'
+// features/billing/api.ts    -&gt; import { InvoiceStatus } from '@/features/projects/api'
+//    fix: both want shared/format and shared/types - give it to them
+
+// the healthy version: stable props, public entry, one-directional data
+// features/projects/index.ts
+export { ProjectListPage, ProjectDetailPage } from './pages';
+export { projectRoutes } from './routes';
+export type { Project, ProjectId } from './types';</code></pre></div>
+    <p>Props design is where the boundary is exercised daily, and the pattern that keeps them stable is treating them as a message format: primitives and domain objects the parent already had, callbacks named for the intent they serve (<code>onSelect</code> rather than <code>setSelectedIdFromTable</code>), children for composition slots, and no prop that leaks the component's internal state machine (<code>isOpen</code> plus <code>onToggle</code> plus <code>onOpenChange</code> for one state is a contract with three ways to disagree). The test for a props interface: can a consumer use it correctly without reading the component's source? If not, the interface is describing implementation, and implementation is the thing boundaries exist to hide.</p>
+    <div class="codeWrap"><pre><code>// props as a stable message format
+// GOOD: intent-named callbacks, domain data, composition slot
+function ProjectRow({ project, onOpen, onDelete, children }) {
+  return (
+    &lt;li&gt;
+      &lt;button onClick={() =&gt; onOpen(project.id)}&gt;{project.name}&lt;/button&gt;
+      &lt;Menu onDelete={() =&gt; onDelete(project.id)} /&gt;
+      {children}
+    &lt;/li&gt;
+  );
+}
+
+// BAD: the component's internals leaked into its contract
+function ProjectRow({ project, selectedId, onSelectId, onSelectIdChange,
+                      hovered, onHoverChange, expanded, onExpandToggle }) {
+  // six props, three of which are one piece of state with two spellings -
+  // every consumer must know the component's state machine to call it
+}
+
+// the boundary test: use it from the public entry, never the internals
+import { ProjectRow } from '@/features/projects';    // contract
+import ProjectRow from '@/features/projects/components/ProjectRow'; // leak
+</code></pre></div>
+
+      <p>The same rule separates a folder from a feature. A folder is a place
+      to put files; a boundary is a promise about what may depend on what.
+      Enforce it with a lint rule rather than a code-review habit, because a
+      habit survives one reviewer leaving the team and a lint rule does not.</p>
+
+      <div class="codeWrap"><pre><code>// eslint-plugin-boundaries: a feature may import its own files and
+// shared, and nothing else. App wires features together and may
+// import everything. Nothing may import another feature's internals.
+{
+  "rules": {
+    "boundaries/entry-in-dependencies": "error",
+    "boundaries/no-unknown": "error",
+    "boundaries/no-private": "error",
+    "boundaries/element-types": ["error", {
+      "default": "disallow",
+      "message": "Import across features through app/, never feature to feature.",
+      "rules": [
+        { "from": "feature", "to": "feature", "when": { "imported": true } }
+      ]
+    }]
+  }
+}
+</code></pre></div>
+
+      <div class="tip">Boundaries are cheaper to add at the start than to
+      retrofit. If you are retrofitting anyway, start with the rule that
+      catches the most: <em>no feature imports another feature's
+      internals</em>. Everything else is a refinement of that one.</div>
+
+      <h4>Versioning a public surface</h4>
+
+      <p>A shared package used by two teams is a published library, whether
+      or not it reaches a registry. Give it a version, a changelog, and a
+      rule for breaking changes: additive is a minor bump, a changed
+      signature is a major one. Consumers pin a range, so the shared package
+      never forces every feature to change on the same day.</p>
+
+      <div class="codeWrap"><pre><code>// packages/ui/package.json
+{
+  "name": "@acme/ui",
+  "version": "2.4.1",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./icons": { "default": "./dist/icons.js" }
+  },
+  "files": ["dist"],
+  "scripts": { "build": "tsc -p tsconfig.build.json" }
+}
+
+// A breaking change lands as 3.0.0, with a codemod in the changelog.
+// Consumers upgrade when they are ready, not when the shared team ships.
+</code></pre></div>
+
+      <div class="note">Version the <em>export list</em>, not the folder.
+      Deep imports like <code>@acme/ui/dist/internal/Button</code> bypass
+      every guarantee you have made, which is why <code>exports</code> in
+      package.json is worth setting even inside a monorepo.</div>
+
+      <h3 id="ch19-shared" data-toc>Shared code and the component contract</h3>
+
+      <p>Sharing starts the moment two features need the same button. The
+      mistake is treating that as a signal to build a design system; the
+      signal is only that you have written the same button twice. Promote
+      code when the third use is real, and promote it by moving it, not by
+      wrapping it, because a wrapper around a component you do not control
+      becomes a second API you now have to maintain.</p>
+
+      <div class="codeWrap"><pre><code>// Stage 1: duplication. Correct, and free of decisions.
+function SaveButton({ onClick }) {
+  return &lt;button className="btn btn-primary" onClick={onClick}&gt;Save&lt;/button&gt;;
+}
+
+// Stage 2: extract, do not wrap. The props are the ones callers used,
+// not the ones the design system happens to offer.
+function SaveButton({ onClick, disabled }) {
+  return &lt;Button variant="primary" disabled={disabled} onClick={onClick}&gt;
+    Save
+  &lt;/Button&gt;;
+}
+
+// Stage 3, and only once three features agree: the vocabulary becomes
+// yours. Callers now say intent, not styling.
+&lt;SaveButton onClick={save} /&gt;
+&lt;DeleteButton onClick={remove} confirm /&gt;
+</code></pre></div>
+
+      <p>The test for whether something belongs in shared code is not
+      "is it reusable" — almost everything is reusable under pressure — but
+      "do the consumers agree on what it means". Two teams that want
+      different click behaviour do not have a shared button problem; they
+      have a naming problem, and a shared component would hide the
+      disagreement behind a prop.</p>
+
+      <div class="codeWrap"><pre><code>// The disagreement, made visible as a prop: a sign the abstraction is wrong.
+function Button({ onClick, onPress, onActivate, ...rest }) { /* ... */ }
+
+// The fix is a conversation, then two components with honest names.
+function SubmitButton({ onClick })  { /* optimistic, disables itself */ }
+function CommandButton({ onClick }) { /* fire and forget, never disables */ }
+</code></pre></div>
+
+      <div class="warn">Shared code carries shared upgrade cost. Every file
+      you move into <code>packages/ui</code> is a file whose changes can
+      break features you have never opened. Keep the shared surface small
+      and boring — tokens, primitives, layout — and keep product logic in
+      the feature that owns it.</div>
+
+      <h4>The contract is the prop list, not the JSX</h4>
+
+      <p>When a component crosses a feature boundary, its props stop being
+      an implementation detail and become an interface you have to version.
+      The practical difference is visible in review: an internal component
+      may take whatever is convenient, because its only caller is twenty
+      lines away, while a shared one has to be legible to someone who has
+      never opened its file. That means names that describe intent rather
+      than state (<code>disabled</code>, not
+      <code>isDisabledFromParent</code>), a small number of props with
+      obvious defaults, and — for anything with real behaviour — a
+      controlled form so the caller, not the component, decides when the
+      thing happens. A shared component that reaches for context you did
+      not pass it, or reads a global the caller cannot see, is a boundary
+      that only appears to be one.</p>
+
+      <div class="codeWrap"><pre><code>// Internal: convenient is fine, the caller is adjacent.
+function TaskRowInternal({ task, onDrop, ghost }) {
+  return &lt;li className={ghost ? 'row ghost' : 'row'}&gt;{task.title}&lt;/li&gt;;
+}
+
+// Shared: the same rendering, expressed as a contract a stranger can read.
+function TaskRow({ title, state = 'idle', onPick }) {
+  return (
+    &lt;li data-state={state} onClick={() =&gt; onPick?.(title)}&gt;
+      {title}
+    &lt;/li&gt;
+  );
+}
+// state is a closed vocabulary, onPick is optional, and nothing about
+// drag-and-drop leaks in — the feature composes those around the row.</code></pre></div>
+
+      <p>Two habits keep the contract honest over time. Document each shared
+      component with one example of real use rather than a table of prop
+      types, because the example is what a consumer scans for; and treat a
+      prop added to a shared component as a design review, asking whether it
+      belongs to every consumer or only to one. If it belongs to one, it
+      belongs in that feature — passed as children, as a render prop, or as
+      a second component built from the first. The moment a shared component
+      accumulates flags for individual callers, it has stopped being shared
+      code and started being two components wearing one name, and the
+      cheapest fix is to separate them again while the split is still
+      obvious.</p>
+    <h3 id="ch19-pipeline" data-toc>The pipeline: build, verify, ship</h3>
+    <p>A pipeline is not "CI with tests in it"; it is the sequence of
+    promises a change makes before it can reach a user, and each promise has
+    to be checkable by a machine rather than by whoever reviews the pull
+    request that day. The three that matter for a React codebase: it builds
+    (type errors and bundler failures are caught before merge), it verifies
+    (tests, lint, and the boundary rules from earlier in this chapter run on
+    every push), and it ships the same artifact that was verified — not a
+    second build on the deploy machine, which is how "it passed CI but
+    production broke" happens. If the artifact that was tested is not the
+    artifact that ships, nothing else in the pipeline is evidence.</p>
+    <div class="codeWrap"><pre><code># .github/workflows/ci.yml — one job per promise, one artifact out
+name: ci
+on: [push, pull_request]
+
+jobs:
+  build:                       # promise 1: it compiles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run build      # tsc + vite build, no tests yet
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist }
+
+  verify:                      # promise 2: it behaves
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:run -- --coverage
+      - run: npm run test:e2e   # playwright, against the built app
+
+  ship:                        # promise 3: same bytes, different place
+    needs: [build, verify]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - run: ./scripts/deploy.sh   # uploads dist/, never rebuilds</code></pre></div>
+    <p>Cache strategy is the difference between a four-minute pipeline and a
+    twenty-minute one. Three caches pay for themselves immediately: the
+    package manager's (keyed on the lockfile, so a dependency change
+    invalidates exactly once), the test runner's (Vitest and Jest both keep
+    a transform cache between runs — persist it with
+    <code>actions/cache</code>, keyed on source hash plus lockfile), and the
+    bundler's. The failure mode to avoid is a cache keyed only on branch
+    name: a force-push that rewrites history can silently serve stale
+    output, so the key must include something that changes whenever the
+    inputs change.</p>
+    <div class="codeWrap"><pre><code>- uses: actions/cache@v4
+  with:
+    path: |
+      ~/.npm
+      .vitest-cache
+    key: ${{ runner.os }}-verify-${{ hashFiles('**/package-lock.json') }}-${{ github.sha }}
+    restore-keys: |
+      ${{ runner.os }}-verify-${{ hashFiles('**/package-lock.json') }}-
+
+# The restore-keys line is what makes it fast on a miss: an exact-key
+# miss falls back to the newest cache with the same lockfile, which is
+# correct because the lockfile determines the transform inputs.</code></pre></div>
+    <div class="tip">Gate on the fastest failure first. Type errors surface
+    in seconds and catch more real bugs per second than any test suite, so
+    <code>tsc --noEmit</code> belongs before tests, not after — and lint
+    rules that encode boundaries (the import rules from 19.2) run in the
+    same window, for the same reason: they are static, so they are nearly
+    free.</div>
+    <div class="warn">A flaky test is a broken build that occasionally lies.
+    Quarantine is acceptable as a temporary state with an owner and a date;
+    a quarantined suite that nobody revisits teaches the team to re-run
+    failures, which is the same as having no suite at all.</div>
+
+    <h4>Preview deployments: the reviewable build</h4>
+    <p>A preview deployment turns "does this work?" from a question answered
+    in prose on the pull request into a URL a reviewer can open, click
+    through, and form an opinion about — which changes what gets reviewed,
+    because a screenshot invites skim-reading while a running app invites
+    trying the edge case you were hoping nobody would try. The mechanics are
+    cheap once the pipeline emits an artifact: one deploy per branch, named
+    after the PR number so a new push replaces the old one, with the
+    environment URL posted back as a comment. Two rules keep previews
+    trustworthy: they must run the same build command as production (a
+    preview built differently is a demo, not evidence), and they must not
+    touch production data — seeded fixtures or a shadow database, never a
+    copy of the real one.</p>
+    <div class="codeWrap"><pre><code># previews are the same ship step, a different target
+preview:
+  needs: [build, verify]
+  if: github.event_name == 'pull_request'
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/download-artifact@v4
+      with: { name: dist, path: dist }
+    - run: ./scripts/deploy.sh "pr-${{ github.event.number }}"
+    - uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: `Preview: https://pr-${context.issue.number}.staging.example.com`
+          });</code></pre></div>
+    
+    <h3 id="ch19-production" data-toc>Production: deploy, observe, roll back</h3>
+    <p>Deploying a React app is shipping static files plus whatever server
+    renders them, so the interesting decisions are about the boundary
+    between old and new: how a user mid-session is treated when the new
+    version lands, and how fast you can undo it. The boring, correct answer
+    for most teams is immutable deploys — each release is a directory keyed
+    by commit, the server or CDN points at one of them, and rollback is
+    repointing rather than rebuilding. Under that model the browser's cached
+    assets are safe too, because an old HTML file references hashed asset
+    names that still exist in their old directory; the danger case is an
+    in-place overwrite, where the old HTML now points at files that no
+    longer match it and users get a half-old page until their cache
+    expires.</p>
+    <div class="codeWrap"><pre><code>#!/usr/bin/env bash
+# deploy.sh — immutable, repointable, reversible in one command
+set -euo pipefail
+
+RELEASE="releases/$(git rev-parse --short HEAD)"
+mkdir -p "$RELEASE"
+cp -r dist/* "$RELEASE/"
+
+ln -sfn "$RELEASE" releases/current          # repoint atomically
+./scripts/purge-cdn.sh                        # only the HTML, not assets
+
+echo "shipped $RELEASE"
+# rollback is: ln -sfn releases/&lt;previous&gt; releases/current
+# No rebuild, no cache invalidation of hashed assets, no downtime.</code></pre></div>
+    <p>Observability for a single-page app cannot be read from server logs,
+    because the failures users see — a blank screen after a deploy, a form
+    that never submits, a route that renders nothing — happen in the browser
+    after the server has already returned 200. Three signals cover most of
+    it: an error tracker with release tagging (so "errors are up" becomes
+    "errors are up <em>since 2.14.0</em>"), web-vitals reporting to catch a
+    bundle-size regression that no test would see, and a synthetic check
+    that walks the login-and-load flow on a schedule from outside your
+    network. Each is keyed to a release, which is what makes the rollback
+    decision a data question rather than a guess.</p>
+    <div class="codeWrap"><pre><code>// main.tsx — attach the release to every report before anything else
+import * as Sentry from '@sentry/react';
+
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  release: import.meta.env.VITE_GIT_SHA,   // set by the pipeline
+  environment: import.meta.env.MODE,
+  tracesSampleRate: 0.1,
+});
+
+// web-vitals: the regressions tests cannot see
+import { onCLS, onINP, onLCP } from 'web-vitals';
+onVitals(({ name, value, id }) => {
+  sendToCollector({ name, value, id, release: GIT_SHA, route: location.pathname });
+});
+
+// The rule that makes it actionable: a page load with no error and
+// INP over 200ms is a real user's bad day, and it aggregates per
+// release — so the deploy that caused it shows up without archaeology.</code></pre></div>
+    <div class="note">A rollback that has never been rehearsed is a hope.
+    Time it once: from "we are reverting" to "users are on the old version"
+    should be under five minutes and should involve one command. If it is
+    longer than that, fix the deploy model before you need it — the incident
+    is the wrong time to discover that rollback means rebuilding.</div>
+
+    <h4>Releases, sessions, and the tab that stays open</h4>
+    <p>The hardest moment of a deploy is not the deploy; it is the minutes
+    after it, when tabs opened on the old version keep running against a
+    server that now speaks the new contract. A long-lived tab will fetch
+    chunks that no longer exist at their old hashed paths (the classic
+    "ChunkLoadError" on a route change), and its in-flight mutations may
+    answer against a database the release just migrated. Three defences,
+    in order of how much they cost: keep the previous release's assets
+    served for a grace window rather than deleting them on cutover; have
+    the app poll a version endpoint and prompt a reload when it drifts,
+    so the user decides when to switch rather than meeting an error
+    mid-task; and make migrations additive first — add columns, deploy,
+    backfill, and only then remove the old reads in a later release, so
+    old and new code can run against the same schema at once.</p>
+    <div class="codeWrap"><pre><code>// poll the release, ask for a reload when the tab is stale
+let current = window.__RELEASE__;
+setInterval(async () => {
+  const r = await fetch('/version.json', { cache: 'no-store' });
+  const { release } = await r.json();
+  if (release !== current &amp;&amp; !sessionStorage.getItem('reload-offered')) {
+    sessionStorage.setItem('reload-offered', '1');
+    toast('A new version is ready — reload', { action: () => location.reload() });
+  }
+}, 60_000);
+
+// The prompt, not a forced reload: a user mid-form loses nothing,
+// and the stale tab never gets far enough to hit a deleted chunk.</code></pre></div>
+
+    <div class="ex"><h4>Exercises 19</h4><ol>
+      <li>Draw your current repository as a dependency graph: one node per folder, one arrow per import that crosses a folder line. Any arrow that surprises you is a boundary that does not exist yet — write the lint rule that would have caught it.</li>
+      <li>Take your slowest CI job and split it into the build promise and the verify promise as separate jobs. Measure the wall-clock time before and after, then persist the package-manager cache and measure again.</li>
+      <li>Rehearse a rollback on staging with a stopwatch. From "we are reverting" to "users are on the old version", time every step; anything over five minutes or needing more than one command is a deploy-model bug, not an incident procedure.</li>
+      <li>List every shared component your features import, and for each one write the prop list as it would appear if a team that had never seen the file had to use it correctly. Props you cannot explain without opening the file are props that belong to a feature, not to the shared surface.</li>
+    </ol></div>
+  </section>

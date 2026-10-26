@@ -1,0 +1,17 @@
+const fs = require('fs');
+const p = process.argv[2] || 'build/tmp/pkg-ch10-11.deep.html';
+const s = fs.readFileSync(p, 'utf8');
+const count = (re) => (s.match(re) || []).length;
+console.log('file', p, 'len', s.length);
+console.log('sections', count(/<section class="chapter">/g));
+console.log('h2', count(/<h2 /g));
+console.log('h3data', count(/<h3 [^>]*data-toc/g));
+console.log('h4ids', count(/<h4 [^>]*id=/g));
+console.log('h4all', count(/<h4/g));
+console.log('codeWrap', count(/class="codeWrap"/g));
+console.log('sentinel', s.includes('APPEND_SENTINEL'));
+console.log('has chu', s.includes('\u00b7'));
+console.log('---first 200---');
+console.log(s.slice(0, 200));
+console.log('---last 200---');
+console.log(s.slice(-200));

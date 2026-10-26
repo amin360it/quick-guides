@@ -1,0 +1,98 @@
+<h3 id="ch5-3" data-toc>5.3 String vs &amp;str</h3>
+<p class="topic-desc">Rust has two string types and the difference is ownership: <code>String</code> owns a growable heap buffer; <code>&amp;str</code> is an immutable view into a buffer owned by someone else. Getting the boundary right is most of the story.</p>
+
+<h4 id="ch5-3-ownership">The difference is ownership</h4>
+<p><code>String</code> owns; <code>&amp;str</code> borrows. String literals are <code>&amp;str</code> baked into the binary, and <code>&amp;s</code> on a <code>String</code> gives a <code>&amp;str</code> view of its buffer. Functions therefore take <code>&amp;str</code> when they only need to read text — that is what most functions should do — and return <code>String</code> when they must produce text the caller will own. Converting between them is cheap in the borrowing direction and an allocation in the owning direction.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let owned = String::from("hello");   // owns a heap buffer
+    let borrowed: &amp;str = &amp;owned;         // a view; no allocation
+    let literal: &amp;str = "hello";         // points into the binary
+    println!("{borrowed} {literal}");
+}</code></pre></div>
+
+<h4 id="ch5-3-build">Building strings efficiently</h4>
+<p><code>push_str</code> appends a slice and <code>push</code> appends a single <code>char</code>; <code>format!</code> is the convenient one-shot builder; and joining an iterator of owned strings via <code>collect</code> then <code>join</code> is the idiomatic way to build a delimited list. None of this is slow in absolute terms — a <code>String</code> grows geometrically, so appending is amortised O(1) — but a <code>format!</code> inside a hot loop allocates every iteration, which is where the "one pass, then join" shape wins.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut out = String::new();
+    for i in 0..10 {
+        out.push_str(&amp;format!("{i} "));   // 10 small allocations
+    }
+    out.push('!');
+
+    // one pass, one allocation, then a single join:
+    let joined = (0..10)
+        .map(|i| i.to_string())
+        .collect::&lt;Vec&lt;_&gt;&gt;()
+        .join(", ");
+
+    println!("{out}");
+    println!("{joined}");
+}</code></pre></div>
+
+<h4 id="ch5-3-utf8">UTF-8: bytes versus chars</h4>
+<p>A <code>String</code> is UTF-8, so <code>s.len()</code> counts <em>bytes</em>, not characters — <code>"héllo"</code> is 6 bytes and 5 chars because <code>é</code> is two bytes. <code>s.chars()</code> iterates code points and <code>s.char_indices()</code> gives the byte offset of each. Direct indexing <code>s[0]</code> is a compile-time-ish runtime error, because byte 0 might land inside a multi-byte character; slicing must fall on a character boundary, which is what <code>s.get(..n)</code> checks safely.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let s = "héllo";
+    println!("bytes: {}", s.len());            // 6: é is two bytes
+    println!("chars: {}", s.chars().count());  // 5
+    for (i, ch) in s.char_indices() {
+        println!("byte {i}: {ch}");
+    }
+    // s[0] would be an error: indexing must land on a char boundary.
+    // s.get(..2) returns Some("hé") — the checked alternative.
+}</code></pre></div>
+
+<h3 id="ch5-4" data-toc>5.4 Iterators, adaptors and closures</h3>
+<p class="topic-desc">Iterators are the engine of idiomatic Rust: a lazy sequence of items, a set of adaptors that transform the sequence, and <code>collect</code> that turns the result back into a concrete collection. Closures are the small anonymous functions the adaptors take.</p>
+
+<h4 id="ch5-4-lazy">Iterators are lazy; next advances</h4>
+<p>Creating an iterator — <code>v.iter()</code>, <code>s.chars()</code>, <code>1..=10</code> — runs nothing. Values are produced one at a time as the iterator is consumed, by calling <code>next()</code> until it returns <code>None</code>. That laziness is what makes infinite iterators like <code>(0..)</code> safe to construct: nothing is generated until an adaptor pulls, and <code>take(3)</code> pulls exactly three times.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let v = vec![1, 2, 3];
+    let it = v.iter();                 // lazy: nothing has run yet
+    for n in it {                      // iterating pulls the values
+        println!("{n}");
+    }
+
+    let mut it2 = [10, 20].iter();     // drive it manually:
+    println!("{:?}", it2.next());      // Some(10)
+    println!("{:?}", it2.next());      // Some(20)
+    println!("{:?}", it2.next());      // None — the iterator is spent
+}</code></pre></div>
+
+<h4 id="ch5-4-adapt">map, filter, fold, take</h4>
+<p>Adaptors (<code>map</code>, <code>filter</code>, <code>fold</code>, <code>take</code>, <code>skip</code>, <code>enumerate</code>, <code>zip</code>) take one iterator and return another, and they chain naturally. <code>map</code> transforms each item, <code>filter</code> keeps items passing a predicate, <code>fold</code> accumulates a state across the sequence — the general form of sums and products — and <code>take</code> truncates. Each adaptor is a small struct that implements <code>Iterator</code>, so the whole chain compiles to a single fused loop with no intermediate collections.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let evens: Vec&lt;i32&gt; = (1..=10).filter(|n| n % 2 == 0).collect();
+    let sum: i32 = (1..=100).map(|n| n * n).sum();
+    let product: i32 = (1..=5).fold(1, |acc, n| acc * n);
+    let first: Vec&lt;i32&gt; = (0..).take(3).collect();
+    println!("{evens:?} {sum} {product} {first:?}");
+}</code></pre></div>
+
+<h4 id="ch5-4-consume">Collecting and consuming</h4>
+<p>Adaptors are lazy; <code>collect</code> is where the pipeline becomes data. Its target type is inferred from the binding: <code>collect::&lt;Vec&lt;_&gt;&gt;()</code> is the explicitness you need when inference cannot see the collection type. The consuming methods (<code>sum</code>, <code>product</code>, <code>min</code>, <code>max</code>, <code>count</code>, <code>any</code>, <code>all</code>) pull the whole iterator to produce one value. The iterator pipeline exists so that <code>filter</code>, <code>map</code> and <code>sum</code> describe a transformation without building the intermediate vectors a naive imperative version would.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let chars: Vec&lt;char&gt; = "hello".chars().collect();
+    let words: Vec&lt;String&gt; =
+        "a b c".split_whitespace().map(String::from).collect();
+    let total: i32 = [1, 2, 3].into_iter().sum();
+    let max = [4, 9, 1].into_iter().max();
+    let has_big = [4, 9, 1].iter().any(|n| *n &gt; 5);
+
+    println!("{chars:?} {words:?} {total} {max:?} {has_big}");
+}</code></pre></div>
+
+<h4 id="ch5-4-closure">Closures: capture, borrow, move</h4>
+<p>A closure is an anonymous function that can capture variables from its environment. By default it borrows them; <code>move</code> makes it take ownership — mandatory when the closure outlives the scope, as with threads in chapter 7. A closure's capture style is inferred from its body: reading <code>base</code> borrows it, and that borrowed value is held for as long as the closure lives. Closures that capture nothing are usable anywhere a function pointer is.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let base = 10;                    // captured by reference
+    let add_base = |n: i32| n + base;
+    println!("{}", add_base(5));      // 15
+
+    let text = String::from("data");  // moved in, not borrowed
+    let take = move || println!("{text}");
+    take();
+    // println!("{text}");            // ERROR: moved into the closure
+}</code></pre></div>
+<div class="note">The pipeline looks like it allocates a list per step; it does not. <code>map(...).filter(...).sum()</code> compiles to one loop over the source — the iterator types are erased to a single fused state machine.</div></section>

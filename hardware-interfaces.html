@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Port API and Hardware Access</title>
+<meta name="description" content="Hardware access means reading and writing the ports, buses and memory-mapped registers that connect software…. 5 chapters, 24 topics and 54 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/hardware-interfaces.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Port API and Hardware Access">
+<meta property="og:description" content="Hardware access means reading and writing the ports, buses and memory-mapped registers that connect software…. 5 chapters, 24 topics and 54 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/hardware-interfaces.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Port API and Hardware Access">
+<meta name="twitter:description" content="Hardware access means reading and writing the ports, buses and memory-mapped registers that connect software…. 5 chapters, 24 topics and 54 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/hardware-interfaces.html#article","headline":"Port API and Hardware Access","name":"Port API and Hardware Access","description":"Hardware access means reading and writing the ports, buses and memory-mapped registers that connect software…. 5 chapters, 24 topics and 54 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/hardware-interfaces.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/hardware-interfaces.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Port API and Hardware Access","item":"https://amin360it.github.io/quick-guides/hardware-interfaces.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome · Port API and Hardware Access</a><ul>
+<li><a href="#orientation-why" data-target="orientation-why">0.1 What this guide covers and why the platforms differ so much</a></li>
+<li><a href="#orientation-map" data-target="orientation-map">0.2 The mapping table, and how to read the rest of the guide</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Serial Ports in Practice</a><ul>
+<li><a href="#ch1-linux" data-target="ch1-linux">1.1 Linux: opening and configuring with termios</a></li>
+<li><a href="#ch1-win" data-target="ch1-win">1.2 Windows: CreateFile, DCB, COMMTIMEOUTS and overlapped I/O</a></li>
+<li><a href="#ch1-portable" data-target="ch1-portable">1.3 One portable layer, and the four mistakes it prevents</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Framing over a Byte Stream</a><ul>
+<li><a href="#ch2-why" data-target="ch2-why">2.1 A stream has no messages, and no boundaries either</a></li>
+<li><a href="#ch2-endian" data-target="ch2-endian">2.2 Byte order, and the width that decides it</a></li>
+<li><a href="#ch2-timeout" data-target="ch2-timeout">2.3 The timeout has to cover a whole record, not a byte</a></li>
+<li><a href="#ch2-resync" data-target="ch2-resync">2.4 Resynchronisation, and when scanning is honest</a></li>
+<li><a href="#ch2-checksum" data-target="ch2-checksum">2.5 Checksums, and what they actually protect</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · USB, HID and Raw Devices</a><ul>
+<li><a href="#ch3-model" data-target="ch3-model">3.1 The bus, the endpoint, and the transfer</a></li>
+<li><a href="#ch3-linux" data-target="ch3-linux">3.2 Linux: sysfs, usbfs and libusb</a></li>
+<li><a href="#ch3-hid" data-target="ch3-hid">3.3 HID: a class, a descriptor, and report IDs</a></li>
+<li><a href="#ch3-raw" data-target="ch3-raw">3.4 Raw access: libusb on Windows, WinUSB, and the licence to do this</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Memory-Mapped Registers</a><ul>
+<li><a href="#ch4-map" data-target="ch4-map">4.1 What a device mapping actually is</a></li>
+<li><a href="#ch4-acquire" data-target="ch4-acquire">4.2 Acquiring a mapping, on both platforms</a></li>
+<li><a href="#ch4-rmw" data-target="ch4-rmw">4.3 Read-modify-write, and the hazard nobody warns about</a></li>
+<li><a href="#ch4-order" data-target="ch4-order">4.4 Ordering: what volatile does not do</a></li>
+<li><a href="#ch4-rules" data-target="ch4-rules">4.5 Five rules, and the one that prevents the rest</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Port API and Hardware Access</span>
+      <span class="am-band-s">5 chapters &middot; 24 topics &middot; 54 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="orientation" data-toc>Welcome · Port API and Hardware Access</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; Welcome · Port API and Hardware Access</button><div class="ch-toc-list"><a href="#orientation-why">0.1 What this guide covers and why the platforms differ so much</a><a href="#orientation-map">0.2 The mapping table, and how to read the rest of the guide</a></div></div>
+<h3 id="orientation-why" data-toc>0.1 What this guide covers and why the platforms differ so much</h3>
+
+<p class="topic-desc">Hardware access means reading and writing the ports, buses and memory-mapped registers that connect software to physical devices. The bytes on the wire are identical on Windows and Linux. Everything above them - the device name, the open call, the configuration structure, the permission model, and whether register access is possible at all from user mode - is not. This guide covers both platforms side by side, because the differences are structural rather than cosmetic and knowing which side of them you are on is most of the work.</p>
+
+<h4 id="orientation-why--section">The five interfaces, and what each one is</h4>
+<p><strong>Serial ports</strong> are the oldest and most stable: a byte stream over two wires, configured by baud rate, data bits, parity and stop bits. Present on every machine as a legacy controller and on most as a USB-to-serial adapter.</p>
+
+<p><strong>USB</strong> is the bulk of modern peripherals. It appears three ways: as a virtual COM port when a driver claims a serial interface, as a HID device when the class is HID, and as raw endpoints when you write or want the low-level access.</p>
+
+<p><strong>Parallel ports</strong> are IEEE 1284, largely historical, but still present on industrial and test equipment and still the simplest way to read a printer port's status register.</p>
+
+<p><strong>Memory-mapped I/O</strong> is where a PCIe card or an FPGA exposes its registers as a region of the process address space. This is the fastest access available and the one with the sharpest consequences.</p>
+
+<p><strong>Port I/O</strong> is the x86 <code>in</code>/<code>out</code> instruction pair, which predates memory mapping and survives on the ISA and LPC buses. It is one instruction on Linux user mode and unavailable on Windows without a driver.</p>
+
+<h4 id="orientation-why--section-2">The single largest structural difference</h4>
+<p>On Linux, direct register access is a file. <code>/dev/mem</code> exposes physical memory, <code>/dev/uioN</code> exposes a device's register window, and <code>/dev/ports</code> - if enabled - exposes the x86 I/O space. All three are ordinary character devices opened with <code>open()</code> and read with <code>pread()</code>. On Windows, <strong>there is no user-mode path to any of it.</strong> A program that wants to touch a physical address needs a kernel-mode driver calling <code>MmMapIoSpace</code>, installed through driver signing. That is not a stylistic difference; it is the difference between an afternoon and a packaging project, and it should be discovered during design rather than during integration.</p>
+
+<div class="codeWrap"><pre><code>/* Linux: a register is a file, and a read is a pread */
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+
+int uio = open("/dev/uio0", O_RDWR);
+uint32_t status;
+ssize_t k = pread(uio, &amp;status, sizeof status, offsetof(struct regs, STATUS));
+if (k != (ssize_t)sizeof status) { /* the device was not there */ }
+
+/* Windows: the equivalent does not exist in user mode. The same
+   intent requires a KMDF driver doing MmMapIoSpace, signed and
+   installed. There is no CreateFile target that makes it work. */
+</code></pre></div>
+
+<h4 id="orientation-why--section-3">What has not changed in forty years</h4>
+<p>The wire protocol does not care about the operating system. A device that expects the byte sequence <code>AA 55 01 03</code> gets the same four bytes whether they were written by a Python script on a Raspberry Pi or a C++ service on Windows. This is worth stating first because it is the thing that makes a portable hardware abstraction possible at all: the platform-dependent code is a thin layer of open, configure, read, write, and everything above that layer can be shared.</p>
+
+<div class="codeWrap"><pre><code>/* The whole portable idea, in one function signature.
+   Everything above this line is identical on both platforms. */
+typedef struct {
+    int      (*open_port)(const char *name);
+    int      (*configure)(int handle, unsigned baud, unsigned bits,
+                          unsigned parity, unsigned stop);
+    int      (*read_exact)(int handle, void *buf, size_t n, unsigned timeout_ms);
+    int      (*write_exact)(int handle, const void *buf, size_t n);
+    void     (*close_port)(int handle);
+} serial_ops;
+
+/* Two implementations, one table each. */
+extern const serial_ops linux_serial_ops;
+extern const serial_ops windows_serial_ops;
+</code></pre></div>
+
+<h4 id="orientation-why--section-4">What this guide will and will not do</h4>
+<p>It will give you working code for serial on both platforms, a framing layer that sits above any byte stream, USB through virtual COM ports, HID, and raw libusb, and memory-mapped register access on Linux. It will be explicit about what Windows cannot do from user mode rather than pretending otherwise. It will not cover kernel-mode driver development, PCI enumeration from user mode, or GPU compute interfaces, because each of those is a book and none of them is a port API. Where a topic has a Windows answer that requires a driver, that is stated as the answer.</p>
+
+<div class="codeWrap"><pre><code>/* Windows: the driver-based answer, stated honestly */
+/*
+   To read a PCIe device register from Windows you must:
+     1. Write a KMDF or WDM driver
+     2. Call MmMapIoSpace on the BAR, obtained from the IRP
+     3. Sign it - test-signing in the driver store, or an EV
+        certificate from the Windows Hardware Dev Center
+     4. Install it, which needs administrative rights and
+        typically a reboot for a non-PnP driver
+
+   Every "just read the register directly" library for Windows is
+   a signed kernel driver. That is not a criticism of them; it is
+   the cost of the platform, and it should be in the estimate.
+*/
+</code></pre></div>
+
+<h4 id="orientation-why--section-5">The three mistakes that appear in every first attempt</h4>
+<p><strong>Assuming the device name is stable.</strong> <code>/dev/ttyUSB0</code> is assigned by probe order and changes when an unrelated device is unplugged; <code>COM3</code> is assigned by the registry and changes when something else is installed. Code that opens a literal name works until the day it does not.</p>
+
+<p><strong>Treating a partial read as an error.</strong> A serial <code>read</code> can transfer fewer bytes than requested for three unrelated reasons, and returning early is always wrong. The only correct response is a loop.</p>
+
+<p><strong>Leaving the port in canonical mode.</strong> A freshly opened port buffers by line and echoes, which corrupts a binary protocol intermittently rather than totally, and the symptom appears on some frames rather than all of them. <code>cfmakeraw</code> on Linux and <code>fBinary</code> on Windows are the two calls that prevent it.</p>
+
+<div class="codeWrap"><pre><code>/* the third mistake, in one line each */
+cfmakeraw(&amp;t);              /* Linux: 8 bits cleared        */
+dcb.fBinary = TRUE;           /* Windows: canonical mode off  */
+
+/* and the second, as a loop */
+while (got &lt; n) {
+    ssize_t k = read(fd, buf + got, n - got);
+    if (k &lt; 0) { if (errno == EINTR) continue; return -1; }
+    if (k == 0) return TIMEOUT;      /* not end-of-stream */
+    got += (size_t)k;
+}
+</code></pre></div>
+
+<p>Three disciplines for the whole guide: <strong>resolve the device by a stable identifier before opening it,</strong> because both platforms reassign the short name; <strong>loop on every transfer and treat a zero-length read as a timeout rather than end-of-stream,</strong> because that distinction does not exist anywhere else in programming; and <strong>put the platform-dependent code in one small file with a narrow interface,</strong> so that the protocol layer above it is written once.</p>
+
+
+<h3 id="orientation-map" data-toc>0.2 The mapping table, and how to read the rest of the guide</h3>
+
+<p class="topic-desc">Almost every question about hardware access on both platforms reduces to a lookup in one table. This section is the table; the rest of the guide is the detail behind each row.</p>
+
+<h4 id="orientation-map--section">The table</h4>
+<p>Read the right-hand column before writing any code. Note the three rows where the concept does not exist on one side at all, because those are the rows that change a design decision rather than a line of code.</p>
+
+<div class="codeWrap"><pre><code>TASK                  LINUX                        WINDOWS
+----                   -----                        -------
+name the device        /dev/ttyUSB0, /dev/ttyS0     \.COM3
+stable name            /dev/serial/by-id/...        friendly name in registry
+open it                open()                       CreateFileW()
+the handle             int fd                       HANDLE
+read bytes             read()                       ReadFile()
+write bytes            write()                      WriteFile()
+set line parameters    tcsetattr(termios)           SetCommState(DCB)
+set read timeout       c_cc[VMIN], c_cc[VTIME]      SetCommTimeouts()
+exclusive access       TIOCEXCL ioctl               share mode 0
+read modem lines       TIOCMGET ioctl               GetCommModemStatus()
+drive modem lines      TIOCMSET, TIOCDTR            EscapeCommFunction()
+change baud at runtime cfsetispeed + tcsetattr      SetCommState(DCB)
+clear buffers          tcflush()                    PurgeComm()
+async notification     poll(), select()             overlapped I/O, WaitCommEvent()
+raw USB                libusb, /dev/bus/usb         WinUSB, SetupAPI
+HID                    libhidapi                    HidD_*, SetupAPI
+register access        /dev/mem, /dev/uioN          NEEDS A SIGNED DRIVER
+x86 I/O ports          ioperm(), out/in asm        NEEDS A SIGNED DRIVER
+</code></pre></div>
+
+<h4 id="orientation-map--section-2">The three rows that change a design</h4>
+<p><strong>Register access</strong> is a file on Linux and impossible on Windows. If the hardware is chosen before the platform, the choice may be constrained by this row and not by anything about the hardware.</p>
+
+<p><strong>Async notification</strong> is poll and select on Linux, which are available in any language with a file-descriptor API, and overlapped I/O with completion ports on Windows, which requires C or a language with a native interop layer. A design that depends on being woken per byte is portable on Linux and awkward everywhere else.</p>
+
+<p><strong>Runtime baud change</strong> is cheap on Linux - two termios calls - and requires a <code>SetCommState</code> cycle on Windows, which cannot be done while a read is in flight without cancelling it. Code that changes baud mid-stream needs a platform-specific branch, and it should be written as one deliberately rather than discovered at the call site.</p>
+
+<div class="codeWrap"><pre><code>/* runtime baud: one branch, written on purpose */
+int set_baud(int h, unsigned baud)
+{
+#ifdef _WIN32
+    DCB dcb;
+    ZeroMemory(&amp;dcb, sizeof dcb);
+    dcb.DCBlength = sizeof dcb;
+    if (!GetCommState((HANDLE)h, &amp;dcb)) return -1;
+    dcb.BaudRate = baud;
+    return SetCommState((HANDLE)h, &amp;dcb) ? 0 : -1;
+#else
+    struct termios t;
+    if (tcgetattr(h, &amp;t) &lt; 0) return -1;
+    speed_t s = baud_to_speed(baud);
+    if (s == B0) return -1;
+    if (cfsetispeed(&amp;t, s) == -1) return -1;   /* returns a flag,
+                                                       not errno    */
+    if (cfsetospeed(&amp;t, s) == -1) return -1;
+    return tcsetattr(h, TCSANOW, &amp;t);
+#endif
+}
+</code></pre></div>
+
+<h4 id="orientation-map--section-3">How to read the code in the rest of this guide</h4>
+<p>Every sample that has both platforms appears twice rather than once behind an <code>#ifdef</code>. The reason is that an <code>#ifdef</code> hides exactly the part you need to see - the structure sizes, the field names and the call sequence are not related between the two APIs, and the differences are not small. Where a single portable function is genuinely the right answer, it is shown with the <code>#ifdef</code> visible, as above, and that is the shape to copy when you build a thin platform layer.</p>
+
+<div class="codeWrap"><pre><code>/* the thin layer, in full, so the shape is unambiguous */
+static int hw_open(const char *name, void **handle_out)
+{
+#ifdef _WIN32
+    wchar_t wname[MAX_PATH];
+    MultiByteToWideChar(CP_UTF8, 0, name, -1, wname, MAX_PATH);
+    /* COM1..COM9 need the \. prefix to reach the serial driver */
+    wchar_t dev[MAX_PATH + 8];
+    _snwprintf(dev, MAX_PATH + 8, L"\\.\%hs", name + 4);  /* skip COM */
+    HANDLE h = CreateFileW(dev, GENERIC_READ | GENERIC_WRITE, 0,
+                           NULL, OPEN_EXISTING, 0, NULL);
+    if (h == INVALID_HANDLE_VALUE) return -1;
+    *handle_out = h;
+    return 0;
+#else
+    int fd = open(name, O_RDWR | O_NOCTTY);
+    if (fd &lt; 0) return -1;
+    *handle_out = (void *)(intptr_t)fd;
+    return 0;
+#endif
+}
+</code></pre></div>
+
+<h4 id="orientation-map--section-4">What "port" means in each chapter</h4>
+<p>Chapter 2 is about a byte stream and nothing else: a serial port, a TCP socket, a pipe, or a file all present the same <code>read</code>/<code>write</code> problem and chapter 2's framing layer is written against that abstraction, not against a serial device specifically. Chapter 3 covers the specific problems serial adds - no message boundaries, no connection state, and asymmetry. Chapter 4 is USB, where the protocol is structured and the difficulty moves to enumeration and descriptors. Chapter 5 is memory-mapped registers, where the difficulty is entirely about safety and caching. Chapter 6 is parallel and x86 port I/O, which is short because the interfaces are small and the available operations are few.</p>
+
+<div class="codeWrap"><pre><code>/* the abstraction chapter 2 is written against */
+typedef struct {
+    void    *handle;
+    ssize_t (*read)(void *h, void *buf, size_t n, unsigned timeout_ms);
+    ssize_t (*write)(void *h, const void *buf, size_t n);
+    void    (*flush)(void *h);
+    int     (*set_baud)(void *h, unsigned baud);
+    void    (*close)(void *h);
+} byte_stream;
+
+/* one implementation over a serial port, one over a file, one over
+   a socket - and the framing layer above does not know which */
+</code></pre></div>
+
+<p>Three disciplines: <strong>consult the mapping table before writing a line of platform-specific code,</strong> because the three rows that do not exist on one side are the ones that change architecture rather than syntax; <strong>write platform differences side by side rather than behind <code>#ifdef</code> unless the difference is genuinely one call,</strong> because the structure layouts and field names are unrelated and hiding them makes both harder to read; and <strong>put the whole platform dependency behind one narrow interface with read, write, flush and close,</strong> so everything above it is written once and the guide's later chapters are platform-free.</p>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch1" data-toc>1 · Serial Ports in Practice</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 · Serial Ports in Practice</button><div class="ch-toc-list"><a href="#ch1-linux">1.1 Linux: opening and configuring with termios</a><a href="#ch1-win">1.2 Windows: CreateFile, DCB, COMMTIMEOUTS and overlapped I/O</a><a href="#ch1-portable">1.3 One portable layer, and the four mistakes it prevents</a></div></div>
+<h3 id="ch1-linux" data-toc>1.1 Linux: opening and configuring with termios</h3>
+
+<p class="topic-desc">Linux exposes a serial port as a character device and its parameters as a <code>termios</code> structure applied whole rather than field by field. That is why the canonical sequence is get, modify a copy, set - and why reading the current settings before changing them is not optional, because the values you do not set keep whatever the last user of the port left behind.</p>
+
+<h4 id="ch1-linux--section">The flags that must be set before the device will work</h4>
+<p>A freshly opened port is in a state that will not transfer data, and each reason is specific. <code>cfmakeraw</code> clears the bits that corrupt binary data: canonical input, which buffers by line and will swallow framing bytes that happen to look like line endings; echo, which loops transmitted bytes back at you; and output post-processing, which rewrites a single newline as two bytes and silently changes your protocol. <code>CLOCAL</code> tells the driver to ignore modem control lines, which matters because a bench with nothing connected otherwise leaves the port waiting for a carrier that will never arrive. <code>CREAD</code> enables the receiver, which is off on some hardware until it is set.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;fcntl.h&gt;
+#include &lt;termios.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
+
+static int serial_open(const char *path, speed_t speed)
+{
+    /* O_NOCTTY: do not let this become our controlling terminal.
+       Without it, the first process to open a tty with O_RDWR and
+       no controlling terminal acquires it, and every later open
+       gets SIGTTIN or SIGTTOU.                              */
+    int fd = open(path, O_RDWR | O_NOCTTY);
+    if (fd &lt; 0) return -1;
+
+    struct termios t;
+    if (tcgetattr(fd, &amp;t) &lt; 0) { close(fd); return -1; }
+
+    cfmakeraw(&amp;t);                   /* the corruption bits, off */
+    cfsetispeed(&amp;t, speed);
+    cfsetospeed(&amp;t, speed);
+    t.c_cflag |= (CLOCAL | CREAD);
+    t.c_cflag &amp;= ~CRTSCTS;             /* no hardware flow ctrl   */
+
+    /* VMIN and VTIME are a PAIR with different meanings per mode.
+       In canonical mode VMIN is the minimum read length. In raw
+       mode with VTIME greater than zero, the read is a pure
+       timeout and VMIN is IGNORED.                     */
+    t.c_cc[VMIN]  = 0;                   /* return as soon as any  */
+    t.c_cc[VTIME] = 10;                  /* after 1000 ms          */
+
+    if (tcsetattr(fd, TCSANOW, &amp;t) &lt; 0) { close(fd); return -1; }
+
+    /* One opener at a time: a second process reconfiguring the
+       line under you is silent and produces intermittent
+       corruption, which is much harder to diagnose than an
+       error.                                                        */
+    int excl = TIOCEXCL;
+    (void)ioctl(fd, TIOCEXCL, &amp;excl);
+
+    return fd;
+}
+</code></pre></div>
+
+<h4 id="ch1-linux--section-2">Baud rates, and a mapping worth having</h4>
+<p>The <code>B</code> constants are symbolic and must not be confused with numbers; <code>cfsetispeed</code> takes one of them and translates it into a divisor the hardware understands. A function that takes a number is convenient, so the mapping belongs in your own code. Note that <code>cfsetispeed</code> reports failure by return value rather than by <code>errno</code>, which is the exception to the rule that catches people.</p>
+
+<div class="codeWrap"><pre><code>static speed_t baud_to_speed(unsigned b)
+{
+    switch (b) {
+    case 9600:   return B9600;
+    case 19200:  return B19200;
+    case 38400:  return B38400;
+    case 57600:  return B57600;
+    case 115200: return B115200;
+    case 230400: return B230400;
+    case 460800: return B460800;
+    case 921600: return B921600;
+    default:     return B0;      /* caller must handle B0 */
+    }
+}
+
+/* cfsetispeed returns non-zero on failure and does NOT reliably
+   set errno, so the return value is the check. */
+struct termios t;
+tcgetattr(fd, &amp;t);
+speed_t s = baud_to_speed(baud);
+if (s == B0) return -1;
+if (cfsetispeed(&amp;t, s) == -1) return -1;
+if (cfsetospeed(&amp;t, s) == -1) return -1;
+if (tcsetattr(fd, TCSANOW, &amp;t) &lt; 0) return -1;
+</code></pre></div>
+
+<h4 id="ch1-linux--section-3">Reading and writing, and why the loop is mandatory</h4>
+<p>A read or write on a serial device can transfer fewer bytes than requested for three unrelated reasons: the VMIN/VTIME timeout expired part-way through, a signal interrupted the call, or the driver's buffer was not drained. All three are ordinary. The consequence is that the only correct shape is a loop, and that a read returning zero bytes under a non-zero timeout is a <em>timeout</em> and not end-of-stream - a distinction that does not exist on a pipe or a file and that a read loop copied from a file implementation will get wrong.</p>
+
+<div class="codeWrap"><pre><code>/* Returns 0 on success, -1 on error, +1 on timeout with partial data */
+static int serial_read_exact(int fd, void *buf, size_t n)
+{
+    uint8_t *p = buf;
+    size_t got = 0;
+    while (got &lt; n) {
+        ssize_t k = read(fd, p + got, n - got);
+        if (k &lt; 0) {
+            if (errno == EINTR) continue;    /* a signal, not a fail */
+            if (errno == EAGAIN) return +1;  /* would block          */
+            return -1;
+        }
+        if (k == 0) return +1;              /* TIMEOUT, not EOF     */
+        p += (uint8_t *)k;
+        got += (size_t)k;
+    }
+    return 0;
+}
+
+static int serial_write_exact(int fd, const void *buf, size_t n)
+{
+    const uint8_t *p = buf;
+    while (n) {
+        ssize_t k = write(fd, p, n);
+        if (k &lt; 0) {
+            if (errno == EINTR) continue;
+            return -1;
+        }
+        p += (uint8_t *)k;
+        n -= (size_t)k;
+    }
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch1-linux--section-4">Modem control lines, and the direction is reversed</h4>
+<p><code>TIOCMGET</code> fills an <code>int</code> you supply with a bitmask of the current line states; <code>TIOCMSET</code> applies the bitmask you supply. That is opposite to the intuition from reading, where you would expect to read into a mask and write out one. Reading the lines is how a program learns whether the far end has asserted carrier, and driving them is how it pulses DTR to reset a board.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;termios.h&gt;
+
+static void show_lines(int fd)
+{
+    int bits = 0;
+    if (ioctl(fd, TIOCMGET, &amp;bits) == 0) {
+        printf("DTR=%d RTS=%d DSR=%d CTS=%d DCD=%d RI=%d\n",
+               !!(bits &amp; TIOCM_DTR), !!(bits &amp; TIOCM_RTS),
+               !!(bits &amp; TIOCM_DSR), !!(bits &amp; TIOCM_CTS),
+               !!(bits &amp; TIOCM_DCD), !!(bits &amp; TIOCM_RI));
+    }
+}
+
+/* pulse DTR low then high - the usual "reset the target" sequence */
+static void pulse_dtr(int fd, unsigned low_ms)
+{
+    int m = 0;
+    ioctl(fd, TIOCMSET, &amp;m);            /* DTR and RTS low       */
+    usleep(low_ms * 1000u);
+    m = TIOCM_DTR | TIOCM_RTS;
+    ioctl(fd, TIOCMSET, &amp;m);            /* both high             */
+}
+</code></pre></div>
+
+<h4 id="ch1-linux--section-5">Flushing, and when to use each direction</h4>
+<p><code>tcflush</code> takes a queue selector that is not symmetric and is worth stating explicitly. <code>TCIFLUSH</code> discards received data the application has not read, which is the right call before a protocol reset or when you have just resynchronised and do not trust what is buffered. <code>TCOFLUSH</code> discards unsent transmitted data, which on a slow link can abort a partially written frame and leave the peer waiting for bytes that will never arrive. <code>TCIOFLUSH</code> discards both. The correct moment for a flush is after a framing error, not before every read.</p>
+
+<div class="codeWrap"><pre><code>/* after a CRC failure: the stream is desynchronised, so anything
+   already buffered is untrustworthy and must go */
+if (crc_bad) {
+    tcflush(fd, TCIFLUSH);
+    resync(fd);
+    return -1;
+}
+
+/* before changing the protocol, so the peer is not left with a
+   half-written frame from the old one */
+tcflush(fd, TCIOFLUSH);
+</code></pre></div>
+
+<p>Four disciplines: <strong>call <code>cfmakeraw</code> before anything else and do not rely on the defaults,</strong> because the port retains whatever the last user configured and canonical mode corrupts a binary protocol intermittently rather than totally; <strong>check the return value of <code>cfsetispeed</code> rather than <code>errno</code>,</strong> because it does not set errno reliably; <strong>loop on every transfer and treat a zero-length read as a timeout,</strong> because that is the one behaviour that differs from every other file-like object; and <strong>take <code>TIOCEXCL</code> immediately after opening,</strong> because a second opener reconfigures your line silently.</p>
+
+
+<h3 id="ch1-win" data-toc>1.2 Windows: CreateFile, DCB, COMMTIMEOUTS and overlapped I/O</h3>
+
+<p class="topic-desc">Windows splits serial configuration across two structures applied by two calls, its timeout default is not what most code assumes, and its asynchronous model is different enough that a read loop written for Linux is not portable. This section is the Windows half, shown rather than described.</p>
+
+<h4 id="ch1-win--section">Opening, and why the device name needs a prefix</h4>
+<p><code>COM1</code> through <code>COM9</code> are DOS device names inherited from MS-DOS, and <code>CreateFile</code> on them does not reach the serial driver - it reaches the DOS compatibility layer, which works for the first nine and fails in confusing ways. <code>\\.\COMn</code> reaches the driver for every index, which is why the prefixed form is correct everywhere and the unprefixed form is a latent bug that appears when someone plugs in their tenth device.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;windows.h&gt;
+#include &lt;stdio.h&gt;
+
+static HANDLE serial_open(const wchar_t *dev)
+{
+    /* share mode 0 = EXCLUSIVE. Another process opening the same
+       port now gets ERROR_ACCESS_DENIED instead of silently
+       reconfiguring our line. This is the Windows equivalent of
+       TIOCEXCL, and it is the single most useful argument to pass. */
+    HANDLE h = CreateFileW(dev,
+                           GENERIC_READ | GENERIC_WRITE,
+                           0,
+                           NULL,
+                           OPEN_EXISTING,   /* a port is never created */
+                           0,               /* synchronous for now   */
+                           NULL);
+    if (h == INVALID_HANDLE_VALUE) return INVALID_HANDLE_VALUE;
+
+    /* driver buffers: big enough for a full USB packet burst,
+       small enough that a stuck reader is not a memory leak */
+    if (!SetupComm(h, 65536, 65536)) { CloseHandle(h); return INVALID_HANDLE_VALUE; }
+    return h;
+}
+
+/* the prefixed form, always */
+static HANDLE serial_open_com(int n)
+{
+    wchar_t dev[32];
+    swprintf(dev, 32, L"\\\\.\\COM%d", n);
+    return serial_open(dev);
+}
+</code></pre></div>
+
+<h4 id="ch1-win--section-2">The DCB structure, field by field</h4>
+<p><code>DCB</code> is filled by <code>GetCommState</code> before modification, which is what carries forward the settings you did not intend to change. <code>DCBlength</code> must be set before the call or it fails - this is a structure-size convention from the Win32 API and it is not optional. <code>fBinary</code> is the equivalent of <code>cfmakeraw</code>: it disables canonical mode and end-of-file processing, without which binary data is corrupted. The four flow-control booleans must be set consistently or the port deadlocks, because a device asserting CTS with no reader for it is indistinguishable from a hung link.</p>
+
+<div class="codeWrap"><pre><code>static int serial_configure(HANDLE h, DWORD baud, BYTE bits,
+                            BYTE parity, BYTE stop)
+{
+    DCB dcb;
+    ZeroMemory(&amp;dcb, sizeof dcb);
+    dcb.DCBlength = sizeof dcb;          /* REQUIRED before the call */
+    if (!GetCommState(h, &amp;dcb)) return -1;
+
+    dcb.BaudRate = baud;
+    dcb.ByteSize = bits;                 /* 5,6,7 or 8              */
+    dcb.Parity   = parity;               /* NOPARITY, ODDPARITY,
+                                            EVENPARITY, MARKPARITY  */
+    dcb.StopBits = stop;                 /* ONESTOPBIT, TWOSTOPBITS  */
+
+    /* fBinary disables CANON mode and EOF processing. Without it,
+       a 0x1A byte in your data is treated as end-of-file.        */
+    dcb.fBinary = TRUE;
+    dcb.fParity = FALSE;
+    dcb.fNull   = FALSE;                 /* do not strip the high bit */
+
+    /* no flow control: framing plus timeouts is enough, and mixing
+       flow control with a hand-rolled protocol deadlocks */
+    dcb.fOutxCtsFlow = FALSE;
+    dcb.fOutxDsrFlow = FALSE;
+    dcb.fDsrSensitivity = FALSE;
+    dcb.fOutX = FALSE;
+    dcb.fInX  = FALSE;
+    dcb.fRtsControl  = RTS_CONTROL_ENABLE;
+    dcb.fDtrControl  = DTR_CONTROL_ENABLE;
+    dcb.fAbortOnError = FALSE;
+    dcb.fErrorChar   = 0;
+    dcb.fNull        = FALSE;
+
+    if (!SetCommState(h, &amp;dcb)) return -1;
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch1-win--section-3">Timeouts, and the idiom worth memorising</h4>
+<p>Five fields, and the default from <code>GetCommTimeouts</code> may be all zeros, which means an immediate return whether or not data arrived - so a naive <code>ReadFile</code> returns immediately with zero bytes and the caller spins at full CPU. The idiom is <code>ReadIntervalTimeout = MAXDWORD</code> with the other two read timeouts at zero, which means: return immediately if any bytes are available, and fail after the constant if none arrive. That is exactly the Linux <code>VMIN=0, VTIME=10</code> behaviour, and having the same idiom on both platforms is what makes a portable read loop possible.</p>
+
+<div class="codeWrap"><pre><code>static int serial_set_timeouts(HANDLE h, unsigned read_ms, unsigned write_ms)
+{
+    COMTTIMEOUTS to;
+
+    /* Start by asking, so the write fields keep their defaults. */
+    if (!GetCommTimeouts(h, &amp;to)) return -1;
+
+    /* READ: return at once if anything is there, else time out. */
+    to.ReadIntervalTimeout         = MAXDWORD;
+    to.ReadTotalTimeoutMultiplier  = 0;
+    to.ReadTotalTimeoutConstant    = read_ms;
+
+    /* WRITE: with these three at zero, WriteFile blocks until all
+       the bytes have been queued. With ReadIntervalTimeout-style
+       values it would return early with a partial count.        */
+    to.WriteTotalTimeoutMultiplier = 0;
+    to.WriteTotalTimeoutConstant   = write_ms;
+
+    return SetCommTimeouts(h, &amp;to) ? 0 : -1;
+}
+</code></pre></div>
+
+<h4 id="ch1-win--section-4">Overlapped I/O, and why the read loop changes shape</h4>
+<p>Opening with <code>FILE_FLAG_OVERLAPPED</code> puts the handle into asynchronous mode, where <code>ReadFile</code> returns immediately with <code>ERROR_IO_PENDING</code> and completes later. The completion is either via an event in the <code>OVERLAPPED</code> structure, via a completion port, or - if the handle was opened for a file and the event member is null - the system creates an event and <code>GetOverlappedResult</code> waits on it. The read loop must then treat "pending" as a normal intermediate state, which is the substantive difference from Linux's <code>EINTR</code> retry.</p>
+
+<div class="codeWrap"><pre><code>/* read exactly n bytes, overlapped. 0 ok, -1 error, +1 timeout */
+static int serial_read_exact(HANDLE h, void *buf, size_t n,
+                             unsigned timeout_ms)
+{
+    uint8_t *p = buf;
+    size_t got = 0;
+
+    while (got &lt; n) {
+        OVERLAPPED ov = {0};
+        ov.hEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+        if (!ov.hEvent) return -1;
+
+        DWORD want = (DWORD)(n - got);
+        if (!ReadFile(h, p + got, want, NULL, &amp;ov)) {
+            DWORD err = GetLastError();
+            if (err != ERROR_IO_PENDING) { CloseHandle(ov.hEvent); return -1; }
+
+            /* the timeout here is OUR timeout, not the driver's */
+            DWORD r = WaitForSingleObject(ov.hEvent, timeout_ms);
+            if (r == WAIT_TIMEOUT) {
+                CancelIoEx(h, &amp;ov);
+                GetOverlappedResult(h, &amp;ov, NULL, TRUE);
+                CloseHandle(ov.hEvent);
+                return +1;                      /* TIMEOUT, not EOF  */
+            }
+        }
+        DWORD moved = 0;
+        if (!GetOverlappedResult(h, &amp;ov, &amp;moved, TRUE)) {
+            CloseHandle(ov.hEvent);
+            return -1;
+        }
+        CloseHandle(ov.hEvent);
+        if (moved == 0) return +1;              /* nothing arrived   */
+        p += moved;
+        got += moved;
+    }
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch1-win--section-5">Errors, and the one that means two things</h4>
+<p>Six codes matter. <code>ERROR_ACCESS_DENIED</code> covers both "another process has it" and "you may not", and the two need opposite responses, so it must be disambiguated. <code>ERROR_FILE_NOT_FOUND</code> means the port does not exist. <code>ERROR_INVALID_HANDLE</code> after a successful open means the device was unplugged between the open and the read. <code>ERROR_BAD_COMMAND</code> on write means the output buffer is full. <code>ERROR_INVALID_PARAMETER</code> means the DCB was wrong. <code>ERROR_PURGE_FAILED</code> is rare and not worth handling.</p>
+
+<div class="codeWrap"><pre><code>/* ERROR_ACCESS_DENIED is ambiguous. Probe it with a shared open:
+   if that succeeds, the port was merely BUSY; if it fails too,
+   it is a PERMISSION problem. */
+static int classify_open_failure(const wchar_t *dev)
+{
+    HANDLE probe = CreateFileW(dev, GENERIC_READ,
+                               FILE_SHARE_READ | FILE_SHARE_WRITE,
+                               NULL, OPEN_EXISTING, 0, NULL);
+    if (probe != INVALID_HANDLE_VALUE) { CloseHandle(probe); return ERR_BUSY; }
+    return ERR_PERM;
+}
+
+static void report(DWORD e)
+{
+    switch (e) {
+    case ERROR_ACCESS_DENIED:
+        fprintf(stderr, "COM busy or access denied (probe said %s)\n",
+                classify_open_failure(L"\\\\.\\COM3") == ERR_BUSY
+                    ? "busy" : "permission");
+        break;
+    case ERROR_FILE_NOT_FOUND:
+        fprintf(stderr, "port does not exist - check Device Manager\n");
+        break;
+    case ERROR_INVALID_HANDLE:
+        fprintf(stderr, "device was unplugged mid-session\n");
+        break;
+    default:
+        fprintf(stderr, "serial error %lu\n", (unsigned long)e);
+    }
+}
+</code></pre></div>
+
+<p>Four disciplines: <strong>always use <code>\\.\COMn</code> and never the bare name,</strong> because the bare name works for nine ports and fails at the tenth; <strong>set <code>DCBlength</code> before <code>GetCommState</code> and <code>fBinary</code> before anything else,</strong> because a missing size field fails the call and a missing <code>fBinary</code> corrupts binary data only when a 0x1A byte appears; <strong>set <code>ReadIntervalTimeout = MAXDWORD</code> with the other read timeouts at zero,</strong> because that is the only combination that gives the Linux <code>VMIN=0</code> behaviour and a portable read loop depends on it; and <strong>disambiguate <code>ERROR_ACCESS_DENIED</code> with a shared-mode probe</strong>, because it means both busy and forbidden and the responses are opposite.</p>
+
+
+<h3 id="ch1-portable" data-toc>1.3 One portable layer, and the four mistakes it prevents</h3>
+
+<p class="topic-desc">The two APIs share nothing below the wire, so a portable program needs a narrow interface with two implementations. Getting that interface right prevents four specific classes of defect, and this section is the interface in full.</p>
+
+<h4 id="ch1-portable--section">The interface</h4>
+<p>Five operations: open, configure, read exactly, write exactly, close. Two optional ones: set baud at runtime, and flush. Deliberately excluded: anything that assumes a message boundary, anything that assumes a device exists, and anything that returns a length instead of a completion - because a read that can return short is the single most important thing the interface has to hide or expose consistently.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stddef.h&gt;
+#include &lt;stdint.h&gt;
+
+typedef enum {
+    HW_OK      =  0,
+    HW_TIMEOUT =  1,   /* no data within the deadline; partial read */
+    HW_BUSY    =  2,   /* transient: another opener                 */
+    HW_PERM    =  3,   /* permanent until a human intervenes       */
+    HW_NODEV   =  4,   /* unplugged, or never existed              */
+    HW_IO      =  5    /* a genuine transfer failure                */
+} hw_status;
+
+typedef struct {
+    void *handle;
+    hw_status (*open_port)(const char *name);
+    hw_status (*configure)(void *h, unsigned baud, unsigned bits,
+                           const char *parity, unsigned stop);
+    /* read_exact and write_exact are COMPLETE or they report why
+       they did not. Neither ever returns a short count silently. */
+    hw_status (*read_exact)(void *h, void *buf, size_t n, unsigned ms);
+    hw_status (*write_exact)(void *h, const void *buf, size_t n);
+    hw_status (*set_baud)(void *h, unsigned baud);
+    hw_status (*flush)(void *h);
+    void      (*close_port)(void *h);
+} hw_serial;
+</code></pre></div>
+
+<h4 id="ch1-portable--section-2">The Linux implementation, complete</h4>
+<p>Note the error classification at the end: it maps <code>errno</code> onto the six statuses, and it treats <code>EBUSY</code> and <code>EAGAIN</code> as the only retryable classes. A layer that collapses these into one generic error forces every caller to make the same classification again, which is the mistake the interface exists to prevent.</p>
+
+<div class="codeWrap"><pre><code>#ifdef __linux__
+static hw_status linux_open_port(const char *name)
+{
+    int fd = open(name, O_RDWR | O_NOCTTY);
+    if (fd &lt; 0) {
+        switch (errno) {
+        case EBUSY: case EAGAIN: return HW_BUSY;
+        case EACCES:               return HW_PERM;
+        case ENOENT: case ENODEV:  return HW_NODEV;
+        default:                   return HW_IO;
+        }
+    }
+    int excl = TIOCEXCL;
+    (void)ioctl(fd, TIOCEXCL, &amp;excl);
+    /* the handle is stashed in a one-element slot because the
+       interface carries void *, not int */
+    static __thread int slot;
+    slot = fd;
+    return HW_OK;   /* caller reads the handle from linux_handle() */
+}
+
+static hw_status linux_read_exact(int fd, void *buf, size_t n, unsigned ms)
+{
+    uint8_t *p = buf;
+    size_t got = 0;
+    uint64_t deadline = now_ms() + ms;
+
+    while (got &lt; n) {
+        ssize_t k = read(fd, p + got, n - got);
+        if (k &lt; 0) {
+            if (errno == EINTR) continue;
+            return (errno == EAGAIN) ? HW_TIMEOUT : HW_IO;
+        }
+        if (k == 0) return HW_TIMEOUT;        /* never EOF on a port */
+        p += (uint8_t *)k;
+        got += (size_t)k;
+    }
+    return HW_OK;
+}
+#endif
+</code></pre></div>
+
+<h4 id="ch1-portable--section-3">Retrying, and only the transient class</h4>
+<p>The retry loop belongs above the interface rather than inside it, because the policy - how many attempts, what backoff, whether to give up - is a decision of the application and not of the driver. What belongs inside the interface is the classification, so the loop above it is a switch on six values rather than a re-derivation from errno and GetLastError.</p>
+
+<div class="codeWrap"><pre><code>/* the policy layer, and the only place retry appears */
+static hw_status hw_read_retrying(const hw_serial *s, void *buf,
+                                  size_t n, unsigned ms,
+                                  unsigned tries, unsigned *delay_ms)
+{
+    hw_status st;
+    for (unsigned attempt = 0; attempt &lt; tries; attempt++) {
+        st = s->read_exact(s->handle, buf, n, ms);
+        if (st != HW_BUSY) return st;        /* busy is the ONLY
+                                                 retryable class    */
+        sleep_ms(*delay_ms);
+        *delay_ms = *delay_ms * 2 > 1000 ? 1000 : *delay_ms * 2;
+    }
+    return st;
+}
+
+/* and the caller's decision, which is a switch not a guess */
+switch (hw_read_retrying(&amp;io, buf, n, 1000, 5, &amp;delay)) {
+case HW_OK:      process(buf);              break;
+case HW_TIMEOUT: idle();                    break;
+case HW_BUSY:    alert("port held by someone else"); break;
+case HW_PERM:    fatal("check group membership");    break;
+case HW_NODEV:   rescan_devices();          break;
+case HW_IO:      alert("cable or device fault");    break;
+}
+</code></pre></div>
+
+<h4 id="ch1-portable--section-4">The four mistakes the interface makes impossible</h4>
+<p><strong>Reading fewer bytes than requested and treating it as success.</strong> The interface's <code>read_exact</code> either completes or reports, so a caller cannot accidentally process a partial frame. <strong>Opening a hard-coded device name.</strong> The interface takes a name as a parameter rather than reaching for a global, so resolution is a caller decision and appears in the code. <strong>Confusing timeout with end-of-stream.</strong> Both implementations return <code>HW_TIMEOUT</code> for a zero-length read, and neither has an end-of-stream status at all, because a serial port has none. <strong>Retrying a permanent failure.</strong> The classification happens once inside the layer and the retry loop switches on it, so retrying a missing device is not a mistake the caller can make by forgetting to check something.</p>
+
+<div class="codeWrap"><pre><code>/* all four, as they appear without the interface */
+
+/* 1. partial frame processed as if complete */
+n = read(fd, buf, sizeof buf);
+process(buf, n);                    /* n was 3, the frame was 64 */
+
+/* 2. the name is a global, so nothing can test a different one */
+static const char *DEV = "/dev/ttyUSB0";
+
+/* 3. timeout treated as "device closed the connection" */
+if (read(fd, b, 1) &lt;= 0) disconnect();
+
+/* 4. every failure retried, including a device that is gone */
+while (read(fd, b, 1) &lt; 0) { usleep(100000); }
+</code></pre></div>
+
+<h4 id="ch1-portable--section-5">What the interface deliberately does not do</h4>
+<p>It does not hide whether the underlying object is a port, a file or a socket, because the caller sometimes needs to know - for example to flush a file but not a port. It does not provide a message-oriented read, because that belongs in the framing layer of chapter 2 and depends on the protocol rather than the transport. And it does not take a device path, because on Linux the path and the friendly name are different things and choosing between them is the caller's job. Each exclusion is a decision, and each one is a decision that a smaller interface would have forced on you anyway.</p>
+
+<div class="codeWrap"><pre><code>/* what a message-oriented read looks like once framing exists -
+   note that it takes the stream, not the hw_serial, so it works
+   unchanged over a file or a socket */
+hw_status read_frame(byte_stream *st, uint8_t *out, size_t cap,
+                     size_t *out_len, unsigned ms);
+
+/* and why it is separate: framing is a property of the protocol,
+   and the protocol does not know what it is talking to */
+static hw_status on_frame(const uint8_t *body, size_t len)
+{
+    if (len &lt; 4) return HW_IO;
+    uint16_t op = read_u16le(body);
+    uint32_t seq = read_u32le(body + 2);
+    return dispatch(op, seq, body + 6, len - 6);
+}
+</code></pre></div>
+
+<p>Four disciplines: <strong>put the whole platform dependency behind the five-operation interface and nothing else,</strong> because every additional operation is a platform difference you will have to reimplement twice; <strong>classify errors into the six statuses inside the layer,</strong> because the classification is derived from <code>errno</code> on one side and <code>GetLastError</code> on the other and a caller cannot be expected to know both; <strong>keep the retry policy above the interface,</strong> because it is an application decision and the layer should not encode an opinion about how patient the caller is; and <strong>never provide a message-oriented read in the transport layer,</strong> because that is chapter 2's job and it belongs above the transport, not inside it.</p>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 · Framing over a Byte Stream</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 · Framing over a Byte Stream</button><div class="ch-toc-list"><a href="#ch2-why">2.1 A stream has no messages, and no boundaries either</a><a href="#ch2-endian">2.2 Byte order, and the width that decides it</a><a href="#ch2-timeout">2.3 The timeout has to cover a whole record, not a byte</a><a href="#ch2-resync">2.4 Resynchronisation, and when scanning is honest</a><a href="#ch2-checksum">2.5 Checksums, and what they actually protect</a></div></div>
+<h3 id="ch2-why" data-toc>2.1 A stream has no messages, and no boundaries either</h3>
+
+<p class="topic-desc">A read from a port, a socket or a pipe returns however many bytes happened to be available, and the number bears no relation to what was written. One read might return a whole record, a fragment of one, three records and half of a fourth, or nothing at all. Every protocol you build on top of that has to introduce its own boundaries, because the transport will not supply them — and a reader that assumes a boundary that the writer did not enforce desynchronises permanently, in a way that produces plausible output rather than an error.</p>
+
+<h4 id="ch2-why--section">The four things a single read can return</h4>
+<p>The distribution is not a theoretical one. A 24-byte request written as a single call produces a single 24-byte read on an idle link with nothing else queued, and every other case appears once the link is busy: a partial read because the transmitter's buffer filled, two reads because a scheduling boundary fell between the two halves of one record, zero bytes because no record was complete when the read was issued, and one read containing part of the next record because the reader asked for more than the writer had sent. Serial links have a hardware limit as low as one byte per frame on some parts; USB bulk transfers are capped at 512 bytes per packet and a larger transfer is split across many. A protocol that cannot survive all five cases is not a protocol that works slowly.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdio.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;unistd.h&gt;
+
+/* THE MISTAKE, and it is the first thing everyone writes. The
+   assumption is that a write of 24 bytes will be read as 24 bytes.
+   Sometimes it will be, which is what makes the bug survive. */
+static int WRONG_read_record(int fd, unsigned char *buf)
+{
+    size_t got = 0;
+    while (got &lt; 24) {
+        ssize_t n = read(fd, buf + got, 24 - got);
+        if (n &lt; 0) {
+            if (errno == EINTR) continue;     /* a signal, not a
+                                                  failure: retry the
+                                                  SAME request      */
+            return -1;
+        }
+        if (n == 0) return -1;                 /* clean end: the peer
+                                                   closed, or the
+                                                   device was
+                                                   unplugged        */
+        got += (size_t)n;
+        /* ...and no record-boundary checking anywhere. */
+    }
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch2-why--section-2">Framing is a decision, and it is made before any code</h4>
+<p>The choice of framing determines what your parser has to trust, what a corrupt byte costs you, and whether two peers can interoperate with a third-party implementation. There are four that are worth knowing. A length prefix puts a count at the front of each record and is the right default for almost everything: it costs two to four bytes, it is trivial to parse, and a corrupt length is detectable because it is checked against a maximum. A delimiter terminates each record with a byte chosen to be absent from the payload — which for binary data means escaping the payload, so the framing and the escaping are one decision rather than two. A sentinel begins each record with a marker, which is robust in one direction only: a lost byte in the payload is invisible, while a byte lost in the marker corrupts only the record it belonged to. A fixed size removes the problem entirely and is the right answer when the record has no variable part, which is more often than people expect.</p>
+
+<div class="codeWrap"><pre><code>/* THE FOUR, each with the condition under which it is right.
+
+   LENGTH PREFIX. Costs a header; needs a maximum; a corrupt length
+   is caught before the allocation is made. Right for almost
+   everything, and the default.
+       [len:u16][type:u16][body...]
+
+   DELIMITER. Needs a byte that cannot appear in the payload, so
+   binary payloads must be escaped — which means the escaping is
+   part of the framing, not a separate decision. Right for text
+   protocols and for line-oriented devices.
+       [body][0x1C]           EBCDIC record separator
+       [body][0x00]           NUL, if the payload cannot hold one
+
+   SENTINEL. Robust against payload corruption, fragile against
+   framing corruption: one lost byte in a marker desynchronises
+   every record after it, with no way to recover. Right only when
+   the marker is unambiguous and cheap to check.
+       [0xAA][type:u8][body]
+
+   FIXED SIZE. No framing logic at all. Right whenever the record
+   has no variable part — which is true of most register reads,
+   most sensor samples at a fixed rate, and every hardware
+   register block.
+       [16 bytes, always] */
+</code></pre></div>
+
+<h4 id="ch2-why--section-3">Where the boundary has to be, not where it is convenient</h4>
+<p>The reader decides the boundary, not the writer, and that is a design constraint rather than an implementation detail. If the reader owns the framing, the reader can be fed from a buffer by any transport and cannot be confused by one, and a writer in another language or another device can interoperate as long as it follows the same specification. If the writer owns it — by sending whole records and hoping the transport preserves them — the protocol is not a protocol. It is a convention between two specific programs, and it fails the first time a buffer boundary happens to fall inside a record, which is to say the first time the device is slow.</p>
+
+<p>The concrete form of that is a reassembly buffer with an explicit state machine. The reader has an incomplete-record buffer, and the loop is: append what arrived, then consume whole records for as long as the buffer holds one, and return when it does not. This handles every case in the list at the top with one loop and no special cases, and it is the shape worth copying.</p>
+
+<div class="codeWrap"><pre><code>/* THE SHAPE: append, then drain. Partial records, multiple records
+   per read, and an empty read are all the SAME case here, which is
+   the point. */
+struct inbox {
+    unsigned char buf[4096];
+    size_t len;
+};
+
+enum { HDR = 4, MAX_BODY = 1024 };
+
+static uint32_t read_u32le(const unsigned char *p)
+{
+    return  (uint32_t)p[0]
+         | ((uint32_t)p[1] &lt;&lt;  8)
+         | ((uint32_t)p[2] &lt;&lt; 16)
+         | ((uint32_t)p[3] &lt;&lt; 24);
+}
+
+static int feed(struct inbox *ib, const unsigned char *data, size_t n);
+
+static int feed(struct inbox *ib, const unsigned char *data, size_t n)
+{
+    if (n > sizeof ib->buf - ib->len) {
+        /* The peer sent more without a frame boundary. This is not
+           recoverable by resynchronising: the framing is lost, so
+           the only correct response is to drop the connection and
+           make the peer reconnect. Silently discarding the excess
+           and continuing produces records that parse into
+           nonsense. */
+        ib->len = 0;
+        return -1;
+    }
+    memcpy(ib->buf + ib->len, data, n);
+    ib->len += n;
+
+    for (;;) {
+        if (ib->len &lt; HDR) return 0;               /* need a header  */
+
+        uint32_t len = read_u32le(ib->buf);
+        if (len == 0 || len > MAX_BODY) {         /* NEVER TRUST IT  */
+            ib->len = 0;
+            return -1;                             /* malformed     */
+        }
+        if (ib->len &lt; HDR + len) return 0;         /* need a body    */
+
+        on_record(ib->buf + HDR, len);
+        memmove(ib->buf, ib->buf + HDR + len, ib->len - (HDR + len));
+        ib->len -= HDR + len;                      /* keep draining  */
+    }
+}
+</code></pre></div>
+
+<p>Two properties of that loop are worth stating, because they are what make it correct rather than merely plausible. The maximum is checked <em>before</em> the body is waited for, so a corrupt length is rejected on the strength of four bytes rather than after a megabyte has been buffered on a length field that was never a length. And the drain loop continues until the buffer cannot yield another complete record, so a read containing three records is handled by the same code path as one containing a fragment — there is no second loop and therefore no second set of bugs.</p>
+
+<p>The one thing the loop cannot do is recover. Once a length field is wrong the framing is gone and no amount of scanning finds the next boundary, because the payload can contain anything at all. That is why the maximum is not an optimisation but a protocol requirement, and why a link that can corrupt a byte — a long cable, a noisy industrial bus, a wireless hop — wants a checksum as well as a length. The checksum detects the corruption; it does not locate the boundary, and resynchronisation is a separate mechanism with its own cost.</p>
+
+
+<h3 id="ch2-endian" data-toc>2.2 Byte order, and the width that decides it</h3>
+
+<p class="topic-desc">Every multi-byte field in a protocol has a byte order, and the two sides have to agree. The agreement is not a default to be inherited: x86 and ARM are both little-endian, so a program developed on a desktop and deployed to a board will pass every test, and the same binary on a big-endian target produces numbers with their bytes reversed. Worse, the width decides the interpretation of the whole record, because the same sixteen bytes read as four 32-bit words in little-endian order read as four different 32-bit words in big-endian order — so a width mistake and an order mistake are indistinguishable from the value alone.</p>
+
+<h4 id="ch2-endian--section">Both sides write it explicitly, and that is the rule</h4>
+<p>Encode and decode by explicit byte. The portable function is four lines, it costs nothing after compilation, and it removes the entire class of defect. The alternative — <code>memcpy</code> the struct and send it — is correct on a homogeneous fleet and produces corrupt data the first time a field, a device or a language runtime disagrees with the compiler's idea of the layout, which includes anything that inserts padding.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+
+/* THE PORTABLE FORM. The shift amounts are fixed by the
+   specification, not by this machine, so the result is the same
+   here and on a big-endian target. */
+static void put_u16le(unsigned char *p, uint16_t v)
+{
+    p[0] = (unsigned char)(v);
+    p[1] = (unsigned char)(v >> 8);
+}
+
+static void put_u32le(unsigned char *p, uint32_t v)
+{
+    p[0] = (unsigned char)(v);
+    p[1] = (unsigned char)(v >>  8);
+    p[2] = (unsigned char)(v >> 16);
+    p[3] = (unsigned char)(v >> 24);
+}
+
+static uint16_t get_u16le(const unsigned char *p)
+{
+    return (uint16_t)((uint16_t)p[0] | ((uint16_t)p[1] &lt;&lt; 8));
+}
+
+static uint32_t get_u32le(const unsigned char *p)
+{
+    return  (uint32_t)p[0]
+         | ((uint32_t)p[1] &lt;&lt;  8)
+         | ((uint32_t)p[2] &lt;&lt; 16)
+         | ((uint32_t)p[3] &lt;&lt; 24);
+}
+
+/* BEYOND BYTE ORDER: BIT ORDER WITHIN A BYTE. A bit field in a
+   register is numbered from the least significant bit on one
+   architecture and from the most significant on another. A
+   specification that says "bits 3 to 0" without saying which end
+   is not a specification, and the two readings differ by a shift
+   of four places — which produces a plausible wrong number. */
+
+/* THE FLOATING-POINT CASE, which is worse because it has no cheap
+   test. */
+static void put_f32le(unsigned char *p, float f)
+{
+    uint32_t u;
+    memcpy(&amp;u, &amp;f, sizeof u);        /* memcpy is legal: a character
+                                        type may alias any object */
+    put_u32le(p, u);
+}
+/* The IEEE-754 bit pattern itself is portable; the byte order of
+   the integer that carries it is not, which is why this composes
+   the two operations rather than assuming either. */
+</code></pre></div>
+
+<h4 id="ch2-endian--section-2">Alignment is a second, separate trap</h4>
+<p>Byte order is the one everyone thinks of. Alignment is the one that actually bites on a protocol between a host and a device, and it fails differently: the data is byte-correct but the CPU raises an exception, or the compiler emits an unaligned load that some cores handle and others fault on. A protocol that puts a 32-bit field at offset 1 is legal in a byte stream and illegal as a structure, so a peer that <code>memcpy</code>s its own struct into the buffer will insert padding you did not specify.</p>
+
+<p>The rule that removes it: <strong>decoded fields are scalars read one at a time, and structures are packed explicitly.</strong> Never declare a structure matching the wire format and never <code>memcpy</code> a structure into or out of a buffer. Two tools enforce the alternative — <code>-fpack-struct</code> on GCC and Clang, and <code>#pragma pack</code> on MSVC — and either of them removes the padding hazard entirely.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdint.h&gt;
+
+/* THE WRONG SHAPE: the compiler inserts padding, so sizeof is
+   larger than the wire record and the offsets are not the ones the
+   specification states. On x86-64 this struct is 8 bytes, not the
+   6 the protocol describes. */
+struct wire_bad {
+    uint8_t  tag;      /* offset 0 */
+    uint32_t value;    /* offset 4: THREE bytes of padding that the
+                           peer does not have and does not know
+                           about                                       */
+    uint8_t  flags;
+};
+
+/* THE RIGHT SHAPE: explicit width, and the decoder reads each
+   field at the offset the specification gives. */
+enum { TAG_OFF = 0, VALUE_OFF = 1, FLAGS_OFF = 5, REC_LEN = 6 };
+
+static void encode(uint8_t *p, uint8_t tag, uint32_t value, uint8_t flags)
+{
+    p[TAG_OFF]   = tag;
+    put_u32le(p + VALUE_OFF, value);     /* offset 1, on purpose */
+    p[FLAGS_OFF] = flags;
+}
+
+static uint32_t decode_value(const uint8_t *p)
+{
+    return get_u32le(p + VALUE_OFF);     /* no struct, so no
+                                              alignment requirement
+                                              and no padding        */
+}
+
+/* THE STATIC ASSERTION worth having in a protocol header: it makes
+   a layout assumption a compile error on the platform where it is
+   false, rather than a corrupt read on that platform. */
+_Static_assert(sizeof(struct wire_bad) != 6,
+               "this struct must not be used for the wire format");
+</code></pre></div>
+
+<p>The deeper point is that a wire format is not a structure. It is a sequence of offsets and widths, and the only reliable way to keep the two in agreement is to write them down as constants and read each field at its constant. A packed struct makes the two agree by making the compiler agree, which is better and still not as good: it hides the offsets from a reader who wants to check them against the specification, and it makes a change to the specification a change to a compiler flag.</p>
+
+
+<h3 id="ch2-timeout" data-toc>2.3 The timeout has to cover a whole record, not a byte</h3>
+
+<p class="topic-desc">Every blocking read needs a deadline, and the deadline is the part of a port program most often set wrong. A per-read timeout of one second is not a one-second timeout: it is a one-second timeout on <em>each</em> read, so a record arriving as thirty fragments has thirty seconds of latitude, and a reader that restarts its timeout on every call never times out at all against a peer that is sending one byte per second. The deadline has to belong to the record, and the record has to be abandoned as a unit.</p>
+
+<h4 id="ch2-timeout--section">Two deadlines, and they answer different questions</h4>
+<p>A deadline on the idle time between bytes answers "is the link alive". A deadline on the whole record answers "is the peer still working". Only the second one bounds the time a request occupies, and only the second one is what a protocol timeout means. Confusing them produces the two familiar symptoms: a link that appears healthy while every request takes forty seconds, and a slow-but-working device that is declared dead while a single large transfer is in progress.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;poll.h&gt;
+#include &lt;time.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;errno.h&gt;
+
+static uint64_t mono_ms(void)
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &amp;ts);
+    return (uint64_t)ts.tv_sec * 1000ull + (uint64_t)ts.tv_nsec / 1000000ull;
+}
+
+/* THE CORRECT SHAPE: one deadline, computed once, and every wait
+   inside the record is bounded by what remains. */
+static int read_record(int fd, unsigned char *buf, size_t want,
+                       unsigned record_timeout_ms)
+{
+    uint64_t deadline = mono_ms() + record_timeout_ms;
+    size_t got = 0;
+
+    while (got &lt; want) {
+        uint64_t now = mono_ms();
+        if (now >= deadline) {
+            errno = ETIMEDOUT;
+            return -1;              /* the RECORD timed out, not a
+                                        single read of it */
+        }
+
+        struct pollfd p = { fd, POLLIN, 0 };
+        int left = (int)(deadline - now);
+        int rc = poll(&amp;p, 1, left);
+        if (rc &lt; 0) {
+            if (errno == EINTR) continue;   /* a signal, not a
+                                                failure: the DEADLINE
+                                                is unchanged, so the
+                                                retry is bounded by
+                                                the same record   */
+            return -1;
+        }
+        if (rc == 0) { errno = ETIMEDOUT; return -1; }
+
+        ssize_t n = read(fd, buf + got, want - got);
+        if (n &lt; 0) {
+            if (errno == EINTR) continue;
+            return -1;
+        }
+        if (n == 0) { errno = ECONNRESET; return -1; }  /* peer gone */
+
+        got += (size_t)n;
+    }
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch2-timeout--section-2">The partial record has to be discarded, not resumed</h4>
+<p>When the deadline fires mid-record, the bytes already received are not a prefix you can keep. They are a fragment of a record whose header may have been a length, and the next read will begin mid-payload and be interpreted as a header. So a timeout at the record level means: drop the buffer, and either discard the connection or re-synchronise deliberately. Which of those is correct depends on whether the protocol has a resynchronisation marker, and a protocol without one should simply close.</p>
+
+<div class="codeWrap"><pre><code>/* THE CORRECT RECOVERY, which requires the framing state to be
+   held outside the read call — otherwise there is nothing to
+   discard. */
+struct session {
+    int            fd;
+    unsigned char  partial[4096];
+    size_t         partial_len;
+};
+
+static int request(struct session *s, const unsigned char *req,
+                   size_t reqlen, unsigned char *resp, size_t resplen,
+                   unsigned timeout_ms)
+{
+    if (s->partial_len != 0) {
+        /* A previous request did not complete. Those bytes are a
+           FRAGMENT, not a prefix: the next bytes off the wire are
+           mid-payload and will be read as a header. The only
+           correct recovery is to discard them. */
+        s->partial_len = 0;
+    }
+
+    if (write_all(s->fd, req, reqlen) != 0) return -1;
+
+    size_t want = resplen;
+    if (read_record(s->fd, s->partial, want, timeout_ms) != 0) {
+        s->partial_len = 0;          /* give up on the fragment    */
+        return -1;
+    }
+    memcpy(resp, s->partial, resplen);
+    s->partial_len = 0;
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch2-timeout--section-3">What a timeout is for, and what it is not for</h4>
+<p>A timeout bounds the worst case. It does not recover from a failure, it does not make a device faster, and — most importantly — it does not tell you what went wrong. A read that times out has four possible causes that need different responses: the peer is slow, the peer is dead, the framing is wrong and you are waiting for bytes that will never come, or the connection is half-open and the OS has not noticed. Retrying is correct for the first and the third (after discarding the fragment) and wrong for the second and the fourth, where it converts a dead link into a load of traffic against a device that is not there.</p>
+
+<p>The practical rule: <strong>make the timeout long enough for the slowest legitimate operation and short enough to fail before whatever is supervising you gives up.</strong> That is not a single number, because it is a relationship between two — and the number most often in a shipped program is neither, having been chosen as a round figure rather than as an answer to either question. Measure the slowest real case with the instrumentation from chapter 9, set the timeout to a multiple of it, and write down where the number came from, so the next person to change it knows what it is protecting.</p>
+
+
+<h3 id="ch2-resync" data-toc>2.4 Resynchronisation, and when scanning is honest</h3>
+
+<p class="topic-desc">Resynchronisation means finding the next record boundary after a corruption, without closing the connection. It is worth having only if the protocol was designed for it — and the design requirement is a property of the record that has nothing to do with reading: a boundary marker that cannot legitimately appear anywhere in the payload. Without that property, scanning for a marker is not resynchronisation, it is a guess that will eventually match inside a payload and hand you a record that starts in the middle of another.</p>
+
+<h4 id="ch2-resync--section">The marker has to be provably absent from the payload</h4>
+<p>This is the whole design constraint. A length prefix with no marker cannot be resynchronised, because there is nothing to scan for. A record framed by a two-byte magic number can, if the magic number cannot occur in the payload — and "cannot" means escaped, which means the encoder has to guarantee it rather than the decoder hoping.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdio.h&gt;
+
+/* THE FRAMING, with escaping. The invariant: an unescaped 0xAA
+   appears only at a record start. Everything else in the stream is
+   either an escaped 0xAA as AA 55, or a 0x55 that immediately follows
+   an 0xAA. That is a property the ENCODER establishes, and it is
+   what makes the decoder's scan correct rather than hopeful. */
+static size_t encode(unsigned char *out, const unsigned char *body, size_t n)
+{
+    size_t o = 0;
+    out[o++] = 0xAA; out[o++] = 0xAA;   /* the marker itself      */
+
+    size_t run = 0;                     /* consecutive 0x55      */
+    for (size_t i = 0; i &lt; n; i++) {
+        if (body[i] == 0xAA) { out[o++] = 0xAA; out[o++] = 0x55; continue; }
+        if (body[i] == 0x55) {
+            run++;
+            /* Two 0x55 in a row must be escaped too, otherwise the
+               scan cannot tell an escaped marker from a marker
+               preceded by data that happens to be 0x55. */
+            if (run == 2) { out[o++] = 0xAA; run = 0; }
+        } else {
+            run = 0;
+        }
+        out[o++] = body[i];
+    }
+    return o;
+}
+
+/* THE SCAN, which is only correct because of the encoder's
+   invariant. It finds the next marker and returns how many bytes
+   were discarded, so the caller can count the loss rather than
+   pretending it did not happen. */
+static long resynchronise(int fd)
+{
+    unsigned char prev = 0;
+    long discarded = 0;
+    for (;;) {
+        unsigned char b;
+        ssize_t n = read(fd, &amp;b, 1);
+        if (n &lt;= 0) return -1;          /* EOF or error: give up   */
+        discarded++;
+        if (prev == 0xAA &amp;&amp; b == 0xAA) return discarded - 2;
+        prev = b;
+    }
+}
+</code></pre></div>
+
+<h4 id="ch2-resync--section-2">Counting the loss is the part that is usually missing</h4>
+<p>A resynchroniser that silently discards bytes is worse than one that fails, because the caller's log says the connection is healthy while records are going missing. Three things make it honest, and all three are cheap: count the discarded bytes and expose the counter, log a resynchronisation as a warning with the count and the record type that was lost, and reset the protocol state so nothing half-read is carried into the next record. A link that resynchronises once an hour under heavy load is a different problem from one that resynchronises constantly, and the rate is the only thing that distinguishes them in a report.</p>
+
+<div class="codeWrap"><pre><code>/* THE COMPLETE RECOVERY, with the parts that make it observable. */
+struct link {
+    int      fd;
+    unsigned char buf[4096];
+    size_t   len;
+    uint64_t resyncs;      /* how many times      */
+    uint64_t lost_bytes;   /* how much discarded  */
+    uint64_t bad_records;  /* checksum failures   */
+};
+
+static int recover(struct link *L)
+{
+    long n = resynchronise(L->fd);
+    if (n &lt; 0) return -1;               /* the link itself is gone */
+
+    L->resyncs++;
+    L->lost_bytes += (uint64_t)n;
+    L->len = 0;                         /* nothing half-read survives */
+
+    /* A resynchronisation is an ERROR to be surfaced, not a debug
+       line. The caller decides whether it is fatal. */
+    log_warn("link %d: resynchronised after %ld discarded bytes "
+             "(%llu total)", L->fd, n,
+             (unsigned long long)L->lost_bytes);
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch2-resync--section-3">When not to bother</h4>
+<p>Resynchronisation is not free and not always correct. It only works if the payload escape was designed in, so on a device whose protocol you do not control it is usually impossible — which is the honest answer for most third-party hardware. It is worth it on a link that carries traffic you cannot afford to drop and cannot afford to reconnect on, such as a serial bus with a physical connector that will be disturbed. And it is not worth it on a link where reconnecting is cheap and correct, because a resynchroniser that discards a partial record can silently lose a write that the application believed succeeded — which is a worse outcome than a clean disconnect and a retry.</p>
+
+<p>The rule of thumb: <strong>resynchronise when the connection is expensive and the loss is recoverable; close when the connection is cheap and the loss is not.</strong> In practice most links are the second, which is why the length prefix plus a checksum is the framing that appears in almost every industrial protocol, and why the marker-plus-escape design above is worth understanding rather than worth using.</p>
+
+
+<h3 id="ch2-checksum" data-toc>2.5 Checksums, and what they actually protect</h3>
+
+<p class="topic-desc">A checksum detects corruption. It does not correct it, it does not order anything, and it does not tell you where the damage was. Those are three different jobs and the confusion between them is why a protocol ends up with a CRC that is checked but never acted on, or with a retry loop that retries a request whose reply was lost — which for a device that acts on commands is a duplicate.</p>
+
+<h4 id="ch2-checksum--section">Which one, and what each is for</h4>
+<p>A simple sum of bytes catches accidental corruption and nothing else: a byte or two lost in a cable, a truncated packet. It misses transpositions of adjacent bytes entirely, because a sum is unchanged by swapping two values — which makes it useless over a serial link, where the common failure is exactly an adjacent swap from a marginal baud rate. A CRC catches everything a sum misses up to its polynomial degree and is two lines to implement with a table, which is why it is the default for a framed protocol. A cryptographic MAC authenticates as well as checksums, and is the only one of the three that is worth anything against an adversary rather than a bad cable.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
+
+/* CRC-32, the Ethernet and zlib polynomial. The table is built
+   once rather than written out, which is 30 lines instead of 300
+   and provably the same table. */
+static uint32_t crc_table[256];
+
+static void crc_init(void)
+{
+    for (uint32_t i = 0; i &lt; 256; i++) {
+        uint32_t c = i;
+        for (int k = 0; k &lt; 8; k++)
+            c = (c &amp; 1) ? (0xEDB88320u ^ (c >> 1)) : (c >> 1);
+        crc_table[i] = c;
+    }
+}
+
+static uint32_t crc32(const unsigned char *p, size_t n)
+{
+    uint32_t c = 0xFFFFFFFFu;
+    for (size_t i = 0; i &lt; n; i++)
+        c = crc_table[(c ^ p[i]) &amp; 0xFFu] ^ (c >> 8);
+    return c ^ 0xFFFFFFFFu;
+}
+
+/* WHY NOT A SUM, and it is worth being able to demonstrate. */
+static unsigned sum8(const unsigned char *p, size_t n)
+{
+    unsigned s = 0;
+    for (size_t i = 0; i &lt; n; i++) s += p[i];
+    return s;
+}
+/* sum8("AB") == sum8("BA"). Two bytes swapped by a marginal link,
+   and the checksum agrees. A CRC of the same two bytes does not. */
+</code></pre></div>
+
+<h4 id="ch2-checksum--section-2">Where the checksum goes, and what it commits to</h4>
+<p>The checksum goes over the header and the body, and — this is the part that matters — the order of operations is fixed by the protocol, not by the implementation. If the sender computes the CRC and appends it, the receiver verifies what arrived. If the sender computes it over a header whose length field it then updates, the receiver must know which value was used, or every record with a variable length will fail verification. The convention that removes the ambiguity is to define the field as covering the header with the checksum field itself zeroed, and to say so in the specification.</p>
+
+<div class="codeWrap"><pre><code>/* THE AMBIGUITY, shown. The length is part of the header, and the
+   checksum is computed after the length is filled in — so the
+   checksum covers a length that only exists at send time. If the
+   sender instead computed the CRC first and filled in the length
+   afterwards, the receiver's CRC would differ by exactly the
+   difference in the length field, and every record would fail. */
+static void send_record(int fd, unsigned char *hdr, size_t hdrlen,
+                        const unsigned char *body, size_t bodylen)
+{
+    put_u32le(hdr + 4, (uint32_t)bodylen);      /* the length field */
+    uint32_t c = crc32(hdr, hdrlen);
+    c = crc32_update(c, body, bodylen);        /* header THEN body  */
+    put_u32le(hdr + hdrlen, c);                 /* the CRC lands
+                                                    after the header */
+    write_all(fd, hdr, hdrlen + 4);
+    write_all(fd, body, bodylen);
+}
+
+/* THE VERIFY, and it must be the same computation in the same
+   order or it will disagree on every record. */
+static int verify(const unsigned char *hdr, size_t hdrlen,
+                  const unsigned char *body, size_t bodylen)
+{
+    uint32_t want = get_u32le(hdr + hdrlen);
+    uint32_t got  = crc32_update(crc32(hdr, hdrlen), body, bodylen);
+    return want == got;    /* constant time is irrelevant here: the
+                               value is not a secret, it is an
+                               integrity check                    */
+}
+</code></pre></div>
+
+<h4 id="ch2-checksum--section-3">What a checksum failure is allowed to do</h4>
+<p>Here is the decision that matters, and it is a protocol question rather than a coding one. A checksum failure means a record is unreliable, and the response is: discard it, count it, and — if the protocol has sequence numbers — request a retransmission of the missing one. What the response must not be is a silent retry of the <em>command</em>, because the failure may have occurred on the reply rather than the request, and retrying a command a device already acted on is a duplicate. Distinguishing the two is what sequence numbers are for, and it is the reason a protocol without them cannot safely retry anything.</p>
+
+<p>One failure mode is worth designing for explicitly: a link that fails its checksum at a steady high rate is not experiencing noise, it is misconfigured — a baud-rate mismatch, a ground problem, or a driver on the wrong clock. A protocol that retries forever under those conditions hides the fault behind a rising error count and a falling throughput. So: after a threshold of consecutive failures, close the connection and report the link as failed, rather than retrying into a device that is not answering coherently.</p>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 · USB, HID and Raw Devices</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 · USB, HID and Raw Devices</button><div class="ch-toc-list"><a href="#ch3-model">3.1 The bus, the endpoint, and the transfer</a><a href="#ch3-linux">3.2 Linux: sysfs, usbfs and libusb</a><a href="#ch3-hid">3.3 HID: a class, a descriptor, and report IDs</a><a href="#ch3-raw">3.4 Raw access: libusb on Windows, WinUSB, and the licence to do this</a></div></div>
+<h3 id="ch3-model" data-toc>3.1 The bus, the endpoint, and the transfer</h3>
+
+<p class="topic-desc">USB looks like a byte stream and is not one. It is a host-controlled message bus with four endpoint types, a 1-millisecond scheduling frame, and a bandwidth budget that is allocated before any data moves. A program that treats a bulk endpoint as a stream will work at one speed and fail at another, because the transfer sizes and the scheduling are properties of the bus rather than of your loop.</p>
+
+<h4 id="ch3-model--section">The four endpoint types, and what each is for</h4>
+<p>Every USB function exposes some combination of four endpoint types, and the type decides how the host schedules transfers against it. Control carries setup packets: enumeration, and the requests that read a descriptor or set a configuration. Bulk carries data with no timing guarantee, and is what a file transfer or a printer uses. Interrupt carries small periodic inbound messages — a keyboard's key presses, a mouse's movement — with a polling interval the device declares, and it is the only endpoint type where the device initiates. Isochronous carries time-sensitive audio or video with a bandwidth reservation made at enumeration and no retries at all.</p>
+
+<div class="codeWrap"><pre><code>/* THE FOUR, with the property that matters for each.
+
+   CONTROL   endpoint 0, always present, 8 bytes of setup packet.
+             Carries enumeration and the class requests. The only
+             endpoint guaranteed to exist before a configuration
+             is chosen, which is why it is where the first
+             conversation happens.
+
+   BULK      the workhorse. No periodicity, no reserved bandwidth,
+             retries on error. Throughput is set by the number of
+             endpoints the controller schedules per frame, not by
+             the device's own speed.
+
+   INTERRUPT inbound only. The device declares a polling interval
+             from 1 to 255 milliseconds and the host honours it, so
+             the LATENCY is a property of the device. The endpoint
+             is still polled by the host: "interrupt" means the
+             device may raise a request between polls, not that it
+             interrupts the CPU.
+
+   ISOCHRONOUS like bulk, with a bandwidth reservation and NO
+             retries. A dropped isochronous packet is lost and the
+             stream continues - which is correct for audio, where a
+             gap is inaudible, and catastrophic for anything else. */
+
+/* ENDPOINT DIRECTION IS FROM THE HOST'S POINT OF VIEW. An IN
+   endpoint transfers device to host; an OUT endpoint host to
+   device. This trips everyone: a bulk IN endpoint on a keyboard
+   carries key presses toward the host, so it is the device
+   reporting, and there is no way to write to it. */
+</code></pre></div>
+
+<h4 id="ch3-model--section-2">Speeds, and the arithmetic that decides whether your design fits</h4>
+<p>Every device negotiates a speed with the host at enumeration, and the negotiated speed is a ceiling on everything. The budget is 1 millisecond per frame, and each transaction consumes a whole number of microframes regardless of how many bytes it moves. At full speed a bulk transaction is limited to 64 bytes; at high speed 512; at SuperSpeed 1024 with a larger maximum packet size available from the device's endpoint descriptor. The consequence is arithmetic: 1,000 microframes per millisecond, roughly two or three transactions each, and 512 bytes per high-speed bulk transaction gives a ceiling on the order of 1.5 MB/s per endpoint that no amount of loop tuning will raise.</p>
+
+<div class="codeWrap"><pre><code>/* THE BUDGET, in the terms a design decision needs.
+
+   Microframes per millisecond        1000
+   Isochronous reserved               the device's wMaxPacketSize
+                                      times its interval, taken out
+                                      of the budget FIRST
+   Periodic interrupt                 each endpoint's declared
+                                      interval consumes 1 to 8
+                                      microframes per poll
+   Bulk and control                   whatever is left, in
+                                      1 to 3 transactions per
+                                      microframe                */
+
+/* SO: a design that streams uncompressed video over bulk cannot
+   work at full speed and might work at SuperSpeed; a design that
+   streams it over isochronous cannot work at full speed AT ALL,
+   because isochronous bandwidth is reserved at enumeration and a
+   full-speed device has 1,024 bytes per frame to reserve from. The
+   endpoint type is a capacity decision before it is an API
+   decision. */
+
+/* THE MEASURED-ONCE FACT worth knowing: a bulk transfer of 512
+   bytes typically achieves 30 to 40 MB/s on SuperSpeed and 0.5 to
+   1.5 MB/s on high speed. Anything faster is not USB; it is a
+   mistake about which bus you are on. */
+</code></pre></div>
+
+<h4 id="ch3-model--section-3">Descriptors: the device describes itself, in a tree</h4>
+<p>A USB device is not configured by the host sending commands — it is configured by the host <em>reading</em> a tree of descriptors the device publishes. The device descriptor is the root and carries the vendor and product identifiers, the device class, and the version. From it, the host reads the configuration descriptor, which lists interfaces; from each interface, the endpoint descriptors. Getting this wrong is not a matter of style: the device class is how the host knows whether to load a HID driver, a mass-storage driver, or your vendor driver, and a wrong value means no driver binds and nothing appears.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdio.h&gt;
+
+/* THE DEVICE DESCRIPTOR, 18 bytes. The two identifiers are the
+   whole basis of driver binding: idVendor plus idProduct is the key
+   the host looks up in its driver database. */
+struct usb_device_descriptor {
+    uint8_t  bLength;          /* 18 */
+    uint8_t  bDescriptorType;  /* 1: DEVICE */
+    uint16_t bcdUSB;           /* 0x0200 = USB 2.0                */
+    uint8_t  bDeviceClass;     /* 0 = per-interface, 3 = HID     */
+    uint8_t  bDeviceSubClass;
+    uint8_t  bDeviceProtocol;
+    uint8_t  bMaxPacketSize0;  /* 64 for full speed, 512 for high */
+    uint16_t idVendor;
+    uint16_t idProduct;
+    uint16_t bcdDevice;        /* the DEVICE's revision, which is
+                                   not the USB version above     */
+    uint8_t  iManufacturer;   /* index into the string table, or  */
+    uint8_t  iProduct;        /* zero, which is legal and common */
+    uint8_t  iSerialNumber;
+    uint8_t  bNumConfigurations;
+} __attribute__((packed));
+
+/* THE CONFIGURATION, whose totalLength is the field to trust.
+   The host reads the first 9 bytes to learn the length, then reads
+   that many — so a host that reads a fixed 9 bytes and assumes the
+   rest is zero will misparse every device with more than one
+   interface. */
+struct usb_config_descriptor {
+    uint8_t  bLength;          /* 9 */
+    uint8_t  bDescriptorType;  /* 2: CONFIGURATION */
+    uint16_t wTotalLength;     /* the WHOLE configuration, including
+                                   every interface and endpoint  */
+    uint8_t  bNumInterfaces;
+    uint8_t  bConfigurationValue;  /* what SET_CONFIGURATION uses */
+    uint8_t  iConfiguration;
+    uint8_t  bmAttributes;     /* bus-powered, remote wakeup       */
+    uint8_t  bMaxPower;        /* in 2 mA units                   */
+} __attribute__((packed));
+
+/* THE ENDPOINT, and bEndpointAddress is the field that confuses.
+   Bit 7 set means IN. Bits 0-2 are the endpoint NUMBER, which is
+   independent of direction: endpoint 1 IN and endpoint 1 OUT are
+   different endpoints with the same number. */
+struct usb_endpoint_descriptor {
+    uint8_t  bLength;          /* 7, or 9 for the audio variant */
+    uint8_t  bDescriptorType;  /* 5: ENDPOINT */
+    uint8_t  bEndpointAddress; /* bit7: 0=OUT 1=IN. bits 0-2: number */
+    uint8_t  bmAttributes;     /* 0=control 1=isoch 2=bulk 3=int  */
+    uint16_t wMaxPacketSize;
+    uint8_t  bInterval;        /* 1-255 ms for interrupt; ignored
+                                   for bulk                       */
+} __attribute__((packed));
+
+static int is_in(uint8_t addr)              { return (addr &amp; 0x80) != 0; }
+static int ep_number(uint8_t addr)          { return addr &amp; 0x07; }
+static int ep_type(uint8_t attrs)           { return attrs &amp; 0x03; }
+</code></pre></div>
+
+
+<h3 id="ch3-linux" data-toc>3.2 Linux: sysfs, usbfs and libusb</h3>
+
+<p class="topic-desc">On Linux the kernel enumerates, owns the bus, and publishes a sysfs tree that tells you everything the host negotiated — speed, interfaces, endpoints, driver bindings — without a single call into libusb. That tree is the right place to start, because it tells you what the kernel decided before your program contributes anything, and a program that reads sysfs first and opens libusb second has a way to report "this device needs a driver" instead of failing obscurely later.</p>
+
+<h4 id="ch3-linux--section">The sysfs tree, and the three facts worth reading</h4>
+<p>Each device appears under <code>/sys/bus/usb/devices/</code> as <code>busnum-port</code>, with the port numbers in the chain giving the physical path. Three files answer most questions: <code>speed</code> gives the negotiated rate, <code>bConfigurationValue</code> the active configuration, and the per-interface directories give the driver bound to each. Reading them is a few lines and replaces a speculative <code>open</code> followed by an error message.</p>
+
+<div class="codeWrap"><pre><code>#define _GNU_SOURCE
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;dirent.h&gt;
+
+/* READ THE THREE FACTS BEFORE OPENING ANYTHING. A device with no
+   interface driver bound has bInterfaceClass 255 (vendor specific)
+   and no driver directory, and that is the answer to "why does
+   nothing happen when I plug it in". */
+static int describe_usb(const char *devpath)
+{
+    char path[512];
+    char line[256];
+
+    snprintf(path, sizeof path, "%s/speed", devpath);
+    FILE *f = fopen(path, "r");
+    if (f) {
+        if (fgets(line, sizeof line, f)) {
+            /* "480" or "5000" — in Mb/s. The number is the ONLY
+               thing in the interface contract that differs between a
+               working design and a design that cannot hit its
+               throughput target. */
+            long mbps = strtol(line, NULL, 10);
+            printf("%s: %ld Mb/s
+", devpath, mbps);
+        }
+        fclose(f);
+    }
+
+    /* THE INTERFACES, each with the driver the kernel chose. A
+       directory with no "driver" symlink is an unbound interface:
+       your program is what has to bind it. */
+    snprintf(path, sizeof path, "%s/:*/", devpath);
+    DIR *d = opendir(path);
+    if (!d) return -1;
+    struct dirent *e;
+    while ((e = readdir(d)) != NULL) {
+        if (e->d_name[0] == '.') continue;
+
+        char ifdir[640], link[768];
+        snprintf(ifdir, sizeof ifdir, "%s/%s", devpath, e->d_name);
+        snprintf(link,  sizeof link,  "%s/driver", ifdir);
+
+        char target[256] = "(none)";
+        if (readlink(link, target, sizeof target - 1) > 0)
+            { char *b = strrchr(target, '/'); target[0] = b ? b + 1 : target; }
+        printf("  interface %s -> %s
+", e->d_name, target);
+    }
+    closedir(d);
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch3-linux--section-2">usbfs, and why libusb rather than the raw interface</h4>
+<p>The kernel's own interface is <code>/dev/bus/usb/BBB/DDD</code> with <code>ioctl</code> and <code>submiturb</code>, and it is complete: everything libusb does is a ioctl. It is also untyped, it requires manual URB construction and submission, and its error handling is by return code from a function whose signature does not say what it returns. libusb is a library over the same interface that adds typed transfer submission, hotplug notification, and device enumeration that does not require you to parse sysfs.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;libusb-1.0/libusb.h>
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+/* ENUMERATE AND FILTER, which is the first thing any program needs
+   and the reason libusb is worth linking. */
+static libusb_device *find_vid_pid(libusb_context *ctx,
+                                   uint16_t vid, uint16_t pid)
+{
+    libusb_device **list;
+    ssize_t n = libusb_get_device_list(ctx, &amp;list);
+    if (n &lt; 0) return NULL;
+
+    libusb_device *found = NULL;
+    for (ssize_t i = 0; i &lt; n &amp;&amp; !found; i++) {
+        struct libusb_device_descriptor desc;
+        if (libusb_get_device_descriptor(list[i], &amp;desc) != 0) continue;
+        if (desc.idVendor == vid &amp;&amp; desc.idProduct == pid) {
+            /* REFCOUNT IT: the list holds a reference and
+               libusb_free_device_list will drop it. */
+            found = libusb_ref_device(list[i]);
+        }
+    }
+    libusb_free_device_list(list, 1);
+    return found;
+}
+
+/* CLAIM AN INTERFACE, and the reason it fails more often than
+   expected is that a kernel driver already has it. */
+static int claim(libusb_device_handle *h, int iface)
+{
+    int rc = libusb_claim_interface(h, iface);
+    if (rc == LIBUSB_ERROR_BUSY) {
+        /* A kernel driver holds it. Two options, and the choice is
+           a POLICY one: detach the driver and take it (which
+           breaks the kernel driver for every other program on the
+           machine), or require the program to run in a udev rule
+           that removes it beforehand. Doing it at runtime is what
+           makes a program unusable on a desktop. */
+        rc = libusb_detach_kernel_driver(h, iface);
+        if (rc == 0) rc = libusb_claim_interface(h, iface);
+    }
+    return rc;
+}
+</code></pre></div>
+
+<h4 id="ch3-linux--section-3">Synchronous transfers, and the error handling that matters</h4>
+<p><code>libusb_bulk_transfer</code> does the submit-and-wait for you, which is what makes a first program possible, and it reports 12 error codes rather than one. The four worth distinguishing: a timeout is a timeout and the device may still be processing; a pipe error means the endpoint returned more data than the transfer asked for, which for a bulk IN endpoint is a sign the firmware is wrong rather than that the transfer failed; a no-device error means it was unplugged mid-transfer; and an I/O error is the only one that indicates the link itself.</p>
+
+<div class="codeWrap"><pre><code>/* THE TIMEOUT IS IN MILLISECONDS and it is per transfer, not per
+   record — so a loop of 100 transfers with a 100 ms timeout can
+   occupy ten seconds. That is the same class of mistake as the
+   per-read timeout in chapter 2, and the same fix: one deadline
+   for the whole operation. */
+static int read_exact(libusb_device_handle *h, int ep,
+                      unsigned char *buf, int want, unsigned timeout_ms)
+{
+    int got = 0;
+    while (got &lt; want) {
+        int n = 0;
+        int rc = libusb_bulk_transfer(h, ep, buf + got, want - got, &amp;n,
+                                      timeout_ms);
+        if (rc == LIBUSB_ERROR_TIMEOUT) return -1;   /* treat as a
+                                                            failure and
+                                                            discard the
+                                                            partial   */
+        if (rc == LIBUSB_ERROR_NO_DEVICE) return -2; /* unplugged:
+                                                            unrecoverable */
+        if (rc == LIBUSB_ERROR_PIPE) {
+            /* MORE DATA THAN ASKED FOR: clear it and read again.
+               Not a failure — a firmware bug that is safe to
+               recover from, and recovering is better than
+               failing the session. */
+            libusb_clear_halt(h, ep);
+            continue;
+        }
+        if (rc != LIBUSB_ERROR_SUCCESS || n &lt;= 0) return -1;
+        got += n;
+    }
+    return 0;
+}
+</code></pre></div>
+
+<p>Hotplug is the feature that decides whether a program is usable as a service. <code>libusb_hotplug_register_callback</code> delivers arrival and removal, and the removal notification is the one that matters: a device handle is invalid the moment the device is gone, so a program that does not act on the callback will segfault rather than report the unplug. Handling removal by closing the handle and letting the application's state machine reconnect is the whole design.</p>
+
+
+<h3 id="ch3-hid" data-toc>3.3 HID: a class, a descriptor, and report IDs</h3>
+
+<p class="topic-desc">HID is not a device type, it is a class — a report format plus a descriptor that tells the host how to interpret it. That matters because a keyboard, a mouse, a joystick, a 3D-connexion SpaceMouse and a barcode scanner are all the same class: they publish a report descriptor, the host's HID driver parses it, and the application reads reports from an already-configured endpoint. Writing a HID device means producing that descriptor accurately, and almost every HID bug is a descriptor that disagrees with the data.</p>
+
+<h4 id="ch3-hid--section">The report descriptor is a program, in a compact encoding</h4>
+<p>A HID report descriptor is a byte stream in which each item declares a usage, a logical range, a report size and a report ID. The host interprets it to build a per-application layout. The encoding is non-obvious enough that writing it by hand is best done with the item macros below rather than with raw bytes, and the single most common mistake is a report size in bits that does not divide the total report length.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdint.h&gt;
+
+/* THE ITEM ENCODING, in the two forms that cover everything a
+   non-keyboard device needs: unsigned and signed. The prefix byte
+   carries the size, the type and the tag; the payload follows. */
+#define ITEM(bTag, bType, bSize)  (((uint8_t)(bTag) &lt;&lt; 4)                                  | ((uint8_t)(bType) &lt;&lt; 2)                                  | ((uint8_t)(bSize)))
+
+#define TYPE_MAIN     0
+#define TYPE_GLOBAL   1
+#define TYPE_LOCAL    2
+
+#define TAG_INPUT        0x08
+#define TAG_OUTPUT       0x09
+#define TAG_FEATURE      0x0B
+#define TAG_COLLECTION   0x0A
+#define TAG_END_COLL     0x0C
+
+#define TAG_USAGE_PAGE   0x00
+#define TAG_LOGICAL_MIN  0x01
+#define TAG_LOGICAL_MAX  0x02
+#define TAG_REPORT_SIZE  0x07
+#define TAG_REPORT_ID    0x08
+
+#define TAG_USAGE        0x00
+#define TAG_COLLECTION   0x0A
+
+#define USAGE_PAGE_GENERIC_DESKTOP 0x05
+#define USAGE_PAGE_BUTTON          0x09
+#define USAGE_JOYSTICK             0x04
+#define USAGE_X                    0x30
+#define USAGE_Y                    0x31
+#define USAGE_Z                    0x32
+
+/* THE SIX THINGS EVERY DESCRIPTOR NEEDS, and the order they must
+   appear in — the parser is a state machine and reordering items
+   produces a descriptor that parses to something other than what
+   you meant. */
+#define D_BEGIN     0x05, USAGE_PAGE_GENERIC_DESKTOP,     0x09, 0x04,                 /* Usage: Joystick          */     0xA1, 0x01,                 /* Collection: Application  */     0x05, USAGE_PAGE_BUTTON,        0x19, 0x01,                 /* Usage Minimum: 1         */     0x29, 0x08,                 /* Usage Maximum: 8         */     0x15, 0x00,                 /* Logical Minimum: 0       */     0x25, 0x01,                 /* Logical Maximum: 1       */     0x75, 0x01,                 /* Report Size: 1 bit       */     0x95, 0x08,                 /* Report Count: 8          */     0x81, 0x02,                 /* Input (Data,Var,Abs)     */
+
+#define D_AXES     0x05, USAGE_PAGE_GENERIC_DESKTOP,     0x09, USAGE_X,     0x15, 0x81,                 /* Logical Minimum: -127     */     0x25, 0x7F,                 /* Logical Maximum: 127      */     0x75, 0x08,                 /* Report Size: 8 bits       */     0x95, 0x01,                 /* Report Count: 1            */     0x81, 0x02,                 /* Input                     */     0x09, USAGE_Y, 0x81, 0x02,     0x09, USAGE_Z, 0x81, 0x02
+
+#define D_END   0xC0            /* End Collection            */
+</code></pre></div>
+
+<h4 id="ch3-hid--section-2">Report IDs, and the two rules that make them work</h4>
+<p>A device with more than one report type — say a 6-DOF device with motion and with buttons, or a device with a configuration channel — must assign each a report ID, and every report carries its ID as the first byte. Two rules follow and both are enforced by the host: every report must carry an ID, including the ones you did not expect to need one, and no report may use ID zero. A descriptor mixing identified and unidentified reports is rejected by the host, and the rejection appears as a device that enumerates and then does nothing.</p>
+
+<div class="codeWrap"><pre><code>/* TWO CHANNELS ON ONE DEVICE. Motion on report ID 1, buttons on
+   report ID 2, and a vendor configuration channel on ID 3.
+
+   THE TWO RULES:
+     every report carries its ID as byte 0, including the
+     configuration one, which is the one people forget;
+     ID 0 is never used — it means "no report". */
+
+#define D_WITH_IDS     0x05, USAGE_PAGE_GENERIC_DESKTOP, 0x09, 0x04, 0xA1, 0x01,     0x05, USAGE_PAGE_BUTTON, 0x19, 0x01, 0x29, 0x08,     0x15, 0x00, 0x25, 0x01,     0x75, 0x01, 0x95, 0x08,     0x85, 0x02,                 /* Report ID: 2 — buttons     */     0x81, 0x02,                 /* Input                      */     0x05, USAGE_PAGE_GENERIC_DESKTOP,     0x09, USAGE_X, 0x15, 0x81, 0x25, 0x7F,     0x75, 0x08, 0x95, 0x01,     0x85, 0x01,                 /* Report ID: 1 — motion      */     0x81, 0x02,                 /* Input                      */     0xC0
+
+/* THE REPORT LAYOUT the descriptor above produces. Byte 0 is the
+   report ID; the button bits follow; the axes are signed 8-bit.
+   Nothing here is invented: it is the descriptor read back as a
+   structure, which is the only reliable way to check it. */
+struct motion_report {
+    uint8_t id;         /* always 1 for this report          */
+    int8_t  x, y, z;
+} __attribute__((packed));
+
+struct button_report {
+    uint8_t id;         /* always 2                          */
+    uint8_t buttons;    /* bit 0 = button 1, ... bit 7 = 8   */
+} __attribute__((packed));
+
+/* THE RULE THAT CATCHES PEOPLE: the report length is in BITS and
+   the total must be a whole number of bytes. 8 buttons at 1 bit is
+   1 byte; three axes at 8 bits is 3 bytes; plus the 1-byte report
+   ID is 5. A descriptor whose Report Count does not match the
+   payload you actually send produces a device the host reads at
+   the wrong offsets — every value shifted, and no error. */
+</code></pre></div>
+
+<h4 id="ch3-hid--section-3">What the host does with it, and why that decides the design</h4>
+<p>The host parses the descriptor and offers each collection to a driver by usage page and usage. That is why a device declaring Generic Desktop / Joystick appears as a joystick with no driver at all, and why a device declaring Generic Desktop / Mouse appears as a mouse. It is also why a bespoke device should not try to claim a usage it does not implement: declaring Gamepad when your device has no buttons and no rumble makes the host show it as a controller, and a user who presses a button that does nothing concludes the device is broken.</p>
+
+<p>For a device that wants both a standard usage and a vendor interface, declare the standard collection plus a vendor-defined collection (usage page 0xFF00 to 0xFFFF) for the extra channels. The host binds the standard one to its class driver and offers the vendor one to your own driver, and the application sees two separate paths to one device — which is the correct architecture rather than a workaround.</p>
+
+
+<h3 id="ch3-raw" data-toc>3.4 Raw access: libusb on Windows, WinUSB, and the licence to do this</h3>
+
+<p class="topic-desc">Raw USB access means claiming the interface from user space and submitting transfers yourself. It is the right approach for a device you designed, for a protocol you own, and for a device whose vendor driver does not do what you need. It is the wrong approach for a device whose driver already binds the interface, because you will have to fight the kernel driver for it — and on Windows the fight is with the kernel.</p>
+
+<h4 id="ch3-raw--section">Windows: a driver first, then libusb</h4>
+<p>Windows will not let a user-mode program open a USB device's generic interface directly. The supported path is a kernel-mode driver that owns the device and exposes a user-mode interface; WinUSB is the framework for exactly that, and libusb has a Windows backend that talks to it. So "libusb on Windows" means "a WinUSB driver you installed, that libusb is then using" — the portability that looks free is paid for on the Windows side.</p>
+
+<div class="codeWrap"><pre><code>/* THE WINDOWS SEQUENCE, and the step that has no equivalent on
+   Linux. */
+#include &lt;windows.h&gt;
+#include &lt;setupapi.h&gt;
+#include &lt;winusb.h&gt;
+
+static int win_open(HANDLE *out_dev, WINUSB_INTERFACE_HANDLE *out_usb)
+{
+    /* 1. FIND THE DEVICE by VID, PID and (usually) the interface
+          GUID. Without the GUID, SetupDiGetClassDevs returns every
+          USB device on the machine, and the enumeration loop runs
+          for seconds. */
+    HDEVINFO info = SetupDiGetClassDevs(&amp;interface_guid, NULL, NULL,
+                                        DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+    if (info == INVALID_HANDLE_VALUE) return -1;
+
+    SP_DEVICE_INTERFACE_DATA ifd;
+    ifd.cbSize = sizeof ifd;
+    if (!SetupDiEnumDeviceInterfaces(info, NULL, &amp;interface_guid, 0, &amp;ifd))
+        return -1;
+
+    /* 2. THE DETAIL, for the device path. Two calls: the first gets
+          the size, the second gets the data. */
+    DWORD need = 0;
+    SetupDiGetDeviceInterfaceDetail(info, &amp;ifd, NULL, 0, &amp;need, NULL);
+    PSP_DEVICE_INTERFACE_DETAIL_DATA_A detail =
+        (PSP_DEVICE_INTERFACE_DETAIL_DATA_A)malloc(need);
+    detail->cbSize = sizeof *detail;
+    if (!SetupDiGetDeviceInterfaceDetail(info, &amp;ifd, detail, need,
+                                          NULL, NULL))
+        return -1;
+
+    HANDLE dev = CreateFileA(detail->DevicePath, GENERIC_READ | GENERIC_WRITE,
+                             FILE_SHARE_READ | FILE_SHARE_WRITE,
+                             NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+    free(detail);
+    if (dev == INVALID_HANDLE_VALUE) return -1;
+
+    /* 3. CLAIM THE INTERFACE THROUGH WinUSB. A raw CreateFile on
+          the device gives you the device, not the interface, and a
+          transfer on it fails with ERROR_ACCESS_DENIED. This call
+          is the equivalent of libusb_claim_interface. */
+    if (!WinUsb_Initialize(dev, out_usb)) { CloseHandle(dev); return -1; }
+
+    /* 4. QUERY THE PIPES, to learn the endpoint addresses. The
+          host assigns them, so 0x81 is not a constant you can
+          hardcode — it is data you read. */
+    UCHAR pipe_id = 0;
+    WinUsb_QueryInterfaceSettings(*out_usb, 0, &amp;pipe_id);
+
+    *out_dev = dev;
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch3-raw--section-2">Asynchronous transfers, because WinUSB has no synchronous call</h4>
+<p>libusb has <code>libusb_bulk_transfer</code>, which submits and waits. WinUSB has only <code>WinUsb_ReadPipe</code> with an <code>OVERLAPPED</code>, so the structure of the code differs: submit, continue doing other work, get the completion through an event. That is not a detail — it is the reason the Windows version of a device program has an event loop and the Linux version has a linear function.</p>
+
+<div class="codeWrap"><pre><code>/* SUBMIT, AND DO NOT WAIT. */
+typedef struct {
+    HANDLE            dev;
+    WINUSB_INTERFACE_HANDLE usb;
+    OVERLAPPED        ov;          /* must outlive the transfer   */
+    UCHAR             buf[1024];
+    HANDLE            done;       /* per-transfer completion    */
+} xfer;
+
+static int xfer_submit(xfer *x, UCHAR pipe, USHORT len)
+{
+    ZeroMemory(&amp;x->ov, sizeof x->ov);
+    x->ov.hEvent = x->done;
+
+    if (!WinUsb_ReadPipe(x->usb, pipe, x->buf, len, &amp;len, &amp;x->ov)) {
+        DWORD e = GetLastError();
+        /* ERROR_IO_PENDING is SUCCESS for this API: it means the
+           transfer was accepted and will complete later. Every
+           WinUSB sample that checks for zero is wrong, because
+           most transfers on a busy bus complete asynchronously
+           even when nothing is contending. */
+        if (e != ERROR_IO_PENDING) return -1;
+    }
+    return 0;   /* in flight */
+}
+
+static int xfer_wait(xfer *x, DWORD ms, USHORT *got)
+{
+    if (WaitForSingleObject(x->done, ms) != WAIT_OBJECT_0) return -1;
+    if (!GetOverlappedResult(x->dev, &amp;x->ov, (LPDWORD)got, FALSE))
+        return -1;
+    return 0;
+}
+
+/* THE SHUTDOWN THAT MATTERS, and it is the counterpart of the
+   libusb hotplug callback: a device that is unplugged while a
+   transfer is outstanding completes it with a failure, and an
+   application that does not handle it will sit in WaitForSingleObject
+   until its timeout on every subsequent call. CancelOutstandingIrp
+   plus a device-arrival notification is the pair. */
+</code></pre></div>
+
+<h4 id="ch3-raw--section-3">What raw access obliges you to do</h4>
+<p>Three obligations, and skipping any of them is how a raw USB program becomes the reason a machine is slow. You must implement USB enumeration compliance, or the machine cannot suspend: a device that does not respond to a <code>GET_STATUS</code> within a bounded time keeps the bus awake and defeats every power-saving feature the platform has. You must send <code>SET_CONFIGURATION</code> and <code>SET_INTERFACE</code> before any transfer on an interface, because the host leaves interfaces unconfigured after enumeration and a transfer to an unconfigured endpoint fails with <code>PIPE</code> — which is the same error a firmware bug produces, and the two look identical until you check which one it is.</p>
+
+<p>You must also handle the case where your program is not the only user, which is the case the OS gives you a mechanism for and not the one you want. On Linux the kernel driver binds first and you either detach it or require a udev rule that removes it; on Windows a driver owns the device and there is no detaching. The portable answer is a small udev rule on Linux plus an INF on Windows, both of which hand the device to your program before any other driver sees it — and that answer is more work than the code, which is the honest cost of raw access.</p>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 · Memory-Mapped Registers</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 · Memory-Mapped Registers</button><div class="ch-toc-list"><a href="#ch4-map">4.1 What a device mapping actually is</a><a href="#ch4-acquire">4.2 Acquiring a mapping, on both platforms</a><a href="#ch4-rmw">4.3 Read-modify-write, and the hazard nobody warns about</a><a href="#ch4-order">4.4 Ordering: what volatile does not do</a><a href="#ch4-rules">4.5 Five rules, and the one that prevents the rest</a></div></div>
+<h3 id="ch4-map" data-toc>4.1 What a device mapping actually is</h3>
+
+<p class="topic-desc">A memory-mapped register is not memory. It is a register in a device, reachable through an address, and every difference between the two that the CPU does not protect you from will eventually be one you have to. Writes may be reordered, reads may be served from a cache, the width may be enforced, an access may be posted rather than performed, and a read may have a side effect — clearing an interrupt flag, acknowledging a transfer — which means that read elision is a functional change rather than an optimisation.</p>
+
+<h4 id="ch4-map--section">Memory is a promise the device does not keep</h4>
+<p>On a normal load, a write followed by a read of the same address returns what was written, and the compiler is entitled to assume exactly that. On a device register, the read may return something else, may have cleared an interrupt, or may not exist as an operation at all. The compiler and the CPU are not wrong to make the assumption — the mapping is, which is why the language and the processor provide <code>volatile</code> and a memory-ordering instruction respectively, and why a program that maps a device without them works until it is optimised.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
+
+/* A DEVICE POINTER, which is not an int *. The volatile is the
+   whole difference: it tells the compiler that the value may change
+   without being written through this pointer, so it must not be
+   cached in a register across a read and it must not be reordered
+   or elided. Without it, -O2 will read the register once and reuse
+   the value, and a program that polls a status bit will read the
+   value from before the write that set it. */
+typedef struct {
+    volatile uint32_t CONTROL;      /* write: start, stop, mode    */
+    volatile uint32_t STATUS;       /* read: bits change on their
+                                        own, with no store         */
+    volatile uint32_t DATA;         /* read AND write: a FIFO
+                                        port, where a read POPS    */
+    volatile uint32_t INTR_MASK;    /* write: which interrupts     */
+    volatile uint32_t INTR_STATUS;  /* read-and-CLEARS: writing a
+                                        1 clears that bit          */
+} dev_regs;
+
+/* THE WIDTH IS ENFORCED on some buses. A 16-bit device behind an
+   8-bit access window has no halfword access at all, and a
+   uint32_t * to it faults or returns the wrong halves. */
+typedef struct {
+    volatile uint8_t CONTROL;
+    volatile uint8_t STATUS;
+} dev8_regs;
+</code></pre></div>
+
+<h4 id="ch4-map--section-2">Read-to-clear and read-to-clear-and-side-effect</h4>
+<p>The register class that catches people is the one whose read is not idempotent. An interrupt status register that clears on read, a FIFO port that pops on read, a command register whose read returns the status of the last command — in each case the number of times you read it changes what you observe. So the compiler's licence to elide a read is not a licence you want, and <code>volatile</code> is mandatory rather than advisory.</p>
+
+<div class="codeWrap"><pre><code>/* THE POP-ON-READ FIFO. The read has a side effect, so it must
+   happen exactly once per element and its result must be used.
+   Both halves of that are the volatile's doing: the compiler must
+   not skip the read, and must not reorder it against the
+   surrounding logic. */
+static int drain(dev_regs *r, uint8_t *out, size_t max)
+{
+    size_t n = 0;
+    /* READ-UNTIL-EMPTY. The loop condition is a device register
+       read, which is exactly the expression the compiler would
+       otherwise hoist: without volatile it becomes a single read
+       before the loop and the loop never terminates. */
+    while (n &lt; max &amp;&amp; (r->STATUS &amp; 0x01u)) {
+        out[n++] = (uint8_t)r->DATA;      /* one read, one element */
+    }
+    return (int)n;
+}
+
+/* AND THE WRITE THAT IS NOT A WRITE: a doorbell register. The value
+   written is not stored — it is an action. A cached write means the
+   device is never told. */
+static void kick(dev_regs *r)
+{
+    r->DATA = 0x1;
+    /* A memory barrier afterwards, on any bus where the write may
+       be reordered against the writes before it. See 4.3. */
+}
+</code></pre></div>
+
+<p>There is one thing <code>volatile</code> does <em>not</em> do, and it is the thing people expect it to do: it does not order anything. It stops the compiler from caching a value in a register and it stops the compiler from moving the access, but the <em>processor</em> is still free to reorder, to merge two writes into one, or to sit in a write buffer. A device that requires write-after-write ordering needs an explicit barrier — <code>__asm__ __volatile__("" ::: "memory")</code> on GCC and Clang, <code>_ReadWriteBarrier()</code> on MSVC — because <code>volatile</code> constrains the compiler and not the hardware.</p>
+
+
+<h3 id="ch4-acquire" data-toc>4.2 Acquiring a mapping, on both platforms</h3>
+
+<p class="topic-desc">Getting a device mapped is the easy part on Linux and the part with the most moving pieces on Windows. What matters for the rest of the chapter is that the acquisition has one property neither platform gives you for free: the mapping may fail because the device is absent, and the program has to distinguish that from every other failure if it is going to support hot-plug. Both examples below return a status rather than exiting, and both verify what they opened.</p>
+
+<h4 id="ch4-acquire--section">Linux: two files, and only one of them is a device</h4>
+<p>A memory-mapped device needs a file descriptor for <code>/dev/mem</code> or, far more commonly, a driver-provided device node, plus a second descriptor from <code>/dev/mem</code> for the physical range. The modern kernel restricts <code>/dev/mem</code> aggressively — <code>CONFIG_STRICT_DEVMEM</code> is the default on most distributions and it removes the ranges a userspace program would want — so on a real board the mapping comes from a driver, not from this path. The path is here because understanding why it fails is what tells you which mechanism your system actually uses.</p>
+
+<div class="codeWrap"><pre><code>#define _GNU_SOURCE
+#include &lt;fcntl.h&gt;
+#include &lt;sys/mman.h>
+#include &lt;unistd.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+typedef struct {
+    volatile uint32_t CONTROL, STATUS, DATA, INTR_MASK, INTR_STATUS;
+} dev_regs;
+
+/* THE PHYSICAL-RANGE MAPPING. Return codes are explicit because
+   "the device is absent" and "no permission" need different
+   responses from the caller. */
+static int map_phys(uintptr_t phys, size_t len, dev_regs **out)
+{
+    int fd = open("/dev/mem", O_RDWR | O_SYNC | O_CLOEXEC);
+    if (fd &lt; 0) {
+        if (errno == EACCES)  return -2;   /* CONFIG_STRICT_DEVMEM:
+                                                 the mapping exists
+                                                 but the kernel will
+                                                 not give it to
+                                                 userspace        */
+        if (errno == ENOENT)  return -3;   /* the device node is not
+                                                 there at all    */
+        return -1;
+    }
+
+    void *p = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd,
+                   (off_t)phys);
+    int saved = errno;
+    close(fd);                    /* the mapping keeps the object
+                                     alive; the descriptor is not
+                                     needed again                     */
+    if (p == MAP_FAILED) { errno = saved; return -1; }
+
+    *out = p;
+    return 0;
+}
+
+/* THE DRIVER PATH, which is what a real board uses. A device node
+   plus a sysfs-published physical address: no /dev/mem, and no
+   privilege beyond access to the node. */
+#include &lt;dirent.h&gt;
+
+static int sysfs_u32(const char *path, uint32_t *out)
+{
+    FILE *f = fopen(path, "r");
+    if (!f) return -1;
+    int n = fscanf(f, "%x", out);      /* sysfs prints HEX with no
+                                           0x prefix                     */
+    fclose(f);
+    return n == 1 ? 0 : -1;
+}
+
+static int map_by_name(const char *name, dev_regs **out)
+{
+    char path[256];
+    snprintf(path, sizeof path, "/sys/bus/platform/devices/%s/resource0",
+             name);
+
+    uint32_t phys = 0;
+    if (sysfs_u32(path, &amp;phys) != 0) {
+        /* The address is absent when the driver is not bound: the
+           device is present on the bus and nobody claimed it. */
+        return -3;
+    }
+
+    int fd;
+    snprintf(path, sizeof path, "/dev/%s", name);
+    fd = open(path, O_RDWR | O_SYNC | O_CLOEXEC);
+    if (fd &lt; 0) return (errno == ENOENT) ? -3 : -1;
+
+    void *p = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    int saved = errno;
+    close(fd);
+    if (p == MAP_FAILED) { errno = saved; return -1; }
+
+    *out = p;
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch4-acquire--section-2">Windows: the device name, and four different ways to fail</h4>
+<p>A physical or memory-mapped register on Windows is reached through the device namespace, not through a physical address. The name form depends on the bus, and each has a failure mode: a PCI device that has not been started by its driver, a device whose driver exposes no register resource, and a resource that exists but is mapped for another purpose.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;windows.h&gt;
+#include &lt;stdio.h&gt;
+
+/* THE FOUR WAYS THIS FAILS, and they are worth telling apart
+   because they have different fixes. */
+
+/* 1. "\\.\PhysicalDrive0" style paths need administrative
+      privilege for anything but volume 0. Error 5. */
+static int map_physical(HANDLE *out)
+{
+    HANDLE h = CreateFileW(L"\\.\PhysicalDrive0",
+                           GENERIC_READ | GENERIC_WRITE,
+                           0, NULL, OPEN_EXISTING, 0, NULL);
+    if (h == INVALID_HANDLE_VALUE) return (int)GetLastError();  /* 5  */
+    *out = h;
+    return 0;
+}
+
+/* 2. A PCI BAR is exposed through a driver. Without one there is
+      no resource to map, and the class GUID is the only route. */
+static int map_class_dev(HANDLE *out)
+{
+    HANDLE h = CreateFileW(L"\\?\Device#Bus#0000#0&amp;{0000b1d0-3030-11d0-9617-00c04fd430a8}#...",
+                           GENERIC_READ | GENERIC_WRITE,
+                           FILE_SHARE_READ | FILE_SHARE_WRITE,
+                           NULL, OPEN_EXISTING, 0, NULL);
+    if (h == INVALID_HANDLE_VALUE) {
+        DWORD e = GetLastError();
+        /* 2 = the device is not present or not started
+           5 = present, no permission
+           1 = present, the driver rejected the access           */
+        return (int)e;
+    }
+    *out = h;
+    return 0;
+}
+
+/* 3. AND THE PROJECTED ONE: on a PC the thing you actually want is
+      a driver, not a mapping. A user-mode mapping of a register
+      that a kernel driver also touches is a data race with no
+      arbitration - which is exactly the trap section 4.4 is about. */
+static int the_right_answer_on_a_pc(void)
+{
+    /* If the register is not yours alone, open the driver's device
+       object and send requests through it. The kernel driver owns
+       the memory, defines the lock, and can report the state. */
+    HANDLE h = CreateFileW(L"\\.\MyDeviceDriver",
+                           GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                           OPEN_EXISTING, 0, NULL);
+    if (h == INVALID_HANDLE_VALUE) return (int)GetLastError();
+    DeviceIoControl(h, IOCTL_READ_REG, NULL, 0, NULL, 0, NULL, NULL);
+    CloseHandle(h);
+    return 0;
+}
+</code></pre></div>
+
+<p>The asymmetry worth noticing: on Linux the mapping is explicit and the privilege question is stark, while on Windows the path is a name and the failure is a <code>DWORD</code> with a documented meaning. In practice this means a Linux program is more likely to reach a register directly and a Windows program more likely to have been forced through a driver — which is why the driver boundary is treated as a Windows peculiarity when it is actually the safer design on both.</p>
+
+
+<h3 id="ch4-rmw" data-toc>4.3 Read-modify-write, and the hazard nobody warns about</h3>
+
+<p class="topic-desc">Setting a bit in a register is three operations: read, modify, write. If anything else touches the register between the read and the write, the modification is lost. With one thread there is nothing in between; with a driver, a DMA engine, or a second core, there is, and the window is a handful of nanoseconds wide. This is the defect that appears on hardware that works perfectly on the bench and loses interrupts under load.</p>
+
+<h4 id="ch4-rmw--section">Atomic bit set and clear exist for this, and are slower</h4>
+<p>Most device register blocks provide atomic test-and-set and test-and-clear instructions precisely so that callers do not have to do read-modify-write. They exist on ARM, on RISC-V, and on x86 via <code>lock</code>-prefixed instructions. The alternative is an unconditional write, which is what you want when you know the full desired value.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdint.h&gt;
+
+typedef struct {
+    volatile uint32_t CONTROL;
+    volatile uint32_t IRQ_SET;    /* writing 1 SETS the bit, atomically */
+    volatile uint32_t IRQ_CLEAR;  /* writing 1 CLEARS it, atomically   */
+    volatile uint32_t IRQ_STATUS; /* read-only                        */
+} dev_regs;
+
+/* THE RMW TRAP. */
+static void WRONG_set_bit(dev_regs *r, unsigned bit)
+{
+    r->IRQ_SET = 1u &lt;&lt; bit;      /* WRONG: this register needs the
+                                      bit in IRQ_CLEAR or a 1 in
+                                      IRQ_SET, and a read-modify
+                                      is not atomic */
+}
+
+/* RIGHT: use the atomic register the device provides. No read, no
+   window, no lost update. */
+static void right_set_bit(dev_regs *r, unsigned bit)
+{
+    r->IRQ_CLEAR = 1u &lt;&lt; bit;    /* some designs name it SET for
+                                      "unmask", others CLEAR for
+                                      "acknowledge"; check the
+                                      manual, not the name        */
+}
+
+/* WHEN THERE IS NO ATOMIC REGISTER, do the read-modify-write
+   WITHOUT volatile. A volatile read-modify-write is still a race,
+   because volatile constrains the compiler and not the
+   processor. */
+static void right_rmw(dev_regs *r, unsigned bit)
+{
+    uint32_t v = r->CONTROL;
+    r->CONTROL = v | (1u &lt;&lt; bit);
+}
+
+/* OR USE THE ARCHITECTURE. C11 and C++11 both define these, and
+   they are the portable spelling of "atomic test and set". */
+#include &lt;stdatomic.h&gt;
+
+static void portable_atomic(volatile uint32_t *reg, uint32_t mask)
+{
+    /* A CAS loop. Not a lock: on x86 this compiles to the same
+       instruction as the volatile version, because the volatile
+       version was ALSO a CAS loop under the hood. */
+    uint32_t cur = *reg;
+    while (!atomic_compare_exchange_weak(
+               (_Atomic(uint32_t) *)reg, &amp;cur, cur | mask)) { }
+    /* cur was updated by the failed CAS, so the retry must NOT
+       re-read: reloading here is a livelock under contention. */
+}
+</code></pre></div>
+
+<h4 id="ch4-rmw--section-2">The window, drawn out</h4>
+<p>Between the read and the write, anything can happen. The CPU can be preempted. Another core can execute the same sequence. A DMA engine can complete a transfer and write a completion bit that your write then overwrites with a value computed from a stale read. On a single-core system with no interrupts enabled, the window is empty and the code is correct — which is why it survives development on one target and fails on another.</p>
+
+<div class="codeWrap"><pre><code>/* THE TIMELINE, which is what a lost update actually looks
+   like. Both threads read CONTROL, both compute, both write, and
+   thread 2's write discards thread 1's change. */
+void *writer(void *arg)
+{
+    dev_regs *r = arg;
+    for (;;) {
+        uint32_t v = r->CONTROL;         /* A: reads 0x00        */
+        r->CONTROL = v | ENABLE_BIT;     /* C: writes 0x01       */
+    }
+}
+
+void *writer2(void *arg)
+{
+    dev_regs *r = arg;
+    for (;;) {
+        uint32_t v = r->CONTROL;         /* B: reads 0x00, AFTER A
+                                            but BEFORE C          */
+        r->CONTROL = v | DMA_BIT;        /* D: writes 0x02, LOSING
+                                            A's ENABLE entirely  */
+    }
+}
+
+/* THE INTERRUPT-VERSION OF THE SAME BUG, which is more common on
+   embedded and far more damaging. */
+static volatile uint32_t pending = 0;
+
+static void isr(void) { pending |= FROM_IRQ; }   /* read, OR, write */
+
+static void handler(void)
+{
+    pending |= FROM_MAIN;     /* can fire BETWEEN the ISR's read and
+                                 its write, and lose FROM_IRQ
+                                 entirely — so the interrupt is
+                                 never processed and the system
+                                 wedges                      */
+}
+</code></pre></div>
+
+<h4 id="ch4-rmw--section-3">Disabling interrupts is a last resort, and is almost always wrong</h4>
+<p>The traditional fix is to disable interrupts around the read-modify-write, and it is worse than the race it fixes. It makes the region uninterruptible on the current core only, it does nothing about another core or a DMA engine, it costs a pipeline flush on every entry and exit, and — most importantly — it makes the code correct only on a single core. The three better options, in order: use the device's atomic register; use the architecture's atomic instruction; or — if you must — take the lock the driver already provides.</p>
+
+<p>One special case where disabling interrupts <em>is</em> right: a read-modify-write on a flag word that is shared with an interrupt handler on the same core, where the interrupt must not be delayed and the region is a few instructions. That case is narrow, it is a property of a specific architecture's interrupt model, and it should be commented as such — because the comment is the only thing that stops the next person replacing it with the wrong mechanism on a system with more cores.</p>
+
+
+<h3 id="ch4-order" data-toc>4.4 Ordering: what volatile does not do</h3>
+
+<p class="topic-desc">The most common misconception in this entire area is that <code>volatile</code> makes an access ordered. It does not. <code>volatile</code> tells the compiler that a value may change without being written through this program, which prevents caching a value in a register and prevents eliding a read. It says nothing about the processor, which is still free to reorder the access against others, to merge two writes, or to sit in a write buffer while the device reads stale data.</p>
+
+<h4 id="ch4-order--section">Four reorderings, and which one bites on a device</h4>
+<p>Processor stores are not necessarily visible in program order. Store-to-store reordering means a write to the data register may reach the device after a write to the control register, so the device starts before the data is there. Load-load reordering is the same hazard on the read side. Store-to-load reordering means the device may not see a completed write before a subsequent read returns stale data. Write combining merges consecutive writes, which is fine for a register and catastrophic for a FIFO you are filling byte by byte, because the device sees one word where you wrote four.</p>
+
+<div class="codeWrap"><pre><code>#include &lt;stdint.h&gt;
+
+typedef struct {
+    volatile uint32_t DATA;
+    volatile uint32_t CONTROL;
+} dev_regs;
+
+static void fill_and_start(volatile uint32_t *data, volatile uint32_t *ctl,
+                           const uint32_t *words, unsigned n)
+{
+    for (unsigned i = 0; i &lt; n; i++)
+        data[i] = words[i];          /* the compiler keeps the
+                                         ORDER of these writes */
+
+    /* A COMPILER BARRIER: everything above is issued before
+       everything below. It does NOT stop the CPU reordering. */
+    __asm__ __volatile__("" ::: "memory");
+
+    *ctl = START_BIT;                /* ...and the CPU may still
+                                         reach the device with
+                                         START before DATA      */
+}
+
+/* A CPU BARRIER, which is what is actually required. */
+static void with_barrier(volatile uint32_t *data, volatile uint32_t *ctl,
+                         const uint32_t *words, unsigned n)
+{
+    for (unsigned i = 0; i &lt; n; i++)
+        data[i] = words[i];
+
+#if defined(__x86_64__) || defined(__i386__)
+    __asm__ __volatile__("mfence" ::: "memory");   /* x86: orders
+                                                        STORES, which
+                                                        is what this
+                                                        needs        */
+#elif defined(__aarch64__)
+    __asm__ __volatile__("dmb ishst" ::: "memory"); /* ARM: a store
+                                                         barrier      */
+#elif defined(__riscv)
+    __asm__ __volatile__("fence rw,w" ::: "memory");
+#endif
+
+    *ctl = START_BIT;
+}
+
+/* ON WINDOWS THE SAME, with the intrinsic. */
+#ifdef _MSC_VER
+#include &lt;intrin.h&gt;
+static void ms_barrier(void) { _ReadWriteBarrier(); }
+#endif
+</code></pre></div>
+
+<h4 id="ch4-order--section-2">x86 is nearly free, and that is the trap</h4>
+<p>On x86-64 the store buffer is drained by the time a load retires, so load-to-load and store-to-load reorderings essentially do not occur, and a compiler barrier is usually enough. A program developed on x86 with compiler barriers and then ported to ARM — which is the direction almost every embedded port moves — acquires a defect that never existed on the development machine. ARM is weakly ordered, and the weaker of the two is the one with the bugs.</p>
+
+<p>The practical rule: <strong>write the barrier for the weakest target the code will run on, not the one it is tested on.</strong> On ARM the barrier is free when the surrounding code is already synchronising, because a full barrier on a modern core costs tens of cycles and nothing in a device-access loop; on x86 it costs nothing; on an old single-core ARM7 it costs a pipeline flush. The only argument for the weak barrier is a measurable one on a specific target, and that measurement is worth recording where the barrier is.</p>
+
+<div class="codeWrap"><pre><code>/* THE C11 SPELLING, which is the portable answer and the one to
+   prefer over inline assembly. */
+#include &lt;stdatomic.h&gt;
+
+/* An atomic with RELEASE ordering: everything written before this
+   store is visible to whoever observes it. That is exactly the
+   doorbell case. */
+static _Atomic uint32_t doorbell;
+
+static void publish(volatile uint32_t *data, uint32_t *words, unsigned n)
+{
+    for (unsigned i = 0; i &lt; n; i++)
+        data[i] = words[i];
+
+    /* RELEASE: no barrier on x86, a store barrier on ARM, and the
+       compiler cannot move a store above it either. */
+    atomic_store_explicit(&amp;doorbell, START_BIT, memory_order_release);
+}
+
+/* AND THE ACQUIRE SIDE, which the interrupt handler or the driver
+   needs: nothing after this load may be hoisted above it. */
+static uint32_t consume(void)
+{
+    return atomic_load_explicit(&amp;doorbell, memory_order_acquire);
+}
+</code></pre></div>
+
+<h4 id="ch4-order--section-3">Two things that are never the answer</h4>
+<p>A spinlock around the register is not the answer unless the contention actually exists — a device register is not shared memory, and taking a lock for every access costs more than the access. And a delay is not the answer either: a microsecond of delay is not a memory barrier, it is a hope that the write buffer drained, and it is slower than the barrier on every platform and wrong on the platforms where the buffer is deep.</p>
+
+<p>What is the answer is a barrier, at the right strength, for the target that is weakest. On a single-threaded program that talks to a device through a driver, there is often nothing to do at all — the driver's own locking provides the ordering, and a user-mode program that adds barriers is adding cost for a guarantee the driver already made. That is worth knowing before writing any: check whether the mapping is exclusive to you, and only then decide.</p>
+
+
+<h3 id="ch4-rules" data-toc>4.5 Five rules, and the one that prevents the rest</h3>
+
+<p class="topic-desc">Everything in this chapter reduces to a small number of decisions, and the decisions are made once per device rather than once per access. A structure that names the registers, their widths and their access semantics gets the rest of the program right by construction; a program that writes <code>*(volatile uint32_t *)0x40000000 = x</code> in twenty places gets twenty opportunities to be wrong, and every one of them has to be found by review.</p>
+
+<h4 id="ch4-rules--section">Rule 1: one named structure per register block</h4>
+<p>Name the device's registers in a struct, in the manual's order, with the widths the bus enforces. The struct is documentation that the compiler checks, and it is what makes the register map reviewable against the manual — which is the review that catches a typo in an address, and a typo in a register address is a fault or, worse, a write to a status bit that clears something.</p>
+
+<div class="codeWrap"><pre><code>/* THE REGISTERS, from the manual. Field order matches the
+   manual's table, so the two can be compared line by line. */
+typedef struct {
+    volatile uint32_t ID;          /* 0x00  read-only, magic 0xA1B2 */
+    volatile uint32_t VERSION;     /* 0x04  read-only                */
+    volatile uint32_t CONTROL;     /* 0x08  rw                       */
+    volatile uint32_t STATUS;      /* 0x0C  ro, bits change alone   */
+    volatile uint32_t DATA;        /* 0x10  rw, FIFO: read pops     */
+    volatile uint32_t LENGTH;      /* 0x14  rw, byte count          */
+    volatile uint32_t IRQ_MASK;    /* 0x18  rw                      */
+    volatile uint32_t IRQ_ACK;     /* 0x1C  w1c                     */
+    uint32_t          _reserved[64]; /* the rest is not yours to
+                                          touch, and saying so in
+                                          the struct is the
+                                          documentation       */
+} uart_regs;
+
+/* THE ONE STATIC ASSERTION worth having: the identity of the
+   device. A mapping that returns the wrong magic is the wrong
+   device, the wrong bus, or a driver already holding it — and
+   every subsequent access is then a write to somebody else's
+   hardware. */
+static inline int uart_is_present(const uart_regs *r)
+{
+    return r->ID == 0x0000A1B2u;
+}
+</code></pre></div>
+
+<h4 id="ch4-rules--section-2">Rule 2: probe identity before every other access</h4>
+<p>This is the rule that prevents the rest. A mapping that has not been verified identifies nothing, and a program that writes to a control register on an unverified mapping can halt a machine, disable a watchdog on a board it shares, or acknowledge an interrupt belonging to a driver that has not finished initialising. It is three lines and it is the difference between a diagnostic and an outage.</p>
+
+<div class="codeWrap"><pre><code>static int uart_open(struct uart *u)
+{
+    /* 1. Is the device there? */
+    if (!uart_is_present(u->regs)) return -3;
+
+    /* 2. Is the version one this program knows how to drive?
+       Register layouts change between silicon revisions, and the
+       behaviour of a reserved bit changed in one. */
+    if (u->regs->VERSION &lt; 1 || u->regs->VERSION > 3) return -4;
+
+    /* 3. Stop anything that might be running, before touching the
+       rest. A device left running by a previous driver will keep
+       accepting writes while you reconfigure it. */
+    u->regs->CONTROL = 0;
+    barrier();
+
+    /* 4. Drain, or the first read returns a byte from before the
+       reset. */
+    while (u->regs->STATUS &amp; RX_PENDING) (void)u->regs->DATA;
+    (void)u->regs->IRQ_ACK;              /* w1c: acknowledge whatever
+                                             the reset set */
+
+    /* 5. Configure, then enable. */
+    u->regs->IRQ_MASK = 0;
+    u->regs->CONTROL = ENABLE | PARITY_EVEN | STOP_1;
+    return 0;
+}
+</code></pre></div>
+
+<h4 id="ch4-rules--section-3">Rules 3 to 5</h4>
+<p><strong>3. Never use a bare address.</strong> Every access goes through the named struct, so the register map is one place and the address appears once. This is not about safety from segfaults — it is about the fact that a register map is a design artefact that has to be reviewable, and a review cannot compare twenty scattered literals against a manual's table.</p>
+
+<p><strong>4. Put the barrier where the manual says the ordering is required, and nowhere else.</strong> Two barriers per transfer is a common, defensible choice: one after filling the data, one before reading the status. More than that is usually a sign the code is compensating for not knowing which ordering the device needs, and each barrier costs a pipeline drain.</p>
+
+<p><strong>5. Treat an exclusive mapping as a precondition, not an assumption.</strong> If a kernel driver owns the device, your mapping is a second client with no arbitration, and no barrier makes that safe — this is a data race with a device instead of with a thread, and section 4.3's read-modify-write applies to your driver's update as surely as to yours. The right answer is to go through the driver, which means an <code>ioctl</code> on both platforms. The mapping approach is for a board where your program is the operating system, and that is a real and common case — but it is a case, and knowing which one you are in is the difference between working hardware and an intermittent lockup.</p>
+
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Port API.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

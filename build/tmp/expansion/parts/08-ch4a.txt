@@ -1,0 +1,94 @@
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Error Handling</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Rust has no exceptions: recoverable failure is a returned value (<code>Result</code>), and unrecoverable failure is a panic. This chapter covers the <code>?</code> operator that threads errors through a call stack, the panicking accessors and when they are justified, hand-written and derived error types, and the distinction between an error and a panic.</p>
+
+<h3 id="ch4-1" data-toc>4.1 Result and the ? operator</h3>
+<p class="topic-desc">The return type is the function's contract: <code>Result&lt;T, E&gt;</code> says this call may fail, and the <code>?</code> operator converts failure into an early return without obscuring the happy path.</p>
+
+<h4 id="ch4-1-contract">The Result type is the function's contract</h4>
+<p>Because failure is encoded in the return type, a caller can see, before calling, what can go wrong and what the error values are. There is no hidden control flow and no exception to forget to catch. The cost is that every fallible call must be acknowledged — which is why libraries carefully choose which operations return <code>Result</code> and which are infallible by construction.</p>
+<div class="codeWrap"><pre><code>use std::fs;
+
+// The contract: either produce a String or report why not.
+fn read_input(path: &amp;str) -&gt; Result&lt;String, std::io::Error&gt; {
+    fs::read_to_string(path)
+}
+
+fn main() {
+    match read_input("input.txt") {
+        Ok(text) =&gt; println!("{} chars", text.len()),
+        Err(e) =&gt; eprintln!("failed: {e}"),
+    }
+}</code></pre></div>
+
+<h4 id="ch4-1-question">The ? operator</h4>
+<p>Hand-written matches on every <code>Result</code> would bury the logic in boilerplate, so <code>?</code> does the obvious thing: on <code>Ok(v)</code> it yields <code>v</code>; on <code>Err(e)</code> it returns <code>Err(e.into())</code> from the <em>current</em> function. The <code>into()</code> is the interesting part — it converts the error into whatever the function's return type demands, provided a <code>From</code> implementation exists (chapter 4.3 shows how to build one). A function that uses <code>?</code> must itself return a <code>Result</code> (or <code>Option</code>).</p>
+<div class="codeWrap"><pre><code>use std::fs;
+
+fn first_line(path: &amp;str) -&gt; Result&lt;String, std::io::Error&gt; {
+    let text = fs::read_to_string(path)?;   // early return on Err
+    Ok(text.lines().next().unwrap_or("").to_string())
+}
+
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let line = first_line("Cargo.toml")?;
+    println!("{line}");
+    Ok(())
+}</code></pre></div>
+
+<h4 id="ch4-1-main">? in main: Box&lt;dyn Error&gt;</h4>
+<p><code>main</code> may return a <code>Result</code> too, and when it does, the error is printed and the process exits with a non-zero code. The conventional catch-all type is <code>Box&lt;dyn std::error::Error&gt;</code> — a trait object that can hold any error — which is exactly right for a binary that just wants to report failure and stop. When you need to distinguish errors for exit codes or continued execution, return a concrete error type instead.</p>
+<div class="codeWrap"><pre><code>use std::env;
+
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let args: Vec&lt;String&gt; = env::args().collect();
+    if args.len() &lt; 2 {
+        eprintln!("usage: {} &lt;file&gt;", args[0]);
+        std::process::exit(2);       // usage error, not a Result
+    }
+    let text = std::fs::read_to_string(&amp;args[1])?;
+    println!("{} lines", text.lines().count());
+    Ok(())
+}</code></pre></div>
+
+<h3 id="ch4-2" data-toc>4.2 unwrap, expect and when they are acceptable</h3>
+<p class="topic-desc"><code>unwrap</code> and <code>expect</code> are the panicking accessors: they return the <code>Ok</code>/<code>Some</code> value and panic on the error case. They are not wrong — but they are only right where failure is genuinely impossible.</p>
+
+<h4 id="ch4-2-unwrap">unwrap: panic on error</h4>
+<p><code>unwrap</code> says "I am certain this cannot fail", and when the certainty is wrong it aborts with a generic message naming the operation. That is perfect for literals and invariants, and fatal for anything user-controlled — a malformed file name becomes a crash instead of a handled error. The rule of thumb: <code>unwrap</code> on values that come from your own code's constants, never on values that crossed a trust boundary.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    // "10" is a literal: the parse cannot fail, unwrap is honest
+    let n: i32 = "10".parse().unwrap();
+    println!("{n}");
+
+    // a user-supplied string would deserve a Result instead
+    let raw = std::env::args().nth(1).unwrap_or_else(|| "10".into());
+    let m: i32 = raw.parse().unwrap_or(0);   // fall back, don't panic
+    println!("{m}");
+}</code></pre></div>
+
+<h4 id="ch4-2-expect">expect: the message that survives</h4>
+<p><code>expect</code> is <code>unwrap</code> with a caller-written message that appears in the panic output — the difference between "called <code>Option::unwrap()</code> on a <code>None</code> value" and "server requires a port argument". The message is your future self's debugging context, so it should state the <em>invariant</em>, not the panic: "port must be a number in 0..=65535" beats "parse failed". It still panics; it just explains better.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let raw = std::env::args().nth(1);
+    let port: u16 = raw
+        .expect("usage: server &lt;port&gt;")        // None: custom message
+        .parse()
+        .expect("port must be a number 0-65535");
+    println!("listening on {port}");
+}</code></pre></div>
+
+<h4 id="ch4-2-fallback">Graceful fallbacks before you panic</h4>
+<p>Most "unwrap" sites are really asking for a policy: a default, a skip, a retry. <code>unwrap_or</code> supplies a default value, <code>unwrap_or_else</code> computes one lazily, <code>ok</code>/<code>err</code> convert to <code>Option</code>, and <code>unwrap_or_default</code> leans on the type's <code>Default</code>. Reaching for these first — and keeping <code>unwrap</code> for true invariants — makes the crate's panic sites countable on one hand.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let port: u16 = "8080".parse().unwrap_or(8080);   // fallback default
+    let home = std::env::var("HOME")
+        .ok()                                          // Result -&gt; Option
+        .unwrap_or_else(|| "/home/guest".to_string());
+    let jobs: usize = std::env::var("JOBS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(4);
+    println!("{port} {home} {jobs}");
+}</code></pre></div>

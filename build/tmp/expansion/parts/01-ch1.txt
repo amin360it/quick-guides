@@ -1,0 +1,39 @@
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation: Why Rust</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage collector, by enforcing ownership rules in the type system. This chapter orients you: what Rust promises, how the toolchain is organised, and the territory — and the non-territory — where it earns its keep.</p>
+
+<h3 id="ch1-1" data-toc>1.1 Why Rust, and what it guarantees</h3>
+<p class="topic-desc">Every shortcoming that Rust removes comes from one of two places: a tool that makes a promise it does not keep, or a process that is not checking the promise at the boundary. Rust fixes the silence first, which makes the debugging much quieter.</p>
+
+<h4 id="ch1-1-pillars">The three pillars</h4>
+<p><strong>Ownership</strong> means every value has exactly one owner, and the value is dropped when that owner goes out of scope. <strong>Borrowing</strong> means you can pass a reference to a value without giving up ownership, but the reference cannot outlive the owner. <strong>Lifetimes</strong> are the compile-time proof that borrowing is safe. The three ideas are one mechanism with three names: the compiler can prove a program is memory-safe because it can see, at every point, who owns what and which references are still valid.</p>
+<div class="codeWrap"><pre><code>fn sum(xs: &amp;[i32]) -&gt; i32 {
+    xs.iter().sum()
+}
+
+fn main() {
+    let xs = vec![1, 2, 3];
+    println!("{}", sum(&amp;xs));   // 6
+}</code></pre></div>
+
+<h4 id="ch1-1-promise">What the compiler promises — and what it does not</h4>
+<p>The guarantee is narrow and strong: no dangling pointers, no use-after-free, no data races, no buffer overflows. Rust will <em>not</em> stop you from leaking memory deliberately with <code>std::mem::forget</code>, and it will not catch logical errors — you can still return the wrong sum, or dead-lock a mutex. It is a memory-safety guarantee, not a correctness guarantee. When several places genuinely need to share one value, the normal answer is a reference-counted handle: <code>Rc</code> on one thread, <code>Arc</code> across threads, both cloning by bumping a counter rather than copying the data.</p>
+<div class="codeWrap"><pre><code>use std::rc::Rc;
+
+fn main() {
+    let a = Rc::new(vec![1, 2, 3]);
+    let b = a.clone();                // cheap: bumps the refcount
+    println!("a and b share {:?}", a);
+    println!("strong refs: {}", Rc::strong_count(&amp;a));   // 2
+}</code></pre></div>
+
+<h4 id="ch1-1-limits">The one leak Rust allows on purpose</h4>
+<p><code>std::mem::forget</code> takes a value and declares it unreachable: the destructor never runs, so the memory is never returned. It is there for genuinely exotic cases — embedding a value into a lifetime-managed runtime, or handing a buffer to C code that takes over ownership. Because it compiles without complaint, the line <em>is</em> the documentation: a deliberate leak is visible, a buggy one is not.</p>
+<div class="codeWrap"><pre><code>use std::mem::forget;
+
+fn main() {
+    let s = String::from("leak me");
+    forget(s);   // compiles and runs: the buffer is never freed.
+                 // Rust stops accidents, not deliberate decisions.
+}</code></pre></div>

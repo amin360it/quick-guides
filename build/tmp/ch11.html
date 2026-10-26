@@ -1,0 +1,238 @@
+  <section class="chapter">
+<h2 id="ch11" data-toc>11 · Rendering Performance</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Rendering performance</button><div class="ch-toc-list"><a href="#ch11-rerenders">What actually re-renders</a><a href="#ch11-measure">Measuring before you change anything</a><a href="#ch11-cost">What a render actually costs</a><a href="#ch11-lists">Large lists and windowing</a><a href="#ch11-budget">Budgets and regression gates</a></div></div>
+    <p class="topic-desc">Performance work starts with a measurement, not a memo. This chapter establishes what triggers a re-render, how to observe one with the Profiler, where the real cost lives — the commit and the browser, not your function body — and how to keep a fast app fast with budgets in CI.</p>
+    <h3 id="ch11-rerenders" data-toc>What actually re-renders</h3>
+    <p>A render is React calling your component function again with a new set of arguments. It is not a pixel, not a DOM write, and not by itself expensive. The function runs, produces a tree of elements, and React decides what, if anything, to change on screen. Understanding which events cause that function call is the whole of half of performance work, because the other half is measurement and the diagnosis is almost always "component X re-rendered when Y changed, and it did not need to".</p>
+    <p>There are exactly four triggers. Your component's own state changed to a value that is not <code>Object.is</code>-equal to the previous one. A parent component re-rendered, which re-renders every child unless the child is wrapped in <code>React.memo</code>. A context value changed, which re-renders every consumer of that context. And a state update inside a transition or an action settled, which re-renders the components that read what it changed. Nothing else re-renders: mutating <code>ref.current</code>, changing a value held only in a module variable, calling a callback that React does not know about, or touching the DOM directly cause no render at all.</p>
+    <div class="codeWrap"><pre><code>// every update that bails out, and every update that re-renders
+function Counter() {
+  const [n, setN] = useState(0);
+  const [items, setItems] = useState([]);
+
+  // BAILS OUT: Object.is(1, 1) is true, React throws the update away
+  setN(1);                 // when n is already 1
+
+  // RENDERS: new array identity even if the contents are equal
+  setItems([...items]);    // spread always allocates
+
+  // OFTEN BAILS OUT: the updater returns the same state, React re-renders
+  // once to find that out, then stops - so it is not free, but it converges
+  setN((prev) =&gt; prev);
+
+  // RENDERS ANYWAY: setState always schedules, even with the identical value
+  // of a prop passed back in
+  setItems((prev) =&gt; prev.concat([]));
+}</code></pre></div>
+    <p>The subtle case is the updater function. When you pass <code>setN((prev) =&gt; prev)</code>, React must call your function to learn whether the state changed, so the component renders once more than strictly necessary — but then it stops, because the result is identical. Repeated identical updates therefore converge rather than loop. The dangerous version is not bail-out behaviour, it is the new-identity behaviour: an inline object, array or function passed as a prop is a new value on every render, so a memoised child comparing props shallowly sees a difference every time.</p>
+    <div class="codeWrap"><pre><code>// the re-render you did not ask for: identity, not value
+function ProductList({ products }) {
+  // this object is new on every render of ProductList
+  const ui = { dense: true, showPrice: true };
+  return products.map((p) =&gt; (
+    &lt;ProductRow key={p.id} product={p} ui={ui} /&gt;   // memo? wasted - ui differs
+  ));
+}
+
+// hoist what does not depend on props, pass what does
+const DENSE_UI = { dense: true, showPrice: true };
+function ProductList({ products }) {
+  return products.map((p) =&gt; (
+    &lt;ProductRow key={p.id} product={p} ui={DENSE_UI} /&gt;
+  ));
+}</code></pre></div>
+    <h4>The four triggers, stated precisely</h4>
+    <p>Own state that actually changed; a parent re-render; a context value change; a settled transition. Every reported React performance bug is one of these four, and the useful question when a profile looks wrong is never "why is this slow" but "which of the four fired, and did the component need it". Write the trigger down before you change anything — it keeps you from sprinkling <code>memo</code> over components whose re-renders were both correct and cheap.</p>
+    <div class="note"><p>A component that re-renders is not a component that is slow. Rendering 40 tiny function calls is routinely cheaper than the bookkeeping required to prove they could be skipped. The measurement in the next section is what tells you which situation you are in.</p></div>
+    <h3 id="ch11-measure" data-toc>Measuring before you change anything</h3>
+    <p>The React DevTools Profiler records every commit: how long the render phase took, which components rendered, and — critically — which components were skipped because of <code>memo</code>. Two views matter. The flamegraph view shows the tree for one commit, with bar width proportional to time, so the expensive subtree is visually obvious. The ranked chart sorts components by duration across the selected commits, which answers "what is the most expensive thing on this screen" without you guessing.</p>
+    <p>Three habits make profiles trustworthy. Record a real interaction — a click through the slow path — rather than scrolling idly, because the profiler's flamegraph is per-commit and scrolling produces hundreds of commits nobody reads. Filter by the component you suspect, since an unfiltered profile of a large page is mostly chrome you cannot act on. And always compare against a profile taken in a production build: development React is several times slower, runs double-invoked effects under StrictMode, and carries prop-type style checks, so a dev profile ranks problems that do not exist for users.</p>
+    <div class="codeWrap"><pre><code>// programmatic profiling: wrap only the subtree you care about
+import { Profiler } from 'react';
+
+function onRender(id, phase, actualDuration, baseDuration, startTime, commitTime) {
+  // actualDuration - time spent rendering THIS update in this build (dev-only,
+  //                   near meaningles in production builds)
+  // baseDuration    - estimated time to render the whole subtree from scratch
+  //                   stable across updates: use it for "is this subtree big"
+  if (actualDuration &gt; 16) {
+    reportMetric('slow-commit', { id, phase, actualDuration, baseDuration });
+  }
+}
+
+export function Dashboard() {
+  return (
+    &lt;Profiler id="Dashboard" onRender={onRender}&gt;
+      &lt;Chart /&gt;
+      &lt;DataTable /&gt;
+    &lt;/Profiler&gt;
+  );
+}</code></pre></div>
+    <p>Use <code>baseDuration</code> for sizing decisions and <code>actualDuration</code> for regression detection. <code>baseDuration</code> is computed from the element tree as if everything rendered from scratch; it changes only when the tree changes, so it is the right number for "how heavy is this screen". <code>actualDuration</code> measures one update and shrinks whenever memoisation or bail-outs skip work, so it is the right number for "did my change help" — but it is only meaningful in development builds, which is exactly where you compare before and after.</p>
+    <div class="codeWrap"><pre><code>// a render ledger: log which components rendered and why, during development
+const renderLog = new Set();
+
+export function trackRender(name) {
+  if (!import.meta.env.DEV) return;
+  const stack = new Error().stack.split('\n')[2].trim();
+  const key = name + ' @ ' + stack;
+  if (renderLog.has(key)) return;
+  renderLog.add(key);
+  console.count('[render] ' + name);
+}
+
+function Sidebar({ route }) {
+  trackRender('Sidebar');
+  return &lt;nav data-route={route} /&gt;;
+}
+
+// call renderLog.clear() in a test setup file, then assert on the counts:
+// expect(renderLog.size).toBe(2) after a state change that should touch
+// only two components.</code></pre></div>
+    <h4>Reading a flamegraph honestly</h4>
+    <p>A wide bar high in the tree means a layout component re-rendered and took its children with it — fix the state that woke it. A wide bar low in the tree means one component is doing heavy work inside its own function — fix the work. A wall of equal thin bars means nothing is expensive and the frame budget was simply spent on many small commits in sequence; that is a scheduling problem, not a component problem, and memoisation will not touch it. Match the shape to the category before reaching for a tool.</p>
+    <div class="warn"><p>Never profile a development build and then quote the numbers as user-facing. The ratio between dev and prod cost varies with component shape — heavy prop validation and double-invoked effects distort some screens far more than others — so a dev profile is a map of relative priorities, not a stopwatch.</p></div>
+    <h3 id="ch11-cost" data-toc>What a render actually costs</h3>
+    <p>React's render phase is a function call and a diff. Calling your component, running your hooks, building element objects and running the reconciliation algorithm against the previous tree: all of this is JavaScript that usually costs single-digit microseconds per component. The expensive phases are downstream. Commit means writing to the DOM, and the browser then recalculates style, layout and paint. A React app that "feels slow" is almost always blocked in one of three places: a large commit touching many nodes, a layout thrash caused by measuring the DOM and then mutating it repeatedly, or JavaScript occupying the main thread so input events queue behind it.</p>
+    <p>The distinction matters because the fixes are different. If the render phase is heavy, you are doing too much work in the component body — deriving expensive values on every render, stringifying large objects, sorting thousand-item arrays without memo, or calling APIs like <code>new Date().toLocaleString()</code> inside a loop over rows. If the commit phase is heavy, you are changing too much DOM at once — inserting thousands of nodes, toggling classes on an entire tree, or re-running CSS transitions by removing and re-adding elements. If the main thread is simply busy, the fix is to break the work into slices, which is what transitions in chapter 14 exist for.</p>
+    <div class="codeWrap"><pre><code>// expensive work in the render body - it runs on every keystroke
+function FilterableTable({ rows, query }) {
+  // this sorts on every render, even when rows and query are unchanged
+  const sorted = [...rows]
+    .sort((a, b) =&gt; b.score - a.score)
+    .filter((r) =&gt; r.name.includes(query))
+    .map((r) =&gt; ({ ...r, label: r.name + ' (' + r.score + ')' }));
+  return &lt;Table rows={sorted} /&gt;;
+}
+
+// the same derivation, keyed on its inputs
+const selectRows = (rows, query) =&gt; { /* pure selector, one line, unit-tested */ };
+function FilterableTable({ rows, query }) {
+  const sorted = useMemo(() =&gt; selectRows(rows, query), [rows, query]);
+  return &lt;Table rows={sorted} /&gt;;
+}</code></pre></div>
+    <p>Note that the fix above is not primarily about speed, it is about ownership: the derivation became a pure function with inputs, which is testable, reusable in a loader, and safe to move out of render entirely if it ever grows. Derivations that live inline in JSX accumulate until the component function itself is the bottleneck, and at that point every render of any parent is expensive too, because your component is a child of something. Keep the body of a component boring; push work into named functions that take arguments.</p>
+    <div class="codeWrap"><pre><code>// layout thrash: read-write-read-write forces a reflow per iteration
+function measureRows(ref) {
+  const nodes = ref.current.children;
+  for (let i = 0; i &lt; nodes.length; i++) {
+    const h = nodes[i].offsetHeight;          // READ  - forces layout
+    nodes[i].style.setProperty('--row-h', h + 'px'); // WRITE - invalidates
+  }
+}
+
+// batch the reads, then batch the writes
+function measureRows(ref) {
+  const nodes = ref.current.children;
+  const heights = [];
+  for (let i = 0; i &lt; nodes.length; i++) heights.push(nodes[i].offsetHeight);
+  for (let i = 0; i &lt; nodes.length; i++) {
+    nodes[i].style.setProperty('--row-h', heights[i] + 'px');
+  }
+}
+
+// in React the same rule means: measure in one effect, write in the next
+// microtask or the next commit - never interleave reads and writes per node.</code></pre></div>
+    <h4>Wasted work versus wasted DOM</h4>
+    <p>Wasted work is rendering a component whose output is identical to last time — the cost is JavaScript, and the fix is to skip the render or shrink it. Wasted DOM is committing changes the user cannot perceive — the cost is style and layout, and no amount of memoisation helps because the writes still happen. The Profiler shows you the first; for the second you want the browser's own performance panel, looking at the "Recalculate Style" and "Layout" tracks under the commit you clicked. Two tools, two phases, and using only the React profiler will hide an entire category of slowness.</p>
+    <div class="tip"><p>When a screen feels sluggish but the profiler shows nothing over a few milliseconds, look at frame timing instead: long tasks that begin after the commit — data fan-out, event handlers doing synchronous work, third-party scripts — never appear in React's numbers at all.</p></div>
+    <h3 id="ch11-lists" data-toc>Large lists and windowing</h3>
+    <p>Ten thousand rows is not a React problem until it is a browser problem: ten thousand rows means ten thousand rows in the DOM, and the initial commit alone will blow the frame budget regardless of how cheap each component is. Windowing — rendering only the rows inside the viewport plus a small overscan — is the structural fix, and it is worth doing by hand once so you understand what a library like react-window is buying you: a scroll handler, arithmetic, and a container with a fixed height.</p>
+    <p>Windowing has real costs you must weigh against it. The scroll height must be faked, which breaks simple "scroll to element" logic; keyboard navigation needs explicit management because the focused row can leave the DOM; and screen readers see a shorter list than exists. For a table of 50 rows, do nothing. For a feed that grows without bound, window before you profile — a technique that removes the problem class beats a technique that makes one instance of it cheaper.</p>
+    <div class="codeWrap"><pre><code>// windowing by hand: only rows near the viewport exist in the DOM
+function WindowedList({ rows, rowHeight, viewportHeight }) {
+  const [scrollTop, setScrollTop] = useState(0);
+  const overscan = 4;
+
+  const first = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
+  const last = Math.min(rows.length, Math.ceil((scrollTop + viewportHeight) / rowHeight) + overscan);
+  const visible = rows.slice(first, last);
+
+  return (
+    &lt;div style={{ height: viewportHeight, overflow: 'auto' }}
+         onScroll={(e) =&gt; setScrollTop(e.currentTarget.scrollTop)}&gt;
+      &lt;div style={{ height: rows.length * rowHeight, position: 'relative' }}&gt;
+        {visible.map((row, i) =&gt; (
+          &lt;Row key={row.id}
+               row={row}
+               style={{ position: 'absolute', top: (first + i) * rowHeight, height: rowHeight }} /&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <p>Two details separate a correct window from a flaky one. Keys must be stable ids, never the visible index: index keys tell React the identity of every row changed when a row is prepended, so it rebuilds the DOM for the whole window instead of moving one node. And the row component must be memoised with props that are stable across scrolls — passing <code>scrollTop</code> or a freshly-built style object into every row turns windowing into a full re-render per scroll frame, which is what you were avoiding. The arithmetic above runs per scroll event and is trivial; the renders it triggers are not, unless the props let React skip them.</p>
+    <div class="codeWrap"><pre><code>// the row must be skippable, and its props must be comparable
+const Row = memo(function Row({ row, style }) {
+  return &lt;div style={style}&gt;{row.name}&lt;/div&gt;;
+});
+
+// GOOD: style objects built inside map are new every scroll... which defeats
+// memo. build them once per window change instead:
+const styles = visible.map((_, i) =&gt; ({
+  position: 'absolute',
+  top: (first + i) * rowHeight,
+  height: rowHeight,
+}));
+
+// BETTER: let the row compute its own offset from a numeric prop - numbers
+// compare by value, so memo actually works:
+const Row = memo(function Row({ row, top, height }) {
+  return (
+    &lt;div style={{ position: 'absolute', top, height }}&gt;{row.name}&lt;/div&gt;
+  );
+});</code></pre></div>
+    <h4>When not to virtualise</h4>
+    <p>Skip windowing when the list is bounded by the domain — a nav menu, a settings page, a 200-row admin table — because the engineering cost, the accessibility caveats and the print/export edge cases outweigh a commit that costs 30 ms once. Also skip it when rows have variable, unmeasured heights: absolute positioning requires known heights, and measuring every row to discover them reintroduces the layout cost you were removing. Variable-height windowing is a substantially harder problem with its own measurement pass; reach for it only with evidence from the profiler that bounded lists are not your bottleneck.</p>
+    <div class="warn"><p>Windowing hides rows from the DOM, which means find-in-page, anchor scrolling to a row in the middle, and screen-reader row counts all break silently. If the list is a primary navigation surface, budget the accessibility work up front rather than discovering it after release.</p></div>
+    <h3 id="ch11-budget" data-toc>Budgets and regression gates</h3>
+    <p>A performance improvement that is not protected by a check is a performance improvement until the next feature lands. Budgets make the cost visible at the same moment the change is made: a maximum bundle size per entry point, a maximum render duration for the screens you care about, and a maximum long-task duration during the interactions that define your product. The point is not precision — a budget that is right within a factor of two beats a number nobody checks.</p>
+    <p>Three budgets cover most applications. Bundle size is checked in CI against a committed baseline, because it is deterministic and a 20 KB regression is visible long before a user complains. Render cost is checked with the Profiler API inside a component test: render, interact, assert on <code>actualDuration</code> or, better, on how many components rendered, since counts are stable across machines while milliseconds are not. Interaction latency is checked in a real browser against the production build — INP, the web vital that replaced FID, is exactly this measurement aggregated over real sessions, and a synthetic version of it in CI catches the regressions before they reach the field.</p>
+    <div class="codeWrap"><pre><code>// render-count gate: stable across machines, unlike milliseconds
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Profiler } from 'react';
+
+let rendered = [];
+const onRender = (id) =&gt; { rendered.push(id); };
+
+test('typing in the search box renders only the results list', () =&gt; {
+  render(
+    &lt;Profiler id="page" onRender={onRender}&gt;
+      &lt;SearchPage /&gt;
+    &lt;/Profiler&gt;
+  );
+  rendered = [];
+
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'ab' } });
+
+  // alphabetical, so the assertion is readable when it fails
+  expect([...new Set(rendered)].sort()).toEqual(['ResultsList']);
+});</code></pre></div>
+    <p>The reason render counts beat timings in tests is variance. A shared CI runner can be interrupted by its neighbour, so a 12 ms assertion flakes and the team learns to ignore red builds — at which point the gate protects nothing. Counts are deterministic: the same interaction over the same tree renders the same set of components every time. When a count assertion fails, it fails for a real reason — someone added a state update to a component that used to be inert — and the failure message names the component.</p>
+    <div class="codeWrap"><pre><code>// bundle budget: fail the build when an entry point grows past its baseline
+import { readFileSync, writeFileSync } from 'node:fs';
+
+const BUDGETS = { 'index': 180_000, 'vendor': 320_000, 'dashboard': 90_000 };
+const baseline = JSON.parse(readFileSync('bundle-baseline.json', 'utf8'));
+let failed = false;
+
+for (const [name, budget] of Object.entries(BUDGETS)) {
+  const size = readFileSync('dist/assets/' + name + '.js', 'utf8').length;
+  const drift = size - (baseline[name] || 0);
+  if (size &gt; budget) { console.error(name + ' over budget: ' + size + ' &gt; ' + budget); failed = true; }
+  if (drift &gt; 5_000) { console.error(name + ' grew ' + drift + ' bytes since baseline'); failed = true; }
+  baseline[name] = size;
+}
+if (process.argv.includes('--update')) writeFileSync('bundle-baseline.json', JSON.stringify(baseline, null, 2));
+process.exit(failed ? 1 : 0);</code></pre></div>
+    <h4>Baseline discipline</h4>
+    <p>A budget without a baseline only catches absolute blowouts; the baseline catches the slow creep of one small dependency per sprint. Commit it, update it deliberately with a flag, and require the diff to be reviewed — a PR that raises the baseline by 40 KB is a conversation about why, in the same way a raise in test count is not. The cheapest performance work in any mature application is the regression that never shipped.</p>
+    <div class="tip"><p>Measure the screens users actually open, on the device class they actually use. A budget suite that runs only against a top-end laptop on a fast connection will pass while the app is unusable for everyone on mid-range hardware — throttle the CPU in the browser panel once a sprint and let the flamegraph surprise you.</p></div>
+    <div class="ex"><h4>Exercises 11</h4><ol>
+      <li>Take a screen in your application, open the Profiler, and record one real interaction. Classify every wide bar in the flamegraph as render-phase or commit-phase cost, then write down which of the four triggers fired for the top three.</li>
+      <li>Find one derivation done inline in a component body. Extract it into a pure function with explicit inputs, unit-test it, and confirm with the Profiler that <code>baseDuration</code> for the screen did not change while <code>actualDuration</code> did.</li>
+      <li>Build the hand-rolled window from this chapter over 10,000 rows. Verify that scrolling keeps the DOM node count under 60, then break it deliberately by passing a new style object per row and watch the profiler flatline.</li>
+      <li>Write the render-count test for a screen in your app. Make it fail by adding an unnecessary <code>useState</code> to a leaf component, and confirm the failure names that component.</li>
+      <li>Add a bundle budget to CI with a committed baseline, raise the baseline once in a throwaway branch, and confirm the review conversation happens where you wanted it: in the pull request.</li>
+    </ol></div>
+  </section>

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Software Architecture Design Guide</title>
+<meta name="description" content="Software architecture design is the high-level discipline of shaping a system so it stays changeable…. 19 chapters, 77 topics and 21 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/architecture.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Software Architecture Design Guide">
+<meta property="og:description" content="Software architecture design is the high-level discipline of shaping a system so it stays changeable…. 19 chapters, 77 topics and 21 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/architecture.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Software Architecture Design Guide">
+<meta name="twitter:description" content="Software architecture design is the high-level discipline of shaping a system so it stays changeable…. 19 chapters, 77 topics and 21 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/architecture.html#article","headline":"Software Architecture Design Guide","name":"Software Architecture Design Guide","description":"Software architecture design is the high-level discipline of shaping a system so it stays changeable…. 19 chapters, 77 topics and 21 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/architecture.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/architecture.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Software Architecture Design Guide","item":"https://amin360it.github.io/quick-guides/architecture.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Software Architecture</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — Software Architecture Design</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-audience" data-target="orientation-audience">Who this is for</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · What Architecture Is</a><ul><li><a href="#ch1-definition" data-target="ch1-definition">1.1 A working definition</a></li><li><a href="#ch1-quality" data-target="ch1-quality">1.2 Quality attributes drive structure</a></li><li><a href="#ch1-tradeoffs" data-target="ch1-tradeoffs">1.3 Everything is a trade-off</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Architectural Thinking</a><ul><li><a href="#ch2-concerns" data-target="ch2-concerns">2.1 Separating concerns</a></li><li><a href="#ch2-boundaries" data-target="ch2-boundaries">2.2 Where to draw boundaries</a></li><li><a href="#ch2-constraints" data-target="ch2-constraints">2.3 Constraints and forces</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Modularity, Coupling &amp; Cohesion</a><ul><li><a href="#ch3-cohesion" data-target="ch3-cohesion">3.1 Cohesion: how focused a module is</a></li><li><a href="#ch3-coupling" data-target="ch3-coupling">3.2 Coupling: how much modules depend on each other</a></li><li><a href="#ch3-law" data-target="ch3-law">3.3 Interfaces, contracts and the Dependency Rule</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Design Principles</a><ul><li><a href="#ch4-solid" data-target="ch4-solid">4.1 SOLID</a></li><li><a href="#ch4-others" data-target="ch4-others">4.2 Other durable principles</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Design Patterns</a><ul><li><a href="#ch5-creational" data-target="ch5-creational">5.1 Creational patterns</a></li><li><a href="#ch5-structural" data-target="ch5-structural">5.2 Structural patterns</a></li><li><a href="#ch5-behavioral" data-target="ch5-behavioral">5.3 Behavioural patterns</a></li><li><a href="#ch5-enterprise" data-target="ch5-enterprise">5.4 Enterprise integration patterns</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Architectural Styles</a><ul><li><a href="#ch6-layered" data-target="ch6-layered">6.1 Layered (n-tier)</a></li><li><a href="#ch6-hexagonal" data-target="ch6-hexagonal">6.2 Hexagonal / Ports &amp; Adapters</a></li><li><a href="#ch6-clean" data-target="ch6-clean">6.3 Clean / Onion</a></li><li><a href="#ch6-others" data-target="ch6-others">6.4 Other styles</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Monolith vs Services</a><ul><li><a href="#ch7-modular-monolith" data-target="ch7-modular-monolith">7.1 The modular monolith default</a></li><li><a href="#ch7-microservices" data-target="ch7-microservices">7.2 When microservices earn their cost</a></li><li><a href="#ch7-costs" data-target="ch7-costs">7.3 The costs you take on</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Event-Driven Architecture</a><ul><li><a href="#ch8-events" data-target="ch8-events">8.1 Events vs commands</a></li><li><a href="#ch8-patterns" data-target="ch8-patterns">8.2 Broker, bus and choreography</a></li><li><a href="#ch8-delivery" data-target="ch8-delivery">8.3 Delivery semantics</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Domain-Driven Design</a><ul><li><a href="#ch9-language" data-target="ch9-language">9.1 Ubiquitous language</a></li><li><a href="#ch9-building-blocks" data-target="ch9-building-blocks">9.2 Building blocks</a></li><li><a href="#ch9-contexts" data-target="ch9-contexts">9.3 Bounded contexts and context maps</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Data, Consistency &amp; CAP</a><ul><li><a href="#ch10-cap" data-target="ch10-cap">10.1 CAP and PACELC</a></li><li><a href="#ch10-consistency" data-target="ch10-consistency">10.2 Consistency models</a></li><li><a href="#ch10-patterns" data-target="ch10-patterns">10.3 Patterns for consistency</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · API &amp; Integration Design</a><ul><li><a href="#ch11-styles" data-target="ch11-styles">11.1 Integration styles</a></li><li><a href="#ch11-evolution" data-target="ch11-evolution">11.2 Evolving contracts safely</a></li><li><a href="#ch11-resilience" data-target="ch11-resilience">11.3 Resilience for integrations</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch12" data-target="ch12">12 · Scalability &amp; Performance Architecture</a><ul><li><a href="#ch12-scaling" data-target="ch12-scaling">12.1 Scaling dimensions</a></li><li><a href="#ch12-caching" data-target="ch12-caching">12.2 Caching layers</a></li><li><a href="#ch12-method" data-target="ch12-method">12.3 A performance method</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch13" data-target="ch13">13 · Reliability, Resilience &amp; Observability</a><ul><li><a href="#ch13-resilience" data-target="ch13-resilience">13.1 Resilience patterns</a></li><li><a href="#ch13-observability" data-target="ch13-observability">13.2 Observability</a></li><li><a href="#ch13-recovery" data-target="ch13-recovery">13.3 Recovering gracefully</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch14" data-target="ch14">14 · Security Architecture</a><ul><li><a href="#ch14-model" data-target="ch14-model">14.1 Threat modelling</a></li><li><a href="#ch14-controls" data-target="ch14-controls">14.2 Controls</a></li><li><a href="#ch14-zero-trust" data-target="ch14-zero-trust">14.3 Zero trust in practice</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch15" data-target="ch15">15 · Documenting Architecture</a><ul><li><a href="#ch15-c4" data-target="ch15-c4">15.1 The C4 model</a></li><li><a href="#ch15-adr" data-target="ch15-adr">15.2 Architecture Decision Records (ADRs)</a></li><li><a href="#ch15-diagrams" data-target="ch15-diagrams">15.3 Diagrams as code</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch16" data-target="ch16">16 · Evaluating &amp; Evolving Architecture</a><ul><li><a href="#ch16-evaluation" data-target="ch16-evaluation">16.1 Evaluation methods</a></li><li><a href="#ch16-fitness" data-target="ch16-fitness">16.2 Fitness functions (automated governance)</a></li><li><a href="#ch16-evolve" data-target="ch16-evolve">16.3 Evolving safely</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch17" data-target="ch17">17 · Case Study — Designing an E-commerce Platform</a><ul><li><a href="#ch17-requirements" data-target="ch17-requirements">17.1 Requirements and attributes</a></li><li><a href="#ch17-shape" data-target="ch17-shape">17.2 The shape</a></li><li><a href="#ch17-decisions" data-target="ch17-decisions">17.3 Key decisions &amp; trade-offs</a></li><li><a href="#ch17-risks" data-target="ch17-risks">17.4 Risks and mitigations</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Patterns, Checklists &amp; Roadmap</a><ul><li><a href="#app-patterns" data-target="app-patterns">A.1 Pattern quick index</a></li><li><a href="#app-review" data-target="app-review">A.2 Architecture review checklist</a></li><li><a href="#app-roadmap" data-target="app-roadmap">A.3 Roadmap: beginner to advanced</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Software Architecture Design Guide</span>
+      <span class="am-band-s">19 chapters &middot; 77 topics &middot; 21 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — Software Architecture Design</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — Software Architecture Design</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-audience">Who this is for</a></div></div>
+    <p class="topic-desc">Software architecture design is the high-level discipline of shaping a system so it stays changeable, scalable and understandable for years. It is practised by defining system structure, responsibilities and relationships up front, then letting quality attributes such as availability and performance make trade-offs explicit. Mature architects document these choices and revisit them as the system evolves.</p>
+    <p>A practical guide to designing software systems that stay <strong>changeable, scalable and understandable</strong> over years. Single file, offline, progress saved locally.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">The guide is organised so time-poor readers can skip the linear read and jump straight to what they need. Chapters cluster into five bands: foundations, design patterns, architectural styles, distributed systems and non-functional properties, finishing with a worked case study and appendices. Each chapter builds on earlier material while remaining usable on its own.</p>
+    <ul>
+      <li><strong>Foundations (Ch. 1–4)</strong> — what architecture is, quality attributes, modularity, and core design principles.</li>
+      <li><strong>Patterns &amp; styles (Ch. 5–7)</strong> — design patterns, architectural styles, and monolith vs services.</li>
+      <li><strong>Distributed systems (Ch. 8–11)</strong> — event-driven design, DDD, data consistency, APIs.</li>
+      <li><strong>Non-functionals (Ch. 12–14)</strong> — scalability, reliability, security.</li>
+      <li><strong>Practice (Ch. 15–17)</strong> — documentation, evaluation, and a worked case study.</li>
+    </ul>
+    <div class="tip"><p>Architecture is the set of decisions that are <em>expensive to change</em>. Everything else is just code. Spend your effort on the expensive decisions.</p></div>
+    <h3 id="orientation-audience" data-toc>Who this is for</h3>
+    <p class="topic-desc">This material targets developers moving into senior or lead positions, and tech leads who must choose and defend a system’s shape. It assumes you can already code and reason about everyday design, then adds the bigger-picture skills of making structural decisions, balancing trade-offs and communicating them. At the end you should be able to own an architecture, not just contribute to one.</p>
+    <p>Developers growing into senior/lead roles, tech leads, and anyone who must choose how to structure a system and defend the choice.</p>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · What Architecture Is</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · What Architecture Is</button><div class="ch-toc-list"><a href="#ch1-definition">1.1 A working definition</a><a href="#ch1-quality">1.2 Quality attributes drive structure</a><a href="#ch1-tradeoffs">1.3 Everything is a trade-off</a></div></div>
+    <p class="topic-desc">This chapter defines what architecture is and argues that quality attributes, not features, shape a system’s structure. Architects translate non-functional requirements into structural decisions such as module boundaries, communication style and data ownership. Every decision trades one attribute for another, so the aim is to make the trade-off visible rather than to search for a free lunch.</p>
+    <h3 id="ch1-definition" data-toc>1.1 A working definition</h3>
+    <p class="topic-desc">Architecture is the set of structural decisions that are expensive to change later: the organisation of a system into components, their relationships, their responsibilities and the guiding principles that govern evolution. It is driven by non-functional attributes such as scalability, availability and security. Keep the definition practical so it stays usable as a basis for reviews, trade-off analysis and decision records.</p>
+    <p>Architecture is the <strong>structure of a system</strong>: its components, their responsibilities, their relationships, and the principles that guide its evolution. It is shaped by <em>quality attributes</em> (the "-ilities"), not by features.</p>
+    <h3 id="ch1-quality" data-toc>1.2 Quality attributes drive structure</h3>
+    <p class="topic-desc">Quality attributes such as scalability, availability, performance and security are what genuinely push a system into a particular shape, while features merely exercise that shape. In practice the architect derives scenarios for each attribute, weights them against business goals and lets the conflicts between them surface structural decisions. Features are easy to add to a shape that the attributes have already justified.</p>
+    <table>
+      <tr><th>Attribute</th><th>Question</th></tr>
+      <tr><td>Scalability</td><td>Can it handle 10× load?</td></tr>
+      <tr><td>Availability</td><td>What happens when a node dies?</td></tr>
+      <tr><td>Maintainability</td><td>How fast can we add a feature?</td></tr>
+      <tr><td>Performance</td><td>What is the p99 latency?</td></tr>
+      <tr><td>Security</td><td>Who can do what, and is it audited?</td></tr>
+      <tr><td>Testability</td><td>Can we verify a change safely?</td></tr>
+      <tr><td>Deployability</td><td>How often can we ship?</td></tr>
+    </table>
+    <h3 id="ch1-tradeoffs" data-toc>1.3 Everything is a trade-off</h3>
+    <p class="topic-desc">Every architectural decision trades one quality attribute for another, so there is no universally correct answer, only answers that fit the current goals. The discipline is to name the trade-off explicitly, record why one side won and what it cost. Doing this makes decisions reviewable and prevents later collaborators from silently reversing choices they do not understand.</p>
+    <p>There is no "best" architecture, only trade-offs against constraints. Adding a cache improves latency and hurts consistency. Adding a queue improves resilience and adds complexity. Name the trade-off or you have not made a decision.</p>
+    <div class="warn"><p>Beware architecture astronauts: complexity that serves the résumé rather than the requirements. The simplest structure that meets the quality attributes wins.</p></div>
+    <div class="ex"><h4 id="ch1-tradeoffs--exercises-1">Exercises 1</h4><ol>
+      <li>List the top three quality attributes for a system you know.</li>
+      <li>Name one trade-off each implies.</li>
+      <li>Identify a "resumé-driven" decision you have seen.</li>
+    </ol></div>
+  
+    <div class="codeWrap"><pre><code>// The same feature, three valid architectures, three different costs.
+
+// Option A: simplest thing that works
+public class OrderService
+{
+    private readonly AppDbContext _db;
+    public OrderService(AppDbContext db) =&gt; _db = db; // one dependency, easy to test
+
+    public async Task&lt;Order&gt; PlaceAsync(PlaceOrderCommand cmd, CancellationToken ct)
+    {
+        var order = new Order(cmd.CustomerId, cmd.Lines);
+        _db.Orders.Add(order);
+        await _db.SaveChangesAsync(ct);
+        return order;
+    }
+}
+
+// Option B: same behaviour, one extra seam for auditing and retries
+public interface IOrderRepository { Task&lt;Order&gt; AddAsync(Order o, CancellationToken ct); }
+public interface IUnitOfWork    { Task SaveAsync(CancellationToken ct); }
+
+// Option C: same behaviour, extracted behind a queue for independent scaling
+// _outbox.Enqueue(new OrderPlaced(order.Id));  then a worker consumes it
+
+// None is "wrong". Pick the one your current constraints justify.</code></pre></div>
+<p class="code-note">One feature, three architectures. A is cheapest to build and hardest to evolve, C is most scalable and most expensive to operate. Architecture is the deliberate choice among these, not the automatic result.</p>
+    </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Architectural Thinking</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Architectural Thinking</button><div class="ch-toc-list"><a href="#ch2-concerns">2.1 Separating concerns</a><a href="#ch2-boundaries">2.2 Where to draw boundaries</a><a href="#ch2-constraints">2.3 Constraints and forces</a></div></div>
+    <p class="topic-desc">Architectural thinking is the mindset of seeing systems at the level of capabilities and boundaries rather than individual features. Practitioners separate concerns, identify the seams where volatility, ownership and scaling differ and draw boundaries along those lines. Tools of the trade include domain analysis, context mapping and cost-of-change reasoning to keep each piece independently evolvable.</p>
+    <h3 id="ch2-concerns" data-toc>2.1 Separating concerns</h3>
+    <p class="topic-desc">Separating concerns means dividing a system so that things that change together stay together and things that change for different reasons do not. In practice you group code by capability or business behaviour rather than by technical layer, and you refuse coupling between unrelated concerns, however convenient shared objects might look. The result is that a change in one area needs few or no edits elsewhere.</p>
+    <p>Group things that change together and separate things that change for different reasons. A billing rule and a PDF renderer are different concerns even if they touch the same object.</p>
+    <h3 id="ch2-boundaries" data-toc>2.2 Where to draw boundaries</h3>
+    <p class="topic-desc">Good boundaries are drawn where business capabilities, change volatility, data ownership or scaling needs differ between parts of the system. Each bounded piece then owns its data, its model and its lifecycle and can evolve independently. In practice the architect maps these seams early, since moving a boundary after systems are built is far more expensive than drawing it right the first time.</p>
+    <ul>
+      <li><strong>By business capability</strong> (Orders, Billing, Shipping) — aligns with org and change.</li>
+      <li><strong>By volatility</strong> — keep fast-changing policy away from stable mechanics.</li>
+      <li><strong>By data ownership</strong> — the component that writes the data owns it.</li>
+      <li><strong>By scaling need</strong> — isolate what must scale independently.</li>
+    </ul>
+    <div class="codeWrap"><pre><code>Good boundary: Order placement changes with pricing &amp; promotions.
+Bad boundary:  "Database layer" and "Business layer" — every feature
+               crosses both, so they change together (low cohesion).</code></pre></div>
+    <p class="code-note">A capability-aligned boundary keeps change local; a generic layer split forces every feature to cross both layers.</p>
+    <h3 id="ch2-constraints" data-toc>2.3 Constraints and forces</h3>
+    <p class="topic-desc">Constraints act as fixed forces that shape the architecture as strongly as the stated requirements. They include team size and skill mix, budgets, regulation and compliance, existing systems that must integrate and organisational structure. The architect lists them explicitly at the start, because a design that ignores a hard constraint will be redesigned by reality later.</p>
+    <table>
+      <tr><th>Force</th><th>Shapes</th></tr>
+      <tr><td>Team size &amp; skills</td><td>Conway’s Law: systems mirror communication</td></tr>
+      <tr><td>Delivery timeline</td><td>Build vs buy, monolith vs services</td></tr>
+      <tr><td>Regulation</td><td>Data residency, audit, encryption</td></tr>
+      <tr><td>Existing systems</td><td>Integration and migration strategy</td></tr>
+      <tr><td>Budget/ops</td><td>Managed services vs self-hosted</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch2-constraints--exercises-2">Exercises 2</h4><ol>
+      <li>Draw the capabilities of a product you know.</li>
+      <li>Propose boundaries by capability for it.</li>
+      <li>Identify one Conway’s-Law effect in your org.</li>
+    </ol></div>
+  </section>
+<section class="chapter">
+    <h2 id="ch3" data-toc>3 · Modularity, Coupling &amp; Cohesion</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Modularity, Coupling &amp; Cohesion</button><div class="ch-toc-list"><a href="#ch3-cohesion">3.1 Cohesion: how focused a module is</a><a href="#ch3-coupling">3.2 Coupling: how much modules depend on each other</a><a href="#ch3-law">3.3 Interfaces, contracts and the Dependency Rule</a></div></div>
+    <p class="topic-desc">This chapter covers modularity through the two measures that decide whether software ages gracefully: cohesion and coupling. High cohesion keeps each module focused on one job, and low coupling keeps dependencies between modules loose and explicit. Architects apply interface contracts and dependency rules so modules can change independently and be tested in isolation.</p>
+    <h3 id="ch3-cohesion" data-toc>3.1 Cohesion: how focused a module is</h3>
+    <p class="topic-desc">Cohesion is how well the things inside a module belong together, and high cohesion means the module has one clear responsibility. The classic warning sign is a grab-bag class or module named Utils that accumulates unrelated functions over time. In practice you refactor such modules constantly, grouping functions by the behaviour or data they serve.</p>
+    <p>High cohesion means everything in a module serves one purpose. A class called <code>Utils</code> is the classic symptom of low cohesion.</p>
+    <h3 id="ch3-coupling" data-toc>3.2 Coupling: how much modules depend on each other</h3>
+    <p class="topic-desc">Coupling is the degree to which modules depend on one another, and it determines how easily a change in one module forces changes elsewhere. Dependencies on data types and stable interfaces are healthy; dependencies on shared global state or implementation details are not. Architects reduce coupling by inverting dependencies, publishing contracts and keeping communication through narrow, explicit interfaces.</p>
+    <table>
+      <tr><th>Coupling type</th><th>Quality</th></tr>
+      <tr><td>Data (passing primitives)</td><td>Best</td></tr>
+      <tr><td>Message/interface</td><td>Good</td></tr>
+      <tr><td>Control (passing flags)</td><td>Poor</td></tr>
+      <tr><td>Global/static state</td><td>Worst</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code>// Tight coupling: caller knows internals
+// Loose coupling: caller depends on an interface
+interface Notifier { void Send(string to, string msg); }
+
+class OrderService { // wiring happens here, once
+    private readonly Notifier _notifier;   // depends on abstraction
+    public OrderService(Notifier notifier) =&gt; _notifier = notifier;
+}</code></pre></div>
+    <p class="code-note">A service depends on an interface instead of a concrete class, so wiring happens once at construction and the rest of the code stays decoupled.</p>
+    <h3 id="ch3-law" data-toc>3.3 Interfaces, contracts and the Dependency Rule</h3>
+    <p class="topic-desc">Interfaces, contracts and the Dependency Rule keep modules stable by directing how they depend on each other. The rule, captured in the Clean Architecture school of thought, says dependency arrows always point inward, so the domain model depends on nothing while infrastructure depends on abstractions it implements. Applying it means defining interfaces for databases, queues and services inside the domain and reversing the direction of implementation.</p>
+    <p>Depend on abstractions, not concretions. Inner (domain) code must not know about outer (database, UI) code. All dependencies point inward.</p>
+    <div class="ex"><h4 id="ch3-law--exercises-3">Exercises 3</h4><ol>
+      <li>Find a low-cohesion class and split it.</li>
+      <li>Replace a concrete dependency with an interface.</li>
+      <li>Classify a coupling you have seen from the table.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Design Principles</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Design Principles</button><div class="ch-toc-list"><a href="#ch4-solid">4.1 SOLID</a><a href="#ch4-others">4.2 Other durable principles</a></div></div>
+    <p class="topic-desc">This chapter collects the durable design principles that keep code changeable over years rather than weeks. SOLID provides the five structural rules that remove the most common failure modes, while classic heuristics such as DRY, KISS and composition over inheritance restrain ambition. The principles are decision aids, not dogma, and are applied together when designing modules and their relationships.</p>
+    <h3 id="ch4-solid" data-toc>4.1 SOLID</h3>
+    <p class="topic-desc">SOLID is five rules, each aimed at removing one common failure mode: single responsibility limits reasons to change, open-closed supports extension without modification, Liskov substitution keeps inheritance safe, interface segregation avoids fat contracts and dependency inversion points dependencies at abstractions. Applied together they make code more testable and less rigid. The rules operate as design checklists rather than mechanical formulas.</p>
+    <table>
+      <tr><th>Principle</th><th>Meaning</th></tr>
+      <tr><td>S — Single Responsibility</td><td>A module has one reason to change.</td></tr>
+      <tr><td>O — Open/Closed</td><td>Open to extension, closed to modification.</td></tr>
+      <tr><td>L — Liskov Substitution</td><td>Subtypes must be usable as their base type.</td></tr>
+      <tr><td>I — Interface Segregation</td><td>Many small interfaces beat one fat one.</td></tr>
+      <tr><td>D — Dependency Inversion</td><td>Depend on abstractions, not concretions.</td></tr>
+    </table>
+    
+    <div class="codeWrap"><pre><code>// SOLID, shown by breaking one class on purpose and then fixing it.
+
+// BEFORE: violates S, O and L. One class, four reasons to change.
+public class OrderProcessor
+{
+    public void Process(Order order)
+    {
+        if (order.Total &gt; 1000) { // volume discount logic }
+        EmailSender.Send(order.Email, "Your order is confirmed");      // S: knows about email
+        if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Friday) { // promo logic }
+        Db.Insert(order);                                    // S: knows about storage
+    }
+}
+
+// AFTER: one reason to change per class, open for extension, substitutable.
+public interface IOrderRule { decimal Apply(Order order); }
+
+public sealed class VolumeDiscountRule : IOrderRule
+{
+    public decimal Apply(Order order) =&gt; order.Total &gt; 1000 ? order.Total * 0.9m : order.Total;
+}
+
+public interface INotifier { void OrderConfirmed(Order order); }
+public interface IOrderStore  { void Save(Order order); }
+
+public sealed class OrderProcessor
+{
+    private readonly IEnumerable&lt;IOrderRule&gt; _rules;
+    private readonly INotifier _notifier;
+    private readonly IOrderStore _store;
+
+    public OrderProcessor(IEnumerable&lt;IOrderRule&gt; rules, INotifier notifier, IOrderStore store)
+    { _rules = rules; _notifier = notifier; _store = store; }
+
+    public void Process(Order order)   // S: single reason to change
+    {
+        foreach (var rule in _rules) order.Total = rule.Apply(order);  // O: new rule, no edit here
+        _store.Save(order);
+        _notifier.OrderConfirmed(order);
+    }
+}</code></pre></div>
+<p class="code-note">The "before" class changes for four unrelated reasons. The "after" version splits each reason into its own type, accepts new rules as a list, and can be tested with fakes instead of a live database and SMTP server.</p>
+    <h3 id="ch4-others" data-toc>4.2 Other durable principles</h3>
+    <p class="topic-desc">Beyond SOLID, the durable heuristics are DRY, KISS, YAGNI, the Law of Demeter and composition over inheritance. DRY removes duplicate logic, KISS and YAGNI fight accidental complexity, Demeter keeps objects speaking only to their close neighbours and composition over inheritance favours flexible assembly over brittle type hierarchies. They work best when applied deliberately, not as blanket prohibitions.</p>
+    <ul>
+      <li><strong>DRY</strong> — but only for true knowledge, not incidental similarity.</li>
+      <li><strong>KISS / YAGNI</strong> — don’t build what you don’t need yet.</li>
+      <li><strong>Law of Demeter</strong> — talk to friends, not strangers.</li>
+      <li><strong>Composition over inheritance</strong>.</li>
+      <li><strong>Fail fast</strong> and make invalid states unrepresentable.</li>
+    </ul>
+    <div class="warn"><p>Over-application of DRY creates premature abstractions that are harder to change than duplication. Duplicate twice before abstracting.</p></div>
+    <div class="ex"><h4 id="ch4-others--exercises-4">Exercises 4</h4><ol>
+      <li>Refactor a class that violates SRP.</li>
+      <li>Show an open/closed extension with a strategy.</li>
+      <li>Find an over-abstracted "shared" module.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Design Patterns</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Design Patterns</button><div class="ch-toc-list"><a href="#ch5-creational">5.1 Creational patterns</a><a href="#ch5-structural">5.2 Structural patterns</a><a href="#ch5-behavioral">5.3 Behavioural patterns</a><a href="#ch5-enterprise">5.4 Enterprise integration patterns</a></div></div>
+    <p class="topic-desc">Design patterns are proven, named solutions to recurring structural and behavioural problems, and they give a team a shared vocabulary for communicating design. Knowing them lets an architect recognise a problem, pick the fitting pattern and explain the choice in one word. Patterns are not prizes, so each one is adopted only where it actually removes coupling or duplication.</p>
+    <h3 id="ch5-creational" data-toc>5.1 Creational patterns</h3>
+    <p class="topic-desc">Creational patterns decouple the construction of objects from their use, since object instantiation is where a lot of hidden coupling lives. The classic family is Singleton, Factory, Abstract Factory, Builder and Prototype. Practically, factories and builders centralise construction policy so callers work with interfaces and the concrete type can change without rippling through the codebase.</p>
+    <table>
+      <tr><th>Pattern</th><th>Use</th></tr>
+      <tr><td>Factory / Abstract Factory</td><td>Create objects without naming concrete classes</td></tr>
+      <tr><td>Builder</td><td>Construct complex objects step by step</td></tr>
+      <tr><td>Singleton</td><td>One instance — use sparingly (DI usually replaces it)</td></tr>
+    </table>
+    <h3 id="ch5-structural" data-toc>5.2 Structural patterns</h3>
+    <p class="topic-desc">Structural patterns compose classes and objects to add behaviour or simplify subsystems without rewriting them. The family includes Adapter, Facade, Decorator, Composite, Proxy and Bridge. Architects use them to wrap legacy systems, unify interfaces and attach cross-cutting behaviour such as caching or access control through decoration rather than modification.</p>
+    <table>
+      <tr><th>Pattern</th><th>Use</th></tr>
+      <tr><td>Adapter</td><td>Make incompatible interfaces work together</td></tr>
+      <tr><td>Decorator</td><td>Add behaviour without subclassing</td></tr>
+      <tr><td>Facade</td><td>Simplify a complex subsystem</td></tr>
+      <tr><td>Proxy</td><td>Control access (lazy load, cache, security)</td></tr>
+    </table>
+    <h3 id="ch5-behavioral" data-toc>5.3 Behavioural patterns</h3>
+    <p class="topic-desc">Behavioural patterns organise how objects cooperate and communicate, covering everything from Strategy and Observer to State and Command. They distribute responsibility among collaborating objects so behaviour stays flexible and callers stay decoupled from concrete implementations. Selecting them is mostly about matching the pattern’s control flow to the problem at hand rather than collecting them for their own sake.</p>
+    <div class="codeWrap"><pre><code>// Strategy: interchangeable algorithms behind one interface
+interface ShippingCost { decimal For(Order o); }
+class FlatRate : ShippingCost { public decimal For(Order o) =&gt; 5m; }   // flat rate
+class FreeOver100 : ShippingCost {
+    public decimal For(Order o) =&gt; o.Total &gt; 100 ? 0m : 5m;   // free over 100
+}
+
+// Others: Observer (events), Command (undo/queue),
+// Template Method, State, Chain of Responsibility.</code></pre></div>
+    <p class="code-note">Strategy puts each pricing rule in its own class behind one interface, so new rules are added without touching the caller.</p>
+    <h3 id="ch5-enterprise" data-toc>5.4 Enterprise integration patterns</h3>
+    <p class="topic-desc">Enterprise integration patterns bridge application code and the infrastructure around it, dealing with persistence and messaging plumbing. The set includes Repository and Unit of Work for data access, plus Outbox, Saga and the messaging patterns for reliable communication. They exist to tame the common failure modes of distributed transactions, so an architect applies them where atomicity and delivery guarantees actually matter.</p>
+    <ul>
+      <li><strong>Repository</strong> — abstract persistence behind a collection-like interface.</li>
+      <li><strong>Unit of Work</strong> — commit a set of changes atomically.</li>
+      <li><strong>Outbox</strong> — reliably publish events alongside a DB transaction.</li>
+      <li><strong>Saga</strong> — coordinate a long-running distributed transaction.</li>
+    </ul>
+    <div class="ex"><h4 id="ch5-enterprise--exercises-5">Exercises 5</h4><ol>
+      <li>Implement Strategy for a pricing rule.</li>
+      <li>Use Decorator to add caching around a service.</li>
+      <li>Explain when a Singleton is actually harmful.</li>
+    </ol></div>
+  </section>
+<section class="chapter">
+    <h2 id="ch6" data-toc>6 · Architectural Styles</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Architectural Styles</button><div class="ch-toc-list"><a href="#ch6-layered">6.1 Layered (n-tier)</a><a href="#ch6-hexagonal">6.2 Hexagonal / Ports &amp; Adapters</a><a href="#ch6-clean">6.3 Clean / Onion</a><a href="#ch6-others">6.4 Other styles</a></div></div>
+    <p class="topic-desc">Architectural styles are the big-picture shapes a system can take, from layered through hexagonal to event-driven, and choosing one frames every lower-level decision. Each style encodes a different answer to how components interact, where dependencies point and how data flows. The architect’s job is to match a style to the quality attributes and change profile of the system, not to the fashion of the day.</p>
+    <h3 id="ch6-layered" data-toc>6.1 Layered (n-tier)</h3>
+    <p class="topic-desc">Layered, or n-tier, architecture organises code into horizontal tiers such as presentation, application, domain and data. It is the familiar default, but its downsides are ripple effects when a change crosses layers and the temptation to add layers that only delegate. In practice the architect keeps dependencies strictly downward, bounds cross-layer calls and collapses layers that add no behaviour.</p>
+    <div class="codeWrap"><pre><code>Presentation -&gt; Application -&gt; Domain -&gt; Persistence
+Simple and familiar, but changes ripple through layers.
+The "lasagna" anti-pattern: many layers doing nothing but delegating.</code></pre></div>
+    <p class="code-note">Layered is easy to reason about, but watch for changes rippling through every layer and empty "lasagna" layers that only delegate.</p>
+    <h3 id="ch6-hexagonal" data-toc>6.2 Hexagonal / Ports &amp; Adapters</h3>
+    <p class="topic-desc">Hexagonal architecture, also called Ports and Adapters, puts the domain at the centre and connects it to the outside world through ports protected by adapter implementations. HTTP, CLI, database and queue adapters can then be plugged in and swapped without touching the domain. In practice you define port interfaces inside the domain and let infrastructure depend on them, which makes the core independently testable.</p>
+    <div class="codeWrap"><pre><code>        [ HTTP adapter ]        [ CLI adapter ]
+                 \                 /
+              +-----------------------+
+              |        Domain         |
+              |    (ports inside)     |
+              +-----------------------+
+                 /                 \
+        [ Postgres adapter ]   [ Queue adapter ]
+
+The domain defines "ports" (interfaces); adapters implement them.
+Swap a database or UI without touching business rules.</code></pre></div>
+    <p class="code-note">The domain exposes ports and adapters implement them, so swapping the UI or database never touches the business rules.</p>
+    <h3 id="ch6-clean" data-toc>6.3 Clean / Onion</h3>
+    <p class="topic-desc">Clean and Onion architecture push hexagonal thinking further with concentric rings, where the innermost ring is the domain and every dependency arrow points strictly inward. Outer rings contain infrastructure and frameworks, and the dependency rule forbids inner rings from knowing about them. Applied rigorously it produces a highly testable core, at the price of more indirection and boilerplate for simple systems.</p>
+    <p>Concentric rings: entities at the centre, then use cases, then interface adapters, then frameworks. The Dependency Rule: source code dependencies point inward only.</p>
+    <h3 id="ch6-others" data-toc>6.4 Other styles</h3>
+    <p class="topic-desc">Beyond the default styles, modular monoliths, microservices, event-driven and serverless architectures each fit specific workloads. A modular monolith keeps deployment simple while preserving seams; microservices offer independent ownership at distribution cost; event-driven decouples producers and consumers; serverless trades control for elasticity. The architect chooses based on scaling, team and operational drivers rather than trend.</p>
+    <table>
+      <tr><th>Style</th><th>Good for</th></tr>
+      <tr><td>Modular monolith</td><td>Most systems — clear modules, single deploy</td></tr>
+      <tr><td>Microservices</td><td>Independent scaling/teams, high operational maturity</td></tr>
+      <tr><td>Event-driven</td><td>Async workflows, decoupled reactions</td></tr>
+      <tr><td>Serverless</td><td>Spiky/event workloads, low ops</td></tr>
+      <tr><td>Pipe &amp; filter</td><td>Data transformation pipelines</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch6-others--exercises-6">Exercises 6</h4><ol>
+      <li>Redraw a layered app as hexagonal.</li>
+      <li>List the ports your domain would define.</li>
+      <li>Pick the right style for a small CRUD app and explain why.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Monolith vs Services</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Monolith vs Services</button><div class="ch-toc-list"><a href="#ch7-modular-monolith">7.1 The modular monolith default</a><a href="#ch7-microservices">7.2 When microservices earn their cost</a><a href="#ch7-costs">7.3 The costs you take on</a></div></div>
+    <p class="topic-desc">The monolith-versus-services decision is an economics question, not a fashion statement. In practice you start with a modular monolith and extract capability-sized services only when team ownership, scaling or release cadence makes the extraction pay for its distribution costs. Any premature split simply pays the price of distributed systems for no benefit.</p>
+    <h3 id="ch7-modular-monolith" data-toc>7.1 The modular monolith default</h3>
+    <p class="topic-desc">The modular monolith is the sane default: one deployable built from sharply bounded, high-cohesion modules, with transactions and simple operations intact. Its seamlessness is the payoff, because modules are already isolated by interfaces so services can be extracted later without a rewrite. Teams pick it to get most of the architectural benefits at a fraction of the operational cost.</p>
+    <p>One deployable with strongly separated modules. You get simple operations and transactions now, plus a clean path to extract services later. For most products this is the right starting point.</p>
+    
+    <div class="codeWrap"><pre><code>// A modular monolith: separate assemblies, enforced inward dependencies.
+
+// MyApp.Domain        -&gt; no dependencies at all
+// MyApp.Application   -&gt; depends on Domain only
+// MyApp.Infrastructure-&gt; depends on Application (EF Core, HTTP, files)
+// MyApp.WebApi        -&gt; composes Infrastructure + Application
+
+public sealed class PlaceOrderHandler
+{
+    private readonly IOrderRepository _orders;      // interface owned by Application
+    private readonly IEmailGateway _email;          // interface owned by Application
+
+    public PlaceOrderHandler(IOrderRepository orders, IEmailGateway email)
+    { _orders = orders; _email = email; }
+
+    public async Task&lt;OrderId&gt; Handle(PlaceOrder cmd, CancellationToken ct)
+    {
+        var order = Order.Create(cmd.CustomerId, cmd.Lines);
+        await _orders.AddAsync(order, ct);
+        await _email.SendConfirmationAsync(order, ct);
+        return order.Id;
+    }
+}
+
+// Composition root wires the concrete adapters, and only this layer knows them.
+builder.Services.AddScoped&lt;IOrderRepository, EfOrderRepository&gt;();
+builder.Services.AddScoped&lt;IEmailGateway, SendGridEmailGateway&gt;();
+builder.Services.AddScoped&lt;PlaceOrderHandler&gt;();
+
+// Later, if Billing must scale separately, extract this handler plus its
+// repository into its own deployable and replace the interface with a
+// message call. The seam already exists, so the split is a refactor.</code></pre></div>
+<p class="code-note">The module boundary is the interface, and only the composition root names the concrete adapters. Because the seam already exists, extracting a service later is a refactor rather than a rewrite.</p>
+    <h3 id="ch7-microservices" data-toc>7.2 When microservices earn their cost</h3>
+    <p class="topic-desc">Microservices earn their cost when distinct teams need autonomous ownership, when parts must scale independently or when services need different runtimes and release cadences. Each service then owns its data and its lifecycle, communicating over explicit contracts. The decision is justified by measuring the concrete gain against distribution cost, not by the prestige of a distributed architecture.</p>
+    <ul>
+      <li>Independent deployment and scaling are real needs.</li>
+      <li>Multiple teams need autonomous ownership.</li>
+      <li>Different components need different runtimes or scaling profiles.</li>
+      <li>You have the platform maturity to run distributed systems.</li>
+    </ul>
+    <h3 id="ch7-costs" data-toc>7.3 The costs you take on</h3>
+    <p class="topic-desc">Every gain from microservices is bought with a distributed cost: versioned contracts, network latency, partial failure and a heavier toolchain for discovery, tracing and deployment. These costs are invisible in small systems and compound as they grow. The architect names each cost explicitly when deciding to split, and budgets for the operational maturity it demands.</p>
+    <table>
+      <tr><th>Gain</th><th>Cost</th></tr>
+      <tr><td>Independent deploy</td><td>Versioned contracts, backward compatibility</td></tr>
+      <tr><td>Independent scale</td><td>Network latency, partial failure</td></tr>
+      <tr><td>Team autonomy</td><td>Duplication, distributed debugging</td></tr>
+      <tr><td>Tech heterogeneity</td><td>More tooling, more skills</td></tr>
+    </table>
+    <div class="warn"><p>Distributed transactions are hard. Prefer Saga + eventual consistency over two-phase commit. If a feature needs a transaction across services, the boundary is probably wrong.</p></div>
+    <div class="ex"><h4 id="ch7-costs--exercises-7">Exercises 7</h4><ol>
+      <li>Identify a module you would extract first and why.</li>
+      <li>List the distributed costs a microservice split would add.</li>
+      <li>Write a one-paragraph decision to stay monolithic.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Event-Driven Architecture</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Event-Driven Architecture</button><div class="ch-toc-list"><a href="#ch8-events">8.1 Events vs commands</a><a href="#ch8-patterns">8.2 Broker, bus and choreography</a><a href="#ch8-delivery">8.3 Delivery semantics</a></div></div>
+    <p class="topic-desc">Event-driven architecture decouples producers from consumers by making system behaviour a stream of facts that components react to. It enables independent scaling of processing and replayable state, but demands discipline around ordering, delivery and failure handling. Architects choose it when loose coupling at the interaction level matters more than strong ordering guarantees.</p>
+    <h3 id="ch8-events" data-toc>8.1 Events vs commands</h3>
+    <p class="topic-desc">Events are immutable facts in the past tense, while commands are requests that may still be refused. The distinction shapes design because commands carry expectations of a response and possible rejection, whereas events only record that something happened. In practice you route commands when you need an answer and publish events when you want interested parties to react independently.</p>
+    <table>
+      <tr><th>Type</th><th>Tense</th><th>Meaning</th></tr>
+      <tr><td>Command</td><td>Imperative</td><td>"PlaceOrder" — a request, may be rejected</td></tr>
+      <tr><td>Event</td><td>Past</td><td>"OrderPlaced" — a fact, immutable</td></tr>
+    </table>
+    <h3 id="ch8-patterns" data-toc>8.2 Broker, bus and choreography</h3>
+    <p class="topic-desc">Broker, bus and choreography are the three ways to connect producers and consumers in event-driven systems. A broker fans events out to many consumers, choreography lets each service react independently and orchestration names a central coordinator that makes the flow explicit. In practice you combine them, choreographing within boundaries and orchestrating when business processes demand a visible order.</p>
+    <div class="codeWrap"><pre><code>OrderService --OrderPlaced--&gt; [ broker ] --&gt; BillingConsumer
+                                       --&gt; InventoryConsumer
+                                       --&gt; EmailConsumer
+
+Choreography: consumers react independently (loose, harder to see flow).
+Orchestration: a coordinator tells each step what to do (explicit flow).</code></pre></div>
+    <p class="code-note">A broker fans one event out to several consumers; choreography keeps them independent, while orchestration makes the flow explicit.</p>
+    <h3 id="ch8-delivery" data-toc>8.3 Delivery semantics</h3>
+    <p class="topic-desc">Delivery semantics decide what a consumer can assume about a published event after a failure. At-least-once is the realistic default for most infrastructure and demands idempotent consumers that tolerate duplicates. At-most-once accepts data loss for speed, and exactly-once, which most systems only approximate, is expensive; the architect matches the semantic to the consequence of loss or duplication.</p>
+    <ul>
+      <li><strong>At-most-once</strong> — may lose messages.</li>
+      <li><strong>At-least-once</strong> — may duplicate; consumers must be idempotent.</li>
+      <li><strong>Exactly-once</strong> — effectively at-least-once + idempotency/dedup.</li>
+    </ul>
+    <div class="codeWrap"><pre><code>// Idempotent consumer: ignore an event already processed
+if (await store.HasProcessed(evt.Id)) return;
+await handler.Apply(evt);
+await store.MarkProcessed(evt.Id);   // same transaction</code></pre></div>
+    <p class="code-note">Track processed event ids in the same transaction as the effect, so duplicate deliveries are ignored harmlessly — that is the heart of at-least-once handling.</p>
+    <div class="ex"><h4 id="ch8-delivery--exercises-8">Exercises 8</h4><ol>
+      <li>Model an order flow as events.</li>
+      <li>Make one consumer idempotent.</li>
+      <li>Choose choreography or orchestration and justify it.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Domain-Driven Design</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Domain-Driven Design</button><div class="ch-toc-list"><a href="#ch9-language">9.1 Ubiquitous language</a><a href="#ch9-building-blocks">9.2 Building blocks</a><a href="#ch9-contexts">9.3 Bounded contexts and context maps</a></div></div>
+    <p class="topic-desc">Domain-Driven Design aligns the codebase with the language and mental models of the business, so complexity is handled where the money is made. It provides strategic tools, bounded contexts and context maps, and tactical tools such as aggregates and repositories to model invariants. The architect applies it to find the seams worth protecting and to let the domain lead the structure.</p>
+    <h3 id="ch9-language" data-toc>9.1 Ubiquitous language</h3>
+    <p class="topic-desc">The ubiquitous language is a shared vocabulary used by domain experts, developers and code alike so that no translation layer creeps in. Terms in the codebase, the tests and the conversations must mean the same thing. In practice you cultivate it in design meetings, name classes and methods after business concepts and correct drift whenever technical jargon displaces it.</p>
+    <p>One shared vocabulary between domain experts and developers. If the business says "policy", the code says <code>Policy</code> — not <code>Record</code>.</p>
+    <h3 id="ch9-building-blocks" data-toc>9.2 Building blocks</h3>
+    <p class="topic-desc">The tactical building blocks of Domain-Driven Design are entities with identity, value objects with no identity, aggregates that protect invariants, repositories for retrieval and domain events for side effects. They give precise names to model pieces so invariants live in one authoritative place. The architect applies them as a toolkit for turning business rules into clean model code.</p>
+    <table>
+      <tr><th>Block</th><th>Role</th></tr>
+      <tr><td>Entity</td><td>Has identity that persists over time (Order #123)</td></tr>
+      <tr><td>Value Object</td><td>Defined by its values, immutable (Money, Address)</td></tr>
+      <tr><td>Aggregate</td><td>Consistency boundary with one root</td></tr>
+      <tr><td>Repository</td><td>Load/save aggregates</td></tr>
+      <tr><td>Domain Service</td><td>Logic that doesn’t belong to one entity</td></tr>
+      <tr><td>Domain Event</td><td>Something meaningful that happened</td></tr>
+    </table>
+    <h3 id="ch9-contexts" data-toc>9.3 Bounded contexts and context maps</h3>
+    <p class="topic-desc">Bounded contexts each own their own model and vocabulary, and context maps describe how those models relate, through patterns such as shared kernel, customer-supplier and anticorruption layer. The map makes integration contracts explicit and protects each context from the assumptions of others. In practice you draw the map before wiring systems together, because misaligned models are the source of most integration bugs.</p>
+    <div class="codeWrap"><pre><code>Sales context        Shipping context
+  Customer      &lt;--&gt;  Consignee
+  "customer"          "recipient"
+
+Same concept, different models per context. A shared "Customer"
+table across both is an anti-pattern (coupling). Context maps
+describe relationships: Shared Kernel, Customer/Supplier, ACL.</code></pre></div>
+    <p class="code-note">Each bounded context models the same real-world concept differently and maps its relationships with other contexts explicitly.</p>
+    <div class="ex"><h4 id="ch9-contexts--exercises-9">Exercises 9</h4><ol>
+      <li>Write a ubiquitous-language glossary for one area.</li>
+      <li>Model an aggregate with an invariant.</li>
+      <li>Draw a context map with an anti-corruption layer.</li>
+    </ol></div>
+  </section>
+<section class="chapter">
+    <h2 id="ch10" data-toc>10 · Data, Consistency &amp; CAP</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Data, Consistency &amp; CAP</button><div class="ch-toc-list"><a href="#ch10-cap">10.1 CAP and PACELC</a><a href="#ch10-consistency">10.2 Consistency models</a><a href="#ch10-patterns">10.3 Patterns for consistency</a></div></div>
+    <p class="topic-desc">Data consistency in distributed systems sits on a spectrum, and CAP and PACELC frame the trade-offs behind every read and write. Strong consistency is cheaper inside a single node and expensive across nodes, while eventual consistency gains availability at the price of visible staleness. The chapter equips the architect with the models and patterns to make deliberate consistency choices per data set.</p>
+    <h3 id="ch10-cap" data-toc>10.1 CAP and PACELC</h3>
+    <p class="topic-desc">CAP states that under a partition you must choose consistency or availability, and PACELC adds the everyday choice: even without a partition you trade latency for consistency. In practice this forces architects to pick a consistency model per data set and to defend the choice. There is no avoiding the trade-off, only knowing which side wins for each read and write.</p>
+    <p>Under a network partition you choose Consistency or Availability (CAP). When there is no partition you trade Latency against Consistency (PACELC). Most systems are not "CP" or "AP" globally — they are per operation.</p>
+    <h3 id="ch10-consistency" data-toc>10.2 Consistency models</h3>
+    <p class="topic-desc">Consistency models, from strong and linearizable through causal and read-your-writes to eventual, define what guarantees replicas and readers actually get. Strong models behave like a single copy of the data but limit availability and add latency. The architect chooses per use case, often dropping from strong to weaker models for hot paths and compensating with explicit reconciliation.</p>
+    <table>
+      <tr><th>Model</th><th>Guarantee</th></tr>
+      <tr><td>Strong</td><td>Reads see the latest write</td></tr>
+      <tr><td>Read-your-writes</td><td>You see your own writes</td></tr>
+      <tr><td>Monotonic reads</td><td>Time never goes backwards for a reader</td></tr>
+      <tr><td>Eventual</td><td>Replicas converge given time</td></tr>
+    </table>
+    <h3 id="ch10-patterns" data-toc>10.3 Patterns for consistency</h3>
+    <p class="topic-desc">The standard patterns for taming distributed consistency are CQRS, event sourcing, sagas and the outbox pattern. CQRS separates reads from writes, event sourcing treats state as a replayable event log, sagas coordinate multi-service transactions with compensating actions and the outbox reliably publishes writes as events. Combined, they turn hard distributed guarantees into achievable, testable designs.</p>
+    <div class="codeWrap"><pre><code>CQRS:  write model (normalised) -&gt; read model(s) (denormalised)
+Event Sourcing: state = fold(events); full audit + time travel
+Saga:  sequence of local transactions with compensating actions
+Outbox: DB write + event enqueue in one transaction</code></pre></div>
+    <p class="code-note">CQRS, event sourcing, saga and outbox are the standard toolkit for trading consistency for scale without losing integrity.</p>
+    <div class="warn"><p>Event sourcing is powerful but heavy: versioning events, projections, and eventual consistency are all real work. Adopt it where the audit/temporal history is genuinely valuable.</p></div>
+    <div class="ex"><h4 id="ch10-patterns--exercises-10">Exercises 10</h4><ol>
+      <li>Classify three operations by CAP choice.</li>
+      <li>Design a saga with compensations for a booking.</li>
+      <li>Sketch a CQRS read model for a search page.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · API &amp; Integration Design</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · API &amp; Integration Design</button><div class="ch-toc-list"><a href="#ch11-styles">11.1 Integration styles</a><a href="#ch11-evolution">11.2 Evolving contracts safely</a><a href="#ch11-resilience">11.3 Resilience for integrations</a></div></div>
+    <p class="topic-desc">API and integration design treats every integration as a contract plus a failure story, so the same care goes into evolving the contract as into the failure handling around it. Good contracts are explicit, versioned and additive, and callers carry timeouts, retries and circuit breakers. The architect picks the integration style that matches the relationship between the parties.</p>
+    <h3 id="ch11-styles" data-toc>11.1 Integration styles</h3>
+    <p class="topic-desc">REST, GraphQL, gRPC, messaging and webhooks each trade different strengths: REST is simple and cacheable, GraphQL tailors responses, gRPC gives typed high-performance calls, messaging decouples by time and webhooks push without polling. There is no universal best style, so the architect matches the style to the relationship, whether request-response, long-lived stream or fire-and-forget.</p>
+    <table>
+      <tr><th>Style</th><th>Best for</th><th>Caveat</th></tr>
+      <tr><td>REST</td><td>Resource CRUD, public APIs</td><td>Over/under-fetching</td></tr>
+      <tr><td>GraphQL</td><td>Flexible client-driven queries</td><td>Query cost, caching</td></tr>
+      <tr><td>gRPC</td><td>Internal low-latency RPC</td><td>Browser support, schema tooling</td></tr>
+      <tr><td>Messaging</td><td>Async, decoupled</td><td>Eventual consistency</td></tr>
+      <tr><td>Webhooks</td><td>Server-to-server notifications</td><td>Retries, idempotency</td></tr>
+    </table>
+    <h3 id="ch11-evolution" data-toc>11.2 Evolving contracts safely</h3>
+    <p class="topic-desc">Evolving contracts safely means growing them by addition rather than removal and running old versions until telemetry proves they are gone. Techniques include additive fields, tolerant readers, version fields in the payload and deprecation timelines. In practice the architect pairs each breaking change with a migration window during which both versions are supported.</p>
+    <ul>
+      <li>Add fields, don’t remove or repurpose them.</li>
+      <li>Version at the edge (<code>/v2</code>) or via content negotiation.</li>
+      <li>Use tolerant readers (ignore unknown fields).</li>
+      <li>Deprecate with a timeline and telemetry on old-version usage.</li>
+    </ul>
+    <h3 id="ch11-resilience" data-toc>11.3 Resilience for integrations</h3>
+    <p class="topic-desc">Resilience for integrations keeps a calling service alive even when the partner fails, using timeouts, retries, circuit breakers and bulkheads. Timeouts bound the wait, retries handle transient errors with backoff and jitter, circuit breakers stop hammering a failing partner and bulkheads isolate resource pools per dependency. Together they turn a partner outage into a handled condition instead of a cascading failure.</p>
+    <div class="codeWrap"><pre><code>Timeouts       -&gt; never wait forever
+Retries        -&gt; with exponential backoff + jitter (idempotent ops)
+Circuit breaker-&gt; stop calling a failing dependency
+Bulkhead       -&gt; isolate pools so one failure can't exhaust all
+Rate limiting  -&gt; protect yourself and your partners</code></pre></div>
+    <p class="code-note">Each pattern buys one specific protection — timeouts, retries, circuit breakers, bulkheads and rate limits together make integrations fail safely.</p>
+    <div class="ex"><h4 id="ch11-resilience--exercises-11">Exercises 11</h4><ol>
+      <li>Choose an integration style for two scenarios.</li>
+      <li>Design a backward-compatible API change.</li>
+      <li>Add backoff + circuit breaker to one call.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch12" data-toc>12 · Scalability &amp; Performance Architecture</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Scalability &amp; Performance Architecture</button><div class="ch-toc-list"><a href="#ch12-scaling">12.1 Scaling dimensions</a><a href="#ch12-caching">12.2 Caching layers</a><a href="#ch12-method">12.3 A performance method</a></div></div>
+    <p class="topic-desc">Scalability and performance must be designed in rather than bolted on, because replumbing a system for scale is costly after the fact. Scaling happens along several axes, including more instances, more cores, data sharding and asynchronous work, and the profile of the load decides which axes matter. A measuring-before-optimising discipline keeps effort pointed at the real bottleneck.</p>
+    <h3 id="ch12-scaling" data-toc>12.1 Scaling dimensions</h3>
+    <p class="topic-desc">Systems scale in several dimensions: vertically by adding cores and memory, horizontally by adding instances, through data by sharding and using read replicas, and sideways by deferring work into queues. Each axis has a ceiling and a cost, so the architect picks axes the load profile demands. In practice you scale the axis that actually binds, then re-measure.</p>
+    <table>
+      <tr><th>Axis</th><th>Approach</th></tr>
+      <tr><td>Vertical</td><td>Bigger machine (simplest, has a ceiling)</td></tr>
+      <tr><td>Horizontal</td><td>More stateless instances behind a balancer</td></tr>
+      <tr><td>Data</td><td>Replicas, partitioning, sharding, caching</td></tr>
+      <tr><td>Async</td><td>Queues to absorb spikes</td></tr>
+    </table>
+    <h3 id="ch12-caching" data-toc>12.2 Caching layers</h3>
+    <p class="topic-desc">Caching layers sit between clients and storage to cut latency and load, but the cache itself is the easy part and invalidation is the hard part. Strategies such as cache-aside, write-through, read-through and time-to-live each accept different staleness and consistency trade-offs. The architect chooses per data type and always ties the invalidation approach to the consistency guarantees the business actually needs.</p>
+    <ul>
+      <li>Client/CDN → edge → application → distributed cache → DB.</li>
+      <li>Strategies: cache-aside, read-through, write-through, write-behind.</li>
+      <li>Invalidation is the hard part; prefer short TTLs + event-based eviction.</li>
+    </ul>
+    <h3 id="ch12-method" data-toc>12.3 A performance method</h3>
+    <p class="topic-desc">A performance method is a small disciplined loop: set measurable targets, instrument the system, find the biggest bottleneck, remove it and repeat. Targets prevent optimisation for its own sake, and measurement prevents guesswork and premature fixes. In practice you profile under realistic load and stop as soon as the target is met, since each further optimisation usually costs complexity.</p>
+    <div class="codeWrap"><pre><code>1 Define targets (p95/p99, throughput, budget)
+2 Measure under realistic load
+3 Find the bottleneck (queueing theory: Little's Law)
+4 Fix the biggest one
+5 Repeat — the bottleneck always moves</code></pre></div>
+    <p class="code-note">Performance work is a loop — target, measure, find the bottleneck, fix the biggest one, repeat — because the bottleneck always moves.</p>
+    <div class="ex"><h4 id="ch12-method--exercises-12">Exercises 12</h4><ol>
+      <li>Set latency targets for a new service.</li>
+      <li>Choose caching strategies for two endpoints.</li>
+      <li>Load-test and identify the first bottleneck.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch13" data-toc>13 · Reliability, Resilience &amp; Observability</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Reliability, Resilience &amp; Observability</button><div class="ch-toc-list"><a href="#ch13-resilience">13.1 Resilience patterns</a><a href="#ch13-observability">13.2 Observability</a><a href="#ch13-recovery">13.3 Recovering gracefully</a></div></div>
+    <p class="topic-desc">Reliability means more than uptime, including failing gracefully when things go wrong, and resilience plus observability turn otherwise invisible outages into handled, instrumented events. Resilience patterns such as timeouts, retries and circuit breakers keep failures contained, while metrics, logs and traces reveal what failed and why. Together they convert surprises into known, monitored conditions.</p>
+    <h3 id="ch13-resilience" data-toc>13.1 Resilience patterns</h3>
+    <p class="topic-desc">Resilience patterns each defend against a specific failure mode: timeouts bound hang, retries handle transient errors, circuit breakers stop cascades, bulkheads isolate resources and idempotency makes retries safe. The architect applies them at every network and dependency boundary. Because none is free, each is chosen based on the failure it removes and the latency or cost it adds.</p>
+    <table>
+      <tr><th>Pattern</th><th>Protects against</th></tr>
+      <tr><td>Timeout</td><td>Slow dependencies</td></tr>
+      <tr><td>Retry + backoff</td><td>Transient failures</td></tr>
+      <tr><td>Circuit breaker</td><td>Cascading failure</td></tr>
+      <tr><td>Bulkhead</td><td>Resource exhaustion</td></tr>
+      <tr><td>Graceful degradation</td><td>Total outage (serve stale/partial)</td></tr>
+      <tr><td>Idempotency</td><td>Duplicate requests/messages</td></tr>
+    </table>
+    <h3 id="ch13-observability" data-toc>13.2 Observability</h3>
+    <p class="topic-desc">Observability answers what is failing, what is slow and where it happened through three signals: metrics, structured logs and traces. Metrics give aggregated health, logs give detailed events and traces follow a single request across services. In practice you instrument every service with the same correlation identifiers so the three signals can be joined during an incident.</p>
+    <div class="codeWrap"><pre><code>Metrics -&gt; RED (Rate, Errors, Duration) / USE (Util, Saturation, Errors)
+Logs    -&gt; structured, correlated by trace id
+Traces  -&gt; distributed span across services
+Alerting-&gt; on symptoms (SLO burn), not on every spike</code></pre></div>
+    <p class="code-note">RED or USE metrics, correlated logs and traces let you answer what is slow, who failed and where it happened.</p>
+    <h3 id="ch13-recovery" data-toc>13.3 Recovering gracefully</h3>
+    <p class="topic-desc">Recovering gracefully means designing for failure in advance with reversible deploys, feature flags, game days and blameless postmortems. Reversible deploys let you back out quickly, feature flags decouple release from enablement, game days rehearse failure and blameless postmortems turn incidents into systemic improvements. The chapter treats recovery as a designed capability, not an improvisation.</p>
+    <ul>
+      <li>Design for failure: assume every dependency will fail.</li>
+      <li>Reversible deploys and feature flags to limit blast radius.</li>
+      <li>Run game days and chaos experiments.</li>
+      <li>Blameless postmortems that change the system.</li>
+    </ul>
+    <div class="ex"><h4 id="ch13-recovery--exercises-13">Exercises 13</h4><ol>
+      <li>Add a circuit breaker to one integration.</li>
+      <li>Define RED metrics for a service.</li>
+      <li>Write an SLO-based alert.</li>
+    </ol></div>
+  </section>
+<section class="chapter">
+    <h2 id="ch14" data-toc>14 · Security Architecture</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Security Architecture</button><div class="ch-toc-list"><a href="#ch14-model">14.1 Threat modelling</a><a href="#ch14-controls">14.2 Controls</a><a href="#ch14-zero-trust">14.3 Zero trust in practice</a></div></div>
+    <p class="topic-desc">Security is an architectural property, so threats are modelled early and controls are placed where risk actually lives rather than pasted on as an afterthought. The architect connects threat modelling to the structure, routing and trust boundaries of the system. Security then becomes testable requirements, not a set of scattered badges to chase.</p>
+    <h3 id="ch14-model" data-toc>14.1 Threat modelling</h3>
+    <p class="topic-desc">Threat modelling is the practice of enumerating threats per component before they become incidents, and STRIDE gives a structured checklist: spoofing, tampering, repudiation, information disclosure, denial of service and elevation of privilege. You apply it during design to each trust boundary and data flow. The output is a ranked risk list that drives which controls get built.</p>
+    <p>Use STRIDE to enumerate threats per component: Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege. Then apply controls where the risk lives.</p>
+    <h3 id="ch14-controls" data-toc>14.2 Controls</h3>
+    <p class="topic-desc">Controls span identity, network, data, application and operations, and defence in depth means layering them independently so one failure does not expose the system. Examples are authentication and authorisation, network segmentation, encryption at rest and in transit, input validation and least-privilege access. The architect maps controls to the threats from modelling so coverage is deliberate rather than accidental.</p>
+    <table>
+      <tr><th>Layer</th><th>Controls</th></tr>
+      <tr><td>Identity</td><td>OIDC/OAuth2, MFA, short-lived tokens</td></tr>
+      <tr><td>Network</td><td>Segmentation, mTLS, WAF</td></tr>
+      <tr><td>Data</td><td>Encryption in transit/at rest, least privilege, tokenisation</td></tr>
+      <tr><td>Application</td><td>Input validation, output encoding, dependency scanning</td></tr>
+      <tr><td>Operations</td><td>Audit logs, secrets management, patching</td></tr>
+    </table>
+    <h3 id="ch14-zero-trust" data-toc>14.3 Zero trust in practice</h3>
+    <p class="topic-desc">Zero trust stops assuming the network is friendly and instead verifies every request regardless of origin. In practice you grant least privilege, authenticate and authorise at every hop, inspect and log traffic, and elevate permissions just in time for short-lived sessions. It is a mindset shift that turns the network perimeter from the boundary into just another untrusted channel.</p>
+    <ul>
+      <li>Never trust the network; authenticate and authorize every request.</li>
+      <li>Least privilege by default, just-in-time elevation.</li>
+      <li>Defence in depth: multiple independent controls.</li>
+      <li>Secure by design, not bolted on.</li>
+    </ul>
+    <div class="warn"><p>Architecture decisions create security posture. A shared database account or an internal API with no auth is an architectural vulnerability, not a bug to patch later.</p></div>
+    <div class="ex"><h4 id="ch14-zero-trust--exercises-14">Exercises 14</h4><ol>
+      <li>STRIDE one service.</li>
+      <li>List controls per layer for a payment flow.</li>
+      <li>Find a "trusted internal network" assumption to remove.</li>
+    </ol></div>
+  
+    <div class="codeWrap"><pre><code>// Zero trust: verify explicitly, on every request, from every caller.
+
+// 1. Never trust the network. The caller is a workload with a signed identity.
+var identity = await _tokens.ValidateAsync(request.Headers["Authorization"], ct);
+// identity is proven cryptographically - it is not "whoever reached us".
+
+// 2. Authorize per action, not once at the edge.
+if (!identity.HasScope("orders.write")) return Results.Forbid();
+if (!identity.IsSameTenant(order.TenantId)) return Results.Forbid();  // tenant isolation
+
+// 3. Assume breach: keep the blast radius small and the audit trail complete.
+ILogger&lt;Order&gt; _audit;
+await _audit.WriteAsync(new AuditEntry(
+    identity.Subject, "order.update", order.Id,
+    oldValue: before, newValue: after, at: DateTimeOffset.UtcNow), ct);
+
+// 4. Short-lived credentials, rotated automatically. No standing secrets.
+//    Token TTL: 15 minutes. A stolen token expires before it is abused.
+
+// 5. Encrypt in transit and at rest, and let the platform enforce it.
+//    TLS 1.2+ required; envelope encryption for data at rest with KMS keys.
+
+// 6. Log and alert on the anomalies that break the "inside is safe" assumption.
+//    Impossible travel, new device, privilege escalation, bulk export.</code></pre></div>
+<p class="code-note">Zero trust as six concrete practices: verified identity per request, per-action authorization with tenant isolation, complete audit trails, short-lived credentials, encryption everywhere, and anomaly detection. Each is checkable in code review.</p>
+    </section>
+
+  <section class="chapter">
+    <h2 id="ch15" data-toc>15 · Documenting Architecture</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Documenting Architecture</button><div class="ch-toc-list"><a href="#ch15-c4">15.1 The C4 model</a><a href="#ch15-adr">15.2 Architecture Decision Records (ADRs)</a><a href="#ch15-diagrams">15.3 Diagrams as code</a></div></div>
+    <p class="topic-desc">Documentation keeps architecture alive after its authors move on, and a system whose shape is not written down cannot be reviewed or challenged. Good documentation records decisions, current structure and the reasons behind them at a level senior engineers can trust. In practice it is kept in the repository as living material rather than a wall of detached diagrams.</p>
+    <h3 id="ch15-c4" data-toc>15.1 The C4 model</h3>
+    <p class="topic-desc">The C4 model gives one diagram per zoom level, from system context through containers, components and code, so every diagram has a clear scope and legend. Context shows the system and its neighbours, containers show deployables, components show boundaries and code zooms into a class. In practice you maintain the top two levels and generate the lower ones, since they change fastest.</p>
+    <div class="codeWrap"><pre><code>C1 Context   - the system and its users/systems (one diagram)
+C2 Container - deployable units (web app, API, DB, queue)
+C3 Component - pieces inside a container
+C4 Code      - classes (usually generated, rarely hand-drawn)
+
+Rule: one diagram per level, with a legend and a clear scope.</code></pre></div>
+    <p class="code-note">C4 gives one diagram per zoom level from context down to code, so a single diagram never tries to explain everything.</p>
+    <h3 id="ch15-adr" data-toc>15.2 Architecture Decision Records (ADRs)</h3>
+    <p class="topic-desc">Architecture Decision Records capture the context, the decision and its consequences so future engineers can revisit the why rather than only the what. Each record is a short, dated file written at decision time and linked to related decisions. The practice turns conversations into an auditable history of how the architecture arrived where it stands.</p>
+    <div class="codeWrap"><pre><code># ADR 0007: Use PostgreSQL for the primary datastore
+
+Status: Accepted    Date: 2026-09-17
+
+Context:  Need JSONB, geospatial, and strong standards compliance.
+Decision: Adopt PostgreSQL 16 as the primary OLTP database.
+Consequences: Team must learn pg-specific ops; no MSSQL tooling.</code></pre></div>
+    <p class="code-note">An ADR records context, decision and consequences so a future engineer can revisit the why, not just the what.</p>
+    <h3 id="ch15-diagrams" data-toc>15.3 Diagrams as code</h3>
+    <p class="topic-desc">Diagrams as code keep architecture in the repository, where it versions, reviews and updates exactly like source code. Tools such as Mermaid and PlantUML render text descriptions into diagrams for pull requests and documentation. In practice this makes diagrams reviewable in code review, auditable through git history and cheap to regenerate when the design shifts.</p>
+    <p>Keep diagrams in the repo (Structurizr DSL, Mermaid, PlantUML) so they version and review like code. Diagrams that live only in slide decks rot immediately.</p>
+    <div class="ex"><h4 id="ch15-diagrams--exercises-15">Exercises 15</h4><ol>
+      <li>Draw C4 C1 and C2 for a system.</li>
+      <li>Write an ADR for a real decision.</li>
+      <li>Put one diagram in the repo as text.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch16" data-toc>16 · Evaluating &amp; Evolving Architecture</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Evaluating &amp; Evolving Architecture</button><div class="ch-toc-list"><a href="#ch16-evaluation">16.1 Evaluation methods</a><a href="#ch16-fitness">16.2 Fitness functions (automated governance)</a><a href="#ch16-evolve">16.3 Evolving safely</a></div></div>
+    <p class="topic-desc">Good architecture is continuously evaluated and evolved, with automated checks proving the shape still stands as the system grows. Evaluation frameworks such as ATAM and risk storming judge the design against quality attributes, while fitness functions encode constraints as CI checks. This turns architecture from a one-off design into a governed, living process.</p>
+    <h3 id="ch16-evaluation" data-toc>16.1 Evaluation methods</h3>
+    <p class="topic-desc">Architecture evaluation methods give structured lenses for judging a design before it hardens: ATAM runs scenarios against quality attributes, risk storming crowdsources risks from the team, fitness functions automate constraints and cost-of-change tracks how painful modification has become. The architect applies them at milestones and when major changes land. Each answer is only useful if it leads to an action.</p>
+    <table>
+      <tr><th>Method</th><th>Question it answers</th></tr>
+      <tr><td>ATAM</td><td>How do decisions affect quality attributes?</td></tr>
+      <tr><td>Risk storming</td><td>Where is the greatest risk?</td></tr>
+      <tr><td>Fitness functions</td><td>Are we still honouring the architecture?</td></tr>
+      <tr><td>Cost of change</td><td>Which decisions are expensive to reverse?</td></tr>
+    </table>
+    <h3 id="ch16-fitness" data-toc>16.2 Fitness functions (automated governance)</h3>
+    <p class="topic-desc">Fitness functions encode architectural constraints as automated checks that fail loudly when violated, giving continuous governance of the shape. Examples are dependency rules, API compatibility checks, latency budgets and module boundary enforcement implemented as CI tests. In practice you start with a handful of checks for the constraints you care about most and extend the suite as the system evolves.</p>
+    <div class="codeWrap"><pre><code># Example checks (ArchUnit style, run in CI):
+- no dependency from Domain to Infrastructure
+- no cyclic dependencies between modules
+- controllers must not access the DB directly
+- a module's public API only exposes interfaces</code></pre></div>
+    <p class="code-note">Fitness functions turn architectural constraints into automated CI checks that fail loudly the day they are violated.</p>
+    <h3 id="ch16-evolve" data-toc>16.3 Evolving safely</h3>
+    <p class="topic-desc">Evolving a live system safely avoids big-bang rewrites by using the strangler fig pattern, parallel runs and explicit rollback paths. New capability grows alongside the old, traffic is shifted gradually and each step is reversible. In practice you keep the seam between old and new wide enough that any release can be backed out, and you only remove the old system when telemetry shows it is unused.</p>
+    <ul>
+      <li>Use the Strangler Fig to replace legacy incrementally behind a facade.</li>
+      <li>Parallel-run and compare before cutover.</li>
+      <li>Keep a rollback path for every structural change.</li>
+      <li>Let the system’s real pain drive the next refactor.</li>
+    </ul>
+    <div class="ex"><h4 id="ch16-evolve--exercises-16">Exercises 16</h4><ol>
+      <li>Write three fitness functions as CI checks.</li>
+      <li>Plan a strangler-fig migration for a legacy module.</li>
+      <li>Rank your decisions by cost of reversal.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch17" data-toc>17 · Case Study — Designing an E-commerce Platform</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Case Study — Designing an E-commerce Platform</button><div class="ch-toc-list"><a href="#ch17-requirements">17.1 Requirements and attributes</a><a href="#ch17-shape">17.2 The shape</a><a href="#ch17-decisions">17.3 Key decisions &amp; trade-offs</a><a href="#ch17-risks">17.4 Risks and mitigations</a></div></div>
+    <p class="topic-desc">This chapter is a worked case study that applies the whole guide to designing an e-commerce platform from scratch, binding the earlier chapters into one coherent narrative. It moves from requirements and quality attributes through the overall shape, the key decisions and their trade-offs, down to named risks and mitigations. It shows how theory turns into a concrete, defensible design.</p>
+    <h3 id="ch17-requirements" data-toc>17.1 Requirements and attributes</h3>
+    <p class="topic-desc">Concrete targets for availability, scalability, consistency and team shape turn vague goals into testable requirements. Availability gets a number, scalability gets a load profile, consistency gets per-data-set choices and the team shape constrains the number of ownership boundaries. Written this way, requirements become inputs to architectural choices and later to acceptance tests.</p>
+    <table>
+      <tr><th>Driver</th><th>Target</th></tr>
+      <tr><td>Availability</td><td>99.95% for browsing/checkout</td></tr>
+      <tr><td>Scalability</td><td>10× traffic on sale days</td></tr>
+      <tr><td>Consistency</td><td>Strong for inventory/payment; eventual for search/reviews</td></tr>
+      <tr><td>Team</td><td>4 teams, independent deploy desired</td></tr>
+    </table>
+    <h3 id="ch17-shape" data-toc>17.2 The shape</h3>
+    <p class="topic-desc">The design starts as a modular monolith with an asynchronous event bus, and the narrative shows exactly where extraction to services is deferred until it pays. Boundaries are drawn by business capability so each module could be lifted out independently. This layout gets simple operations and real transactions now while keeping the seams that future scaling may need.</p>
+    <div class="codeWrap"><pre><code>[ CDN + SPA ]
+      |
+[ API Gateway ] --(sync)--&gt; [ Catalog ] [ Cart ] [ Checkout ] [ Payments ]
+      |                          |          |          |            |
+      +--(async bus)--&gt; [ Inventory ] [ Orders ] [ Notifications ]
+                          |
+                  [ Postgres ] [ Redis ] [ Search Index ]
+
+Modular monolith first; extract Inventory and Checkout only when
+sale-day load and team autonomy demand it.</code></pre></div>
+    <p class="code-note">The platform starts as a modular monolith with an async bus; only inventory and checkout are candidates for later extraction.</p>
+    <h3 id="ch17-decisions" data-toc>17.3 Key decisions &amp; trade-offs</h3>
+    <p class="topic-desc">Every big decision in the case study is recorded with its trade-off, from starting with a monolith through adopting events, read replicas, an idempotent checkout and an outbox for reliable publishing. Each choice names what was gained and what was paid. The discipline of recording them is exactly what makes the design defensible in review.</p>
+    <ul>
+      <li><strong>Modular monolith</strong> initially — simple ops, transactions, fast delivery; extract later.</li>
+      <li><strong>Event bus</strong> for inventory and notifications — decoupling, eventual consistency accepted.</li>
+      <li><strong>Read replicas + cache</strong> — scale reads without sharding.</li>
+      <li><strong>Idempotent checkout</strong> — at-least-once messaging safety.</li>
+      <li><strong>Outbox</strong> — no lost events between DB and bus.</li>
+    </ul>
+    <h3 id="ch17-risks" data-toc>17.4 Risks and mitigations</h3>
+    <p class="topic-desc">Each identified risk gets a named mitigation, converting worries into tracked actions. Examples include reserve-then-confirm sagas for inventory and payment, and correlation ids threaded through every log and trace for debugging. The result is a risk register whose entries map to concrete mechanisms rather than vague hopes.</p>
+    <table>
+      <tr><th>Risk</th><th>Mitigation</th></tr>
+      <tr><td>Oversell inventory</td><td>Reserve-then-confirm saga with compensation</td></tr>
+      <tr><td>Sale-day spike</td><td>Queue + autoscale + load test + graceful degradation</td></tr>
+      <tr><td>Payment failure</td><td>Idempotency keys and retries with backoff</td></tr>
+      <tr><td>Distributed debugging</td><td>Correlation IDs end-to-end, traces</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch17-risks--exercises-17">Exercises 17</h4><ol>
+      <li>Add reviews (eventual) to the design.</li>
+      <li>Decide which module to extract first and why.</li>
+      <li>Write the ADR for the modular-monolith decision.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Patterns, Checklists &amp; Roadmap</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Patterns, Checklists &amp; Roadmap</button><div class="ch-toc-list"><a href="#app-patterns">A.1 Pattern quick index</a><a href="#app-review">A.2 Architecture review checklist</a><a href="#app-roadmap">A.3 Roadmap: beginner to advanced</a></div></div>
+    <p class="topic-desc">The appendix is a quick-reference layer of the guide, gathering a pattern index, a review checklist and a learning roadmap for the whole discipline. It supports day-to-day use without re-reading the chapters, from looking up the pattern that fits a problem to running the sign-off checklist before a release. It is designed to be open on a desk, not read cover to cover.</p>
+    <h3 id="app-patterns" data-toc>A.1 Pattern quick index</h3>
+    <p class="topic-desc">The pattern quick index answers the question which pattern fits, organised by common goals such as decoupling, scaling, consistency and survivability. It maps each goal to the shortlist of patterns that serve it, with a pointer to the chapter that explains them. It is meant for the moment you already know the problem but want the matching pattern fast.</p>
+    <table>
+      <tr><th>Need</th><th>Pattern</th></tr>
+      <tr><td>Decouple components</td><td>Event-driven, pub/sub, adapter</td></tr>
+      <tr><td>Swap infrastructure</td><td>Hexagonal, dependency inversion</td></tr>
+      <tr><td>Consistency across services</td><td>Saga, outbox, CQRS</td></tr>
+      <tr><td>Survive failure</td><td>Timeout, retry, circuit breaker, bulkhead</td></tr>
+      <tr><td>Scale reads</td><td>Cache, replica, materialised view</td></tr>
+      <tr><td>Replace legacy</td><td>Strangler fig, anti-corruption layer</td></tr>
+    </table>
+    <h3 id="app-review" data-toc>A.2 Architecture review checklist</h3>
+    <p class="topic-desc">The review checklist is run before sign-off and covers quality attributes, boundaries, style, failure modes, observability and recorded decisions. It turns a long design conversation into a compact list that any reviewer can apply. A design that passes every item still deserves debate, but the checklist catches the gaps people routinely forget.</p>
+    <ul>
+      <li>Are quality attributes explicit and measurable?</li>
+      <li>Are boundaries aligned to capabilities and data ownership?</li>
+      <li>Is the simplest viable style chosen?</li>
+      <li>Are failure modes and consistency handled?</li>
+      <li>Is the system observable and testable?</li>
+      <li>Are decisions recorded as ADRs?</li>
+    </ul>
+    
+    <div class="codeWrap"><pre><code>// A review checklist expressed as tests, so governance is executable.
+
+// Rule 1: no module may reference another's internals.
+//   Enforced by the build, not by review comments.
+public sealed class LayerDependencyTests
+{
+    [Fact]
+    public void Domain_does_not_reference_infrastructure()
+    {
+        var refs = TypeScanner.ReferencesFrom("MyApp.Domain");
+        refs.Should().NotContain("MyApp.Infrastructure")
+            .And.NotContain("MyApp.WebApi");
+    }
+}
+
+// Rule 2: every public method on a controller is covered by an integration test.
+// Rule 3: no synchronous call to a remote dependency.
+// Rule 4: no PII written to logs (checked by a log-scan in CI).
+// Rule 5: p99 latency budget has an alert attached.
+
+// Rule 6: the decision log is current.
+public sealed class DecisionLogTests
+{
+    [Theory]
+    [InlineData("ADR-0001"), InlineData("ADR-0007")]
+    public void Each_record_is_linked_from_an_active_decision(string adr)
+    {
+        var record = File.ReadAllText($"docs/adr/{adr}.md");
+        record.Should().Contain("## Status");      // still maintained
+        record.Should().Contain("## Consequences"); // trade-offs recorded
+    }
+}</code></pre></div>
+<p class="code-note">An architecture review checklist becomes durable when each rule is a failing test. Rules 1 and 6 are automated here; the rest belong in CI as lint rules, log scanning and alerting.</p>
+    <h3 id="app-roadmap" data-toc>A.3 Roadmap: beginner to advanced</h3>
+    <p class="topic-desc">The roadmap structures growth from beginner to advanced in stages: understanding and applying SOLID, then design patterns, then architectural styles and distributed systems, and finally evaluating architecture and mentoring others. Each stage names its goals and the building blocks that unlock the next one. It gives a developer a sequence for becoming a senior or lead.</p>
+    <table>
+      <tr><th>Stage</th><th>You can…</th></tr>
+      <tr><td>Beginner</td><td>Apply SOLID, layer an app, name quality attributes</td></tr>
+      <tr><td>Intermediate</td><td>Design modules/boundaries, hexagonal, REST, caching, resilience</td></tr>
+      <tr><td>Advanced</td><td>DDD, event-driven, CQRS/saga, CAP trade-offs, fitness functions</td></tr>
+      <tr><td>Lead</td><td>Evaluate architectures, drive evolution, document decisions, mentor</td></tr>
+    </table>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Software Architecture Design Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

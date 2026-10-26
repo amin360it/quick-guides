@@ -1,0 +1,109 @@
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Concurrency, Testing and the Ecosystem</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">The last chapter ties the language to the real world: threads and the data-race guarantees around them, channels and shared state, the <code>Send</code>/<code>Sync</code> marker traits, the testing set-up that ships with cargo, and the ecosystem crates — serde, clap, tokio — plus the cargo tooling that makes a Rust project shippable.</p>
+
+<h3 id="ch7-1" data-toc>7.1 Threads</h3>
+<p class="topic-desc">Rust's threads are OS threads — no green threading by default — and the borrow checker applies across thread boundaries, which is the whole safety story: a data race is a compile error, not a heisenbug.</p>
+
+<h4 id="ch7-1-spawn">thread::spawn and the move closure</h4>
+<p><code>std::thread::spawn</code> takes a closure and runs it on a new OS thread. The closure must own everything it uses — the thread may outlive the caller's scope — which is why <code>move</code> appears on almost every spawn: it forces the captured values inside the closure. The spawned thread runs concurrently with the caller, and there is no automatic wait; if the main thread ends first, the process exits and the spawned threads are cut off.</p>
+<div class="codeWrap"><pre><code>use std::thread;
+
+fn main() {
+    let handle = thread::spawn(|| {
+        for i in 1..=5 {
+            println!("worker: {i}");
+        }
+    });
+    for i in 1..=3 {
+        println!("main: {i}");
+    }
+    handle.join().unwrap();   // wait for the worker to finish
+}</code></pre></div>
+
+<h4 id="ch7-1-join">join returns the thread's result</h4>
+<p><code>handle.join()</code> blocks until the thread completes and returns <code>Result&lt;T&gt;</code> — the closure's return value, or an <code>Err</code> if the thread panicked. So a thread is not just fire-and-forget; it is a unit of work with a result you collect. Moving an owned vector in and getting a computed total back is the canonical pattern: values cross the thread boundary in both directions, with the move guaranteeing no aliasing on the way.</p>
+<div class="codeWrap"><pre><code>use std::thread;
+
+fn main() {
+    let v = vec![10, 20, 30];           // the closure must own v
+    let handle = thread::spawn(move || {
+        v.into_iter().sum::&lt;i32&gt;()      // the thread's return value
+    });
+    let total = handle.join().unwrap(); // join hands it back
+    println!("total: {total}");
+}</code></pre></div>
+
+<h4 id="ch7-1-scoped">Scoped threads borrow instead of moving</h4>
+<p>When the threads are guaranteed to finish before the caller continues — the common case in parallel processing — <code>thread::scope</code> is the better tool: its threads may <em>borrow</em> surrounding variables, and the scope joins all of them before returning. That removes the <code>move</code> and the <code>Arc</code> boilerplate entirely. If your threads only need to read shared data, start here.</p>
+<div class="codeWrap"><pre><code>use std::thread;
+
+fn main() {
+    let s = String::from("hello");
+    thread::scope(|scope| {
+        // scoped threads may BORROW surrounding variables
+        scope.spawn(|| println!("len: {}", s.len()));
+        scope.spawn(|| println!("{s}"));
+    });                       // all threads joined before scope ends
+    println!("{s}");          // still ours afterwards
+}</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 Channels and shared state</h3>
+<p class="topic-desc">Threads communicate two ways: message passing through channels, or shared state behind a mutex. Rust's standard library ships both — <code>mpsc</code> for channels, <code>Mutex</code> for shared state.</p>
+
+<h4 id="ch7-2-channel">mpsc: multiple producers, one consumer</h4>
+<p><code>mpsc::channel()</code> returns a sender and a receiver. The sender's <code>send</code> places a value into the channel; the receiver's <code>recv</code> blocks until a value arrives, and iterating the receiver yields values until every sender is dropped — the channel closes when its last sender goes away. Multiple threads can hold cloned senders; only the receiver side is single. This is the actor-style pattern: workers send results back to one coordinator.</p>
+<div class="codeWrap"><pre><code>use std::sync::mpsc;
+use std::thread;
+
+fn main() {
+    let (tx, rx) = mpsc::channel();
+    for i in 0..3 {
+        let tx = tx.clone();          // a sender clone per thread
+        thread::spawn(move || {
+            tx.send(i * 10).unwrap();
+        });
+    }
+    drop(tx);                          // close the ORIGINAL sender
+    for received in rx {               // ends when all senders drop
+        println!("{received}");
+    }
+}</code></pre></div>
+
+<h4 id="ch7-2-mutex">Mutex: interior mutability with a lock</h4>
+<p><code>Mutex&lt;T&gt;</code> gives safe mutation of a <code>T</code> shared through a reference: <code>lock()</code> returns a guard that derefs to <code>&amp;mut T</code>, and the lock is released when the guard drops — automatically, even if the scope exits early. The guard is the token of permission: while it lives, no other thread can touch the value. A second thread calling <code>lock()</code> blocks until the first releases. The price of this safety is the lock itself, which is why the guard scope should be as short as possible.</p>
+<div class="codeWrap"><pre><code>use std::sync::Mutex;
+
+fn main() {
+    let m = Mutex::new(0);
+    {
+        let mut guard = m.lock().unwrap();
+        *guard += 1;                 // deref through the guard
+    }                                // guard dropped: lock released
+    println!("{:?}", m);             // Mutex { data: 1 }
+}</code></pre></div>
+
+<h4 id="ch7-2-arc">Arc&lt;Mutex&lt;T&gt;&gt;: share across threads</h4>
+<p>The combination that actually gets shared between threads is <code>Arc&lt;Mutex&lt;T&gt;&gt;</code>: <code>Arc</code> gives each thread a reference-counted handle (atomics included, unlike <code>Rc</code>), and the <code>Mutex</code> inside serialises access to the <code>T</code>. Ten threads each incrementing one counter is the hello-world of shared state — and the answer to why <code>Rc</code> will not do: its count is not atomic, so two threads cloning it would race on the refcount itself.</p>
+<div class="codeWrap"><pre><code>use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let c = Arc::clone(&amp;counter);
+        handles.push(thread::spawn(move || {
+            let mut n = c.lock().unwrap();
+            *n += 1;
+        }));
+    }
+
+    for h in handles {
+        h.join().unwrap();
+    }
+    println!("counter = {}", *counter.lock().unwrap());   // 10
+}</code></pre></div>
+<div class="warn">Holding a <code>MutexGuard</code> across a blocking call or an <code>await</code> is a dead-lock and a performance bug respectively: the lock stays held while other threads wait. Scope the guard tightly — acquire, mutate, drop.</div>

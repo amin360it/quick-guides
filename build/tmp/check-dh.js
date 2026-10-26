@@ -1,0 +1,13 @@
+const fs = require('fs');
+const s = fs.readFileSync('domains-hosting.html', 'utf8');
+const h3 = (s.match(/<h3 id=/g) || []).length;
+const h4 = (s.match(/<h4 id=/g) || []).length;
+const code = (s.match(/<div class="codeWrap"><pre><code>/g) || []).length;
+const ch = (s.match(/<section class="chapter">/g) || []).length;
+const ch2 = (s.match(/<h2 /g) || []).length;
+console.log('domains-hosting.html:');
+console.log('chapters (section): ' + ch);
+console.log('h2 count: ' + ch2);
+console.log('h3 count: ' + h3);
+console.log('h4 count: ' + h4);
+console.log('code blocks: ' + code);

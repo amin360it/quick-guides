@@ -1,0 +1,267 @@
+  <section class="chapter">
+<h2 id="ch14" data-toc>14 · Suspense and Transitions</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Suspense and transitions</button><div class="ch-toc-list"><a href="#ch14-boundaries">Boundaries and where they go</a><a href="#ch14-fallback">Fallbacks that do not lie</a><a href="#ch14-transition">Transitions: urgent versus predictable</a><a href="#ch14-deferred">useDeferredValue and stale input</a><a href="#ch14-lazy">lazy, code splitting and keeping frames</a></div></div>
+    <p class="topic-desc">Suspense and transitions are two answers to the same question: what does the user see while work is still happening. Suspense draws the line on the screen — here is pending, here is content. Transitions draw the line in time — this update can wait so that one cannot. Used together they are what makes a React app feel deliberate rather than jumpy.</p>
+    <h3 id="ch14-boundaries" data-toc>Boundaries and where they go</h3>
+    <p>A Suspense boundary is a promise from the layout to the user: everything below this point may be temporarily unavailable, and when it arrives it will appear in place, without moving what is already on screen. The boundary is what makes that promise enforceable — a component below it may suspend (from <code>use</code>, from a framework data hook, from <code>React.lazy</code>) and React replaces only that subtree with the fallback, keeping the rest of the page mounted, interactive and holding its state. Without a boundary the suspension travels to the root, and the whole screen goes to fallback, which is the failure mode people mean when they say Suspense caused flicker.</p>
+    <p>Placement therefore follows the layout, not the data. Put a boundary around each independently-arriving region — the sidebar, the table, the chart panel — so each one can resolve on its own schedule, and put none around regions that must arrive together or that are above the fold as a unit, because a boundary inside a region that needs all its children at once just moves the wait without shortening it. A useful test: cover the region with your hand and ask whether the rest of the screen is still usable if it is missing. If yes, it wants a boundary. If no, the boundary belongs higher.</p>
+    <div class="codeWrap"><pre><code>// one boundary per independently-arriving region
+function Dashboard({ reportPromise, activityPromise }) {
+  return (
+    &lt;div className="grid"&gt;
+      &lt;Header /&gt;                                   {/* never suspends */}
+      &lt;Suspense fallback={&lt;ReportSkeleton /&gt;}&gt;
+        &lt;Report promise={reportPromise} /&gt;        {/* its own boundary */}
+      &lt;/Suspense&gt;
+      &lt;aside&gt;
+        &lt;Suspense fallback={&lt;ActivitySkeleton /&gt;}&gt;
+          &lt;Activity promise={activityPromise} /&gt;  {/* resolves independently */}
+        &lt;/Suspense&gt;
+      &lt;/aside&gt;
+    &lt;/div&gt;
+  );
+}
+
+// WRONG: one boundary at the root -&gt; a pending sidebar blanks the report
+function BadDashboard(props) {
+  return &lt;Suspense fallback={&lt;PageSkeleton /&gt;}&gt;&lt;Dashboard {...props} /&gt;&lt;/Suspense&gt;;
+}</code></pre></div>
+    <p>Boundaries compose, and nesting them is how you get granularity without losing the coarse safety net: a page-level boundary catches everything, regional boundaries inside it catch their own subtrees first. The innermost boundary wins, so the finer ones should sit lower. One structural rule keeps this maintainable: a boundary should be rendered by the component that owns the region's layout, not by the component that performs the fetch. A boundary embedded deep inside a data-owning component couples fallback presentation to data plumbing, and the moment you want a different skeleton for a different context you have to move it anyway.</p>
+    <div class="codeWrap"><pre><code>// boundaries owned by layout, data owned by leaves
+function SettingsPage() {
+  return (
+    &lt;section&gt;
+      &lt;h2&gt;Notifications&lt;/h2&gt;
+      {/* layout decides this region exists and how it looks while pending */}
+      &lt;Suspense fallback={&lt;SettingsRowSkeleton rows={3} /&gt;}&gt;
+        &lt;NotificationSettings /&gt;     {/* leaf decides HOW to fetch */}
+      &lt;/Suspense&gt;
+    &lt;/section&gt;
+  );
+}
+
+function NotificationSettings() {
+  const prefs = use(preferencesPromise);   // suspends; the boundary above pays
+  return &lt;PreferenceList prefs={prefs} /&gt;;
+}</code></pre></div>
+    <h4>The state-preserving property</h4>
+    <p>When a subtree suspends behind an already-mounted boundary, React does not unmount the existing content — it keeps showing the current content while the new data loads, and swaps when ready. That is the behaviour that makes transitions feel smooth, and it only exists if the boundary is already mounted when the suspension happens. A boundary rendered for the first time at the same moment as the suspending child has nothing to keep showing, so its fallback appears: the flicker case. Ensure boundaries mount before the data they guard, which in practice means the boundary lives in the initial render of the region and the fetch is triggered after.</p>
+    <div class="note"><p>Suspense is a rendering contract, not a loading contract: it says "this subtree is not ready", and whether that means fetching, a slow computation, or a lazy chunk download is the caller's business. This is why the same boundary covers a data hook and a <code>React.lazy</code> import without knowing which is inside.</p></div>
+    <h3 id="ch14-fallback" data-toc>Fallbacks that do not lie</h3>
+    <p>A fallback is shown for an unknown duration, so its job is to communicate structure and ownership, not progress. The worst fallback is a spinner on an empty page: it says nothing about what is coming, and the moment the content arrives — often at a different height — the entire layout jumps. The second worst is a perfect skeleton of the loaded content, because if the real content differs in shape the skeleton was a promise broken. The right fallback mirrors the <em>structure</em> of the region at roughly its final size, without pretending to know the values.</p>
+    <p>Layout stability is the measurable part. Give the fallback the same footprint the content will occupy — same grid, same row count where it is predictable, same minimum height — so that arrival causes zero reflow of surrounding regions. The test is a screenshot comparison with the network throttled: a good fallback and the loaded state should differ in texture, not in geometry. Beyond geometry, fallbacks owe the user two things: they must not remove interactive chrome that does not depend on the pending region (a page title, a back button, a search field that searches something else), and they must not trap focus or steal it — a fallback that renders a button the content will not have is a focus trap waiting to snap shut.</p>
+    <div class="codeWrap"><pre><code>// fallback that keeps the geometry: same grid, same row heights
+function Panel({ children }) {
+  return (
+    &lt;div className="panel-grid"&gt;
+      &lt;Suspense
+        fallback={
+          &lt;div className="panel-grid" aria-busy="true"&gt;
+            {/* same class as the loaded content: identical layout box */}
+            {Array.from({ length: 6 }, (_, i) =&gt; (
+              &lt;div key={i} className="panel-cell panel-cell--pending" /&gt;
+            ))}
+          &lt;/div&gt;
+        }
+      &gt;
+        {children}
+      &lt;/Suspense&gt;
+    &lt;/div&gt;
+  );
+}
+
+// the loaded content uses the same panel-grid / panel-cell classes,
+// so arrival swaps texture, not geometry - zero layout shift.</code></pre></div>
+    <p>Announce the pending state to assistive technology without turning every refresh into noise. Marking the region <code>aria-busy="true"</code> while the fallback shows is the structured signal; a live-region announcement ("Loading report") is appropriate the first time a region loads and irritating on every refetch. The distinction mirrors the visual one: a first load is new content appearing, a background refresh is content being maintained. Design the fallback for both cases rather than only the first — a region that goes blank on every refetch teaches users not to trust it.</p>
+    <div class="codeWrap"><pre><code>// announce the first load, stay quiet on background refresh
+function AnnouncedRegion({ promise, firstLoad, children }) {
+  return (
+    &lt;section aria-busy="true"
+             aria-live={firstLoad ? 'polite' : 'off'}
+             aria-label="Report"&gt;
+      &lt;Suspense fallback={&lt;ReportSkeleton /&gt;}&gt;{children}&lt;/Suspense&gt;
+    &lt;/section&gt;
+  );
+}
+
+// and never use the fallback for a REFRESH: under a transition, React keeps
+// the current content mounted while the new data loads (next section), so
+// the skeleton only ever appears once per region, at first mount.</code></pre></div>
+    <h4>What a fallback must never contain</h4>
+    <p>Interactive controls whose behaviour depends on the pending content — a submit button for a form that has not loaded, a filter for a table that does not exist yet, a link to a detail view you cannot address. Focus can land on these, activation does nothing or throws, and the user has no way to know why. Static presentation, a status message, and the chrome that stands on its own are all fine; anything that accepts input must either work or be visibly disabled with the disabled reason stated.</p>
+    <div class="warn"><p>A fallback rendered by a region that suspends on every keystroke — the anti-pattern of fetching in render without a transition — turns the skeleton into a strobe. If your fallback appears repeatedly rather than once, the fix is not a subtler fallback; it is chapter 14's transitions: the update causing the suspension must be marked as non-urgent.</p></div>
+    <h3 id="ch14-transition" data-toc>Transitions: urgent versus predictable</h3>
+    <p>React 18 divided updates into two kinds: urgent, which the user expects to see immediately (typing, clicking, dragging — the element under the pointer must respond in this frame), and transitional, which the user expects to settle rather than instantaneously appear (filtering a large list, opening a detail view whose data is loading, navigating). <code>startTransition</code> marks a state update as the second kind: React may interrupt it, render it at lower priority, and — critically — keep the current content on screen while it completes instead of dropping to a fallback. The API is two lines; the semantics it activates are the whole of concurrent rendering's user-facing value.</p>
+    <p>The signature behaviour worth internalising: if a transition's render suspends, React keeps showing the old UI until the new one is ready, even though the state has already changed. That is the difference between a search box that blinks a skeleton per keystroke and one that shows results the moment they are ready while you keep typing. And if a newer urgent update arrives mid-transition, React discards the transition's progress and starts again from the new state — transitions are interruptible, which is exactly why typing during a slow filter never feels locked. The rule for when to use one follows from the two categories: wrap the update if the user would accept waiting; do not wrap it if the user would be surprised that nothing happened.</p>
+    <div class="codeWrap"><pre><code>// urgent: the input must repaint THIS frame
+function SearchBox({ query, onQuery }) {
+  return &lt;input value={query} onChange={(e) =&gt; onQuery(e.target.value)} /&gt;;
+}
+
+function Results({ query }) {
+  const [rows, setRows] = useState([]);
+  const [pending, startTransition] = useTransition();
+
+  function handleChange(next) {
+    // urgent half: the input is controlled by query state in the PARENT,
+    // which updates immediately...
+    onQuery(next);
+    // transitional half: the expensive derived list can wait and be
+    // interrupted if the user keeps typing
+    startTransition(() =&gt; {
+      setRows(filterHugeList(next));
+    });
+  }
+
+  return (
+    &lt;&gt;
+      &lt;SearchBox query={query} onQuery={handleChange} /&gt;
+      {pending &amp;&amp; &lt;span role="status"&gt;Filtering…&lt;/span&gt;}
+      &lt;List rows={rows} /&gt;
+    &lt;/&gt;
+  );
+}</code></pre></div>
+    <p>Transitions pair with Suspense to produce the behaviour that defines the modern React feel: inside a transition, a suspending render does not show the fallback — it waits. This is the single most useful fact in this chapter, because it converts a design decision (skeleton or keep-current-content?) from a per-component judgement into a property of how the update was scheduled. Refetching a panel after a mutation: transition it, and the panel keeps its old values until the new ones arrive. Navigating to a route whose data is loading: transition it, and the current page stays while the next one prepares.</p>
+    <div class="codeWrap"><pre><code>// refetch under a transition: old content stays until new arrives
+function ProjectView({ projectId }) {
+  const [project, setProject] = useState(null);
+  const [pending, startTransition] = useTransition();
+
+  useEffect(() =&gt; {
+    startTransition(async () =&gt; {           // async transition body
+      setProject(await api.getProject(projectId));   // suspends internally
+    });                                          // no fallback shown: the
+  }, [projectId]);                               // PREVIOUS project stays
+                                                 // visible the whole time
+  if (!project) return &lt;InitialSkeleton /&gt;;   // only for the very first load
+
+  return (
+    &lt;&gt;
+      {pending &amp;&amp; &lt;span role="status"&gt;Updating…&lt;/span&gt;}
+      &lt;Project project={project} /&gt;
+    &lt;/&gt;
+  );
+}</code></pre></div>
+    <h4>What not to transition</h4>
+    <p>Do not transition the urgent half of an interaction. A controlled input whose value only updates inside a transition will lag behind the keystrokes, because urgent typing updates must never queue behind a long render — that is precisely the responsiveness guarantee transitions are built to sacrifice for everything else. Likewise, do not transition a state update that toggles something the user is pointing at: a button that goes unpressed after a delay feels broken even when the work behind it succeeds. Split the update: the pointer-visible state updates immediately, the expensive dependent state transitions.</p>
+    <div class="tip"><p>Expose transition pending state to the user as a status, not a blocking overlay. <code>useTransition</code>'s pending flag drives a subtle "Filtering…" label or an <code>aria-busy</code> attribute — enough to explain why results lag, never enough to stop the user typing. If your instinct is a spinner over the list during a transition, the update probably should not have been a transition; it should have been urgent.</p></div>
+    <h3 id="ch14-deferred" data-toc>useDeferredValue and stale input</h3>
+    <p><code>useDeferredValue</code> is the read-side counterpart of a transition: given a value, it returns that value immediately on the urgent render and a deferred, possibly-stale copy during subsequent low-priority renders. Where <code>startTransition</code> wraps the state update, <code>useDeferredValue</code> wraps the consumption — which makes it the tool for the cases you do not control the update, because it arrives as a prop from a parent, a URL parameter, or a store. The component stays responsive by rendering with last frame's value while the new one catches up.</p>
+    <p>The comparison that matters: an input with a derived expensive list has two legitimate designs, and both use the same primitive from opposite ends. If you own the state, split it — urgent input state, transitioned derived state, as in the previous section. If you receive the value as a prop, defer it inside the component — render the input from the prop directly and the list from the deferred copy. Both produce the same frame timing: keystroke paints now, expensive subtree reconciles later. The second is often necessary precisely because the parent that owns the value is far away, and threading a transition down to it would couple a leaf's performance needs to an ancestor's API.</p>
+    <div class="codeWrap"><pre><code>// the value arrives from a parent you do not control - defer the read
+function BigFilter({ query }) {
+  const deferredQuery = useDeferredValue(query);
+  const pending = query !== deferredQuery;
+
+  // the input renders from the REAL value: every keystroke paints immediately
+  // the expensive subtree renders from the DEFERRED value: it may lag a frame
+  const rows = useMemo(() =&gt; filterHugeList(deferredQuery), [deferredQuery]);
+
+  return (
+    &lt;&gt;
+      &lt;input readOnly value={query} /&gt;
+      {pending &amp;&amp; &lt;span role="status"&gt;Updating results…&lt;/span&gt;}
+      &lt;List rows={rows} /&gt;
+    &lt;/&gt;
+  );
+}
+
+// equivalent timing, opposite control: you own the state, so split it
+function OwnsState({ onQuery }) {
+  const [query, setQuery] = useState('');
+  const [rows, setRows] = useState([]);
+  const [, startTransition] = useTransition();
+  return &lt;input onChange={(e) =&gt; {
+    setQuery(e.target.value);                          // urgent
+    startTransition(() =&gt; setRows(filterHugeList(e.target.value)));
+  }} /&gt;;
+}</code></pre></div>
+    <p>Two traps. First, the stale value must be safe to render: if the deferred list is keyed by a value that the urgent render has already moved past — a selected row id that no longer exists in the stale array — you get an index or lookup error precisely during the frames the user is watching. Guard the derived render against staleness (a null check, a "no longer available" state) rather than assuming the two copies agree. Second, using the deferred value as a dependency of anything imperative — an effect that fetches, a subscription that re-registers — reintroduces the lag into a path that cannot skip frames; defer reads for rendering, keep effects on the urgent value.</p>
+    <div class="codeWrap"><pre><code>// staleness is visible: the selection may point outside the deferred list
+function Picker({ query }) {
+  const deferred = useDeferredValue(query);
+  const results = useMemo(() =&gt; search(deferred), [deferred]);
+  const [selectedId, setSelectedId] = useState(null);
+
+  // results lags query; selectedId may reference a row not in results yet
+  const selected = results.find((r) =&gt; r.id === selectedId);
+
+  return (
+    &lt;&gt;
+      &lt;List rows={results} onSelect={setSelectedId} /&gt;
+      {/* guard the render: do not assume the two copies agree */}
+      {selected
+        ? &lt;Detail row={selected} /&gt;
+        : &lt;p role="status"&gt;Selecting…&lt;/p&gt;}
+    &lt;/&gt;
+  );
+}</code></pre></div>
+    <h4>Measuring the deferral</h4>
+    <p>Confirm the win the same way chapter 11 confirms anything: with the profiler, before and after, on the real interaction. The signature of a correct <code>useDeferredValue</code> adoption is that the urgent input's commit stays under a few milliseconds while the deferred subtree's render moves out of the keystroke's frame — visible as input-handler work shrinking and a second, lower-priority render appearing afterwards. If both renders are still in the same frame, the deferred work is not the bottleneck and the technique bought you an extra render for nothing.</p>
+    <div class="note"><p>Deferral and transitions are alternatives, not layers: pick one owner for "this update is non-urgent" per interaction. Running both — a transitioned update whose consumer also defers — doubles the lag between what the user did and what they see, and the extra staleness buys no responsiveness the first one did not already provide.</p></div>
+    <h3 id="ch14-lazy" data-toc>lazy, code splitting and keeping frames</h3>
+    <p><code>React.lazy</code> takes a function returning a dynamic import and produces a component that suspends until its chunk arrives — which means, with the previous sections in hand, that it is governed by a Suspense boundary like any other pending region. This is the mechanism behind route-level and widget-level code splitting in applications without a framework: the initial payload ships the shell and the first screen, and heavy secondary features — a charting library, a rich-text editor, an admin panel — download only when first rendered. The win is not bytes saved overall; it is bytes moved off the critical path of first interaction.</p>
+    <p>What makes splitting pay is choosing boundaries that match usage rather than files that match folders. Splitting every component is worse than splitting none: dozens of small requests, a waterfall of chunk discoveries, and worse total latency than one bundle. The right seams are where a usage pattern changes — the detail view behind a list row, the settings modal, anything behind an authenticated area — so that the common path loads one chunk more and the uncommon path loads its cost only when taken. The measurable targets are first-paint and time-to-interactive for the entry route; if a split moves those, it earned its place, and a bundle report in CI (chapter 11's budget) keeps it honest afterwards.</p>
+    <div class="codeWrap"><pre><code>// route-level splitting: the shell never downloads the heavy panels
+import { lazy, Suspense } from 'react';
+
+const AdminPanel = lazy(() =&gt; import('./AdminPanel'));   // own chunk
+const Reports    = lazy(() =&gt; import('./Reports'));      // own chunk
+
+function App() {
+  return (
+    &lt;Suspense fallback={&lt;PageSkeleton /&gt;}&gt;
+      &lt;Routes&gt;
+        &lt;Route path="/" element={&lt;Home /&gt;} /&gt;            {/* in the shell */}
+        &lt;Route path="/admin" element={&lt;AdminPanel /&gt;} /&gt; {/* on demand */}
+        &lt;Route path="/reports" element={&lt;Reports /&gt;} /&gt;  {/* on demand */}
+      &lt;/Routes&gt;
+    &lt;/Suspense&gt;
+  );
+}
+
+// WRONG: splitting every component - dozens of round trips, worse than one
+const Button   = lazy(() =&gt; import('./Button'));
+const Badge    = lazy(() =&gt; import('./Badge'));
+const ListItem = lazy(() =&gt; import('./ListItem'));</code></pre></div>
+    <p>Prefetching closes the gap between "split" and "split without the user noticing". If the shell can predict the next likely route — the item row that will be clicked, the nav link being hovered — it can start the dynamic import before navigation, so the transition resolves from cache instead of network. This is a small amount of code with a disproportionate effect on perceived speed: the split exists for the rare path, and prefetching makes the common transition to it indistinguishable from an unsplit bundle. React's own examples pair <code>React.lazy</code> with an intersection observer for exactly this, and any router worth using exposes a prefetch option on links.</p>
+    <div class="codeWrap"><pre><code>// prefetch on intent: hover or viewport-entry starts the chunk download
+const Reports = lazy(() =&gt; import('./Reports'));
+let reportsStarted = false;
+export function preloadReports() {
+  if (reportsStarted) return;
+  reportsStarted = true;
+  import('./Reports');            // the same specifier -&gt; the same chunk,
+}                                 // now cached before anyone navigates
+
+function NavReportsLink() {
+  return (
+    &lt;Link to="/reports"
+          onPointerEnter={preloadReports}
+          onFocus={preloadReports}&gt;
+      Reports
+    &lt;/Link&gt;
+  );
+}
+
+// viewport prefetch for content far down a long list
+function useViewportPreload(ref, preload) {
+  useEffect(() =&gt; {
+    const io = new IntersectionObserver((entries) =&gt; {
+      if (entries.some((e) =&gt; e.isIntersecting)) { preload(); io.disconnect(); }
+    });
+    if (ref.current) io.observe(ref.current);
+    return () =&gt; io.disconnect();
+  }, [ref, preload]);
+}</code></pre></div>
+    <h4>Splitting, boundaries and state — the three regressions</h4>
+    <p>Three ways a splitting pass makes an app worse, each with a distinct symptom. Losing state across a boundary: because a lazy subtree suspends, anything holding local state inside the shell but above the split point survives, while state inside the swapped subtree resets — so a form half-filled in a modal that lazy-loads must live in the store, not the modal. Chunk waterfalls: one lazy component importing another lazily serialises their downloads; check the network panel for chunks arriving in sequence. And duplicate vendors: two chunks each bundling their own copy of a library doubles its bytes across the session — the bundle report from chapter 11 catches this the week it happens, not the quarter after.</p>
+    <div class="warn"><p>Never <code>lazy</code>-load the element that renders the fallback's destination — a lazy component with no Suspense boundary above it, or one placed above a boundary that itself suspends, produces an unhandled suspension that React resolves by unmounting to the root. Every <code>React.lazy</code> call needs a boundary that is guaranteed to be mounted before it, which in practice means the boundary sits in code that was in the initial bundle.</p></div>
+    <div class="ex"><h4>Exercises 14</h4><ol>
+      <li>Draw your application's main screen as regions. Mark each one independently-arriving or all-or-nothing, then place Suspense boundaries accordingly and compare with where your data hooks currently suspend.</li>
+      <li>Take a fallback that collapses the layout on load. Give it the content's geometry using shared classes and verify with before/after screenshots that arrival causes no reflow.</li>
+      <li>Find a list that goes blank while filtering. Wrap the set in a transition, confirm the old rows stay visible, then confirm typing during the filter stays responsive in the profiler.</li>
+      <li>Adopt <code>useDeferredValue</code> in a component that receives its query as a prop. Intentionally break it by selecting a row outside the deferred results, and fix the render with an explicit staleness guard.</li>
+      <li>Split your heaviest secondary feature behind <code>React.lazy</code>, add prefetch on the entry link, and compare first-interaction timing and chunk requests against the unsplit build.</li>
+    </ol></div>
+  </section>

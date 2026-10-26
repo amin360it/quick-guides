@@ -1,0 +1,17 @@
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const ROOT = path.resolve(__dirname, '..');
+const s = fs.readFileSync(path.join(ROOT, 'vue-nuxt-capacitor.html'), 'utf8');
+const lineOf = (i) => s.slice(0, i).split('\n').length;
+const marks = [];
+const push = (re, label) => { for (const m of s.matchAll(re)) marks.push({ i: m.index, l: lineOf(m.index), t: label, id: (m[1] || '').slice(0, 40) }); };
+push(/<section class="chapter">/g, 'SECTION');
+push(/<h2 id="([^"]+)"/g, 'H2');
+push(/<h2(?![^>]*id=)[^>]*>/g, 'H2-noid');
+push(/<h3 id="([^"]+)"/g, 'H3');
+push(/<h4 id="([^"]+)"/g, 'H4');
+push(/<\/section>/g, 'ENDSEC');
+push(/<\/main>/g, 'ENDMAIN');
+marks.sort((a, b) => a.i - b.i);
+for (const m of marks) console.log(String(m.l).padStart(6) + '  ' + m.t.padEnd(8) + ' ' + m.id);

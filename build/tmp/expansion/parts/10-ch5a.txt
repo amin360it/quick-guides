@@ -1,0 +1,96 @@
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Collections and Iterators</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Most programs are plumbing: data in, data transformed, data out. This chapter covers the standard collections — <code>Vec</code>, <code>HashMap</code>, <code>HashSet</code> — the owned vs borrowed string distinction, and the iterator pipeline that turns collections into transformations without the intermediate allocations of imperative code.</p>
+
+<h3 id="ch5-1" data-toc>5.1 Vec: the growable sequence</h3>
+<p class="topic-desc"><code>Vec&lt;T&gt;</code> is a contiguous, growable buffer of <code>T</code> — the array you can resize. It is the default sequence type, and most iteration in Rust starts from one.</p>
+
+<h4 id="ch5-1-create">Creating and indexing</h4>
+<p><code>vec![1, 2, 3]</code> is the idiomatic constructor; <code>vec![0; 5]</code> repeats a value five times; <code>Vec::new()</code> starts empty. Indexing with <code>v[i]</code> reads from the buffer directly, and slicing <code>&amp;v[1..3]</code> borrows a run of elements. The capacity is distinct from the length: the buffer may hold more than the logical length, which is what makes <code>push</code> cheap on average.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut v: Vec&lt;i32&gt; = Vec::new();
+    v.push(1);
+    v.push(2);
+
+    let zeros = vec![0; 5];          // five zeroes
+    let ab = vec![1, 2, 3];
+    println!("{} {} {:?}", v.len(), zeros.len(), &amp;ab[1..3]);
+}</code></pre></div>
+
+<h4 id="ch5-1-mutate">push, pop, insert, remove, extend</h4>
+<p><code>push</code> appends and <code>pop</code> removes from the end — both O(1) amortised. <code>insert</code> and <code>remove</code> work at any position by shifting the following elements, so they are O(n): use them when the vector is small or the position genuinely matters. <code>extend</code> appends a whole iterator, which is how you concatenate collections without a loop.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut v = vec![10, 20, 30];
+    v.push(40);                 // [10, 20, 30, 40]
+    v.insert(1, 15);            // [10, 15, 20, 30, 40]
+    let last = v.pop().unwrap();// 40
+    v.remove(0);                // drop the first element
+    v.extend([50, 60]);
+    v.sort();
+    println!("{last} {v:?}");   // 40 [15, 20, 30, 50, 60]
+}</code></pre></div>
+
+<h4 id="ch5-1-get">Indexing vs get: panic versus Option</h4>
+<p><code>v[i]</code> with an out-of-range index panics; <code>v.get(i)</code> returns <code>Option</code> instead. The choice is the same policy as chapter 4: use the panicking form when the index is an invariant, the checked form when it crosses a boundary. <code>first</code> and <code>last</code> return <code>Option</code>s for the endpoints, and <code>iter</code>, <code>iter_mut</code> and <code>into_iter</code> give borrow, mutable borrow and owned iteration respectively.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let v = vec![10, 20, 30];
+
+    match v.get(9) {
+        Some(x) =&gt; println!("{x}"),
+        None =&gt; println!("index 9 out of bounds — no panic"),
+    }
+
+    let first = v.first().copied().unwrap_or(0);
+    let last = v.last().copied().unwrap_or(0);
+    println!("{first} {last}");
+}</code></pre></div>
+<div class="warn">Never reach for <code>insert(0, ...)</code> or <code>remove(0)</code> in a hot path on a big vector — every call shifts every element. If the front matters, consider <code>VecDeque</code>, which is the ring buffer type made for exactly that.</div>
+
+<h3 id="ch5-2" data-toc>5.2 HashMap and HashSet</h3>
+<p class="topic-desc">A <code>HashMap&lt;K, V&gt;</code> maps keys to values with average O(1) lookup; a <code>HashSet&lt;T&gt;</code> is a <code>HashMap</code> whose values are the unit type — membership is the whole value.</p>
+
+<h4 id="ch5-2-map">HashMap basics</h4>
+<p><code>insert</code> overwrites an existing key; <code>get</code> returns <code>Option&lt;&amp;V&gt;</code> — the <code>Option</code> again, so absence is a handled possibility, and <code>copied</code> turns the borrowed value into an owned <code>V</code> when <code>V: Copy</code>. <code>contains_key</code> is the pure membership test. Iteration visits in hash order, which is deliberate and non-deterministic, so anything that must print stably should collect and sort first.</p>
+<div class="codeWrap"><pre><code>use std::collections::HashMap;
+
+fn main() {
+    let mut scores = HashMap::new();
+    scores.insert("blue", 10);
+    scores.insert("red", 5);
+    scores.insert("blue", 12);       // overwrites the earlier blue
+
+    for (team, pts) in &amp;scores {
+        println!("{team}: {pts}");
+    }
+
+    let blue = scores.get("blue").copied().unwrap_or(0);
+    println!("blue has {blue}");
+}</code></pre></div>
+
+<h4 id="ch5-2-entry">The entry API: read-modify-write in one step</h4>
+<p>The classic counting bug — <code>if let Some(v) = map.get_mut(k) { *v += 1 } else { map.insert(k, 1) }</code> — does two lookups and a lot of noise. <code>entry(k)</code> borrows a slot once: <code>or_insert(0)</code> returns a <code>&amp;mut V</code> that is either the existing value or a freshly inserted default, and the <code>+= 1</code> writes through it. One lookup, one mutation, no duplicated logic.</p>
+<div class="codeWrap"><pre><code>use std::collections::HashMap;
+
+fn main() {
+    let mut counts = HashMap::new();
+    for word in "the cat and the dog and the bird".split_whitespace() {
+        *counts.entry(word).or_insert(0) += 1;
+    }
+    println!("the={} dog={}", counts["the"], counts["dog"]);
+}</code></pre></div>
+<div class="tip"><code>entry(k).or_insert_with(|| expensive_default())</code> computes the default lazily, only when the key is absent — the map version of <code>unwrap_or_else</code>.</div>
+
+<h4 id="ch5-2-set">HashSet: uniqueness and set maths</h4>
+<p>A <code>HashSet</code> rejects duplicates on insert — a second <code>insert</code> of an equal value is a no-op — and that single property makes it the tool of choice for deduplication and membership checks. The set operations <code>union</code>, <code>intersection</code> and <code>difference</code> return iterators, which is why the sample collects them into vectors for printing. Filtering a stream by "seen before?" is the canonical use.</p>
+<div class="codeWrap"><pre><code>use std::collections::HashSet;
+
+fn main() {
+    let a: HashSet&lt;i32&gt; = [1, 2, 3].into_iter().collect();
+    let b: HashSet&lt;i32&gt; = [2, 3, 4].into_iter().collect();
+
+    let all: Vec&lt;i32&gt; = a.union(&amp;b).copied().collect();
+    let common: Vec&lt;i32&gt; = a.intersection(&amp;b).copied().collect();
+    let only_in_a: Vec&lt;i32&gt; = a.difference(&amp;b).copied().collect();
+    println!("{all:?} {common:?} {only_in_a:?}");
+}</code></pre></div>

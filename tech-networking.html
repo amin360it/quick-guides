@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Networking - Protocols &amp; Hands-On Guide</title>
+<meta name="description" content="This chapter sets expectations for the whole guide: what you will learn, how the material is organised, and…. 21 chapters, 102 topics and 48 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/tech-networking.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Tech Networking - Protocols &amp; Hands-On Guide">
+<meta property="og:description" content="This chapter sets expectations for the whole guide: what you will learn, how the material is organised, and…. 20 chapters, 89 topics and 36 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/tech-networking.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Tech Networking - Protocols &amp; Hands-On Guide">
+<meta name="twitter:description" content="This chapter sets expectations for the whole guide: what you will learn, how the material is organised, and…. 20 chapters, 89 topics and 36 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/tech-networking.html#article","headline":"Tech Networking - Protocols & Hands-On Guide","name":"Tech Networking - Protocols & Hands-On Guide","description":"This chapter sets expectations for the whole guide: what you will learn, how the material is organised, and…. 20 chapters, 89 topics and 36 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/tech-networking.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/tech-networking.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Tech Networking - Protocols & Hands-On Guide","item":"https://amin360it.github.io/quick-guides/tech-networking.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Tech Networking</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — Tech Networking: Protocols &amp; Hands-On</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-models" data-target="orientation-models">The two models, side by side</a></li><li><a href="#orientation-labkit" data-target="orientation-labkit">Your lab kit</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Models &amp; Encapsulation</a><ul><li><a href="#ch1-encapsulation" data-target="ch1-encapsulation">1.1 Encapsulation and the PDU chain</a></li><li><a href="#ch1-pdu" data-target="ch1-pdu">1.2 PDUs, names and addresses at each layer</a></li><li><a href="#ch1-lab" data-target="ch1-lab">1.3 Lab — watch encapsulation live</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Ethernet, Frames &amp; Switching</a><ul><li><a href="#ch2-frame" data-target="ch2-frame">2.1 The Ethernet frame</a></li><li><a href="#ch2-mac" data-target="ch2-mac">2.2 MAC addresses and the switch MAC table</a></li><li><a href="#ch2-vlan" data-target="ch2-vlan">2.3 VLANs and 802.1Q trunking</a></li><li><a href="#ch2-stp-lag" data-target="ch2-stp-lag">2.4 STP, RSTP and link aggregation</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · IP Addressing &amp; Subnetting</a><ul><li><a href="#ch3-cidr" data-target="ch3-cidr">3.1 IPv4 structure and CIDR</a></li><li><a href="#ch3-reserved" data-target="ch3-reserved">3.2 Reserved ranges and special addresses</a></li><li><a href="#ch3-ipv6" data-target="ch3-ipv6">3.3 IPv6 addressing</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · TCP &amp; UDP Deep Dive</a><ul><li><a href="#ch4-tcp-header" data-target="ch4-tcp-header">4.1 The TCP header and connection state</a></li><li><a href="#ch4-handshake" data-target="ch4-handshake">4.2 The three-way handshake and teardown</a></li><li><a href="#ch4-controls" data-target="ch4-controls">4.3 Flow control, congestion control and windows</a></li><li><a href="#ch4-udp" data-target="ch4-udp">4.4 UDP and when to choose it</a></li><li><a href="#ch4-lab" data-target="ch4-lab">4.5 Lab — observe a session</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Routing Protocols</a><ul><li><a href="#ch5-route-table" data-target="ch5-route-table">5.1 The routing table and longest-prefix match</a></li><li><a href="#ch5-static" data-target="ch5-static">5.2 Static routing</a></li><li><a href="#ch5-ospf" data-target="ch5-ospf">5.3 OSPF — link state</a></li><li><a href="#ch5-bgp" data-target="ch5-bgp">5.4 BGP — path vector for the internet</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · ARP, ICMP &amp; Neighbor Discovery</a><ul><li><a href="#ch6-arp" data-target="ch6-arp">6.1 ARP — mapping IP to MAC</a></li><li><a href="#ch6-icmp" data-target="ch6-icmp">6.2 ICMP and traceroute mechanics</a></li><li><a href="#ch6-nd" data-target="ch6-nd">6.3 IPv6 Neighbor Discovery</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · DNS Deep Dive</a><ul><li><a href="#ch7-resolution" data-target="ch7-resolution">7.1 How resolution actually happens</a></li><li><a href="#ch7-records" data-target="ch7-records">7.2 Record types</a></li><li><a href="#ch7-lab" data-target="ch7-lab">7.3 Lab — query and trace DNS</a></li><li><a href="#ch7-dnssec" data-target="ch7-dnssec">7.4 DNSSEC, DoH and DoT</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · DHCP Deep Dive</a><ul><li><a href="#ch8-dora" data-target="ch8-dora">8.1 The DORA exchange</a></li><li><a href="#ch8-options" data-target="ch8-options">8.2 Options, relay and leases</a></li><li><a href="#ch8-security" data-target="ch8-security">8.3 Rogue servers and snooping</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · NAT, PAT &amp; Firewalls</a><ul><li><a href="#ch9-nat" data-target="ch9-nat">9.1 SNAT, DNAT and PAT</a></li><li><a href="#ch9-firewall" data-target="ch9-firewall">9.2 Stateless vs stateful firewalls</a></li><li><a href="#ch9-ngfw" data-target="ch9-ngfw">9.3 NGFW, WAF and zones</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · HTTP, HTTPS, TLS &amp; QUIC</a><ul><li><a href="#ch10-http" data-target="ch10-http">10.1 HTTP versions</a></li><li><a href="#ch10-tls" data-target="ch10-tls">10.2 TLS handshake (1.3)</a></li><li><a href="#ch10-certs" data-target="ch10-certs">10.3 Certificates and trust</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10b" data-target="ch10b">10b · CDNs, Edge Caching and Anycast</a><ul>
+<li><a href="#ch10b-model" data-target="ch10b-model">What a CDN actually is</a></li>
+<li><a href="#ch10b-dns" data-target="ch10b-dns">Getting the user to the edge</a></li>
+<li><a href="#ch10b-anycast" data-target="ch10b-anycast">Anycast and why it works</a></li>
+<li><a href="#ch10b-headers" data-target="ch10b-headers">Cache-control, the whole header</a></li>
+<li><a href="#ch10b-key" data-target="ch10b-key">The cache key and Vary</a></li>
+<li><a href="#ch10b-stale" data-target="ch10b-stale">Stale-while-revalidate and stale-if-error</a></li>
+<li><a href="#ch10b-purge" data-target="ch10b-purge">Purging and versioned URLs</a></li>
+<li><a href="#ch10b-tls" data-target="ch10b-tls">TLS at the edge</a></li>
+<li><a href="#ch10b-tiered" data-target="ch10b-tiered">Tiered caching and shielding</a></li>
+<li><a href="#ch10b-api" data-target="ch10b-api">CDNs and APIs</a></li>
+<li><a href="#ch10b-privacy" data-target="ch10b-privacy">Privacy, cookies and the wrong CDN</a></li>
+<li><a href="#ch10b-labs" data-target="ch10b-labs">Hands-on labs</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · VPN &amp; Tunnelling Protocols</a><ul><li><a href="#ch11-compare" data-target="ch11-compare">11.1 Comparing tunnels</a></li><li><a href="#ch11-ipsec" data-target="ch11-ipsec">11.2 IPsec phases and modes</a></li><li><a href="#ch11-wg" data-target="ch11-wg">11.3 WireGuard lab</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch12" data-target="ch12">12 · Wi-Fi Technology &amp; Protocols</a><ul><li><a href="#ch12-standards" data-target="ch12-standards">12.1 802.11 standards</a></li><li><a href="#ch12-frames" data-target="ch12-frames">12.2 Association and frames</a></li><li><a href="#ch12-security" data-target="ch12-security">12.3 Security modes</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch13" data-target="ch13">13 · Supporting Protocols</a><ul><li><a href="#ch13-ntp" data-target="ch13-ntp">13.1 NTP</a></li><li><a href="#ch13-snmp" data-target="ch13-snmp">13.2 SNMP</a></li><li><a href="#ch13-syslog" data-target="ch13-syslog">13.3 Syslog and flow data</a></li><li><a href="#ch13-aaa" data-target="ch13-aaa">13.4 AAA, RADIUS and TACACS+</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch14" data-target="ch14">14 · Packet Analysis</a><ul><li><a href="#ch14-capture" data-target="ch14-capture">14.1 Capturing with tcpdump</a></li><li><a href="#ch14-wireshark" data-target="ch14-wireshark">14.2 Wireshark display filters</a></li><li><a href="#ch14-follow" data-target="ch14-follow">14.3 Reading a capture</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch15" data-target="ch15">15 · Troubleshooting Labs</a><ul><li><a href="#ch15-method" data-target="ch15-method">15.1 The layered method</a></li><li><a href="#ch15-tools" data-target="ch15-tools">15.2 Command toolbox</a></li><li><a href="#ch15-symptoms" data-target="ch15-symptoms">15.3 Symptom to cause</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch16" data-target="ch16">16 · Automation, SDN &amp; Modern Networking</a><ul><li><a href="#ch16-discovery" data-target="ch16-discovery">16.1 Discover and inventory</a></li><li><a href="#ch16-automation" data-target="ch16-automation">16.2 Network automation</a></li><li><a href="#ch16-sdn" data-target="ch16-sdn">16.3 SDN, overlays and cloud</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch17" data-target="ch17">17 · Network Security Protocols</a><ul><li><a href="#ch17-control" data-target="ch17-control">17.1 Protecting the control plane</a></li><li><a href="#ch17-crypto" data-target="ch17-crypto">17.2 Crypto you will configure</a></li><li><a href="#ch17-segmentation" data-target="ch17-segmentation">17.3 Segmentation and zero trust</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch18" data-target="ch18">18 · Capstone Lab Series</a><ul><li><a href="#ch18-lab1" data-target="ch18-lab1">18.1 Lab 1 — Two-site routed network</a></li><li><a href="#ch18-lab2" data-target="ch18-lab2">18.2 Lab 2 — VLANs, trunking and inter-VLAN routing</a></li><li><a href="#ch18-lab3" data-target="ch18-lab3">18.3 Lab 3 — TLS and HTTPS analysis</a></li><li><a href="#ch18-lab4" data-target="ch18-lab4">18.4 Lab 4 — Diagnose an incident</a></li><li><a href="#ch18-lab5" data-target="ch18-lab5">18.5 Lab 5 — Automate a change safely</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Protocol Reference &amp; Roadmap</a><ul><li><a href="#app-ports" data-target="app-ports">A.1 Protocol and port reference</a></li><li><a href="#app-toolkit" data-target="app-toolkit">A.2 Command cheat sheet</a></li><li><a href="#app-roadmap" data-target="app-roadmap">A.3 Roadmap: beginner to advanced</a></li><li><a href="#app-rules" data-target="app-rules">A.4 Rules of thumb</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Tech Networking</span>
+      <span class="am-band-s">21 chapters &middot; 102 topics &middot; 48 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — Tech Networking: Protocols &amp; Hands-On</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — Tech Networking: Protocols &amp; Hands-On</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-models">The two models, side by side</a><a href="#orientation-labkit">Your lab kit</a></div></div>
+    <p class="topic-desc">This chapter sets expectations for the whole guide: what you will learn, how the material is organised, and which free tools you will need. Before starting, set up your lab with Wireshark, tcpdump, and a virtual router such as GNS3 or EVE-NG. Skim the chapter map, then plan your study time around the hands-on labs so theory and practice reinforce each other.</p>
+    <p>A deeply technical, hands-on guide to how networks actually work: the <strong>protocols on the wire</strong>, the frames and packets, the tools that reveal them, and the labs that build real skill. This is the companion to the <em>Network System Design</em> guide — that one is about designing networks, this one is about the technology itself. Single file, offline, progress saved locally.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">This section explains the layout of the guide so you can navigate by topic. The book moves from the OSI and TCP/IP models through Ethernet, IP, TCP and UDP, then routing, DNS, DHCP, security, and packet analysis. Each chapter opens with concepts and closes with a hands-on lab. Use the appendix tables for quick reference when you are in the field.</p>
+    <ul>
+      <li><strong>Core models (Ch. 1–5)</strong> — models/encapsulation, Ethernet &amp; switching, IP &amp; subnetting, TCP/UDP, routing protocols.</li>
+      <li><strong>Supporting protocols (Ch. 6–9)</strong> — ARP/ICMP, DNS, DHCP, NAT/firewalls.</li>
+      <li><strong>Application &amp; transport security (Ch. 10–13)</strong> — HTTP/TLS/QUIC, VPNs, Wi-Fi, supporting services.</li>
+      <li><strong>Hands-on (Ch. 14–18)</strong> — packet analysis, troubleshooting labs, automation/SDN, security protocols, capstone labs.</li>
+    </ul>
+    <h3 id="orientation-models" data-toc>The two models, side by side</h3>
+    <p class="topic-desc">The OSI reference model has seven layers while the TCP/IP model collapses them into four, and both describe the same protocol stack. Know which layer each common protocol belongs to: IP at the network layer, TCP and UDP at the transport layer, HTTP at the application layer. Understanding both models lets you read any network diagram and talk to engineers who prefer either one.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 660 300" role="img" aria-label="OSI layers mapped to the TCP/IP model" style="width:100%;max-width:660px;height:auto;color:inherit">
+        <text x="165" y="14" text-anchor="middle" fill="currentColor" font-size="13" font-weight="bold">OSI (7 layers)</text>
+        <text x="495" y="14" text-anchor="middle" fill="currentColor" font-size="13" font-weight="bold">TCP/IP (4 layers)</text>
+        <rect x="40" y="20" width="250" height="32" rx="6" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-width="1.3"/>
+        <text x="165" y="41" text-anchor="middle" fill="currentColor" font-size="12">7 · Application</text>
+        <rect x="40" y="56" width="250" height="32" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="165" y="77" text-anchor="middle" fill="currentColor" font-size="12">6 · Presentation</text>
+        <rect x="40" y="92" width="250" height="32" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="165" y="113" text-anchor="middle" fill="currentColor" font-size="12">5 · Session</text>
+        <rect x="40" y="128" width="250" height="32" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="165" y="149" text-anchor="middle" fill="currentColor" font-size="12">4 · Transport</text>
+        <rect x="40" y="164" width="250" height="32" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="165" y="185" text-anchor="middle" fill="currentColor" font-size="12">3 · Network</text>
+        <rect x="40" y="200" width="250" height="32" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="165" y="221" text-anchor="middle" fill="currentColor" font-size="12">2 · Data Link</text>
+        <rect x="40" y="236" width="250" height="32" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="165" y="257" text-anchor="middle" fill="currentColor" font-size="12">1 · Physical</text>
+        <rect x="380" y="20" width="230" height="104" rx="6" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-width="1.3"/>
+        <text x="495" y="76" text-anchor="middle" fill="currentColor" font-size="12">Application</text>
+        <rect x="380" y="128" width="230" height="32" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="495" y="149" text-anchor="middle" fill="currentColor" font-size="12">Transport</text>
+        <rect x="380" y="164" width="230" height="32" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="495" y="185" text-anchor="middle" fill="currentColor" font-size="12">Internet</text>
+        <rect x="380" y="200" width="230" height="68" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="495" y="238" text-anchor="middle" fill="currentColor" font-size="12">Link</text>
+        <line x1="290" y1="36" x2="380" y2="36" stroke="currentColor" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <line x1="290" y1="72" x2="380" y2="60" stroke="currentColor" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <line x1="290" y1="108" x2="380" y2="84" stroke="currentColor" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <line x1="290" y1="144" x2="380" y2="144" stroke="currentColor" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <line x1="290" y1="180" x2="380" y2="180" stroke="currentColor" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <line x1="290" y1="216" x2="380" y2="234" stroke="currentColor" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <line x1="290" y1="252" x2="380" y2="234" stroke="currentColor" stroke-width="1.1" stroke-dasharray="4 3"/>
+      </svg>
+      <figcaption style="font-size:.85rem;opacity:.75;margin-top:.5rem">Figure 1 — The 7-layer OSI model mapped onto the 4-layer TCP/IP model.</figcaption>
+    </figure>
+    <h3 id="orientation-labkit" data-toc>Your lab kit</h3>
+    <p class="topic-desc">The lab kit is entirely free and runs on an ordinary laptop. You need Wireshark for capture analysis, tcpdump for command-line packet capture, and a virtual router platform such as GNS3, EVE-NG, or a Linux VM running a routing daemon. A virtual machine or container also helps for DNS, DHCP, and server tests. Everything in the guide can be reproduced with these tools.</p>
+    <table>
+      <tr><th>Tool</th><th>Use</th></tr>
+      <tr><td>Wireshark / tshark</td><td>Capture and dissect packets</td></tr>
+      <tr><td>tcpdump</td><td>CLI capture on Linux/BSD</td></tr>
+      <tr><td>ping, traceroute/tracert</td><td>Reachability and path</td></tr>
+      <tr><td>dig, nslookup</td><td>DNS queries</td></tr>
+      <tr><td>ip / ifconfig, ip route</td><td>Addresses and routes</td></tr>
+      <tr><td>netstat / ss, lsof</td><td>Sockets and connections</td></tr>
+      <tr><td>nmap, curl, openssl</td><td>Scanning, HTTP, TLS</td></tr>
+      <tr><td>GNS3 / EVE-NG / Packet Tracer</td><td>Build virtual topologies</td></tr>
+    </table>
+    <div class="tip"><p>Everything here can be practised free: run Linux in a VM, use Wireshark on your own traffic, and build topologies in GNS3 or container-based labs (containerlab).</p></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Models &amp; Encapsulation</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Models &amp; Encapsulation</button><div class="ch-toc-list"><a href="#ch1-encapsulation">1.1 Encapsulation and the PDU chain</a><a href="#ch1-pdu">1.2 PDUs, names and addresses at each layer</a><a href="#ch1-lab">1.3 Lab — watch encapsulation live</a></div></div>
+    <p class="topic-desc">This chapter introduces the layered model that explains how packets are built, forwarded, and dismantled. Each layer adds its own header as data travels down and strips it in reverse at the destination. Encapsulation, protocol data unit naming, and per-layer addressing such as ports, IP addresses, and MAC addresses are the core ideas. Lab 1.3 shows the whole chain live with a captured ping.</p>
+    <h3 id="ch1-encapsulation" data-toc>1.1 Encapsulation and the PDU chain</h3>
+    <p class="topic-desc">Encapsulation wraps application data in a new header at each layer as it travels down the protocol stack. TCP adds a segment header, IP wraps that in a packet with source and destination addresses, and Ethernet adds a frame header at the end. The receiver removes each header in reverse order. A single ping captured in Wireshark shows every wrapper in sequence.</p>
+    <p>Data travels down the stack, gaining a header at each layer; the receiver strips them back off. Each layer’s unit has a name: <strong>segment</strong> (TCP), <strong>packet</strong> (IP), <strong>frame</strong> (Ethernet).</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 660 170" role="img" aria-label="Encapsulation of data with headers at each layer" style="width:100%;max-width:660px;height:auto;color:inherit">
+        <text x="330" y="16" text-anchor="middle" fill="currentColor" font-size="12" opacity="0.8">Application data → segment → packet → frame (header added at each layer)</text>
+        <rect x="20" y="70" width="120" height="40" rx="5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="80" y="95" text-anchor="middle" fill="currentColor" font-size="12">Data</text>
+        <rect x="170" y="70" width="70" height="40" rx="5" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="1.3"/>
+        <text x="205" y="95" text-anchor="middle" fill="currentColor" font-size="11">TCP</text>
+        <rect x="240" y="70" width="120" height="40" rx="5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="300" y="95" text-anchor="middle" fill="currentColor" font-size="11">Data</text>
+        <rect x="390" y="70" width="60" height="40" rx="5" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="1.3"/>
+        <text x="420" y="95" text-anchor="middle" fill="currentColor" font-size="11">IP</text>
+        <rect x="450" y="70" width="130" height="40" rx="5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="515" y="95" text-anchor="middle" fill="currentColor" font-size="11">Segment</text>
+        <rect x="200" y="130" width="70" height="30" rx="5" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="1.3"/>
+        <text x="235" y="150" text-anchor="middle" fill="currentColor" font-size="11">Eth</text>
+        <rect x="270" y="130" width="180" height="30" rx="5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="360" y="150" text-anchor="middle" fill="currentColor" font-size="11">Packet</text>
+        <rect x="450" y="130" width="60" height="30" rx="5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="480" y="150" text-anchor="middle" fill="currentColor" font-size="11">FCS</text>
+        <path d="M140 90 L168 90" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar1)"/>
+        <path d="M360 90 L388 90" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar1)"/>
+        <path d="M580 110 L580 145 L520 145" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar1)"/>
+        <defs>
+          <marker id="ar1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="currentColor"/></marker>
+        </defs>
+      </svg>
+      <figcaption style="font-size:.85rem;opacity:.75;margin-top:.5rem">Figure 2 — Encapsulation: the TCP header wraps the data, the IP header wraps the segment, the Ethernet header and trailer wrap the packet.</figcaption>
+    </figure>
+    <h3 id="ch1-pdu" data-toc>1.2 PDUs, names and addresses at each layer</h3>
+    <p class="topic-desc">Each layer gives its data a name: transport sends segments, or datagrams for UDP, the network layer sends packets, and the data link layer sends frames. Each layer also uses its own address: TCP and UDP use port numbers, IP uses 32-bit addresses, and Ethernet uses 48-bit MAC addresses. These names and addresses are the vocabulary you will read in every capture, and Wireshark shows each as a separate expandable header.</p>
+    <table>
+      <tr><th>Layer</th><th>PDU</th><th>Address</th><th>Example device</th></tr>
+      <tr><td>Application</td><td>Data</td><td>Name/URL</td><td>Server</td></tr>
+      <tr><td>Transport</td><td>Segment (TCP) / Datagram (UDP)</td><td>Port</td><td>Firewall (L4)</td></tr>
+      <tr><td>Network</td><td>Packet</td><td>IP address</td><td>Router</td></tr>
+      <tr><td>Data Link</td><td>Frame</td><td>MAC address</td><td>Switch</td></tr>
+      <tr><td>Physical</td><td>Bits</td><td>—</td><td>Hub/repeater, cable</td></tr>
+    </table>
+    <h3 id="ch1-lab" data-toc>1.3 Lab — watch encapsulation live</h3>
+    <p class="topic-desc">In this lab you run a single ping between two hosts while capturing with Wireshark. Apply an icmp filter and expand each packet to reveal the frame, the IP packet, and the ICMP message one inside the other. The result shows encapsulation live: application data carried in an IP packet inside an Ethernet frame. Repeat with tcpdump using a host filter to confirm the same chain on the command line.</p>
+    <div class="codeWrap"><pre><code># Capture a single ping and read the layers
+$ sudo tcpdump -i eth0 -n -vv icmp -c 1
+IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto ICMP (1), length 84)
+    10.0.0.5 &gt; 8.8.8.8: ICMP echo request, id 1234, seq 1, length 64
+
+# In Wireshark, expand Frame -&gt; Ethernet II -&gt; IPv4 -&gt; ICMP
+# Each triangle is one layer's header decoded.</code></pre></div>
+<p class="code-note">One ping captured live shows the IP header and payload; expand each layer in Wireshark to read every header.</p>
+    <div class="ex"><h4 id="ch1-lab--exercises-1">Exercises 1</h4><ol>
+      <li>Capture a DNS request and identify each header layer.</li>
+      <li>Name the PDU at each layer for an HTTP request.</li>
+      <li>Find the MAC, IP and port in one captured frame.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Ethernet, Frames &amp; Switching</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Ethernet, Frames &amp; Switching</button><div class="ch-toc-list"><a href="#ch2-frame">2.1 The Ethernet frame</a><a href="#ch2-mac">2.2 MAC addresses and the switch MAC table</a><a href="#ch2-vlan">2.3 VLANs and 802.1Q trunking</a><a href="#ch2-stp-lag">2.4 STP, RSTP and link aggregation</a></div></div>
+    <p class="topic-desc">This chapter covers Ethernet, the dominant data link technology on wired local area networks. You learn the frame format, how switches build MAC tables and forward frames, how VLANs and 802.1Q trunks segment traffic, and how Spanning Tree and link aggregation keep the topology stable. These mechanisms determine how effectively any LAN carries data between hosts.</p>
+    <h3 id="ch2-frame" data-toc>2.1 The Ethernet frame</h3>
+    <p class="topic-desc">The Ethernet frame is the data link unit a LAN delivers between directly connected stations. A basic Ethernet II frame carries a 6-byte destination MAC address, a 6-byte source MAC address, a 2-byte EtherType such as 0x0800 for IPv4, the payload, and a frame check sequence that detects corruption. Jumbo frames extend the payload to about 9000 bytes. Wireshark shows the frame header as the outermost layer of any capture.</p>
+    <div class="codeWrap"><pre><code>+---------+---------+--------+---------------------+------+
+| Dst MAC | Src MAC |  Type  |      Payload        | FCS  |
+| 6 bytes | 6 bytes | 2 byte | 46 - 1500 bytes     | 4 B  |
++---------+---------+--------+---------------------+------+
+Type 0x0800 = IPv4, 0x86DD = IPv6, 0x8100 = VLAN tag
+MTU 1500 -&gt; jumbo frames up to 9000 on storage/special links</code></pre></div>
+<p class="code-note">The frame is laid out field by field, and the type field decides whether the payload is IPv4, IPv6, or a VLAN tag.</p>
+    <h3 id="ch2-mac" data-toc>2.2 MAC addresses and the switch MAC table</h3>
+    <p class="topic-desc">A layer 2 switch learns which MAC address sits behind each of its ports by inspecting source addresses and records the mapping in its MAC address table. Forwarding consults the table, floods unknown unicast and broadcast frames out of all ports, and does not forward a frame back onto the port it arrived on. On Cisco use show mac address-table to inspect learned entries. This table also explains how broadcast behaviour is scoped.</p>
+    <table>
+      <tr><th>Address type</th><th>Meaning</th></tr>
+      <tr><td>Unicast</td><td>One destination (LSB of first octet = 0)</td></tr>
+      <tr><td>Multicast</td><td>Group (01:00:5E:...)</td></tr>
+      <tr><td>Broadcast</td><td>FF:FF:FF:FF:FF:FF — every host on the segment</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code># Switch learning: source MAC -&gt; port
+show mac address-table
+Vlan  Mac Address       Type     Ports
+10    0050.56aa.1b2c    DYNAMIC  Gi0/2
+# Unknown unicast is flooded; broadcasts flood the whole VLAN.</code></pre></div>
+<p class="code-note">This switch output shows a learned MAC-to-port mapping; unknown unicast is flooded across the VLAN.</p>
+    <h3 id="ch2-vlan" data-toc>2.3 VLANs and 802.1Q trunking</h3>
+    <p class="topic-desc">A VLAN is a virtual LAN that keeps broadcast domains small by isolating traffic at layer 2, with each port assigned a VLAN ID. To carry several VLANs between switches, trunk ports add a 4-byte 802.1Q tag holding the VLAN ID, from 1 to 4094. Configure access ports for a single VLAN and trunks for tagged traffic, then add a router or layer 3 switch with subinterfaces to route between VLANs.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 660 250" role="img" aria-label="Two switches connected by an 802.1Q trunk carrying multiple VLANs" style="width:100%;max-width:660px;height:auto;color:inherit">
+        <rect x="90" y="60" width="180" height="56" rx="6" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-width="1.3"/>
+        <text x="180" y="93" text-anchor="middle" fill="currentColor" font-size="12">Switch A</text>
+        <rect x="390" y="60" width="180" height="56" rx="6" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-width="1.3"/>
+        <text x="480" y="93" text-anchor="middle" fill="currentColor" font-size="12">Switch B</text>
+        <line x1="270" y1="88" x2="390" y2="88" stroke="currentColor" stroke-width="4"/>
+        <text x="330" y="78" text-anchor="middle" fill="currentColor" font-size="11">802.1Q trunk</text>
+        <text x="330" y="106" text-anchor="middle" fill="currentColor" font-size="10" opacity="0.8">VLAN 10 · 20 · 30 tagged</text>
+        <rect x="60" y="170" width="90" height="40" rx="5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="105" y="194" text-anchor="middle" fill="currentColor" font-size="11">VLAN 10</text>
+        <rect x="210" y="170" width="90" height="40" rx="5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="255" y="194" text-anchor="middle" fill="currentColor" font-size="11">VLAN 20</text>
+        <rect x="360" y="170" width="90" height="40" rx="5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="405" y="194" text-anchor="middle" fill="currentColor" font-size="11">VLAN 10</text>
+        <rect x="510" y="170" width="90" height="40" rx="5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="555" y="194" text-anchor="middle" fill="currentColor" font-size="11">VLAN 20</text>
+        <line x1="105" y1="170" x2="150" y2="116" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="255" y1="170" x2="210" y2="116" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="405" y1="170" x2="450" y2="116" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="555" y1="170" x2="510" y2="116" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"/>
+      </svg>
+      <figcaption style="font-size:.85rem;opacity:.75;margin-top:.5rem">Figure 3 — A trunk carries multiple VLANs between switches; each frame is tagged with its VLAN ID (802.1Q).</figcaption>
+    </figure>
+    <h3 id="ch2-stp-lag" data-toc>2.4 STP, RSTP and link aggregation</h3>
+    <p class="topic-desc">Spanning Tree Protocol (IEEE 802.1D) and Rapid Spanning Tree Protocol (IEEE 802.1w) prevent loops by blocking redundant switch ports and electing a root bridge. Link aggregation using Link Aggregation Control Protocol (IEEE 802.3ad) bundles several physical links into one logical link for more bandwidth and redundancy. Both are needed on any network with redundant paths. Verify with show spanning-tree and show etherchannel on Cisco.</p>
+    <ul>
+      <li><strong>STP</strong> blocks redundant links to prevent loops; <strong>RSTP</strong> converges in seconds.</li>
+      <li>Edge ports: enable PortFast; add BPDU guard so a rogue switch can’t join.</li>
+      <li><strong>LACP/EtherChannel</strong> bundles links (bandwidth + redundancy) — one logical link.</li>
+    </ul>
+    <div class="ex"><h4 id="ch2-stp-lag--exercises-2">Exercises 2</h4><ol>
+      <li>Decode an Ethernet header in Wireshark.</li>
+      <li>Create two VLANs and a tagged trunk.</li>
+      <li>Explain why STP must block a redundant link.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · IP Addressing &amp; Subnetting</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · IP Addressing &amp; Subnetting</button><div class="ch-toc-list"><a href="#ch3-cidr">3.1 IPv4 structure and CIDR</a><a href="#ch3-reserved">3.2 Reserved ranges and special addresses</a><a href="#ch3-ipv6">3.3 IPv6 addressing</a></div></div>
+    <p class="topic-desc">IP addressing identifies every host on a network, and CIDR notation defines how address space is divided into usable chunks. This chapter teaches IPv4 structure and subnetting math, reserved and private ranges, and the basics of IPv6 including compression and scopes. Subnet planning is a daily skill for anyone configuring routers, firewalls, or DHCP scopes.</p>
+    <h3 id="ch3-cidr" data-toc>3.1 IPv4 structure and CIDR</h3>
+    <p class="topic-desc">CIDR writes an IPv4 address with a slash prefix, such as 192.168.1.0/24, where the prefix counts the leading bits that belong to the network. The remaining bits are host bits, so a /24 leaves 8 host bits and 254 usable addresses after removing network and broadcast. The equivalent subnet mask is 255.255.255.0. Use ipcalc or a subnet calculator to convert quickly between the two forms.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 660 190" role="img" aria-label="An IPv4 address split into network and host bits, divided into four subnets" style="width:100%;max-width:660px;height:auto;color:inherit">
+        <text x="330" y="16" text-anchor="middle" fill="currentColor" font-size="12">192.168.10.0 / 24</text>
+        <rect x="40" y="30" width="435" height="34" rx="4" fill="currentColor" fill-opacity="0.15" stroke="currentColor" stroke-width="1.3"/>
+        <text x="257" y="52" text-anchor="middle" fill="currentColor" font-size="12">network bits (24)</text>
+        <rect x="475" y="30" width="145" height="34" rx="4" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="547" y="52" text-anchor="middle" fill="currentColor" font-size="12">host bits (8)</text>
+        <text x="330" y="92" text-anchor="middle" fill="currentColor" font-size="12" opacity="0.85">Split into four /26 subnets (2 host bits taken)</text>
+        <rect x="40" y="110" width="140" height="34" rx="4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="110" y="132" text-anchor="middle" fill="currentColor" font-size="11">.0 /26</text>
+        <rect x="190" y="110" width="140" height="34" rx="4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="260" y="132" text-anchor="middle" fill="currentColor" font-size="11">.64 /26</text>
+        <rect x="340" y="110" width="140" height="34" rx="4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="410" y="132" text-anchor="middle" fill="currentColor" font-size="11">.128 /26</text>
+        <rect x="490" y="110" width="140" height="34" rx="4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="560" y="132" text-anchor="middle" fill="currentColor" font-size="11">.192 /26</text>
+        <text x="330" y="172" text-anchor="middle" fill="currentColor" font-size="11" opacity="0.8">Each /26 = 64 addresses = 62 usable hosts</text>
+      </svg>
+      <figcaption style="font-size:.85rem;opacity:.75;margin-top:.5rem">Figure 4 — CIDR splits a network into a network part and a host part; borrowing host bits creates subnets.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Prefix</th><th>Addresses</th><th>Usable hosts</th><th>Mask</th></tr>
+      <tr><td>/24</td><td>256</td><td>254</td><td>255.255.255.0</td></tr>
+      <tr><td>/25</td><td>128</td><td>126</td><td>255.255.255.128</td></tr>
+      <tr><td>/26</td><td>64</td><td>62</td><td>255.255.255.192</td></tr>
+      <tr><td>/27</td><td>32</td><td>30</td><td>255.255.255.224</td></tr>
+      <tr><td>/30</td><td>4</td><td>2</td><td>255.255.255.252</td></tr>
+    </table>
+    <h3 id="ch3-reserved" data-toc>3.2 Reserved ranges and special addresses</h3>
+    <p class="topic-desc">Certain IPv4 ranges are reserved for specific jobs and must not be used for ordinary public addressing. RFC 1918 defines private ranges 10.0.0.0/8, 172.16.0.0/12, and 192.168.0.0/16 for internal networks, while 127.0.0.0/8 is loopback, 169.254.0.0/16 is link-local for clients when DHCP fails, and 224.0.0.0/4 is multicast. Knowing these ranges explains what normal hosts can and cannot reach directly.</p>
+    <div class="codeWrap"><pre><code>Private:   10.0.0.0/8   172.16.0.0/12   192.168.0.0/16
+Loopback:  127.0.0.0/8
+Link-local:169.254.0.0/16  (APIPA when DHCP fails)
+Multicast: 224.0.0.0/4
+Limited broadcast: 255.255.255.255</code></pre></div>
+<p class="code-note">These reserved ranges separate private, diagnostics, automatic, and multicast traffic from normal internet addresses.</p>
+    <h3 id="ch3-ipv6" data-toc>3.3 IPv6 addressing</h3>
+    <p class="topic-desc">IPv6 addresses are 128-bit values written as eight groups of four hex digits, with a double colon compressing one run of zero groups. Global unicast addresses use the 2000::/3 prefix, unique-local uses fc00::/7, and link-local uses fe80::/10. Each subnet normally gets a /64, which supports stateless address autoconfiguration through SLAAC. Inspect scopes with ip -6 addr on Linux to see how they apply in practice.</p>
+    <div class="codeWrap"><pre><code>2001:0db8:0000:0000:0000:0000:0000:0001
+= 2001:db8::1
+Global: 2000::/3      Unique local: fc00::/7      Link-local: fe80::/10
+/64 per subnet; SLAAC or DHCPv6 for host configuration.</code></pre></div>
+<p class="code-note">IPv6 addresses compress long zero runs, and the leading prefix of each address tells you its scope at a glance.</p>
+    <div class="codeWrap"><pre><code># Compute a subnet
+$ ipcalc 192.168.10.65/26   # prints network, hosts, broadcast
+Network:   192.168.10.64/26
+HostMin:   192.168.10.65
+HostMax:   192.168.10.126
+Broadcast: 192.168.10.127
+Hosts/Net: 62</code></pre></div>
+<p class="code-note">ipcalc turns a prefix into everything you need: network, usable range, broadcast, and host count.</p>
+    <div class="ex"><h4 id="ch3-ipv6--exercises-3">Exercises 3</h4><ol>
+      <li>Subnet 10.0.0.0/24 into 8 subnets.</li>
+      <li>Find the network and broadcast for 172.16.5.130/26.</li>
+      <li>Compress and expand an IPv6 address.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · TCP &amp; UDP Deep Dive</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · TCP &amp; UDP Deep Dive</button><div class="ch-toc-list"><a href="#ch4-tcp-header">4.1 The TCP header and connection state</a><a href="#ch4-handshake">4.2 The three-way handshake and teardown</a><a href="#ch4-controls">4.3 Flow control, congestion control and windows</a><a href="#ch4-udp">4.4 UDP and when to choose it</a><a href="#ch4-lab">4.5 Lab — observe a session</a></div></div>
+    <p class="topic-desc">TCP and UDP are the transport layer protocols that carry application data across IP networks. TCP provides reliable, ordered delivery with connections, sequence numbers, acknowledgements, and retransmission, while UDP offers an 8-byte header and no handshake for low latency and simplicity. Reading their headers in captures explains most performance problems and connection failures you will meet.</p>
+    <h3 id="ch4-tcp-header" data-toc>4.1 The TCP header and connection state</h3>
+    <p class="topic-desc">The TCP header is normally 20 bytes and carries the source and destination ports, sequence and acknowledgement numbers, control flags, a window size, and a checksum. Firewalls, load balancers, and capture tools read this header first to classify and manage connections. On Linux use ss -t to inspect active sockets, and in Wireshark expand the TCP layer to see flags, window, and sequence values for any packet.</p>
+    <div class="codeWrap"><pre><code>Fields: src port, dst port, sequence, ack, flags (SYN ACK FIN RST PSH URG),
+        window, checksum, urgent pointer, options
+Key flags: SYN (open) ACK (acknowledge) FIN (close) RST (abort) PSH (push)</code></pre></div>
+<p class="code-note">These header fields and flags define how connections open, flow, and abort; SYN, ACK, FIN, and RST are the essentials.</p>
+    <h3 id="ch4-handshake" data-toc>4.2 The three-way handshake and teardown</h3>
+    <p class="topic-desc">TCP opens a connection with a three-way handshake: the client sends a SYN, the server replies with SYN-ACK, and the client returns an ACK. Closing uses FIN and FIN-ACK exchanges, or a reset for an abrupt abort. Watch the flags in Wireshark or tcpdump to confirm a clean setup. A repeated SYN with no SYN-ACK reply usually means a firewall is silently dropping the traffic.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 560 320" role="img" aria-label="TCP three-way handshake and connection teardown" style="width:100%;max-width:560px;height:auto;color:inherit">
+        <line x1="120" y1="34" x2="120" y2="300" stroke="currentColor" stroke-width="1.3"/>
+        <line x1="440" y1="34" x2="440" y2="300" stroke="currentColor" stroke-width="1.3"/>
+        <text x="120" y="24" text-anchor="middle" fill="currentColor" font-size="12">Client</text>
+        <text x="440" y="24" text-anchor="middle" fill="currentColor" font-size="12">Server</text>
+        <line x1="120" y1="60" x2="440" y2="60" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"/>
+        <text x="280" y="53" text-anchor="middle" fill="currentColor" font-size="11">SYN (seq = x)</text>
+        <line x1="440" y1="100" x2="120" y2="100" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"/>
+        <text x="280" y="93" text-anchor="middle" fill="currentColor" font-size="11">SYN-ACK (seq = y, ack = x+1)</text>
+        <line x1="120" y1="140" x2="440" y2="140" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"/>
+        <text x="280" y="133" text-anchor="middle" fill="currentColor" font-size="11">ACK (ack = y+1)  → established</text>
+        <line x1="120" y1="185" x2="440" y2="185" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"/>
+        <text x="280" y="178" text-anchor="middle" fill="currentColor" font-size="11">FIN</text>
+        <line x1="440" y1="215" x2="120" y2="215" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"/>
+        <text x="280" y="208" text-anchor="middle" fill="currentColor" font-size="11">ACK</text>
+        <line x1="440" y1="245" x2="120" y2="245" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"/>
+        <text x="280" y="238" text-anchor="middle" fill="currentColor" font-size="11">FIN</text>
+        <line x1="120" y1="275" x2="440" y2="275" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"/>
+        <text x="280" y="268" text-anchor="middle" fill="currentColor" font-size="11">ACK → closed</text>
+        <defs>
+          <marker id="ar2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="currentColor"/></marker>
+        </defs>
+      </svg>
+      <figcaption style="font-size:.85rem;max-width:560px;opacity:.75;margin-top:.5rem">Figure 5 — TCP opens with SYN / SYN-ACK / ACK and closes with FIN/ACK in both directions.</figcaption>
+    </figure>
+    <h3 id="ch4-controls" data-toc>4.3 Flow control, congestion control and windows</h3>
+    <p class="topic-desc">Flow and congestion control stop senders from overwhelming a slow receiver or a congested network. The receiver advertises a window size that limits the data in flight, while congestion control algorithms such as CUBIC use slow start and congestion avoidance to probe capacity, and fast retransmit resends lost segments early. Retransmissions, duplicate ACKs, and window values in captures reveal the bottleneck and explain low throughput.</p>
+    <ul>
+      <li><strong>Sliding window</strong> — receiver advertises how much it can accept.</li>
+      <li><strong>Congestion control</strong> — slow start, congestion avoidance, fast retransmit.</li>
+      <li><strong>Retransmission</strong> — unacknowledged segments are resent (tuples: RTT, RTO).</li>
+      <li><strong>Selective ACK / window scaling</strong> — modern throughput on long fat links.</li>
+    </ul>
+    <h3 id="ch4-udp" data-toc>4.4 UDP and when to choose it</h3>
+    <p class="topic-desc">UDP is a connectionless transport with an 8-byte header holding source port, destination port, length, and checksum. It is chosen when speed and low overhead matter more than reliability, so DNS answers travel over port 53, DHCP uses ports 67 and 68, and RTP carries voice and video. Applications that need reliability on top of UDP add their own mechanisms, as QUIC does.</p>
+    <table>
+      <tr><th></th><th>TCP</th><th>UDP</th></tr>
+      <tr><td>Reliability</td><td>Ordered, acknowledged</td><td>None</td></tr>
+      <tr><td>Overhead</td><td>20+ byte header</td><td>8-byte header</td></tr>
+      <tr><td>Use</td><td>Web, mail, DB, file</td><td>DNS, DHCP, voice, video, games, QUIC</td></tr>
+    </table>
+    <h3 id="ch4-lab" data-toc>4.5 Lab — observe a session</h3>
+    <p class="topic-desc">In this lab you capture a real transport session end to end. Filter Wireshark on tcp or on udp.port, then Follow TCP Stream to reconstruct the conversation. Identify the SYN, SYN-ACK, ACK opening, watch sequence numbers advance with payload, and note the FIN-ACK teardown. Repeat against a web server to confirm the same pattern appears consistently.</p>
+    <div class="codeWrap"><pre><code># Capture handshake
+sudo tcpdump -n -i eth0 'tcp[tcpflags] &amp; (tcp-syn|tcp-fin) != 0'  # keep only SYN and FIN flags
+# See sockets
+ss -tanp
+State   Recv-Q Send-Q Local Address:Port  Peer Address:Port
+ESTAB   0      0      10.0.0.5:54322      93.184.216.34:443</code></pre></div>
+<p class="code-note">The tcpdump filter keeps only SYN and FIN packets, and ss shows the established sockets alongside them.</p>
+    <div class="ex"><h4 id="ch4-lab--exercises-4">Exercises 4</h4><ol>
+      <li>Capture and identify a full TCP handshake.</li>
+      <li>Find a retransmission and explain it.</li>
+      <li>Capture a DNS query and note it is UDP.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Routing Protocols</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Routing Protocols</button><div class="ch-toc-list"><a href="#ch5-route-table">5.1 The routing table and longest-prefix match</a><a href="#ch5-static">5.2 Static routing</a><a href="#ch5-ospf">5.3 OSPF — link state</a><a href="#ch5-bgp">5.4 BGP — path vector for the internet</a></div></div>
+    <p class="topic-desc">Routing protocols decide how routers learn where to send packets. Routes come from directly connected networks, manually configured static routes, and dynamic protocols such as OSPF inside an enterprise and BGP across the internet. Understanding the routing table and how routes are preferred lets you predict the exact path any packet will take.</p>
+    <h3 id="ch5-route-table" data-toc>5.1 The routing table and longest-prefix match</h3>
+    <p class="topic-desc">The routing table pairs destination prefixes with a next-hop address, an outgoing interface, and a metric. When several entries match a destination, the router uses longest-prefix match so the most specific entry wins, with administrative distance and metric breaking ties between protocols. On Linux read it with ip route show, and on routers with show ip route. Traceroute confirms the path actually selected.</p>
+    <div class="codeWrap"><pre><code># Linux
+ip route  # prints the routing table (FIB)
+default via 10.0.0.1 dev eth0
+10.20.0.0/24 via 10.0.0.2 dev eth0
+# Most specific prefix wins: /24 beats /16 beats default.</code></pre></div>
+<p class="code-note">A Linux routing table shows the default route and specific subnets; the most specific prefix always wins.</p>
+    <h3 id="ch5-static" data-toc>5.2 Static routing</h3>
+    <p class="topic-desc">Static routing is manual route configuration, which is simple, predictable, and well suited to small or stub networks. You state the destination prefix and next hop, with ip route on Cisco or ip route add on Linux, and the route never changes unless you change it. It provides no automatic failsafe for a lost link unless you add floating static routes or object tracking.</p>
+    <div class="codeWrap"><pre><code>ip route add 10.30.0.0/24 via 10.0.0.3
+# Cisco
+ip route 10.30.0.0 255.255.255.0 10.0.0.3
+# Good for small/stub networks; no failover unless tracked.</code></pre></div>
+<p class="code-note">Static routes are written nearly identically on Linux and Cisco, making them easy to automate and audit.</p>
+    <h3 id="ch5-ospf" data-toc>5.3 OSPF — link state</h3>
+    <p class="topic-desc">OSPF is a link-state routing protocol (RFC 2328) in which every router advertises its links and computes the shortest path to each destination with the Dijkstra algorithm. Neighbours form adjacency by exchanging hello messages on multicast 224.0.0.5, and all routers in an area share the same link-state database. OSPF traffic uses IP protocol 89. Put the backbone in area 0 and use area border routers to summarise for large designs.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 660 210" role="img" aria-label="Two routers connecting three networks with OSPF" style="width:100%;max-width:660px;height:auto;color:inherit">
+        <rect x="40" y="80" width="120" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="100" y="110" text-anchor="middle" fill="currentColor" font-size="12">PC / LAN</text>
+        <rect x="250" y="70" width="140" height="70" rx="6" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="1.3"/>
+        <text x="320" y="100" text-anchor="middle" fill="currentColor" font-size="12">Router R1</text>
+        <text x="320" y="120" text-anchor="middle" fill="currentColor" font-size="10" opacity="0.8">Area 0</text>
+        <rect x="470" y="70" width="140" height="70" rx="6" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="1.3"/>
+        <text x="540" y="100" text-anchor="middle" fill="currentColor" font-size="12">Router R2</text>
+        <text x="540" y="120" text-anchor="middle" fill="currentColor" font-size="10" opacity="0.8">Area 1</text>
+        <line x1="160" y1="105" x2="250" y2="105" stroke="currentColor" stroke-width="1.6"/>
+        <text x="205" y="97" text-anchor="middle" fill="currentColor" font-size="10">10.0.0.0/30</text>
+        <line x1="390" y1="105" x2="470" y2="105" stroke="currentColor" stroke-width="1.6"/>
+        <text x="430" y="97" text-anchor="middle" fill="currentColor" font-size="10">10.0.1.0/30</text>
+        <text x="320" y="180" text-anchor="middle" fill="currentColor" font-size="11" opacity="0.85">Routers advertise networks; each builds an identical map of the area.</text>
+      </svg>
+      <figcaption style="font-size:.85rem;opacity:.75;margin-top:.5rem">Figure 6 — OSPF routers share link-state information and compute the shortest path tree per area.</figcaption>
+    </figure>
+    <div class="codeWrap"><pre><code>router ospf 1
+ network 10.0.0.0 0.0.0.3 area 0   # wildcard mask, not a netmask
+ network 10.20.0.0 0.0.0.255 area 0
+show ip ospf neighbor
+show ip route ospf
+# Metric = cost = reference-bandwidth / link-bandwidth</code></pre></div>
+<p class="code-note">The OSPF config declares networks with wildcard masks, and show commands verify neighbours and learned routes.</p>
+    <h3 id="ch5-bgp" data-toc>5.4 BGP — path vector for the internet</h3>
+    <p class="topic-desc">BGP is the path-vector protocol (RFC 4271) that exchanges network prefixes between autonomous systems over TCP port 179. Selection relies on attributes rather than a single cost, including local preference, AS path length, origin, MED, and communities, so operators can encode rich routing policy. Advertise prefixes with the network and neighbor commands. BGP is the routing protocol that makes the internet work.</p>
+    <div class="codeWrap"><pre><code>router bgp 65001
+ neighbor 203.0.113.1 remote-as 65002
+ network 198.51.100.0 mask 255.255.255.0
+# Path selection uses attributes: weight, local-pref, AS-path length, MED...
+# Filter inbound/outbound prefixes; enable RPKI to fight hijacks.</code></pre></div>
+<p class="code-note">This BGP neighbour config and attribute list show it is a policy-driven protocol, unlike the simple metrics of interior routing.</p>
+    <div class="ex"><h4 id="ch5-bgp--exercises-5">Exercises 5</h4><ol>
+      <li>Read a routing table and explain each entry.</li>
+      <li>Enable OSPF between two routers and verify neighbours.</li>
+      <li>Explain longest-prefix match with an example.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · ARP, ICMP &amp; Neighbor Discovery</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · ARP, ICMP &amp; Neighbor Discovery</button><div class="ch-toc-list"><a href="#ch6-arp">6.1 ARP — mapping IP to MAC</a><a href="#ch6-icmp">6.2 ICMP and traceroute mechanics</a><a href="#ch6-nd">6.3 IPv6 Neighbor Discovery</a></div></div>
+    <p class="topic-desc">ARP and ICMP are the auxiliary protocols that glue the IP stack together. ARP maps IPv4 addresses to MAC addresses on a local segment, ICMP carries error and diagnostic messages such as ping and traceroute, and IPv6 Neighbor Discovery delivers the same functions over ICMPv6. Both protocols appear constantly in captures when a path fails.</p>
+    <h3 id="ch6-arp" data-toc>6.1 ARP — mapping IP to MAC</h3>
+    <p class="topic-desc">ARP resolves an IPv4 address to a MAC address within the same Ethernet segment and sits directly on the data link with EtherType 0x0806. A host broadcasts a who-has request, the owner replies with its MAC address, and the mapping is cached for minutes of use. Inspect the cache with arp -a on Windows or ip neigh on Linux. ARP has no built-in security, which makes spoofing a common attack.</p>
+    <div class="codeWrap"><pre><code>Who has 10.0.0.1? Tell 10.0.0.5      (broadcast)
+10.0.0.1 is at 00:50:56:aa:bb:cc     (unicast reply)
+
+$ arp -a
+? (10.0.0.1) at 00:50:56:aa:bb:cc [ether] on eth0
+# ARP cache poisoning is a classic MITM; use Dynamic ARP Inspection.</code></pre></div>
+<p class="code-note">ARP is a broadcast question with a unicast reply, and its cache is exactly what attackers try to poison.</p>
+    <h3 id="ch6-icmp" data-toc>6.2 ICMP and traceroute mechanics</h3>
+    <p class="topic-desc">ICMP carries control and error messages for IPv4. Echo request (type 8) and echo reply (type 0) drive ping, while destination unreachable (type 3) and time exceeded (type 11) matter for path diagnosis. Traceroute sends packets with rising TTL values so each router returns a time-exceeded message, revealing every hop. Use ping and traceroute or mtr on Linux to watch the path live.</p>
+    <div class="codeWrap"><pre><code>Types: 8 echo request, 0 echo reply, 3 unreachable, 11 time exceeded
+traceroute sends packets with increasing TTL; each router that
+expires the TTL replies ICMP time-exceeded — revealing the path.
+
+$ traceroute 8.8.8.8
+ 1  10.0.0.1   1.1 ms
+ 2  203.0.113.9  8.4 ms
+ 3  8.8.8.8    12.0 ms</code></pre></div>
+ <p class="code-note">Rising TTL values force each router in turn to reply time-exceeded, which is how traceroute reveals the whole path.</p>
+    <h3 id="ch6-nd" data-toc>6.3 IPv6 Neighbor Discovery</h3>
+    <p class="topic-desc">IPv6 Neighbor Discovery replaces ARP and runs as ICMPv6. Router Solicitation and Advertisement (types 133 and 134) enable default gateway discovery and stateless address autoconfiguration, while Neighbor Solicitation and Advertisement (types 135 and 136) resolve addresses and perform duplicate address detection. IPv6 hosts depend on ND from boot, and failures show as unreachable entries in ip -6 neigh.</p>
+    <ul>
+      <li>ND replaces ARP using ICMPv6 (Neighbor Solicitation/Advertisement).</li>
+      <li>Router Advertisements provide prefix + default gateway (SLAAC).</li>
+      <li>Duplicate Address Detection (DAD) prevents address conflicts.</li>
+    </ul>
+    <div class="ex"><h4 id="ch6-nd--exercises-6">Exercises 6</h4><ol>
+      <li>Flush and rebuild the ARP cache.</li>
+      <li>Capture an ICMP time-exceeded from traceroute.</li>
+      <li>Explain DAD in IPv6.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · DNS Deep Dive</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · DNS Deep Dive</button><div class="ch-toc-list"><a href="#ch7-resolution">7.1 How resolution actually happens</a><a href="#ch7-records">7.2 Record types</a><a href="#ch7-lab">7.3 Lab — query and trace DNS</a><a href="#ch7-dnssec">7.4 DNSSEC, DoH and DoT</a></div></div>
+    <p class="topic-desc">DNS translates human-friendly names into IP addresses through a chain of resolvers and servers. When resolution is slow, incomplete, or wrong, DNS is the first suspect for most internet problems. This chapter explains the full resolution path, the record types, the debugging commands, and the security layers that protect the system.</p>
+    <h3 id="ch7-resolution" data-toc>7.1 How resolution actually happens</h3>
+    <p class="topic-desc">Resolution starts when a recursive resolver asks the root servers for the top-level domain, then the TLD server, then the authoritative name server, and finally caches the answer for the record time to live. This chain explains why the first lookup is slow and repeats are instant. Use dig with +trace to walk the whole chain in one command and +short to see only the final address.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 660 270" role="img" aria-label="Recursive DNS resolution through root, TLD and authoritative servers" style="width:100%;max-width:660px;height:auto;color:inherit">
+        <rect x="20" y="110" width="120" height="46" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="80" y="138" text-anchor="middle" fill="currentColor" font-size="11">Client</text>
+        <rect x="200" y="110" width="150" height="46" rx="6" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="1.3"/>
+        <text x="275" y="132" text-anchor="middle" fill="currentColor" font-size="11">Recursive</text>
+        <text x="275" y="147" text-anchor="middle" fill="currentColor" font-size="11">resolver</text>
+        <rect x="430" y="20" width="200" height="40" rx="6" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="530" y="45" text-anchor="middle" fill="currentColor" font-size="11">1 · Root servers</text>
+        <rect x="430" y="110" width="200" height="40" rx="6" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="530" y="135" text-anchor="middle" fill="currentColor" font-size="11">2 · TLD (.com)</text>
+        <rect x="430" y="200" width="200" height="40" rx="6" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text x="530" y="225" text-anchor="middle" fill="currentColor" font-size="11">3 · Authoritative NS</text>
+        <line x1="140" y1="133" x2="200" y2="133" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar3)"/>
+        <line x1="350" y1="125" x2="430" y2="45" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar3)"/>
+        <line x1="350" y1="133" x2="430" y2="130" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar3)"/>
+        <line x1="350" y1="142" x2="430" y2="215" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar3)"/>
+        <text x="150" y="255" text-anchor="middle" fill="currentColor" font-size="11" opacity="0.8">Cache the answer (TTL) for next time</text>
+        <defs>
+          <marker id="ar3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="currentColor"/></marker>
+        </defs>
+      </svg>
+      <figcaption style="font-size:.85rem;opacity:.75;margin-top:.5rem">Figure 7 — A resolver walks Root → TLD → Authoritative servers, then caches the answer for its TTL.</figcaption>
+    </figure>
+    <h3 id="ch7-records" data-toc>7.2 Record types</h3>
+    <p class="topic-desc">DNS record types answer different questions about a name. A and AAAA map names to IPv4 and IPv6 addresses, MX names the mail server with a priority, CNAME aliases one name to another, TXT carries text such as SPF policy, and NS and SOA describe delegation and zone boundaries. Query a specific type with dig by naming the type, and use PTR for reverse lookups and SRV for services.</p>
+    <table>
+      <tr><th>Record</th><th>Maps to</th></tr>
+      <tr><td>A / AAAA</td><td>IPv4 / IPv6 address</td></tr>
+      <tr><td>CNAME</td><td>Alias to another name</td></tr>
+      <tr><td>MX</td><td>Mail exchanger + priority</td></tr>
+      <tr><td>TXT</td><td>SPF, DKIM, verification</td></tr>
+      <tr><td>NS / SOA</td><td>Authoritative servers / zone metadata</td></tr>
+      <tr><td>SRV</td><td>Service location (host + port)</td></tr>
+      <tr><td>PTR</td><td>Reverse lookup (IP → name)</td></tr>
+    </table>
+    <h3 id="ch7-lab" data-toc>7.3 Lab — query and trace DNS</h3>
+    <p class="topic-desc">This lab practises querying and tracing DNS with dig. Run dig on a host to get the A record, dig with the MX type for the mail server, and dig with +trace to watch recursion from the root servers down. Use dig with the at sign and a resolver address to target a specific server, and nslookup for a quick Windows reference. These commands turn a vague name complaint into record-level evidence.</p>
+    <div class="codeWrap"><pre><code>$ dig example.com A +short
+93.184.216.34
+$ dig @1.1.1.1 example.com MX
+example.com.  3600  IN  MX  10 mail.example.com.
+$ dig +trace example.com          # walk root -&gt; TLD -&gt; authoritative
+$ dig -x 8.8.8.8 +short
+dns.google.</code></pre></div>
+<p class="code-note">dig shows answers, mail routing, and a full chain trace, letting you pinpoint exactly where a lookup fails.</p>
+    <h3 id="ch7-dnssec" data-toc>7.4 DNSSEC, DoH and DoT</h3>
+    <p class="topic-desc">DNSSEC protects DNS data itself by signing records with keys published in DNSKEY and pointing to them from DS records in the parent zone, so resolvers verify RRSIG signatures and reject forged answers. DoH (RFC 8484) and DoT (RFC 7858) instead encrypt queries, over HTTPS port 443 or TLS port 853 respectively, hiding them from on-path snooping. Together they close the two weakest links in DNS.</p>
+    <ul>
+      <li><strong>DNSSEC</strong> signs records so answers can’t be forged (RRSIG/DNSKEY/DS).</li>
+      <li><strong>DoT/DoH</strong> encrypt queries to a resolver (port 853 / HTTPS).</li>
+      <li>Split-horizon DNS serves different answers internally vs externally.</li>
+    </ul>
+    <div class="ex"><h4 id="ch7-dnssec--exercises-7">Exercises 7</h4><ol>
+      <li>Trace resolution with <code>dig +trace</code>.</li>
+      <li>Query MX and TXT records for a domain.</li>
+      <li>Explain how caching and TTL reduce load.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · DHCP Deep Dive</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · DHCP Deep Dive</button><div class="ch-toc-list"><a href="#ch8-dora">8.1 The DORA exchange</a><a href="#ch8-options">8.2 Options, relay and leases</a><a href="#ch8-security">8.3 Rogue servers and snooping</a></div></div>
+    <p class="topic-desc">DHCP automates IP configuration, so a host obtains its address, subnet mask, default gateway, DNS servers, and other settings automatically when it boots. The core exchange is four broadcast messages that end in a temporary lease. Nearly every client on any network boots this way, which makes DHCP one of the first services to check when hosts cannot reach the network.</p>
+    <h3 id="ch8-dora" data-toc>8.1 The DORA exchange</h3>
+    <p class="topic-desc">The DORA exchange is how a DHCP client obtains a lease. The client broadcasts a DHCPDISCOVER, servers answer with DHCPOFFER, the client broadcasts DHCPREQUEST to accept one offer, and the server confirms with DHCPACK. All four messages travel on UDP ports 67 and 68. Filter Wireshark on bootp to watch the whole exchange in a handful of packets.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 560 250" role="img" aria-label="DHCP DORA exchange between client and server" style="width:100%;max-width:560px;height:auto;color:inherit">
+        <line x1="110" y1="34" x2="110" y2="230" stroke="currentColor" stroke-width="1.3"/>
+        <line x1="450" y1="34" x2="450" y2="230" stroke="currentColor" stroke-width="1.3"/>
+        <text x="110" y="24" text-anchor="middle" fill="currentColor" font-size="12">Client</text>
+        <text x="450" y="24" text-anchor="middle" fill="currentColor" font-size="12">DHCP server</text>
+        <line x1="110" y1="66" x2="450" y2="66" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar4)"/>
+        <text x="280" y="59" text-anchor="middle" fill="currentColor" font-size="11">Discover (broadcast)</text>
+        <line x1="450" y1="106" x2="110" y2="106" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar4)"/>
+        <text x="280" y="99" text-anchor="middle" fill="currentColor" font-size="11">Offer (proposed IP)</text>
+        <line x1="110" y1="146" x2="450" y2="146" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar4)"/>
+        <text x="280" y="139" text-anchor="middle" fill="currentColor" font-size="11">Request (accept offer)</text>
+        <line x1="450" y1="186" x2="110" y2="186" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar4)"/>
+        <text x="280" y="179" text-anchor="middle" fill="currentColor" font-size="11">Acknowledge (lease + options)</text>
+        <defs>
+          <marker id="ar4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="currentColor"/></marker>
+        </defs>
+      </svg>
+      <figcaption style="font-size:.85rem;max-width:560px;opacity:.75;margin-top:.5rem">Figure 8 — DHCP uses four broadcast messages: Discover, Offer, Request, Acknowledge.</figcaption>
+    </figure>
+    <h3 id="ch8-options" data-toc>8.2 Options, relay and leases</h3>
+    <p class="topic-desc">DHCP options carry the extra settings a client needs along with its address. Option 1 provides the subnet mask, option 3 the default gateway, option 6 the DNS servers, option 15 the domain name, option 51 the lease time, and option 53 the message type. A relay agent forwards requests between subnets, configured on Cisco routers with ip helper-address. Clients renew at half the lease and rebind later, so exhausted scopes fail silently.</p>
+    <table>
+      <tr><th>Option</th><th>Provides</th></tr>
+      <tr><td>3</td><td>Default gateway</td></tr>
+      <tr><td>6</td><td>DNS servers</td></tr>
+      <tr><td>15</td><td>Domain name</td></tr>
+      <tr><td>42</td><td>NTP servers</td></tr>
+      <tr><td>66/67</td><td>PXE boot server / filename</td></tr>
+      <tr><td>82</td><td>Relay agent info (switch/port)</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code># Packet capture of DORA
+sudo tcpdump -n -i eth0 port 67 or port 68
+# Server sees giaddr (relay) when the client is on another subnet.</code></pre></div>
+<p class="code-note">Capturing UDP 67 and 68 shows the whole DORA exchange, and the giaddr field reveals when a relay was involved.</p>
+    <h3 id="ch8-security" data-toc>8.3 Rogue servers and snooping</h3>
+    <p class="topic-desc">A rogue DHCP server can hijack addressing, so switches use DHCP snooping to trust only authorised ports and discard offers arriving on untrusted ports. Snooping also builds IP-to-MAC bindings, and relay-enabled option 82 adds switch and port information for audit. Rate limiting protects against exhaustion floods. On Cisco enable ip dhcp snooping, mark uplinks trusted, and verify with show ip dhcp snooping.</p>
+    <ul>
+      <li>Authorise DHCP servers in AD; enable DHCP snooping on switches.</li>
+      <li>Option 82 lets the relay tag which port a request came from.</li>
+      <li>Monitor scope utilisation — exhaustion causes silent failures.</li>
+    </ul>
+    <div class="ex"><h4 id="ch8-security--exercises-8">Exercises 8</h4><ol>
+      <li>Capture a DORA exchange and label each message.</li>
+      <li>Configure option 66/67 for PXE.</li>
+      <li>Explain how DHCP snooping stops a rogue server.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · NAT, PAT &amp; Firewalls</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · NAT, PAT &amp; Firewalls</button><div class="ch-toc-list"><a href="#ch9-nat">9.1 SNAT, DNAT and PAT</a><a href="#ch9-firewall">9.2 Stateless vs stateful firewalls</a><a href="#ch9-ngfw">9.3 NGFW, WAF and zones</a></div></div>
+    <p class="topic-desc">NAT lets private IPv4 networks share a much smaller set of public addresses, and firewalls filter what may cross a network boundary. Together they shape how almost every edge network is built and defended. This chapter covers NAT flavours, stateless versus stateful filtering, and what next-generation firewalls add.</p>
+    <h3 id="ch9-nat" data-toc>9.1 SNAT, DNAT and PAT</h3>
+    <p class="topic-desc">NAT rewrites addresses and ports as packets cross a boundary. Source NAT translates private source addresses to the public side, PAT multiplexes many internal hosts behind a single public IP by rewriting source ports, and destination NAT performs port forwarding so inbound traffic reaches internal servers. On routers mark interfaces with ip nat inside and ip nat outside and match traffic with an access list. Verify with show ip nat translations.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Network address translation from a private LAN to the internet" style="width:100%;max-width:640px;height:auto;color:inherit">
+        <rect x="20" y="100" width="150" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="95" y="130" text-anchor="middle" fill="currentColor" font-size="11">LAN 192.168.1.0/24</text>
+        <rect x="240" y="90" width="160" height="70" rx="6" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="1.3"/>
+        <text x="320" y="118" text-anchor="middle" fill="currentColor" font-size="12">NAT router</text>
+        <text x="320" y="136" text-anchor="middle" fill="currentColor" font-size="10" opacity="0.85">public 203.0.113.5</text>
+        <rect x="470" y="100" width="150" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="545" y="130" text-anchor="middle" fill="currentColor" font-size="11">Internet</text>
+        <line x1="170" y1="125" x2="240" y2="125" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="400" y1="125" x2="470" y2="125" stroke="currentColor" stroke-width="1.5"/>
+        <text x="320" y="205" text-anchor="middle" fill="currentColor" font-size="11">PAT table: 192.168.1.10:5001 → 203.0.113.5:40001</text>
+        <text x="320" y="225" text-anchor="middle" fill="currentColor" font-size="11">192.168.1.11:5001 → 203.0.113.5:40002</text>
+      </svg>
+      <figcaption style="font-size:.85rem;opacity:.75;margin-top:.5rem">Figure 9 — PAT (NAT overload) maps many private addresses to one public address using distinct source ports.</figcaption>
+    </figure>
+    <div class="codeWrap"><pre><code># Linux nftables: masquerade outbound
+nft add rule ip nat postrouting oifname "eth0" masquerade
+# Destination NAT (port forward)
+nft add rule ip nat prerouting tcp dport 443 dnat to 10.0.0.20:443
+# iptables equivalent
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</code></pre></div>
+<p class="code-note">The nftables rules show outbound masquerade and inbound port forwarding, with an iptables equivalent for comparison.</p>
+    <h3 id="ch9-firewall" data-toc>9.2 Stateless vs stateful firewalls</h3>
+    <p class="topic-desc">Stateless firewalls evaluate every packet against a fixed rule table on its own, so return traffic must be allowed by an explicit rule. Stateful firewalls track connections in a connection table and automatically permit replies to established sessions while blocking the rest. Linux iptables uses the state or conntrack module for this. That is why stateful filtering is the default model on modern edge devices.</p>
+    <table>
+      <tr><th></th><th>Stateless (ACL)</th><th>Stateful</th></tr>
+      <tr><td>State</td><td>None</td><td>Connection table</td></tr>
+      <tr><td>Return traffic</td><td>Must be allowed manually</td><td>Allowed automatically</td></tr>
+      <tr><td>Use</td><td>Router ACLs, edge filters</td><td>Almost everywhere</td></tr>
+    </table>
+    <h3 id="ch9-ngfw" data-toc>9.3 NGFW, WAF and zones</h3>
+    <p class="topic-desc">Next-generation firewalls add application awareness, intrusion prevention, TLS inspection, and user identity to traditional port filtering, so policy can follow applications instead of bare sockets. A web application firewall specialises in HTTP traffic and defends web applications against injection and other application-layer attacks. Most vendors put interfaces into security zones and apply zone-based policies with the IPS engine inspecting payloads in real time.</p>
+    <ul>
+      <li><strong>NGFW</strong> adds application awareness + IPS (identifies apps, not just ports).</li>
+      <li><strong>WAF</strong> inspects HTTP for SQLi/XSS and virtual patches.</li>
+      <li>Zone-based policy (LAN/DMZ/WAN/mgmt) beats a long flat rule list.</li>
+    </ul>
+    <div class="warn"><p>Asymmetric routing breaks stateful firewalls: if the return path is a different device, the connection table never sees the reply and drops it. Keep flows symmetric.</p></div>
+    <div class="ex"><h4 id="ch9-ngfw--exercises-9">Exercises 9</h4><ol>
+      <li>Set up SNAT/PAT on a Linux router.</li>
+      <li>Port-forward 443 to an internal server.</li>
+      <li>Explain why stateful firewalls need symmetric paths.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · HTTP, HTTPS, TLS &amp; QUIC</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · HTTP, HTTPS, TLS &amp; QUIC</button><div class="ch-toc-list"><a href="#ch10-http">10.1 HTTP versions</a><a href="#ch10-tls">10.2 TLS handshake (1.3)</a><a href="#ch10-certs">10.3 Certificates and trust</a></div></div>
+    <p class="topic-desc">The web runs on HTTP, with TLS protecting that traffic in transit when served as HTTPS. This chapter explains each HTTP version, the TLS 1.3 handshake that negotiates keys and certificates, and how certificates build trust. Following that flow explains the speed and security of every HTTPS connection you test.</p>
+    <h3 id="ch10-http" data-toc>10.1 HTTP versions</h3>
+    <p class="topic-desc">HTTP has evolved through three major versions. HTTP/1.1 keeps connections alive but handles requests serially, HTTP/2 multiplexes many streams over one TCP connection using binary framing, and HTTP/3 runs over QUIC on UDP to avoid head-of-line blocking. Servers negotiate the version during the TLS handshake using ALPN. Test explicitly with curl --http2 or curl --http3.</p>
+    <table>
+      <tr><th>Version</th><th>Transport</th><th>Key idea</th></tr>
+      <tr><td>HTTP/1.1</td><td>TCP</td><td>Keep-alive, one request at a time per connection</td></tr>
+      <tr><td>HTTP/2</td><td>TCP</td><td>Multiplexing, header compression, server push</td></tr>
+      <tr><td>HTTP/3</td><td>QUIC over UDP</td><td>No head-of-line blocking, faster setup</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code>$ curl -I https://example.com
+HTTP/2 200
+content-type: text/html; charset=UTF-8
+cache-control: max-age=604800</code></pre></div>
+<p class="code-note">curl over HTTPS reports the negotiated HTTP version and the response headers in a couple of lines.</p>
+    <h3 id="ch10-tls" data-toc>10.2 TLS handshake (1.3)</h3>
+    <p class="topic-desc">TLS 1.3 (RFC 8446) completes a handshake in one round trip using ephemeral Diffie-Hellman key exchange, sending the certificate and finished messages together so the client verifies the server and derives keys in that single exchange. It protects traffic on TCP port 443 and offers 0-RTT resumption for faster reconnections. Inspect the negotiated suite with openssl s_client and the -tls1_3 flag.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 560 250" role="img" aria-label="TLS 1.3 handshake between client and server" style="width:100%;max-width:560px;height:auto;color:inherit">
+        <line x1="110" y1="34" x2="110" y2="230" stroke="currentColor" stroke-width="1.3"/>
+        <line x1="450" y1="34" x2="450" y2="230" stroke="currentColor" stroke-width="1.3"/>
+        <text x="110" y="24" text-anchor="middle" fill="currentColor" font-size="12">Client</text>
+        <text x="450" y="24" text-anchor="middle" fill="currentColor" font-size="12">Server</text>
+        <line x1="110" y1="66" x2="450" y2="66" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar5)"/>
+        <text x="280" y="59" text-anchor="middle" fill="currentColor" font-size="11">ClientHello (keyshare, ciphers)</text>
+        <line x1="450" y1="106" x2="110" y2="106" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar5)"/>
+        <text x="280" y="99" text-anchor="middle" fill="currentColor" font-size="11">ServerHello + {cert, Finished}</text>
+        <line x1="110" y1="146" x2="450" y2="146" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar5)"/>
+        <text x="280" y="139" text-anchor="middle" fill="currentColor" font-size="11">{Finished} + HTTP request</text>
+        <line x1="450" y1="186" x2="110" y2="186" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar5)"/>
+        <text x="280" y="179" text-anchor="middle" fill="currentColor" font-size="11">{HTTP response}</text>
+        <defs>
+          <marker id="ar5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="currentColor"/></marker>
+        </defs>
+      </svg>
+      <figcaption style="font-size:.85rem;max-width:560px;opacity:.75;margin-top:.5rem">Figure 10 — TLS 1.3 needs only one round trip: the certificate and Finished are sent together and encrypted after the key share.</figcaption>
+    </figure>
+    <h3 id="ch10-certs" data-toc>10.3 Certificates and trust</h3>
+    <p class="topic-desc">TLS relies on X.509 certificates to prove server identity. Each certificate is signed by its issuer and chains up to a trusted root, with intermediate certificates in between, and the server presents this chain during the handshake. Clients verify the chain, the validity period, and that the hostname matches the subject alternative names. Dump a presented chain with openssl s_client and the -showcerts flag.</p>
+    <div class="codeWrap"><pre><code># Inspect a certificate chain
+$ openssl s_client -connect example.com:443 -servername example.com -showcerts
+subject=CN = example.com
+issuer=C = US, O = DigiCert Inc, CN = DigiCert TLS RSA SHA256 2020 CA1
+Verify return code: 0 (ok)
+
+# Verify hostname + expiry quickly
+$ echo | openssl s_client -connect example.com:443 2&gt;/dev/null | openssl x509 -noout -dates</code></pre></div>
+<p class="code-note">openssl prints the full certificate chain and expiry, showing exactly who issued the certificate and whether it verifies.</p>
+    <ul>
+      <li>Chain of trust: leaf → intermediate → root (in the trust store).</li>
+      <li>ACME/Let’s Encrypt automates issuance and renewal.</li>
+      <li>SNI lets one IP host many sites; ALPN negotiates HTTP/2.</li>
+    </ul>
+    <div class="ex"><h4 id="ch10-certs--exercises-10">Exercises 10</h4><ol>
+      <li>Check which HTTP version a site uses with curl.</li>
+      <li>Inspect a certificate chain and its expiry.</li>
+      <li>Explain why TLS 1.3 has a one-round-trip handshake.</li>
+    </ol></div>
+  </section>
+  <section class="chapter">
+<h2 id="ch10b" data-toc>10b · CDNs, Edge Caching and Anycast</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · CDNs, edge caching and anycast</button><div class="ch-toc-list"><a href="#ch10b-model">What a CDN actually is</a><a href="#ch10b-dns">Getting the user to the edge</a><a href="#ch10b-anycast">Anycast and why it works</a><a href="#ch10b-headers">Cache-control, the whole header</a><a href="#ch10b-key">The cache key and Vary</a><a href="#ch10b-stale">Stale-while-revalidate and stale-if-error</a><a href="#ch10b-purge">Purging and versioned URLs</a><a href="#ch10b-tls">TLS at the edge</a><a href="#ch10b-tiered">Tiered caching and shielding</a><a href="#ch10b-api">CDNs and APIs</a><a href="#ch10b-privacy">Privacy, cookies and the wrong CDN</a><a href="#ch10b-labs">Hands-on labs</a></div></div>
+    <p class="topic-desc">A content delivery network is three technologies wearing one name: a distributed cache, a routing system that gets users to the nearest copy, and an HTTP server that runs close to them. Separating them is what makes CDN behaviour predictable instead of mysterious.</p>
+    <h3 id="ch10b-model" data-toc>What a CDN actually is</h3>
+    <div class="codeWrap"><pre><code>// three independent parts. most CDN confusion is a confusion between them.
+
+// 1. THE CACHE
+//    N copies of your content, in memory and on disk, at N locations.
+//    serves a request without touching your origin at all.
+//    this is the part that makes it fast, and the part with all the
+//    invalidation problems.
+
+// 2. THE ROUTING LAYER
+//    given a hostname, decide which copy serves it.
+//    usually DNS: a CNAME to the CDN, and the CDN's authoritative DNS
+//    returns an address near the user.
+//    this is the part that makes it fast for geographically distant users.
+
+// 3. THE EDGE SERVER
+//    an HTTP server at each location, terminating TLS, applying cache
+//    policy, and forwarding a miss to the origin.
+//    this is where the configuration lives: headers, rules, functions.
+
+// WHY THE SEPARATION MATTERS
+//   cache hit rate is a CACHE problem. Latency is a ROUTING problem.
+//   A CDN with a 95% hit rate can still be slow if the routing sends
+//   European users to a Singapore PoP. And a perfectly routed CDN
+//   with a 20% hit rate is slow for everybody, everywhere.
+//   Measure them separately.</code></pre></div>
+    <h3 id="ch10b-dns" data-toc>Getting the user to the edge</h3>
+    <div class="codeWrap"><pre><code>// the DNS-based flow, which is the modern default
+//   www.example.com  CNAME  d2x4uv6k2v0e9.cloudfront.net
+//   the CDN's DNS returns an A/AAAA record for the nearest PoP
+
+$ dig www.example.com +short
+203.0.113.42          // a CloudFront edge address, not yours
+$ dig www.example.com @8.8.8.8 +short
+198.51.100.17         // different resolver, possibly a different PoP
+
+// WHY THE ADDRESS LOOKS UNHELPFUL
+//   it is anycast: one address announced from hundreds of locations. The
+//   BGP routing table decides which location your packet reaches. See
+//   the next section.
+
+// THE OPTIONS, in increasing order of control
+//   1. CNAME to a CDN-provided hostname. simplest, least control.
+   www.example.com  CNAME  abc123.cloudfront.net
+//   2. CNAME to your own hostname, aliased through the provider.
+   www.example.com  CNAME  origin-www.example.com.cdn-provider.net
+   www.example.com  CNAME  origin-www.example.com     // you own the name
+//   3. CNAME with a Host header override, for a zone you do not own
+   origin-www.vendor.com  CNAME  abc123.cloudfront.net
+   // the client sends Host: www.vendor.com; the CDN routes on the CNAME
+//   target but verifies the Host. This is how CDNs front domains they
+//   do not control.
+
+// TTL AND PROPAGATION, the operational reality
+//   a low TTL means fast failover, but more DNS traffic and more
+//   resolver caching problems
+//   a high TTL means faster resolution but a slow cutover
+//   practice: 300s during normal operation, dropped to 60s for a
+//   planned migration, then raised again once it is stable.
+
+// THE LEGACY PATTERN, and why it is worse
+//   a geo-DNS provider returning a different CNAME per region
+//   or a separate hostname per region: eu.example.com, us.example.com
+//   both work but fragment your TLS certificates, your cookies, your
+//   analytics and your SEO. Prefer one hostname with anycast.</code></pre></div>
+    <h3 id="ch10b-anycast" data-toc>Anycast and why it works</h3>
+    <div class="codeWrap"><pre><code>// ANYCAST: one IP address announced from many locations
+//   BGP allows the same prefix to be advertised by hundreds of
+//   independent providers. Every router in the world picks the shortest
+//   path, which is naturally the nearest location to that router.
+//
+//   consequences
+//   - the client gets a low-latency path with no client-side logic
+//   - failover is a routing change, measured in BGP convergence time
+//     (seconds to a minute), not a DNS TTL
+//   - there is ONE address, so no DNS churn and no per-region names
+//   - a DDoS attack against the address hits all locations at once,
+//     which is why anycast alone is not a DDoS defence
+//     (it is a DDoS AMPLIFIER without a scrubbing layer)
+
+// VERIFYING IT
+$ traceroute d2x4uv6k2v0e9.cloudfront.net
+// the first hops should be local: a transit provider, then a PoP
+$ curl -sI https://www.example.com | grep -i server
+// CloudFront: 1.0    or   cloudflare    or   nginx
+$ curl -sI https://www.example.com
+// look for: age, x-cache, via, cf-cache-status, x-amz-cf-id
+
+// WHAT "NEAREST" ACTUALLY MEANS
+//   nearest to the CLIENT's network, not to you. A user in Japan
+//   routed to a Singapore PoP may be 20ms away even if you have a
+//   Tokyo PoP, because the ISP's transit path goes to Singapore.
+//   Always measure from real users, in the countries you care about.
+
+// THE FLIP SIDE
+//   some ISPs and mobile networks do poor BGP. A user on a network
+//   with a bad route may reach Singapore from Brazil. Some CDNs let
+//   you override with a "prefer region" hint or a custom PoP
+//   (CloudFront, Fastly and Cloudflare all offer this for enterprise).</code></pre></div>
+    <h3 id="ch10b-headers" data-toc>Cache-control, the whole header</h3>
+    <p>`Cache-Control` is the whole contract, and it is short enough to memorise and subtle enough to get wrong constantly.</p>
+    <div class="codeWrap"><pre><code>Cache-Control: public, max-age=31536000, immutable
+
+// every directive
+  public              cacheable by shared caches. without it, a shared
+                      cache MUST NOT store a response with
+                      Authorization. most CDNs are shared caches.
+  private             only a browser may store it. never for a CDN.
+  no-store            do not store it AT ALL. not "do not reuse",
+                      not "store but revalidate". never store.
+  no-cache            you MAY store it, but you MUST revalidate with
+                      the origin before every use. often confused with
+                      no-store. it is the correct directive for
+                      "always check, but do not re-download"
+  max-age=N           fresh for N seconds. the primary directive.
+  s-maxage=N          fresh for N seconds for SHARED caches only,
+                      overriding max-age for a CDN. use this when a
+                      browser should cache briefly but the edge
+                      should cache for an hour.
+  must-revalidate     once stale, a cache MUST NOT serve it without
+                      contacting the origin
+  proxy-revalidate    the same, for shared caches only
+  immutable           never revalidate while fresh. implies a
+                      versioned URL. powerful, and easy to misuse
+  stale-while-revalidate=N
+                      serve stale for N seconds while fetching a
+                      fresh copy in the background. the single most
+                      useful directive for a busy site
+  stale-if-error=N    serve stale for up to N seconds if the origin
+                      is down. this is how a cache saves you from an
+                      outage
+  no-transform        intermediaries must not change the response
+
+// EXPIRES is dead. use max-age. it is HTTP/1.0 and browsers have not
+// honoured it consistently in over a decade.
+
+// THE THREE SCOPES, and this is where confusion lives
+//   Cache-Control in the RESPONSE   -&gt; how caches may store it
+//   Cache-Control in the REQUEST    -&gt; what THIS requester wants
+//   Pragma / Expires                -&gt; obsolete, ignore
+
+// a request that bypasses the cache, and what it costs
+Cache-Control: no-cache          // revalidate, still served from cache on 304
+Cache-Control: no-store          // bypass entirely
+Cache-Control: max-age=0         // same as no-cache in effect
+Pragma: no-cache                 // HTTP/1.0 clients, some bots
+// never confuse "no-cache" with "do not serve me from cache". A
+// bot sending no-cache will bypass your CDN on every request and take
+// your origin down. Rate-limit by user agent, not just by cache
+// behaviour, and note that a CDN cannot enforce this on third-party
+// traffic.</code></pre></div>
+    <h3 id="ch10b-key" data-toc>The cache key and Vary</h3>
+    <div class="codeWrap"><pre><code>// by default the cache key is: scheme + host + path + query string
+//   https://example.com/products?page=2
+//   key = https | example.com | /products | page=2
+
+// WHAT IS INCLUDED BY DEFAULT varies by provider
+//   Cloudflare  : scheme, host, path, query. NOT headers, unless a
+//                 Cache Rule adds them
+//   CloudFront  : scheme, host, path, query. plus a whitelist of
+//                 headers you configure
+//   Fastly      : scheme, host, path, query, plus configured headers
+//   Varnish     : whatever you write in VCL
+
+// WHY QUERY STRINGS MATTER
+//   every distinct query string is a distinct cache entry. An analytics
+//   tag, a cache-buster, or a session id in the query string can
+//   multiply your storage by thousands and drop the hit rate to zero.
+//
+//   THE FIX, and you need all three parts
+//   1. normalise or ignore the parameters that do not affect the body
+//      at the CDN (a cache rule, or VCL)
+//   2. normalise them at the ORIGIN too, so a direct hit matches
+//   3. stop emitting them: analytics tags go in a path or a header,
+//      not in a query string you cannot control
+
+// VARY, and why it will destroy your hit rate
+Vary: Accept-Encoding, Accept-Language
+
+// Vary tells every cache in the chain to store one copy PER VALUE of
+// each listed header. Two languages and two encodings means four
+// objects. Add User-Agent and you have forty. Add a session cookie and
+// your hit rate is zero and your storage is unbounded.
+
+Vary: Accept-Encoding     // acceptable: 2-3 variants
+Vary: Cookie              // CATASTROPHIC. never do this on a CDN.
+//   you have just told the edge to store a copy per session
+
+// the correct way to vary by language: not at all. put the language in
+// the URL.
+/en/products   /fr/products   /ar/products
+// one cache entry each, shareable, and the URL is honest about what
+// it returns.
+
+// MODERN CACHING HEADERS that do this properly
+Cache-Control: private, no-store    // for genuinely per-user content
+ETag / Last-Modified                 // revalidation
+Vary: Accept-Encoding                // the only Vary most sites need</code></pre></div>
+    <h3 id="ch10b-stale" data-toc>Stale-while-revalidate and stale-if-error</h3>
+    <div class="codeWrap"><pre><code>// the two directives that make a cache resilient
+
+// stale-while-revalidate
+Cache-Control: public, max-age=60, stale-while-revalidate=600
+// 0-60s     fresh, served instantly
+// 60-660s   stale, served instantly, AND one background request goes
+//           to the origin to refresh
+// >660s     too old, must revalidate synchronously
+//
+// the effect: your origin sees roughly one request per PoP per TTL
+// instead of one per user. A busy site goes from 10,000 origin
+// requests a minute to perhaps 300.
+
+// stale-if-error
+Cache-Control: public, max-age=60, stale-if-error=86400
+// if the origin returns 5xx, or times out, serve the stale copy for up
+// to 24 hours
+//
+// this is the directive that keeps you online during an incident. It
+// is the reason a static marketing site survives a database outage:
+// the HTML is cached, and only the dynamic fragments fail.
+
+// THE COMBINATION that most high-traffic sites ship
+Cache-Control: public, max-age=300, s-maxage=86400,
+              stale-while-revalidate=86400, stale-if-error=604800
+// 5 min in the browser, 1 day at the edge, served stale for a day
+// while refreshing, and for a week if your origin is on fire.
+
+// THE CAVEAT, and it matters
+//   stale-while-revalidate means your users can see old content. For a
+//   news site, a price, or anything legally required to be current,
+//   that may be unacceptable. Know the trade before you ship it.</code></pre></div>
+    <h3 id="ch10b-purge" data-toc>Purging and versioned URLs</h3>
+    <div class="codeWrap"><pre><code>// THE TWO WAYS TO INVALIDATE
+
+// A. PURGE, per object
+POST https://api.cdn-provider.com/purge
+{ "paths": ["/products/123"] }        // or a wildcard /products/*
+//   instant-ish (seconds to a couple of minutes)
+//   every provider rate-limits purges. a purge storm will get you
+//   throttled or suspended, and it costs money on many plans.
+//   NEVER purge in a loop. NEVER purge on a schedule.
+
+// B. VERSIONED URLs, and this is the right answer
+&lt;link rel="stylesheet" href="/css/app.4f2a91.css"&gt;
+//   the filename contains a content hash
+//   when the content changes, the filename changes, so it is a new
+//   cache key. the old file stays cached until it expires, which is
+//   fine, because nobody requests it any more.
+
+//   build-time, the hash must be of the CONTENT
+const cssHash = crypto.createHash('sha256')
+  .update(await fs.readFile('dist/app.css'))
+  .digest('hex').slice(0, 8);
+// `app.4f2a91.css`
+
+//   cache the hashed asset for a YEAR and the HTML for a MINUTE
+Cache-Control: public, max-age=31536000, immutable   // the .css
+Cache-Control: no-cache                              // the .html
+
+//   that is the whole immutable-asset strategy. HTML is always
+//   revalidated, so it is never stale for more than a round trip, and
+//   assets are never re-downloaded at all.
+
+// C. SURGICAL PURGE, for the rest
+//   most providers let you purge by prefix, by a cache tag, or by
+//   a surrogate key. Tagging is the best of these:
+//   Tag the object "product-123" at the origin, then purge by tag.
+//   You invalidate one object across every PoP without knowing its URL.
+
+// WHEN YOU DO NEED A PURGE
+//   a legal change: a page that must disappear immediately
+//   a security fix to content that is not versioned
+//   a content editor who insists on seeing their change
+//   the last one is not a real reason. Versioned URLs solve it, and a
+//   purge on every save is how a small team accidentally DDoSes itself.</code></pre></div>
+    <h3 id="ch10b-tls" data-toc>TLS at the edge</h3>
+    <div class="codeWrap"><pre><code>// the CDN terminates TLS, so it needs a certificate for your hostname
+//   options: a managed certificate (automatic, free on most providers,
+//             but you cannot use it for a wildcard you do not own)
+//           a custom certificate (bring your own, full control,
+//             you handle renewal)
+//           a certificate for a customer name (CloudFront and others
+//             have an "alternate domain" feature for this)
+
+// MODERN TLS, and what to require
+//   TLS 1.3 is the default target. It is faster (1-RTT handshake) and
+//   simpler.
+//   TLS 1.2 still needs supporting. Disable 1.0 and 1.1.
+//   modern cipher suites only: AEAD, forward secrecy.
+//   do NOT set a fixed cipher string at the CDN if the provider
+//   already defaults sensibly. A hand-written cipher list is almost
+//   always worse than the provider's.
+
+// HSTS, and preload
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+//   max-age=63072000 (2 years) is required for the preload list
+//   preload means the browser hardcodes it and you cannot undo it
+//   for a long time. Only preload when you are certain every
+//   subdomain is HTTPS. A single forgotten subdomain breaks it.
+//   do this at the ORIGIN as well as the edge, so it applies to
+//   direct origin traffic too.
+
+// OCSP STAPLING
+//   removes a round trip to the CA when the client checks revocation.
+//   the edge does the stapling. Most browsers ignore it now that
+//   certificate revocation checking has been reworked, but it costs
+//   nothing.
+
+// SNI, SNI-based routing and why a CDN changes your certificate needs
+//   a CDN serving many hostnames needs a certificate covering all of
+//   them, or SNI, which lets it present a different certificate per
+//   name. Either way the certificate is on the CDN, not your origin,
+//   so the origin can sit behind a private link on plain HTTP.</code></pre></div>
+    <h3 id="ch10b-tiered" data-toc>Tiered caching and shielding</h3>
+    <div class="codeWrap"><pre><code>// THE PROBLEM WITH ONE TIER
+//   200 PoPs, all missing at once, all fetching from the origin
+//   your origin sees 200 requests for one object. Miss the origin and
+//   you have a thundering herd.
+
+// TIER 1: REGIONAL
+//   each region has one big cache. PoPs in that region share it.
+//   origin requests reduced from 200 to 20.
+tiered-cache regional          // Cloudflare, Fastly
+tiered-cache smart-tiered      // Fastly: only fill a lower tier on hit
+
+// TIER 2: SHIELDING, aka a mid-tier
+//   a small number of shield locations between the PoPs and the origin
+//   a PoP miss goes to a shield, not to the origin. Only 4 shields
+//   exist globally, so the origin sees at most 4 fetches per object.
+origin-shield                  // CloudFront: "Origin Shield"
+//   the shield sits at your AWS region, so the origin fetch is
+//   intra-region: low latency, no internet egress cost
+
+// THE ORDER OF PREFERENCE
+//   1. cache at the origin. a fast origin eliminates the problem
+//      rather than mitigating it. This is the answer more often than
+//      people expect.
+//   2. cache with a long TTL so misses are rare
+//   3. shield, so a miss is cheap
+//   4. rate-limit the origin, so a stampede is survivable
+
+// ORIGIN PROTECTION, regardless of caching
+//   allow-list the CDN's IP ranges at your firewall or security group
+//   and nothing else may reach the origin. This is the single most
+//   important security step for a CDN-fronted site, and it is
+//   routinely skipped.
+//   the ranges are published by every provider and change. Automate
+//   the fetch, or you will block yourself out at some point.
+//   remember: an IP allow-list also blocks your health checkers and
+//   your office. Use a separate health-check path.</code></pre></div>
+    <h3 id="ch10b-api" data-toc>CDNs and APIs</h3>
+    <div class="codeWrap"><pre><code>// a CDN in front of an API is usually the wrong tool, unless you
+// control the cache headers deliberately.
+
+// WHAT A CDN DOES TO AN API BY DEFAULT
+//   - caches GET responses, even ones you meant to be per-user
+//   - a cached GET with a stale Authorization header is a data leak
+//   - the CDN hides your real latency, so your monitoring lies
+//   - error responses may be cached, which is very confusing
+
+// IF YOU DO USE ONE FOR AN API
+//   cache only what is genuinely public, and say so explicitly
+Cache-Control: public, max-age=60
+//   on everything else
+Cache-Control: private, no-store
+
+//   never cache errors
+Cache-Control: no-store
+//   on 4xx and 5xx. A cached 500 is a 500 for an hour.
+
+//   bypass the cache for authenticated requests
+//   most providers: a cache rule matching the presence of an
+//   Authorization header, set to bypass. This is a configuration
+//   decision that must be made deliberately, not by accident.
+
+//   CDN rate limiting is the right place for abuse controls
+//   per-IP, per-path, per-API-key, with the headers from the API design
+//   guide. It happens before your servers see the traffic.
+
+// THE CASE FOR PUTTING A CDN IN FRONT OF AN API
+//   - DDoS absorption. This is the strongest argument, and it is
+//     decisive for any public API.
+//   - TLS termination off your own hardware
+//   - geographic latency for a read-heavy public API
+//   - connection reuse, which helps clients on poor mobile networks
+
+// THE CASE AGAINST
+//   - you lose visibility and you add a failure mode
+//   - cache bugs become data-leak bugs
+//   - it is another vendor with its own outage domain</code></pre></div>
+    <h3 id="ch10b-privacy" data-toc>Privacy, cookies and the wrong CDN</h3>
+    <div class="codeWrap"><pre><code>// THE GDPR PROBLEM, and it is not hypothetical
+//   if a CDN serves content to users in the EU, it is processing
+//   personal data. Log files containing IP addresses are personal data.
+//   That requires:
+//     - a data processing agreement with the provider
+//     - a lawful basis, usually legitimate interests
+//     - a clear privacy notice that names the CDN
+//     - the ability to honour a data-subject request, which means the
+//       provider's logs must be reachable and deletable
+//     - a transfer mechanism for non-EU providers, which under the
+//       current rules means the EU-US Data Privacy Framework, Standard
+//       Contractual Clauses, or an adequacy decision. If the provider
+//       is not certified, you need SCCs plus a transfer impact
+//       assessment.
+//
+//   this is a legal question, not a technical one, and you need a
+//   lawyer. What you can do technically is make sure you are not
+//   accidentally setting cookies from the edge.
+
+// COOKIES AT THE EDGE
+//   a CDN setting a cookie means it is setting a first-party cookie
+//   from your domain. That is subject to consent requirements in the
+//   EU, and in some cases to US state privacy laws.
+//   most providers can be told not to set cookies at all, and most
+//   should not for a content site.
+
+// CACHING PERSONALISED RESPONSES
+//   if the origin sets a session cookie AND returns
+//   Cache-Control: public, the CDN will cache it and serve one user's
+//   content to another. The cookie does not prevent it. This is the
+//   most damaging CDN misconfiguration there is, and it happens
+//   because people test on a cache miss and never test the second hit.
+//
+//   THE TEST: load a page, log in, change something. Then in a private
+//   window, log in as a different user, and check you see YOUR data.
+//   Repeat until the second load. A cache bug that shows up on request
+//   one is not a cache bug.
+
+// GEOLOCATION AND COMPLIANCE
+//   some jurisdictions require content to be geo-blocked, and GDPR
+//   regimes differ by country. A CDN makes this easy because you can
+//   vary content by country. Know whether you need to, and if you do,
+//   make sure a VPN or a foreign DNS resolver cannot bypass it, which
+//   is a genuinely hard problem.</code></pre></div>
+    <h3 id="ch10b-labs" data-toc>Hands-on labs</h3>
+    <div class="codeWrap"><pre><code>// LAB 1 - prove the cache is working
+curl -sI https://www.example.com | grep -iE 'age|cache|x-cache|via'
+// hit the URL twice. The second must show a non-zero Age and a HIT
+// from the provider. If it does not, nothing is being cached and you
+// have not understood why yet.
+
+// LAB 2 - read the response headers and predict the behaviour
+curl -sI https://www.example.com
+// write down, from the headers alone, the answer to:
+//   how long will a browser cache this?
+//   how long will a CDN cache this?
+//   will a second visitor hit the edge?
+//   what happens if the origin is down?
+// then verify your predictions by testing each one.
+
+// LAB 3 - find the effective cache key
+$ for i in $(seq 1 5); do
+    curl -sI "https://www.example.com/p?utm_source=x$i" \
+      | grep -iE '^age|^x-cache' | head -1
+  done
+// if Age stays 0, the query string is in the cache key and you have
+// just multiplied your origin load. This is the check that finds the
+// most common CDN misconfiguration in the wild.
+
+// LAB 4 - build a cache-key policy from first principles
+// list every query parameter your application emits. For each, decide
+// and write down: does it change the response body?
+//   no  -&gt; strip it at the CDN and at the origin
+//   yes -&gt; keep it, and accept the cache-entry multiplication
+// Now do the same for every response header you set with Vary.
+
+// LAB 5 - test failure behaviour
+// point a test hostname at a broken origin, with
+//   stale-if-error=3600
+// and confirm the cached page is still served. This is the lab that
+// teaches you why the directive exists.
+
+// LAB 6 - measure from a real user location
+// a ping and a traceroute from a machine in another continent, not
+// from yours. Record RTT, hop count, and whether any hop degrades.
+// Repeat at three different times of day.</code></pre></div>
+    <div class="ex"><h4 id="ch10b-labs--exercises-10b">Exercises 10b</h4><ol>
+      <li>Run labs 1 to 3 against a site you use. Write down its effective cache key, its cacheability per route, and every place it is defeating its own caching. Most sites fail lab 3.</li>
+      <li>Set up a versioned-asset pipeline: content-hashed filenames, <code>immutable</code> on the assets, <code>no-cache</code> on the HTML. Verify that a content change causes exactly one new asset request and zero re-downloads of unchanged assets.</li>
+      <li>Configure <code>stale-while-revalidate</code> and <code>stale-if-error</code> on a static page, then break the origin and confirm the page still serves. Record how stale the content got.</li>
+      <li>Measure hit rate, edge latency and origin latency separately for 24 hours. Then identify whether your slowest requests are cache misses, routing problems, or origin problems — the three have completely different fixes.</li>
+      <li>Test the personalised-content leak: log in as user A, load, then log in as user B in a private window and load again. If A's data appears, you have the most serious CDN misconfiguration. Find it and fix it, then re-test.</li>
+    </ol></div>
+  </section>
+
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · VPN &amp; Tunnelling Protocols</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · VPN &amp; Tunnelling Protocols</button><div class="ch-toc-list"><a href="#ch11-compare">11.1 Comparing tunnels</a><a href="#ch11-ipsec">11.2 IPsec phases and modes</a><a href="#ch11-wg">11.3 WireGuard lab</a></div></div>
+    <p class="topic-desc">VPNs and tunnels carry private traffic across untrusted networks by adding encapsulation and, usually, strong encryption. IPsec suits enterprise site-to-site links, OpenVPN and WireGuard fit remote access, and GRE offers simple encapsulation without security. This chapter compares the options and then builds a real WireGuard tunnel.</p>
+    <h3 id="ch11-compare" data-toc>11.1 Comparing tunnels</h3>
+    <p class="topic-desc">Each tunnelling protocol suits a different job. IPsec encrypts at the IP layer and is the standard for gateway-to-gateway VPNs, using UDP ports 500 and 4500. OpenVPN is TLS-based, usually listening on UDP 1194, and works well for remote access across many client platforms. WireGuard is minimal and fast on UDP 51820 with a very short config. GRE (IP protocol 47) only encapsulates and adds no encryption by itself.</p>
+    <table>
+      <tr><th>Protocol</th><th>Transport</th><th>Typical use</th></tr>
+      <tr><td>IPsec (IKEv2)</td><td>UDP 500/4500 (ESP)</td><td>Site-to-site, remote access</td></tr>
+      <tr><td>WireGuard</td><td>UDP</td><td>Modern, fast, simple</td></tr>
+      <tr><td>OpenVPN</td><td>TCP/UDP</td><td>Flexible, TLS-based</td></tr>
+      <tr><td>GRE</td><td>IP proto 47</td><td>Tunnelling (often + IPsec)</td></tr>
+      <tr><td>SSL/TLS VPN</td><td>TCP 443</td><td>Browser/anywhere access</td></tr>
+    </table>
+    <h3 id="ch11-ipsec" data-toc>11.2 IPsec phases and modes</h3>
+    <p class="topic-desc">IPsec protects IP traffic and is negotiated in two phases. IKE phase 1 authenticates peers and exchanges keys over UDP port 500, and phase 2 builds the IPsec security associations that protect data with ESP (IP protocol 50), while AH (protocol 51) authenticates without encryption. Tunnel mode encrypts the whole inner packet for gateway links, and transport mode protects only the payload for host-to-host. Verify with show crypto ipsec sa on Cisco.</p>
+    <div class="codeWrap"><pre><code>Phase 1 (IKE): authenticate peers, establish ISAKMP SA
+Phase 2 (ESP): negotiate keys for the data SA
+
+Transport mode: encrypt payload only (host-to-host)
+Tunnel mode:    encrypt whole packet + new IP header (gateway-to-gateway)
+
+ESP provides confidentiality + integrity; AH provides integrity only.</code></pre></div>
+<p class="code-note">IPsec separates authentication from data protection and chooses between payload-only and full-packet encryption.</p>
+    <h3 id="ch11-wg" data-toc>11.3 WireGuard lab</h3>
+    <p class="topic-desc">WireGuard is a modern VPN with a deliberately minimal design: each peer holds a Curve25519 key pair and a short config listing a private key and allowed IP ranges. Install with apt install wireguard, generate keys with wg genkey and wg pubkey, and bring the tunnel up with wg-quick. It defaults to UDP port 51820 and is far simpler to audit than IPsec or OpenVPN.</p>
+    <div class="codeWrap"><pre><code>wg genkey | tee privatekey | wg pubkey &gt; publickey
+# Server
+[Interface]
+Address = 10.99.0.1/24
+ListenPort = 51820
+PrivateKey = &lt;server.key&gt;
+[Peer]
+PublicKey = &lt;client.pub&gt;
+AllowedIPs = 10.99.0.2/32
+
+# Bring up and verify
+wg-quick up wg0
+wg show</code></pre></div>
+<p class="code-note">WireGuard uses a single interface file of key pairs and allowed IPs, then wg-quick brings the tunnel up.</p>
+    <div class="ex"><h4 id="ch11-wg--exercises-11">Exercises 11</h4><ol>
+      <li>Build a WireGuard tunnel between two VMs.</li>
+      <li>Explain tunnel mode vs transport mode.</li>
+      <li>Capture ESP traffic and note it is encrypted.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch12" data-toc>12 · Wi-Fi Technology &amp; Protocols</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Wi-Fi Technology &amp; Protocols</button><div class="ch-toc-list"><a href="#ch12-standards">12.1 802.11 standards</a><a href="#ch12-frames">12.2 Association and frames</a><a href="#ch12-security">12.3 Security modes</a></div></div>
+    <p class="topic-desc">Wi-Fi runs the same ethernet-style addressing over radio, with its own set of 802.11 standards, frame types, and security modes. Because the medium is shared and half-duplex, performance and security behave differently than on wired LANs. This chapter covers the standards, the association sequence, and the authentication choices.</p>
+    <h3 id="ch12-standards" data-toc>12.1 802.11 standards</h3>
+    <p class="topic-desc">Wi-Fi generations are defined by the 802.11 amendments. 802.11n is Wi-Fi 4, 802.11ac is Wi-Fi 5 on 5 GHz, 802.11ax is Wi-Fi 6 adding OFDMA and better density, and 802.11be is Wi-Fi 7. Standards differ in channel width, modulation, spatial streams, and which clients they support. Match the standard to the client and plan channels in 2.4 GHz and 5 GHz rather than chasing raw speed alone.</p>
+    <table>
+      <tr><th>Standard</th><th>Band</th><th>Notes</th></tr>
+      <tr><td>802.11n / Wi-Fi 4</td><td>2.4/5 GHz</td><td>MIMO</td></tr>
+      <tr><td>802.11ac / Wi-Fi 5</td><td>5 GHz</td><td>MU-MIMO downlink, wide channels</td></tr>
+      <tr><td>802.11ax / Wi-Fi 6/6E</td><td>2.4/5/6 GHz</td><td>OFDMA, high density</td></tr>
+      <tr><td>802.11be / Wi-Fi 7</td><td>2.4/5/6 GHz</td><td>MLO, very low latency</td></tr>
+    </table>
+    <h3 id="ch12-frames" data-toc>12.2 Association and frames</h3>
+    <p class="topic-desc">Joining a Wi-Fi network is a defined sequence of management frames. A client sends probe requests and receives probe responses, then authenticates, then sends an association request that is answered with an association response assigning an association ID and negotiated rates. Beacons advertise network presence. Roaming and handover quality depend on these exchanges, so delays at association time often appear as problems in captures.</p>
+    <div class="codeWrap"><pre><code>Beacon -&gt; Probe -&gt; Authentication -&gt; Association -&gt; 4-way handshake (WPA)
+Frame types: management, control, data
+Roaming: client decides; 802.11r/k/v speed up handover.</code></pre></div>
+<p class="code-note">Client association is a fixed frame sequence, ending in the WPA handshake that only begins when everything else succeeds.</p>
+    <h3 id="ch12-security" data-toc>12.3 Security modes</h3>
+    <p class="topic-desc">Wi-Fi security modes range from open through WPA2 and WPA3 personal to enterprise. Personal modes use a pre-shared key, with WPA3 strengthening this through SAE simultaneous authentication of equals, while enterprise mode uses 802.1X with RADIUS so every user authenticates individually over EAP. Organisations run enterprise mode for per-user credentials and accounting. Use the strongest mode every client in the fleet can support.</p>
+    <table>
+      <tr><th>Mode</th><th>Auth</th><th>Use</th></tr>
+      <tr><td>Open</td><td>None</td><td>Captive portal only</td></tr>
+      <tr><td>WPA2/WPA3-Personal</td><td>PSK</td><td>Home/small office</td></tr>
+      <tr><td>WPA2-Enterprise</td><td>802.1X + RADIUS</td><td>Corporate</td></tr>
+      <tr><td>WPA3-Enterprise</td><td>802.1X, PMF, SAE</td><td>Best current practice</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code># Capture management frames to survey
+sudo tcpdump -i wlan0 -e -n type mgt subtype beacon
+# On Linux, iw lists capabilities and channels
+iw dev wlan0 info</code></pre></div>
+<p class="code-note">Filtering for beacon management frames is a fast way to survey access points, and iw lists local adapter capabilities.</p>
+    <div class="ex"><h4 id="ch12-security--exercises-12">Exercises 12</h4><ol>
+      <li>Survey nearby channels and pick the least congested.</li>
+      <li>Explain the WPA 4-way handshake.</li>
+      <li>Compare personal vs enterprise Wi-Fi security.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch13" data-toc>13 · Supporting Protocols</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Supporting Protocols</button><div class="ch-toc-list"><a href="#ch13-ntp">13.1 NTP</a><a href="#ch13-snmp">13.2 SNMP</a><a href="#ch13-syslog">13.3 Syslog and flow data</a><a href="#ch13-aaa">13.4 AAA, RADIUS and TACACS+</a></div></div>
+    <p class="topic-desc">Supporting protocols keep a network running, observable, and controlled. NTP synchronises clocks for accurate log correlation, SNMP exposes device health and counters, syslog and flow data centralise visibility, and AAA protocols control access. These quiet services matter more than most operators think during an outage.</p>
+    <h3 id="ch13-ntp" data-toc>13.1 NTP</h3>
+    <p class="topic-desc">NTP keeps device clocks synchronised over UDP port 123 using stratum levels, from authoritative stratum 1 sources down to ordinary clients. Accurate time matters because logs from many devices must line up to reconstruct any incident, and a few seconds of drift breaks that correlation. Configure chrony on Linux hosts and ntp on routers or switches, then verify with ntpq -p to check offset and stratum.</p>
+    <div class="codeWrap"><pre><code># Query a time server (UDP 123)
+$ ntpdate -q pool.ntp.org
+server 162.159.200.1, stratum 3, offset -0.001234, delay 0.025
+
+# chrony tracking
+$ chronyc tracking
+Reference ID / Stratum / System time offset</code></pre></div>
+<p class="code-note">ntpdate and chrony tracking both report stratum and offset, the two numbers that tell you how healthy time sync is.</p>
+    <h3 id="ch13-snmp" data-toc>13.2 SNMP</h3>
+    <p class="topic-desc">SNMP lets monitoring platforms read device health, interface counters, and status over UDP ports 161 and 162. Managed objects live in MIBs and are referenced by OIDs, and tools like snmpwalk dump whole subtrees for graphing or alerting. Only SNMPv3 with authentication, such as SHA, and privacy, such as AES, is safe today, because version 2c community strings travel in clear text.</p>
+    <div class="codeWrap"><pre><code># Poll a device (use v3 with auth+privacy, never public community)
+snmpwalk -v3 -l authPriv -u monitor -a SHA -A pass -x AES -X pass 10.0.0.1 system
+SNMPv1/v2c use community strings (weak); SNMPv3 adds real security.
+Traps/informs push events to the manager.</code></pre></div>
+<p class="code-note">SNMPv3 adds authentication and encryption, while v1 and v2c rely on weak community strings, so always prefer v3.</p>
+    <h3 id="ch13-syslog" data-toc>13.3 Syslog and flow data</h3>
+    <p class="topic-desc">Syslog collects log lines from network devices to a central server, with severity levels 0 to 7 marking emergencies through debug, typically over UDP 514 or TLS 6514 when confidentiality matters. Flow data tells a different story: NetFlow and IPFIX export full connection records, and sFlow samples packets statistically, showing who talks to whom. Logs and flows together are the basis of monitoring and forensics.</p>
+    <table>
+      <tr><th>Protocol</th><th>Port</th><th>Use</th></tr>
+      <tr><td>Syslog</td><td>514 UDP/TCP, 6514 TLS</td><td>Central log collection</td></tr>
+      <tr><td>NetFlow/IPFIX</td><td>2055/4739</td><td>Flow analysis</td></tr>
+      <tr><td>sFlow</td><td>6343</td><td>Packet sampling</td></tr>
+    </table>
+    <h3 id="ch13-aaa" data-toc>13.4 AAA, RADIUS and TACACS+</h3>
+    <p class="topic-desc">AAA centralises authentication, authorisation, and accounting for network access. RADIUS runs on UDP ports 1812 and 1813 with a shared secret and powers 802.1X, VPN, and wireless authentication. TACACS+ runs on TCP port 49 and encrypts the whole packet, so it is the usual choice for device administration on routers and switches. Both log what users did.</p>
+    <div class="codeWrap"><pre><code>RADIUS (1812/1813): authentication + authorization + accounting
+TACACS+ (49): Cisco, separates AAA, encrypts full payload
+Used by 802.1X, VPN, and device admin.
+
+# Radtest a user against FreeRADIUS
+radtest user pass localhost 0 testing123
+Received Access-Accept</code></pre></div>
+<p class="code-note">RADIUS and TACACS+ handle AAA differently; radtest verifies a user against FreeRADIUS and returns Access-Accept or -Reject.</p>
+    <div class="ex"><h4 id="ch13-aaa--exercises-13">Exercises 13</h4><ol>
+      <li>Query an NTP server and read the offset.</li>
+      <li>Walk a device with SNMPv3.</li>
+      <li>Authenticate a user against RADIUS.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch14" data-toc>14 · Packet Analysis</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Packet Analysis</button><div class="ch-toc-list"><a href="#ch14-capture">14.1 Capturing with tcpdump</a><a href="#ch14-wireshark">14.2 Wireshark display filters</a><a href="#ch14-follow">14.3 Reading a capture</a></div></div>
+    <p class="topic-desc">Packet analysis is the craft of reading what actually crosses the wire. This chapter builds real skill with tcpdump for capture and Wireshark for analysis, covering capture filters, display filters, and how to read a session from handshake to teardown. Mastery here turns vague performance complaints into hard evidence.</p>
+    <h3 id="ch14-capture" data-toc>14.1 Capturing with tcpdump</h3>
+    <p class="topic-desc">tcpdump captures raw packets from the command line, which makes it ideal for routers, servers, and containers. Basic use is tcpdump -i any host 10.0.0.1 and port 443, with -n to skip name resolution, -c to limit the count, and -w file.pcap to save captures for analysis in Wireshark. Filters use Berkeley Packet Filter syntax covering hosts, ports, and protocols such as icmp and tcp.</p>
+    <div class="codeWrap"><pre><code># Capture on an interface to a file, then open in Wireshark
+sudo tcpdump -i eth0 -w capture.pcap
+# Read it back with names and timestamps
+sudo tcpdump -nn -r capture.pcap 'tcp port 443' -c 20
+# Useful filters
+host 10.0.0.5                  # one host
+net 10.0.0.0/24                # a subnet
+tcp and port 80                # protocol + port
+icmp or arp                    # control protocols
+tcp[tcpflags] &amp; tcp-syn != 0   # SYN packets</code></pre></div>
+<p class="code-note">Write to a pcap file, read it back with filters, and combine these small filters to isolate almost any traffic.</p>
+    <h3 id="ch14-wireshark" data-toc>14.2 Wireshark display filters</h3>
+    <p class="topic-desc">Wireshark display filters narrow thousands of captured packets to exactly the traffic you care about after the capture. Syntax follows protocol fields, so ip.src selects the source address, tcp.port filters a port, and http selects application traffic, and filters combine with and and or. The filter bar highlights invalid expressions as you type. Reusable filters and colour rules make spotting anomalies fast.</p>
+    <table>
+      <tr><th>Goal</th><th>Display filter</th></tr>
+      <tr><td>One conversation</td><td><code>ip.addr==10.0.0.5 &amp;&amp; tcp.port==443</code></td></tr>
+      <tr><td>DNS problems</td><td><code>dns.flags.rcode != 0</code></td></tr>
+      <tr><td>TCP resets</td><td><code>tcp.flags.reset == 1</code></td></tr>
+      <tr><td>Retransmissions</td><td><code>tcp.analysis.retransmission</code></td></tr>
+      <tr><td>Slow responses</td><td><code>tcp.time_delta &gt; 1</code></td></tr>
+      <tr><td>TLS alerts</td><td><code>tls.alert_message</code></td></tr>
+    </table>
+    <h3 id="ch14-follow" data-toc>14.3 Reading a capture</h3>
+    <p class="topic-desc">Reading a capture means telling its story. Filter for the session, expand the TCP header, and follow the handshake, the data exchange, and the teardown while watching sequence numbers, window sizes, retransmissions, and timing. Right-click Follow TCP Stream reconstructs the application-layer conversation, and the Time column exposes latency. A structured read separates the symptom, such as a reset or a stall, from the underlying cause.</p>
+    <div class="codeWrap"><pre><code>1 Filter to the flow
+2 Follow the TCP stream (right-click -&gt; Follow -&gt; TCP Stream)
+3 Check the handshake completes (SYN, SYN-ACK, ACK)
+4 Look for resets, retransmissions and long delays
+5 Correlate application data with the timing</code></pre></div>
+<p class="code-note">These five steps turn a capture into a diagnosis, starting with the flow and ending with timing and retransmission checks.</p>
+    <div class="ex"><h4 id="ch14-follow--exercises-14">Exercises 14</h4><ol>
+      <li>Capture a full HTTP request/response and follow the stream.</li>
+      <li>Filter for retransmissions in a slow transfer.</li>
+      <li>Find a TCP reset and explain its cause.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch15" data-toc>15 · Troubleshooting Labs</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Troubleshooting Labs</button><div class="ch-toc-list"><a href="#ch15-method">15.1 The layered method</a><a href="#ch15-tools">15.2 Command toolbox</a><a href="#ch15-symptoms">15.3 Symptom to cause</a></div></div>
+    <p class="topic-desc">Troubleshooting turns an outage into a solvable problem by working through the layers systematically. Starting at the client and moving outward, each test narrows the possibilities until the first failing check points at the faulty layer. This chapter teaches that layered method, the essential command set, and the common symptom-to-cause mappings used by working engineers.</p>
+    <h3 id="ch15-method" data-toc>15.1 The layered method</h3>
+    <p class="topic-desc">The layered method tests each hop and each layer from the client toward the destination. Start with addressing and link state using ip addr and ping the gateway, then move through name resolution with dig, transport with ss or a port test, and application with curl or browser checks. The first check that fails identifies the broken layer, so stop there instead of guessing. Work bottom-up for total failures and top-down for application-specific slowness.</p>
+    <figure style="margin:1.5rem 0;text-align:center">
+      <svg viewBox="0 0 660 260" role="img" aria-label="Troubleshooting a path from the client through the network to the server" style="width:100%;max-width:660px;height:auto;color:inherit">
+        <rect x="20" y="105" width="110" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="75" y="135" text-anchor="middle" fill="currentColor" font-size="11">Client</text>
+        <rect x="180" y="105" width="120" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="240" y="128" text-anchor="middle" fill="currentColor" font-size="11">Access</text>
+        <text x="240" y="144" text-anchor="middle" fill="currentColor" font-size="10">switch/AP</text>
+        <rect x="350" y="105" width="120" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="410" y="128" text-anchor="middle" fill="currentColor" font-size="11">Firewall</text>
+        <text x="410" y="144" text-anchor="middle" fill="currentColor" font-size="10">router/NAT</text>
+        <rect x="520" y="105" width="120" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <text x="580" y="135" text-anchor="middle" fill="currentColor" font-size="11">Server</text>
+        <line x1="130" y1="130" x2="180" y2="130" stroke="currentColor" stroke-width="1.3" marker-end="url(#ar6)"/>
+        <line x1="300" y1="130" x2="350" y2="130" stroke="currentColor" stroke-width="1.3" marker-end="url(#ar6)"/>
+        <line x1="470" y1="130" x2="520" y2="130" stroke="currentColor" stroke-width="1.3" marker-end="url(#ar6)"/>
+        <text x="75" y="90" text-anchor="middle" fill="currentColor" font-size="10" opacity="0.8">1 link/IP</text>
+        <text x="240" y="90" text-anchor="middle" fill="currentColor" font-size="10" opacity="0.8">2 VLAN/STP</text>
+        <text x="410" y="90" text-anchor="middle" fill="currentColor" font-size="10" opacity="0.8">3 rules/NAT</text>
+        <text x="580" y="90" text-anchor="middle" fill="currentColor" font-size="10" opacity="0.8">4 service</text>
+        <text x="330" y="205" text-anchor="middle" fill="currentColor" font-size="11" opacity="0.85">Test each hop: ping, traceroute, arp, capture, port test</text>
+        <defs>
+          <marker id="ar6" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="currentColor"/></marker>
+        </defs>
+      </svg>
+      <figcaption style="font-size:.85rem;opacity:.75;margin-top:.5rem">Figure 11 — Divide and conquer: verify each hop and layer along the path to isolate where it breaks.</figcaption>
+    </figure>
+    <h3 id="ch15-tools" data-toc>15.2 Command toolbox</h3>
+    <p class="topic-desc">A small command toolbox answers most troubleshooting questions. ip addr and ip route show addressing, ping tests reachability and loss, traceroute or mtr maps the path, ss and netstat show sockets and listening ports, dig tests DNS, curl tests HTTP, and tcpdump captures the evidence. Each symptom maps to one or two of these tools, which keeps debugging fast and repeatable.</p>
+    <table>
+      <tr><th>Question</th><th>Command</th></tr>
+      <tr><td>Do I have an address?</td><td><code>ip addr</code> / <code>ipconfig /all</code></td></tr>
+      <tr><td>Is the default gateway reachable?</td><td><code>ping &lt;gw&gt;</code></td></tr>
+      <tr><td>What path do packets take?</td><td><code>traceroute</code> / <code>tracert</code></td></tr>
+      <tr><td>Can I resolve names?</td><td><code>dig</code> / <code>nslookup</code></td></tr>
+      <tr><td>Is the port open?</td><td><code>nc -vz host 443</code> / <code>Test-NetConnection</code></td></tr>
+      <tr><td>What is actually on the wire?</td><td><code>tcpdump</code> / Wireshark</td></tr>
+    </table>
+    <h3 id="ch15-symptoms" data-toc>15.3 Symptom to cause</h3>
+    <p class="topic-desc">Common symptoms map to short lists of likely causes. An address in the 169.254.0.0/16 range points to DHCP failure, a path that drops at the same hop hints at a firewall filter, and a connection that stalls right after the handshake suggests session filtering. Matching the symptom to its list is the fastest route from a user report to a repair.</p>
+    <table>
+      <tr><th>Symptom</th><th>Likely cause</th></tr>
+      <tr><td>ping by IP works, name fails</td><td>DNS</td></tr>
+      <tr><td>Small packets pass, large hang</td><td>MTU / PMTUD black hole</td></tr>
+      <tr><td>Intermittent at scale</td><td>NAT/connection table exhaustion</td></tr>
+      <tr><td>Works one way only</td><td>Asymmetric routing / firewall state</td></tr>
+      <tr><td>Duplicated addresses</td><td>IP conflict / rogue DHCP</td></tr>
+      <tr><td>Widespread broadcast storms</td><td>Switching loop / STP failure</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch15-symptoms--exercises-15">Exercises 15</h4><ol>
+      <li>Break DNS on purpose and diagnose it.</li>
+      <li>Create an MTU black hole and detect it with packet sizes.</li>
+      <li>Capture the exact hop where a connection fails.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch16" data-toc>16 · Automation, SDN &amp; Modern Networking</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Automation, SDN &amp; Modern Networking</button><div class="ch-toc-list"><a href="#ch16-discovery">16.1 Discover and inventory</a><a href="#ch16-automation">16.2 Network automation</a><a href="#ch16-sdn">16.3 SDN, overlays and cloud</a></div></div>
+    <p class="topic-desc">Modern networks are discovered, configured, and managed by software instead of by hand on a CLI. Discovery and inventory turn an unknown estate into a documented one, automation engines such as Ansible push consistent configuration at scale, and SDN separates the control plane from the forwarding hardware. This is how new networks are actually built today.</p>
+    <h3 id="ch16-discovery" data-toc>16.1 Discover and inventory</h3>
+    <p class="topic-desc">Discovery builds an accurate inventory before anything is changed. Link Layer Discovery Protocol (IEEE 802.1AB) lets neighbouring switches announce themselves over their ports, and scans with nmap -sn find live hosts. SNMP polling and RADIUS accounting reveal devices and their roles. The result turns an undocumented network into a map you can trust before automating it.</p>
+    <div class="codeWrap"><pre><code>$ nmap -sn 10.20.0.0/24        # ping sweep
+$ nmap -sV -p 1-1024 10.20.0.10 # service/version scan (authorised only!)
+$ lldpcli show neighbors        # LLDP topology discovery</code></pre></div>
+<p class="code-note">nmap finds live hosts and services while lldpcli reveals neighbour switches, building an instant inventory.</p>
+    <h3 id="ch16-automation" data-toc>16.2 Network automation</h3>
+    <p class="topic-desc">Network automation replaces manual CLI typing with repeatable, idempotent configuration. Ansible connects over SSH and runs playbooks that declare the desired state, NETCONF uses remote procedure calls over SSH on port 830 with data modelled in YANG, and RESTCONF offers the same models over HTTPS. Because the declared state is the source of truth, re-running a playbook changes nothing when the state already matches.</p>
+    <div class="codeWrap"><pre><code># Ansible network module (idempotent config)
+- hosts: switches
+  tasks:
+    - name: ensure VLAN 30 exists
+      community.network.ios_vlan: { vlan_id: 30, name: SERVERS }
+
+# Model-driven: NETCONF/RESTCONF + YANG schemas
+# Python with Netmiko/Nornir for scripted CLI</code></pre></div>
+<p class="code-note">Ansible declares the desired end state for switches, so a task like ensuring a VLAN exists is safe to run again and again.</p>
+    <h3 id="ch16-sdn" data-toc>16.3 SDN, overlays and cloud</h3>
+    <p class="topic-desc">SDN separates the control plane from the data plane so centralised controllers program forwarding devices through protocols such as OpenFlow. Overlay networks like VXLAN (UDP 4789) tunnel layer 2 traffic across any underlay, which is how cloud providers stretch virtual networks between data centres. SD-WAN applies the same philosophy to branch connectivity, and cloud virtual private clouds are this pattern at internet scale.</p>
+    <ul>
+      <li><strong>SDN</strong> separates the control plane from the data plane (central controller).</li>
+      <li><strong>VXLAN/EVPN</strong> overlays create large L2/L3 segments over an IP fabric.</li>
+      <li><strong>SD-WAN</strong> steers traffic across links by application policy.</li>
+      <li><strong>Cloud</strong>: VPC/VNet, security groups, transit gateways, private endpoints.</li>
+    </ul>
+    <div class="ex"><h4 id="ch16-sdn--exercises-16">Exercises 16</h4><ol>
+      <li>Sweep a lab subnet with nmap.</li>
+      <li>Push a VLAN config with Ansible.</li>
+      <li>Explain the SDN control/data plane split.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch17" data-toc>17 · Network Security Protocols</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Network Security Protocols</button><div class="ch-toc-list"><a href="#ch17-control">17.1 Protecting the control plane</a><a href="#ch17-crypto">17.2 Crypto you will configure</a><a href="#ch17-segmentation">17.3 Segmentation and zero trust</a></div></div>
+    <p class="topic-desc">Security protocols protect the control plane, the data plane, and access to the network itself. Port-level defences such as 802.1X and MACsec secure the edge, modern-only crypto configuration removes weak algorithms, and segmentation under a zero-trust model assumes the network is already hostile. Together they form the defensive baseline for any serious organisation.</p>
+    <h3 id="ch17-control" data-toc>17.1 Protecting the control plane</h3>
+    <p class="topic-desc">Protecting the control plane starts at the port. 802.1X uses EAPOL with RADIUS to authenticate each device before the port opens, MACsec (IEEE 802.1AE) encrypts traffic on the secured link, and DHCP snooping validates addressing. Port security locks MAC learning to defined limits, and control plane policing protects the router CPU from floods. Enable these before connecting untrusted devices to a distribution switch.</p>
+    <table>
+      <tr><th>Protocol</th><th>Purpose</th></tr>
+      <tr><td>802.1X</td><td>Port-based network access control</td></tr>
+      <tr><td>MACsec (802.1AE)</td><td>Link-layer encryption between switches</td></tr>
+      <tr><td>DHCP snooping / DAI</td><td>Block rogue DHCP and ARP spoofing</td></tr>
+      <tr><td>BPDU guard / root guard</td><td>Protect STP topology</td></tr>
+      <tr><td>SSH / TLS</td><td>Secure management and transport</td></tr>
+    </table>
+    <h3 id="ch17-crypto" data-toc>17.2 Crypto you will configure</h3>
+    <p class="topic-desc">This section covers the concrete cryptography a practitioner configures. Disable every service older than SSHv2, allow only modern key exchange and cipher suites such as AES and ChaCha20, and reject SHA-1 in favour of SHA-2 signatures. On Linux that means hardening sshd_config and enforcing the system crypto policy, and on network gear disabling weak algorithms so legacy clients cannot negotiate insecure sessions.</p>
+    <div class="codeWrap"><pre><code># Strong SSH (disable legacy KEX/ciphers/MACs)
+KexAlgorithms curve25519-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
+MACs hmac-sha2-512-etm@openssh.com
+# Generate a key pair
+ssh-keygen -t ed25519 -a 100 -C "ops@example.com"</code></pre></div>
+<p class="code-note">Locking SSH to modern algorithms and generating an ed25519 key are two small changes with a real security payoff.</p>
+    <h3 id="ch17-segmentation" data-toc>17.3 Segmentation and zero trust</h3>
+    <p class="topic-desc">Zero trust assumes the network is already hostile, so it segments by identity rather than just by location. VLANs and ACLs isolate departments and workloads, microsegmentation pushes filtering closer to each workload, and every access request is authenticated independently of source address. Egress filtering matters as much as ingress, because most lateral movement crosses the boundary of the compromised segment.</p>
+    <ul>
+      <li>Micro-segment workloads; never a flat trusted LAN.</li>
+      <li>mTLS between services; identity-based access, not IP-based.</li>
+      <li>Continuous verification; assume breach and monitor east-west traffic.</li>
+      <li>Filter egress as well as ingress — data exfiltration is outbound.</li>
+    </ul>
+    <div class="warn"><p>Default-deny both directions and log drops. Most breaches move laterally after the first foothold; segmentation is what stops them.</p></div>
+    <div class="ex"><h4 id="ch17-segmentation--exercises-17">Exercises 17</h4><ol>
+      <li>Configure 802.1X on a lab switch and RADIUS.</li>
+      <li>Harden SSH to modern algorithms only.</li>
+      <li>Write egress filtering rules for a server VLAN.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch18" data-toc>18 · Capstone Lab Series</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Capstone Lab Series</button><div class="ch-toc-list"><a href="#ch18-lab1">18.1 Lab 1 — Two-site routed network</a><a href="#ch18-lab2">18.2 Lab 2 — VLANs, trunking and inter-VLAN routing</a><a href="#ch18-lab3">18.3 Lab 3 — TLS and HTTPS analysis</a><a href="#ch18-lab4">18.4 Lab 4 — Diagnose an incident</a><a href="#ch18-lab5">18.5 Lab 5 — Automate a change safely</a></div></div>
+    <p class="topic-desc">The capstone series ties the whole guide together in five guided labs run on your virtual lab kit. You build a routed two-site network, add VLANs and inter-VLAN routing, analyse an HTTPS session end to end, diagnose a planted incident, and automate a change with Ansible. Each lab is verified before you move on to the next.</p>
+    <h3 id="ch18-lab1" data-toc>18.1 Lab 1 — Two-site routed network</h3>
+    <p class="topic-desc">This lab joins two LANs into one routed network. Configure OSPF between the routers so both subnets learn each other’s routes, then add a DNS server and a DHCP server at one site to hand out addresses and names. Verify with ping across the link and dig for the DNS lookup. It is the classic small-enterprise core in a single lab.</p>
+    <div class="codeWrap"><pre><code>Goal: two LANs, two routers, OSPF between them, DNS + DHCP at site A.
+Build in GNS3/EVE-NG or with Linux namespaces.
+Verify: ping across sites, traceroute shows both hops,
+        clients get DHCP leases and resolve internal names.</code></pre></div>
+        <p class="code-note">The lab goal lists what to build, then the verify steps prove routing, leases, and name resolution all actually work.</p>
+    <h3 id="ch18-lab2" data-toc>18.2 Lab 2 — VLANs, trunking and inter-VLAN routing</h3>
+    <p class="topic-desc">This lab builds user, server, and voice VLANs across two switches. Configure access ports for each VLAN and an 802.1Q trunk between the switches, then route between the VLANs with a router-on-a-stick using subinterfaces. Capturing on the trunk shows the tagged frames carrying each VLAN ID, which proves the trunk is working. Confirm by pinging between hosts in different VLANs.</p>
+    <div class="codeWrap"><pre><code>Goal: VLAN 10 (users), VLAN 20 (servers), VLAN 30 (voice).
+Trunk between switches; router-on-a-stick for inter-VLAN.
+Verify: hosts in different VLANs reach each other only via the router,
+        capture 802.1Q tags on the trunk.</code></pre></div>
+        <p class="code-note">Inter-VLAN routing flows one way only, through the router, and captured 802.1Q tags on the trunk confirm the tagging.</p>
+    <h3 id="ch18-lab3" data-toc>18.3 Lab 3 — TLS and HTTPS analysis</h3>
+    <p class="topic-desc">This lab stands up HTTPS with a self-signed certificate and analyses the full TLS flow. Generate a key and certificate with openssl req, serve it from a simple web server, and capture on port 443 with Wireshark. Loading the private key into the TLS preferences decrypts the session, so you can read both the handshake details and the plaintext application data.</p>
+    <div class="codeWrap"><pre><code>Goal: stand up Nginx with a self-signed cert; capture the handshake.
+Verify: read ClientHello/ServerHello in Wireshark, identify SNI and ALPN,
+        confirm HTTP/2, then decrypt by importing the key (SSLKEYLOGFILE).</code></pre></div>
+        <p class="code-note">The verification list walks from reading the handshake to decrypting the session with SSLKEYLOGFILE.</p>
+    <h3 id="ch18-lab4" data-toc>18.4 Lab 4 — Diagnose an incident</h3>
+    <p class="topic-desc">This lab presents a broken network with planted root causes and forces you to debug it layer by layer. Work outward from the client with ip addr, ping, dig, ss, and tcpdump until the first failing check reveals the fault. Fix the cause, then document what failed, what you verified, and what corrected it. That documented reasoning is the whole troubleshooting job in miniature.</p>
+    <div class="codeWrap"><pre><code>Goal: given a broken scenario (wrong gateway, DNS failure,
+duplicate IP, MTU black hole, firewall drop), find and fix it.
+Method: layered checks, capture evidence, document root cause.</code></pre></div>
+<p class="code-note">Each plausible failure is listed up front, and the method demands evidence and a documented root cause before you call it fixed.</p>
+    <h3 id="ch18-lab5" data-toc>18.5 Lab 5 — Automate a change safely</h3>
+    <p class="topic-desc">This lab automates a switch change. Write an Ansible playbook that configures a VLAN and an interface description, run it against your lab device over SSH, and verify each task. Run it a second time and confirm it changes nothing, which proves the automation is idempotent. The result replaces risky manual CLI edits with repeatable, reviewable changes.</p>
+    <div class="codeWrap"><pre><code>Goal: use Ansible to push a VLAN + interface change to two switches.
+Add a pre-check and post-verify; make it idempotent; run it twice
+and confirm the second run changes nothing.</code></pre></div>
+<p class="code-note">Pre-checks and post-verify wrap the change, and repeating the run with zero diff confirms idempotency.</p>
+    <div class="ex"><h4 id="ch18-lab5--exercises-18">Exercises 18</h4><ol>
+      <li>Complete all five labs and write them up.</li>
+      <li>Add a packet capture as evidence for each.</li>
+      <li>Publish your lab topology as code (containerlab/GNS3).</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Protocol Reference &amp; Roadmap</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Protocol Reference &amp; Roadmap</button><div class="ch-toc-list"><a href="#app-ports">A.1 Protocol and port reference</a><a href="#app-toolkit">A.2 Command cheat sheet</a><a href="#app-roadmap">A.3 Roadmap: beginner to advanced</a><a href="#app-rules">A.4 Rules of thumb</a></div></div>
+    <p class="topic-desc">The appendix gathers reference material for everyday field work. It contains port and protocol tables, a command cheat sheet covering addressing, captures, DNS, sockets, and scans, a study roadmap from beginner to advanced, and a set of rules of thumb. Bookmark it and reach for it instead of guessing.</p>
+    <h3 id="app-ports" data-toc>A.1 Protocol and port reference</h3>
+    <p class="topic-desc">This table lists the well-known protocols and their ports used throughout the guide: SSH on 22, DNS on 53, DHCP on 67 and 68, NTP on 123, BGP on 179, HTTP on 80, HTTPS and DoH on 443, SNMP on 161 and 162, syslog on 514, RADIUS on 1812 and 1813, and TACACS+ on 49. Keep it handy when configuring firewalls and service access lists.</p>
+    <table>
+      <tr><th>Protocol</th><th>Port/Proto</th><th>Purpose</th></tr>
+      <tr><td>ARP</td><td>Ethertype 0x0806</td><td>IP → MAC</td></tr>
+      <tr><td>ICMP</td><td>IP proto 1</td><td>Errors, ping, traceroute</td></tr>
+      <tr><td>DNS</td><td>53 TCP/UDP</td><td>Name resolution</td></tr>
+      <tr><td>DHCP</td><td>67/68 UDP</td><td>Address assignment</td></tr>
+      <tr><td>NTP</td><td>123 UDP</td><td>Time sync</td></tr>
+      <tr><td>HTTP/HTTPS</td><td>80/443 TCP</td><td>Web</td></tr>
+      <tr><td>HTTP/3</td><td>443 UDP (QUIC)</td><td>Web over QUIC</td></tr>
+      <tr><td>SSH</td><td>22 TCP</td><td>Secure shell</td></tr>
+      <tr><td>SNMP</td><td>161/162 UDP</td><td>Monitoring</td></tr>
+      <tr><td>Syslog</td><td>514 / 6514 TLS</td><td>Logging</td></tr>
+      <tr><td>RADIUS</td><td>1812/1813 UDP</td><td>AAA</td></tr>
+      <tr><td>TACACS+</td><td>49 TCP</td><td>Device AAA</td></tr>
+      <tr><td>IPsec</td><td>500/4500 UDP, ESP</td><td>VPN</td></tr>
+      <tr><td>WireGuard</td><td>51820 UDP (default)</td><td>VPN</td></tr>
+      <tr><td>OSPF</td><td>IP proto 89</td><td>Routing</td></tr>
+      <tr><td>BGP</td><td>179 TCP</td><td>Routing</td></tr>
+    </table>
+    <h3 id="app-toolkit" data-toc>A.2 Command cheat sheet</h3>
+    <p class="topic-desc">This cheat sheet lists the essential commands for network work. Use ip addr, ip route, and ip neigh for addressing, ping and traceroute for reachability, dig and nslookup for DNS, ss and netstat for sockets, curl for HTTP, tcpdump for captures, and nmap for scans. Each entry shows the common flags so you can find an answer quickly.</p>
+    <table>
+      <tr><th>Task</th><th>Command</th></tr>
+      <tr><td>Addresses/routes</td><td><code>ip addr</code> · <code>ip route</code></td></tr>
+      <tr><td>Capture</td><td><code>tcpdump -nn -i eth0 -w c.pcap</code></td></tr>
+      <tr><td>DNS</td><td><code>dig +trace</code> · <code>dig -x</code></td></tr>
+      <tr><td>Sockets</td><td><code>ss -tanp</code></td></tr>
+      <tr><td>Port test</td><td><code>nc -vz host port</code></td></tr>
+      <tr><td>TLS cert</td><td><code>openssl s_client -connect h:443</code></td></tr>
+      <tr><td>Path</td><td><code>traceroute</code> · <code>mtr</code></td></tr>
+      <tr><td>Scan</td><td><code>nmap -sV host</code></td></tr>
+    </table>
+    <h3 id="app-roadmap" data-toc>A.3 Roadmap: beginner to advanced</h3>
+    <p class="topic-desc">This roadmap divides learning into four stages from beginner to expert. Each stage names the topics to master, starting with addressing and Ethernet, then TCP and DNS, then routing and security, and finally automation and design. Use it to pace your progression and to know exactly which skills to practise at each level.</p>
+    <table>
+      <tr><th>Stage</th><th>You can…</th></tr>
+      <tr><td>Beginner</td><td>Explain models, subnet, read a capture, use ping/dig/traceroute</td></tr>
+      <tr><td>Intermediate</td><td>TCP internals, VLAN/STP, OSPF, DNS/DHCP mechanics, TLS</td></tr>
+      <tr><td>Advanced</td><td>BGP, IPsec/WireGuard, packet-level debugging, automation, Wi-Fi</td></tr>
+      <tr><td>Expert</td><td>SDN/overlays, design + troubleshoot complex incidents, security architecture</td></tr>
+    </table>
+    <h3 id="app-rules" data-toc>A.4 Rules of thumb</h3>
+    <p class="topic-desc">This section collects short rules of thumb that resolve most real-world network mysteries. Examples include the first failing ping hop pointing at the fault, a 169.254.0.0/16 address meaning DHCP failed, and a dropped connection tracing back to an allow rule missing return traffic. Internalise them from day one and they become instinct during outages.</p>
+    <ul>
+      <li><strong>The packet never lies — capture it.</strong></li>
+      <li><strong>Name resolution first, then the path, then the port.</strong></li>
+      <li><strong>Longest prefix wins; symmetric paths matter.</strong></li>
+      <li><strong>DNS, MTU and NAT cause most "impossible" bugs.</strong></li>
+      <li><strong>Default-deny; segment; encrypt; monitor.</strong></li>
+      <li><strong>Automate changes; verify idempotency.</strong></li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Tech Networking — Protocols &amp; Hands-On Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

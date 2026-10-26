@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axios - HTTP Client Guide</title>
+<meta name="description" content="This guide teaches Axios, the promise-based HTTP client for the browser and Node.js, from your first request…. 12 chapters, 59 topics and 40 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/axios.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Axios - HTTP Client Guide">
+<meta property="og:description" content="This guide teaches Axios, the promise-based HTTP client for the browser and Node.js, from your first request…. 12 chapters, 59 topics and 40 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/axios.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Axios - HTTP Client Guide">
+<meta name="twitter:description" content="This guide teaches Axios, the promise-based HTTP client for the browser and Node.js, from your first request…. 12 chapters, 59 topics and 40 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/axios.html#article","headline":"Axios - HTTP Client Guide","name":"Axios - HTTP Client Guide","description":"This guide teaches Axios, the promise-based HTTP client for the browser and Node.js, from your first request…. 12 chapters, 59 topics and 40 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/axios.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/axios.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Axios - HTTP Client Guide","item":"https://amin360it.github.io/quick-guides/axios.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Axios</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This Axios Guide</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use all course long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Axios Fundamentals &amp; Setup</a><ul><li><a href="#ch1-what" data-target="ch1-what">1.1 What Axios is</a></li><li><a href="#ch1-install" data-target="ch1-install">1.2 Installing Axios</a></li><li><a href="#ch1-first" data-target="ch1-first">1.3 Your first request</a></li><li><a href="#ch1-environments" data-target="ch1-environments">1.4 Supported environments: ESM and CJS</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Making Requests</a><ul><li><a href="#ch2-verbs" data-target="ch2-verbs">2.1 The five HTTP verbs</a></li><li><a href="#ch2-config" data-target="ch2-config">2.2 The request config object</a></li><li><a href="#ch2-params" data-target="ch2-params">2.3 params, bodies and headers</a></li><li><a href="#ch2-concurrent" data-target="ch2-concurrent">2.4 Running requests concurrently</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Response Handling &amp; Data</a><ul><li><a href="#ch3-schema" data-target="ch3-schema">3.1 The response schema</a></li><li><a href="#ch3-json" data-target="ch3-json">3.2 JSON by default, and transforming responses</a></li><li><a href="#ch3-progress" data-target="ch3-progress">3.3 Upload and download progress</a></li><li><a href="#ch3-binary" data-target="ch3-binary">3.4 Binary data: blob, arraybuffer and stream</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Configuration &amp; Defaults</a><ul><li><a href="#ch4-defaults" data-target="ch4-defaults">4.1 Global defaults</a></li><li><a href="#ch4-instances" data-target="ch4-instances">4.2 Instances with axios.create</a></li><li><a href="#ch4-options" data-target="ch4-options">4.3 baseURL, timeout, headers and paramsSerializer</a></li><li><a href="#ch4-overrides" data-target="ch4-overrides">4.4 Per-request overrides and environment config</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Interceptors</a><ul><li><a href="#ch5-request" data-target="ch5-request">5.1 Request interceptors</a></li><li><a href="#ch5-response" data-target="ch5-response">5.2 Response interceptors</a></li><li><a href="#ch5-order" data-target="ch5-order">5.3 Ordering and ejecting interceptors</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Error Handling</a><ul><li><a href="#ch6-shape" data-target="ch6-shape">6.1 The error shape</a></li><li><a href="#ch6-status" data-target="ch6-status">6.2 Status-based handling with AxiosError</a></li><li><a href="#ch6-validate" data-target="ch6-validate">6.3 validateStatus and retry patterns</a></li><li><a href="#ch6-global" data-target="ch6-global">6.4 A global error interceptor</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Cancellation &amp; Timeouts</a><ul><li><a href="#ch7-abort" data-target="ch7-abort">7.1 Cancelling with AbortController</a></li><li><a href="#ch7-canceltoken" data-target="ch7-canceltoken">7.2 The legacy CancelToken</a></li><li><a href="#ch7-timeout" data-target="ch7-timeout">7.3 Timeouts</a></li><li><a href="#ch7-races" data-target="ch7-races">7.4 Race conditions and debouncing searches</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Authentication Patterns</a><ul><li><a href="#ch8-bearer" data-target="ch8-bearer">8.1 Bearer tokens</a></li><li><a href="#ch8-refresh" data-target="ch8-refresh">8.2 The refresh-token flow</a></li><li><a href="#ch8-cookies" data-target="ch8-cookies">8.3 Cookies and withCredentials</a></li><li><a href="#ch8-csrf" data-target="ch8-csrf">8.4 CSRF tokens and logout on 401</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Axios with Frameworks</a><ul><li><a href="#ch9-vue" data-target="ch9-vue">9.1 Vue 3: a service layer and composable</a></li><li><a href="#ch9-react" data-target="ch9-react">9.2 React: a data-fetching hook</a></li><li><a href="#ch9-nuxt" data-target="ch9-nuxt">9.3 Nuxt integration and SSR</a></li><li><a href="#ch9-node" data-target="ch9-node">9.4 Axios in Node and Express</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Testing &amp; Best Practices</a><ul><li><a href="#ch10-mockadapter" data-target="ch10-mockadapter">10.1 Mocking with axios-mock-adapter</a></li><li><a href="#ch10-msw" data-target="ch10-msw">10.2 Mock Service Worker</a></li><li><a href="#ch10-structure" data-target="ch10-structure">10.3 Structuring an API layer with TypeScript</a></li><li><a href="#ch10-quality" data-target="ch10-quality">10.4 Security and performance</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix — Quick Reference &amp; Glossary</a><ul><li><a href="#app-methods" data-target="app-methods">A.1 Request methods</a></li><li><a href="#app-config" data-target="app-config">A.2 Config options</a></li><li><a href="#app-response" data-target="app-response">A.3 Response and error fields</a></li><li><a href="#app-interceptors" data-target="app-interceptors">A.4 Interceptor and cancellation reference</a></li><li><a href="#app-glossary" data-target="app-glossary">A.5 Glossary</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Axios</span>
+      <span class="am-band-s">12 chapters &middot; 59 topics &middot; 40 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This Axios Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This Axios Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The right mindset</a><a href="#orientation-tools">Tools you will use all course long</a></div></div>
+    <p class="topic-desc">This guide teaches Axios, the promise-based HTTP client for the browser and Node.js, from your first request to production auth flows and testing. Work through the chapters in order and type out each code sample yourself instead of copying it, because typing builds muscle memory. Finish each chapter with its copy-ready code, then move on to the next topic.</p>
+    <p>This is a complete, self-paced path through <strong>Axios</strong>, the promise-based HTTP client for the browser and Node.js. Everything runs in a single HTML file — no internet required, progress is saved in your browser.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">Read this section to understand how the guide is organized: ten chapters that build on each other plus a reference appendix. Each chapter moves from a concept explanation to copy-ready code that you are expected to type out yourself. The appendix at the end gathers quick-reference tables and a glossary for fast lookup. Progress through the chapters sequentially and return to the appendix whenever you need a reminder.</p>
+    <ul>
+      <li><strong>Ch. 1–4</strong> — foundations: setup, requests, responses, and configuration.</li>
+      <li><strong>Ch. 5–8</strong> — real-world concerns: interceptors, errors, cancellation, and authentication.</li>
+      <li><strong>Ch. 9–10</strong> — integration: Vue, React, Nuxt, Node, testing, and best practices.</li>
+      <li>Every chapter ends with exercises. Code is copy-ready; type it rather than pasting to build muscle memory.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset</h3>
+    <p class="topic-desc">Explains the mindset behind Axios, a promise-based library that wraps plain HTTP requests with sensible defaults. Rather than memorizing every option, learn the single config object that every request is built from. Once you know where to set values and how to override defaults on individual requests, most questions resolve themselves. Approaching Axios this way turns unfamiliar errors and options into variations on the same request shape.</p>
+    <p>Axios rewards understanding one idea: every request is a plain <em>config object</em>, and every response is a promise that resolves to a rich response object. Sane defaults (JSON in and out, a 2xx rule, a timeout you control) mean small apps barely need configuration — the skill that scales is knowing exactly where to override those defaults.</p>
+    <div class="tip"><p>Keep the official docs open beside this guide at <code>axios-http.com/docs</code>. This guide explains the why and the sequence; the docs are the exhaustive reference.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will use all course long</h3>
+    <p class="topic-desc">Lists the tooling you will rely on throughout the course, including Node for running scripts, a browser for client-side demos, a REST API for real requests, and the browser Network tab for inspecting traffic. Install these once at the start so they carry you through every chapter. Keep the setup minimal and verify your installs by making the first request in chapter one.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Node.js 18+</td><td>Runtime that installs Axios via npm and can run it outside the browser</td></tr>
+      <tr><td>A browser</td><td>Run Axios against a real API and inspect traffic</td></tr>
+      <tr><td>An API to call</td><td>A public REST API (JSONPlaceholder) reused through the book</td></tr>
+      <tr><td>DevTools Network tab</td><td>Watch requests, status codes, timing, and headers as they happen</td></tr>
+      <tr><td>npm or a CDN</td><td>Install Axios in Node or load it straight from a script tag</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Axios Fundamentals &amp; Setup</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Axios Fundamentals &amp; Setup</button><div class="ch-toc-list"><a href="#ch1-what">1.1 What Axios is</a><a href="#ch1-install">1.2 Installing Axios</a><a href="#ch1-first">1.3 Your first request</a><a href="#ch1-environments">1.4 Supported environments: ESM and CJS</a></div></div>
+    <p class="topic-desc">Chapter one covers Axios fundamentals and setup, installing the library in both the browser and Node.js and comparing it with the built-in fetch API. You choose between an npm install for bundler projects or a CDN script tag for plain HTML pages. The chapter ends with your first request, which delivers parsed JSON data from a single line of code, establishing the core request-and-await pattern used everywhere later.</p>
+    <p>Axios is a promise-based HTTP client for the browser and Node.js: you hand it a method and a URL, and it returns a promise that resolves to a rich response. The request lifecycle stays the same everywhere — browser tab, build tool, tests, or a server function.</p>
+    <h3 id="ch1-what" data-toc>1.1 What Axios is</h3>
+    <p class="topic-desc">Explains what Axios is and contrasts it with the built-in fetch API so you know when each shines. Both send the same HTTP requests, but Axios adds a convenience layer on top including automatic JSON handling, request config objects, interceptors, and consistent error handling. Use fetch when you want zero dependencies and the native API, and reach for Axios when you want defaults and features that keep request code short.</p>
+    <table>
+      <tr><th>Capability</th><th>Axios</th><th>fetch</th></tr>
+      <tr><td>JSON handling</td><td>Parses and stringifies automatically</td><td>Manual res.json() / JSON.stringify</td></tr>
+      <tr><td>Response shape</td><td>data, status, headers, config together</td><td>Status on the response, body via methods</td></tr>
+      <tr><td>HTTP errors</td><td>Rejects for non-2xx by default</td><td>Rejects only on network failure</td></tr>
+      <tr><td>Timeout</td><td>Built-in timeout option</td><td>Needs AbortSignal.timeout</td></tr>
+      <tr><td>Progress</td><td>Upload and download callbacks</td><td>Streams read manually</td></tr>
+    </table>
+    <p>None of this is magic that the browser cannot do with fetch — Axios packages it so your call sites stay short and consistent.</p>
+    <h3 id="ch1-install" data-toc>1.2 Installing Axios</h3>
+    <p class="topic-desc">Shows the two standard ways to install Axios for your environment. In Node or bundler projects you run npm install axios and import the package in your code. For a plain HTML page you add a CDN script tag pointing at the axios bundle, which exposes axios globally in the browser. After following one of these paths you have the package available in scope and ready for a first request.</p>
+    <div class="codeWrap"><pre><code># Node / bundler projects
+npm install axios
+# yarn add axios   |   pnpm add axios
+# TypeScript types are bundled — no @types package needed</code></pre></div>
+    <p class="code-note">npm install adds axios to your project dependencies, and modern axios ships its own TypeScript definitions, so no separate @types package is required.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- Browser without a build step: a CDN exposes the global axios object --&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  axios.get('/api/ping');   // works immediately, no import needed
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">The CDN build attaches axios to window so a plain HTML page can start calling it at once, which is handy for demos and small static pages.</p>
+    <h3 id="ch1-first" data-toc>1.3 Your first request</h3>
+    <p class="topic-desc">Makes your very first request with axios.get, awaiting the response and reading the parsed JSON from the data property. The pattern is one await and one response shape: call a method, await it, and use the returned data. Everything Axios does later, from config options to interceptors, is a variation on this same request, await, and read data flow.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+async function loadPost() {
+  const res = await axios.get('https://jsonplaceholder.typicode.com/posts/1');
+  console.log(res.status);        // 200
+  console.log(res.data.title);    // the JSON body, already parsed into an object
+}
+
+loadPost().catch((err) =&gt; console.error(err.message));   // handle failures separately</code></pre></div>
+    <p class="code-note">axios.get returns a promise that resolves to a response object, and res.data is the JSON decoded for you — no .json() call anywhere.</p>
+    <h3 id="ch1-environments" data-toc>1.4 Supported environments: ESM and CJS</h3>
+    <p class="topic-desc">Covers the environments Axios supports and how to import it, which differs between ES modules and CommonJS. In modern bundlers you add axios as an import from the axios package at the top of your module, while CommonJS projects pull it in with the require function. The API is identical in both cases, so only the import line changes. Choose the import style that matches your project’s module system.</p>
+    <div class="codeWrap"><pre><code>// CommonJS (Node.js)
+const axios = require('axios');
+
+// ES modules (Node 18+ or a bundler like Vite/Webpack)
+import axios from 'axios';
+
+// Both hand you the same instance: methods, defaults, interceptors, cancel.</code></pre></div>
+    <p class="code-note">Axios supports both module systems plus the browser global, so the import line is the only difference between your Node scripts, bundler apps, and test files.</p>
+    <div class="ex"><h4 id="ch1-environments--exercises-1">Exercises 1</h4><ol>
+      <li>Install axios and log <code>axios.VERSION</code> to the console.</li>
+      <li>Load the CDN build in a plain HTML page and make one GET call.</li>
+      <li>Fetch <code>https://jsonplaceholder.typicode.com/users</code> and print the first user’s name.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Making Requests</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Making Requests</button><div class="ch-toc-list"><a href="#ch2-verbs">2.1 The five HTTP verbs</a><a href="#ch2-config">2.2 The request config object</a><a href="#ch2-params">2.3 params, bodies and headers</a><a href="#ch2-concurrent">2.4 Running requests concurrently</a></div></div>
+    <p class="topic-desc">Chapter two is about making requests and covers the five HTTP verbs, the shorthand alias methods, the config object, params, headers, and concurrent requests. You learn that aliases such as get, post, put, patch, and delete are sugar over the low-level axios(config) call. By the end you have written every request shape Axios offers, from a simple GET to requests carrying bodies, query params, and custom headers.</p>
+    <p>Axios exposes two ways to fire a request: <em>method aliases</em> like axios.get, and one <em>config object</em> you pass to axios(). They are the same thing under the hood — aliases are sugar that fills in the method for you.</p>
+    <h3 id="ch2-verbs" data-toc>2.1 The five HTTP verbs</h3>
+    <p class="topic-desc">Shows the alias method for each of the five HTTP verbs and the argument order each one expects. For aliases such as get, delete, and head the URL is the first argument and config the second, while post, put, and patch take the data as their second argument and config as the third. Learn this one rule and you can call any verb correctly without looking anything up.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+await axios.get('/api/users');                     // read — data goes in params
+await axios.post('/api/users', { name: 'Ada' });   // create — body is arg 2
+await axios.put('/api/users/1', { name: 'Enid' }); // replace the whole record
+await axios.patch('/api/users/1', { name: 'Ada' }); // update a few fields
+await axios.delete('/api/users/1', {               // config is arg 2 here
+  headers: { 'X-Reason': 'duplicate account' },
+});</code></pre></div>
+    <p class="code-note">Every alias follows the pattern axios.method(url, data?, config?), and objects passed as data are stringified to JSON with the right Content-Type automatically.</p>
+    <h3 id="ch2-config" data-toc>2.2 The request config object</h3>
+    <p class="topic-desc">Introduces axios(config) as the low-level form of every request, where the whole request is described as one config object. The config holds the URL, method, params, data, headers, timeout, and every other option. Anything you can do with an alias like axios.get you can also do with this object, making it the most flexible way to issue a request. Most other chapters build directly on this object.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+const promise = axios({
+  method: 'get',          // default is get
+  url: '/users',
+  params: { page: 2 },    // serialized into the query string
+  headers: { Accept: 'application/json' },
+  timeout: 5000,          // give up after 5 seconds
+});
+
+// The aliases build exactly this object:
+// axios.get(url, cfg) === axios({ method: 'get', url, ...cfg })</code></pre></div>
+    <p class="code-note">The config object is the single vocabulary of Axios, and method aliases are just shortcuts that fill in the method field for you.</p>
+    <h3 id="ch2-params" data-toc>2.3 params, bodies and headers</h3>
+    <p class="topic-desc">Shows where GET params, POST bodies, and custom headers each live inside the config object. Query parameters for a GET go in the params property, a request body for methods like POST and PUT goes in the data property, and custom headers go in the headers property. Combining them in one config object lets a single request carry query strings, a payload, and authentication all at once.</p>
+    <div class="codeWrap"><pre><code>// GET: params become the query string, array-aware
+await axios.get('/api/search', {
+  params: { q: 'axios', per_page: 10, tags: ['js', 'http'] },
+});
+// =&gt; /api/search?q=axios&amp;per_page=10&amp;tags%5B%5D=js&amp;tags%5B%5D=http
+
+// POST: data becomes the JSON body, headers can be mixed in
+await axios.post('/api/login', { email, password }, {
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Client': 'web',          // any custom header you need
+  },
+});</code></pre></div>
+    <p class="code-note">params, data, and headers each have their own slot in the config, and Axios serializes params into the URL and data into the body for you.</p>
+    <h3 id="ch2-concurrent" data-toc>2.4 Running requests concurrently</h3>
+    <p class="topic-desc">Explains how to run several requests in parallel and wait for all of them to finish. Use Promise.all with an array of axios request promises, and note that axios.all and axios.spread are now legacy aliases for the same Promise behavior. This pattern suits loading independent resources at once, where responses can arrive in any order. Await the combined promise and read each result from the data property.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+// legacy pair: axios.all([...]).then(axios.spread(fn))
+const responses = await axios.all([
+  axios.get('/api/posts'),
+  axios.get('/api/users'),
+]);   // responses is an array of two response objects
+
+// modern equivalent — plain Promise.all with destructuring
+const [postsRes, usersRes] = await Promise.all([
+  axios.get('/api/posts'),
+  axios.get('/api/users'),
+]);</code></pre></div>
+    <p class="code-note">Parallel requests are ordinary promises combined with Promise.all; axios.all and axios.spread exist for older code but do exactly the same thing.</p>
+    <div class="ex"><h4 id="ch2-concurrent--exercises-2">Exercises 2</h4><ol>
+      <li>Run a GET and log both <code>status</code> and <code>data</code>.</li>
+      <li>POST a new user to JSONPlaceholder and confirm the returned id.</li>
+      <li>Fetch three resources concurrently and merge them into one object.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Response Handling &amp; Data</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Response Handling &amp; Data</button><div class="ch-toc-list"><a href="#ch3-schema">3.1 The response schema</a><a href="#ch3-json">3.2 JSON by default, and transforming responses</a><a href="#ch3-progress">3.3 Upload and download progress</a><a href="#ch3-binary">3.4 Binary data: blob, arraybuffer and stream</a></div></div>
+    <p class="topic-desc">Chapter three covers response handling and data, deconstructing the response schema and showing how to transform payloads, read binary data, and track transfer progress. You learn that Axios parses JSON automatically and that the transformResponse option can reshape data before your code sees it. The chapter also covers responseType for binary formats and callbacks for measuring progress, so you can shape what your app receives and know how long it takes.</p>
+    <p>A fulfilled Axios promise resolves to a response object with a fixed shape. Its fields are predictable, so the same handling code works for a tiny JSON endpoint or a multi-gigabyte download.</p>
+    <h3 id="ch3-schema" data-toc>3.1 The response schema</h3>
+    <p class="topic-desc">Maps every field on the Axios response object so you know what a resolved request gives you. The data field holds the parsed payload your app actually uses, while status, statusText, headers, config, and request carry the metadata your debugger and error handling want. Learning this shape means you always know where to read the body, verify the status code, and inspect the outgoing configuration.</p>
+    <div class="codeWrap"><pre><code>const res = await axios.get('/api/users/1');
+
+res.data;        // the parsed body (already a JS object for JSON APIs)
+res.status;      // 200
+res.statusText;  // 'OK'
+res.headers;     // response headers (lower-cased keys)
+res.config;      // the exact config object this request used
+res.request;     // underlying XMLHttpRequest (browser) or request handle (Node)</code></pre></div>
+    <p class="code-note">The response object bundles the parsed body with status, headers, and the config that produced it — everything you need to handle or debug a request.</p>
+    <div class="tip"><p>res.config is a debugging goldmine — it shows the final URL, headers, params, and timeout after interceptors ran.</p></div>
+    <h3 id="ch3-json" data-toc>3.2 JSON by default, and transforming responses</h3>
+    <p class="topic-desc">Shows how Axios handles JSON automatically, serializing objects you send and parsing JSON into JavaScript objects on the way back. For payloads that need reshaping, the transformResponse config option runs your function on the response data before your code receives it. Small APIs commonly need no transformation at all because the default JSON behavior covers text, objects, and arrays. Set the transform when an API returns a shape you want normalized.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+// JSON is the default content type: objects in, objects out
+const { data } = await axios.post('/api/search', { q: 'router' }, {
+  headers: { 'Content-Type': 'application/json' },
+});
+
+// transformResponse: an array of functions run after parsing, in order
+const api = axios.create({
+  transformResponse: [
+    ...axios.defaults.transformResponse,   // keep the built-in JSON parser
+    (payload) =&gt; {
+      if (payload &amp;&amp; Array.isArray(payload.items)) {
+        return { users: payload.items, total: payload.total };   // reshape
+      }
+      return payload;
+    },
+  ],
+});</code></pre></div>
+    <p class="code-note">JSON just works, and transformResponse lets you reshape every payload centrally — as long as you spread the default transformers first, parsing still happens.</p>
+    <h3 id="ch3-progress" data-toc>3.3 Upload and download progress</h3>
+    <p class="topic-desc">Tracks upload and download progress by passing the onUploadProgress and onDownloadProgress callbacks in the config. Each callback receives an event carrying loaded and total bytes, which you use to compute a percentage for progress bars, upload spinners, and large file feeds. Attach the callbacks per request or per instance, and update your UI from the reported values as transfers proceed.</p>
+    <div class="codeWrap"><pre><code>// Upload: FormData goes straight into data
+const form = new FormData();
+form.append('file', fileInput.files[0]);
+
+await axios.post('/api/upload', form, {
+  onUploadProgress: (e) =&gt; {
+    const pct = e.total ? Math.round((e.loaded / e.total) * 100) : null;
+    updateProgressBar(pct);   // render a bar for each chunk report
+  },
+});
+
+// Download
+await axios.get('/api/report.csv', {
+  responseType: 'blob',
+  onDownloadProgress: (e) =&gt; {
+    console.log(`${e.loaded} / ${e.total} bytes`);   // e.total may be null
+  },
+});</code></pre></div>
+    <p class="code-note">onUploadProgress and onDownloadProgress receive progress events with loaded and total, so you can render a bar on both sides of a transfer.</p>
+    <h3 id="ch3-binary" data-toc>3.4 Binary data: blob, arraybuffer and stream</h3>
+    <p class="topic-desc">Explains how to request binary payloads by setting the responseType config option to blob or arraybuffer in the browser, and to stream in Node. The format you choose determines what lands in the response data, matching the environment’s strengths: blobs and arraybuffers suit client-side downloads, while a stream lets Node process large bodies incrementally. Select responseType based on what your consumer expects to read.</p>
+    <div class="codeWrap"><pre><code>// ArrayBuffer for processing in memory (browser or Node)
+const { data } = await axios.get('/api/file.bin', { responseType: 'arraybuffer' });
+const bytes = new Uint8Array(data);
+
+// Blob in the browser — make it a clickable image
+const res = await axios.get('/img/logo.png', { responseType: 'blob' });
+const url = URL.createObjectURL(res.data);
+document.querySelector('#logo').src = url;
+
+// Stream in Node — write to disk without holding it all in memory
+import { createWriteStream } from 'node:fs';
+const resp = await axios.get('https://example.com/big.zip', { responseType: 'stream' });
+resp.data.pipe(createWriteStream('big.zip'));</code></pre></div>
+    <p class="code-note">responseType tells Axios to hand back blob, arraybuffer, or a readable stream, letting you transfer files without loading everything into RAM.</p>
+    <div class="ex"><h4 id="ch3-binary--exercises-3">Exercises 3</h4><ol>
+      <li>Log all six fields of a response object for one request.</li>
+      <li>Download an image as a blob and show it in a page.</li>
+      <li>Log download progress for a large JSON payload.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Configuration &amp; Defaults</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Configuration &amp; Defaults</button><div class="ch-toc-list"><a href="#ch4-defaults">4.1 Global defaults</a><a href="#ch4-instances">4.2 Instances with axios.create</a><a href="#ch4-options">4.3 baseURL, timeout, headers and paramsSerializer</a><a href="#ch4-overrides">4.4 Per-request overrides and environment config</a></div></div>
+    <p class="topic-desc">Chapter four covers configuration and defaults, showing how to stop repeating options on every call. You set global defaults directly on the axios object, or better, create instances with axios.create that carry their own baseURL, timeout, headers, and other options. Per-request config always wins over instance defaults, which win over global defaults, letting you override precisely when needed. Environment variables can feed baseURLs so config differs per deployment.</p>
+    <p>Configuration in Axios has three layers — global defaults, instance defaults, and per-request overrides — merged in that order. Once you internalize the merge order, every configuration question answers itself.</p>
+    <h3 id="ch4-defaults" data-toc>4.1 Global defaults</h3>
+    <p class="topic-desc">Shows how to set application-wide defaults directly on the shared axios object, for example axios.defaults.timeout and axios.defaults.headers. Common keys are the timeout, the base URL, and default headers applied to every request. Global defaults are the right layer for one-off apps and demos, but for real projects the axios.create instance approach keeps config better contained. Individual requests can still override any global default with their own options.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+axios.defaults.baseURL = 'https://api.example.com/v2';
+axios.defaults.timeout = 10000;
+axios.defaults.headers.common['Accept'] = 'application/json';
+
+// short calls now resolve against the defaults
+const { data } = await axios.get('/users');   // https://api.example.com/v2/users</code></pre></div>
+    <p class="code-note">Global defaults lift shared settings out of every call, so relative URLs like /users resolve against the baseURL you set once.</p>
+    <h3 id="ch4-instances" data-toc>4.2 Instances with axios.create</h3>
+    <p class="topic-desc">Creates separate HTTP clients with their own defaults using axios.create, passing baseURL, timeout, headers, and other options in the call. Each instance exposes the full request API, so you call instance.get and instance.post exactly as on the global axios. Instances are the recommended approach for real applications because they let different parts of an app talk to different APIs with independent defaults. Per-request config can still override anything on an instance.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+const authApi = axios.create({
+  baseURL: 'https://sso.example.com',
+  timeout: 5000,
+});
+
+const dataApi = axios.create({
+  baseURL: 'https://data.example.com',
+  timeout: 15000,
+  headers: { 'X-Data-Token': process.env.DATA_TOKEN },
+});
+
+export { authApi, dataApi };   // two clients, independent defaults and interceptors</code></pre></div>
+    <p class="code-note">Each instance carries its own defaults and interceptors, so one app can talk to several APIs without mixing up tokens or timeouts.</p>
+    <h3 id="ch4-options" data-toc>4.3 baseURL, timeout, headers and paramsSerializer</h3>
+    <p class="topic-desc">Covers the daily config options: baseURL for prefixing relative URLs, timeout for failing slow requests, headers for per-call HTTP headers, and paramsSerializer for customizing how params become a query string. A custom paramsSerializer is useful when the default style does not match what the API expects. These options can live at the global, instance, or request level, giving you consistent defaults with precise per-request overrides.</p>
+    <div class="codeWrap"><pre><code>const api = axios.create({
+  baseURL: 'https://api.example.com',
+  timeout: 5000,                      // abort after 5s of inactivity
+  headers: { 'X-App-Version': '1.4.0' },
+
+  // some backends want plain key=value pairs, no brackets
+  paramsSerializer: (params) =&gt;
+    Object.entries(params)
+      .map(([key, value]) =&gt; `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&amp;'),
+});
+
+// now all calls share the baseURL, timeout, and serializer
+await api.get('/search', { params: { q: 'axios' } });</code></pre></div>
+    <p class="code-note">Instance options layer up (baseURL, timeout, headers, serializer) so every request inherits them, and paramsSerializer lets you match a backend’s exact query style.</p>
+    <h3 id="ch4-overrides" data-toc>4.4 Per-request overrides and environment config</h3>
+    <p class="topic-desc">Shows how config precedence works: a per-request config object always wins, followed by instance defaults, then global defaults, so scarce overrides stay local. Environment variables feed values such as baseURL so the same code adapts to development, staging, and production. Put anything that differs per environment in an env var rather than hard-coding it. Read the value once, apply it in defaults or a create call, and keep secrets out of source.</p>
+    <div class="codeWrap"><pre><code>// per-request options override instance and global defaults every time
+const slow = await api.get('/slow-report', { timeout: 60000, params: { full: 1 } });
+
+// environment-driven base URL (Node or a bundler like Vite)
+const API_URL =
+  process.env.API_URL ??
+  (import.meta.env ? import.meta.env.VITE_API_URL : null) ??
+  'https://default.example.com';
+
+const client = axios.create({ baseURL: API_URL });</code></pre></div>
+    <p class="code-note">The merge order is request over instance over global, and baseURL should come from environment configuration so the same code runs in dev, staging, and production.</p>
+    <div class="ex"><h4 id="ch4-overrides--exercises-4">Exercises 4</h4><ol>
+      <li>Create a dataApi instance with a baseURL and a 10s timeout.</li>
+      <li>Send one request with a header set at all three layers and inspect which wins.</li>
+      <li>Write a custom <code>paramsSerializer</code> that omits dates from the query string.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Interceptors</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Interceptors</button><div class="ch-toc-list"><a href="#ch5-request">5.1 Request interceptors</a><a href="#ch5-response">5.2 Response interceptors</a><a href="#ch5-order">5.3 Ordering and ejecting interceptors</a></div></div>
+    <p class="topic-desc">Chapter five covers interceptors, middleware that runs on every request and response so cross-cutting concerns live in one place. Request interceptors can stamp auth headers, add logging, or queue retries, while response interceptors normalize errors and unwrap payloads. You register them with axios.interceptors.request.use and axios.interceptors.response.use, and they chain forward in order and reverse on the way back. Centralize once instead of repeating logic at every call site.</p>
+    <p>Interceptors are functions that run for every request before it is sent and for every response before it is delivered. They are where auth tokens, logging, and common error handling belong — not sprinkled across your call sites.</p>
+    <h3 id="ch5-request" data-toc>5.1 Request interceptors</h3>
+    <p class="topic-desc">Attaches a handler that runs before each request is sent, registered with axios.interceptors.request.use. The canonical use is stamping an Authorization header onto every call so individual requests stay simple and secure. The interceptor receives the config object and returns it, possibly modified, for the request to continue. This centralizes token attachment so no call site has to think about headers.</p>
+    <div class="codeWrap"><pre><code>api.interceptors.request.use(
+  (config) =&gt; {
+    const token = authStore.getToken();               // from memory or a store
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`; // attach it everywhere
+    }
+    config.metadata = { startedAt: Date.now() };      // stamp for later timing
+    return config;                                     // required — hand it onward
+  },
+  (error) =&gt; Promise.reject(error),                   // outbound errors skip the chain
+);</code></pre></div>
+    <p class="code-note">The request interceptor mutates config (token, timing metadata) and must return it, so every call downstream carries the same enriched headers.</p>
+    <h3 id="ch5-response" data-toc>5.2 Response interceptors</h3>
+    <p class="topic-desc">Intercepts both successful responses and failures by passing callbacks to axios.interceptors.response.use. The success callback receives the response object, while the error callback receives the error and can normalize it before it reaches your code. Error normalization here flattens messy API errors into one consistent shape callers can trust. Because the handler runs for every response, one registered interceptor covers the whole application.</p>
+    <div class="codeWrap"><pre><code>api.interceptors.response.use(
+  (response) =&gt; response,                            // success: pass through unchanged
+  (error) =&gt; {
+    if (!error.response) {
+      // network failure — no server ever replied
+      console.warn('Network error:', error.message);
+      error.userMessage = 'You appear to be offline.';
+      return Promise.reject(error);
+    }
+    // map statuses to a friendly message every caller can rely on
+    const messages = { 403: 'No permission', 404: 'Not found', 422: 'Check your input' };
+    error.userMessage =
+      messages[error.response.status] ?? 'Something went wrong.';
+    return Promise.reject(error);
+  },
+);</code></pre></div>
+    <p class="code-note">Response interceptors see successes and failures: network errors and status codes get normalized to a consistent userMessage that components display.</p>
+    <h3 id="ch5-order" data-toc>5.3 Ordering and ejecting interceptors</h3>
+    <p class="topic-desc">Explains how Axios executes registered interceptors and how to remove them later. Request interceptors run in registration order, while response interceptors run in reverse order, the last one registered running first on the way back. To remove one, store the id returned by the use call and pass it to axios.interceptors.request.eject or its response equivalent. Removing an interceptor detaches its handler for all subsequent requests.</p>
+    <div class="codeWrap"><pre><code>const first = api.interceptors.request.use((c) =&gt; { console.log('first'); return c; });
+const second = api.interceptors.request.use((c) =&gt; { console.log('second'); return c; });
+// log order for one request: 'first', 'second' (registration order)
+
+// response handlers run in reverse: the last one registered is called first
+
+api.interceptors.request.eject(first);    // remove one by the id use() returned
+api.interceptors.request.clear();         // or remove them all for a fresh state</code></pre></div>
+    <p class="code-note">Ordering matters when interceptors depend on each other — requests run in, responses run back — and eject() removes a specific handler by its registration id.</p>
+    <div class="ex"><h4 id="ch5-order--exercises-5">Exercises 5</h4><ol>
+      <li>Add a request interceptor that logs the method and URL of every call.</li>
+      <li>Normalize 401 and 403 errors into a single message in one interceptor.</li>
+      <li>Register two interceptors, confirm the order, then eject one.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Error Handling</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Error Handling</button><div class="ch-toc-list"><a href="#ch6-shape">6.1 The error shape</a><a href="#ch6-status">6.2 Status-based handling with AxiosError</a><a href="#ch6-validate">6.3 validateStatus and retry patterns</a><a href="#ch6-global">6.4 A global error interceptor</a></div></div>
+    <p class="topic-desc">Chapter six covers error handling by decoding the AxiosError shape and classifying failures by HTTP status. You learn where failures surface on the error, across the message, the request, and the response, and use instanceof AxiosError plus optional chaining to distinguish network failures from server rejections. The chapter adds validateStatus for controlling which statuses count as errors, and retry patterns for transient failures. A global interceptor centralizes reactions such as toasts and redirects.</p>
+    <p>Axios rejects with AxiosError for every failure — but failure means different things: a network outage, a timeout, a 404, or a 500. The skill is reading <code>error.code</code>, <code>error.response</code>, and <code>error.request</code> to classify each one.</p>
+    <h3 id="ch6-shape" data-toc>6.1 The error shape</h3>
+    <p class="topic-desc">Maps the three places a failed request can surface: the error message, the error.request object, and the error.response object. A network failure before a response arrives leaves response undefined while request is present, and a server rejection fills response with status, data, and headers. Determining which of these is present tells you where the chain broke. Build your error handling around these three properties.</p>
+    <div class="codeWrap"><pre><code>try {
+  await axios.get('/api/users');
+} catch (error) {
+  error.message;         // readable summary, e.g. 'Request failed with status code 404'
+  error.response;        // present when the server answered (has .status and .data)
+  error.request;         // present when nothing came back (network failure, timeout)
+  error.isAxiosError;    // true for every error Axios produces
+  error.code;            // machine code: 'ERR_BAD_REQUEST', 'ERR_NETWORK', 'ECONNABORTED'
+}</code></pre></div>
+    <p class="code-note">An AxiosError tells you where the request died: response means the server answered with an error status, request alone means the network never delivered one.</p>
+    <h3 id="ch6-status" data-toc>6.2 Status-based handling with AxiosError</h3>
+    <p class="topic-desc">Classifies failures by status code using instanceof AxiosError and optional chaining on the response. Treat 4xx statuses as business logic, such as validation errors or rejected auth, where the app should show a message, and 5xx as infrastructure trouble worth retrying or alerting. Read error.response.status to pick the branch, and fall back to generic network handling when status is undefined. Guard every read so a missing response never throws.</p>
+    <div class="codeWrap"><pre><code>import axios, { AxiosError } from 'axios';
+
+try {
+  await api.post('/login', creds);
+} catch (error) {
+  if (error instanceof AxiosError) {
+    const status = error.response?.status;
+
+    if (status === 401) return showLoginForm();
+    if (status === 422) return showFieldErrors(error.response.data.errors);
+    if (status === 429) return showRetryNotice();       // rate-limited
+    if (!error.response) return showOfflineBanner();    // network failure
+    if (status &gt;= 500) return showServerError();        // upstream broke
+  }
+  throw error;   // anything unexpected: let it bubble to a global handler
+}</code></pre></div>
+    <p class="code-note">instanceof AxiosError reliably detects Axios failures, optional chaining on error.response handles the no-reply case, and each status routes to its own UX.</p>
+    <h3 id="ch6-validate" data-toc>6.3 validateStatus and retry patterns</h3>
+    <p class="topic-desc">Shows how to change which statuses count as errors using the validateStatus config option, which receives a status code and returns a boolean. Returning true for statuses such as 404 lets your code read the response without entering the error path. The chapter also covers retry patterns for transient failures, where you catch an AxiosError, check that it is retryable, and re-run the request a limited number of times. Temporary glitches then never surface as red screens.</p>
+    <div class="codeWrap"><pre><code>// treat 304 as a fulfilled response instead of a thrown error
+const api = axios.create({
+  validateStatus: (status) =&gt; (status &gt;= 200 &amp;&amp; status &lt; 300) || status === 304,
+});
+
+// retry only what is likely transient: network errors and 5xx
+async function getWithRetry(url, { retries = 3, delayMs = 500 } = {}) {
+  for (let attempt = 1; attempt &lt;= retries; attempt++) {
+    try {
+      return await api.get(url);
+    } catch (error) {
+      const transient = !error.response || error.response.status &gt;= 500;
+      if (!transient || attempt === retries) throw error;
+      await new Promise((r) =&gt; setTimeout(r, delayMs * attempt));   // back off linearly
+    }
+  }
+}</code></pre></div>
+    <p class="code-note">validateStatus redefines what counts as an error, and getWithRetry retries only network errors and 5xx responses with a small backoff, never 4xx client mistakes.</p>
+    <h3 id="ch6-global" data-toc>6.4 A global error interceptor</h3>
+    <p class="topic-desc">Centralizes error reactions in one global response interceptor so every axios call gets consistent treatment. In the error callback you can show a toast, redirect to login, or reset the session, and then rethrow or resolve so local call sites stay small. Pair the global handler with local catch blocks for per-request details that only that caller knows. This keeps error UI consistent while preserving fine-grained control where needed.</p>
+    <div class="codeWrap"><pre><code>api.interceptors.response.use(
+  (response) =&gt; response,
+  (error) =&gt; {
+    const status = error.response?.status;
+    if (status === 401) redirectToLogin();        // session expired, once
+    if (status &amp;&amp; status &gt;= 500) toast('Server hiccup — please retry.');
+    if (!error.response) toast('You seem to be offline.');
+    return Promise.reject(error);                 // local handlers still run
+  },
+);
+
+// call sites stay readable — the interceptor handles the noise
+try {
+  await api.post('/comments', body);
+} catch (error) {
+  if (error.response?.status === 422) showInlineErrors(error.response.data.errors);
+}</code></pre></div>
+    <p class="code-note">A response interceptor handles global reactions (toasts, redirects) while call sites handle only local details, because the interceptor still re-rejects the error.</p>
+    <div class="ex"><h4 id="ch6-global--exercises-6">Exercises 6</h4><ol>
+      <li>Write a handler that prints a different message for 401, 404, and network errors.</li>
+      <li>Configure <code>validateStatus</code> so 404 falls through, and prove it with a test call.</li>
+      <li>Wrap a flaky endpoint with a retry that retries exactly twice.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Cancellation &amp; Timeouts</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Cancellation &amp; Timeouts</button><div class="ch-toc-list"><a href="#ch7-abort">7.1 Cancelling with AbortController</a><a href="#ch7-canceltoken">7.2 The legacy CancelToken</a><a href="#ch7-timeout">7.3 Timeouts</a><a href="#ch7-races">7.4 Race conditions and debouncing searches</a></div></div>
+    <p class="topic-desc">Chapter seven covers cancellation and timeouts so stale requests never waste work or hang the UI. The modern approach uses the AbortController API, passed through the signal config option, and the legacy CancelToken API is shown for reading older code. A timeout config option fails slow requests fast with code ECONNABORTED. Race-condition patterns and debouncing ensure the newest request always wins in a user interface.</p>
+    <p>Two tools control how long a request may live: <code>timeout</code> aborts after silence, and an <em>abort signal</em> cancels on demand. Both exist because the alternative — letting every request run to completion — produces stale UI and wasted bandwidth.</p>
+    <h3 id="ch7-abort" data-toc>7.1 Cancelling with AbortController</h3>
+    <p class="topic-desc">Uses the modern AbortController API to cancel one or more requests. Create an AbortController, pass its signal in the request config, and call controller.abort() to cancel the in-flight request, which rejects with an error whose code is ERR_CANCELED. Aborting is the current recommended approach for new code. Attach the same signal to several requests to cancel them all together.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+const controller = new AbortController();     // one signal, shared if you like
+
+const promise = axios.get('/api/report', { signal: controller.signal });
+
+// cancel from a button handler, an unmount hook, or a timer
+controller.abort();
+
+promise.catch((error) =&gt; {
+  if (axios.isCancel(error)) {
+    console.log('Request cancelled:', error.message);   // silently ignore
+  }
+});</code></pre></div>
+    <p class="code-note">controller.abort() fires the signal and the in-flight request rejects with a cancel error; axios.isCancel lets you ignore those silently and rethrow everything else.</p>
+    <h3 id="ch7-canceltoken" data-toc>7.2 The legacy CancelToken</h3>
+    <p class="topic-desc">Shows the legacy CancelToken API so you can read and fix existing code that uses it. You create a token with axios.CancelToken.source(), pass token in the config, and call source.cancel with an optional message when you want to abort. The cancel reason surfaces in error.code as ERR_CANCELED. Migrate new work to the AbortController approach, keeping CancelToken only for maintaining code that already uses it.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+const source = axios.CancelToken.source();     // a token plus its cancel function
+
+axios.get('/api/slow', { cancelToken: source.token })
+  .catch((error) =&gt; {
+    if (axios.isCancel(error)) console.log('cancelled by caller');
+  });
+
+source.cancel('user navigated away');          // choose the message seen above</code></pre></div>
+    <p class="code-note">CancelToken.source gives you a token to pass and a cancel() to call later; it still works but is deprecated in favour of AbortController.</p>
+    <h3 id="ch7-timeout" data-toc>7.3 Timeouts</h3>
+    <p class="topic-desc">Sets a timeout config option in milliseconds so slow servers fail fast instead of hanging a request forever. When a request takes longer than the timeout, Axios aborts it and rejects with an AxiosError whose code is ECONNABORTED and whose message describes the timeout. Keep users from staring at spinners by choosing a sane value per request or per instance. Handle the timeout error like any other AxiosError at the call site.</p>
+    <div class="codeWrap"><pre><code>const api = axios.create({ timeout: 5000 });   // 5s of no data aborts the request
+
+try {
+  const { data } = await api.get('/stats');
+} catch (error) {
+  if (error.code === 'ECONNABORTED') {
+    console.error('Timed out after 5 seconds');
+  }
+}</code></pre></div>
+    <p class="code-note">timeout aborts the request after the configured milliseconds with error.code ECONNABORTED, so you can tell a slow server from a down server.</p>
+    <h3 id="ch7-races" data-toc>7.4 Race conditions and debouncing searches</h3>
+    <p class="topic-desc">Prevents race conditions where a stale response overrides fresh data, and debounces type-ahead searches. Track the newest request by aborting the previous one with AbortController whenever a new call starts, so only the latest response is applied. Debouncing delays a search until the user pauses typing, cutting request volume. Together these patterns guarantee that in the UI the newest request always wins.</p>
+    <div class="codeWrap"><pre><code>let controller = null;
+let timer = null;
+
+input.addEventListener('input', (e) =&gt; {
+  clearTimeout(timer);
+  timer = setTimeout(() =&gt; search(e.target.value), 300);   // debounce 300ms
+});
+
+async function search(q) {
+  controller?.abort();                       // kill the previous request first
+  controller = new AbortController();
+  try {
+    const { data } = await axios.get('/api/search', {
+      params: { q },
+      signal: controller.signal,
+    });
+    renderResults(data);
+  } catch (error) {
+    if (axios.isCancel(error)) return;       // superseded request — ignore quietly
+    throw error;
+  }
+}</code></pre></div>
+    <p class="code-note">Aborting the previous request before starting a new one guarantees the last keystroke wins, and ignored cancel errors stop stale responses from clobbering results.</p>
+    <div class="ex"><h4 id="ch7-races--exercises-7">Exercises 7</h4><ol>
+      <li>Cancel a slow request from a button and confirm isCancel fires.</li>
+      <li>Set a 2s timeout and verify the ECONNABORTED branch.</li>
+      <li>Build a debounced search that aborts the previous query.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Authentication Patterns</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Authentication Patterns</button><div class="ch-toc-list"><a href="#ch8-bearer">8.1 Bearer tokens</a><a href="#ch8-refresh">8.2 The refresh-token flow</a><a href="#ch8-cookies">8.3 Cookies and withCredentials</a><a href="#ch8-csrf">8.4 CSRF tokens and logout on 401</a></div></div>
+    <p class="topic-desc">Chapter eight covers authentication patterns: Bearer tokens, refresh flows, cookies, and CSRF handling. You send an Authorization: Bearer header from a request interceptor, and when an access token expires a response interceptor refreshes it and replays the failed request. Cookie-based sessions need the withCredentials option for cross-origin calls, and CSRF tokens are attached through a small interceptor. The result is authentication that survives page reloads and expired sessions.</p>
+    <p>Axios does not authenticate for you — but its interceptor machinery is exactly the right place to attach credentials, refresh tokens, and react to 401s. Every pattern in this chapter is built on the interceptor layer you already know.</p>
+    <h3 id="ch8-bearer" data-toc>8.1 Bearer tokens</h3>
+    <p class="topic-desc">Sends an Authorization: Bearer header on every request using one request interceptor. Read the token from secure storage, such as a cookie or memory, and set config.headers.Authorization to Bearer plus the token in the interceptor before returning config. Store the token safely and avoid putting it in query strings or logs. This attaches credentials to every call without repeating header code at each call site.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+async function login(email, password) {
+  const { data } = await axios.post('/auth/login', { email, password });
+  sessionStorage.setItem('token', data.accessToken);   // a token store in real apps
+}
+
+api.interceptors.request.use((config) =&gt; {
+  const token = sessionStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// every api.* call now carries the token automatically
+const { data } = await api.get('/me');</code></pre></div>
+    <p class="code-note">After login stores the token, one request interceptor stamps Authorization on every later call, so call sites never think about credentials.</p>
+    <div class="warn"><p>Prefer keeping tokens out of localStorage — an XSS bug can read it. In-memory storage or an HttpOnly cookie are safer homes for JWTs.</p></div>
+    <h3 id="ch8-refresh" data-toc>8.2 The refresh-token flow</h3>
+    <p class="topic-desc">Implements the refresh-token flow inside a response interceptor. When a request fails with 401, the interceptor calls your refresh endpoint to get a new access token, retries the original request with that token, and resolves the promise with its response. Guard against parallel refreshes by sharing one refresh promise across concurrent failures. One interceptor handles the whole cycle, so call sites never see an expired-token failure.</p>
+    <div class="codeWrap"><pre><code>api.interceptors.response.use(
+  (res) =&gt; res,
+  async (error) =&gt; {
+    const original = error.config;
+    if (error.response?.status !== 401 || original._retry) {
+      return Promise.reject(error);            // not a token problem — pass on
+    }
+    original._retry = true;                    // guard against refresh loops
+    try {
+      const { data } = await axios.post('/auth/refresh', {
+        refreshToken: sessionStorage.getItem('refreshToken'),
+      });
+      sessionStorage.setItem('token', data.accessToken);
+      original.headers.Authorization = `Bearer ${data.accessToken}`;
+      return api(original);                    // replay the original request
+    } catch (refreshError) {
+      logout();                                // refresh failed — session is over
+      return Promise.reject(refreshError);
+    }
+  },
+);</code></pre></div>
+    <p class="code-note">On a 401 the interceptor refreshes the token once, patches the original request, and retries it transparently — and falls back to logout if the refresh itself fails.</p>
+    <h3 id="ch8-cookies" data-toc>8.3 Cookies and withCredentials</h3>
+    <p class="topic-desc">Uses cookies for session-based authentication and the withCredentials config option for cross-origin requests. With withCredentials: true, Axios sends the browser cookies for the target origin and accepts set-cookie headers, which same-origin calls get automatically. Set the option on an instance or per request when credentials must cross origins, and ensure the server is configured to accept them. Same-origin calls need nothing special at all.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+
+// same-origin: the cookie rides along automatically, nothing to configure
+await axios.get('/me');
+
+// cross-origin (app on :3000, API on :8000): opt in with a flag
+const api = axios.create({
+  withCredentials: true,         // send our cookies, accept Set-Cookie back
+});
+await api.get('/me');            // session cookie authenticates this call</code></pre></div>
+    <p class="code-note">Cookies authenticate silently on same-origin requests; withCredentials opts cross-origin browsers into sending and receiving them.</p>
+    <h3 id="ch8-csrf" data-toc>8.4 CSRF tokens and logout on 401</h3>
+    <p class="topic-desc">Adds the CSRF token dance common in cookie-based frameworks and logs the user out on session expiry. A request interceptor reads a cookie-delivered CSRF token and includes it in a header on mutating requests, matching what the server verifies. A response interceptor catches 401 responses and bounces the user to the login screen or resets session state. Two small interceptors cover both concerns for every request.</p>
+    <div class="codeWrap"><pre><code>// Laravel/Sanctum style: fetch the cookie, echo it back as a header
+await axios.get('/sanctum/csrf-cookie');
+axios.defaults.headers.common['X-XSRF-TOKEN'] = readCookie('XSRF-TOKEN');
+
+// global 401 reaction: clear local state, then redirect to login
+api.interceptors.response.use(
+  (res) =&gt; res,
+  (error) =&gt; {
+    if (error.response?.status === 401) {
+      authStore.logout();               // drop token and user state
+      window.location.assign('/login'); // one bounce, app reloads clean
+    }
+    return Promise.reject(error);
+  },
+);</code></pre></div>
+    <p class="code-note">Frameworks with cookie-based CSRF usually expect the token echoed back in a header, and a global 401 interceptor centralizes the session-expired logout dance.</p>
+    <div class="ex"><h4 id="ch8-csrf--exercises-8">Exercises 8</h4><ol>
+      <li>Attach a Bearer token via an interceptor and verify it appears in the Network tab.</li>
+      <li>Implement the refresh-token interceptor against a fake API.</li>
+      <li>Wire withCredentials for a cross-origin call and observe the cookies sent.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Axios with Frameworks</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Axios with Frameworks</button><div class="ch-toc-list"><a href="#ch9-vue">9.1 Vue 3: a service layer and composable</a><a href="#ch9-react">9.2 React: a data-fetching hook</a><a href="#ch9-nuxt">9.3 Nuxt integration and SSR</a><a href="#ch9-node">9.4 Axios in Node and Express</a></div></div>
+    <p class="topic-desc">Chapter nine connects Axios to Vue, React, Nuxt, and Node by building a thin service layer reused across components and server handlers. In Vue you expose API calls through a composable, and in React through a data-fetching hook built on useEffect and useCallback. Nuxt wires Axios in as a plugin that handles the server and client baseURL split, and Node uses the same client inside Express routes. One API layer serves every framework.</p>
+    <p>Axios itself is framework-agnostic. The value in a framework comes from a small <em>service layer</em> — one module that owns the instance, the interceptors, and the typed functions — that components then import.</p>
+    <h3 id="ch9-vue" data-toc>9.1 Vue 3: a service layer and composable</h3>
+    <p class="topic-desc">Separates API calls into a dedicated service module and wires them into Vue components with a composable. The service owns transport, calling axios with the right methods and config, while the component only describes intent such as load, save, or delete. A composable function wraps the service with reactive state and loading flags using ref or reactive. Components stay lean and the transport logic lives in one testable place.</p>
+    <div class="codeWrap"><pre><code>// api/posts.js — thin service layer over the shared client
+import client from './client';            // shared instance with interceptors
+
+export const postsApi = {
+  list: () =&gt; client.get('/posts'),
+  byId: (id) =&gt; client.get(`/posts/${id}`),
+  create: (body) =&gt; client.post('/posts', body),
+  remove: (id) =&gt; client.delete(`/posts/${id}`),
+};</code></pre></div>
+    <p class="code-note">The service module wraps the shared client instance so components never touch axios config and the transport stays in exactly one place.</p>
+    <div class="codeWrap"><pre><code>// composables/usePosts.js — Vue 3 composable consuming the service
+import { ref, onMounted } from 'vue';
+import { postsApi } from '../api/posts';
+
+export function usePosts() {
+  const posts = ref([]);
+  const loading = ref(false);
+  const error = ref(null);
+
+  onMounted(async () =&gt; {
+    loading.value = true;
+    try {
+      const { data } = await postsApi.list();
+      posts.value = data;
+    } catch (e) {
+      error.value = e.userMessage ?? e.message;   // normalized by an interceptor
+    } finally {
+      loading.value = false;
+    }
+  });
+
+  return { posts, loading, error };   // template: v-for over posts once it settles
+}</code></pre></div>
+    <p class="code-note">The composable owns all the reactive state (posts, loading, error) so any component gets a full loading-with-error experience in one import.</p>
+    <h3 id="ch9-react" data-toc>9.2 React: a data-fetching hook</h3>
+    <p class="topic-desc">Exposes the data-fetching pattern as a React hook built on useEffect and useCallback. The hook holds state for the data, the loading flag, and the error, calls the axios service inside useEffect, and returns a reload function via useCallback. The dependency array decides when the hook refetches, and a cleanup step cancels superseded requests. Components consume the hook and render from its returned state.</p>
+    <div class="codeWrap"><pre><code>import { useEffect, useState, useCallback } from 'react';
+import client from '../api/client';
+
+export function useUsers() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const load = useCallback(async () =&gt; {
+    setLoading(true);
+    try {
+      const { data } = await client.get('/users');
+      setUsers(data);
+    } catch (e) {
+      setError(e.userMessage ?? e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() =&gt; { load(); }, [load]);   // fetch on mount
+
+  return { users, loading, error, reload: load };
+}</code></pre></div>
+    <p class="code-note">The hook keeps error state, loading state, and a reusable reload in one place; an effect runs it once on mount, and callers trigger reload themselves.</p>
+    <h3 id="ch9-nuxt" data-toc>9.3 Nuxt integration and SSR</h3>
+    <p class="topic-desc">Wires Axios into Nuxt as a plugin so every component and server handler can use a shared client. The plugin creates an axios instance with a baseURL that splits between server and browser, using an env variable such as NUXT_API_URL for the server side and a relative URL or explicit origin on the client. SSR changes where credentials and baseURLs live, so configure both environments. Make the client available everywhere through Nuxt’s plugin mechanism.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    public: { apiBase: process.env.NUXT_PUBLIC_API_BASE ?? 'https://api.example.com' },
+  },
+});
+
+// plugins/axios.ts — expose the instance as this.$axios everywhere
+export default defineNuxtPlugin(() =&gt; {
+  const config = useRuntimeConfig();
+  const instance = axios.create({ baseURL: config.public.apiBase });
+  return { provide: { axios: instance } };
+});</code></pre></div>
+    <p class="code-note">The plugin creates one instance configured from runtime config, and the same $axios is available in client and server renders — with the caveat below.</p>
+    <div class="warn"><p>Server-side renders have no window: interceptors that read cookies or localStorage must check they are running in the browser first, or the first paint breaks.</p></div>
+    <h3 id="ch9-node" data-toc>9.4 Axios in Node and Express</h3>
+    <p class="topic-desc">Uses Axios server-side inside an Express route, where the same client API works with a couple of additions. Create an axios instance and reuse it across handlers, pass an http.Agent with keepAlive for connection reuse, and map errors into HTTP responses you send to the client. The promise-based API is identical to the browser, so a handler awaits the request and forwards the data. Centralize baseURL and timeout once in the server client.</p>
+    <div class="codeWrap"><pre><code>import express from 'express';
+import axios from 'axios';
+import https from 'node:https';
+
+const upstream = axios.create({
+  baseURL: process.env.UPSTREAM_URL,       // internal API address
+  timeout: 15000,
+  httpsAgent: new https.Agent({ keepAlive: true }),   // reuse connections
+});
+
+app.post('/api/reports', async (req, res) =&gt; {
+  try {
+    const { data } = await upstream.post('/score-reports', req.body, {
+      headers: { Authorization: `Bearer ${process.env.INTERNAL_KEY}` },
+    });
+    res.json(data);
+  } catch (error) {
+    res.status(error.response?.status ?? 502).json({   // 502 if upstream never replied
+      message: 'Upstream service unavailable',
+    });
+  }
+});</code></pre></div>
+    <p class="code-note">In Node the same Axios client calls other services, with a keep-alive agent for connection reuse and upstream status codes mapped to your own error semantics.</p>
+    <div class="ex"><h4 id="ch9-node--exercises-9">Exercises 9</h4><ol>
+      <li>Extract your existing calls into a postsApi service module.</li>
+      <li>Build a useUsers hook or usePosts composable with loading and error state.</li>
+      <li>Add an Express route that proxies a request through Axios.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Testing &amp; Best Practices</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Testing &amp; Best Practices</button><div class="ch-toc-list"><a href="#ch10-mockadapter">10.1 Mocking with axios-mock-adapter</a><a href="#ch10-msw">10.2 Mock Service Worker</a><a href="#ch10-structure">10.3 Structuring an API layer with TypeScript</a><a href="#ch10-quality">10.4 Security and performance</a></div></div>
+    <p class="topic-desc">Chapter ten covers testing and best practices, mocking Axios in tests and structuring a maintainable API layer. You learn axios-mock-adapter for intercepting requests in unit tests and Mock Service Worker for network-level interception that works in Node and browsers. A TypeScript API layer with one typed function per endpoint keeps call sites safe. Security and performance habits, such as avoiding token logging, round out the chapter.</p>
+    <p>A healthy Axios setup is one you can run in tests without a network. The two mainstream tools are axios-mock-adapter (fakes axios itself) and Mock Service Worker (fakes the network layer) — pick whichever matches your existing test stack.</p>
+    <h3 id="ch10-mockadapter" data-toc>10.1 Mocking with axios-mock-adapter</h3>
+    <p class="topic-desc">Intercepts matching requests in tests using axios-mock-adapter so your suite never touches the network. Create an adapter on your axios instance and register handlers such as onGet or onPost that reply from fixtures with a status, data, and headers. Matching can check the URL and params, and you reset handlers between tests for isolation. It is the friendliest option when your test code already calls axios directly.</p>
+    <div class="codeWrap"><pre><code>import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+
+const mock = new MockAdapter(axios, { delayResponse: 200 });   // simulate latency
+
+mock.onGet('/api/users/1').reply(200, { id: 1, name: 'Ada' });
+
+mock.onPost('/api/users').reply((config) =&gt; {
+  const body = JSON.parse(config.data);
+  return [201, { id: 2, ...body }];       // echo the payload back with an id
+});
+
+// in tests: axios.get('/api/users/1') now returns the fixture, no server needed
+const { data } = await axios.get('/api/users/1');</code></pre></div>
+    <p class="code-note">axios-mock-adapter intercepts matching requests before the real network and returns fixtures, optionally with latency, so tests are fast and deterministic.</p>
+    <h3 id="ch10-msw" data-toc>10.2 Mock Service Worker</h3>
+    <p class="topic-desc">Introduces Mock Service Worker, which intercepts at the network layer so it works identically in Node tests and browsers. MSW uses a service worker in the browser and a polyfill in Node, and your application code cannot tell the difference from a real API. Define handlers that match the request URL and method and return canned responses. This makes tests realistic and reusable across both environments.</p>
+    <div class="codeWrap"><pre><code>// src/mocks/handlers.js — shared by tests (node) and dev tools (browser)
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+
+export const handlers = [
+  http.get('/api/users', () =&gt; HttpResponse.json([{ id: 1, name: 'Ada' }])),
+  http.post('/api/users', async ({ request }) =&gt; {
+    const body = await request.json();
+    return HttpResponse.json({ id: 2, ...body }, { status: 201 });
+  }),
+];
+
+// in Vitest/Jest: const server = setupServer(...handlers) in a beforeAll,
+// server.listen(), then server.close() in an afterAll.</code></pre></div>
+    <p class="code-note">MSW replaces the network itself, so real axios calls, fetch calls, and browser requests all hit the same handlers, making it the most integration-shaped mock.</p>
+    <h3 id="ch10-structure" data-toc>10.3 Structuring an API layer with TypeScript</h3>
+    <p class="topic-desc">Structures an API layer with TypeScript so call sites stay safe and organized by resource. Define response interfaces, write one typed function per endpoint that calls the axios client and returns the data with the correct type, and group functions by resource such as users or orders. A small amount of shared config, like baseURL and a single instance, keeps the layer consistent. This yields compile-time safety and predictable call sites.</p>
+    <div class="codeWrap"><pre><code>// types.ts
+export interface User { id: number; name: string; email: string; }
+export interface ListResponse&lt;T&gt; { items: T[]; total: number; }
+
+// client.ts
+export const api = axios.create({ baseURL: '/api' });
+
+// services/users.ts — one typed function per endpoint
+export async function fetchUser(id: number): Promise&lt;User&gt; {
+  const { data } = await api.get&lt;User&gt;(`/users/${id}`);
+  return data;
+}
+
+export async function listUsers(page: number): Promise&lt;ListResponse&lt;User&gt;&gt; {
+  const { data } = await api.get&lt;ListResponse&lt;User&gt;&gt;('/users', { params: { page } });
+  return data;
+}</code></pre></div>
+    <p class="code-note">Typing each endpoint with a generic return type means a reshape of the API surfaces as a compile error instead of a runtime surprise.</p>
+    <h3 id="ch10-quality" data-toc>10.4 Security and performance</h3>
+    <p class="topic-desc">Hardens the client against leaks and wasted work: never log tokens or sensitive headers, enable keep-alive in Node by passing an http.Agent with keepAlive true, and cancel superseded requests with AbortController. Use short timeouts for user-facing calls and reuse a single instance instead of creating clients per request. These small habits improve security, speed, and reliability across the whole application.</p>
+    <div class="codeWrap"><pre><code>// never log credential headers
+client.interceptors.request.use((config) =&gt; {
+  if (import.meta.env?.MODE === 'development') {
+    const safe = { method: config.method, url: config.url, params: config.params };
+    console.debug('request', safe);       // Authorization deliberately absent
+  }
+  return config;
+});
+
+// Node: reuse sockets instead of opening a fresh TLS handshake per call
+import https from 'node:https';
+const api = axios.create({
+  baseURL: process.env.API_URL,
+  httpsAgent: new https.Agent({ keepAlive: true, maxSockets: 25 }),
+});
+
+// checklist: one instance per API, reuse via service modules, timeouts,
+// abort superseded requests, keep the JSON default unless you need binary.</code></pre></div>
+    <p class="code-note">A dev-only logger that strips credentials, a keep-alive agent, and a short checklist cover most real-world Axios hygiene in a single glance.</p>
+    <div class="ex"><h4 id="ch10-quality--exercises-10">Exercises 10</h4><ol>
+      <li>Mock the GET users route with axios-mock-adapter and assert on the payload.</li>
+      <li>Move that mock to an MSW handler and prove the same test passes.</li>
+      <li>Type two endpoints with generics and make an intentional mismatch fail compilation.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix — Quick Reference &amp; Glossary</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix — Quick Reference &amp; Glossary</button><div class="ch-toc-list"><a href="#app-methods">A.1 Request methods</a><a href="#app-config">A.2 Config options</a><a href="#app-response">A.3 Response and error fields</a><a href="#app-interceptors">A.4 Interceptor and cancellation reference</a><a href="#app-glossary">A.5 Glossary</a></div></div>
+    <p class="topic-desc">The appendix bundles quick-reference tables and a glossary into one section for fast lookup. You will find every request method with its alias, the daily config options from baseURL to responseType, and the response and error fields side by side. Skim it whenever you forget a method, a config option, or a response field, and use the glossary when a chapter introduces a term you have not seen before.</p>
+    <h3 id="app-methods" data-toc>A.1 Request methods</h3>
+    <p class="topic-desc">Lists every request method on the axios client and the shorthand alias for each. For each verb you learn the argument order, such as url, then data for methods like post, then config. Keep this table open as you build, since it answers the most common question about how to call any verb. The alias methods resolve the same request chain as axios(config).</p>
+    <table>
+      <tr><th>Method</th><th>Verb</th><th>Signature</th></tr>
+      <tr><td><code>axios.get(url, config)</code></td><td>GET</td><td>data belongs in params</td></tr>
+      <tr><td><code>axios.post(url, data, config)</code></td><td>POST</td><td>payload in the second arg</td></tr>
+      <tr><td><code>axios.put(url, data, config)</code></td><td>PUT</td><td>full replacement</td></tr>
+      <tr><td><code>axios.patch(url, data, config)</code></td><td>PATCH</td><td>partial update</td></tr>
+      <tr><td><code>axios.delete(url, config)</code></td><td>DELETE</td><td>config as second arg</td></tr>
+      <tr><td><code>axios.request(config)</code></td><td>any</td><td>low-level driver behind every alias</td></tr>
+    </table>
+    <h3 id="app-config" data-toc>A.2 Config options</h3>
+    <p class="topic-desc">Lists the config options you will use on a daily basis, from baseURL and timeout to headers, params, and responseType. Every option shown can be set globally on the defaults, per instance in axios.create, or per request in the config object, with per-request values winning. Use this table to pick the right option instead of guessing the name. Interceptor functions can also read and modify the same config shape.</p>
+    <table>
+      <tr><th>Option</th><th>Default</th><th>Purpose</th></tr>
+      <tr><td><code>url</code></td><td>—</td><td>Request URL (merged with baseURL)</td></tr>
+      <tr><td><code>method</code></td><td><code>get</code></td><td>HTTP verb</td></tr>
+      <tr><td><code>baseURL</code></td><td>—</td><td>Prepended unless url is absolute</td></tr>
+      <tr><td><code>headers</code></td><td><code>{}</code></td><td>Custom request headers</td></tr>
+      <tr><td><code>params</code></td><td>—</td><td>Object serialized into the query string</td></tr>
+      <tr><td><code>data</code></td><td>—</td><td>Request body (auto-JSON for objects)</td></tr>
+      <tr><td><code>timeout</code></td><td><code>0</code></td><td>Milliseconds before abort (0 = none)</td></tr>
+      <tr><td><code>withCredentials</code></td><td><code>false</code></td><td>Send and accept cookies cross-origin</td></tr>
+      <tr><td><code>responseType</code></td><td><code>json</code></td><td>json, text, blob, arraybuffer, stream, document</td></tr>
+      <tr><td><code>validateStatus</code></td><td>2xx</td><td>Which statuses count as fulfilled</td></tr>
+    </table>
+    <h3 id="app-response" data-toc>A.3 Response and error fields</h3>
+    <p class="topic-desc">Maps the fields on a successful response and on an AxiosError side by side. A response gives you data, status, statusText, headers, config, and request, while an error adds the response and request objects that change depending on where the failure happened. Knowing that response holds the server answer and message holds human-readable detail ends most debugging. Use this reference to decide which field to read in any situation.</p>
+    <table>
+      <tr><th>Field</th><th>On</th><th>Meaning</th></tr>
+      <tr><td><code>data</code></td><td>response</td><td>Parsed body (JSON already decoded)</td></tr>
+      <tr><td><code>status</code></td><td>response</td><td>HTTP status code</td></tr>
+      <tr><td><code>statusText</code></td><td>response</td><td>Status phrase, e.g. OK</td></tr>
+      <tr><td><code>headers</code></td><td>response</td><td>Response headers</td></tr>
+      <tr><td><code>config</code></td><td>both</td><td>The config object that made the request</td></tr>
+      <tr><td><code>message</code></td><td>error</td><td>Human-readable summary</td></tr>
+      <tr><td><code>response</code></td><td>error</td><td>The response (null on network failure)</td></tr>
+      <tr><td><code>request</code></td><td>error</td><td>The request that never got a response</td></tr>
+      <tr><td><code>code</code></td><td>error</td><td>Machine code like ECONNABORTED, ERR_NETWORK, ERR_CANCELED</td></tr>
+    </table>
+    <h3 id="app-interceptors" data-toc>A.4 Interceptor and cancellation reference</h3>
+    <p class="topic-desc">Summarizes the interceptor API and cancellation options at a glance. Request interceptors registered with use run in registration order before the request goes out, while response interceptors run in reverse after it returns, and eject removes a handler by its id. The cancellation options are the modern signal from AbortController or the legacy CancelToken. Keep this reference beside you while wiring middleware.</p>
+    <ul>
+      <li><code>axios.interceptors.request.use(onFulfilled, onRejected)</code> — attach a handler that runs before a request is sent.</li>
+      <li><code>axios.interceptors.response.use(onFulfilled, onRejected)</code> — intercept fulfilled or rejected responses.</li>
+      <li><code>interceptor.eject(id)</code> — remove one installed interceptor by the id its use() returned.</li>
+      <li><code>new AbortController()</code> plus the <code>signal</code> config — modern cancellation; pass one signal to many requests.</li>
+      <li><code>axios.CancelToken.source()</code> — legacy cancellation API; keep AbortController for new code.</li>
+      <li><code>axios.isCancel(err)</code> — true when the error came from a cancel, so you can ignore it.</li>
+    </ul>
+    <h3 id="app-glossary" data-toc>A.5 Glossary</h3>
+    <p class="topic-desc">Defines the terms used throughout the guide in one place, from core concepts like instance and interceptor to error-related terms such as AxiosError. Skim it whenever a chapter uses a word you have not seen before, so reading is not interrupted by unfamiliar vocabulary. Entries are short, plain definitions of the names and options the rest of the guide assumes you know.</p>
+    <ul>
+      <li><strong>AxiosError</strong> — the error object Axios produces; carries message, response, request, and code.</li>
+      <li><strong>BaseURL</strong> — a prefix prepended to every relative url on an instance.</li>
+      <li><strong>Config object</strong> — the plain object describing one request (method, url, params, headers, data, and more).</li>
+      <li><strong>Interceptor</strong> — a handler that sees every outgoing request or every incoming response.</li>
+      <li><strong>Serializer</strong> — the function turning the params object into a query string.</li>
+      <li><strong>validateStatus</strong> — the predicate deciding which status codes settle the promise as fulfilled.</li>
+      <li><strong>Race condition</strong> — a stale response beating a newer one; prevented by aborting superseded requests.</li>
+      <li><strong>Bearer token</strong> — an Authorization header value of the form <code>Bearer &lt;token&gt;</code>.</li>
+      <li><strong>withCredentials</strong> — the flag that lets cookies cross the same-origin boundary.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Axios — HTTP Client Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

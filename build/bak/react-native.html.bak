@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>React Native - Expo, Navigation &amp; Full-Scale Apps</title>
+<meta name="description" content="React Native from scratch to release: Expo, navigation, the New Architecture, native modules and offline data. 15 chapters, 85 topics and 140 code samples.">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/react-native.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="React Native - Expo, Navigation &amp; Full-Scale Apps">
+<meta property="og:description" content="React Native from scratch to release: Expo, navigation, the New Architecture, native modules and offline data. 15 chapters, 85 topics and 140 code samples.">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/react-native.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Mobile">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="React Native - Expo, Navigation &amp; Full-Scale Apps">
+<meta name="twitter:description" content="React Native from scratch to release: Expo, navigation, the New Architecture, native modules and offline data. 15 chapters, 85 topics and 140 code samples.">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/react-native.html#article","headline":"React Native - Expo, Navigation & Full-Scale Apps","name":"React Native - Expo, Navigation & Full-Scale Apps","description":"React Native from scratch to release: Expo, navigation, the New Architecture, native modules and offline data. 15 chapters, 85 topics and 140 code samples.","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/react-native.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/react-native.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Mobile","keywords":["react native","expo","navigation","new architecture","turbo modules","offline-first"],"wordCount":24000,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[{"@type":"WebPageElement","name":"Welcome - How to Use This React Native Guide","url":"https://amin360it.github.io/quick-guides/react-native.html#orientation"},{"@type":"WebPageElement","name":"1 · React Native and the React Model","url":"https://amin360it.github.io/quick-guides/react-native.html#ch1"},{"@type":"WebPageElement","name":"2 · Environment Setup: Expo vs Bare Workflow","url":"https://amin360it.github.io/quick-guides/react-native.html#ch2"},{"@type":"WebPageElement","name":"3 · Core Components and Layout Primitives","url":"https://amin360it.github.io/quick-guides/react-native.html#ch3"},{"@type":"WebPageElement","name":"4 · Styling and Flexbox on Mobile","url":"https://amin360it.github.io/quick-guides/react-native.html#ch4"},{"@type":"WebPageElement","name":"5 · State: Component State, Context and Libraries","url":"https://amin360it.github.io/quick-guides/react-native.html#ch5"},{"@type":"WebPageElement","name":"6 · Navigation with React Navigation","url":"https://amin360it.github.io/quick-guides/react-native.html#ch6"},{"@type":"WebPageElement","name":"7 · Networking, Data and Lists at Scale","url":"https://amin360it.github.io/quick-guides/react-native.html#ch7"},{"@type":"WebPageElement","name":"8 · Forms, Inputs and Keyboard Handling","url":"https://amin360it.github.io/quick-guides/react-native.html#ch8"},{"@type":"WebPageElement","name":"9 · Animations and Gestures","url":"https://amin360it.github.io/quick-guides/react-native.html#ch9"},{"@type":"WebPageElement","name":"10 · The New Architecture and Native Modules","url":"https://amin360it.github.io/quick-guides/react-native.html#ch10"},{"@type":"WebPageElement","name":"11 · Debugging, Testing and Performance","url":"https://amin360it.github.io/quick-guides/react-native.html#ch11"},{"@type":"WebPageElement","name":"12 · Offline, Persistence and Resilience","url":"https://amin360it.github.io/quick-guides/react-native.html#ch12"},{"@type":"WebPageElement","name":"13 · Shipping: CI/CD, Stores and Releases","url":"https://amin360it.github.io/quick-guides/react-native.html#ch13"},{"@type":"WebPageElement","name":"14 · Building a Full-Scale Project End to End","url":"https://amin360it.github.io/quick-guides/react-native.html#ch14"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Mobile & Cross-Platform","item":"https://amin360it.github.io/quick-guides/index.html#cat-mobile"},{"@type":"ListItem","position":3,"name":"React Native - Expo, Navigation & Full-Scale Apps","item":"https://amin360it.github.io/quick-guides/react-native.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">React Native</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"></nav>
+</aside>
+
+<main id="content">
+<h1 class="am-band"><span class="am-band-t">React Native</span><span class="am-band-s">15 chapters &middot; 85 topics &middot; 140 code samples &middot; works offline</span></h1>
+
+  <section class="chapter">
+<h2 id="orientation" data-toc>Welcome — How to Use This React Native Guide</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · How to use this guide</button><div class="ch-toc-list"><a href="#orientation-assume">What this guide assumes</a><a href="#orientation-map">How the chapters fit together</a><a href="#orientation-stack">The stack you will build with</a><a href="#orientation-conventions">Conventions and how to read the code</a></div></div>
+    <p class="topic-desc">React Native is how you build real iOS and Android applications with React: the same components, hooks and one-way data flow, rendered to platform views instead of the DOM. This guide takes a cold machine to a released application on the stack that has become the default — Expo, TypeScript, React Navigation and the New Architecture.</p>
+    <h3 id="orientation-assume" data-toc>What this guide assumes</h3>
+    <p>You can already write React. Components, props, state, hooks and the closure-over-state trap are assumed knowledge, because React Native changes the host environment and not the programming model. If React itself is new to you, learn it first — this guide will not stop to explain what a dependency array is, and the middle chapters move quickly. TypeScript familiarity is also assumed: every sample is typed, and the ecosystem's types are good enough that arguing with them is wasted time.</p>
+    <p>What you need on the machine is modest:</p>
+    <ul>
+      <li><strong>Node 22.13 or newer</strong> — the floor Expo SDK 57 sets, plus a package manager. The samples use npm; nothing depends on it.</li>
+      <li><strong>Android Studio</strong> for the emulator and SDK 36 tooling. An Android device over USB or Wi-Fi works too and catches bugs the emulator hides.</li>
+      <li><strong>macOS with Xcode 26.4 or newer</strong> only when you build for iOS. You can complete the first half of this guide without ever touching a Mac.</li>
+      <li><strong>A real phone with Expo Go installed.</strong> The gap between an emulator and a five-year-old handset is where most performance lessons live.</li>
+    </ul>
+    <div class="codeWrap"><pre><code># 1. verify the toolchain before you blame the framework
+node -v              # v22.13 or newer
+java -version        # JDK 17+ for Android builds
+npx expo-doctor@latest   # validates a project against the SDK's expectations
+
+# 2. create the project exactly the way this guide does
+npx create-expo-app@latest field-notes --template default
+cd field-notes
+npx expo start        # Metro bundler + QR code, the loop you will live in</code></pre></div>
+    <h4>A note on versions</h4>
+    <p>Everything here targets <strong>Expo SDK 57</strong>, which pins <strong>React Native 0.86</strong> and <strong>React 19.2</strong>. React Native ships roughly six releases a year and each Expo SDK locks to exactly one of them, so a single number describes your whole native toolchain. Where behaviour differs between SDK versions — and after 2025 it rarely does — it is called out in a note rather than left for you to discover on a Friday deploy.</p>
+    <div class="codeWrap"><pre><code>field-notes/
+├── src/
+│   ├── components/     # shared UI primitives, no business logic   (ch 3)
+│   ├── screens/        # one file per screen                       (ch 6)
+│   ├── navigation/     # stack, tabs, linking config               (ch 6)
+│   ├── features/       # notes, auth, settings — one folder each   (ch 14)
+│   ├── lib/            # api client, storage, logging              (ch 7, 12)
+│   └── theme/          # tokens, dark mode, spacing scale          (ch 4)
+├── app.config.ts       # config as code, not a JSON blob           (ch 14)
+├── eas.json            # build profiles                             (ch 13)
+├── tsconfig.json
+└── package.json</code></pre></div>
+    <div class="note"><p>Chapter numbers in the tree are not decoration: the structure above is assembled gradually across the guide, and chapter 14 puts every folder together as one working project. If you build along rather than only reading, the architecture stops being advice and becomes muscle memory.</p></div>
+    <h3 id="orientation-map" data-toc>How the chapters fit together</h3>
+    <p>The order is deliberate. Each part only leans on the parts before it, and nothing in the early chapters is beginner filler you are expected to unlearn later.</p>
+    <ul>
+      <li><strong>Part one (1–4) is the foundation.</strong> What React Native actually renders, how the toolchain turns source into an app, what the core components are, and how layout and styling work on a screen with no <code>div</code>.</li>
+      <li><strong>Part two (5–9) is the product surface.</strong> State, navigation, network data and lists, forms and the keyboard, motion and gestures — the five places where mobile apps are won or lost.</li>
+      <li><strong>Part three (10–13) is the platform.</strong> The New Architecture and native modules, debugging and testing, offline persistence, and the release pipeline.</li>
+      <li><strong>Part four (14) is the capstone.</strong> One project assembled end to end: structure, configuration, authentication, error handling and the decisions that keep a codebase alive past version one.</li>
+    </ul>
+    <div class="codeWrap"><pre><code>// when something breaks, jump to the chapter that owns the problem
+//   "the keyboard covers my input"           -&gt; 8   forms
+//   "lists stutter on a cheap Android"       -&gt; 7   lists at scale
+//   "my animations drop frames"              -&gt; 9   animations
+//   "a library says it needs the old bridge" -&gt; 10  new architecture
+//   "where does this file even go"           -&gt; 14  full-scale project
+//
+// and the two that pay for themselves immediately:
+//   "it works in Expo Go but not in a build" -&gt; 2   development builds
+//   "I changed one line and wait 40 seconds" -&gt; 11  performance</code></pre></div>
+    <h4>Reading order and skip paths</h4>
+    <p>If you already ship for the web, chapter 1 will feel like a restatement of React and chapter 4 will surprise you — Flexbox defaults invert on mobile. If you have maintained a legacy React Native app, skip to chapter 10: the New Architecture is not an optimisation you add later, it is the only architecture left, and legacy modules are the main thing that will bite you during an upgrade. Everyone else should read in order; the capstone chapter assumes all four parts.</p>
+    <div class="codeWrap"><pre><code>{
+  "dependencies": {
+    "expo": "~57.0.0",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "@react-navigation/native": "^7.1.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-safe-area-context": "~5.6.0",
+    "@tanstack/react-query": "^5.90.0",
+    "zod": "^4.1.0"
+  }
+}</code></pre></div>
+    <div class="tip"><p>Treat the version numbers above as a snapshot, not a target to hand-pin. Chapter 2 explains why <code>npx expo install</code> exists: the SDK knows which version of every native library was tested against this React Native, and letting npm guess at that relationship is the single most common cause of a build that fails only on someone else's machine.</p></div>
+    <h3 id="orientation-stack" data-toc>The stack you will build with</h3>
+    <p>Mobile has more framework arguments than any other corner of the ecosystem, so it is worth stating the position this guide takes and why. Expo is the default build system, React Navigation the default navigator, TanStack Query the default server-state layer, Reanimated plus Gesture Handler the default motion stack, and Jest with React Native Testing Library plus Maestro the default test pyramid. These are not the only defensible choices, but they are the ones that work together without configuration.</p>
+    <p>The reason to start from defaults is not laziness. Every native dependency in a React Native app has to be compiled into two binaries and kept compatible with one specific React Native version; a library chosen because its API is prettier but which lags two releases behind will cost you more than it saves. The packages below are all New-Architecture-native, actively maintained, and pinned together by the SDK.</p>
+    <div class="codeWrap"><pre><code># expo install resolves the versions YOUR SDK was tested with.
+# plain npm install resolves the newest versions, which may target
+# a different React Native and fail at compile time, not install time.
+npx expo install expo-camera expo-notifications expo-secure-store expo-sqlite
+npx expo install react-native-screens react-native-safe-area-context
+npx expo install react-native-reanimated react-native-gesture-handler
+npx expo install @tanstack/react-query zod react-hook-form
+
+# if a native package is missing a peer, the app builds and then
+# crashes on launch. expo-doctor catches it before the store does.
+npx expo-doctor@latest</code></pre></div>
+    <h4>Why Expo is the default in 2026</h4>
+    <p>Expo used to mean a walled garden: a curated set of native modules, and if you needed one outside it you ejected. That world ended with development builds. Native code is now compiled on demand with <code>expo prebuild</code>, your own modules are included like any other dependency, and the <code>android/</code> and <code>ios/</code> folders are generated artifacts you keep out of version control. What remains is a real choice: Expo supplies the SDK, the build service, over-the-air updates and the config plugins, and you supply any native code you like. Roughly four out of five new projects built on the service run the New Architecture with no migration work at all, which is the other half of the argument.</p>
+    <div class="codeWrap"><pre><code>// app.config.ts — configuration as code, evaluated at build time.
+// secrets stay in the environment; the file stays in git.
+import 'dotenv/config';
+
+export default {
+  expo: {
+    name: 'Field Notes',
+    slug: 'field-notes',
+    scheme: 'fieldnotes',            // required for deep links (ch 6)
+    version: '1.4.0',
+    ios: { bundleIdentifier: 'it.amin360i.fieldnotes', buildNumber: '84' },
+    android: { package: 'it.amin360i.fieldnotes', versionCode: 84 },
+    extra: {
+      apiBase: process.env.API_BASE ?? 'https://staging.api.example.com',
+      sentryDsn: process.env.SENTRY_DSN ?? '',
+    },
+  },
+};</code></pre></div>
+    <div class="note"><p>Nothing in this stack is paid-only. The build service has a free tier that is enough for a solo developer, and every package named here is open source. What you are actually choosing when you choose Expo is who maintains the compatibility matrix — and the answer "the React Native team and the Expo team, together" is the best answer available.</p></div>
+    <h3 id="orientation-conventions" data-toc>Conventions and how to read the code</h3>
+    <p>Code samples are complete, runnable files unless a comment says otherwise. TypeScript is strict, components are function components with hooks, exports are named, and styles live in a <code>StyleSheet.create</code> block at the bottom of the file rather than inline. When a type would hide the idea being taught it is elided with a comment — never silently.</p>
+    <p>Three rules appear in nearly every sample, so they are worth stating before you meet them:</p>
+    <ul>
+      <li><strong>State updates are functional.</strong> <code>setCount(c =&gt; c + 1)</code>, not <code>setCount(count + 1)</code>. Chapter 5 explains the closure that makes the second form wrong.</li>
+      <li><strong>Styles are static.</strong> Dynamic values are passed as one of several style objects, or produced by a memoised factory — never by rebuilding the whole object in render.</li>
+      <li><strong>Async work is cancelled.</strong> Every effect that fetches returns a cleanup that aborts. Chapter 7 shows why "the request came back after I navigated away" is a correctness bug, not a cosmetic one.</li>
+    </ul>
+    <div class="codeWrap"><pre><code>import { useCallback, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import type { Item } from '../lib/types';
+
+export function ItemList({ data, onOpen }: {
+  data: Item[];
+  onOpen: (id: string) =&gt; void;
+}) {
+  const [selected, setSelected] = useState&lt;string | null&gt;(null);
+
+  const handleSelect = useCallback((id: string) =&gt; {
+    setSelected(id);
+    onOpen(id);
+  }, [onOpen]);
+
+  return (
+    &lt;View style={styles.list}&gt;
+      &lt;FlatList
+        data={data}
+        keyExtractor={(item) =&gt; item.id}
+        renderItem={({ item }) =&gt; (
+          &lt;Pressable
+            onPress={() =&gt; handleSelect(item.id)}
+            style={[styles.row, selected === item.id &amp;&amp; styles.rowOn]}
+          &gt;
+            &lt;Text style={styles.rowTxt}&gt;{item.title}&lt;/Text&gt;
+          &lt;/Pressable&gt;
+        )}
+      /&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  list: { flex: 1 },
+  row: { padding: 16, borderBottomWidth: StyleSheet.hairlineWidth },
+  rowOn: { backgroundColor: 'rgba(0, 156, 255, 0.12)' },
+  rowTxt: { fontSize: 16 },
+});</code></pre></div>
+    <h4>What is deliberately not in this guide</h4>
+    <p>There are no class components, no <code>componentWillReceiveProps</code>, no manual <code>Linking</code> state, no Flux implementations and no "wrap it in a setTimeout to fix the render". Where the old answer survives in real codebases — a library still exporting a class, a mixin-shaped API — it is mentioned as migration context, because you will meet it, but it is never the pattern you are taught to reach for. Web-only concerns (SSR, SEO, the DOM) appear only where they explain a difference, and the guide never pretends React Native is a browser.</p>
+    <div class="codeWrap"><pre><code>// what you will NOT see in this guide, and the reason for each:
+//
+// class components        - dead weight since 2019; error boundaries
+//                          are the one justified exception (ch 14)
+// inline style objects    - a new object per render, and on a phone
+//                          that is a layout invalidation, not a warning
+// AsyncStorage for state  - storage is not state; see ch 5 and ch 12
+// manual setInterval sync - use AppState + focus effects (ch 5)
+// polyfills everywhere    - Hermes ships what you need; only add
+//                          what you can name the missing API for
+//
+// if you find a pattern in the wild that conflicts with this list,
+// the question to ask is not "which is right" but "what problem
+// was this solving in 2021, and does that problem still exist?"</code></pre></div>
+    <div class="tip"><p>Run the samples. React Native has a unusually fast feedback loop — save a file and the running app updates in under a second — and every claim in this guide about layout, keyboard behaviour or list performance is something you can falsify on your own device in the time it takes to read the next section.</p></div>
+  </section>
+  <section class="chapter">
+<h2 id="ch1" data-toc>1 · React Native and the React Model</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · React Native and the React model</button><div class="ch-toc-list"><a href="#ch1-what">What React Native actually is</a><a href="#ch1-host">Host components, not DOM elements</a><a href="#ch1-thread">The JS thread and the UI thread</a><a href="#ch1-render">Rendering, reconciliation and Fast Refresh</a><a href="#ch1-compile">How your code becomes an app</a></div></div>
+    <p class="topic-desc">React Native does not change how you think about React; it changes what React is rendering into. This chapter fixes the mental model — two threads, host components, a bundler that does not type-check — because every performance and debugging decision later depends on it.</p>
+    <h3 id="ch1-what" data-toc>What React Native actually is</h3>
+    <p>React is a description engine: you give it a function of state, it works out what should be on screen. What makes React web and React Native different is only the last step — React web commits a diff of DOM nodes, React Native commits a diff of <em>native</em> views. There is no web view, no HTML and no browser underneath: a <code>View</code> becomes a real <code>UIView</code> on iOS and a real <code>android.view.ViewGroup</code> on Android, laid out by the Yoga engine and drawn by the platform's own compositor.</p>
+    <p>The result is that a React Native application is two programs in one binary: a native shell that owns the window, permissions and every platform API, and a JavaScript program compiled to Hermes bytecode that owns the logic. They are not layered the way a website layers script over markup — the JS side runs on its own thread and reaches the native side through JSI, a direct function-call interface rather than a serialised message queue.</p>
+    <div class="codeWrap"><pre><code>// the same App component, two hosts
+
+// WEB: the host is the DOM
+import { createRoot } from 'react-dom/client';
+createRoot(document.getElementById('root')).render(&lt;App /&gt;);
+
+// REACT NATIVE: the host is the platform view system
+import { AppRegistry } from 'react-native';
+import { App } from './src/App';
+AppRegistry.registerComponent('FieldNotes', () =&gt; App);
+
+// everything above this line is identical React. everything below the
+// registration is where the two worlds diverge: no document, no window,
+// no CSS cascade - a shadow tree that UIKit and Android render for you.</code></pre></div>
+    <p>Two consequences follow immediately. First, web instincts about layout and style are wrong in specific, predictable ways — chapter 4 covers exactly which. Second, "it is slow" splits into three different questions: is the JavaScript slow, is the layout slow, or is the paint slow? They are measured in different places and fixed in different ways, and the framework gives you no single number called FPS.</p>
+    <h4>What React Native is not</h4>
+    <p>It is not a browser in a shell — projects that wrap a web view are a different technology with a different failure mode, and React Native's whole point is that a scroll view is the platform's scroll view. It is also not a canvas framework: React Native does not draw pixels itself the way Flutter does, which is why platform widgets, system fonts and platform scroll physics come for free, and why a custom-drawn control costs more effort here than in a drawing library. What it is, is React with the DOM swapped for two native view systems and a runtime that connects them.</p>
+    <div class="codeWrap"><pre><code>// one screen, three layers - name the layer before you diagnose
+//
+//   src/screens/Home.tsx     React: state, props, effects, memoisation
+//   React runtime + Yoga     shadow tree, layout, diffing, events
+//   platform views           UIView / android.view, drawing, scrolling
+//
+// "the screen is slow" means three different bugs:
+//   JS slow     -&gt; too many renders, heavy work in a handler   (ch 11)
+//   layout slow -&gt; deep trees, absolute positioning everywhere (ch 4)
+//   paint slow  -&gt; huge images, overlapping shadows, overdraw   (ch 11)
+//
+// the perf monitor shows JS FPS and UI FPS separately for exactly
+// this reason. learn to read the two numbers as two sentences.</code></pre></div>
+    <div class="note"><p>JavaScript runs in <strong>Hermes</strong>, Meta's engine built for React Native: it pre-compiles to bytecode during the app build rather than at startup, which cuts time-to-first-frame and memory on low-end devices. It is not V8, so micro-benchmarks you have seen for Node or Chrome do not transfer — measure on device, in the release build, or do not measure at all.</p></div>
+    <h3 id="ch1-host" data-toc>Host components, not DOM elements</h3>
+    <p>React Native exposes a deliberately small set of host components, and each one maps to a real platform view. <code>View</code> is the box that everything else lives in — the closest thing to a <code>div</code>, but it cannot contain raw text. <code>Text</code> renders a string and is a native label, not a styling wrapper. <code>Image</code>, <code>TextInput</code>, <code>ScrollView</code>, <code>FlatList</code>, <code>Pressable</code> and <code>Modal</code> cover most of what you will build; everything else is composition.</p>
+    <p>The first invariant a beginner meets is that text must be wrapped. A string directly inside a <code>View</code> is not a style problem, it is an invariant violation — the renderer refuses it, because there is no platform view that means "bare text". The second is that there are no <code>h1</code>–<code>h6</code>, <code>span</code> or <code>button</code>: semantics that HTML gives you implicitly have to be supplied explicitly through accessibility props, which chapter 3 covers properly.</p>
+    <div class="codeWrap"><pre><code>// WRONG: raw string inside a View -> invariant violation at runtime
+&lt;View&gt;{unreadCount} messages&lt;/View&gt;
+
+// RIGHT: text is a first-class native component
+&lt;View&gt;&lt;Text&gt;{unreadCount} messages&lt;/Text&gt;&lt;/View&gt;
+
+// Text nests, and a nested Text inherits what it can from its parent -
+// this is how you style one word inside a sentence
+&lt;Text style={styles.body}&gt;
+  {'You have '}
+  &lt;Text style={styles.strong}&gt;{unreadCount}&lt;/Text&gt;
+  {' unread messages'}
+&lt;/Text&gt;</code></pre></div>
+    <p>Props map across one-to-one but the names differ where the web leaked implementation detail: there is no <code>className</code>, only <code>style</code>; there is no <code>onClick</code>, only <code>onPress</code> and the gesture events chapter 9 covers. Unknown props are not silently attached to a node the way a stray attribute is in HTML — they are ignored or warned about, because there is no element object for them to land on.</p>
+    <h4>Why there is no innerHTML</h4>
+    <p>There is no HTML parser in React Native, so a string is never markup. That is a security property as much as a limitation: an entire class of injection bugs cannot exist because a value you interpolate into <code>Text</code> is always text. When an app needs rich text — bold ranges, links inside a paragraph, bilingual strings with different fonts — the answer is nested <code>Text</code> components or a library built on the platform's attributed-string APIs, never a string assembled from tags.</p>
+    <div class="codeWrap"><pre><code>// semantics are explicit, because nothing is implicit any more
+// a web &lt;button&gt; announces itself; this must announce itself too.
+&lt;Pressable
+  accessibilityRole="button"
+  accessibilityLabel={'Delete ' + item.title}
+  accessibilityHint="Removes the note from every device"
+  accessibilityState={{ disabled: isDeleting }}
+  hitSlop={8}
+  onPress={() =&gt; onDelete(item.id)}
+&gt;
+  &lt;Text style={styles.deleteLabel}&gt;Delete&lt;/Text&gt;
+&lt;/Pressable&gt;
+
+// hitSlop grows the touch target without growing the layout box -
+// the difference between a usable row and a "my app feels
+// imprecise" bug report. 44x44pt minimum, always.</code></pre></div>
+    <div class="tip"><p>Because <code>Text</code> and <code>Pressable</code> are native, text selection, dynamic type and screen readers behave the way the platform expects — a VoiceOver user gets real label semantics, and system font scaling works if you used relative units. Props that look like decoration are often the platform contract in disguise.</p></div>
+    <h3 id="ch1-thread" data-toc>The JS thread and the UI thread</h3>
+    <p>Two threads matter on every frame. The <strong>JavaScript thread</strong> runs your components, effects, event handlers and network callbacks. The <strong>UI thread</strong> — the main thread — handles touch input, layout, drawing and the platform's own animations. Under the old architecture both were glued together by an asynchronous bridge that JSON-serialised every call; under the New Architecture JSI lets JavaScript call native functions directly, but the <em>threads are still separate</em>, and the separation is where most real-world jank comes from.</p>
+    <p>The rule that falls out is simple: a long synchronous task on the JS thread stops handling presses, even while the UI thread paints beautifully. An animation driven by JS callbacks stutters whenever a fetch resolves in the middle of it. Neither problem shows up on a laptop emulator, because a laptop has ten times the CPU of the phone your user bought in 2021.</p>
+    <div class="codeWrap"><pre><code>// this freezes taps for 300ms even though the UI thread is idle
+const handleSearch = (query: string) =&gt; {
+  const hits = ALL_ITEMS.filter((i) =&gt;
+    i.title.toLowerCase().includes(query.toLowerCase())
+  ); // 60,000 rows, synchronous, on the JS thread
+  setResults(hits); // and only THEN does the press state repaint
+};
+
+// better: keep the handler short and let React yield.
+// useTransition marks the list update as interruptible, so typing
+// stays responsive while the expensive render catches up.
+const [isPending, startTransition] = useTransition();
+const handleSearch = (query: string) =&gt; {
+  setInput(query);                     // urgent: the field itself
+  startTransition(() =&gt; setResults(     // non-urgent: the big list
+    filterItems(query)
+  ));
+};</code></pre></div>
+    <p>The mirror-image problem lives on the UI thread: layout invalidation, deep view hierarchies and anything that has to synchronously measure before drawing. This is why an animation should never depend on a JS round trip — Reanimated, chapter 9, runs its animation logic on the UI thread as worklets precisely so that a busy JS thread cannot steal frames from a gesture.</p>
+    <h4>Profiling the two threads</h4>
+    <p>The in-app performance monitor (shake the device, or <code>Cmd/Ctrl+M</code>) reports JS FPS and UI FPS as separate numbers, and the gap between them is a diagnosis. Low JS FPS with healthy UI FPS means your React code is the bottleneck — usually renders, usually list item factories or context churn. Healthy JS FPS with stuttering UI FPS means layout or overdraw. Both low usually means you did both, or that the whole device is simply being pushed past what it can do.</p>
+    <div class="codeWrap"><pre><code>// measure the JS side with the engine's own clock
+const t0 = performance.now();
+const rows = buildRows(lotsOfData);   // pure JS work
+console.log('buildRows', (performance.now() - t0).toFixed(1), 'ms');
+
+// measure what React commits by timing an effect around the update
+useEffect(() =&gt; {
+  const t = performance.now();
+  requestAnimationFrame(() =&gt; {
+    console.log('frame after commit', (performance.now() - t).toFixed(1));
+  });
+}, [rows]);
+
+// the three numbers that matter on a mid-range Android:
+//   handler duration   &lt; 16ms  so the press feels instant
+//   per-row build      &lt;  1ms  so a 50-row batch fits one frame
+//   frame after commit &lt; 32ms  so scrolling never drops to 30fps</code></pre></div>
+    <div class="warn"><p>Never ship the measuring code. A <code>console.log</code> inside a row component runs thousands of times per second during a scroll, and on Android the cost of the bridge-free call is still not zero — logging is a classic way to turn a fast list into a slow one. LogBox also pauses the app on warnings in development, which makes timing measurements meaningless. Measure in a release build, on the slowest device you own.</p></div>
+    <h3 id="ch1-render" data-toc>Rendering, reconciliation and Fast Refresh</h3>
+    <p>Reconciliation works exactly as it does on the web: React compares element trees by type and key, then commits the minimal set of updates to the host. The difference is that the host is a shadow tree of native views, so a "DOM mutation" becomes a layout-invalidating native call. The same lesson applies with more force — re-rendering is expensive not because functions are slow, but because every committed change potentially invalidates layout on a device with a fraction of a desktop's power.</p>
+    <p>In practice this means the React skills transfer intact: stable keys, derived state, colocated state, memoised callbacks passed to list items. What does not transfer is the tolerance for sloppiness. A web app with 4,000 unnecessary renders per second may still feel fine on a M-series laptop; the identical app on a budget Android will drop to single-digit FPS during a scroll.</p>
+    <div class="codeWrap"><pre><code>import { memo, useCallback } from 'react';
+
+// memo only pays when props are stable. the parent must not rebuild
+// onPress inline, or every row re-renders on every parent render.
+type RowProps = { item: Item; onOpen: (id: string) =&gt; void };
+
+const Row = memo(function Row({ item, onOpen }: RowProps) {
+  const handlePress = useCallback(
+    () =&gt; onOpen(item.id),
+    [item.id, onOpen]
+  );
+  return (
+    &lt;Pressable onPress={handlePress} style={styles.row}&gt;
+      &lt;Text style={styles.title}&gt;{item.title}&lt;/Text&gt;
+      &lt;Text style={styles.meta}&gt;{item.updatedAt}&lt;/Text&gt;
+    &lt;/Pressable&gt;
+  );
+});
+
+// onOpen comes from useCallback in the list screen, onOpen is stable,
+// item changes only when the data changes: 200 rows, 1 render each.</code></pre></div>
+    <p>Fast Refresh is the other half of the render story. It re-executes the edited module in place and swaps the component tree while keeping component state, so you can edit a screen and see the change without losing what you had typed. The rules are narrower than people assume: state is preserved when you edit a component's body, but a change to hook order deliberately resets state, and edits to module-level variables re-run the whole module.</p>
+    <h4>When Fast Refresh lies to you</h4>
+    <p>Preserved state is a convenience that can hide a class of bug: a module-level cache or a stale closure that would be re-created on a cold start keeps living through your edits, so the app works in development and misbehaves for a user who launches it fresh. The discipline that catches this is to restart the JS bundle (press <code>r</code> in the terminal, or reload from the dev menu) every time something feels subtly wrong, and to smoke-test a release build before you believe a fix.</p>
+    <div class="codeWrap"><pre><code>// Fast Refresh behaviour, by edit type:
+//
+//   edit a component's body        -> refresh, component state KEPT
+//   edit a hook's dependency list  -> refresh, state KEPT (re-run effect)
+//   change the ORDER of hooks      -> refresh, state RESET (correct)
+//   edit a module-level variable   -> module re-executes, state LOST
+//   edit a file that exports none of its components -> full re-import
+//   edit native code or a config plugin            -> NO REFRESH:
+//                                      you are editing the binary,
+//                                      so rebuild (ch 2)
+//
+// the trap: state kept == old closure may still be alive. when a fix
+// "works" but a reload breaks it, you are debugging Fast Refresh,
+// not your app. press r, then look again.</code></pre></div>
+    <div class="note"><p>Fast Refresh only observes JavaScript. A change to <code>app.config.ts</code>, a config plugin, an asset registered with <code>require()</code> in a native-facing way, or a dependency with native code all require the binary to be rebuilt — which is chapter 2's entire subject. Knowing which of the four kinds of change you just made tells you whether to wait one second or four minutes.</p></div>
+    <h3 id="ch1-compile" data-toc>How your code becomes an app</h3>
+    <p>The pipeline from <code>.tsx</code> to a shipped binary has four stages, and knowing them explains most "it works on my machine" mysteries. Babel (via <code>babel-preset-expo</code>) strips TypeScript and compiles JSX. Metro, the bundler, resolves every import into one JavaScript bundle and serves it from memory during development. At build time Hermes compiles that bundle to bytecode, which is embedded in the binary. Native dependencies are autolinked and compiled into the same binary by Gradle or Xcode.</p>
+    <p>Development and production differ in exactly one dimension that matters: development Metro serves source with Fast Refresh, production ships minified bytecode that was compiled once, on a build machine, ahead of time. Anything that behaves differently between the two — timing, globals, environment values — is usually a difference in <em>when</em> something was evaluated, not in how.</p>
+    <div class="codeWrap"><pre><code>src/**/*.tsx
+     |  babel-preset-expo: strip types, compile JSX, handle env vars
+     v
+JS bundle (one file, every import inlined by Metro)
+     |  dev:  served from memory, source maps, Fast Refresh
+     |  release: hermesc -> index.android.bundle (Hermes bytecode)
+     v
+binary -- gradle/xcode link native modules (autolinked from node_modules)
+
+# the four kinds of change, and what each one costs you:
+#   source / asset     -&gt; reload        (~1 second)
+#   dependency (JS)    -&gt; restart bundle (~2 seconds)
+#   config plugin / app.config.ts -&gt; expo prebuild  (~10 seconds)
+#   native module code -&gt; full rebuild  (~2-5 minutes)</code></pre></div>
+    <p>Three practical facts fall out of this pipeline. Metro does <strong>not</strong> type-check: it transpiles TypeScript away, so a type error ships silently unless something else runs <code>tsc --noEmit</code>. Environment variables are inlined at bundle time, which is why only the <code>EXPO_PUBLIC_</code> prefixed ones are visible in code. And asset references must go through <code>require()</code> so Metro can fingerprint and copy them — a string path that works in a dev server 404s in a release build.</p>
+    <h4>The four kinds of change</h4>
+    <p>Classifying a change before you make it saves real minutes every day. Editing a component or style is a reload. Adding or upgrading a pure-JavaScript dependency is a bundle restart. Anything read by <code>app.config.ts</code> — permissions, bundle identifiers, plugins — requires regeneration of the native projects with <code>expo prebuild</code>. Anything that touches Swift, Kotlin or C++ requires a full rebuild of the binary, which is why native iteration is planned in batches rather than attempted line by line.</p>
+    <div class="codeWrap"><pre><code>{
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --ci --coverage",
+    "lint": "eslint . --max-warnings 0",
+    "build:preview": "eas build --profile preview",
+    "submit:preview": "eas submit --platform android --profile preview"
+  }
+}</code></pre></div>
+    <div class="warn"><p><code>tsc --noEmit</code> in the scripts above is not optional decoration. Metro strips types without evaluating them, so an app that compiles perfectly can still be full of type errors; if the only check is "does it bundle", the first type error you will properly see is the one a user's crash report points at. Chapter 11 wires this into CI so the question never arises.</p></div>
+  </section>
+  <section class="chapter">
+<h2 id="ch2" data-toc>2 · Environment Setup: Expo vs Bare Workflow</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Environment setup: Expo vs bare workflow</button><div class="ch-toc-list"><a href="#ch2-choices">The three ways to start</a><a href="#ch2-project">Creating a project</a><a href="#ch2-native">Native code, prebuild and development builds</a><a href="#ch2-devices">Simulators, devices and the dev loop</a><a href="#ch2-decide">Deciding: Expo or bare</a></div></div>
+    <p class="topic-desc">The setup decision is the one decision that is expensive to reverse, so it is worth making deliberately. This chapter lays out the three starting points, shows the commands for each, and gives you the criteria that actually decide between them — most of which are about who maintains the native folders, not about features.</p>
+    <h3 id="ch2-choices" data-toc>The three ways to start</h3>
+    <p>There are exactly three starting positions, and they differ in one dimension: who owns the <code>android/</code> and <code>ios/</code> folders. <strong>Expo Go</strong> means nobody does — you run the pre-built shell from the store and your JavaScript is the entire app. A <strong>development build</strong> means <code>expo prebuild</code> owns them: they are generated from your config, compiled into a binary that contains your native modules, and regenerated whenever the config changes. A <strong>bare React Native</strong> project means you do — the folders are committed, hand-edited and merged by hand on every upgrade.</p>
+    <p>The three are not three religions; they are three points on one axis, and moving along it is a supported operation in both directions. What is not supported is pretending to be at two points at once, which is the state that causes the most confusing failures.</p>
+    <div class="codeWrap"><pre><code># 1. Expo Go — zero native setup, but only the modules in the store shell
+npx create-expo-app@latest my-app
+npx expo start                    # scan the QR with Expo Go
+
+# 2. development build — YOUR binary, ANY native module you can install
+npx expo install expo-dev-client
+npx expo run:android              # compiles a binary with your modules
+npx expo run:ios                  # needs a Mac; simulator or cable
+
+# 3. bare React Native CLI — you own the native folders from day one
+npx @react-native-community/cli init MyApp</code></pre></div>
+    <p>Expo Go is a preview environment, not a deployment target, and the failure mode is abrupt: install a package with native code, keep running in Expo Go, and the app dies at launch with a module-not-found error that looks like a broken install but is really a wrong runtime. Development builds end that class of problem — the binary you test is compiled from the same dependency list your users will get.</p>
+    <h4>What each path costs you</h4>
+    <p>The real difference between the paths is not what they can do today but who pays at upgrade time. Expo Go costs nothing because there is no native code to maintain, and caps you at the SDK's module list. A development build costs a one-time compile and then keeps costing only what config plugins cost. A bare project costs manual three-way merges on every React Native upgrade, twice — once for Gradle, once for CocoaPods — plus the CI machine that has to have exactly the right Xcode, JDK and Android SDK versions installed.</p>
+    <div class="codeWrap"><pre><code>// who owns android/ and ios/?
+//   Expo Go          nobody - those folders do not exist in your project
+//   dev build        "expo prebuild" regenerates them from config; keep
+//                    them out of git and treat them as build output
+//   bare RN CLI      you do - commit them, patch them, merge upgrades
+//
+// what breaks first in each path:
+//   Expo Go          any module outside the store shell's list
+//   dev build        a config plugin you forgot to declare, or a native
+//                    dependency pinned to the wrong React Native
+//   bare CLI         every React Native upgrade, and "works on my Mac"
+//                    CI that only the one engineer who set it up can run
+//
+// the direction that is HARD: going backwards. un-owning native folders
+// you have patched for a year means replaying every patch as a plugin.</code></pre></div>
+    <div class="note"><p>The store shell is not frozen in time — Expo updates Expo Go for each SDK, roughly three times a year — but it is frozen relative to your app. If a bug only reproduces in Expo Go, ask first whether the module you are testing is even present in that binary.</p></div>
+    <h3 id="ch2-project" data-toc>Creating a project</h3>
+    <p>The default template gives you TypeScript, a file-based router, linting and a sensible folder layout — more than you need on line one, but all of it removable. If you are following this guide's navigation chapter, which builds on React Navigation directly, note that the two are not rivals: the default router is implemented <em>on top of</em> React Navigation, so choosing the library instead of its file-based wrapper is a smaller decision than it looks.</p>
+    <p>Three settings are worth deciding before the first commit, because changing them later means touching every file: strictness of the type checker, path aliases, and where shared code lives. Relative imports like <code>../../../../lib/api</code> are the symptom of not deciding the third one, and they make a folder move a diff across fifty files.</p>
+    <div class="codeWrap"><pre><code>npx create-expo-app@latest field-notes
+cd field-notes
+
+# everything native goes through expo install so versions match THIS SDK
+npx expo install expo-dev-client
+npx expo install react-native-screens react-native-safe-area-context
+
+# one-time project settings, before the first commit
+npx expo lint --init               # eslint config for the project
+npx expo install --save-dev jest-expo
+
+# run it
+npx expo start                     # JS + assets, any device on the LAN</code></pre></div>
+    <p>Metro resolves the path alias declared in <code>tsconfig.json</code> natively in current SDKs — there is no Babel plugin to install and no bundler config to write, which is a change from a few years ago when the alias had to be declared three times and the third omission produced a runtime-only failure. Declare it once, in the file TypeScript already reads.</p>
+    <h4>Project settings that pay off now</h4>
+    <p><code>strict: true</code> is the setting people skip and regret: React Native's own types and the types of every serious library are written assuming it, and without it <code>null</code> checks disappear from your own code while the libraries still return nullables. The alias turns folder structure into a stable import vocabulary — <code>@/lib/api</code> means the same thing from any depth. And the Jest preset matters now rather than later, because <code>jest-expo</code> configures the transform and the native mocks that every test in chapter 11 will depend on.</p>
+    <div class="codeWrap"><pre><code>{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] },
+    "types": ["jest"]
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ]
+}</code></pre></div>
+    <div class="tip"><p>Run <code>npx tsc --noEmit</code> from your editor's task runner now, not in week six. Metro discards types without checking them, so the bundler will happily hand a type error straight to production — the alias and <code>strict</code> only buy their guarantee if something actually evaluates them.</p></div>
+    <h3 id="ch2-native" data-toc>Native code, prebuild and development builds</h3>
+    <p><code>expo prebuild</code> turns configuration into native projects. It reads <code>app.config.ts</code>, evaluates every config plugin, generates a fresh <code>android/</code> and <code>ios/</code>, applies your permission strings, bundle identifiers, version numbers and plugin modifications, and then Gradle or Xcode compile them as usual. The discipline that makes this work is called Continuous Native Generation: keep the folders out of version control, express every native change as code that prebuild applies, and the native projects become reproducible build output instead of a hand-maintained fork.</p>
+    <p>What breaks this discipline is a hand edit. Someone opens Android Studio, changes a Gradle line so the build passes on Friday, and the change evaporates the next time prebuild runs with <code>--clean</code> — or worse, it silently survives in one developer's folder and never reaches anyone else's. Every native change has exactly two legal forms: a config plugin, or a dependency that autolinks.</p>
+    <div class="codeWrap"><pre><code># inspect exactly what your config evaluates to - no guessing
+npx expo config --type public
+
+# generate (or regenerate) the native projects
+npx expo prebuild                 # applies config + plugins, keeps extras
+npx expo prebuild --clean         # from scratch: what CI should do
+
+# a plugin runs DURING prebuild and mods the generated project
+# app.config.ts:
+#   plugins: ['expo-notifications', './plugins/with-camera-usage.js']
+
+# most native modules need NOTHING but installation - autolinking
+# registers them at build time. plugins are for manifest-level edits:
+# permissions, URL schemes, gradle properties, plists.</code></pre></div>
+    <p>A config plugin is a small JavaScript function that edits the generated native project: append a key to <code>Info.plist</code> on iOS, add a permission or an intent filter to <code>AndroidManifest.xml</code>, set a Gradle property. You write one when a module needs platform metadata that installation alone cannot supply — a camera permission string is the canonical example, because iOS will terminate an app that calls the camera without a usage description, and no amount of JavaScript can add that string after the binary exists.</p>
+    <h4>When a config plugin is not enough</h4>
+    <p>Some changes are structural: a new build phase, a modified Gradle plugin, an entitlement for push notifications. For those, prefer an existing published plugin — nearly every popular SDK ships one — and write your own only for the delta. When you do write one, keep it idempotent, because prebuild may run repeatedly over an existing folder, and a plugin that appends a duplicate manifest entry on every run will eventually produce a build error on a machine you do not have access to.</p>
+    <div class="codeWrap"><pre><code>// plugins/with-camera-usage.js - evaluated at prebuild time
+const { withInfoPlist, AndroidConfig } = require('expo/config-plugins');
+
+module.exports = function withCameraUsage(config) {
+  // iOS: without this string the OS kills the app on camera access
+  config = withInfoPlist(config, (cfg) =&gt; {
+    cfg.modResults.NSCameraUsageDescription =
+      'Scans QR codes to join a shared notebook.';
+    return cfg;
+  });
+
+  // Android: a manifest permission, added idempotently
+  config = AndroidConfig.Permissions.withPermissions(config, [
+    'android.permission.CAMERA',
+  ]);
+  return config;
+};</code></pre></div>
+    <div class="warn"><p>Never mix the two ownership models. If prebuild generates the native folders, treat every file inside them as read-only build output; if you need a permanent hand edit, you have chosen the bare workflow and should stop running <code>--clean</code> — or better, replay the edit as a plugin and move back. A project where half the native changes live in git and half live in plugins is the hardest state to debug in React Native, because neither <code>git log</code> nor <code>expo config</code> tells the whole story.</p></div>
+    <h3 id="ch2-devices" data-toc>Simulators, devices and the dev loop</h3>
+    <p>Your loop is Metro plus a target. Metro serves the JavaScript bundle from memory and pushes updates over a socket, so a save becomes a screen change in about a second — but that loop has three hidden dependencies: the emulator must be awake, the device must reach the bundler over the network, and Metro's cache must still be valid. When any of the three is wrong, the symptom is always "my change did not appear", and the fixes are ordered by cost.</p>
+    <p>Targets differ in ways that decide your test plan. The iOS simulator is fast and accurate for layout but shares your Mac's CPU, so it lies about performance. The Android emulator is accurate enough for most behaviour and still lies harder about performance, because emulated devices run on your desktop's cores. Only a physical device gives you real frame timing, real keyboard behaviour and real network conditions — and a five-year-old Android handset is worth more as a test device than three emulators.</p>
+    <div class="codeWrap"><pre><code>npx expo start --clear            # reset Metro's cache: the 90% fix
+npx expo start --tunnel           # different network than the phone? use this
+npx expo start --lan              # default: same Wi-Fi, fastest path
+
+# device-side tools
+#   Android: shake the device (or press m in the terminal) - dev menu
+#   iOS sim: Cmd+D in the simulator window - dev menu
+adb logcat *:S ReactNativeJS:V    # JS console output, on a real device
+adb shell input keyevent 82       # open the Android dev menu via cable
+
+# the cold-start ladder, cheapest fix first
+#   1. press r in the Metro terminal      (reload the bundle)
+#   2. npx expo start --clear             (drop the bundler cache)
+#   3. rebuild the dev binary             (native deps changed?)
+#   4. npx expo-doctor                    (version matrix wrong?)
+#   5. rm -rf node_modules &amp;&amp; npm install (last, not first)</code></pre></div>
+    <p>Network deserves special mention because it is the failure that looks like a framework bug. On a guest Wi-Fi network with client isolation, the phone simply cannot reach your laptop, and Metro reports nothing at all — the app sits on the old bundle. The tunnel option relays traffic through Expo's servers and costs some speed; the reliable alternative is a USB cable and <code>adb reverse tcp:8081 tcp:8081</code>, which puts the bundler on the device through the USB connection itself.</p>
+    <h4>The five-minute cold start</h4>
+    <p>Every React Native developer eventually loses time to a wedged environment, and the symptoms are always the same: Fast Refresh stopped, a module that certainly exists "cannot be resolved", or an emulator refuses to install an update. The order above — reload, clear cache, rebuild, diagnose, reinstall — resolves nearly all of it. The mistake that multiplies the cost is starting at step five: deleting <code>node_modules</code> does not fix a stale Metro cache, it just makes you wait while the real cause is still there.</p>
+    <div class="codeWrap"><pre><code>// symptom -&gt; first move (in order, never skip to the last one)
+//
+// "Unable to resolve module @/lib/api"      -&gt; alias missing in
+//    tsconfig or Metro cache stale: restart with --clear
+// "Cannot find module 'expo-camera'"        -&gt; you are in Expo Go:
+//    that module needs a development build  (see above)
+// white screen on launch, logs show a throw -&gt; module-scope code ran
+//    before setup finished; read logcat, not the Metro terminal
+// Fast Refresh stopped applying edits       -&gt; --clear, then check
+//    the terminal for a bundling error it may have swallowed
+// INSTALL_FAILED_UPDATE_INCOMPATIBLE         -&gt; uninstall the app on
+//    the device, then run again (signature changed after prebuild)
+// pods failing after an SDK upgrade         -&gt; pod install --repo-update
+//    inside ios/, or npx expo run:ios --no-build-cache</code></pre></div>
+    <div class="tip"><p>Keep one physical Android and one physical iOS device in the test rotation from the first week. The bugs they catch — cut-out safe areas on notched phones, keyboards that cover the submit button, list scrolling with touch instead of a mouse wheel, animations that drop frames while the emulator reports sixty — are all bugs you would otherwise ship to users, and all of them are chapters in this guide for exactly that reason.</p></div>
+    <h3 id="ch2-decide" data-toc>Deciding: Expo or bare</h3>
+    <p>The honest 2026 answer is that you start with Expo unless you can name a specific reason not to, and the reasons that survive scrutiny are narrow: you are embedding React Native inside an existing native application, you need a platform React Native's Expo support does not target, or you maintain a white-label product whose native forks are the product. "We might need native code later" is not a reason — that is what development builds are, and compiling your own binary with your own modules is the normal path, not an escape from one.</p>
+    <p>The decision should also account for who is on the team. A bare project is a permanent commitment to maintain two native build environments on every developer's machine and in CI; an Expo project is a commitment to express native changes as configuration. For a small team shipping its first mobile product, the second commitment is almost always cheaper, and it is reversible in a way the first one is not.</p>
+    <div class="codeWrap"><pre><code>                    Expo Go      development build     bare RN CLI
+native modules       SDK only     anything you install  anything
+compile time         none         ~1-3 min, cached      ~1-3 min, cached
+who owns native      nobody       prebuild (from config) YOU
+upgrades             one command  one command + prebuild manual merges
+OTA updates          built in     built in              wire it up
+CI complexity        low          medium                high
+"escapes"            none needed  prebuild --clean      stay and merge
+
+# bringing an EXISTING bare app into Expo, without losing anything:
+npx install-expo-modules@latest   # adds Expo modules alongside yours
+npx expo install expo-updates     # OTA channel, optional but cheap
+# npx expo prebuild              # only when you are ready to hand the
+#                                 native folders to config as code</code></pre></div>
+    <p>Read the matrix by column rather than by row. Expo Go and a development build are the same JavaScript project seen at two moments of maturity; the bare CLI is a different project. And the migration arrows are asymmetric: moving from Go to a development build is one install, while moving from bare back to generated native folders means replaying every hand edit as a plugin first.</p>
+    <h4>Signals you are on the wrong path</h4>
+    <p>Three signals are worth trusting. First, upgrades take a day of Gradle and pod conflicts rather than an hour — that is the bare workflow's recurring tax, and it grows with every native dependency. Second, only one engineer can run the build — that means native setup has become tribal knowledge instead of configuration. Third, a native change cannot be reproduced from a clean checkout — if a fresh clone does not produce the same binary, the native folders are no longer source code, whatever they are called in the repository.</p>
+    <div class="codeWrap"><pre><code>// choose by answering four questions, in this order:
+//
+// 1. embedding RN in an EXISTING native app, or targeting a platform
+//    Expo does not support?                     -&gt; bare, and stay there
+// 2. do you need a native SDK this week that is not in the Expo SDK?
+//    (a payments SDK, BLE, a bespoke device)    -&gt; development build.
+//    installing it and compiling your own binary is ONE command; it
+//    does not imply the bare workflow at all.
+// 3. do you want OTA updates, reproducible CI, and no Xcode on
+//    anybody's laptop?                          -&gt; Expo, EAS Build
+// 4. is this a team's first mobile product?     -&gt; Expo, unconditionally.
+//    the thing you will underestimate is not the app code, it is the
+//    two native build environments you just signed up to maintain.
+//
+// revisit when any of the four stops being true - the migration in
+// the other direction is a script, not a project.</code></pre></div>
+    <div class="note"><p>The choice is revisitable in both directions, but not for free. Moving up the axis (Go to development build, development build to bare-ownership) is a command. Moving down — un-owning native folders you have patched by hand for a year — means converting every patch into a plugin first, which is the migration everyone wishes they had started at month two instead of month twenty.</p></div>
+  </section>
+  <section class="chapter">
+<h2 id="ch3" data-toc>3 · Core Components and Layout Primitives</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Core components and layout primitives</button><div class="ch-toc-list"><a href="#ch3-view-text">View and Text: the two primitives</a><a href="#ch3-image">Image, caching and expo-image</a><a href="#ch3-scroll">ScrollView and the windowing problem</a><a href="#ch3-press">Pressable and touch handling</a><a href="#ch3-semantics">Accessibility and touch targets</a></div></div>
+    <p class="topic-desc">React Native ships a small component vocabulary, and the whole framework is a set of opinions about composing it. This chapter covers the components you will use in every screen — what each one maps to natively, where each one costs memory, and the rules the platform enforces that the DOM never did.</p>
+    <h3 id="ch3-view-text" data-toc>View and Text: the two primitives</h3>
+    <p><code>View</code> is the universal container: a native view that lays its children out with flexbox, clips or not according to <code>overflow</code>, and exists in every combination of the interface. There is no <code>span</code>, no <code>section</code>, no <code>ul</code> — semantic roles are supplied later through accessibility props rather than inferred from tag names, which is chapter 3's last section. Almost every layout bug in React Native is a statement about a <code>View</code> that has no size: a container with neither <code>flex</code>, nor a dimension, nor a content-bearing child will collapse to zero, exactly as an empty div does, but with no inspector nudge to tell you which of the three was missing.</p>
+    <p><code>Text</code> is the one component that behaves unlike anything on the web. It is a native label — <code>UILabel</code>, <code>TextView</code> — so strings must live inside it, it can itself be pressed, and it accepts layout props like <code>numberOfLines</code> that a web paragraph expresses with CSS. Styles nest: a child <code>Text</code> inherits what it can from its parent, which is how a bold word inside a sentence is built without a wrapper element.</p>
+    <div class="codeWrap"><pre><code>export function Headline({ title, subtitle, onPress }: Props) {
+  return (
+    &lt;View style={styles.block}&gt;
+      &lt;Text
+        style={styles.title}
+        numberOfLines={2}
+        ellipsizeMode="tail"
+        onPress={onPress}      // Text is pressable in its own right
+      &gt;
+        {title}
+      &lt;/Text&gt;
+      &lt;Text style={styles.sub} selectable={false}&gt;
+        {subtitle}
+      &lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  block: { paddingHorizontal: 16, paddingVertical: 12 },
+  title: { fontSize: 20, fontWeight: '600', lineHeight: 26 },
+  sub: { fontSize: 14, marginTop: 4, opacity: 0.7 },
+});</code></pre></div>
+    <p>The whitespace rules are the most common silent bug. JSX collapses a newline-adjacent text segment, so an expression and a word on separate lines lose the space between them — the string renders as <code>12unread</code> and no error is raised, because both fragments are individually valid. The fix is to make the space explicit, and to know that any run of spaces in source collapses to one.</p>
+    <h4>Text rules the DOM never taught you</h4>
+    <p>Four rules account for nearly every text surprise. Raw strings outside a <code>Text</code> throw an invariant. Newlines in a JS string render as line breaks, but JSX source newlines do not. Runs of spaces collapse to a single space, so aligned source does not align output. And long unbroken tokens — URLs, IDs, table names — need an explicit <code>ellipsizeMode</code> and a width, or they will push the layout sideways instead of wrapping.</p>
+    <div class="codeWrap"><pre><code>// WRONG: JSX eats the newline, so the space vanishes with it
+&lt;Text&gt;
+  {count}
+  unread messages
+&lt;/Text&gt;                     // renders "12unread messages"
+
+// RIGHT: one of these three forms
+&lt;Text&gt;{count + ' unread messages'}&lt;/Text&gt;
+&lt;Text&gt;{count} unread messages&lt;/Text&gt;
+&lt;Text&gt;
+  {count}{' '}
+  unread messages
+&lt;/Text&gt;
+
+// and remember: source "a    b" renders "a b" - one space survives.
+// indentation inside a Text is output, not formatting. it never was
+// formatting on the web either; here there is no CSS whitespace
+// property to rescue you.</code></pre></div>
+    <div class="note"><p><code>numberOfLines</code> is not a truncation preference, it is a layout contract: it caps the box, and combined with <code>ellipsizeMode</code> it is what lets a row keep a stable height in a list. Rows whose heights change as titles wrap are a major cause of scroll jitter, because every wrap invalidates layout for everything below it.</p></div>
+    <h3 id="ch3-image" data-toc>Image, caching and expo-image</h3>
+    <p><code>Image</code> from <code>react-native</code> loads a URI into a native image view with <code>resizeMode</code> controlling the fit, and it caches in memory for the lifetime of the process. That is the whole story for a prototype. Production apps reach for <code>expo-image</code>, which adds a persistent disk cache, a blurhash or main-color placeholder, an animated transition, priority and recycling — the difference between a feed that feels instant on a second visit and one that refetches everything on every visit.</p>
+    <p>The performance rule underneath both is that the decoder works on the whole bitmap. A 4000-pixel photo rendered into a 160-pixel thumbnail allocates the full image before scaling it down, and on Android that allocation is one of the fastest routes to an out-of-memory kill. The server should send thumbnails; the client should ask for a size; and the row slot should be sized before the bytes arrive so nothing reflows when they do.</p>
+    <div class="codeWrap"><pre><code>import { Image } from 'expo-image';
+
+const BLURHASH = 'L6PZfSjE.AyE_3t7t7R**0o#DgR4';
+
+export function Cover({ uri, label }: { uri: string; label: string }) {
+  return (
+    &lt;Image
+      source={{ uri }}
+      placeholder={{ blurhash: BLURHASH }}  // instant paint, no pop
+      contentFit="cover"
+      transition={180}
+      cachePolicy="disk"                    // survives an app restart
+      priority="normal"
+      accessibilityLabel={label}
+      style={styles.cover}
+    /&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  cover: { width: '100%', aspectRatio: 16 / 9, borderRadius: 4 },
+});</code></pre></div>
+    <p>Two habits make images cheap. First, size the slot: an <code>aspectRatio</code> box reserves space before the download, so the list does not reflow halfway through a scroll — reflow during scroll is what produces the stutter users describe as "the app feels rough". Second, warm the cache for what is about to be visible: prefetching the next handful of rows while the user reads the first one moves the download off the moment of need.</p>
+    <h4>Avoiding the layout jump</h4>
+    <p>Layout jumps have a specific shape: row at height 88, image arrives, row grows to 140, every row below shifts, and because the finger was already down, the scroll position now points at different content. The defence is structural rather than cosmetic — every image lives in a box whose size is known from layout alone, and the image fills that box. When a source image can be any aspect ratio, the box still wins: <code>contentFit="cover"</code> crops instead of expanding.</p>
+    <div class="codeWrap"><pre><code>// reserve the space FIRST, warm the cache EARLY
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', gap: 12, padding: 12 },
+  thumb: { width: 84, height: 84, borderRadius: 4 }, // fixed: no reflow
+  body: { flex: 1, justifyContent: 'center' },
+});
+
+// prefetch only what the user is about to see - prefetching a whole
+// feed burns data and disk for rows that are never opened
+const upcoming = data.slice(0, 10).map((i) =&gt; i.thumbUrl);
+Image.prefetch(upcoming);
+
+// measure the difference honestly: memory pressure on a low-end
+// Android shows up as an OOM kill, not as a slow frame. use the
+// memory meter in the dev menu while scrolling the real feed.</code></pre></div>
+    <div class="warn"><p>Never render an unbounded image list at full source resolution. The failure is not gradual — Android kills the process, iOS jetsams it, and the user sees the app "close randomly" with nothing in the logs you would recognise as your bug. Downsample on the server, cap the decoded size on the client, and treat the memory meter as a dashboard you check before release, not after the first store review mentioning crashes.</p></div>
+    <h3 id="ch3-scroll" data-toc>ScrollView and the windowing problem</h3>
+    <p><code>ScrollView</code> lays out every child it is given, eagerly, at mount. That is exactly right when the content is known and bounded — a form, a settings screen, a profile page — because a small number of native views laid out once is the cheapest thing a UI can do. It also gives you the integration points a static page needs: a pull-to-refresh control, keyboard avoidance, scroll-to-bottom on focus, and content insets that respond to the safe area.</p>
+    <p>The failure mode arrives the moment content is unbounded. A feed inside a <code>ScrollView</code> creates every row's native views before the first frame, so mount cost grows linearly with history, memory grows linearly with history, and the first scroll gesture pays for a layout pass over all of it on the UI thread. The windowed lists — <code>FlatList</code> and <code>SectionList</code>, both built on <code>VirtualizedList</code> — exist to break that linearity, and chapter 7 tunes them properly.</p>
+    <div class="codeWrap"><pre><code>export function ProfileScreen({ user, reload, loading }: Props) {
+  return (
+    &lt;ScrollView
+      contentContainerStyle={styles.content}
+      contentInsetAdjustmentBehavior="automatic"
+      keyboardShouldPersistTaps="handled"
+      refreshControl={
+        &lt;RefreshControl refreshing={loading} onRefresh={reload} /&gt;
+      }
+    &gt;
+      &lt;Avatar user={user} /&gt;
+      &lt;Stats user={user} /&gt;
+      &lt;Biography text={user.bio} /&gt;
+      &lt;RecentNotes notes={user.recent} /&gt;   // bounded: 5 items
+    &lt;/ScrollView&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  content: { padding: 16, gap: 24, flexGrow: 1 },
+});</code></pre></div>
+    <p>Three props do most of the work. <code>contentContainerStyle</code> styles the content rather than the viewport — on the web you would use the inner wrapper div, and getting the two confused is why "my padding does not work" is a real support question. <code>keyboardShouldPersistTaps</code> decides whether a tap outside the keyboard dismisses it or activates the control under it, and <code>"handled"</code> is almost always the right value. <code>refreshControl</code> attaches the platform's native pull-to-refresh, which cannot be faked convincingly with JS.</p>
+    <h4>Nested scroll: the rule</h4>
+    <p>A screen may have one scrolling axis of its own; anything else is a negotiation that must be set up deliberately. A vertical <code>ScrollView</code> inside another vertical one requires the inner to have a bounded height and, on Android, <code>nestedScrollEnabled</code> — without both, one of them simply wins and the other becomes unscrollable depending on where the finger starts. Horizontal inside vertical is well-behaved, because the two gestures differ in direction and the responder system can tell them apart.</p>
+    <div class="codeWrap"><pre><code>// choosing the container, once and for all:
+//
+//   content known, &lt; ~20 views, does not grow   -&gt; ScrollView
+//   a form, a settings screen, a profile        -&gt; ScrollView
+//   a feed, chat history, gallery, search results
+//     that can grow without bound               -&gt; FlatList   (ch 7)
+//   grouped data with sticky headers            -&gt; SectionList (ch 7)
+//
+// why the number matters: ScrollView creates every child eagerly.
+//   50 rows  -&gt; 50 native views, laid out once, invisible cost
+//  500 rows  -&gt; 500 native views BEFORE first paint, one giant
+//               layout pass on the UI thread, and every state change
+//               above them invalidates all of them
+//
+// a list that "feels fine with mock data" and crawls with real data
+// is almost always this decision, made too early.</code></pre></div>
+    <div class="tip"><p>If a screen needs both a long body and a fixed header or tab bar, do not nest a full-height scroll view inside another. Give the header its own row, let the body own the remaining flex, and let the body be the only scroller. One scroll owner per screen is the rule that keeps Android's nested scrolling predictable.</p></div>
+    <h3 id="ch3-press" data-toc>Pressable and touch handling</h3>
+    <p><code>Pressable</code> is the primitive behind <code>TouchableOpacity</code>, <code>TouchableHighlight</code> and most library buttons: a component that participates in the responder system, reports press lifecycle events, and renders feedback through a style function instead of an animated wrapper. Its signature feature is that the pressed state arrives as an argument to <code>style</code>, so the visual response is a pure function of the interaction — no state to set, no effect to run, no re-render for a highlight.</p>
+    <p>Touch is not click. A tap has to be distinguished from the scroll that may follow it, from a long press, and from an accidental brush while the user is reaching for something else. The responder system resolves this by letting the scroll view claim the gesture once the finger moves past a slop distance, at which point the row's <code>onPress</code> will never fire — which is the behaviour you want, and the reason rows should be a single <code>Pressable</code> rather than a click handler on an inner element.</p>
+    <div class="codeWrap"><pre><code>export function SaveButton({ onSave, busy }: Props) {
+  return (
+    &lt;Pressable
+      onPress={onSave}
+      disabled={busy}
+      hitSlop={8}                       // grow the target, not the box
+      android_ripple={{ color: 'rgba(3, 77, 184, 0.25)' }}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: busy, busy }}
+      accessibilityLabel="Save note"
+      style={({ pressed }) =&gt; [
+        styles.btn,
+        pressed &amp;&amp; styles.btnPressed,
+        busy &amp;&amp; styles.btnBusy,
+      ]}
+    &gt;
+      &lt;Text style={styles.label}&gt;
+        {busy ? 'Saving...' : 'Save'}
+      &lt;/Text&gt;
+    &lt;/Pressable&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  btn: { height: 48, borderRadius: 4, alignItems: 'center',
+         justifyContent: 'center', paddingHorizontal: 20 },
+  btnPressed: { opacity: 0.85 },
+  btnBusy: { opacity: 0.5 },
+});</code></pre></div>
+    <p><code>hitSlop</code> is the prop that separates a usable interface from a fiddly one: it extends the touch area without changing layout, so a 24-point icon in a 44-point row responds across the whole row while the visual design stays tight. <code>delayLongPress</code> tunes the long-press threshold, <code>pressRetentionOffset</code> decides how far the finger may drift before the press is lost, and <code>onPressIn</code>/<code>onPressOut</code> let you start and cancel an animation at exactly the moments the user's finger does.</p>
+    <h4>Tap versus scroll</h4>
+    <p>The arbitration rule is worth internalising: the responder that receives the touch first may keep it, and a scroll view that claims the gesture releases the tap permanently, even if the finger returns to the original position. That is why a row implemented as a full-area <code>Pressable</code> behaves correctly while a row with an inner button and a separate row handler does not — in the second design, the scroll and the button fight over the same touch, and the winner depends on where the finger started.</p>
+    <div class="codeWrap"><pre><code>// what actually happens when a finger moves:
+//   press-in        -&gt; the row gets the responder, highlights
+//   move ~10 points -&gt; the scroll view claims the gesture
+//   move back       -&gt; the row does NOT regain it
+//   release         -&gt; no onPress, the list scrolled. correct.
+//
+// the design consequences:
+//   1. one Pressable per row, covering the WHOLE row. an inner
+//      button that only covers the icon gives a 24pt target in a
+//      56pt row and users aim at the row.
+//   2. do not attach a second gesture recognizer to the same area
+//      unless you want to arbitrate between them yourself (ch 9).
+//   3. onPress must be safe to receive a press that followed a
+//      micro-scroll - check whether anything actually changed.
+//   4. long press for secondary actions, but ALWAYS provide a
+//      visible alternative: gestures without affordance are
+//      undiscoverable, and inaccessible by definition.</code></pre></div>
+    <div class="warn"><p>A press handler that navigates must be idempotent for a double tap. Network plus navigation in one <code>onPress</code> with no guard is how a screen ends up pushed twice and a record created twice; guard with a ref or a pending state, and make the server side idempotent anyway — chapter 8 covers the submitting state properly, and chapter 14 makes the server assume duplicates arrive.</p></div>
+    <h3 id="ch3-semantics" data-toc>Accessibility and touch targets</h3>
+    <p>Accessibility props are not a compliance checkbox layered on afterwards; they are the semantic layer that the tag soup of HTML gave you for free. A native view announces itself through role, label, value and state, and if you do not supply them the screen reader announces nothing useful — it reads the view's coordinates or, worse, stays silent. Supplying them also happens to make the interface better for everyone: a labelled icon button is easier to hit, understand and test.</p>
+    <p>The vocabulary is small. <code>accessibilityRole</code> says what the element is ("button", "header", "link", "tab"). <code>accessibilityLabel</code> says what it is called, and should read as an outcome — "Delete note", not "X". <code>accessibilityState</code> exposes <code>disabled</code>, <code>selected</code>, <code>checked</code>. <code>accessibilityHint</code> adds what happens next when the label alone is ambiguous. On a container, <code>accessible</code> groups its children into one focusable unit — useful for a row, dangerous for anything containing a control.</p>
+    <div class="codeWrap"><pre><code>export function NoteRow({ item, onOpen, onArchive }: Props) {
+  return (
+    &lt;Pressable
+      accessible
+      accessibilityRole="button"
+      accessibilityLabel={'Note ' + item.title}
+      accessibilityValue={{ text: 'Edited ' + item.editedLabel }}
+      accessibilityHint="Opens the note for reading and editing"
+      testID={'note-row-' + item.id}
+      onPress={() =&gt; onOpen(item.id)}
+      onLongPress={() =&gt; onArchive(item.id)}
+      hitSlop={4}
+      style={styles.row}
+    &gt;
+      &lt;Text style={styles.title}&gt;{item.title}&lt;/Text&gt;
+      &lt;Text style={styles.meta}&gt;{item.editedLabel}&lt;/Text&gt;
+    &lt;/Pressable&gt;
+  );
+}</code></pre></div>
+    <p>Target size and font scaling are the two checks that catch real reports. Every actionable element needs a 44-point (iOS) or 48-dp (Android) touch area, which <code>hitSlop</code> provides without changing the design. And text must survive the platform's largest font setting: <code>allowFontScaling</code> defaults to true, which means a fixed-height row with <code>numberOfLines</code> will clip at large sizes — the accessible behaviour is to let the row grow, and clip only the truly decorative text.</p>
+    <h4>Checking it without a device across the room</h4>
+    <p>You can verify most of this without leaving the editor. Turn on VoiceOver in the iOS simulator or TalkBack on the Android emulator and navigate by focus: if the order jumps, if a control is silent, or if a label reads as gibberish, the props are wrong. Then query the same labels in tests — a testing library that resolves elements by accessibility label forces the labels to exist, so the test suite becomes a second enforcement of the same contract.</p>
+    <div class="codeWrap"><pre><code>// per-screen accessibility checklist (run it in BOTH readers once):
+//
+//  roles      every actionable element has accessibilityRole
+//  labels     outcome-first: "Delete note", never "X" or "icon"
+//  state      disabled / selected / checked exposed, not implied
+//  targets    44pt / 48dp minimum, or hitSlop grows the area
+//  contrast   colour is never the only signal - pair icon or text
+//  scaling    survives 200% font without clipping the ACTION
+//  order      focus order matches visual order on every screen
+//  motion     reduce-motion respected: swap animation for a fade
+//
+// and the two automated equivalents, both cheap:
+//   jest:  getByLabelText('Delete note') fails if the label is gone
+//   CI:    accessibility audit script over the tree (ch 11)
+//
+// a screen reader label is also a test selector and a voice-control
+// target. write it once, get all three.</code></pre></div>
+    <div class="tip"><p>The fastest discipline is to navigate every new screen with TalkBack once before merging it. It costs two minutes and it finds unlabeled icon buttons, focus order that makes no sense, and controls that are visually 44 points but only respond to their inner 12 — the three defects users actually report, and none of which a screenshot review would ever catch.</p></div>
+  </section>
+
+  <section class="chapter">
+<h2 id="ch4" data-toc>4 · Styling and Flexbox on Mobile</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Styling and flexbox on mobile</button><div class="ch-toc-list"><a href="#ch4-objects">Styles are objects, not CSS</a><a href="#ch4-flex">Flexbox defaults: column, not row</a><a href="#ch4-density">Points, pixels and density</a><a href="#ch4-responsive">Responsive layouts and breakpoints</a><a href="#ch4-theme">Design tokens and dark mode</a></div></div>
+    <p class="topic-desc">React Native threw the cascade away, and what replaced it is a smaller and stricter system: style objects drawn from a fixed vocabulary, flexbox with defaults opposite to the web, a unit that is not a pixel, and no media queries at all. This chapter builds the model that makes a layout question answerable in one pass instead of five.</p>
+    <h3 id="ch4-objects" data-toc>Styles are objects, not CSS</h3>
+    <p>React Native has no CSS. The <code>style</code> prop takes a plain JavaScript object whose keys are drawn from a fixed, documented vocabulary — colour, margin, flex, opacity — and a key outside that vocabulary is not quietly ignored the way an unknown CSS property is ignored in a browser; it is reported. There are no selectors, so there is no specificity: the rule you wrote in March cannot beat the rule you wrote today, because there is no cascade to arbitrate between them. Every visual fact lives on the element that uses it, which makes a screen file readable top to bottom in a way that a component backed by four stylesheets rarely is.</p>
+    <p>What is given up is composition by class name. On the web you accumulate utility classes and let the stylesheet decide; here composition is code — arrays of style objects, flags spread into them, small functions that return an object — and the decision is made by position: the last entry in the array wins, always. That one rule is what makes theming tractable, because a theme override appended after a base style beats it by construction, and the component never needs to know which of its styles came from a theme. It also makes a falsey flag harmless: <code>selected &amp;&amp; styles.selected</code> contributes <code>false</code> when the flag is off, and the array simply skips it.</p>
+    <div class="codeWrap"><pre><code>import { StyleSheet, View, Text } from 'react-native';
+import { palette } from '../theme/palette';
+
+export function Card({ title, body, highlighted }) {
+  // the flag is appended after the base style, so it wins - position
+  // decides, there is no specificity to argue about
+  const tone = highlighted ? styles.highlighted : styles.quiet;
+
+  return (
+    &lt;View style={[styles.card, tone]}&gt;
+      &lt;Text style={styles.title}&gt;{title}&lt;/Text&gt;
+      &lt;Text style={styles.body}&gt;{body}&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: palette.border,
+  },
+  highlighted: { backgroundColor: palette.accent },
+  quiet: { backgroundColor: palette.surface },
+  title: { color: palette.text, fontSize: 17, fontWeight: '600' },
+  body: { color: palette.textMuted, fontSize: 15, marginTop: 6 },
+});</code></pre></div>
+    <p>Two habits keep this from becoming the inline-style swamp that React on the web became. The first is one <code>StyleSheet.create</code> block per component, at the bottom of the file where it can be read as a summary of everything the component can look like. The second is never an object literal inside JSX: <code>style={{ padding: 16 }}</code> allocates a fresh object on every render and hands the engine something new to compare each time, for a value that never changes.</p>
+    <h4>Why StyleSheet.create still exists</h4>
+    <p>It looks like an identity function — you hand it an object and get the same object back — but in development it is a validator. A misspelled key or a value of the wrong type throws at module load with a stack that points at the line you wrote, instead of producing a silently missing margin that gets discovered on a physical device three days later. It also gives the type checker one object to check, so renaming a token becomes a refactor the compiler verifies rather than a hunt through inline literals. In production the function returns your object as-is; on the old architecture it had allocated a static identifier that crossed the bridge once per style, which was a real optimization, and that history is why the API survived the rewrite intact.</p>
+    <p>Mutation is the other trap. Styles passed to <code>StyleSheet.create</code> are frozen in development, so writing to a property throws where it happens rather than at the call site you blamed. If a component genuinely needs different values at run time, that is not a mutation, it is a second style in the array — and because position decides, the second style is also the correct place for it.</p>
+    <div class="codeWrap"><pre><code>import { StyleSheet, View, Text } from 'react-native';
+import { palette } from '../theme/palette';
+
+// false disappears from the array; no nested ternaries, no dead object
+export function Chip({ label, selected, disabled }) {
+  return (
+    &lt;View
+      style={[
+        styles.chip,
+        selected &amp;&amp; styles.selected,
+        disabled &amp;&amp; styles.dimmed,
+      ]}
+    &gt;
+      &lt;Text style={[styles.label, selected &amp;&amp; styles.labelOn]}&gt;
+        {label}
+      &lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: palette.border,
+    alignSelf: 'flex-start',
+  },
+  selected: { backgroundColor: palette.accent, borderColor: palette.accent },
+  dimmed: { opacity: 0.45 },
+  label: { fontSize: 13, color: palette.text },
+  labelOn: { color: palette.accentInk, fontWeight: '700' },
+});</code></pre></div>
+    <div class="tip"><p>Keep styles in the file that uses them. Shared styles should become a component or a wrapper function, never an imported stylesheet: the moment a style object is imported from another module you have reintroduced the cascade, with worse tooling and no inspector.</p></div>
+    <h3 id="ch4-flex" data-toc>Flexbox defaults: column, not row</h3>
+    <p>The default <code>flexDirection</code> in React Native is <code>column</code>; on the web it is <code>row</code>. The framework chose the direction a phone screen actually stacks — title above body above action — and the consequence is that every horizontal arrangement becomes an explicit decision you write down. Once a container sets <code>row</code>, two questions decide the entire layout, and they are always the same two: which axis is the main axis, where <code>justifyContent</code> distributes children, and where children sit on the cross axis, where <code>alignItems</code> places them. Reading any layout as main axis first, cross axis second, before touching a property, turns most layout debugging into a lookup rather than an experiment.</p>
+    <p>The default that catches people out is not the direction, it is shrinking. On the web a flex item shrinks to fit because <code>flex-shrink</code> defaults to <code>1</code>; in React Native <code>flexShrink</code> defaults to <code>0</code>. A row holding a long unbroken title and a timestamp therefore does not squeeze the title — it pushes the timestamp off the right edge, with no warning and no scroll, because the row itself is not a scroll region. The fix is a rule worth writing into a team convention: any child of a row that holds variable-length content gets <code>flex: 1</code>, and any child that must keep its exact size — an avatar, a badge, a button — gets <code>flexShrink: 0</code> explicitly, so the intent survives even where the default already agrees with it.</p>
+    <p>The structural convention that follows is the screen skeleton: one root view at <code>flex: 1</code>, exactly one region that grows, everything else sized by its content. Screens built without that rule end up with three children all claiming to grow, which on a fixed-height screen means the middle one silently loses, and the bug presents as a footer that sometimes appears. Spacing between siblings no longer needs margin arithmetic either — <code>gap</code> has been supported since React Native 0.71, so a stack of items with even spacing is one property on the container.</p>
+    <div class="codeWrap"><pre><code>import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { palette } from '../theme/palette';
+
+export function Screen({ title, children, onContinue }) {
+  return (
+    &lt;SafeAreaView style={styles.root}&gt;
+      &lt;View style={styles.header}&gt;
+        &lt;Text style={styles.title}&gt;{title}&lt;/Text&gt;
+      &lt;/View&gt;
+
+      {/* exactly one region grows: the body. headers and footers are
+          sized by their content, so scrolling belongs to the body */}
+      &lt;View style={styles.body}&gt;{children}&lt;/View&gt;
+
+      &lt;View style={styles.footer}&gt;
+        &lt;Pressable style={styles.cta} onPress={onContinue}&gt;
+          &lt;Text style={styles.ctaText}&gt;Continue&lt;/Text&gt;
+        &lt;/Pressable&gt;
+      &lt;/View&gt;
+    &lt;/SafeAreaView&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+  header: { paddingHorizontal: 16, paddingVertical: 12 },
+  body: { flex: 1, paddingHorizontal: 16 },
+  footer: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 12, gap: 8 },
+  cta: { backgroundColor: palette.accent, padding: 14, borderRadius: 8 },
+  ctaText: { color: palette.accentInk, textAlign: 'center', fontWeight: '600', fontSize: 16 },
+  title: { fontSize: 20, fontWeight: '700', color: palette.text },
+});</code></pre></div>
+    <h4>Centering: the three cases</h4>
+    <p>Almost every centering question resolves to one of three answers, and naming the case first stops the property guessing. Center in both axes: put both <code>justifyContent: 'center'</code> and <code>alignItems: 'center'</code> on the container — the classic mistake is setting one and staring at a child that is still flush against an edge. Center along one axis only, such as a header row where the title sits mid-height but the action belongs at the end: <code>alignItems: 'center'</code> for the cross axis and <code>justifyContent: 'space-between'</code> to push the two ends apart. And center a single child without disturbing its siblings: <code>alignSelf: 'center'</code> on that child, which overrides the container's cross-axis decision for exactly one element. When none of the three fits, the container is usually the wrong shape — a child with no intrinsic height cannot be centered vertically, because there is nothing to center.</p>
+    <div class="codeWrap"><pre><code>import { View, Text, Image, StyleSheet } from 'react-native';
+import { palette } from '../theme/palette';
+
+export function ThreadRow({ avatar, title, preview, time }) {
+  return (
+    &lt;View style={styles.row}&gt;
+      &lt;Image source={{ uri: avatar }} style={styles.avatar} /&gt;
+
+      {/* flex: 1 on the variable-length middle. without it, a long
+          title pushes the timestamp off the right edge, because
+          flexShrink defaults to 0 in React Native */}
+      &lt;View style={styles.text}&gt;
+        &lt;Text style={styles.title} numberOfLines={1}&gt;{title}&lt;/Text&gt;
+        &lt;Text style={styles.preview} numberOfLines={2}&gt;{preview}&lt;/Text&gt;
+      &lt;/View&gt;
+
+      &lt;Text style={styles.time}&gt;{time}&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  avatar: { width: 44, height: 44, borderRadius: 22, flexShrink: 0 },
+  text: { flex: 1, flexShrink: 1 },
+  title: { fontSize: 16, fontWeight: '600', color: palette.text },
+  preview: { fontSize: 14, marginTop: 2, color: palette.textMuted },
+  time: { fontSize: 12, color: palette.textMuted, flexShrink: 0 },
+});</code></pre></div>
+    <div class="warn"><p>When a row runs off the right edge of the screen, the first suspect is the missing <code>flexShrink</code> on its variable-length child, not the row's own width. The row is only reporting what its children asked for, and a fixed-width child plus a zero-shrink child equals a container that cannot fit — on a screen with no horizontal scrollbar to absorb the difference.</p></div>
+    <h3 id="ch4-density" data-toc>Points, pixels and density</h3>
+    <p>A number in a React Native style is not a pixel. It is a density-independent point — a point on iOS, a density-independent pixel on Android — and the engine converts it to physical pixels using the screen's scale factor at layout time. The same <code>16</code> is therefore roughly the same physical length on a 160 dpi phone and a 520 dpi one, which is the entire reason mobile operating systems invented the unit: without it, every design either looks microscopic on a flagship or enormous on a cheap device, and the fix is never a media query.</p>
+    <p>The unit system is also deliberately tiny. There is no <code>px</code>, no <code>rem</code>, no <code>em</code>, no <code>vh</code>; lengths are unitless numbers, and the only string accepted in a length position is a percentage such as <code>'50%'</code>, which resolves against the parent's measured size during layout. Because every number is the same unit, there is no unit arithmetic to get wrong either — <code>marginBottom: 8</code> plus <code>paddingTop: 8</code> is sixteen points, full stop, and the <code>calc()</code> class of bug has no way to enter the codebase. Percentages remain useful for one specific job: a child that should be a fixed fraction of a parent whose height you do not know, where <code>flex</code> would give you a ratio across the whole axis instead.</p>
+    <p>The other half of the equation is text. By default React Native scales fonts with the operating system's accessibility setting — a user who has set their phone to 200 percent text size will see your 15-point body copy at 30 points, which is correct and required for accessibility, and which will break any layout that assumed one size. The policy is set per element: <code>allowFontScaling={false}</code> opts a single element out entirely, and <code>maxFontSizeMultiplier</code> caps how far a single element may grow. Both are legitimate on genuinely fixed-shape elements — a counter pill, a chart axis label — and both are an accessibility defect when applied to body copy, because the user who needs the larger text cannot ask your component for it.</p>
+    <div class="codeWrap"><pre><code>import { PixelRatio, useWindowDimensions } from 'react-native';
+
+// the design comp is 390 pt wide. type follows the width but stops at
+// both walls, so a foldable cannot turn body copy into a poster
+const BASE_WIDTH = 390;
+const MIN = 0.92;
+const MAX = 1.15;
+
+export function useTypeScale() {
+  const { width } = useWindowDimensions();
+  const raw = width / BASE_WIDTH;
+  const clamped = Math.min(MAX, Math.max(MIN, raw));
+  return Math.round(clamped * 100) / 100;
+}
+
+// snap a computed length to a whole physical pixel: a 14.4 pt rule
+// laid across a half-pixel boundary comes out of the compositor
+// blurred, which is why hairlines use StyleSheet.hairlineWidth
+export function snap(points) {
+  return PixelRatio.roundToNearestNear(points);
+}</code></pre></div>
+    <h4>PixelRatio in practice</h4>
+    <p><code>PixelRatio.get()</code> returns the screen's scale factor — <code>2</code> on most phones, <code>3</code> on flagships, higher on tablets — and <code>PixelRatio.getFontScale()</code> returns the user's text-size multiplier separately, which is the value you need when a component must track accessibility text without tracking device density. <code>getPixelSizeForLayoutSize</code> converts points to physical pixels for the cases where you are drawing rather than laying out: exporting a view to an image, sizing a canvas, or preparing a bitmap for a native API that speaks pixels. Asset naming follows the same convention without any code at all — <code>icon.png</code>, <code>icon@2x.png</code>, <code>icon@3x.png</code> — but the <code>require</code> that loads them must stay static, because the bundler resolves module paths at build time and cannot follow a path assembled at run time.</p>
+    <div class="codeWrap"><pre><code>import { View, Text, StyleSheet } from 'react-native';
+import { palette } from '../theme/palette';
+
+export function Readout({ value, hint }) {
+  return (
+    &lt;View style={styles.row}&gt;
+      {/* a fixed pill: growing it with the OS font size would break
+          the shape, so this element opts out */}
+      &lt;Text style={styles.badge} allowFontScaling={false}&gt;
+        {value}
+      &lt;/Text&gt;
+
+      {/* prose follows the OS setting, capped so a 200 percent
+          system size cannot swallow the rest of the screen */}
+      &lt;Text style={styles.hint} maxFontSizeMultiplier={1.6} numberOfLines={3}&gt;
+        {hint}
+      &lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  badge: {
+    fontSize: 13, fontWeight: '700', color: palette.accentInk,
+    backgroundColor: palette.accent, paddingHorizontal: 8,
+    paddingVertical: 3, borderRadius: 999,
+  },
+  hint: { flex: 1, fontSize: 14, color: palette.textMuted },
+});</code></pre></div>
+    <div class="note"><p>Font scaling interacts with <code>numberOfLines</code>: truncation is decided after scaling, so a hint that fits at the default size can clip at 150 percent. If truncation matters, detect it rather than assume — <code>onTextLayout</code> reports the rendered line count, and a component that hides overflow it never measured is a component that hides content from exactly the users who enlarged the text.</p></div>
+    <h3 id="ch4-responsive" data-toc>Responsive layouts and breakpoints</h3>
+    <p>There are no media queries in React Native. The measurement comes from a hook: <code>useWindowDimensions</code> returns width, height, scale and font scale, and the component that calls it re-renders when the device rotates, when a foldable opens, or when the window is dragged into a split-screen pane on Android. That is the entire responsive system — read the width, branch on it, render a different arrangement — and it is simpler than media queries because the branch lives in JavaScript where it can be unit tested, instead of in a stylesheet where it is silently re-derived on every layout pass.</p>
+    <p>The discipline this demands is knowing where the branch belongs. A breakpoint decision belongs in the layout component that owns the arrangement — the one that decides whether the screen has one pane or two — and nowhere deeper. When every leaf calls its own <code>useWindowDimensions</code>, the whole subtree re-renders on each rotation, and a width value ends up coupled to a label that never actually changed. Measure once at the top, hand the decision down as a prop or through context, and a rotation costs one component's render instead of the screen's.</p>
+    <p>Coverage is three cases, not thirty devices. The narrow end is a small phone in portrait; the wide end is a tablet or a desktop-class window; the awkward middle is Android split-screen, where a phone in landscape can suddenly be handed a 480-point window that behaves like neither. A foldable adds one more wrinkle — the hinge sits in the middle of the window — and the window segments API, available since React Native 0.76, reports the usable segments so content can avoid the hinge instead of being cut by it. Rotation itself is the cheap test: every responsive screen should be opened sideways at least once before it ships, because width and height swap and a layout written against width alone will notice.</p>
+    <div class="codeWrap"><pre><code>import { useWindowDimensions } from 'react-native';
+
+// width classes, not device names: a new 5.8-inch phone lands wherever
+// its width puts it, and a tablet in split-screen behaves like a phone
+export const BREAKPOINTS = { sm: 0, md: 600, lg: 900, xl: 1200 };
+
+export function useBreakpoint() {
+  const { width } = useWindowDimensions();
+
+  if (width >= BREAKPOINTS.xl) return 'xl';
+  if (width >= BREAKPOINTS.lg) return 'lg';
+  if (width >= BREAKPOINTS.md) return 'md';
+  return 'sm';
+}
+
+// re-renders on rotation and on split-screen resize, so the consumer
+// of this hook must own layout - not a leaf label that merely prints
+export function useIsWide() {
+  const { width } = useWindowDimensions();
+  return width >= BREAKPOINTS.md;
+}</code></pre></div>
+    <h4>Choosing breakpoints that mean something</h4>
+    <p>Number the classes, not the phones. A lookup keyed to a device model list — small phone, large phone, tablet — fails the first time a new model ships, and it fails silently, because the new device simply falls into the wrong branch. Width thresholds are portable: compact below 600 points, medium from 600 to 899, expanded at 900 and above, which are the window size classes Material publishes and which map cleanly onto structural facts. Below 600 there is genuinely room for one pane; from 600 a master-detail pair fits side by side with readable columns; from 900 a permanently pinned navigation rail stops costing content width. When a threshold corresponds to a structural fact like those, it stays correct for years; when it corresponds to a device, it is wrong on release day for the next device.</p>
+    <div class="codeWrap"><pre><code>import { View, StyleSheet } from 'react-native';
+import { palette } from '../theme/palette';
+import { useIsWide } from './useBreakpoint';
+
+export function Inbox({ list, detail }) {
+  const wide = useIsWide();
+
+  return (
+    &lt;View style={styles.frame}&gt;
+      &lt;View style={[styles.list, wide &amp;&amp; styles.listPinned]}&gt;
+        {list}
+      &lt;/View&gt;
+
+      {/* narrow: one pane, and the detail replaces the list through
+          navigation (chapter 6). wide: both, side by side */}
+      {wide ? &lt;View style={styles.detail}&gt;{detail}&lt;/View&gt; : null}
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  frame: { flex: 1, flexDirection: 'row' },
+  list: { flex: 1 },
+  listPinned: {
+    maxWidth: 420,
+    borderRightWidth: StyleSheet.hairlineWidth,
+    borderColor: palette.border,
+  },
+  detail: { flex: 2, padding: 16 },
+});</code></pre></div>
+    <div class="tip"><p>Set the device frame in your development client to the smallest width you support and leave it there for a day of work. Responsive bugs are found by being stuck at the narrow width, not by remembering to check it — and the narrow width is where a fixed <code>maxWidth</code>, an unshrinkable row, or a two-column form all fail first.</p></div>
+    <h3 id="ch4-theme" data-toc>Design tokens and dark mode</h3>
+    <p>A colour typed into a component is a decision made locally and enforced globally: it cannot be re-themed, checked for contrast, or changed in one place later. The rule that keeps a codebase themable is that components never see a hex code — they ask for a role: surface, raised surface, text, muted text, accent, border. Two palettes then satisfy every component, and adding a third mode — high contrast, AMOLED black, a corporate skin for a white-label build — becomes a data change rather than a refactor. It is the same discipline as CSS custom properties, with one difference: because styles are objects, the tokens must travel through JavaScript, so they need an owner rather than a global scope.</p>
+    <p>The owner is a small theme module. <code>useColorScheme</code> from React Native returns <code>'light'</code>, <code>'dark'</code> or <code>null</code>, re-rendering the component when the system theme changes at run time; <code>null</code> means the user has expressed no preference, and the app must pick a side rather than ask again on every render. Following the system is the right default. A user who opens your app in a dark room with the phone on dark should not be flashbanged by a white screen, and a user whose wallpaper-driven theme changed mid-session should not need to restart. An in-app override, if you ship one, pins the scheme through <code>Appearance.setColorScheme</code> and passes <code>null</code> to hand control back to the system.</p>
+    <p>Two palettes sharing one vocabulary is only half of it; the palettes themselves must be checked rather than eyeballed. Contrast is a ratio with a threshold: 4.5 to 1 for body text, 3 to 1 for large text and for the edges of interactive controls, and every one of those pairs is a separate calculation — muted text against a raised surface is a different pair from muted text against the background, and passing one does not pass the other. The failure mode to watch for is the dark palette that is merely the light one inverted: pure white on pure black vibrates, and a muted grey tuned for paper reads as unreadable on navy. Design each theme against its own surfaces, then verify the pairs.</p>
+    <div class="codeWrap"><pre><code>// theme/tokens.js - two palettes, one vocabulary. components import
+// roles, never raw hex, and no component knows what a hex code is
+export const palette = {
+  dark: {
+    bg: '#0b1220',
+    surface: '#111a2c',
+    surfaceRaised: '#18233a',
+    text: '#e6edf7',
+    textMuted: '#9aa8bf',
+    accent: '#4dd2ff',
+    accentInk: '#03203f',
+    border: '#223049',
+  },
+  light: {
+    bg: '#f5f7fb',
+    surface: '#ffffff',
+    surfaceRaised: '#eef2f8',
+    text: '#0f172a',
+    textMuted: '#475569',
+    accent: '#0b5fbf',
+    accentInk: '#ffffff',
+    border: '#d7deea',
+  },
+};</code></pre></div>
+    <h4>Naming: the role, not the colour</h4>
+    <p>A token called <code>blue500</code> encodes where a colour sits in a ramp; a token called <code>accent</code> encodes what the colour is for, and only the second survives a re-theme. Role names also make the contrast audit greppable: every use of <code>textMuted</code> is a use of one audited pair, so the list of places to recheck when the value changes is a search result instead of a survey. The third layer, which arrives when a codebase grows, is the component token — a named decision such as <code>cardBorder</code> that resolves to a role plus a modification, defined once so twenty cards cannot drift apart by a point of opacity. Keep the layers pointing downward only: primitives are chosen by the theme, roles are chosen by the app, components consume roles. A component that reaches past its role to a primitive has quietly hardcoded a colour again.</p>
+    <div class="codeWrap"><pre><code>import { createContext, useContext, useMemo } from 'react';
+import { useColorScheme, StyleSheet, View, Text } from 'react-native';
+import { palette } from './tokens';
+
+const ThemeCtx = createContext(palette.dark);
+
+export function ThemeProvider({ children }) {
+  const scheme = useColorScheme();
+
+  // null means no preference: fall back to dark once, rather than
+  // choosing a side again on every render
+  const colors = useMemo(
+    () =&gt; (scheme === 'light' ? palette.light : palette.dark),
+    [scheme]
+  );
+
+  return &lt;ThemeCtx.Provider value={colors}&gt;{children}&lt;/ThemeCtx.Provider&gt;;
+}
+
+export function useTheme() {
+  return useContext(ThemeCtx);
+}
+
+// the style factory runs only when the theme changes, so the objects
+// are created once per scheme instead of once per render
+export function Row({ label }) {
+  const t = useTheme();
+  const s = useMemo(
+    () =&gt;
+      StyleSheet.create({
+        row: { backgroundColor: t.surface, padding: 12, borderRadius: 8 },
+        label: { color: t.text, fontSize: 15 },
+      }),
+    [t]
+  );
+
+  return (
+    &lt;View style={s.row}&gt;
+      &lt;Text style={s.label}&gt;{label}&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}</code></pre></div>
+    <div class="warn"><p>Never approve a palette by looking at it. Compute the ratios for every text-on-surface pair in each theme — body against background, muted against background, muted against raised, accent against its own ink — and treat a pair below 4.5 to 1 as a bug with an owner, because a colour that is legible to you on your monitor is a colour some of your users cannot read at all.</p></div>
+  </section>
+
+  <section class="chapter">
+<h2 id="ch5" data-toc>5 · State Management</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · State management</button><div class="ch-toc-list"><a href="#ch5-render">The render cycle and useState</a><a href="#ch5-colocate">Local, lifted or derived state</a><a href="#ch5-context">Context and the cost of sharing</a><a href="#ch5-reducer">useReducer for feature state</a><a href="#ch5-server">Server state belongs in a query cache</a></div></div>
+    <p class="topic-desc">Most React Native performance bugs and most stale-screen bugs are state bugs wearing a different costume: two sources of truth, a closure that captured last render's value, a context that re-renders a whole screen to change one label. This chapter gives the decision procedure — where state lives, what is derived instead of stored, and which of your data is not client state at all.</p>
+    <h3 id="ch5-render" data-toc>The render cycle and useState</h3>
+    <p>State is a value a component remembers between renders, and the only thing that makes it state is that the component can change it. Calling the setter schedules a new render of the component that owns the state — that component, not its children first and not its parent — and the render itself is a pure description of what the interface should look like at this moment. React Native does not surgically patch the parts that changed while your function runs; it re-runs the function, diffs the returned tree against the previous one, and hands only the difference to the native views. Every render must therefore be safe to run twice: no writes to outer variables, no network calls, no logging that assumes it happens once, nothing observable except what you return.</p>
+    <p>Renders batch. Several setter calls inside one event handler produce a single re-render, not three, and the same holds for updates queued in the same tick from an effect. Batching is why reading state immediately after calling its setter still shows the old value — the update has been queued, not applied — and it is the reason the functional form of the setter exists at all. It is also why anything measured during render produces suspicious numbers: the render you are timing may be the only one that runs, or it may be one of five, and neither result is a measurement of how long the user waited. Measure effects and committed work, not the render function.</p>
+    <p>Two conventions keep state honest. One owner: state is written by exactly one component, and everyone else receives it as a prop, because two components writing the same value means the values will disagree eventually and nothing will say so. And stable identity in lists: each row in a <code>FlatList</code> needs a key derived from a property of the item that never changes, because an index key tells React that a reordered list is the same items in new clothes — so scroll position, focus, and half-finished animations all attach to the wrong rows the moment the data changes.</p>
+    <div class="codeWrap"><pre><code>import { useState } from 'react';
+import { View, TextInput, Text, StyleSheet } from 'react-native';
+
+export function SearchBox({ items, onPick }) {
+  const [query, setQuery] = useState('');
+
+  // derived during render, never stored: keeping a second copy of the
+  // results next to the query creates two sources of truth, and the
+  // first time they disagree the screen is simply wrong
+  const hits = items.filter((i) =&gt; i.name.includes(query));
+
+  return (
+    &lt;View style={styles.box}&gt;
+      &lt;TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search notes"
+        autoCorrect={false}
+        style={styles.input}
+      /&gt;
+      &lt;Text style={styles.count}&gt;{hits.length} matches&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  box: { gap: 8 },
+  input: { borderWidth: 1, padding: 10, borderRadius: 8 },
+  count: { fontSize: 12, opacity: 0.7 },
+});</code></pre></div>
+    <h4>Stale closures and functional updates</h4>
+    <p>A function created during render closes over the values of that render, and if the function outlives it — in a timer, a subscription, a native event listener, an effect that never re-runs — it keeps reading those values forever. The canonical bug is a one-second interval whose callback does <code>setCount(count + 1)</code>: the callback captured a count of zero on the first render, the setter never changes what the closure sees, and the counter increments once instead of forever. The functional form, <code>setCount((c) =&gt; c + 1)</code>, defers reading the value to the moment the update is applied, so the latest state arrives regardless of which render scheduled the update. The second half of the same fix is ownership of teardown: an effect that starts a timer, a listener, or a native module subscription must return the function that stops it, or the work continues after unmount — firing setters on a component that no longer exists and holding the whole tree in memory.</p>
+    <div class="codeWrap"><pre><code>import { useEffect, useState } from 'react';
+
+export function useTicker(startAt) {
+  const [count, setCount] = useState(startAt);
+
+  useEffect(() =&gt; {
+    const id = setInterval(() =&gt; {
+      // functional update: reads the latest count at fire time, so
+      // the closure captured at effect setup can never go stale
+      setCount((c) =&gt; c + 1);
+    }, 1000);
+
+    // the effect owns the interval and tears it down; without this
+    // a component that unmounts leaks a timer that keeps firing
+    return () =&gt; clearInterval(id);
+  }, []); // empty deps: set up once, tear down on unmount
+
+  return count;
+}</code></pre></div>
+    <div class="tip"><p>When a value seems to be stuck at its first render, reach for the functional setter before reaching for a ref. Refs are the right tool for values that genuinely are not part of the visual state — an animation frame handle, a native module instance — and the wrong tool for anything the interface displays, because a ref that holds displayed data has quietly left the render cycle and taken correctness with it.</p></div>
+    <h3 id="ch5-colocate" data-toc>Local, lifted or derived state</h3>
+    <p>Every state value answers three questions in order, and skipping the first two is how apps end up with a global store holding a modal's open flag. First, is it state at all — if it can be computed from other state or from props during render, it is derived, and derived values are computed, never stored. Second, does anything outside this component need it — if not, keep it local, because state that lives where it is used needs no wiring, no action, and no cleanup when the feature is deleted. Third, do two siblings both need it — if so, lift it to their lowest common ancestor and pass it down. That ancestor is not allowed to be the app root out of convenience: a value lifted higher than the lowest common ancestor re-renders everything below it for a change only two components felt.</p>
+    <p>Derived beats stored because stored derived values drift. The shape of the bug is always the same: a component keeps the full list, the current filter text, and a filtered copy, and one code path updates the first two without the third. The screen now disagrees with itself, and since both halves render, the disagreement is visible and rare — which is worse than a consistently wrong screen, because it cannot be reproduced on demand. Computing during render eliminates the class of bug: there is one input and one place where the output is produced, so no path can update one without the other. When the computation is genuinely expensive — sorting thousands of rows, parsing — wrap it in <code>useMemo</code> with the real dependencies, and treat the memo as a cache of a pure function rather than as a correctness device.</p>
+    <p>Prop drilling deserves its reputation only at depth. Three levels of a prop is not a problem, it is a component tree being explicit about its data flow, and it shows up in the type signature for free. The moment a prop is passed through components that do not use it, the tree is telling you the value belongs somewhere else — often to context for genuinely ambient data, often to a route parameter for data the navigation already owns, and often to the feature component itself, because the drill is evidence that state was colocated one level too low. Reach for a state library only when you can name the problem it solves that these three mechanisms do not; in most apps that moment arrives with cross-feature coordination, not with local UI state.</p>
+    <h4>Derive, do not sync</h4>
+    <p>The unmistakable smell of stored-derived state is an effect whose only job is to keep one variable matching another. If you find yourself writing an effect that sets <code>filtered</code> whenever <code>query</code> changes, delete the second variable and compute it. The effect version is not merely more code: it introduces a render where the two values disagree — the user types, the query updates, the screen still shows the old results, and the effect runs after paint to correct it — so the list visibly lags behind the keystroke on slower devices. The derived version has no such frame, because the render that sees the new query is the render that computes the new results. Effects are for synchronizing with things outside React: the network, timers, native modules, storage. When both sides of an effect are React state, one of them should not exist.</p>
+    <div class="codeWrap"><pre><code>import { useMemo, useState } from 'react';
+import { View, TextInput, FlatList } from 'react-native';
+
+export function Catalog({ products }) {
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('name');
+
+  // one source of truth (the raw list) plus two inputs; every view of
+  // the data is computed from them, so no update path can desync
+  const visible = useMemo(() =&gt; {
+    const q = query.trim().toLowerCase();
+    const rows = products.filter((p) =&gt;
+      p.title.toLowerCase().includes(q)
+    );
+    return rows.sort((a, b) =&gt;
+      sort === 'price' ? a.price - b.price : a.title.localeCompare(b.title)
+    );
+  }, [products, query, sort]);
+
+  return (
+    &lt;View&gt;
+      &lt;TextInput value={query} onChangeText={setQuery} placeholder="Filter" /&gt;
+      &lt;FlatList
+        data={visible}
+        keyExtractor={(item) =&gt; item.id}
+        renderItem={({ item }) =&gt; &lt;Row product={item} /&gt;}
+      /&gt;
+    &lt;/View&gt;
+  );
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>import { useState } from 'react';
+import { View } from 'react-native';
+
+// both children need the same value, so the state lives at their
+// lowest common ancestor - one level above them, not at the root.
+// neither child knows or cares where it is stored
+export function Tabs({ tabs }) {
+  const [active, setActive] = useState(tabs[0].id);
+
+  return (
+    &lt;View&gt;
+      &lt;TabBar active={active} onSelect={setActive} tabs={tabs} /&gt;
+      &lt;TabPanel active={active} tabs={tabs} /&gt;
+    &lt;/View&gt;
+  );
+}
+
+// TabBar writes, TabPanel reads, and the parent only forwards: if a
+// third sibling ever needs the value, it joins at this level too.
+// the moment two writers exist, this shape is no longer enough and
+// the transition is a reducer (5.4), not a second useState</code></pre></div>
+    <h3 id="ch5-context" data-toc>Context and the cost of sharing</h3>
+    <p>Context exists to end prop drilling: one provider sits above the tree, consumers call <code>useContext</code>, and every component in between is untouched. The mechanics are worth stating precisely because the cost is usually discovered late. Passing a new value to the provider causes <em>every component that called <code>useContext</code> for that context</em> to re-render, regardless of depth and regardless of whether the consumer's output would change — the intermediate components that merely forward the prop are spared, but the consumers are not. Context is therefore a broadcast channel, and a broadcast re-renders everyone tuned in.</p>
+    <p>This makes the shape of the value decisive. A provider that passes a fresh object literal on every render — <code>value={{ user, theme, online }}</code> — creates a new identity each time, so every consumer re-renders on every render of the provider, which on a context mounted at the top of the app means every consumer re-renders whenever anything at the top changes. The fix is identity stability: build the value once per change with <code>useMemo</code>, or better, split the context so the volatile part and the stable part are separate broadcasts. A consumer that needs the user id should not re-render because the theme changed, and that is only achievable when those are two contexts with two values.</p>
+    <p>Context is also not a store. It has no subscriptions, no selectors, and no way for a consumer to declare that it only cares about one field — the unit of re-rendering is the whole value. That is exactly right for low-frequency, high-coverage data: the session, the color scheme, a feature flag, the current locale. It is wrong for a list of a thousand rows that changes on a keystroke, because every screen in the app subscribes to something that now churns. When you find yourself adding selectors or a version counter to a context, you have built a worse version of a store, and the honest move is to use the store — or the query cache from 5.5, if the data is actually server data.</p>
+    <h4>Keeping the value stable</h4>
+    <p>Three rules make context cheap in practice. Never pass an inline literal as the provider value — construct it with <code>useMemo</code> keyed on the state it actually contains, so identity changes only when content changes. Keep dispatch functions out of the value entirely: <code>useReducer</code>'s dispatch is stable across renders by contract, so putting it in its own context gives you a channel whose value never changes and which therefore never re-renders a consumer — a trick that is impossible if dispatch rides along inside a state object. And place the provider as low as the sharing actually goes: a session provider above the entire app re-renders the entire app on sign-in, which may be correct, but a screen-scoped provider re-renders one screen. Placement is a performance decision, and it deserves the same thought as the value's shape.</p>
+    <div class="codeWrap"><pre><code>import { createContext, useContext, useMemo, useState } from 'react';
+
+const SessionCtx = createContext(null);
+
+export function SessionProvider({ children }) {
+  const [user, setUser] = useState(null);
+
+  // the value object is rebuilt only when user changes. passed inline,
+  // it would be a new reference on every render of this provider, and
+  // every consumer would re-render on every parent render for free
+  const value = useMemo(() =&gt; ({ user, signIn: setUser }), [user]);
+
+  return &lt;SessionCtx.Provider value={value}&gt;{children}&lt;/SessionCtx.Provider&gt;;
+}
+
+export function useSession() {
+  const ctx = useContext(SessionCtx);
+  if (!ctx) throw new Error('useSession must be used inside SessionProvider');
+  return ctx;
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>import { createContext, useContext, useReducer } from 'react';
+
+const StateCtx = createContext(null);
+const DispatchCtx = createContext(null);
+
+// two contexts, two channels. readers subscribe to the data, writers
+// subscribe to the dispatch, and since dispatch identity is stable,
+// firing an action re-renders only the components that read state
+export function TodoProvider({ children }) {
+  const [items, dispatch] = useReducer(todoReducer, []);
+
+  return (
+    &lt;StateCtx.Provider value={items}&gt;
+      &lt;DispatchCtx.Provider value={dispatch}&gt;{children}&lt;/DispatchCtx.Provider&gt;
+    &lt;/StateCtx.Provider&gt;
+  );
+}
+
+export function useTodos() {
+  return useContext(StateCtx);
+}
+
+export function useTodoDispatch() {
+  return useContext(DispatchCtx);
+}</code></pre></div>
+    <div class="warn"><p>A context whose value changes on every keystroke has turned your broadcast channel into a render storm: every consumer re-renders for a change one of them made. Before adding a store, split the context or move the churning value down to the feature that owns it — most context performance problems are a scoping problem that a provider move fixes in one commit.</p></div>
+    <h3 id="ch5-reducer" data-toc>useReducer for feature state</h3>
+    <p>A second <code>useState</code> is the right answer until it is not, and the transition is recognizable: state has grown a compound shape, it has more than two or three transitions, and updates have started arriving from places far enough apart that reading them all in one screen is no longer possible. <code>useReducer</code> moves the transition logic out of the event handlers and into a single pure function — <code>(state, action) =&gt; nextState</code> — which can be called with any sequence of actions and asserted against, without rendering anything. That is the entire appeal: the rules of a feature become data you can test, log, and read, instead of a scatter of setters distributed across components.</p>
+    <p>The compound shape is the more common trigger. A feature with <code>loading</code>, <code>error</code>, and <code>data</code> as three separate booleans has an impossible state — both <code>loading</code> and <code>error</code> true — that some ordering of updates will eventually produce, because nothing enforces their relationship. A single <code>status</code> field with three legal values makes the illegal combination unrepresentable, and a reducer with a case per transition is the enforcement. This is the state-machine discipline applied at component scale, and it pays the same dividend: when a bug report says the screen is stuck, the question "which states can it be in, and what moved it there" has a finite answer found in one function.</p>
+    <p>The dispatch side matters as much. Dispatch is stable for the lifetime of the component, so it can be passed to contexts, memoized children, and native event handlers without becoming stale, and it can be captured in an effect that runs once without re-subscribing. Keep the reducer next to the feature — a shared generic reducer in a utils folder turns into a switch statement that every team hesitates to touch — and keep the action objects plain: a type and the minimum payload needed to compute the next state. If an action carries a whole object because the handler might need some of it, the reducer is computing with inputs it does not own, and the test that feeds it fixtures will tell you so first.</p>
+    <h4>Actions as documentation</h4>
+    <p>Read the switch statement and you have read the feature's contract: every state it can be in, every event it handles, and what each event does — in that order, with no prose to keep in sync. A reducer with cases named for verbs the user or the network can actually cause — <code>start</code>, <code>succeed</code>, <code>fail</code>, <code>reset</code> — documents better than a wiki page, because it cannot drift from the implementation. Exhaustiveness is the companion discipline: a <code>default</code> case that returns the previous state hides a typo in an action type behind a no-op, while a switch with no default — or, under TypeScript, no widening of the return — turns an unhandled action into a compile error. Add the case or fix the name; never absorb it silently.</p>
+    <div class="codeWrap"><pre><code>// a whole feature's transitions in one place: these three fields are
+// in exactly one shape at any time, and this function is where the
+// guarantee lives. it is pure, so the test renders nothing
+export function requestReducer(state, action) {
+  switch (action.type) {
+    case 'start':
+      return { status: 'loading', data: null, error: null };
+    case 'succeed':
+      return { status: 'ready', data: action.payload, error: null };
+    case 'fail':
+      return { status: 'error', data: null, error: action.message };
+    case 'reset':
+      return { status: 'idle', data: null, error: null };
+    default:
+      // an unknown action is a typo: returning state hides it, so
+      // in development this should throw rather than pass quietly
+      return state;
+  }
+}
+
+export const initialRequest = { status: 'idle', data: null, error: null };</code></pre></div>
+    <div class="codeWrap"><pre><code>import { useEffect, useReducer } from 'react';
+import { requestReducer, initialRequest } from './requestReducer';
+
+export function useFetch(url) {
+  const [state, dispatch] = useReducer(requestReducer, initialRequest);
+
+  useEffect(() =&gt; {
+    let cancelled = false;
+    dispatch({ type: 'start' });
+
+    fetch(url)
+      .then((r) =&gt; {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then((payload) =&gt; {
+        if (!cancelled) dispatch({ type: 'succeed', payload });
+      })
+      .catch((err) =&gt; {
+        if (!cancelled) dispatch({ type: 'fail', message: String(err) });
+      });
+
+    // url is a dependency: when it changes the first response is
+    // discarded on cleanup, so a slow answer cannot overwrite the
+    // data the user navigated to while it was in flight
+    return () =&gt; {
+      cancelled = true;
+    };
+  }, [url]);
+
+  return state;
+}</code></pre></div>
+    <div class="tip"><p>Log every dispatched action with its previous state in development. One line per transition — <code>start</code>, then <code>succeed</code> — reconstructs the exact sequence that produced a bad screen, which is precisely the evidence a bug report never contains and the reason reducers pay for themselves before the feature is even finished.</p></div>
+    <h3 id="ch5-server" data-toc>Server state belongs in a query cache</h3>
+    <p>Client state and server state behave nothing alike, and treating them the same is the most expensive category error in React data code. Client state — what is selected, what text is in the input, whether a panel is open — is owned by the app and changes because the user did something. Server state is remote, shared with every other client, and already changing without you: it goes stale on its own, it is fetched more than once by different screens, and it must be reconciled after every write. A <code>useEffect</code> that fetches into <code>useState</code> implements none of that: two components mounting the same data fire two requests, unmounting mid-flight loses the answer, and going back to a screen refetches from zero while showing an empty skeleton.</p>
+    <p>A query library — TanStack Query is the standard choice in React Native — replaces the hand-written effect with a cache keyed by a value you declare. The key is the identity of the data: two components asking for <code>['tasks', userId]</code> share one request and one cached result, a third mounting while it is in flight joins the in-flight promise instead of starting a second one, and stale data paints immediately while a revalidation runs behind it. The hook's return value distinguishes the states the hand-written version conflates — no data yet versus data being refreshed — so a background refetch no longer flashes a loading skeleton over content the user is reading. Writing is the other half: a mutation hook that invalidates its keys after success makes "the list updates when I add an item" a two-line declaration instead of a chain of manual refetch calls threaded through navigation callbacks.</p>
+    <p>Placement follows from ownership. Data the server owns lives in the query cache and is read through hooks; data the interface owns lives in <code>useState</code> or a reducer locally; values the navigator already carries — the route id, the tab — are read from the route rather than copied into state, because a copy will not follow the user when they navigate. The pattern to refuse outright is mirroring cached data into component state "so it is easier to edit": the mirror starts equal and diverges on the first background update, and the screen now shows two answers to one question. Edit through a mutation, invalidate the key, and let the cache be the single copy.</p>
+    <h4>Query keys and invalidation</h4>
+    <p>Query keys are worth designing deliberately, because they are the cache's addressing scheme and the unit of every invalidation. Structure them hierarchically — <code>['projects', projectId, 'tasks']</code> — so that invalidating the prefix <code>['projects']</code> retires every project-derived query in one call after a project-wide change, while a narrow mutation invalidates only its leaf. A flat key like <code>['tasks']</code> for everything gives you all-or-nothing invalidation, which in a feature with lists, detail views, and counts means every write refetches everything and the cache stops paying for itself. Two knobs decide how it feels: <code>staleTime</code>, how long a result is trusted before a background revalidation is worth firing, and garbage collection, how long unobserved data stays cached — long enough that back-navigation is instant, short enough that a long session does not accumulate every screen's payload in memory.</p>
+    <div class="codeWrap"><pre><code>import { useQuery } from '@tanstack/react-query';
+
+// the key is the cache address: two components using this exact array
+// share one request and one result, and a third mounting mid-flight
+// joins the promise instead of starting a second network call
+export function useProjects() {
+  return useQuery({
+    queryKey: ['projects', 'active'],
+    queryFn: async () =&gt; {
+      const res = await fetch(API + '/projects');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    },
+    staleTime: 60000, // trusted for a minute: back-navigation paints
+                      // instantly and focus does not refetch, but the
+                      // data still revalidates once it goes stale
+  });
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+export function useCompleteTask() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) =&gt;
+      fetch(API + '/tasks/' + id, { method: 'POST' }).then((r) =&gt; r.json()),
+
+    // optimistic: paint the completion now, so the check mark is
+    // instant, then reconcile with whatever the server actually did
+    onMutate: async (id) =&gt; {
+      await qc.cancelQueries({ queryKey: ['tasks'] });
+      const before = qc.getQueryData(['tasks']);
+      qc.setQueryData(['tasks'], (old) =&gt;
+        old.map((t) =&gt; (t.id === id ? { ...t, done: true } : t))
+      );
+      return { before };
+    },
+
+    // roll the snapshot back if the write failed, then refetch in
+    // either case so the cache converges on the server's truth
+    onError: (_err, _id, ctx) =&gt; qc.setQueryData(['tasks'], ctx.before),
+    onSettled: () =&gt; qc.invalidateQueries({ queryKey: ['tasks'] }),
+  });
+}</code></pre></div>
+    <div class="note"><p>Server state copied into component state is a fork, and a fork of remote data is always wrong within one background update. If a component needs to edit server data, mutate and invalidate; if it needs to transform server data for display, derive it during render. The cached query result should be the only copy that answers "what is on the server".</p></div>
+  </section>
+
+  <section class="chapter">
+<h2 id="ch6" data-toc>6 · Navigation with React Navigation</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Navigation with React Navigation</button><div class="ch-toc-list"><a href="#ch6-stack">The navigator and the stack</a><a href="#ch6-params">Params: passing data between screens</a><a href="#ch6-tabs">Tabs, drawers and nested navigators</a><a href="#ch6-auth">Auth flows and the navigation gate</a><a href="#ch6-deep">Deep links, back behaviour and state</a></div></div>
+    <p class="topic-desc">Navigation is the spine of a mobile app: it owns screen lifetime, hardware back, deep links, and the header you forgot to configure. This chapter covers React Navigation — the library behind nearly every React Native app, and the engine Expo Router sits on top of — from a two-screen stack to nested tab flows, auth gates and URLs.</p>
+    <h3 id="ch6-stack" data-toc>The navigator and the stack</h3>
+    <p>React Navigation is a JavaScript library that coordinates native screen containers: the stack itself is real — pushed screens are native view controllers and fragments, transitions and swipe-back gestures run where the platform expects them — while the state machine deciding what is on top lives in JavaScript, where you can read it and test it. At the root of the app sits one <code>NavigationContainer</code>, and it is not optional: it owns the navigation state, serializes it for state persistence, forwards deep links into it, and provides the context that every <code>useNavigation</code> hook reads. Two containers in one tree means two states pretending to be one, and the classic symptom is a deep link that resolves on the first screen and goes nowhere.</p>
+    <p>A navigator declares its screens by name, and a screen is registered by passing the component to render — never a rendered element. The distinction is structural rather than stylistic. A component reference lets the stack own creation: the screen is not mounted when the navigator renders, only when its route is pushed, and at that moment it is mounted inside the navigator's container with navigation context, route params and the header already in place. An element built during the navigator's render does the opposite — it exists before any route does, outside the navigator's control, and <code>navigate</code> to its name has nothing left to push. The stack would be describing screens that were never in it.</p>
+    <p>What the native stack buys over a purely JavaScript stack is worth naming, because it explains the default. Screen content renders in a native container that can move independently of the JavaScript thread, so a list keeps scrolling during a heavy re-render instead of freezing with it. The back gesture is the platform's own, with its edge-swipe physics already correct. And pushed screens stay mounted underneath, so returning restores scroll position and half-typed form state for free. The cost is memory — ten screens in a stack are ten mounted trees — and the mitigation is architectural rather than configurational: use <code>replace</code> for one-way transitions, pop back to a known root after a flow completes, and keep every screen's lists virtualized so a screen parked in the stack does not hold a thousand rows of views.</p>
+    <div class="codeWrap"><pre><code>import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { HomeScreen } from './HomeScreen';
+import { ProfileScreen } from './ProfileScreen';
+
+const Stack = createNativeStackNavigator();
+
+export function RootNavigator({ sessionReady }) {
+  // the gate from 6.4: mounting the navigator before the session has
+  // been restored shows the wrong stack for a frame, and a frame of
+  // a signed-in user's data on a signed-out device is a real bug
+  if (!sessionReady) return null;
+
+  return (
+    &lt;NavigationContainer&gt;
+      &lt;Stack.Navigator initialRouteName="Home"&gt;
+        &lt;Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: 'Notes' }}
+        /&gt;
+        &lt;Stack.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={({ route }) =&gt; ({ title: route.params?.name ?? 'Profile' })}
+        /&gt;
+      &lt;/Stack.Navigator&gt;
+    &lt;/NavigationContainer&gt;
+  );
+}</code></pre></div>
+    <h4>Component, not element</h4>
+    <p>The rule that resolves most navigator confusion is this: the stack stores components and renders them itself, on its schedule, inside its own tree. Given that, options may be a value or a function — a plain object for anything static, a function of <code>route</code> and <code>navigation</code> whenever the header must reflect data the screen has — because the function is re-evaluated each time the screen focuses. That is also how header buttons get a working navigation object without prop threading or a context of your own: the options function receives it as an argument. Static decisions belong on <code>screenOptions</code> at the navigator level, where one declaration configures every screen, and a per-screen <code>options</code> should only ever override what it actually changes — otherwise the same animation setting gets re-decided, differently, on a dozen screens.</p>
+    <div class="codeWrap"><pre><code>import { Pressable, Text, StyleSheet } from 'react-native';
+
+// shared options: declared once on the navigator as screenOptions,
+// so a decision like animation style is made once instead of on
+// every screen where someone eventually forgets it
+export const sharedOptions = {
+  headerBackButtonDisplayMode: 'minimal',
+  animation: 'slide_from_right',
+  gestureEnabled: true,
+};
+
+// per-screen options: a function of route and navigation, re-run on
+// every focus. header buttons therefore get a live navigation object
+// with no prop threading and no context of our own
+export function editorOptions({ navigation }) {
+  return {
+    title: 'Edit note',
+    headerRight: () =&gt; (
+      &lt;Pressable style={styles.done} onPress={() =&gt; navigation.goBack()} hitSlop={12}&gt;
+        &lt;Text style={styles.doneText}&gt;Done&lt;/Text&gt;
+      &lt;/Pressable&gt;
+    ),
+  };
+}
+
+const styles = StyleSheet.create({
+  done: { paddingHorizontal: 12, paddingVertical: 6 },
+  doneText: { fontWeight: '600' },
+});</code></pre></div>
+    <div class="tip"><p>Keep the navigator tree shallow and the route names in one shared file. Names are matched as plain strings from anywhere in the app, and a typo in a <code>navigate</code> call fails silently at run time — no crash, no warning, nothing happens — so a constants module of route names turns the entire failure class into an import error before the app ever ships.</p></div>
+    <h3 id="ch6-params" data-toc>Params: passing data between screens</h3>
+    <p>A screen is addressed by name and parameterized by params: <code>navigate('Detail', { id: note.id, origin: 'search' })</code> pushes the route, and the target reads the same object from its route. Two constraints shape what may go in them. They must be serializable — strings, numbers, booleans, plain objects and arrays — because the whole navigation state is written to disk for state persistence and mirrored across the native boundary, and a function or a native handle silently breaks both. And they must be small, because params ride on every navigation event and are stored with the state; the canonical payload for a detail screen is an id plus whatever the header needs, not the record itself.</p>
+    <p>The second constraint is the one that keeps data correct. A record passed through params is a copy frozen at push time: the list updates on a background refresh, the user returns to the detail screen, and it still shows the old values because its input never changed. Passing the id instead makes the screen a view over the source of truth — the query cache from 5.5 — which updates for everyone the moment new data lands. Params then carry exactly what navigation alone knows: which record, where the user came from, and any intent the next screen needs in order to choose its behavior. Everything else the screen should ask for by id, at render time, from the place that owns it.</p>
+    <p>Reading params defensively is part of the same discipline. The contract of <code>route.params</code> is optional: a deep link or a restored navigation state can arrive at any screen with fewer params than the in-app path provides, and an unguarded read of <code>route.params.id</code> turns that into a red screen. Guard the read, render the empty or error state for the missing case, and treat the guard as the screen's honest answer to what it needs in order to exist. Returning data backwards gets the same treatment: rather than pushing params back onto the previous screen, re-read the source of truth when that screen refocuses — it will refocus anyway, because that is what going back means — and a value pushed backwards is one more copy that can drift.</p>
+    <div class="codeWrap"><pre><code>import { useNavigation } from '@react-navigation/native';
+import { Pressable, Text, StyleSheet } from 'react-native';
+
+export function NoteRow({ note }) {
+  const navigation = useNavigation();
+
+  return (
+    &lt;Pressable
+      style={styles.row}
+      onPress={() =&gt;
+        navigation.navigate('Detail', {
+          id: note.id,          // the id is the payload, not the record
+          origin: 'search',     // where we came from decides the back path
+        })
+      }
+    &gt;
+      &lt;Text style={styles.title}&gt;{note.title}&lt;/Text&gt;
+    &lt;/Pressable&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { padding: 12 },
+  title: { fontSize: 16 },
+});</code></pre></div>
+    <h4>Params are an interface, not a store</h4>
+    <p>Treat a screen's params as its typed interface: the one list of inputs it accepts, stated at the call site where the screen is chosen. A screen reading eight params is a screen with eight inputs, and the natural shortcut — threading a whole object through because the caller already has one — turns that interface into an undocumented schema only the caller understands. Params also travel in one direction. They are handed to a screen when it is pushed, and a screen that needs to influence its parent does not write back through the navigator; it updates the shared state both screens read, and the parent sees the result on the refocus that brought it back. Navigation decides where you are and what you are looking at; state decides what is true. Keeping that split is what stops a navigation tree from quietly becoming a second, worse store.</p>
+    <div class="codeWrap"><pre><code>import { useRoute } from '@react-navigation/native';
+import { View, Text, StyleSheet } from 'react-native';
+import { useNote } from './useNote';
+
+export function DetailScreen() {
+  const route = useRoute();
+
+  // params are optional by contract: a deep link or a state restore
+  // can land here with nothing, and an unguarded read turns that into
+  // a red screen instead of a rendered page with an error state
+  const id = route.params?.id;
+
+  if (!id) {
+    return (
+      &lt;View style={styles.missing}&gt;
+        &lt;Text style={styles.muted}&gt;This note is no longer available.&lt;/Text&gt;
+      &lt;/View&gt;
+    );
+  }
+
+  // the id is the input; the note itself comes from the cache, so
+  // returning to this screen paints instantly even though the
+  // request that opened it finished long ago
+  return &lt;NoteBody id={id} /&gt;;
+}
+
+const styles = StyleSheet.create({
+  missing: { padding: 24 },
+  muted: { opacity: 0.7 },
+});</code></pre></div>
+    <div class="warn"><p>Never store what the app already knows in params because it was convenient at the call site. A record passed by value freezes the moment it is passed, and the next background update makes the screen quietly wrong — a bug that reproduces only after the data has changed, which is the hardest kind to see in development.</p></div>
+    <h3 id="ch6-tabs" data-toc>Tabs, drawers and nested navigators</h3>
+    <p>Every navigator holds its own stack of routes, and nesting them is how a real app is shaped: a tab navigator at the top, one stack per tab underneath, because tabs are peer destinations and each destination needs its own history. Two behaviors follow from the structure and are worth internalizing. Back inside a tab pops that tab's stack, and only when its stack is empty does attention return to the tab bar. And switching tabs does not unmount anything: each tab keeps its stack, its scroll offsets, and its half-finished form exactly where the user left them, which is the entire reason tabs exist — they are parallel places the user can return to, not screens that replace one another.</p>
+    <p>Naming across the boundary is where the nesting shows itself. A bare <code>navigate('Detail')</code> resolves against the navigator that owns the current screen — the current tab's stack — which is what you want for a link inside a tab. Reaching a screen in another tab requires the qualified form: the outer name picks the tab, <code>screen</code> picks the screen within that tab's stack, <code>params</code> lands on it. Both forms are matched by string with no compile-time check, and the wrong one fails by doing nothing, so route names belong in a shared constants module rather than as inline literals scattered through features. Drawers nest by identical rules — the container differs, the state machine does not.</p>
+    <p>Configuration follows the destination count. Three to five tabs with icon and label, a badge where a count exists, and no more: a tab bar with eight entries is not navigation, it is a menu that no longer fits. Tabs mount lazily, so a tab the user never opened has never mounted its stack — which is both the performance win and the reason startup work that must happen regardless belongs in an effect at the app root, not inside a tab's screen, where it may never run. Drawers suit secondary destinations and wide layouts, but they add an always-present gesture region on the left edge that competes with Android's back gesture; if the destinations are peers, tabs are the honest structure and the drawer is a hiding place.</p>
+    <div class="codeWrap"><pre><code>import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { FeedScreen } from './FeedScreen';
+import { DetailScreen } from './DetailScreen';
+import { ProfileScreen } from './ProfileScreen';
+import { AccountScreen } from './AccountScreen';
+
+const Tab = createBottomTabNavigator();
+const HomeStack = createNativeStackNavigator();
+const SettingsStack = createNativeStackNavigator();
+
+function HomeFlow() {
+  return (
+    &lt;HomeStack.Navigator&gt;
+      &lt;HomeStack.Screen name="Feed" component={FeedScreen} /&gt;
+      &lt;HomeStack.Screen name="Detail" component={DetailScreen} /&gt;
+    &lt;/HomeStack.Navigator&gt;
+  );
+}
+
+function SettingsFlow() {
+  return (
+    &lt;SettingsStack.Navigator&gt;
+      &lt;SettingsStack.Screen name="Profile" component={ProfileScreen} /&gt;
+      &lt;SettingsStack.Screen name="Account" component={AccountScreen} /&gt;
+    &lt;/SettingsStack.Navigator&gt;
+  );
+}
+
+// each tab owns a stack: back inside a tab pops the tab, and each
+// tab keeps its own position - switch away and back to find the
+// scroll offset and the pushed screen exactly where they were
+export function MainTabs() {
+  return (
+    &lt;Tab.Navigator screenOptions={{ headerShown: false }}&gt;
+      &lt;Tab.Screen name="Home" component={HomeFlow} /&gt;
+      &lt;Tab.Screen
+        name="Settings"
+        component={SettingsFlow}
+        options={{ tabBarBadge: 2 }}
+      /&gt;
+    &lt;/Tab.Navigator&gt;
+  );
+}</code></pre></div>
+    <h4>Resolving a nested navigate</h4>
+    <p>Resolution is a two-step lookup, and knowing which step failed tells you what to fix. An unqualified name is looked up in the current navigator: if the current tab's stack contains it, it pushes there. If it does not, the lookup walks to the parent, where a tab navigator's rules apply — the name may select an entirely different tab, mounting it first if needed. The qualified form skips the ambiguity by naming both steps explicitly. When a navigation call silently does nothing, the name is either misspelled or living in a navigator that is not an ancestor of the caller, and the shared route-name module eliminates the first case before anyone debugs the second.</p>
+    <div class="codeWrap"><pre><code>// routes.js - every route name in one place. names are matched by
+// string from anywhere in the app, and a typo in a navigate() call
+// fails silently at runtime: no crash, no warning, nothing happens
+export const ROUTES = {
+  home: 'Home',
+  feed: 'Feed',
+  detail: 'Detail',
+  settings: 'Settings',
+  profile: 'Profile',
+};
+
+// cross-tab navigation: the outer name selects the tab, screen
+// selects the screen inside that tab's stack, params land on it.
+// this is the only way to target a screen not in your own stack
+export function openProfile(navigation, userId) {
+  navigation.navigate(ROUTES.settings, {
+    screen: ROUTES.profile,
+    params: { userId },
+  });
+}
+
+// inside the same tab the bare form is enough, and is preferred: it
+// keeps the call site independent of which tab hosts the screen
+export function openDetail(navigation, id) {
+  navigation.navigate(ROUTES.detail, { id });
+}</code></pre></div>
+    <div class="note"><p>Tab state is part of the navigation state, which means it can be persisted — but only restore it deliberately. Reopening the app onto the exact screen the user left is often what they want, and it is occasionally a private screen behind a lock that no longer exists; decide per app, and clear the persisted state on sign-out so the next account never inherits the previous one's position.</p></div>
+    <h3 id="ch6-auth" data-toc>Auth flows and the navigation gate</h3>
+    <p>An authenticated app is two navigators and a gate: a small stack with sign-in and sign-up, and the application stack, with a decision between them that lives above both. The decision is a state machine, not a boolean — restoring the saved session, signed out, signed in — and the third state is the one that separates a correct gate from a flickering one. While the token is being restored there is nothing to show: rendering the auth stack for a frame makes a signed-in user watch a login screen flash on every launch, and rendering the app stack for a frame hands a signed-out device a moment of private UI. The splash screen is covering that time anyway; gate on it.</p>
+    <p>The session itself has a home that is not React state. Tokens belong in platform secure storage — Keychain and Keystore, reached through <code>expo-secure-store</code> or a native module — because AsyncStorage is a plain unencrypted file and anything readable from the app sandbox is readable from a jailbroken device or a backup extract. On launch the gate reads storage, refreshes the token if needed, and only then flips to signed in; the read is async, which is exactly why the restoring state exists. The session provider sits at the app root, above the gate, because everything below it — the query cache, the navigators, user-scoped effects — needs to know who is signed in, and everything above it exists only to decide that.</p>
+    <p>Signing out is where gates usually go wrong, because it is a transition between trees rather than a screen inside one. Pushing the auth stack on top of the app stack leaves every private screen mounted underneath, still holding its data, reachable with the hardware back gesture or the iOS edge swipe — a logout that leaks. The gate avoids the problem by construction: when the session ends, the app tree unmounts and its navigation state goes with it. What must be done explicitly is everything cached alongside it — the query cache still holds the signed-out user's rows, the persisted navigation state still describes their screens, and in-memory feature state still holds whatever the last screen computed. One sign-out routine clears all three, in that order, and the session change is the trigger.</p>
+    <div class="codeWrap"><pre><code>import { useContext } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SessionCtx } from './session';
+import { SignInScreen } from './SignInScreen';
+import { HomeScreen } from './HomeScreen';
+
+const Auth = createNativeStackNavigator();
+const App = createNativeStackNavigator();
+
+export function Root() {
+  const { status } = useContext(SessionCtx); // restoring | in | out
+
+  // while the token is being restored there is no navigator to show:
+  // the auth stack for one frame signs the user out visually, and
+  // the app stack for one frame signs them in falsely
+  if (status === 'restoring') return null;
+
+  return (
+    &lt;NavigationContainer&gt;
+      {status === 'in' ? (
+        &lt;App.Navigator&gt;
+          &lt;App.Screen name="Home" component={HomeScreen} /&gt;
+        &lt;/App.Navigator&gt;
+      ) : (
+        &lt;Auth.Navigator&gt;
+          &lt;Auth.Screen name="SignIn" component={SignInScreen} /&gt;
+        &lt;/Auth.Navigator&gt;
+      )}
+    &lt;/NavigationContainer&gt;
+  );
+}</code></pre></div>
+    <h4>Reset, do not push</h4>
+    <p>Navigation offers three ways to arrive somewhere and only one of them is right at a gate. <code>navigate</code> and <code>push</code> add a route to the current stack, which is correct between screens and wrong between trees: the previous routes remain below, mounted, with their scroll positions and their data, and every back affordance in the app can lead back into them. <code>replace</code> swaps the top route, which is right for one-way steps inside a flow — an onboarding wizard should not be re-enterable backwards — but it still lives in one tree. What a sign-in or sign-out needs is <code>CommonActions.reset</code>, which declares a new root: a fresh index and route list, nothing below, nothing remembered. The imperative rule to carry is that arriving at a gate resets, arriving at a screen navigates, and a flow that must not be reversed replaces.</p>
+    <div class="codeWrap"><pre><code>import { CommonActions } from '@react-navigation/native';
+import { useQueryClient } from '@tanstack/react-query';
+
+export function useSignOut(navigation) {
+  const qc = useQueryClient();
+
+  return async function signOut() {
+    // token out of secure storage first: if any step below throws,
+    // the device is signed out rather than stranded in a half state
+    await clearSession();
+
+    // reset, do not navigate: pushing SignIn on top of the app stack
+    // leaves every private screen underneath it, still mounted, and
+    // the back gesture returns straight to private data
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'SignIn' }],
+      })
+    );
+
+    // the cache still holds the signed-out user's rows: an uncleared
+    // query cache means the next account sees the previous one's
+    // data for as long as it takes the first fetch to land
+    qc.clear();
+  };
+}</code></pre></div>
+    <div class="warn"><p>Test sign-out as a journey, not a button. After it runs, press the hardware back gesture, background and reopen the app, and check that no cached row, restored route, or retained form field of the previous account survives — the leak almost always lives in the query cache or the persisted navigation state, not in the stack you just reset.</p></div>
+    <h3 id="ch6-deep" data-toc>Deep links, back behaviour and state</h3>
+    <p>A deep link is a URL that resolves to a screen, and the linking config is the translation table: prefixes declare which schemes and hosts belong to the app, and a config tree maps path patterns onto the same route names the navigators use — <code>note/:id</code> becomes the Detail route with <code>{ id: '42' }</code> in its params. On a cold start the container parses the initial URL and builds the whole navigation state from it, so the app opens directly at the right screen with the right params; on a warm start it navigates there through the normal machinery. The same table drives both, which is why a deep link that works from a killed app but not from the background — or the reverse — points at state handling rather than at the config.</p>
+    <p>What lives outside the code is the part teams discover late. Universal links on iOS need an <code>apple-app-site-association</code> file served from the domain, App Links on Android need <code>assetlinks.json</code>, and Expo records the associations in <code>app.json</code> at build time; all three must agree on the same app identifiers or the OS decides the URL belongs to the browser and your handler never runs. Custom schemes are trivial to add and unreliable by nature — any app can register one, and an intent handler can be claimed — so they are right for development and wrong as the only entry point for a shared link. Test the paths users actually take: a link from a messaging app into a killed app, into a backgrounded app, and into an app sitting on a different screen.</p>
+    <p>Back deserves its own paragraph because it is a platform contract. On Android the hardware back gesture must go somewhere: the stack pops if it can, the tab bar falls back to the first tab if it must, and only the root may choose to leave the app — a choice worth confirming rather than performing silently, since a stray exit discards whatever the user was doing. On iOS there is no hardware button at all: back is the header button or the edge swipe, so every screen pushed without a header needs its own visible way out, and a modal needs an explicit close. State persistence rounds it out: the navigation state can survive a process death, which restores a user's exact position for free and can equally restore a signed-out user into a screen their account no longer reaches unless the gate clears it.</p>
+    <div class="codeWrap"><pre><code>export const linking = {
+  prefixes: ['notesapp://', 'https://notes.example.com'],
+
+  config: {
+    screens: {
+      // notesapp://note/42 pushes Detail with { id: '42' }; the same
+      // path served from a universal link builds the identical
+      // navigation state, so a cold start from a link and a warm
+      // navigation land on the same screen with the same params
+      Detail: 'note/:id',
+      Home: '',
+      Settings: {
+        path: 'settings',
+        screens: {
+          Profile: 'profile/:userId',
+        },
+      },
+    },
+  },
+};
+
+// passed to the container as linking={linking}, with a fallback
+// element for the moment the initial URL is still being parsed -
+// without it the root screen flashes before the link resolves</code></pre></div>
+    <h4>Back is a feature, not a default</h4>
+    <p>Every pushed screen owes the user a way out, and the platform supplies two different notions of what that means. On Android, back is a system gesture the app does not own: React Navigation handles the common cases — pop the stack, then collapse to the first tab — and an app that swallows the gesture without offering anything in return has trapped its user. On iOS there is no hardware back at all; the header button and the edge swipe are the only exits, which makes a screen pushed with <code>headerShown: false</code> a screen that can strand whoever opened it unless it draws its own close control. The discipline is the same on both: intercept back only when the app is about to lose something — an unsaved draft, a multi-step flow mid-way — and when it intercepts, always present a visible alternative. A confirmation dialog is not a navigation strategy.</p>
+    <div class="codeWrap"><pre><code>import { useEffect } from 'react';
+import { BackHandler } from 'react-native';
+
+// React Navigation already pops the stack on hardware back; a
+// listener is only for the presses it must not handle: an unsaved
+// draft, the root tab, leaving the app
+export function useConfirmExit(navigation, isDirty) {
+  useEffect(() =&gt; {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () =&gt; {
+      // not handled: return false and the navigator pops as usual
+      if (!isDirty) return false;
+
+      // handled: ask instead of destroying the draft. showing the
+      // dialog and returning true tells Android the press is spent
+      showDiscardDialog({
+        onDiscard: () =&gt; navigation.popToTop(),
+      });
+      return true;
+    });
+
+    // a listener added by a screen must be removed by that screen,
+    // or the next screen to mount answers presses on behalf of one
+    // that no longer exists
+    return () =&gt; sub.remove();
+  }, [navigation, isDirty]);
+}</code></pre></div>
+    <div class="tip"><p>Walk the app's links the way a user does: open a shared URL into a killed app, into a backgrounded app, and into an app parked three screens deep — then press back from where each one landed. Cold-start routing, warm routing and back behaviour are three separate code paths in React Navigation, and only the first one usually gets tested.</p></div>
+  </section>
+
+  <section class="chapter">
+<h2 id="ch7" data-toc>7 · Networking, Data and Lists</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Networking, data and lists</button><div class="ch-toc-list"><a href="#ch7-client">The HTTP client and the request lifecycle</a><a href="#ch7-list">FlatList: windowing and what makes lists jank</a><a href="#ch7-pagination">Pagination and infinite lists</a><a href="#ch7-upload">Uploads, files and progress</a><a href="#ch7-errors">Errors, retries and failure states</a></div></div>
+    <p class="topic-desc">A mobile app spends most of its life waiting for a network that is worse than the one in the office: high latency, handoffs between towers, connections that stall instead of failing. This chapter builds the request layer that survives that reality, then the two surfaces that expose it — lists that scroll at sixty frames and pagination that does not lose the user's place.</p>
+    <h3 id="ch7-client" data-toc>The HTTP client and the request lifecycle</h3>
+    <p>Every request the app sends shares the same concerns: the base URL that changes per environment, the authorization header, a timeout, cancellation when the screen that asked is gone, and an error shape the screens can render without parsing raw responses. Writing <code>fetch</code> calls directly into components duplicates all five in every feature, and the duplication is where they drift — one screen remembers to send the token, another has no timeout, a third keeps a spinner spinning after navigation because nothing ever aborted the request. One client module is the fix, and it is a small module: a single <code>request</code> function that every call site wraps rather than reimplements.</p>
+    <p>Timeout deserves its own paragraph because React Native's <code>fetch</code> has none. On a desktop with a wired connection a hanging request is rare; on a phone it is ordinary — a connection accepted and then stalled during a handoff between cell towers leaves <code>fetch</code> pending indefinitely, so the screen shows its loading state forever and the retry button never appears, because from the app's point of view nothing failed. An <code>AbortController</code> with a timer converts that hang into an error the UI can display. The same controller links to the component's lifetime: when the screen unmounts or the user navigates away, the request is aborted rather than left running to completion for a screen nobody is looking at.</p>
+    <p>Error handling starts with the taxonomy, because the four failures look identical in a naive implementation and demand opposite responses. A thrown exception from <code>fetch</code> means the request never completed — offline, DNS, refused — and is usually transient. A response with <code>ok</code> false is a completed exchange with a bad answer: 4xx says the app asked wrongly, 5xx says the server answered wrongly, both need different UI. A timeout is a fifth case entirely — the server may still have processed the request, so retrying a GET is safe while retrying a payment is not. And a response that parses as invalid JSON is an error wearing a success costume, caught only by parsing inside a try. Normalize all five into one error object carrying a status and a retryable flag before any screen sees them.</p>
+    <div class="codeWrap"><pre><code>const BASE = 'https://api.example.com';
+
+export class HttpError extends Error {
+  constructor(status, body, retryable) {
+    super('HTTP ' + status);
+    this.status = status;
+    this.body = body;
+    this.retryable = retryable; // 4xx is not; timeouts and 5xx are
+  }
+}
+
+export async function request(path, options = {}) {
+  const { method = 'GET', body, token, signal } = options;
+
+  // a phone can hold a stalled connection open indefinitely; without
+  // a timeout the request does not fail, it never returns, and the
+  // screen sits in its loading state until the user force-quits
+  const ctrl = new AbortController();
+  const timer = setTimeout(() =&gt; ctrl.abort(), 15000);
+
+  // the caller may also abort - unmount, navigation, a newer query -
+  // and either signal stopping the transport is enough
+  if (signal) signal.addEventListener('abort', () =&gt; ctrl.abort());
+
+  try {
+    const res = await fetch(BASE + path, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: 'Bearer ' + token } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: ctrl.signal,
+    });
+
+    if (!res.ok) {
+      const parsed = await res.json().catch(() =&gt; null);
+      const retryable = res.status &gt;= 500 || res.status === 429;
+      throw new HttpError(res.status, parsed, retryable);
+    }
+
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}</code></pre></div>
+    <h4>One client, one place for headers</h4>
+    <p>The header injection point is the part worth centralizing above all else. The access token changes — refreshed, rotated, replaced after sign-in — and if each call site reads it from storage at request time, then every feature needs the same async plumbing; if a call site caches it, the cached copy goes stale and requests fail with 401s that look like session expiry. A client that reads the current token at send time removes the question. The companion problem is refresh: on a 401 the natural implementation refreshes and retries, but five requests in flight when the token expires produce five refreshes racing to write the session, and one of them wins with an older token. The fix is single-flight — all callers await the same refresh promise, then retry once — and one retry only, because a second 401 with a freshly minted token is the server saying the session is over, which should sign the user out rather than loop them.</p>
+    <div class="codeWrap"><pre><code>import { request, HttpError } from './http';
+import { getAccessToken, refreshSession } from './session';
+
+let inFlight = null;
+
+// single-flight: five parallel 401s trigger one refresh, not five.
+// the five callers await the same promise and then retry once each;
+// without this, five token writes race each other and the loser
+// leaves the next request carrying a token that is already rotated
+function oncePerRefresh() {
+  if (!inFlight) {
+    inFlight = refreshSession().finally(() =&gt; {
+      inFlight = null;
+    });
+  }
+  return inFlight;
+}
+
+export async function authed(path, options = {}) {
+  const token = await getAccessToken();
+
+  try {
+    return await request(path, { ...options, token });
+  } catch (err) {
+    if (!(err instanceof HttpError) || err.status !== 401) throw err;
+
+    const fresh = await oncePerRefresh();
+
+    // one retry only. a second 401 with a fresh token means the
+    // session is genuinely gone, and looping here would sign the
+    // user into an endless request cycle instead of out of it
+    return request(path, { ...options, token: fresh });
+  }
+}</code></pre></div>
+    <div class="warn"><p>Never retry a non-idempotent request on an ambiguous failure. A timeout does not mean the server did nothing — the payment may have landed — so GETs and idempotent puts may back off and try again while posts wait for the user or carry an idempotency key the server recognizes.</p></div>
+    <h3 id="ch7-list" data-toc>FlatList: windowing and what makes lists jank</h3>
+    <p><code>FlatList</code> is not a styled <code>map</code>. Its entire value is windowing: the list measures the viewport, renders the rows inside it plus a small buffer above and below, and unmounts the rest — so a feed of ten thousand rows costs the memory of twenty. Everything else about the component is in service of that trick, and every performance conversation about lists comes down to whether the window is doing its job. The baseline is the row itself: shallow, fixed in its outer dimensions, with images given their size before they load so a slow network cannot resize rows under the user's finger.</p>
+    <p>What breaks windowing falls into three families. Re-rendering: <code>renderItem</code> defined as an inline arrow recreates a component description every time the list renders, and if the row is not wrapped in <code>memo</code>, every visible row reconciles because of it — cheap for five rows, a frame dropped with forty. Unstable keys: an index key tells the list that a row inserted at the top shifted every identity below it, so inserting one item remounts the entire list, losing scroll anchors and in-flight image loads. And measurement: without <code>getItemLayout</code>, scrolling to an index means rendering rows until the list can guess where the index is, which on a long list is slow and visibly approximate — when row height is fixed, supplying the math costs four lines and removes the guessing.</p>
+    <p>The tuning knobs exist and are tempting: <code>windowSize</code>, <code>initialNumToRender</code>, <code>maxToRenderPerBatch</code>, <code>removeClippedSubviews</code>. They move real numbers, and they are the wrong first move, because a janky list with heavy rows stays janky after tuning and a light list rarely needs it. The order that works: fix the row's own cost first — count its views, size its images, memo it — then measure on a slow device, and only then adjust the window. A common source of jank that is neither the row nor the window is the scroll handler itself: work done per scroll event belongs behind a throttle on the native side, because a JavaScript function running on every frame of a gesture competes directly with the thread doing the scroll.</p>
+    <div class="codeWrap"><pre><code>import { memo } from 'react';
+import { FlatList, Image, Text, Pressable, StyleSheet } from 'react-native';
+
+const ROW = 64; // fixed height: lets the list size its window and
+                // answer scroll-to-index without measuring anything
+
+// memo without stable props is decoration: it pays off only when
+// renderItem and onOpen also keep their identity across renders
+const Row = memo(function Row({ item, onOpen }) {
+  return (
+    &lt;Pressable style={styles.row} onPress={() =&gt; onOpen(item.id)}&gt;
+      &lt;Image source={{ uri: item.thumb }} style={styles.thumb} /&gt;
+      &lt;Text style={styles.title} numberOfLines={2}&gt;{item.title}&lt;/Text&gt;
+    &lt;/Pressable&gt;
+  );
+});
+
+export function NoteList({ notes, onOpen }) {
+  return (
+    &lt;FlatList
+      data={notes}
+      keyExtractor={(item) =&gt; item.id}
+      // the inline arrow here is fine: it builds an element, it does
+      // not re-render rows, because Row is memoized and its props -
+      // item and onOpen - keep identity between calls
+      renderItem={({ item }) =&gt; &lt;Row item={item} onOpen={onOpen} /&gt;}
+      getItemLayout={(_data, index) =&gt; ({
+        length: ROW,
+        offset: ROW * index,
+        index,
+      })}
+      initialNumToRender={10}
+      windowSize={7}
+    /&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { height: ROW, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16 },
+  thumb: { width: 40, height: 40, borderRadius: 6 },
+  title: { flex: 1, fontSize: 15 },
+});</code></pre></div>
+    <h4>Why a list scrolls badly</h4>
+    <p>A dropped frame while scrolling is a budget problem: the JavaScript thread must finish its work in about sixteen milliseconds, and lists spend that budget on four things in a predictable order. Row reconciliation is first — which is why the <code>memo</code> on the row and the stable callback matter more than any list prop. Layout is second, and nested text is the expensive case: a row with text inside a view inside a view must compute all three boxes every time anything about it changes, which is why row height is fixed and depth is kept low. Image decoding is third: an image that arrives without a declared size renders at natural size, then reflows when it loads, so the row it occupies is laid out twice — declare the box first and let the picture fill it. Fourth is work done per scroll event, which is the only one of the four the user's gesture controls the cadence of, so it must be cheap by construction rather than by luck.</p>
+    <div class="codeWrap"><pre><code>import { useCallback, useState } from 'react';
+import { FlatList, Pressable, Text, StyleSheet } from 'react-native';
+
+export function SelectableList({ notes }) {
+  const [selected, setSelected] = useState(null);
+
+  // stable identity: rows close over this once, so their memo
+  // comparison keeps working instead of invalidating every render
+  // the moment the selection state changes anywhere in the list
+  const onOpen = useCallback((id) =&gt; {
+    setSelected((current) =&gt; (current === id ? null : id));
+  }, []);
+
+  // each row's look now depends on state the list itself owns;
+  // extraData is how the list learns that visible rows must be
+  // re-rendered even though data - the array of notes - never
+  // changed identity, which is otherwise invisible to it
+  return (
+    &lt;FlatList
+      data={notes}
+      extraData={selected}
+      keyExtractor={(item) =&gt; item.id}
+      renderItem={({ item }) =&gt; (
+        &lt;Row
+          item={item}
+          onOpen={onOpen}
+          selected={item.id === selected}
+        /&gt;
+      )}
+    /&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { padding: 14, borderBottomWidth: 1 },
+});</code></pre></div>
+    <div class="tip"><p>Profile lists on the slowest device you support, not in the development client on a laptop. Windowing bugs are invisible where rows cost four milliseconds and visible where they cost sixteen, and the dev client runs unoptimized JavaScript that hides the difference you are trying to measure.</p></div>
+    <h3 id="ch7-pagination" data-toc>Pagination and infinite lists</h3>
+    <p>An infinite list is two systems stitched together: a data layer that fetches successive pages and a view layer that asks for the next one when the user approaches the end. On the data side, cursor-based pagination is the correct default. An offset is a promise about the list staying still, and a list that gains three items between page two and page three silently drops or duplicates rows at the seam; an opaque cursor — the last item's id, signed or server-held — names a position rather than counting it, so concurrent inserts cannot shift the boundary. Pages are cached as an array of page objects rather than flattened, because the array is the honest record of what was asked for and it lets refetching re-run every page request through the same cache machinery.</p>
+    <p>The view side is where the failures concentrate. <code>onEndReached</code> is an event, not a button: it fires when the viewport approaches the threshold, it can fire several times during one gesture, and it fires once on mount whenever the content is shorter than the viewport — a cold empty list therefore triggers it immediately, twice, before the user has done anything. The guard belongs in exactly one place, written once: only fetch if there is a next page and no fetch is already running. Get that wrong and you get duplicate pages, which the dedupe step hides for a while and then stops hiding when the server's ordering puts the same item across a boundary twice. Dedupe by id when flattening, unconditionally — it is four lines and it converts an entire class of seam bugs into nothing.</p>
+    <p>Continuity is the last piece, and it is judged by whether the user notices the fetch at all. The list must not jump: appending to the end of a non-inverted list is naturally stable, while an inverted list — the chat pattern, newest at the bottom — must start at the end and append above the anchor. A failed next page is not a full-screen error: the list still holds everything it had, so the failure renders in the footer, where the retry affordance sits next to the thing it retries. And a footer spinner must occupy space before it has content — a footer that appears the instant loading starts adds height below the last row, nudging the scroll position the user was reading.</p>
+    <div class="codeWrap"><pre><code>import { useInfiniteQuery } from '@tanstack/react-query';
+
+export function useNotePages() {
+  return useInfiniteQuery({
+    queryKey: ['notes', 'pages'],
+    initialPageParam: '',
+    queryFn: ({ pageParam }) =&gt;
+      fetch(API + '/notes?cursor=' + encodeURIComponent(pageParam))
+        .then((r) =&gt; {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        }),
+
+    // the next cursor comes from the last page, and undefined ends
+    // the list. because it is opaque, inserting notes at the top
+    // between two fetches cannot shift a page boundary
+    getNextPageParam: (lastPage) =&gt; lastPage.nextCursor || undefined,
+  });
+}
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>React Native - Expo, Navigation & Full-Scale Apps.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,2814 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Next.js 15 - App Router, Server Components &amp; Rendering</title>
+<meta name="description" content="Next.js is a React framework, and almost every confusion with it comes from not knowing which of your code…. 6 chapters, 48 topics and 127 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/nextjs.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Next.js 15 - App Router, Server Components &amp; Rendering">
+<meta property="og:description" content="Next.js is a React framework, and almost every confusion with it comes from not knowing which of your code…. 6 chapters, 48 topics and 127 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/nextjs.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Frameworks">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Next.js 15 - App Router, Server Components &amp; Rendering">
+<meta name="twitter:description" content="Next.js is a React framework, and almost every confusion with it comes from not knowing which of your code…. 6 chapters, 48 topics and 127 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/nextjs.html#article","headline":"Next.js 15 - App Router, Server Components & Rendering","name":"Next.js 15 - App Router, Server Components & Rendering","description":"Next.js is a React framework, and almost every confusion with it comes from not knowing which of your code…. 6 chapters, 48 topics and 127 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/nextjs.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/nextjs.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Frameworks","keywords":["nextjs","react","ssr","isr","app router","rsc","edge"],"wordCount":10590,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[{"@type":"WebPageElement","name":"Welcome - How to Use This Next.js Guide","url":"https://amin360it.github.io/quick-guides/nextjs.html#orientation"},{"@type":"WebPageElement","name":"1 · The Two Runtimes","url":"https://amin360it.github.io/quick-guides/nextjs.html#ch1"},{"@type":"WebPageElement","name":"2 · Server and Client Components","url":"https://amin360it.github.io/quick-guides/nextjs.html#ch2"},{"@type":"WebPageElement","name":"3 · The Rendering Lifecycle","url":"https://amin360it.github.io/quick-guides/nextjs.html#ch3"},{"@type":"WebPageElement","name":"4 · Data Fetching and Mutations","url":"https://amin360it.github.io/quick-guides/nextjs.html#ch4"},{"@type":"WebPageElement","name":"5 · The File System Router","url":"https://amin360it.github.io/quick-guides/nextjs.html#ch5"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Frameworks","item":"https://amin360it.github.io/quick-guides/index.html#cat-frameworks"},{"@type":"ListItem","position":3,"name":"Next.js 15 - App Router, Server Components & Rendering","item":"https://amin360it.github.io/quick-guides/nextjs.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Next.js 15</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This Next.js Guide</a><ul>
+<li><a href="#orientation-assume" data-target="orientation-assume">What this guide assumes</a></li>
+<li><a href="#orientation-map" data-target="orientation-map">How the chapters fit together</a></li>
+<li><a href="#orientation-mental" data-target="orientation-mental">The mental model you need first</a></li>
+<li><a href="#orientation-conventions" data-target="orientation-conventions">Conventions and how to read the code</a></li>
+<li><a href="#orientation-exercises" data-target="orientation-exercises">Working through the exercises</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · The Two Runtimes</a><ul>
+<li><a href="#ch1-ssr" data-target="ch1-ssr">What actually happens on a request</a></li>
+<li><a href="#ch1-environments" data-target="ch1-environments">Two environments, two globals</a></li>
+<li><a href="#ch1-server-only" data-target="ch1-server-only">Marking code server-only</a></li>
+<li><a href="#ch1-env" data-target="ch1-env">Environment variables</a></li>
+<li><a href="#ch1-runtime" data-target="ch1-runtime">Node versus Edge runtimes</a></li>
+<li><a href="#ch1-cost" data-target="ch1-cost">What each choice costs</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Server and Client Components</a><ul>
+<li><a href="#ch2-server" data-target="ch2-server">Writing a Server Component</a></li>
+<li><a href="#ch2-async" data-target="ch2-async">Async components and Suspense</a></li>
+<li><a href="#ch2-client" data-target="ch2-client">Writing a Client Component</a></li>
+<li><a href="#ch2-serial" data-target="ch2-serial">What can cross the boundary</a></li>
+<li><a href="#ch2-place" data-target="ch2-place">Where to put the boundary</a></li>
+<li><a href="#ch2-context" data-target="ch2-context">Context across the boundary</a></li>
+<li><a href="#ch2-patterns" data-target="ch2-patterns">Composition patterns that work</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · The Rendering Lifecycle</a><ul>
+<li><a href="#ch3-request" data-target="ch3-request">A request end to end</a></li>
+<li><a href="#ch3-static" data-target="ch3-static">Static, dynamic, and how Next decides</a></li>
+<li><a href="#ch3-dynamic" data-target="ch3-dynamic">Opting into dynamic rendering</a></li>
+<li><a href="#ch3-partial" data-target="ch3-partial">Partial prerendering</a></li>
+<li><a href="#ch3-headers" data-target="ch3-headers">Reading headers and cookies</a></li>
+<li><a href="#ch3-nonce" data-target="ch3-nonce">The render cache and a nonce</a></li>
+<li><a href="#ch3-trace" data-target="ch3-trace">Seeing what happened</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Data Fetching and Mutations</a><ul>
+<li><a href="#ch4-where" data-target="ch4-where">Where to fetch</a></li>
+<li><a href="#ch4-await" data-target="ch4-await">Parallel and dependent fetches</a></li>
+<li><a href="#ch4-suspense" data-target="ch4-suspense">Fetching with Suspense</a></li>
+<li><a href="#ch4-cascade" data-target="ch4-cascade">Cascades and how to flatten them</a></li>
+<li><a href="#ch4-mutations" data-target="ch4-mutations">Mutations and the client cache</a></li>
+<li><a href="#ch4-revalidate" data-target="ch4-revalidate">Revalidating after a mutation</a></li>
+<li><a href="#ch4-errors" data-target="ch4-errors">Error handling per fetch</a></li>
+<li><a href="#ch4-form" data-target="ch4-form">A complete data flow</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · The File System Router</a><ul>
+<li><a href="#ch5-conventions" data-target="ch5-conventions">File conventions</a></li>
+<li><a href="#ch5-dynamic" data-target="ch5-dynamic">Dynamic segments</a></li>
+<li><a href="#ch5-catchall" data-target="ch5-catchall">Catch-all and optional segments</a></li>
+<li><a href="#ch5-groups" data-target="ch5-groups">Route groups</a></li>
+<li><a href="#ch5-parallel" data-target="ch5-parallel">Parallel routes and slots</a></li>
+<li><a href="#ch5-intercepting" data-target="ch5-intercepting">Intercepting routes</a></li>
+<li><a href="#ch5-navigation" data-target="ch5-navigation">Programmatic navigation</a></li>
+<li><a href="#ch5-links" data-target="ch5-links">Link prefetching</a></li>
+<li><a href="#ch5-middleware-routing" data-target="ch5-middleware-routing">Rewrites, redirects and middleware</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+<h1 class="am-band"><span class="am-band-t">Next.js 15</span><span class="am-band-s">6 chapters &middot; 48 topics &middot; 127 code samples &middot; works offline</span></h1>
+
+  <section class="chapter">
+<h2 id="orientation" data-toc>Welcome — How to Use This Next.js Guide</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; Welcome — How to Use This Next.js Guide</button><div class="ch-toc-list"><a href="#orientation-assume">What this guide assumes</a><a href="#orientation-map">How the chapters fit together</a><a href="#orientation-mental">The mental model you need first</a><a href="#orientation-conventions">Conventions and how to read the code</a><a href="#orientation-exercises">Working through the exercises</a></div></div>
+    <p class="topic-desc">Next.js is a React framework, and almost every confusion with it comes from not knowing which of your code runs on the server and which runs in the browser. This guide is organised around making that boundary explicit, because once you can state where a piece of code runs, every Next.js decision becomes obvious.</p>
+    <h3 id="orientation-assume" data-toc>What this guide assumes</h3>
+    <p>You know React — the component model, hooks, effects and state from a React guide at this level. You do not need Node.js server experience; where it matters, it is explained.</p>
+    <h4 id="orientation-assume-stack">Pin the versions down</h4>
+    <p>Next.js 15 is written against a specific React release. It expects React 19 and the App Router's component rules: async Server Components, the <code>'use client'</code> boundary, and action props instead of callback props. A library written for React 18 — a drag-and-drop kit, a virtualised list — can still work, but pairing it with a server component that passes functions across the boundary is where the confusing errors start.</p>
+    <p>Let <code>create-next-app</code> pick the versions. The one thing worth choosing yourself is TypeScript: the framework has first-class types, typed <code>Link</code> hrefs via <code>experimental.typedRoutes</code>, and generated route types that catch a mistyped URL at build time instead of in production.</p>
+    <div class="codeWrap"><pre><code>// package.json - the versions create-next-app@latest pins today
+{
+  "dependencies": {
+    "next": "15.3.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
+  }
+}</code></pre></div>
+    <h4 id="orientation-assume-node">Node 20 or newer, no excuses</h4>
+    <p>Every Next.js command — <code>next dev</code>, <code>next build</code>, <code>next start</code> — runs on Node.js, and Next.js 15 raises the floor to 20.9.0. Node 18 installs refuse to start with a clear engine error rather than misbehaving halfway through a build, but failing fast is still better: pin the version in <code>engines</code> and an <code>.nvmrc</code> so your machine, CI and deployment all agree.</p>
+    <p>You can develop with just Node and a text editor; a Docker image or a platform like Vercel is a deployment detail, not a requirement. The exercises in this guide run on <code>next dev</code> alone.</p>
+    <div class="codeWrap"><pre><code># .nvmrc
+20.18.0
+
+# package.json - refuse to run on the wrong Node
+"engines": { "node": ">=20.9.0" }
+
+# the check before you scaffold
+node -v
+npx create-next-app@latest my-shop --ts --app --turbopack</code></pre></div>
+    <ul>
+      <li><strong>Node.js 20 or newer.</strong> Next.js 15 requires it.</li>
+      <li><strong>TypeScript.</strong> Next.js has first-class types and the type-level route helpers are worth learning.</li>
+      <li>A hosted platform is optional. Everything here works with <code>next dev</code> and <code>next build</code> locally, and deploys to Vercel, Netlify, a container, or a VM.</li>
+    </ul>
+    <div class="note"><p><strong>Versions used here:</strong> Next.js 15 with the App Router, React 19, and Turbopack as the default dev bundler. The App Router replaced the Pages Router in 13.4 and is the recommended default; the Pages Router is covered in one chapter for migrating existing projects.</p></div>
+    <h3 id="orientation-map" data-toc>How the chapters fit together</h3>
+    <p>The five numbered chapters form one argument: where does code run, how do you write components for that place, how does a request become a page, how do you get data in and out of it, and how does the file tree become URLs. Reading them in order is the shortest path; skipping straight to routing (chapter 5) is the most common way to get stuck.</p>
+    <h4 id="orientation-map-route">The order is the argument</h4>
+    <p>Chapter 1 establishes the two runtimes and their security properties. Chapter 2 turns that into a component model. Chapter 3 explains the rendering modes those components participate in, chapter 4 adds data, and chapter 5 backfills the routing machinery. Each chapter's exercises assume the previous one's project, so the same small shop grows as you read.</p>
+    <div class="codeWrap"><pre><code>// how the chapters build on each other
+//
+//   1 · The Two Runtimes        where each line of code runs
+//            |
+//   2 · Server and Client       how to write components for each runtime
+//            |
+//   3 · The Rendering           static vs dynamic vs partially static
+//            |
+//   4 · Data Fetching           where data comes from, how it changes
+//            |
+//   5 · The File System        how folders and files become URLs</code></pre></div>
+    <h4 id="orientation-map-project">One project from exercise one</h4>
+    <p>Everything builds against a running <code>app/</code> tree, so the exercises assume one persistent project rather than a new scaffold per chapter. The canonical shape used throughout is a shop: a public catalogue, a product detail page, a cart, and an admin edit form — the smallest feature set that exercises every mechanism in the guide.</p>
+    <div class="codeWrap"><pre><code>my-shop/                    npx create-next-app@latest my-shop
+  app/
+    layout.tsx              root layout: html, body, nav
+    page.tsx                /
+    products/
+      page.tsx              /products
+      [id]/page.tsx         /products/42
+      [id]/edit/page.tsx    /products/42/edit   (ch4's complete flow)
+    api/route.ts            /api - a handler
+  components/
+    AddToCart.tsx           'use client'
+  lib/
+    db.ts                   'server-only'
+    actions.ts              'use server'</code></pre></div>
+    <ul>
+      <li><strong>Part one (1–4): the two runtimes.</strong> Server Components, the client boundary, data fetching and the request lifecycle. This is the part that changes how you write React.</li>
+      <li><strong>Part two (5–8): routing and rendering.</strong> The file system router, layouts, streaming, caching and revalidation.</li>
+      <li><strong>Part three (9–13): the platform.</strong> Server Actions, middleware, forms, images, fonts and metadata.</li>
+      <li><strong>Part four (14–19): production.</strong> Auth, performance, testing, deployment, the Pages Router migration, and architecture.</li>
+    </ul>
+    <h3 id="orientation-mental" data-toc>The mental model you need first</h3>
+    <p>Hold this one idea and most of the framework stops being surprising.</p>
+    <h4 id="orientation-mental-default">The default is the server</h4>
+    <p>Most of your components should carry no directive at all. A Server Component renders to HTML on the server, ships no JavaScript for itself, and is never re-executed in the browser — so anything that must be interactive has to be pulled out, not pushed in. Starting with <code>'use client'</code> on everything and carving server components out of it is the exact inverse of how the framework is designed.</p>
+    <div class="codeWrap"><pre><code>// app/page.tsx - a Server Component; no 'use client' in sight
+import { ProductCard } from '@/components/ProductCard';   // also server
+
+export default async function Home() {
+  const products = await db.product.findMany({ take: 8 });
+  return (
+    &lt;ul&gt;
+      {products.map((p) =&gt; (
+        &lt;ProductCard key={p.id} product={p} /&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}
+// the browser never receives this component's code - only its HTML</code></pre></div>
+    <h4 id="orientation-mental-questions">Two questions classify any component</h4>
+    <p>Ask: does it need state, an effect, an event handler or a browser API? And: does it read secrets, the session or the request itself? Only-serves-data is a server component; only-interactive is a client component; both is a split — fetch on the server, pass plain data down to the smallest possible client leaf.</p>
+    <div class="codeWrap"><pre><code>// Q1: does it need state, an effect, an event handler, or the DOM?
+// Q2: does it read secrets, the session, or the request itself?
+//
+//                    Q1 yes      Q1 no
+//   Q2 yes          split them   server
+//   Q2 no           client       server
+//
+// 'split them' means: fetch on the server, pass plain data down to a
+// client component that owns the interaction.</code></pre></div>
+    <div class="codeWrap"><pre><code>// Next.js renders your React tree in TWO places, and a component belongs
+// to one of them permanently.
+//
+//   SERVER                          BROWSER
+//   runs Node.js                    runs JS
+//   has the filesystem, the         has no filesystem, no secrets,
+//   database, the network            can be called directly by anyone
+//   renders to HTML                 hydrates the HTML
+//   cannot use useState, useEffect  cannot read the database
+//
+// THE DEFAULT is the server. A component is a Server Component unless it
+// says otherwise. 'use client' is an opt-in, not a starting point.
+//
+// this is the opposite of what most tutorials lead with, and it is the
+// single most important fact in the framework.
+
+// 'use client' marks the BOUNDARY. Everything imported into a client
+// component becomes client code too, transitively.
+'use client';
+import Counter from './Counter';   // Counter is now a Client Component
+// and if Counter imports a big library, that library is in the bundle
+
+// you do NOT need 'use client' on a component that only renders other
+// server components and has no interactivity. Most of your app should
+// not have it.</code></pre></div>
+    <p>Two consequences follow immediately:</p>
+    <div class="codeWrap"><pre><code>// 1. you cannot import a server-only thing into a client component
+//    this is a build error, and it is a feature:
+//      import { db } from '@/lib/db';        in a client component
+//      -&gt; "You're importing a component that needs db. That React hook
+//          only works in a Server Component"
+
+//    the fix is to pass the DATA down as a prop, not the client
+
+// 2. the client boundary is a one-way street
+//    a Server Component can render a Client Component and pass it
+//    serialisable props. It cannot receive a function from one.
+&lt;SearchBox
+  results={results}            // data: fine
+  onSelect={() =&gt; ...}       // function: not serialisable
+/&gt;                            // -&gt; "Functions cannot be passed to Client
+                               //     Components" - use a Server Action</code></pre></div>
+    <h3 id="orientation-conventions" data-toc>Conventions and how to read the code</h3>
+    <p>File names in the App Router are meaningful, and the examples use the standard conventions:</p>
+    <h4 id="orientation-conventions-special">The files that mean something</h4>
+    <p>A handful of filenames in every <code>app/</code> folder are declarations; everything else is inert. <code>page.tsx</code> creates the URL, <code>route.ts</code> creates an HTTP endpoint instead — and a folder cannot have both, because they would fight over the same path. <code>layout.tsx</code>, <code>loading.tsx</code>, <code>error.tsx</code> and <code>not-found.tsx</code> shape the UI around the page, and <code>template.tsx</code> behaves like a layout that remounts on every navigation.</p>
+    <div class="codeWrap"><pre><code>app/
+  products/
+    page.tsx          UI at /products
+    route.ts          CONFLICT - the build refuses two handlers for one URL
+    layout.tsx        chrome shared by every page under /products
+    loading.tsx       streamed fallback while page.tsx awaits
+    error.tsx         per-segment error boundary ('use client')
+
+  api/products/
+    route.ts          an API endpoint, no UI, no page.tsx</code></pre></div>
+    <h4 id="orientation-conventions-folders">Folders are either URLs or organisation</h4>
+    <p>The underscore prefix <code>_name</code> removes a folder from routing entirely — the conventional home for helpers is <code>_components/</code> and <code>_lib/</code>. Parenthesised groups <code>(name)</code> organise without contributing a URL segment, and square brackets <code>[name]</code> create dynamic segments. Between the two you can express any URL structure while keeping the tree readable.</p>
+    <div class="codeWrap"><pre><code>app/
+  _lib/             never a URL - the underscore is the escape hatch
+    format.ts
+  (marketing)/      never a URL - groups organise only
+    page.tsx        /
+  [lang]/           always a URL parameter
+    page.tsx        /en</code></pre></div>
+    <ul>
+      <li><code>page.tsx</code> — a route. Its presence in a folder creates the URL.</li>
+      <li><code>layout.tsx</code> — shared UI wrapping this route and everything under it.</li>
+      <li><code>loading.tsx</code> — a loading UI, streamed automatically.</li>
+      <li><code>error.tsx</code> — an error boundary for this segment.</li>
+      <li><code>not-found.tsx</code> — the 404 UI for this segment.</li>
+      <li><code>template.tsx</code> — like a layout, but remounts on navigation.</li>
+      <li><code>route.ts</code> — a custom HTTP handler, no UI.</li>
+      <li>Anything prefixed <code>_</code> is <strong>excluded</strong> from routing. <code>_components/</code> and <code>_lib/</code> are the conventional homes for helpers.</li>
+    </ul>
+    <div class="codeWrap"><pre><code>// the shape of an app
+app/
+  layout.tsx           root layout: html, body, global nav
+  page.tsx             /
+  globals.css
+  (marketing)/         a group: no URL segment, purely organisational
+    layout.tsx
+    page.tsx           /
+    pricing/page.tsx   /pricing
+  products/
+    layout.tsx
+    page.tsx           /products
+    [id]/              a dynamic segment
+      page.tsx         /products/123
+      loading.tsx
+      error.tsx
+  api/
+    route.ts           /api - a POST handler, no UI
+  _components/         excluded from routing
+    CartButton.tsx     'use client'
+  _lib/
+    db.ts              server-only, never imported by a client component
+
+// the URL is the folder path. (marketing) contributes nothing.</code></pre></div>
+    <h3 id="orientation-exercises" data-toc>Working through the exercises</h3>
+    <p>Every chapter ends with exercises. Run them in a real project — <code>npx create-next-app@latest</code> — because the build errors described in chapters 1 and 2 are the whole point and they only appear in a real build.</p>
+    <h4 id="orientation-exercises-scaffold">Scaffold once, answer every chapter against it</h4>
+    <p>The exercises are cumulative, so scaffold one project and keep it. <code>npx create-next-app@latest</code> asks interactive questions; the flags below answer them all at once. The App Router and TypeScript are non-negotiable for this guide; Tailwind and ESLint are personal taste, and skipping them keeps the project smaller and the build output easier to read.</p>
+    <div class="codeWrap"><pre><code>npx create-next-app@latest my-shop --ts --app --turbopack --no-tailwind --no-eslint
+cd my-shop
+npm run dev
+# open http://localhost:3000 - the default page proves the toolchain</code></pre></div>
+    <h4 id="orientation-exercises-verify">Production build is the exam</h4>
+    <p>Dev mode is forgiving: it compiles lazily, double-runs components, and hides prerendering problems. Several exercises — the server-only import in chapter 1, the boundary placement in chapter 2, the route table in chapter 3 — only act as described under <code>next build</code>, so get comfortable running it after every chapter.</p>
+    <div class="codeWrap"><pre><code>npm run build        # the route table (○ ● ƒ ◐) appears here
+npm run start        # production server: no hot reload, real caching
+curl -i localhost:3000   # inspect headers: streaming, cache, cookies</code></pre></div>
+    <div class="tip"><p>One habit that pays for itself immediately: open the browser devtools Network panel and keep it visible while developing. Click a server component and you will see an HTML document, not a JS bundle. That one observation explains more about Next.js than any diagram.</p></div>
+  </section>
+
+  <section class="chapter">
+<h2 id="ch1" data-toc>1 · The Two Runtimes</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 · The Two Runtimes</button><div class="ch-toc-list"><a href="#ch1-ssr">What actually happens on a request</a><a href="#ch1-environments">Two environments, two globals</a><a href="#ch1-server-only">Marking code server-only</a><a href="#ch1-env">Environment variables</a><a href="#ch1-runtime">Node versus Edge runtimes</a><a href="#ch1-cost">What each choice costs</a></div></div>
+    <p class="topic-desc">A single page request in Next.js passes through several environments with different capabilities and different security properties. Knowing which is which is the foundation for every decision that follows.</p>
+    <h3 id="ch1-ssr" data-toc>What actually happens on a request</h3>
+    <p>A single page load is not one thing. The request crosses the CDN, the Next.js server and the browser, and code runs in three places — middleware, Server Components, Client Components — in a fixed order. Only the cached pieces change between routes.</p>
+    <h4 id="ch1-ssr-steps">Render first, hydrate later</h4>
+    <p>Steps 1–5 of the walkthrough happen before the first byte is sent: the URL resolves against the <code>app/</code> tree, the layouts render top-down, and each Server Component executes — awaiting, reading the database, reading environment variables. The HTML response ships with the serialised RSC payload interleaved, so the browser can both display the document and reconcile later updates. Hydration then attaches behaviour to the already-correct DOM; a page is visible and scrollable before its JavaScript finishes loading.</p>
+    <p>The practical consequence is easy to verify: curl the route and the content is in the HTML. There is no client fetch and no skeleton for the server-rendered parts of the tree.</p>
+    <div class="codeWrap"><pre><code># what a browser actually receives for a Server Component page
+curl -s http://localhost:3000/products/42 | head -20
+# &lt;!DOCTYPE html&gt; - the product name is already in the markup
+
+# what a client-side navigation asks for instead (the Flight stream)
+curl -s -H "RSC: 1" http://localhost:3000/products/42
+# a serialised React tree, not a document - the router reconciles it</code></pre></div>
+    <h4 id="ch1-ssr-browser">The browser takes over after hydration</h4>
+    <p>From the first soft navigation onwards, the router fetches the next route's RSC payload and reconciles it into the live DOM — no document reload, no full-page data refetch. The Server Components of that route run on the server again; the browser only ever runs the client components. This is why a <code>Link</code> to a product page feels instant twice: once from prefetching, once because there is no full page load.</p>
+    <div class="codeWrap"><pre><code>import Link from 'next/link';
+
+export function Nav() {
+  return (
+    &lt;nav&gt;
+      &lt;Link href="/products"&gt;Products&lt;/Link&gt;
+      &lt;Link href="/cart"&gt;Cart&lt;/Link&gt;
+    &lt;/nav&gt;
+  );
+}
+// click -&gt; router fetches the RSC payload -&gt; tree swap in the live DOM
+// no document reload; scroll position and component state survive</code></pre></div>
+    <div class="codeWrap"><pre><code>// GET /products/42
+//
+//  1. the request hits your server (or the edge, or a CDN)
+//
+//  2. Next.js matches the URL against the app/ tree
+//     /products/[id]/page.tsx  with  id = "42"
+//     and collects every layout.tsx on the path:
+//       app/layout.tsx          root
+//       app/products/layout.tsx products
+//       app/products/[id]/page.tsx
+//
+//  3. layouts render TOP DOWN, page LAST
+//     each is a React tree, so this is a normal render
+//
+//  4. Server Components run HERE, on the server
+//     they can await, read the database, read env vars
+//     their output is HTML plus a serialised RSC payload
+//
+//  5. the HTML response is streamed to the browser as it renders
+//     (this is why loading.tsx and Suspense work - see ch6)
+//
+//  6. the browser downloads the JS chunks for the Client Components
+//
+//  7. the browser hydrates those components and takes over the DOM
+//
+//  8. from then on, navigation is client-side
+//     the RSC payload for the next route is fetched, no full page load
+//
+// Server Components do NOT run in steps 6-8. They ran once, on the server.
+// They are not re-run on the client. If a Server Component's output is
+// not there, re-rendering in the browser is not going to produce it.</code></pre></div>
+    <div class="note"><p>This is why a Server Component cannot have <code>useState</code>. There is no client instance of it to hold state — the component executed, produced a description, and that is the end of it. The state would have nowhere to live between interactions.</p></div>
+    <h3 id="ch1-environments" data-toc>Two environments, two globals</h3>
+    <p>The two environments are not two APIs bolted onto one codebase — they are two different runtime objects with different <code>globalThis</code>. A module that runs in both must use only what exists in both.</p>
+    <h4 id="ch1-environments-detect">Know where you are at runtime</h4>
+    <p><code>typeof window === 'undefined'</code> is the classic guard, but in Next.js the better answer is structural: split the module so each file lives in one environment, and let the bundler enforce it. When you genuinely need one module for both — a logger, a formatting helper — the guard is enough, because the opposite global does not exist in that environment.</p>
+    <div class="codeWrap"><pre><code>// lib/runtime.ts - safe to import from server AND client components
+export const isServer = typeof window === 'undefined';
+
+export function announce(message: string) {
+  // server: prints in the terminal. client: prints in devtools.
+  console.log(`[${isServer ? 'server' : 'client'}] ${message}`);
+}</code></pre></div>
+    <h4 id="ch1-environments-shared">The intersection is small, and that's fine</h4>
+    <p><code>fetch</code>, <code>URL</code>, <code>Request</code> and <code>Response</code>, <code>crypto.subtle</code>, Web Streams and <code>structuredClone</code> exist in both environments. Node-specific globals (<code>process</code>, <code>fs</code>, <code>Buffer</code>) are server-only; DOM globals (<code>window</code>, <code>localStorage</code>, <code>navigator</code>) are browser-only. A data module written against the intersection can be imported from anywhere without a directive.</p>
+    <div class="codeWrap"><pre><code>// lib/http.ts - imports cleanly on both sides of the boundary
+export async function fetchJson(url: string, init?: RequestInit) {
+  const res = await fetch(url, {
+    ...init,
+    headers: { 'content-type': 'application/json', ...init?.headers },
+  });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json();
+}
+// fetch, RequestInit, Response, Error - all in the intersection</code></pre></div>
+    <div class="codeWrap"><pre><code>//                    Server            Browser
+// process.env        YES               bundled at build - only NEXT_PUBLIC_*
+// fs                 YES               no
+// path/child_process YES               no
+// Buffer             YES               no (unless polyfilled)
+// window/document    no                YES
+// localStorage       no                YES
+// navigator          no                YES
+// fetch              full              browser fetch, no caching rules
+// setTimeout         yes               yes
+// WebSocket          yes               yes
+// Deno / Bun globals yes (node runtime) no
+
+// consequences that surprise people
+// 1. an object with methods cannot cross the boundary
+//   pass plain data: strings, numbers, booleans, null, undefined,
+//   Date (yes, serialised), plain objects, arrays, Map, Set,
+//   typed arrays, Promise, and JSX elements
+
+// 2. a class instance cannot cross
+//   class Money { constructor(c) { this.c = c } }
+//   &lt;Price money={new Money(100)} /&gt;      Error
+//   &lt;Price cents={100} /&gt;                  fine
+
+// 3. a function cannot cross
+//   &lt;Form onSubmit={() =&gt; save()} /&gt;     Error
+//   &lt;Form action={saveAction} /&gt;           fine (ch9)</code></pre></div>
+    <h3 id="ch1-server-only" data-toc>Marking code server-only</h3>
+    <p>There is a package for this, and it should be used on every module that touches secrets or a database.</p>
+    <h4 id="ch1-server-only-guard">The import that makes mistakes impossible</h4>
+    <p><code>import 'server-only'</code> must be the first statement of a module. It has no runtime effect: nothing is exported, nothing is executed. What it does is make any client bundle that transitively imports the module a build error, with a message naming the import chain. Without it, the failure mode is worse — either a runtime error in the browser or, with sloppy tooling, your connection string baked into a public bundle.</p>
+    <div class="codeWrap"><pre><code>// lib/db.ts
+import 'server-only';               // FIRST line. enforced at build time
+import { PrismaClient } from '@prisma/client';
+
+const g = globalThis as unknown as { prisma?: PrismaClient };
+export const prisma = g.prisma ?? new PrismaClient();
+if (process.env.NODE_ENV !== 'production') g.prisma = prisma;
+// the global reassignment keeps dev hot-reload from exhausting sockets</code></pre></div>
+    <h4 id="ch1-server-only-reversed">The mirror image: client-only</h4>
+    <p>The <code>client-only</code> package enforces the opposite direction: a module that must never execute on the server. It is for code that touches <code>window</code> at module scope — analytics, web workers — where an accidental server import would throw during render and break the route.</p>
+    <div class="codeWrap"><pre><code>// lib/analytics.ts
+import 'client-only';               // npm i client-only
+export function track(event: string) {
+  window.gtag?.('event', event);    // window is safe at module scope now
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// lib/db.ts
+import 'server-only';          // npm i server-only
+import { Pool } from 'pg';
+
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+// what it does: if ANY client component, anywhere in the dependency
+// graph, imports this module, the BUILD FAILS with a clear message.
+// without it, the mistake is a runtime error in the browser - or worse,
+// a successful build with your connection string in the bundle.
+
+// the reverse: client-only modules
+'use client';
+import { Chart } from './Chart';   // everything imported is client code
+// use 'client' on the LEAF that needs interactivity, not at the top of
+// your tree. 'use client' at the root turns your entire app into a SPA
+// and throws away most of what Next.js does for you.</code></pre></div>
+    <div class="warn"><p><strong><code>process.env.SECRET</code> in a client component is a real leak, not a type error.</strong> A non-<code>NEXT_PUBLIC_</code> variable referenced in client code is replaced with <code>undefined</code> at build time — safe but silently broken. Referenced in a module that reaches the bundle by accident, older tooling inlined it. Always add <code>'server-only'</code> and always check what you import into a client component.</p></div>
+    <h3 id="ch1-env" data-toc>Environment variables</h3>
+    <p>Environment variables are split by when they are read: at build time for the client bundle, at startup for the server. The <code>NEXT_PUBLIC_</code> prefix is the single switch between the two.</p>
+    <h4 id="ch1-env-loading">Which file wins</h4>
+    <p>Files load in a fixed precedence — <code>.env.$(NODE_ENV).local</code> beats <code>.env.local</code>, which beats <code>.env.$(NODE_ENV)</code>, which beats <code>.env</code>. <code>.env.local</code> is the one you never commit; <code>.env</code> holds committed defaults. Values are read when the server starts or the build runs, so editing a file requires a restart in dev and a rebuild in production to take effect.</p>
+    <div class="codeWrap"><pre><code># load order, top wins
+.env.production.local    # production machine only, not committed
+.env.local               # your machine, not committed
+.env.production          # committed, shared production defaults
+.env                     # committed, base defaults
+
+# which set is active
+#   next dev   -&gt; development
+#   next build -&gt; production (build-time inlining happens here)
+#   next start -&gt; production</code></pre></div>
+    <h4 id="ch1-env-public">NEXT_PUBLIC_ is a compile-time splice</h4>
+    <p>At <code>next build</code>, every reference to <code>process.env.NEXT_PUBLIC_*</code> is replaced with the literal string. The value ends up in the shipped JavaScript and is readable by anyone who opens the bundle, so it is a broadcast channel, not a secret. Because it is baked in, changing it requires a rebuild — a restart alone is not enough.</p>
+    <div class="codeWrap"><pre><code># .env.local
+NEXT_PUBLIC_API_BASE=https://api.example.com
+API_KEY=sk_live_1234          # never NEXT_PUBLIC_ - that would leak
+
+// app/components/Brand.tsx - 'use client'
+const base = process.env.NEXT_PUBLIC_API_BASE;
+// after next build, the bundle literally contains
+//   const base = "https://api.example.com";</code></pre></div>
+    <div class="codeWrap"><pre><code>// .env.local        not committed, your machine
+// .env              committed defaults, safe to share
+// .env.production   production values, committed, no secrets
+//
+// the rule
+//   NEXT_PUBLIC_FOO   -&gt; inlined into the client bundle at build time.
+//                       public. treat as broadcast.
+//   EVERYTHING_ELSE   -&gt; server only. read in server components, route
+//                       handlers, server actions and middleware.
+
+// reading them
+const url = process.env.DATABASE_URL;            // server only
+const version = process.env.NEXT_PUBLIC_VERSION; // any
+
+// a typed accessor, so a missing variable fails at boot not at 3am
+// lib/env.ts
+import 'server-only';
+
+function required(name: string): string {
+  const v = process.env[name];
+  if (!v) throw new Error(`Missing required environment variable: ${name}`);
+  return v;
+}
+
+export const env = {
+  DATABASE_URL: required('DATABASE_URL'),
+  SESSION_SECRET: required('SESSION_SECRET'),
+  STRIPE_SECRET_KEY: required('STRIPE_SECRET_KEY'),
+};
+
+// and validate the PUBLIC ones too
+if (!/^\d+\.\d+\.\d+$/.test(process.env.NEXT_PUBLIC_VERSION ?? '')) {
+  throw new Error('NEXT_PUBLIC_VERSION must look like 1.2.3');
+}</code></pre></div>
+    <div class="tip"><p>Because <code>NEXT_PUBLIC_</code> variables are inlined at build time, changing one requires a <strong>rebuild</strong>, not just a restart. This surprises people deploying to a platform that restarts containers. Treat a public env var as part of the build, not the runtime.</p></div>
+    <h3 id="ch1-runtime" data-toc>Node versus Edge runtimes</h3>
+    <p>Next.js can run your code in two very different runtimes, and the choice is per-route or per-page.</p>
+    <h4 id="ch1-runtime-constraints">What the edge really takes away</h4>
+    <p>The Edge runtime is a V8 isolate at the CDN, not a Node.js process. <code>fs</code>, <code>path</code>, <code>child_process</code>, <code>Buffer</code> and native addons are absent — often showing up as a missing package — and on some platforms a fresh isolate per request means a module-level <code>Map</code> is not a cache. What you keep is the Web platform: <code>fetch</code>, <code>URL</code>, <code>crypto.subtle</code>, Request and Response. The surprise is usually the opposite of the fear: most auth and routing code runs on the edge unchanged.</p>
+    <div class="codeWrap"><pre><code>// middleware.ts - the edge is the default here, so prove what survives
+export function middleware(req: NextRequest) {
+  // fs.readFileSync(...)                     - TypeError
+  // const b = Buffer.from('x')               - ReferenceError
+  const u = new URL(req.url);        // Web API - survives
+  u.searchParams.set('v', '2');
+  return NextResponse.rewrite(u);
+}</code></pre></div>
+    <h4 id="ch1-runtime-choices">Pick per route, not per app</h4>
+    <p>The default is <code>nodejs</code>, and it works everywhere. Reach for the edge for middleware and for read-only, latency-sensitive routes that can live at the CDN; put anything that touches a database back on Node, because a direct TCP connection beats proxying SQL over HTTP. A Node function deployed in the same region as the database is often the better answer than an edge function two network hops away from it.</p>
+    <div class="codeWrap"><pre><code>// app/dashboard/page.tsx - Node runtime, reads Postgres directly
+export default async function DashboardPage() {
+  const rows = await pool.query('SELECT 1');   // TCP to Postgres: works
+  return &lt;Table rows={rows.rows} /&gt;;
+}
+
+// app/api/geo/route.ts - edge: one HTTP call, no Node APIs needed
+export const runtime = 'edge';
+export async function GET(req: NextRequest) {
+  const ip = req.nextUrl.searchParams.get('ip') ?? '';
+  return Response.json(await geoLookup(ip));
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// DEFAULT: the Node.js runtime. full Node APIs, no artificial limits.
+export const runtime = 'nodejs';     // this is the default; no need to say it
+
+// EDGE: a V8 isolate at the CDN's edge. starts in ~1ms instead of ~300ms,
+// but NO Node built-ins.
+export const runtime = 'edge';
+
+// what you lose on the edge
+//   fs, path, child_process, Buffer
+//   most npm packages that depend on them
+//   native addons
+//   long-lived in-process caches (a new isolate per request in some
+//     platforms, so a module-level Map is not a cache)
+//
+// what you keep
+//   fetch, Web Streams, the standard Web APIs
+//   crypto.subtle
+//   most of the Web platform
+
+// the real trade-off
+//   edge  = faster cold start, less CPU per request, global distribution
+//   node  = everything works, longer cold start
+//
+// a pragmatic rule: put edge on middleware and on genuinely
+// request-scoped, read-only, latency-sensitive routes. Put a database
+// anywhere else - a TCP connection to Postgres is not available on the
+// edge, and a proxy through an HTTP data API adds latency and a failure
+// mode that a direct connection does not have.</code></pre></div>
+    <div class="codeWrap"><pre><code>// where you declare it
+// app/api/geo/route.ts
+export const runtime = 'edge';
+export async function GET(req: Request) {
+  const ip = req.headers.get('x-forwarded-for');
+  return Response.json(await lookup(ip));    // fetch-based, fine on edge
+}
+
+// app/products/page.tsx
+export const runtime = 'nodejs';             // default; reads the DB directly
+export default async function Page() {
+  const rows = await pool.query('SELECT * FROM products');
+  return &lt;List rows={rows.rows} /&gt;;
+}
+
+// a third option, the most capable one
+export const runtime = 'nodejs';
+export const preferredRegion = 'home';       // keep compute near the DB
+// a Node serverless function with a full filesystem and a warm-ish start,
+// deployed close to your database. often the right answer for anything
+// data-heavy</code></pre></div>
+    <h3 id="ch1-cost" data-toc>What each choice costs</h3>
+    <p>The cost of a choice shows up in two ledgers: bytes of JavaScript shipped, and work done per request. Both are visible in the build output and both are measured, not guessed.</p>
+    <h4 id="ch1-cost-friction">Client code pays twice</h4>
+    <p>A Client Component pays shipping — its own code plus every transitive import goes to the browser — and it pays again at hydration, when the browser rewrites the DOM it already has. A Server Component pays nothing on the client and a render on the server, which caching can amortise. The cheapest design is therefore: fetch and format on the server, and keep the client leaf small enough to count its lines.</p>
+    <div class="codeWrap"><pre><code>// the same UI, two cost profiles
+// server: HTML in the document, ~0 KB of JS for this subtree
+export async function Reviews() {
+  const rows = await db.review.findMany();
+  return &lt;ul&gt;{rows.map((r) =&gt; &lt;li key={r.id}&gt;{r.text}&lt;/li&gt;)}&lt;/ul&gt;;
+}
+
+// client: the subtree ships, then hydrates, then fetches (extra round trip)
+'use client';
+import { useEffect, useState } from 'react';
+export function ReviewsClient() {
+  const [rows, setRows] = useState&lt;string[]&gt;([]);
+  useEffect(() =&gt; { fetch('/api/reviews').then((r) =&gt; r.json()).then(setRows); }, []);
+  return &lt;ul&gt;{rows.map((t) =&gt; &lt;li key={t}&gt;{t}&lt;/li&gt;)}&lt;/ul&gt;;
+}</code></pre></div>
+    <h4 id="ch1-cost-measure">The three numbers that matter</h4>
+    <p>First Load JS per route — the bundle a visitor must download before interaction; the build prints it. Time-to-first-byte versus time-to-interactive — a streaming page decouples them. And the route table: <code>○</code> routes cost a CDN hit, <code>ƒ</code> routes cost a server render per request. Watch these three after every architectural change and the trade-offs stop being opinions.</p>
+    <div class="codeWrap"><pre><code>npx next build
+#  Route (app)                          Size     First Load JS
+#  ┌ ○ /                                1.8 kB        91.0 kB
+#  ├ ○ /about                           1.9 kB        91.0 kB
+#  └ ƒ /products/[id]                   2.0 kB        92.6 kB
+#
+# First Load JS is the practical cost of visiting a route.
+# it jumps the moment a 'use client' component imports a library.</code></pre></div>
+    <div class="codeWrap"><pre><code>// SERVER COMPONENT
+//   pros: reads the DB, no client JS shipped, secrets stay server,
+//         no data-fetching waterfall, the HTML is complete for crawlers
+//   cons: no interactivity, runs on every request unless cached (ch7),
+//         must return serialisable output
+
+// CLIENT COMPONENT
+//   pros: state, effects, event handlers, browser APIs
+//   cons: shipped to the browser, so its imports are too, re-renders,
+//         its markup arrives in the HTML but its behaviour needs JS
+
+// THE PRACTICAL DIVISION
+//   server: fetch data, format it, decide what to render
+//   client: everything the user can do to it
+//   the boundary should be as low in the tree as possible, and as small
+//   as possible. A 4 KB client component that owns a dropdown is a good
+//   design. 'use client' on your layout is not.</code></pre></div>
+    <div class="ex"><h4>Exercises 1</h4><ol>
+      <li>Create a project and add <code>lib/db.ts</code> with <code>import 'server-only'</code>. Import it from a client component and confirm the <em>build</em> fails, not just the dev server.</li>
+      <li>Add <code>lib/env.ts</code> with a <code>required()</code> helper. Delete one variable and confirm the app fails at boot with a readable message rather than at first query.</li>
+      <li>Write a <code>route.ts</code> that returns the current runtime and the region, declared on the edge, and another on Node. Note the cold-start difference in the response headers your platform sets.</li>
+      <li>Take an existing client component and move its data fetching up into a server parent, passing only serialisable props down. Measure the client bundle before and after.</li>
+      <li>Deliberately pass a <code>Date</code>, a <code>Map</code>, a class instance and a function from a server component to a client one. Record the exact error for each, then explain which of the four is legal and why.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+<h2 id="ch2" data-toc>2 · Server and Client Components</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 · Server and Client Components</button><div class="ch-toc-list"><a href="#ch2-server">Writing a Server Component</a><a href="#ch2-async">Async components and Suspense</a><a href="#ch2-client">Writing a Client Component</a><a href="#ch2-serial">What can cross the boundary</a><a href="#ch2-place">Where to put the boundary</a><a href="#ch2-context">Context across the boundary</a><a href="#ch2-patterns">Composition patterns that work</a></div></div>
+    <p class="topic-desc">The mechanics of the client boundary: what each kind of component can do, what may be passed between them, and the composition patterns that keep a mostly-server application from turning into a mostly-client one.</p>
+    <h3 id="ch2-server" data-toc>Writing a Server Component</h3>
+    <p>A Server Component is just an async function with no <code>'use client'</code> directive. There is nothing else to declare.</p>
+    <h4 id="ch2-server-anatomy">The working parts</h4>
+    <p>A server component is a plain async function that returns JSX. It awaits its inputs — <code>params</code>, <code>searchParams</code>, <code>cookies()</code>, a database call — and the render pauses at each await, resuming when the promise resolves. Anything it returns crosses to the client only as serialised data; anything it imports stays on the server, except client components, whose subtree ships alone.</p>
+    <div class="codeWrap"><pre><code>// app/profile/page.tsx - the full idiom in one file
+export default async function ProfilePage() {
+  const session = await getSession();          // cookies() under the hood
+  if (!session) redirect('/login');
+
+  const profile = await db.profile.findUnique({ where: { userId: session.userId } });
+  return (
+    &lt;section&gt;
+      &lt;h1&gt;{profile?.name ?? 'No profile'}&lt;/h1&gt;
+      &lt;EditButton userId={session.userId} /&gt;  {/* client leaf */}
+    &lt;/section&gt;
+  );
+}</code></pre></div>
+    <h4 id="ch2-server-noevent">What a Server Component cannot do</h4>
+    <p>The build rejects the interactive toolbox outright: <code>useState</code>, <code>useEffect</code>, event handlers and browser globals are compile errors in a server component. That is the point — there is no client instance to hold state, so the failure is surfaced before deployment. The escape is composition, not a workaround: the server component resolves the data and a small client child owns the behaviour.</p>
+    <div class="codeWrap"><pre><code>export default async function Page() {
+  // const [n, setN] = useState(0);            // ✗ build error
+  // useEffect(() =&gt; { ... }, []);             // ✗ build error
+  // &lt;button onClick={...}&gt;                    // ✗ function props need an action
+
+  const post = await loadPost();                // ✓ await is the whole point
+  return &lt;UpvoteButton count={post.upvotes} /&gt;; // ✓ data across, behaviour in
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// app/products/[id]/page.tsx
+import { db } from '@/lib/db';            // server-only
+import { notFound } from 'next/navigation';
+import AddToCart from './AddToCart';       // 'use client' inside
+
+export default async function Page({
+  params,
+}: {
+  params: Promise&lt;{ id: string }&gt;;     // async in Next 15
+}) {
+  const { id } = await params;             // must await
+
+  const product = await db.product.findUnique({ where: { id } });
+  if (!product) notFound();                // renders not-found.tsx, 404
+
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;{product.name}&lt;/h1&gt;
+      &lt;p&gt;{product.description}&lt;/p&gt;
+
+      {/* data crosses as a plain object: fine */}
+      &lt;AddToCart productId={product.id} price={product.price} available={product.stock &gt; 0} /&gt;
+    &lt;/main&gt;
+  );
+}
+
+// no 'use client', no useState, no useEffect, no event handler.
+// params and searchParams are Promises in Next 15 - a real change that
+// catches people upgrading.</code></pre></div>
+    <h3 id="ch2-async" data-toc>Async components and Suspense</h3>
+    <p>A Server Component may be <code>async</code>. That is the mechanism behind streaming, and it is why a slow query does not block a fast one.</p>
+    <h4 id="ch2-async-stream">Render flows, not waits</h4>
+    <p>Each async server component is an independent unit of work. The parent renders what is ready and suspends on what is not, and each <code>Suspense</code> boundary marks where the stream pauses: the shell goes out immediately, the fallback shows, and the real content replaces it the moment its promise resolves. Streaming cuts time-to-first-byte, not total render time — the same work happens, just delivered in the order it finishes.</p>
+    <div class="codeWrap"><pre><code>// app/dashboard/page.tsx - shell first, tiles stream in
+export default function Page() {
+  return (
+    &lt;div className="grid"&gt;
+      &lt;Suspense fallback={&lt;TileSkeleton /&gt;}&gt;&lt;RevenueTile /&gt;&lt;/Suspense&gt;
+      &lt;Suspense fallback={&lt;TileSkeleton /&gt;}&gt;&lt;OrdersTile /&gt;&lt;/Suspense&gt;
+    &lt;/div&gt;
+  );
+}
+
+async function RevenueTile() {
+  const revenue = await getRevenue();   // 600ms
+  return &lt;Tile value={revenue} label="Revenue" /&gt;;
+}</code></pre></div>
+    <h4 id="ch2-async-fallback">Fallbacks are part of the design</h4>
+    <p>The fallback is what the user sees while data resolves, so it is a UI decision, not a placeholder: match its shape to the real content so the page does not jump when streaming finishes. <code>loading.tsx</code> is the folder-level shorthand — Next.js wraps that segment in a single <code>Suspense</code> boundary with your fallback, covering every page beneath it.</p>
+    <div class="codeWrap"><pre><code>// app/products/loading.tsx - one fallback for the whole segment
+export default function Loading() {
+  return (
+    &lt;div className="grid"&gt;
+      {Array.from({ length: 8 }, (_, i) =&gt; (
+        &lt;div key={i} className="card skeleton" /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// a page with two independent slow sections
+export default async function Page() {
+  // NOT this - the whole page waits for the slower of the two
+  const [reviews, recommendations] = await Promise.all([
+    getReviews(),          // 800ms
+    getRecommendations(),  // 1200ms
+  ]);
+  return &lt;Layout reviews={reviews} recs={recommendations} /&gt;;
+}
+
+// THIS - each streams in as it resolves
+export default function Page() {
+  return (
+    &lt;Layout&gt;
+      &lt;Suspense fallback={&lt;ReviewsSkeleton /&gt;}&gt;
+        &lt;Reviews /&gt;                {/* async server component */}
+      &lt;/Suspense&gt;
+      &lt;Suspense fallback={&lt;RecsSkeleton /&gt;}&gt;
+        &lt;Recommendations /&gt;
+      &lt;/Suspense&gt;
+    &lt;/Layout&gt;
+  );
+}
+
+async function Reviews() {
+  const reviews = await getReviews();       // 800ms
+  return &lt;ReviewList reviews={reviews} /&gt;;
+}
+
+// the shell arrives immediately, ReviewsSkeleton streams, then Reviews
+// replaces it. total time to first byte is roughly zero in both cases -
+// what changes is when the CONTENT arrives.
+
+// layout.tsx is a natural Suspense boundary: it is the shell
+// loading.tsx wraps the page in its segment automatically, which is
+// shorthand for exactly this</code></pre></div>
+    <div class="note"><p>You cannot put a <code>useState</code> in a server component, so the skeleton is a static component. The one place this becomes awkward is a skeleton that needs to match real content dimensions — pass the shape in from the parent as plain data, or use CSS <code>aspect-ratio</code> so the placeholder occupies the space the real content will.</p></div>
+    <h3 id="ch2-client" data-toc>Writing a Client Component</h3>
+    <p>A Client Component is one line of intent — <code>'use client'</code> at the top of the file — and then ordinary React: state, effects, handlers, browser APIs. The directive turns the whole file and everything it imports into client code.</p>
+    <h4 id="ch2-client-least">Put the directive on the smallest leaf</h4>
+    <p>The directive fans out: everything the file imports, and everything those imports import, ships to the browser. So it belongs on the component that owns the state, not on a parent that merely renders it. A button with a local <code>useState</code> is a good client component; a layout with a directive is a mistake you notice three builds later when the bundle has quietly tripled.</p>
+    <div class="codeWrap"><pre><code>// app/components/Counter.tsx - twenty lines, the only client bit on the page
+'use client';
+import { useState } from 'react';
+
+export function Counter({ initial }: { initial: number }) {
+  const [n, setN] = useState(initial);       // initial comes from the server
+  return &lt;button onClick={() =&gt; setN(n + 1)}&gt;{n}&lt;/button&gt;;
+}</code></pre></div>
+    <h4 id="ch2-client-hydration">It renders twice in dev, once in prod</h4>
+    <p>In development every client component renders on the server and again during hydration, and React Strict Mode double-invokes effects — so code that reads <code>new Date()</code> or a random value during render produces different output on the two passes, and hydration complains. The fix is to defer output-changing reads to an effect that runs after mount, so the first client render matches the server HTML exactly.</p>
+    <div class="codeWrap"><pre><code>'use client';
+import { useEffect, useState } from 'react';
+
+export function RightNow() {
+  const [iso, setIso] = useState&lt;string | null&gt;(null);
+  useEffect(() =&gt; setIso(new Date().toISOString()), []);  // after mount only
+  return &lt;time&gt;{iso ?? 'loading'}&lt;/time&gt;;                  // stable first render
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// app/products/AddToCart.tsx
+'use client';
+
+import { useState, useTransition } from 'react';
+import { addToCart } from './actions';       // a server action, ch9
+
+export default function AddToCart({
+  productId, price, available,
+}: { productId: string; price: number; available: boolean }) {
+  const [quantity, setQuantity] = useState(1);
+  const [pending, startTransition] = useTransition();
+
+  return (
+    &lt;div&gt;
+      &lt;label&gt;
+        Quantity
+        &lt;input
+          type="number"
+          min={1}
+          value={quantity}
+          onChange={(e) =&gt; setQuantity(Number(e.target.value))}
+        /&gt;
+      &lt;/label&gt;
+
+      &lt;button
+        disabled={!available}
+        onClick={() =&gt; startTransition(() =&gt; addToCart(productId, quantity))}
+      &gt;
+        {pending ? 'Adding...' : 'Add to cart'}
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+// the component is small, it owns only quantity, and the price prop is
+// data it does not need to fetch. the server did the fetching.
+
+// 'use client' is transitive: everything AddToCart imports ships too
+import { motion } from 'framer-motion';   // 40KB in the bundle
+// import what you need, or move the animation into its own leaf component</code></pre></div>
+    <h3 id="ch2-serial" data-toc>What can cross the boundary</h3>
+    <p>Crossing the boundary is a serialisation step, not a reference pass. Anything a JSON-like formatter cannot express — functions, prototypes, symbols, DOM nodes — fails at build or render time by design.</p>
+    <h4 id="ch2-serial-values">The exact value types</h4>
+    <p>Strings, numbers, booleans, <code>null</code>, <code>undefined</code>, <code>bigint</code>, plain objects and arrays of those, <code>Date</code> (which arrives as a string), typed arrays, and — with care — <code>Map</code> and <code>Set</code>. The golden rule is to build the exact shape the client expects on the server and convert near the boundary, not deep in the client tree where the loss is harder to see.</p>
+    <div class="codeWrap"><pre><code>// server parent - make the prop shape explicit
+export default async function Page() {
+  const stats = await getStats();
+  return (
+    &lt;StatsGraph
+      points={stats.points}                   // number[]
+      label={stats.label}                      // string
+      fetchedAt={new Date().toISOString()}     // string, NOT a Date
+    /&gt;
+  );
+}</code></pre></div>
+    <h4 id="ch2-serial-real">The traps that fail silently</h4>
+    <p><code>Map</code> and <code>Set</code> arrive as empty objects — no error, just missing data. Class instances throw outright; getters are stripped; non-plain objects like <code>URL</code> arrive mangled unless they implement <code>toJSON</code>. Convert at the boundary: an array of keys travels cleanly and the client rebuilds the structure it needs.</p>
+    <div class="codeWrap"><pre><code>// server: &lt;FilterPanel selected={new Set(['a'])} /&gt;   - arrives as {}
+// server: &lt;FilterPanel selected={['a']} /&gt;            - arrives intact
+
+// client: rebuild where it is used
+'use client';
+export function FilterPanel({ selected }: { selected: string[] }) {
+  const selectedSet = new Set(selected);   // rebuild on arrival
+  return &lt;ul&gt;{[...selectedSet].map((s) =&gt; &lt;li key={s}&gt;{s}&lt;/li&gt;)}&lt;/ul&gt;;
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// ALLOWED as props from server to client
+string, number, boolean, null, undefined
+bigint
+plain object / array of allowed values
+Date                       serialised to an ISO string, arrives as a string
+Map, Set                    serialised to {} and {} - LOSSY
+typed arrays                Buffer, Uint8Array - pass as-is, Node only
+Promise                     a promise prop, then await in a client component
+JSX elements                a server-rendered child, not re-rendered client-side
+Server Action references    the only way to pass behaviour
+
+// NOT ALLOWED
+() =&gt; {}                          function
+class instances                     anything with a prototype
+Symbol, WeakMap, WeakSet
+DOM nodes
+getters and setters are lost
+class Foo { get x() { return 1 } }  &lt;Foo /&gt;  -&gt; x is gone
+non-plain objects (URL, Headers)    use toJSON at the boundary
+
+// the Date trap, in full
+// server: &lt;Client date={new Date()} /&gt;
+// client receives a STRING. new Date(str) works, but date.getMonth()
+// throws. if you need a Date on the client, construct it there, or send
+// a timestamp and document the conversion.
+
+// the JSX-element exception, and why it matters
+// server: &lt;ClientLayout&gt;&lt;ServerHeavyThing /&gt;&lt;/ClientLayout&gt;
+// the child was rendered on the SERVER. its HTML is in the response and
+// its JS is not shipped, but the client component can receive it as
+// children and place it. this is the main way to have interactivity
+// without losing server rendering.</code></pre></div>
+    <div class="warn"><p>A <code>Map</code> or <code>Set</code> passed from a server component arrives as an empty object. This fails silently — no error, just missing data. If you need a set-like structure across the boundary, pass an array and rebuild it in the client component, or pass a plain object keyed by id.</p></div>
+    <h3 id="ch2-place" data-toc>Where to put the boundary</h3>
+    <p>The boundary is a design decision, not a syntax detail. One directive at the root silently converts the entire application into a client-rendered SPA; one directive per interactive leaf keeps the rest of the tree on the server.</p>
+    <h4 id="ch2-place-rule">One directive per interactive leaf</h4>
+    <p>A typical page carries three to eight directives, each on the component that owns state, an effect or an event handler. Everything else renders on the server — including the layouts and pages around those leaves. The position of each directive is the map of your application's interactive surface; if you cannot say what each one is for, it is probably wrong.</p>
+    <div class="codeWrap"><pre><code>// the audit: every directive on a page, named
+'use client';   // CartButton: owns "added" state and the optimistic UI
+'use client';   // SearchBox: needs debounce and focus management
+'use client';   // ThemeToggle: touches document.documentElement
+// everything else renders on the server - no directive, no bundle</code></pre></div>
+    <h4 id="ch2-place-audit">The removal test</h4>
+    <p>Delete a directive and rebuild. If the build errors with <em>"You're importing a component that needs useState"</em> or similar, the component earned its directive — put it back. If the build passes and the UI behaves, the directive was never needed; leave it out and the tree shrinks.</p>
+    <div class="codeWrap"><pre><code># the removal test, one directive at a time
+# 1. delete 'use client' from one file
+# 2. npm run build
+# 3. build error about useState/useEffect/events -&gt; it needed the directive
+#    build passes cleanly                      -&gt; it never did - leave it out</code></pre></div>
+    <div class="codeWrap"><pre><code>// the WRONG boundary: as high as possible
+'use client';
+// app/layout.tsx
+export default function RootLayout({ children }) {
+  const [theme, setTheme] = useState('light');
+  return (
+    &lt;html&gt;
+      &lt;body&gt;
+        &lt;ThemeToggle theme={theme} onChange={setTheme} /&gt;
+        {children}
+        &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}
+// now EVERYTHING below is a client component. The database import that
+// worked yesterday fails to build. Your static page ships as JS.
+
+// the RIGHT boundary: as low as possible, one per interactive island
+// app/layout.tsx - server
+export default function RootLayout({ children }) {
+  return (
+    &lt;html&gt;
+      &lt;body&gt;
+        &lt;Header /&gt;               {/* server, renders children slots */}
+        {children}
+        &lt;Footer /&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}
+
+// app/components/ThemeToggle.tsx - client, 30 lines
+'use client';
+export function ThemeToggle() { /* ... */ }
+
+// the rule of thumb: one 'use client' per interactive leaf. A page
+// should typically contain three to eight of them, not one at the top.
+
+// a test: if a component has no state, no effect, no event handler and
+// no browser API, it does not need 'use client'. Delete the directive
+// and see if the build still passes. It almost always does.</code></pre></div>
+    <h3 id="ch2-context" data-toc>Context across the boundary</h3>
+    <p>Context flows from provider to consumer, and the provider must live in the client tree. A server component cannot read a client context, and a client provider cannot wrap server children — so the two runtimes coordinate through props, not context.</p>
+    <h4 id="ch2-context-wrongway">Which direction works</h4>
+    <p>Server-to-client is fine: a server component renders a client provider and passes values in as props, and client descendants consume the context normally. Client-to-server is impossible — a client provider's children render on the client, and server components never execute there — which is why "put the whole app in a provider" does not translate to the App Router.</p>
+    <div class="codeWrap"><pre><code>// app/layout.tsx (server) - mounts the client provider, feeds it data
+import { CartProvider } from '@/components/cart-provider';
+import { Nav } from '@/components/nav';        // still a server component
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    &lt;CartProvider initialCount={2}&gt;   {/* client */}
+      &lt;Nav /&gt;                       {/* server - fine as a child */}
+      {children}
+    &lt;/CartProvider&gt;
+  );
+}</code></pre></div>
+    <h4 id="ch2-context-state">Split the state by runtime</h4>
+    <p>The pattern that works: read data on the server and pass it down as props; let a client context hold only interactive state. A theme toggle is the canonical example — the server supplies the initial value, the client context stores the choice after the user flips it.</p>
+    <div class="codeWrap"><pre><code>// components/theme-provider.tsx
+'use client';
+import { createContext, useContext, useState } from 'react';
+
+const ThemeCtx = createContext&lt;{ dark: boolean; toggle: () =&gt; void }&gt;({
+  dark: false, toggle: () =&gt; {},
+});
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [dark, setDark] = useState(false);
+  return (
+    &lt;ThemeCtx.Provider value={{ dark, toggle: () =&gt; setDark((d) =&gt; !d) }}&gt;
+      {children}
+    &lt;/ThemeCtx.Provider&gt;
+  );
+}
+
+export const useTheme = () =&gt; useContext(ThemeCtx);</code></pre></div>
+    <div class="codeWrap"><pre><code>// a Server Component can PROVIDE to a Client Component
+// app/providers.tsx  - server
+import { ThemeProvider } from './ThemeProviderClient';
+
+export default function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    &lt;ThemeProvider theme="dark"&gt;
+      {children}          {/* client children passed through, fine */}
+    &lt;/ThemeProvider&gt;
+  );
+}
+
+// a Client Component canNOT provide a context to a Server Component
+// because the provider's children would have to be rendered by the
+// client, and the point is that they are not.
+
+// the practical pattern for shared state
+//   server: read the data, pass it down as props
+//   client: a provider near the top of the CLIENT tree holds the
+//           interactive state
+//   the two never have to share a context
+
+// reading cookies/session in a server component and passing it down
+import { cookies } from 'next/headers';
+
+export default async function Shell({ children }) {
+  const session = await getSession();     // reads cookies() internally
+  return (
+    &lt;ClientShell user={session?.user ?? null}&gt;
+      {children}
+    &lt;/ClientShell&gt;
+  );
+}</code></pre></div>
+    <h3 id="ch2-patterns" data-toc>Composition patterns that work</h3>
+    <p>Four compositions cover almost every real layout: a server parent with a client leaf, children-as-a-prop, an interactive wrapper around server content, and Server Actions as props. They all share one idea — the server renders, the client behaves, and the two meet through props.</p>
+    <h4 id="ch2-patterns-children">Server children inside a client frame</h4>
+    <p>A client component can receive <code>children</code> that were already rendered on the server and drop them into its tree. The frame — say an expandable panel — owns the interactivity, while the content keeps all its advantages: it is present in the HTML, it is indexable, and its text never enters the client bundle.</p>
+    <div class="codeWrap"><pre><code>// components/expandable.tsx
+'use client';
+import { useState } from 'react';
+
+export function Expandable({ title, children }: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    &lt;section&gt;
+      &lt;button onClick={() =&gt; setOpen(!open)}&gt;{title}&lt;/button&gt;
+      {open ? children : null}      {/* server-rendered, dropped in whole */}
+    &lt;/section&gt;
+  );
+}
+
+// app/faq/page.tsx (server) - the content is rendered on the server
+&lt;Expandable title="How do refunds work?"&gt;
+  &lt;p&gt;Full refunds within 30 days.&lt;/p&gt;
+&lt;/Expandable&gt;</code></pre></div>
+    <h4 id="ch2-patterns-actions">Behaviour across the boundary: actions</h4>
+    <p>When the client must call back into the server, pass a Server Action as a prop — the only function reference that survives serialisation. A bound action (<code>fn.bind(null, id)</code>) bakes in its arguments so the client never handles sensitive ids. The callback looks like a function prop, but it is a reference to a server endpoint, not executable code.</p>
+    <div class="codeWrap"><pre><code>// app/posts/actions.ts
+'use server';
+import { deletePost } from '@/lib/posts';
+import { revalidatePath } from 'next/cache';
+
+export async function removePost(id: string) {
+  await deletePost(id);
+  revalidatePath('/posts');
+}
+
+// app/posts/page.tsx (server)
+&lt;DeleteButton action={removePost.bind(null, post.id)} /&gt;
+
+// components/delete-button.tsx
+'use client';
+import { useState } from 'react';
+
+export function DeleteButton({ action }: { action: () =&gt; Promise&lt;void&gt; }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    &lt;button disabled={busy} onClick={async () =&gt; { setBusy(true); await action(); }}&gt;
+      Delete
+    &lt;/button&gt;
+  );
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// PATTERN 1: server parent, client leaf, server children
+// layout.tsx (server)
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    &lt;div className="shell"&gt;
+      &lt;Sidebar user={user} /&gt;        {/* client, interactive */}
+      &lt;main&gt;{children}&lt;/main&gt;    {/* server children, untouched */}
+    &lt;/div&gt;
+  );
+}
+
+// PATTERN 2: render a client component FROM a server component with
+// server-rendered children - the "children as a prop" trick
+// app/comments/page.tsx (server)
+export default async function Page() {
+  const comments = await getComments();
+  return (
+    &lt;CommentList comments={comments}&gt;
+      {/* this is server-rendered and passed as children */}
+      {comments.map((c) =&gt; (
+        &lt;CommentRow key={c.id} comment={c} /&gt;   {/* server */}
+      ))}
+    &lt;/CommentList&gt;
+  );
+}
+// CommentList is 'use client' and handles the sort control. The rows
+// are server components: their data fetching and rendering happen on the
+// server, and only the control is interactive.
+
+// PATTERN 3: an interactive wrapper around server content
+// 'use client'
+export function Disclosure({ summary, children }: {
+  summary: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    &lt;details open={open} onToggle={(e) =&gt; setOpen(e.currentTarget.open)}&gt;
+      &lt;summary&gt;{summary}&lt;/summary&gt;      {/* server-rendered summary */}
+      {open &amp;&amp; children}                  {/* server-rendered content */}
+    &lt;/details&gt;
+  );
+}
+
+// PATTERN 4: passing a server action as a prop
+// &lt;DeleteButton action={deleteProduct.bind(null, id)} /&gt;
+//   server action, so the client can pass it to onClick
+// &lt;ClientRow onDelete={deleteProduct.bind(null, row.id)} row={row} /&gt;
+//   both are a function and a plain object: one legal, one not</code></pre></div>
+    <div class="ex"><h4>Exercises 2</h4><ol>
+      <li>Build a product page where the server fetches the product and a client <code>AddToCart</code> handles quantity. Pass only <code>productId</code> and <code>price</code> — confirm the client component never imports the database.</li>
+      <li>Convert a <code>Date</code> prop, a <code>Map</code> prop and a class instance passed from a server component. Record the exact failure for each, then fix all three.</li>
+      <li>Take a page whose root layout has <code>'use client'</code>. Remove it, add directives to the leaves that genuinely need it, and count the directives. Measure the client bundle before and after.</li>
+      <li>Implement the children-as-a-prop pattern: a client <code>SortableList</code> receiving server-rendered rows as children. Verify the rows are not in the client bundle by searching for their text in the built JS.</li>
+      <li>Add a <code>Suspense</code> boundary around two slow independent queries in a page and measure time-to-first-byte and time-to-last-byte in the Network panel, before and after.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+<h2 id="ch3" data-toc>3 · The Rendering Lifecycle</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 · The Rendering Lifecycle</button><div class="ch-toc-list"><a href="#ch3-request">A request end to end</a><a href="#ch3-static">Static, dynamic, and how Next decides</a><a href="#ch3-dynamic">Opting into dynamic rendering</a><a href="#ch3-partial">Partial prerendering</a><a href="#ch3-headers">Reading headers and cookies</a><a href="#ch3-nonce">The render cache and a nonce</a><a href="#ch3-trace">Seeing what happened</a></div></div>
+    <p class="topic-desc">Every Next.js page is rendered in one of a small number of ways, and the choice is made for you unless you make it. This chapter is about knowing which one you got, and about the two functions that make the choice explicit.</p>
+    <h3 id="ch3-request" data-toc>A request end to end</h3>
+    <p>One request is a pipeline with caching layers at every stop, and the same pipeline serves both the initial load and every later navigation. Two details decide most of what you observe: streaming, and the serialised RSC payload that rides alongside the HTML.</p>
+    <h4 id="ch3-request-stream">The response is a stream, not a file</h4>
+    <p>Next.js does not assemble a complete document and then send it. The route renders into a stream, and as each segment resolves — layouts first, then the page, then whatever sits inside Suspense boundaries — those bytes flush immediately. The browser paints the shell and keeps painting as chunks arrive, which is why a slow query degrades into a filling page rather than a spinner for the whole route.</p>
+    <div class="codeWrap"><pre><code>curl -i -N http://localhost:3000/dashboard | head
+# HTTP/1.1 200 OK
+# Transfer-Encoding: chunked      &lt;- the shell streams, then the tiles
+#
+# &lt;div id="__next"&gt;...Dashboard shell...&lt;/div&gt;
+# &lt;!-- later chunks replace each Suspense fallback in order --&gt;</code></pre></div>
+    <h4 id="ch3-request-flight">The RSC payload is the contract</h4>
+    <p>Every render also produces a serialised React tree — the Flight stream — interleaved into the response. Soft navigation requests exactly that payload with an <code>RSC: 1</code> header and reconciles it into the live DOM; no document is sent, so no full reload happens. Server Components on the target route execute on the server again; the client only ever renders what the payload describes.</p>
+    <div class="codeWrap"><pre><code># what a soft navigation transports instead of a document
+curl -s -H "RSC: 1" http://localhost:3000/products | head -c 300
+# [[["$","main",null,...]]]   - a serialised React tree, not HTML
+# the router reconciles it into the live DOM: no reload, no flash</code></pre></div>
+    <div class="codeWrap"><pre><code>// GET /dashboard  (signed in)
+
+//  1. CDN edge. is this URL in the cache?
+//     no, and this is a dynamic route with a session cookie
+
+//  2. Next.js server. run middleware first (ch8):
+//     rewrite? redirect? authenticate? add a header?
+
+//  3. Resolve the route to a React tree.
+//     app/dashboard/layout.tsx
+//     app/dashboard/page.tsx
+
+//  4. Collect what each component needs.
+//     layouts render top-down; the page renders last.
+
+//  5. Each Server Component executes on the server.
+//     this is where 'await' happens, where the DB is read, where
+//     fetch calls are made. Some results are cached (ch7).
+
+//  6. React renders the tree to a stream.
+//     - already-resolved parts flush immediately
+//     - pending parts inside a Suspense boundary flush a fallback
+//     - the RSC payload is interleaved with the HTML
+
+//  7. Response streams to the browser. TTFB is low even if the page
+//     takes 2 seconds, because the shell goes out first.
+
+//  8. Browser parses the HTML. Content is visible and indexable now.
+
+//  9. Browser downloads client chunks for the Client Components only.
+
+// 10. Hydration. Only the interactive parts become live.
+
+// 11. Later navigations: the router fetches the RSC payload for the
+//     next route and swaps the tree. No document reload, no full
+//     page data refetch, and the server components on that route
+//     execute on the server again.</code></pre></div>
+    <p>Step 6 is the one people miss. <strong>Next.js streams by default</strong>, which is why a slow query degrades gracefully instead of showing a spinner for the whole page.</p>
+    <h3 id="ch3-static" data-toc>Static, dynamic, and how Next decides</h3>
+    <p>"Static" and "dynamic" are not flags you choose — they are the outcome of what the route's render touches. Knowing the inputs that flip the outcome is the skill; the route table prints the verdict at every build.</p>
+    <h4 id="ch3-static-decides">The inputs that flip the outcome</h4>
+    <p>A route stays static when its render touches none of: request APIs (<code>cookies()</code>, <code>headers()</code>, <code>draftMode()</code>), <code>searchParams</code>, an uncached fetch of a non-static source, an uncached database read, or an explicit dynamic marker. A dynamic segment that omits <code>generateStaticParams</code> is dynamic too, because Next.js cannot know which paths exist. Any one of these makes the whole route <code>ƒ</code>; the fix is usually to move the dynamic read into a Suspense-wrapped child (PPR) or into a Server Action.</p>
+    <div class="codeWrap"><pre><code>// a page that looks static but is not
+export default async function ProductPage({ params }: { params: Promise&lt;{ id: string }&gt; }) {
+  const { id } = await params;                       // dynamic segment
+  const product = await prisma.product.findUnique({ where: { id } });  // uncached read
+  return &lt;ProductView product={product} /&gt;;
+}
+// next build prints ƒ. give it generateStaticParams to prerender the
+// known ids, or accept on-demand rendering - decide, do not discover</code></pre></div>
+    <h4 id="ch3-static-cache">The cache destinations</h4>
+    <p>A static route is served from the CDN as a plain file: identical bytes for every visitor, cache hits in milliseconds. Revalidation comes in three flavours — time-based (<code>revalidate</code>), on-demand (<code>revalidatePath</code> and <code>revalidateTag</code>), or never. ISR keeps the old page live while the new one builds, so visitors never see a moment of downtime.</p>
+    <div class="codeWrap"><pre><code>// app/blog/[slug]/page.tsx - ISR: serve instantly, refresh hourly
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const posts = await db.post.findMany({ select: { slug: true } });
+  return posts.map((p) =&gt; ({ slug: p.slug }));
+}
+// visitors get the cached page in milliseconds; a background rebuild
+// refreshes it every hour without ever taking the route down</code></pre></div>
+    <div class="codeWrap"><pre><code>// A STATIC route
+//   rendered ONCE at build time. The HTML file is what gets served.
+//   Every request gets the same bytes.
+//
+//   Used when the output is the same for everyone: a blog post,
+//   a product page for a slow-changing catalogue, a docs page.
+//
+//   revalidated in the background every N seconds (ISR, ch7), or
+//   never, or on demand via revalidatePath / revalidateTag.
+//
+// a page is STATIC if none of these appear in its render:
+//   - cookies(), headers(), draftMode()
+//   - searchParams (dynamic, see below)
+//   - a route or segment marked dynamic
+//   - an uncached fetch of a non-static source
+//   - uncached DB queries (a non-static API, or a dynamic data source)
+
+// A DYNAMIC route
+//   rendered per request on the server. Can read the session, the
+//   user's cookies, the current time, anything.
+//
+//   the response is not cached by the CDN unless you say so
+//
+// A PARTIALLY STATIC route
+//   the shell is static, and the parts that need the request are
+//   streamed in behind Suspense. This is Partial Prerendering and
+//   it is the interesting middle case.</code></pre></div>
+    <div class="codeWrap"><pre><code>// you can see which it is
+//   next build prints a route table:
+//
+//   ○  (Static)    prerendered as static content
+//   ●  (SSG)       prerendered as static HTML (uses generateStaticParams)
+//   ƒ  (Dynamic)   server-rendered on demand
+//   ◐  (Partial)   prerendered with dynamic holes (PPR)
+//
+//   this table is the single most useful diagnostic in Next.js. If a
+//   page you expected to be static is marked ƒ, something is reading
+//   the request. `next build` will often name the culprit.
+
+// forcing a choice
+export const dynamic = 'force-static';    // never dynamic
+export const dynamic = 'force-dynamic';  // always dynamic
+export const revalidate = 3600;          // ISR: at most 1 hour stale
+export const dynamicParams = true;       // allow unknown params to render
+
+// a route can only be one of these. If a page reads headers() and you
+// set force-static, the read returns empty rather than erroring, and
+// you get a page that silently lacks what it needed.</code></pre></div>
+    <h3 id="ch3-dynamic" data-toc>Opting into dynamic rendering</h3>
+    <p>Four inputs flip a route to dynamic, and knowing them lets you either embrace the route being <code>ƒ</code> or quarantine the exact part that needs the request.</p>
+    <h4 id="ch3-dynamic-causes">The four culprits, and the 15 surprise</h4>
+    <p>An uncached fetch from a dynamic source, a request API call, a <code>searchParams</code> read, or an uncached database query — any one makes the route <code>ƒ</code>. The surprise in Next.js 15 is the first one: <code>fetch</code> is <em>uncached by default</em>, a deliberate reversal of version 14. An ordinary fetch now pushes a route toward dynamic unless you opt in per call.</p>
+    <div class="codeWrap"><pre><code>// next 15: fetch does NOT cache by default
+const res = await fetch('https://api.example.com/prices');   // route is ƒ
+
+// opt back in, per call
+const a = await fetch('https://api.example.com/prices', { cache: 'force-cache' });
+const b = await fetch('https://api.example.com/prices', { next: { revalidate: 300 } });
+const c = await fetch('https://api.example.com/prices', { next: { tags: ['prices'] } });</code></pre></div>
+    <h4 id="ch3-dynamic-when">Embrace it deliberately</h4>
+    <p>Some pages are personal, mutable and request-shaped by nature — a checkout, a dashboard, a session-scoped cart — and caching them would be wrong even if it worked. For those, <code>force-dynamic</code> states the decision in the file so the build, your colleagues and next month's you all know it was a choice, not an accident.</p>
+    <div class="codeWrap"><pre><code>// app/checkout/page.tsx - always per-request; say so, once
+export const dynamic = 'force-dynamic';
+
+export default async function CheckoutPage() {
+  const cart = await getCart();        // session-scoped
+  const totals = await computeTotals(cart);
+  return &lt;CheckoutView cart={cart} totals={totals} /&gt;;
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// WHY a page becomes dynamic, and how to control it
+
+// 1. an uncached fetch with a dynamic source
+//    a fetch with no-store, or with cache: 'no-store', is dynamic
+//    a fetch to an authenticated URL is dynamic by default
+const data = await fetch('https://api.internal/me', { cache: 'no-store' });
+
+// 2. request APIs
+const cookieHeader = (await cookies()).get('session');
+const ua = (await headers()).get('user-agent');
+
+// 3. searchParams
+//    a page that reads searchParams is dynamic, because the URL is
+//    part of the request identity
+export default async function Page({
+  searchParams,
+}: { searchParams: Promise&lt;{ q?: string }&gt; }) {
+  const { q } = await searchParams;
+  return &lt;SearchResults query={q} /&gt;;
+}
+
+// 4. uncached database access
+const rows = await db.query.someCmsTable();   // no cache tag
+
+// opting out, deliberately
+//   wrap the dynamic part in a Suspense boundary, and make the rest
+//   static. This is Partial Prerendering (next section).
+
+// opting in, deliberately
+export const dynamic = 'force-dynamic';
+//   when the page genuinely needs per-request data AND you have no
+//   useful static shell to cache around it</code></pre></div>
+    <h3 id="ch3-partial" data-toc>Partial prerendering</h3>
+    <p>PPR splits a route into a static shell, cached at build, and dynamic holes, filled per request. It is the answer to "this page is mostly the same for everyone but has a personalised corner".</p>
+    <h4 id="ch3-partial-shell">The shell is the product</h4>
+    <p>Everything outside a Suspense boundary in a PPR route is prerendered once at build time — navigation, headings, static cards — and then served from cache for every visitor. Only the holes render per request. That changes the economics of a personalised dashboard: the shared shell no longer re-renders for each user, so there is no per-user cache explosion and the personalised feed simply streams in.</p>
+    <div class="codeWrap"><pre><code>// with ppr: 'incremental', opt a route in per file
+// app/page.tsx
+export const experimental_ppr = true;
+
+export default function Page() {
+  return (
+    &lt;main&gt;
+      &lt;Hero /&gt;                          {/* static: prerendered once */}
+      &lt;Suspense fallback={&lt;PricesSkeleton /&gt;}&gt;
+        &lt;LivePrices /&gt;                   {/* dynamic: rendered per request */}
+      &lt;/Suspense&gt;
+    &lt;/main&gt;
+  );
+}</code></pre></div>
+    <h4 id="ch3-partial-scope">What PPR is not</h4>
+    <p>PPR does not make a personalised page static — the shell is still one identical HTML for every user. It only pays off when the shared part is large relative to the holes. The selector is simple: measure what fraction of the HTML is identical across two users. If it is most of the page, a static shell earns its complexity; if nearly everything is personal, you are paying for a cache nobody hits.</p>
+    <div class="codeWrap"><pre><code>// the selector
+//   mostly shared (docs, catalogue, marketing) -&gt; PPR or full static
+//   mostly personal (feed, dashboard)          -&gt; dynamic + Suspense
+//   shared shell with a personal corner        -&gt; PPR is exactly this
+//
+// measure: what fraction of the HTML is identical across two users?
+//   more than half shared -&gt; the static shell pays for itself</code></pre></div>
+    <div class="codeWrap"><pre><code>// next.config.ts
+const nextConfig = {
+  experimental: { ppr: 'incremental' },   // or true for the whole app
+};
+
+// a route with a static shell and a dynamic hole
+// app/dashboard/page.tsx
+import { Suspense } from 'react';
+
+export default function Page() {
+  // everything outside the Suspense boundary is prerendered at build time
+  return (
+    &lt;div className="dashboard"&gt;
+      &lt;h1&gt;Dashboard&lt;/h1&gt;
+      &lt;Nav /&gt;                        {/* static */}
+      &lt;Suspense fallback={&lt;FeedSkeleton /&gt;}&gt;
+        &lt;PersonalFeed /&gt;              {/* dynamic, per request */}
+      &lt;/Suspense&gt;
+    &lt;/div&gt;
+  );
+}
+
+async function PersonalFeed() {
+  const user = await getSession();          // cookies() -&gt; dynamic
+  const feed = await getFeed(user.id);      // no-store -&gt; dynamic
+  return &lt;Feed items={feed} /&gt;;
+}
+
+// the shell is served from cache instantly, everywhere, forever.
+// only the hole is rendered per request.
+// this turns "my dashboard is slow" into "the shell is cached and the
+// feed streams in", with no per-user shell cache explosion.</code></pre></div>
+    <div class="note"><p>PPR is still experimental, but the mental model it teaches is the one you need regardless: <strong>separate what is the same for everyone from what is specific to this request, and cache the first.</strong> Even without PPR you can achieve most of it with <code>loading.tsx</code> and a well-placed Suspense boundary.</p></div>
+    <h3 id="ch3-headers" data-toc>Reading headers and cookies</h3>
+    <p><code>cookies()</code> and <code>headers()</code> are the two request APIs most routes read, and in Next 15 both are async — a deliberate change that makes it obvious the call performs I/O.</p>
+    <h4 id="ch3-headers-api">The async store API</h4>
+    <p>Both functions return a Promise of a store: <code>(await cookies()).get('name')</code> returns a cookie object or <code>undefined</code>; <code>headers()</code> returns a header map. The stores are request-scoped, so a read inside a Server Action or a route handler sees the same request as the page — and in an action or handler the cookie store is also writable via <code>.set()</code>, which is how a theme choice or session rotation gets persisted.</p>
+    <div class="codeWrap"><pre><code>import { cookies } from 'next/headers';
+
+export default async function RegionNote() {
+  const store = await cookies();
+  const currency = store.get('currency')?.value ?? 'USD';
+  const session = store.get('session')?.value;   // httpOnly: JS never sees it
+  return &lt;p&gt;{currency} - {session ? 'signed in' : 'guest'}&lt;/p&gt;;
+}</code></pre></div>
+    <h4 id="ch3-headers-leak">Every read shapes the cache story</h4>
+    <p>Reading a header or cookie during render makes the route dynamic — even when the value is only used for logging. Reading in a layout makes every page beneath it dynamic. The discipline: do not read what you do not render. If the value is only needed later — in a Server Action, a route handler or middleware — read it there, where it costs nothing; if it is genuinely needed during render, use the smallest component possible and wrap it in Suspense.</p>
+    <div class="codeWrap"><pre><code>// the truth, in one line each
+// cookies() or headers() anywhere in the render -&gt; route is ƒ
+//   ...unless the read is inside Suspense AND partial prerendering is on
+// a value needed only on submit:  read it in the Action, not the page
+// a value needed only on redirect: read it in middleware, not the page</code></pre></div>
+    <div class="codeWrap"><pre><code>// both are ASYNC in Next 15, and they are DYNAMIC APIs:
+// calling either makes the route dynamic.
+
+import { cookies, headers } from 'next/headers';
+
+export default async function Page() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('session')?.value;
+  const theme = cookieStore.get('theme')?.value ?? 'light';
+
+  const headersList = await headers();
+  const ua = headersList.get('user-agent');
+  const lang = headersList.get('accept-language')?.slice(0, 2);
+
+  return &lt;Dashboard theme={theme} lang={lang} ua={ua} /&gt;;
+}
+
+// in a Server Action the cookieStore is also writable
+'use server';
+export async function setTheme(theme: string) {
+  (await cookies()).set('theme', theme, { httpOnly: true, sameSite: 'lax' });
+}
+
+// in MIDDLEWARE, they are not async (it is not a component)
+import { NextRequest } from 'next/server';
+export function middleware(req: NextRequest) {
+  const token = req.cookies.get('session');
+}
+
+// in a ROUTE HANDLER, the NextRequest carries them
+export async function GET(req: NextRequest) {
+  const session = req.cookies.get('session');
+  return Response.json({ ok: !!session });
+}</code></pre></div>
+    <div class="warn"><p>Reading a cookie to vary content means the page cannot be cached for everyone. For "one small personalised corner of a large page", the fix is usually: read the cookie inside a small child component wrapped in Suspense, so only that child is dynamic. Reading it in the page's top level makes the whole page dynamic, which is a heavy price for one value.</p></div>
+    <h3 id="ch3-nonce" data-toc>The render cache and a nonce</h3>
+    <p>Next.js keeps a per-request cache so that if a layout and a page both fetch the same thing, it happens once. Understanding it explains some otherwise-baffling behaviour.</p>
+    <h4 id="ch3-nonce-cache">Dedup without the client boundary</h4>
+    <p>The render cache deduplicates calls within one render pass; <code>React.cache()</code> (from <code>react</code>) extends that to the whole request, even across module boundaries and client components. Wrap a data accessor in it and every caller — layout, page, and server components rendered behind client frames — shares one fetch per request.</p>
+    <div class="codeWrap"><pre><code>// lib/data.ts
+import { cache } from 'react';
+
+export const getProduct = cache(async (id: string) =&gt; {
+  return db.product.findUnique({ where: { id } });
+});
+
+// layout and page both call getProduct(id) in one request:
+// ONE query, even with a client component between them, because the
+// cache dedupes before the value crosses any boundary</code></pre></div>
+    <h4 id="ch3-nonce-csp">Nonces exist for the CSP, not for you</h4>
+    <p>A strict Content-Security-Policy needs a per-request nonce for inline scripts, and the framework must know it at render time — so middleware mints one, exposes it as a header, and composes the CSP from it. Reading <code>x-nonce</code> in a component is legitimate only when you are applying that policy; if you find yourself checking it to decide what to render, you are working around a design problem.</p>
+    <div class="codeWrap"><pre><code>// middleware.ts - mint a nonce per request, wire it into the CSP
+export function middleware(req: NextRequest) {
+  const nonce = crypto.randomUUID();
+  const csp = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'`,
+    "style-src 'self' 'unsafe-inline'",
+  ].join('; ');
+
+  const res = NextResponse.next();
+  res.headers.set('x-nonce', nonce);
+  res.headers.set('Content-Security-Policy', csp);
+  return res;
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// the render cache: a Map that lives for the duration of one request
+// and is shared by everything rendered in it.
+
+export default async function Layout({ children }) {
+  const user = await getUser();     // hits the DB
+  return &lt;Shell user={user}&gt;{children}&lt;/Shell&gt;;
+}
+
+export default async function Page() {
+  const user = await getUser();     // SAME request, so the cache returns
+  // the first result. one DB query, not two.
+  return &lt;Profile user={user} /&gt;;
+}
+
+// IMPORTANT: a client component in between BREAKS the render cache,
+// because the client component does not execute on the server, so the
+// value has to be serialised and passed across the boundary.
+export default async function Page() {
+  const user = await getUser();
+  return &lt;ClientProfile user={user} /&gt;;   // serialised now
+}
+
+// if the cache is disabled, or you cross a client boundary, or you use
+// a non-cached fetch, you get N queries instead of 1. The fix is
+// React.cache(), which deduplicates across the whole request even
+// across client boundaries.
+
+// a nonce is how a Server Component claims it was rendered on the server
+// when the output is not HTML
+const nonce = (await headers()).get('x-nonce');
+// rendered into the RSC payload. If you ever find yourself checking
+// this in a client component, you are working around a design problem,
+// not solving one.</code></pre></div>
+    <h3 id="ch3-trace" data-toc>Seeing what happened</h3>
+    <p>The mental model is cheap to verify with three tools: the build's route table, the browser's Network panel, and a raw HTTP client. Ten minutes with them settles most "is this actually running on the server?" arguments permanently.</p>
+    <h4 id="ch3-trace-build">The route table is a report card</h4>
+    <p>Every <code>next build</code> prints one symbol per route: <code>○</code> static, <code>●</code> SSG via <code>generateStaticParams</code>, <code>ƒ</code> dynamic, <code>◐</code> partial. It is the fastest regression detector in the framework — add a <code>cookies()</code> read and watch <code>○</code> flip to <code>ƒ</code>, with the build usually naming the culprit. Make reading it part of every build.</p>
+    <div class="codeWrap"><pre><code>npx next build 2&gt;&amp;1 | grep -E "○|●|ƒ|◐"
+# ○ /            static - served from the CDN
+# ● /blog/[slug] prerendered for the generateStaticParams set
+# ƒ /dashboard   dynamic - find the cookies()/fetch that did it</code></pre></div>
+    <h4 id="ch3-trace-prod">Prove it over HTTP</h4>
+    <p>Static and dynamic routes are indistinguishable in the rendered output and completely different on the wire. A static route returns identical bytes for every visitor plus cache-age headers from the CDN; a dynamic route sets per-request cookies and refuses to be stored. Curl twice and diff, or grep the response headers.</p>
+    <div class="codeWrap"><pre><code>curl -si https://your-app.example.com/blog/hello | grep -iE "age|cache|etag"
+# age: 34218                &lt;- the CDN served it from cache
+# x-vercel-cache: HIT
+
+curl -si https://your-app.example.com/dashboard | grep -iE "set-cookie|cache"
+# set-cookie: session=...        &lt;- personalised, per-request
+# cache-control: private, no-store</code></pre></div>
+    <div class="codeWrap"><pre><code>// 1. next build prints the route table with ○ ● ƒ ◐ per route.
+//    read it every build. it is the fastest way to know whether your
+//    change to a fetch or a cookie read silently made a static page
+//    dynamic.
+
+// 2. DevTools, the Next.js tab
+//    shows which parts of the tree are server and which are client,
+//    and highlights the client boundary visually.
+
+// 3. console.log runs once, on the server
+//    in a Server Component it prints in the terminal. If it prints
+//    twice, you are in a cached route being revalidated, or in dev's
+//    double render.
+
+// 4. A deliberate marker
+//    put a unique token in the markup and look for it in the HTML
+//    response vs the JS bundles. If it is in the HTML but not in the
+//    JS, that component is server-only and will not re-render client
+//    side. This is the fastest way to verify your mental model.</code></pre></div>
+    <div class="tip"><p>Try this on any page: view source, then search the HTML for a string that only appears in a Server Component's output. Then look at the JS bundle for the same string. Its absence from the bundle is the proof that it rendered on the server. Ten minutes with this habit resolves most "is this running on the server?" confusion permanently.</p></div>
+    <div class="ex"><h4>Exercises 3</h4><ol>
+      <li>Run <code>next build</code> on a fresh project and record the route table. Then add a <code>cookies()</code> read to a static page, rebuild, and confirm it flips to <code>ƒ</code>. Remove it and confirm it flips back.</li>
+      <li>Build a page with two independent slow server components and a Suspense boundary around each. Measure time-to-first-byte and time-to-interactive with and without the boundaries, using curl and the Network panel.</li>
+      <li>Enable Partial Prerendering and build a static shell with a dynamic hole. Verify the shell HTML is identical for two different users, and that only the hole differs.</li>
+      <li>Prove the render cache: fetch the same value in a layout and a page and count queries in your database log. Then insert a client component between them and count again. Then fix it with <code>React.cache()</code>.</li>
+      <li>Use the "unique token in view source" technique to classify all 20 components on one of your pages as server or client. Write down any you got wrong and work out why.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+<h2 id="ch4" data-toc>4 · Data Fetching and Mutations</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 · Data Fetching and Mutations</button><div class="ch-toc-list"><a href="#ch4-where">Where to fetch</a><a href="#ch4-await">Parallel and dependent fetches</a><a href="#ch4-suspense">Fetching with Suspense</a><a href="#ch4-cascade">Cascades and how to flatten them</a><a href="#ch4-mutations">Mutations and the client cache</a><a href="#ch4-revalidate">Revalidating after a mutation</a><a href="#ch4-errors">Error handling per fetch</a><a href="#ch4-form">A complete data flow</a></div></div>
+    <p class="topic-desc">Fetching in the App Router is easier than it was in the Pages Router, mostly because there is one obvious place to do it. This chapter is about doing it well: in parallel, without waterfalls, with errors that are contained, and with a cache you can reason about.</p>
+    <h3 id="ch4-where" data-toc>Where to fetch</h3>
+    <p>In the App Router there are exactly two correct answers to "where do I fetch?": in a Server Component for anything the request can know, and in a client effect only for data that genuinely depends on post-hydration user interaction.</p>
+    <h4 id="ch4-where-server">Fetch in the component that renders the data</h4>
+    <p>The component starts, awaits, and renders — there is no loading state to manage, no effect to fire, no cache library, and the data is not in the client bundle. If the fetch fails, the component throws and the nearest <code>error.tsx</code> catches it. The HTML is complete in the first response because the data was resolved before anything was sent.</p>
+    <div class="codeWrap"><pre><code>// app/repos/[owner]/page.tsx
+export default async function RepoPage({ params }: { params: Promise&lt;{ owner: string }&gt; }) {
+  const { owner } = await params;
+  const repos = await getRepos(owner);           // any async source
+  return &lt;RepoList repos={repos} /&gt;;
+}
+// no useEffect, no isLoading, no refetch-on-mount</code></pre></div>
+    <h4 id="ch4-where-default">Next 15's fetch is uncached by default</h4>
+    <p>The single biggest behaviour change from version 14: a plain <code>fetch</code> no longer caches. Teams upgrading who relied on implicit caching get dynamic routes and duplicate requests for free. The fix is not to fight it — it is to make caching explicit, per call, with <code>cache</code>, <code>revalidate</code> or tags, and to reserve the client effect for genuinely interaction-driven data.</p>
+    <div class="codeWrap"><pre><code>// upgrading from next 14 - what silently changed
+const r = await fetch(API + '/prices');            // 14: cached   15: not cached
+
+// restore caching deliberately
+const r1 = await fetch(API + '/prices', { cache: 'force-cache' });
+const r2 = await fetch(API + '/prices', { next: { revalidate: 60 } });
+const r3 = await fetch(API + '/prices', { next: { tags: ['prices'] } });</code></pre></div>
+    <div class="codeWrap"><pre><code>// DEFAULT AND USUALLY CORRECT: in the Server Component, at the top level,
+// not in an effect, not in a client hook.
+
+export default async function Page({ params }: { params: Promise&lt;{ id: string }&gt; }) {
+  const { id } = await params;
+  const product = await db.product.findUnique({ where: { id } });
+  return &lt;ProductView product={product} /&gt;;
+}
+
+// WHY this is better than the alternatives
+//   - it runs before anything is sent, so the HTML is complete
+//   - there is no loading state to manage: either the component renders
+//     with data, or it throws
+//   - no waterfall: the component does not mount before fetching
+//   - no cache library required
+//   - the data is not in the client bundle
+
+// the rule: fetch in a Server Component. Put the fetch in a client
+// effect only when the request genuinely depends on user interaction
+// that happens after hydration.
+
+// WHERE NOT TO FETCH
+//   - in useEffect        (waterfall, loading state, double-fetch risk)
+//   - in a layout          (blocks every page beneath it)
+//   - in a Client Component (ships your data-access code to the browser)</code></pre></div>
+    <h3 id="ch4-await" data-toc>Parallel and dependent fetches</h3>
+    <p>Fetch shapes come in two: independent calls fan out, dependent calls chain. Sequential <code>await</code> where calls must chain is correct; sequential <code>await</code> where they do not is a waterfall you built yourself.</p>
+    <h4 id="ch4-await-parallel">Fan out with Promise.all</h4>
+    <p>Independent calls cost the maximum of their latencies, not the sum. <code>Promise.all</code> fails fast — one rejection rejects the whole batch — while <code>Promise.allSettled</code> lets you keep the results that succeeded. Pick the semantics that matches the UI: all-or-nothing for a form, best-effort for a dashboard row.</p>
+    <div class="codeWrap"><pre><code>const [nav, hero, deals] = await Promise.all([
+  getNav(),          // 50ms
+  getHero(),         // 120ms
+  getDeals(),        // 90ms
+]);
+// total ≈ 120ms, not 260ms
+
+const results = await Promise.allSettled([getA(), getB(), getC()]);
+const ok = results
+  .filter((r) =&gt; r.status === 'fulfilled')
+  .map((r) =&gt; r.value);            // keep what succeeded</code></pre></div>
+    <h4 id="ch4-await-dependent">Chain only what depends</h4>
+    <p>Two calls that use each other's output must sequence; everything else joins the current batch. The pattern is a staircase: resolve one step, fan out with what it unlocked, resolve the next step. Each fan-out is a <code>Promise.all</code>; each dependency is a single <code>await</code>.</p>
+    <div class="codeWrap"><pre><code>async function getOrderSummary(id: string) {
+  const order = await getOrder(id);                    // step 1: depends on id
+  const [customer, items] = await Promise.all([        // step 2: both depend on order
+    getCustomer(order.customerId),
+    getItems(order.id),
+  ]);
+  return { order, customer, items };
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// DEPENDENT: b needs a's result, so they must be sequential
+const user = await getUser(session.userId);
+const orders = await getOrders(user.id);        // must wait
+
+// INDEPENDENT: three of these, so run them at once
+const [a, b, c] = await Promise.all([
+  getProducts(),
+  getCategories(),
+  getReviews(),
+]);
+// three sequential awaits = 300 + 200 + 150 = 650ms
+// Promise.all        = max(300, 200, 150) = 300ms
+
+// "waterfall" means dependent requests stacked on top of each other. The
+// most common cause in Next.js is a parent awaiting before a child starts.
+//
+// BAD: layout awaits, so every page under it waits
+// app/dashboard/layout.tsx
+export default async function Layout({ children }) {
+  const user = await getUser();          // 400ms, always
+  return &lt;Shell user={user}&gt;{children}&lt;/Shell&gt;;
+}
+// app/dashboard/page.tsx
+export default async function Page() {
+  const stats = await getStats();        // 300ms, starts AFTER the layout
+  return &lt;Stats stats={stats} /&gt;;      // total 700ms
+}
+
+// GOOD: the layout does not fetch, the page fetches in parallel, and the
+// parts that need the user sit behind their own Suspense boundary
+// app/dashboard/layout.tsx - server, no await
+export default function Layout({ children }) {
+  return &lt;Shell&gt;{children}&lt;/Shell&gt;;
+}
+
+// app/dashboard/page.tsx
+export default async function Page() {
+  const stats = await getStats();        // starts immediately
+  return (
+    &lt;&gt;
+      &lt;Suspense fallback={&lt;NavSkeleton /&gt;}&gt;
+        &lt;UserNav /&gt;                   {/* awaits the user itself */}
+      &lt;/Suspense&gt;
+      &lt;Stats stats={stats} /&gt;
+    &lt;/&gt;
+  );
+}
+// shell + stats stream together; the nav fills in when the user arrives</code></pre></div>
+    <div class="tip"><p>The practical rule: <strong>fetch as close to where the data is used as possible.</strong> A layout that fetches forces every page beneath it to wait for data most of them do not need. It is the most common cause of a slow dashboard.</p></div>
+    <h3 id="ch4-suspense" data-toc>Fetching with Suspense</h3>
+    <p>Suspense is how the App Router turns "wait for all data" into "render what is ready". The parent stays sync; each async child streams in behind its own boundary.</p>
+    <h4 id="ch4-suspense-parent">Sync parent, async children</h4>
+    <p>An async parent awaits its children implicitly, which serialises them; a sync parent hands each child to its own Suspense boundary, and the children start fetching the moment the parent renders — in parallel. The distinction fits in one line: <code>async parent -&gt; awaits everything</code>, while <code>sync parent + async children -&gt; streams</code>.</p>
+    <div class="codeWrap"><pre><code>export default function Admin() {
+  return (
+    &lt;&gt;
+      &lt;Suspense fallback={&lt;SlowCard /&gt;}&gt;&lt;AuditLog /&gt;&lt;/Suspense&gt;
+      &lt;Suspense fallback={&lt;SlowCard /&gt;}&gt;&lt;QueueStats /&gt;&lt;/Suspense&gt;
+    &lt;/&gt;
+  );
+}
+
+async function AuditLog() {
+  const rows = await getAuditRows();          // starts immediately
+  return &lt;LogTable rows={rows} /&gt;;
+}</code></pre></div>
+    <h4 id="ch4-suspense-granularity">Boundaries are a UI decision</h4>
+    <p>One boundary per visible region beats one per query: the fallback is what users see, so group work that finishes together. Nested boundaries work — an outer shell streams first, inner details stream later. <code>loading.tsx</code> is the shorthand for "one boundary around this whole segment", the right default for most routes.</p>
+    <div class="codeWrap"><pre><code>// one boundary for a whole region, not one per query
+&lt;Suspense fallback={&lt;ActivitySkeleton /&gt;}&gt;
+  &lt;ActivityFeed /&gt;    {/* fetches five things internally, streams once */}
+&lt;/Suspense&gt;</code></pre></div>
+    <div class="codeWrap"><pre><code>// make a data-fetching component itself async, and let Suspense handle it
+// the parent does NOT await it
+
+// app/products/page.tsx
+export default function Page() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Products&lt;/h1&gt;
+      &lt;Suspense fallback={&lt;GridSkeleton /&gt;}&gt;
+        &lt;ProductGrid /&gt;                {/* async, fetches its own data */}
+      &lt;/Suspense&gt;
+    &lt;/div&gt;
+  );
+}
+
+async function ProductGrid() {
+  const products = await db.product.findMany();
+  return &lt;Grid products={products} /&gt;;
+}
+
+// the page function must NOT be async here, or it awaits everything
+// and the streaming benefit is lost. This is the pattern to remember:
+
+//   async parent  -&gt; awaits everything, one slow thing blocks all
+//   sync parent + async children behind Suspense -&gt; streams
+
+// the fetches run in PARALLEL even though they are sequential in the file
+// because each component starts independently
+export default function Dashboard() {
+  return (
+    &lt;&gt;
+      &lt;Suspense fallback={&lt;A /&gt;}&gt;&lt;WidgetA /&gt;&lt;/Suspense&gt;   {/* 200ms */}
+      &lt;Suspense fallback={&lt;B /&gt;}&gt;&lt;WidgetB /&gt;&lt;/Suspense&gt;   {/* 900ms */}
+      &lt;Suspense fallback={&lt;C /&gt;}&gt;&lt;WidgetC /&gt;&lt;/Suspense&gt;   {/* 100ms */}
+    &lt;/&gt;
+  );
+}
+// A and C are visible almost immediately, B arrives last. No waterfall,
+// no whole-page spinner.</code></pre></div>
+    <h3 id="ch4-cascade" data-toc>Cascades and how to flatten them</h3>
+    <p>A cascade is a request that cannot start until an earlier one finishes. It is the root cause of most slow pages.</p>
+    <h4 id="ch4-cascade-shape">Diagnose by shape, not speed</h4>
+    <p>In the Network panel, a cascade reads as a staircase: each later request starts the moment the previous one ends. Ten requests at 50 ms serialised cost 500 ms; one request at 120 ms costs 120 ms. When profiling, look at the shape of the waterfall first — flattening it is usually worth more than speeding up any single request.</p>
+    <div class="codeWrap"><pre><code>// the signature of a cascade in the Network panel
+//   /orders/42           200ms
+//     /customers/1        50ms   (starts only after #1)
+//       /items/...        40ms   (starts only after #2)
+//
+// each row begins where the previous row ends - that is the smell</code></pre></div>
+    <h4 id="ch4-cascade-batch">Kill the N+1 with one IN query</h4>
+    <p>Collect the ids, run one query, rebuild a lookup <code>Map</code>, and assign in a loop. A loader function that batches and dedupes across the whole render — the pattern behind the <code>dataloader</code> library — does the same thing structurally, so ten components asking for ten ids produce one query with an <code>IN</code> clause.</p>
+    <div class="codeWrap"><pre><code>// before: N queries for N products' categories
+const categories = [];
+for (const p of products) {
+  categories.push(await getCategory(p.categoryId));   // N round trips
+}
+
+// after: 1 query
+const ids = [...new Set(products.map((p) =&gt; p.categoryId))];
+const rows = await db.category.findMany({ where: { id: { in: ids } } });
+const byId = new Map(rows.map((c) =&gt; [c.id, c]));
+products.forEach((p) =&gt; { p.category = byId.get(p.categoryId) ?? null; });</code></pre></div>
+    <div class="codeWrap"><pre><code>// THE CASCADE, UNFLATTENED
+// app/orders/[id]/page.tsx
+const order = await getOrder(id);          // 100ms
+const customer = await getCustomer(order.customerId);   // 120ms, after
+const items = await getItems(order.id);                // 80ms, after
+const productDetails = await Promise.all(
+  items.map((i) =&gt; getProduct(i.productId)),         // 150ms, after
+);
+const reviews = await getReviews(productDetails.map((p) =&gt; p.id)); // 200ms, after
+// total: 650ms, strictly sequential
+
+// FLATTENED
+// step 1: what is known at the start? just the id
+const order = await getOrder(id);          // 100ms, unavoidable
+
+// step 2: everything now computable runs together
+const [customer, items] = await Promise.all([
+  getCustomer(order.customerId),
+  getItems(order.id),
+]);                                        // max(120, 80) = 120ms
+
+// step 3: and the next layer together
+const products = await db.product.findMany({
+  where: { id: { in: items.map((i) =&gt; i.productId) } },
+});                                        // ONE query, not N
+const reviews = products.length
+  ? await getReviews(products.map((p) =&gt; p.id))
+  : [];
+// total: ~370ms, and one round trip instead of N
+
+// THE BIGGEST WIN: batch the N+1
+// BAD: 50 products, 50 queries
+for (const p of products) p.category = await getCategory(p.categoryId);
+
+// GOOD: one query
+const categories = await db.category.findMany({
+  where: { id: { in: [...new Set(products.map((p) =&gt; p.categoryId))] } },
+});
+const byId = new Map(categories.map((c) =&gt; [c.id, c]));
+products.forEach((p) =&gt; { p.category = byId.get(p.categoryId); });
+
+// or use a data loader, which batches across an entire render
+const getUser = dataLoader(async (id) =&gt; {
+  return db.user.findUnique({ where: { id } });
+});
+// 10 components ask for users 1, 2, 3... Next.js issues ONE query with
+// an IN clause, and caches it for the request</code></pre></div>
+    <div class="note"><p>When profiling, look at the <em>shape</em> of the waterfall in the Network panel, not just the slowest request. Ten requests that each take 50 ms but run in sequence cost 500 ms; one request that takes 120 ms costs 120 ms. The waterfall, not the latency, is usually the problem.</p></div>
+    <h3 id="ch4-mutations" data-toc>Mutations and the client cache</h3>
+    <p>Reads in the App Router are server-side and cached. That means a mutation must tell the server cache what changed, or the user will see stale data on their next navigation.</p>
+    <h4 id="ch4-mutations-action">The server action is the mutation endpoint</h4>
+    <p>A Server Action is a public HTTP endpoint that looks like a function: it receives <code>FormData</code> or plain arguments, runs with the request's cookies, and may revalidate and redirect. Because it is public, every action needs an authorisation check and schema validation — treat every argument as untrusted, including ids that belong to other users.</p>
+    <div class="codeWrap"><pre><code>// app/notes/actions.ts
+'use server';
+import { createNote } from '@/lib/notes';
+import { revalidatePath } from 'next/cache';
+
+export async function addNote(form: FormData) {
+  const title = String(form.get('title') ?? '').trim();
+  if (!title) throw new Error('title is required');     // validate first
+  await createNote(title);                              // then write
+  revalidatePath('/notes');                             // then invalidate
+}
+
+// a plain HTML form can post to it - the write works without JavaScript
+// &lt;form action={addNote}&gt;&lt;input name="title" /&gt;&lt;/form&gt;</code></pre></div>
+    <h4 id="ch4-mutations-pending">Give the user a pending state</h4>
+    <p><code>useFormStatus</code> exposes the pending flag of the nearest form action, and <code>useActionState</code> threads a returned state back into the form — neither needs a <code>useEffect</code> or a hand-rolled loading boolean. Disable the submit button while pending, then let revalidation or <code>router.refresh()</code> present the new data.</p>
+    <div class="codeWrap"><pre><code>'use client';
+import { useFormStatus } from 'react-dom';
+
+export function SubmitButton() {
+  const { pending } = useFormStatus();
+  return &lt;button disabled={pending}&gt;{pending ? 'Saving…' : 'Save'}&lt;/button&gt;;
+}
+// rendered inside the form that owns the action - pending tracks it</code></pre></div>
+    <div class="codeWrap"><pre><code>// the core tension
+//   reads:  happen on the server, and the RESULT is cached
+//   writes: happen via a server action, on the server
+//   the client router has its OWN cache of the last-visited pages
+
+// so after a write you must invalidate, or the user navigates back to
+// the old data. Three mechanisms exist:
+
+// 1. revalidatePath - drop a route from the server cache
+// 2. revalidateTag  - drop anything fetched under a tag (ch7)
+// 3. router.refresh() - re-fetch the current route's RSC payload
+
+// 'use server'
+import { revalidatePath, revalidateTag } from 'next/cache';
+
+export async function updateProduct(id: string, form: FormData) {
+  await requireUser();                        // ALWAYS authorise
+  const data = validate(form);                // ALWAYS validate
+  await db.product.update({ where: { id }, data });
+
+  revalidateTag('products');                  // the list
+  revalidatePath(`/products/${id}`);           // the detail page
+  // both. the list and the detail are different cache entries.
+}
+
+// 3. client-side, when you want a transition
+'use client';
+const router = useRouter();
+const [pending, startTransition] = useTransition();
+
+function onSaved() {
+  startTransition(() =&gt; {
+    router.refresh();       // re-fetch this route's payload, show it
+                          // without a loading state
+  });
+}</code></pre></div>
+    <div class="warn"><p><strong>Every server action needs both an authorisation check and a validation step, and they are not optional.</strong> A server action is a public HTTP endpoint. Anyone can call it with any argument, including an id belonging to another user. Treat every action as untrusted input: check who is calling, check what they are allowed to touch, and validate every field.</p></div>
+    <h3 id="ch4-revalidate" data-toc>Revalidating after a mutation</h3>
+    <p>Revalidation is cache arithmetic: which cache entries does the mutation touch, and which invalidation reaches exactly those? The wrong choice means stale data or a cache thrashed unnecessarily.</p>
+    <h4 id="ch4-revalidate-tag">Tags reach across routes</h4>
+    <p>A tag is a name attached at fetch time and dropped on revalidation: <code>revalidateTag('posts')</code> invalidates every cache entry fetched under that tag, wherever it is used. Tags survive route restructuring — the same tag serves the list and the detail page. Database reads join the same system via <code>cache</code> from <code>next/cache</code>, which accepts the same <code>tags</code> and <code>revalidate</code> options.</p>
+    <div class="codeWrap"><pre><code>// fetch with a tag and a TTL
+const posts = await fetch('http://api.internal/posts', {
+  next: { tags: ['posts'], revalidate: 300 },
+});
+
+// DB reads join the same system
+import { cache } from 'next/cache';
+export const getPosts = cache(async () =&gt; db.post.findMany(), {
+  tags: ['posts'],
+  revalidate: 300,
+});
+
+// after a mutation:
+await createPost(...);
+revalidateTag('posts');          // every 'posts' consumer goes stale at once</code></pre></div>
+    <h4 id="ch4-revalidate-sequence">Order a create: write, revalidate, redirect</h4>
+    <p>For a create, redirect beats refresh: the Post/Redirect/Get pattern prevents double-submits and lands the user on a freshly built page. Revalidate before redirecting so the destination is regenerated in time, and revalidate both granularities — the list and the detail — because they are different cache entries.</p>
+    <div class="codeWrap"><pre><code>// app/posts/actions.ts
+'use server';
+import { redirect } from 'next/navigation';
+import { revalidatePath, revalidateTag } from 'next/cache';
+
+export async function createPost(form: FormData) {
+  const post = await db.post.create({ data: { title: String(form.get('title')) } });
+  revalidatePath('/posts');                     // the list
+  revalidateTag(`post:${post.id}`);             // the detail
+  redirect(`/posts/${post.slug}`);              // PRG: fresh target
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// choosing the right invalidation
+
+// revalidateTag - precise, survives as long as the data is fetched with
+// the tag
+export async function createPost(form: FormData) {
+  const post = await db.post.create({ data: parse(form) });
+  revalidateTag('posts');                 // matches fetch(url, { next: { tags: ['posts'] } })
+  revalidateTag(`post:${post.id}`);
+  return post;
+}
+
+// revalidatePath - path-based, simpler, coarser
+revalidatePath('/blog');                 // the list
+revalidatePath(`/blog/${slug}`);          // one post
+
+// router.refresh() - client-side, re-fetches the current route only,
+// and does not touch the server cache. Good for a form that updates
+// what is on screen right now.
+
+// router.push(href) - for a redirect after a create. Navigating to the
+// new page fetches it fresh (or from cache, if still valid).
+
+// the ordering that avoids a flash of stale data
+'use client';
+async function onSubmit(form: FormData) {
+  const action = useActionState(updateProfile, null);
+  // ...
+  // the component receives the new value as props after revalidation,
+  // so there is no window where the old data is shown
+}
+
+// what NOT to do
+// 'use client'; useEffect(() =&gt; { fetch('/api/products').then(setProducts) }, [])
+// this bypasses the server cache entirely, gives you no streaming, and
+// duplicates the data-fetching logic the framework already does</code></pre></div>
+    <h3 id="ch4-errors" data-toc>Error handling per fetch</h3>
+    <p>Error handling has three layers — throw, boundary, local catch — and the right one depends on blast radius. One bad tile should not blank the dashboard.</p>
+    <h4 id="ch4-errors-layers">Boundary or catch?</h4>
+    <p>A thrown error in a server component is caught by the nearest <code>error.tsx</code>, which must be a client component (it needs a <code>reset</code> callback to retry). An error inside a Suspense boundary is caught by that boundary's error file, not the whole page's. Decide per segment how much of the UI one failure may take down.</p>
+    <div class="codeWrap"><pre><code>// app/feed/error.tsx - must be 'use client'
+'use client';
+export default function FeedError({ error, reset }: {
+  error: Error &amp; { digest?: string };
+  reset: () =&gt; void;
+}) {
+  return (
+    &lt;div role="alert"&gt;
+      &lt;p&gt;This section failed to load.&lt;/p&gt;
+      &lt;p&gt;digest: {error.digest ?? 'unknown'}&lt;/p&gt;
+      &lt;button onClick={reset}&gt;Retry&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <h4 id="ch4-errors-degrade">Local recovery beats a page error</h4>
+    <p>When one widget failing should not affect its neighbours, catch near the fetch and render a fallback — a muted line beats a blank region, and a blank region is worse than an honest message. The pattern is a two-value result: data or error, never a swallowed promise.</p>
+    <div class="codeWrap"><pre><code>async function Recommendations() {
+  const [recs, error] = await getRecs().then(
+    (r) =&gt; [r, null] as const,
+    (e) =&gt; [null, e as Error] as const,
+  );
+  if (error) return &lt;p className="muted"&gt;Recommendations unavailable.&lt;/p&gt;;
+  return &lt;RecList recs={recs!} /&gt;;
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// three layers, and you want all three
+
+// 1. a thrown error is caught by the nearest error.tsx (ch16)
+//    this is the default and it is correct
+async function Widget() {
+  const data = await getData();   // throws on failure
+  return &lt;Chart data={data} /&gt;;
+}
+
+// 2. error.tsx catches it for the segment. Note it must be a client
+//    component, because it needs useEffect for the reset button
+'use client';
+export default function Error({ error, reset }: {
+  error: Error &amp; { digest?: string };
+  reset: () =&gt; void;
+}) {
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Something went wrong&lt;/h2&gt;
+      &lt;p&gt;{error.message}&lt;/p&gt;
+      &lt;button onClick={reset}&gt;Try again&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+// 3. graceful degradation, when one failure should not blank the page
+async function Widget() {
+  const data = await getData().catch(() =&gt; null);
+  if (data === null) return &lt;WidgetUnavailable /&gt;;
+  return &lt;Chart data={data} /&gt;;
+}
+
+// the two rules
+//   - a failed fetch inside a Suspense boundary triggers the boundary's
+//     error handler, NOT the whole page
+//   - never catch an error and show nothing. an empty region with no
+//     explanation is worse than an error message</code></pre></div>
+    <div class="note"><p>Next.js redacts server error messages in production before sending them to the client, and shows a digest instead. That is deliberate: stack traces and database errors leak schema and file paths. Use the digest in logs to find the real error.</p></div>
+    <h3 id="ch4-form" data-toc>A complete data flow</h3>
+    <p>An edit form is the one place every idea in this chapter lands at once: server component reads, server action writes, schema validates, authorisation gates, revalidation refreshes, and the client form is a thin shell around <code>useActionState</code>.</p>
+    <h4 id="ch4-form-shape">The three files and their jobs</h4>
+    <p><code>page.tsx</code> (server) reads the record and gate-checks who may edit it; <code>actions.ts</code> declares the action, the Zod schema and the revalidation; <code>ProductForm.tsx</code> (client) binds the action through <code>useActionState</code>. The <code>State</code> type is the contract between form and action: per-field <code>errors</code>, a top-level <code>message</code>, or <code>null</code> for success.</p>
+    <div class="codeWrap"><pre><code>// the data contract the form and the action both speak
+export type State = {
+  errors?: Record&lt;string, string[]&gt;;   // per-field, rendered with role="alert"
+  message?: string;                     // top-level failure (not found, forbidden)
+} | null;                               // null = success
+
+// useActionState wires it together
+const [state, formAction, pending] = useActionState(action, null);</code></pre></div>
+    <h4 id="ch4-form-nojs">It works with JavaScript switched off</h4>
+    <p>The form is progressive: a plain <code>form action</code> posts to the server, the action revalidates, and the server re-renders the page — no <code>fetch</code>, no <code>useEffect</code>, no loading boolean anywhere. <code>useActionState</code> only upgrades the experience: pending states, inline errors, no page flash. The test below is the cheapest correctness check in the framework.</p>
+    <div class="codeWrap"><pre><code># the progressive baseline, in three steps
+# 1. DevTools -&gt; Settings -&gt; disable JavaScript
+# 2. edit a product, submit
+# 3. the server re-renders with the saved values
+#    useActionState is an enhancement, not a requirement</code></pre></div>
+    <div class="codeWrap"><pre><code>// the full pattern: server component reads, form posts to a server action,
+// validation and authorisation on the server, cache invalidated, UI
+// updates without a manual refetch.
+
+// app/products/[id]/edit/page.tsx - server
+import { requireUser } from '@/lib/auth';
+import { canEdit } from '@/lib/permissions';
+import { updateProduct } from './actions';
+import { notFound } from 'next/navigation';
+
+export default async function EditPage({ params }: { params: Promise&lt;{ id: string }&gt; }) {
+  const { id } = await params;
+  const user = await requireUser();                  // redirects if not signed in
+  const product = await db.product.findUnique({ where: { id } });
+  if (!product) notFound();
+  if (!canEdit(user, product)) notFound();           // do not leak existence
+
+  return (
+    &lt;ProductForm
+      product={product}                              {/* plain, serialisable */}
+      action={updateProduct}                         {/* a server action */}
+    /&gt;
+  );
+}
+
+// app/products/[id]/edit/actions.ts
+'use server';
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { z } from 'zod';
+
+const Schema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(200),
+  price: z.coerce.number().positive(),
+});
+
+export type State = { errors?: Record&lt;string, string[]&gt;; message?: string } | null;
+
+export async function updateProduct(
+  _prev: State,
+  form: FormData,
+): Promise&lt;State&gt; {
+  const session = await requireUser();
+
+  const parsed = Schema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) {
+    return { errors: parsed.error.flatten().fieldErrors };
+  }
+
+  const { id, ...fields } = parsed.data;
+  const existing = await db.product.findUnique({ where: { id } });
+  if (!existing || !canEdit(session.user, existing)) {
+    return { message: 'Not found' };
+  }
+
+  await db.product.update({ where: { id }, data: fields });
+
+  revalidateTag('products');
+  revalidatePath(`/products/${id}`);
+  revalidatePath('/products');
+  return null;                                       // success: no error state
+}
+
+// app/products/[id]/edit/ProductForm.tsx - client
+'use client';
+import { useActionState } from 'react';
+
+export function ProductForm({ product, action }: {
+  product: Product;
+  action: (prev: State, form: FormData) =&gt; Promise&lt;State&gt;;
+}) {
+  const [state, formAction, pending] = useActionState(action, null);
+
+  return (
+    &lt;form action={formAction}&gt;
+      &lt;input name="id" type="hidden" value={product.id} /&gt;
+
+      &lt;label&gt;
+        Name
+        &lt;input name="name" defaultValue={product.name}
+          aria-invalid={!!state?.errors?.name} /&gt;
+        {state?.errors?.name?.map((e) =&gt; &lt;span key={e} role="alert"&gt;{e}&lt;/span&gt;)}
+      &lt;/label&gt;
+
+      &lt;label&gt;
+        Price
+        &lt;input name="price" type="number" step="0.01" defaultValue={product.price} /&gt;
+        {state?.errors?.price?.map((e) =&gt; &lt;span key={e} role="alert"&gt;{e}&lt;/span&gt;)}
+      &lt;/label&gt;
+
+      {state?.message &amp;&amp; &lt;p role="alert"&gt;{state.message}&lt;/p&gt;}
+
+      &lt;button disabled={pending}&gt;{pending ? 'Saving...' : 'Save'}&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre></div>
+    <p>Note what is <em>not</em> in there: no <code>useEffect</code>, no <code>useState</code> for the field values, no <code>fetch</code>, no loading boolean, no refetch after submit. The form is progressive — it works without JavaScript, because a plain <code>&lt;form action&gt;</code> posts to the server and the server re-renders.</p>
+    <div class="ex"><h4>Exercises 4</h4><ol>
+      <li>Take a page with a layout that awaits data. Move the fetch into the page, wrap the user-dependent part in its own Suspense boundary, and measure time-to-first-byte before and after.</li>
+      <li>Build a component tree with five independent async children, each 200–900 ms. Verify from the Network panel that they run in parallel, then convert the parent from <code>async</code> to sync and confirm streaming still works.</li>
+      <li>Find an N+1 query in your codebase using the database query log. Replace it with a single <code>findMany({ where: { id: { in: [...] } } })</code> and record the query count before and after.</li>
+      <li>Build a server action with a Zod schema, authorisation check, and both <code>revalidateTag</code> and <code>revalidatePath</code>. Verify by mutating in a second browser tab that the first tab's data updates on navigation.</li>
+      <li>Write a test that calls your server action directly with a forged <code>id</code> belonging to another user, and assert it is rejected. Then remove the authorisation check and watch the test fail.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+<h2 id="ch5" data-toc>5 · The File System Router</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 5 · The File System Router</button><div class="ch-toc-list"><a href="#ch5-conventions">File conventions</a><a href="#ch5-dynamic">Dynamic segments</a><a href="#ch5-catchall">Catch-all and optional segments</a><a href="#ch5-groups">Route groups</a><a href="#ch5-parallel">Parallel routes and slots</a><a href="#ch5-intercepting">Intercepting routes</a><a href="#ch5-navigation">Programmatic navigation</a><a href="#ch5-links">Link prefetching</a><a href="#ch5-middleware-routing">Rewrites, redirects and middleware</a></div></div>
+    <p class="topic-desc">The App Router derives your URL structure from the folder tree. Almost every routing question — nesting, layouts, parallel routes, modals — is answered by knowing the file conventions.</p>
+    <h3 id="ch5-conventions" data-toc>File conventions</h3>
+    <p>In the App Router, a filename is a declaration. <code>page.tsx</code> creates a URL; a layout, a template and a route handler each answer one question; everything else in <code>app/</code> is inert.</p>
+    <h4 id="ch5-conventions-special">The special files, in three groups</h4>
+    <p>Group one makes URLs: <code>page.tsx</code> (UI) and <code>route.ts</code> (handler) — never both in one folder. Group two wraps UI: <code>layout.tsx</code>, <code>template.tsx</code>, <code>loading.tsx</code>, <code>error.tsx</code>, <code>not-found.tsx</code>. Group three is adjuncts: <code>default.tsx</code> for parallel slots, <code>redirect.ts</code> for server-side redirects, <code>middleware.ts</code> at the root for pre-route logic. Knowing which group a file belongs to explains most "why is this not a route?" confusion.</p>
+    <div class="codeWrap"><pre><code>app/
+  page.tsx        route - UI
+  route.ts        route - handler; a folder cannot define BOTH
+  layout.tsx      shared chrome, persists across navigations
+  template.tsx    chrome that REMOUNTS on each navigation (analytics)
+  loading.tsx     automatic Suspense fallback for the segment
+  error.tsx       per-segment error boundary ('use client')
+  not-found.tsx   the segment's 404
+  default.tsx     parallel-route fallback (see ch5-parallel)
+  redirect.ts     server-side redirect, no component</code></pre></div>
+    <h4 id="ch5-conventions-layout">Layouts persist; templates remount</h4>
+    <p>This one behavioural difference has the biggest consequences. A layout renders once and stays mounted across navigations inside it, so state it holds survives — a feature for a cart badge, a bug for a per-page form. A template renders again for every navigation, which is what you want for page-view analytics or scroll reset. Choose by asking: should this re-run when the URL changes?</p>
+    <div class="codeWrap"><pre><code>// app/products/layout.tsx - rendered once, reused across /products/*
+export default function ProductsLayout({ children }: { children: React.ReactNode }) {
+  return (
+    &lt;div className="products-shell"&gt;
+      &lt;ProductNav /&gt;              {/* stays mounted while children swap */}
+      {children}
+    &lt;/div&gt;
+  );
+}
+// any state in ProductNav survives navigation between product pages</code></pre></div>
+    <div class="codeWrap"><pre><code>// these filenames have meaning. Nothing else in app/ is special.
+app/
+  layout.tsx        wraps its segment and all children; ONE root, renders html+body
+  page.tsx          makes the segment a route
+  loading.tsx       Suspense fallback for this segment, automatic
+  error.tsx         error boundary for this segment; MUST be 'use client'
+  global-error.tsx  catches root layout errors; replaces the root layout
+  not-found.tsx     404 UI, used by notFound()
+  template.tsx      like layout.tsx but REMOUNTS on navigation
+  route.ts          an HTTP endpoint, no UI
+  default.tsx       fallback for parallel routes
+  redirect.ts       a redirect, server-side
+  middleware.ts     runs before routing
+
+// the four you will use daily
+layout.tsx  page.tsx  loading.tsx  error.tsx</code></pre></div>
+    <p>One rule about nesting worth internalising: <strong><code>layout.tsx</code> does not re-render on navigation.</strong> It renders once and persists. That is why a layout must not hold per-page state, and why state in a layout survives navigation — a feature for a cart, a bug for a form.</p>
+    <h3 id="ch5-dynamic" data-toc>Dynamic segments</h3>
+    <p><code>[name]</code> matches exactly one URL segment and binds it to a route parameter. In Next 15 that parameter arrives as a Promise, which makes optional handling and <code>generateMetadata</code> explicit.</p>
+    <h4 id="ch5-dynamic-params">params is a Promise in 15</h4>
+    <p><code>params</code> — and <code>searchParams</code> on pages — are Promises in Next 15, so the component <code>await</code>s them before use. Awaited separately they serialise time; awaited together they resolve in parallel. The type tells the truth about the shape: <code>Promise&lt;{ id: string }&gt;</code> for a single <code>[id]</code> segment.</p>
+    <div class="codeWrap"><pre><code>export default async function Page({
+  params,
+  searchParams,          // also a Promise on pages
+}: {
+  params: Promise&lt;{ id: string }&gt;;
+  searchParams: Promise&lt;{ tab?: string }&gt;;
+}) {
+  const [{ id }, { tab }] = await Promise.all([params, searchParams]);
+  return &lt;Panel id={id} tab={tab ?? 'overview'} /&gt;;
+}</code></pre></div>
+    <h4 id="ch5-dynamic-static">Pre-render the known set</h4>
+    <p><code>generateStaticParams</code> lists the parameter values that exist at build time, so Next.js prerenders those pages and renders the rest on demand. With <code>dynamicParams = false</code>, unknown values 404 instead of rendering on demand — visible, predictable, and usually what a catalogue wants.</p>
+    <div class="codeWrap"><pre><code>export const dynamicParams = false;      // unknown ids -&gt; 404, no on-demand render
+
+export async function generateStaticParams() {
+  const slugs = await db.post.findMany({ select: { slug: true } });
+  return slugs.map((s) =&gt; ({ slug: s.slug }));   // page.tsx receives { slug }
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// [id] matches one segment
+// app/blog/[slug]/page.tsx   -&gt;  /blog/anything-here
+
+export default async function Page({ params }: { params: Promise&lt;{ slug: string }&gt; }) {
+  const { slug } = await params;             // async in Next 15
+  const post = await db.post.findUnique({ where: { slug } });
+  if (!post) notFound();
+  return &lt;Article post={post} /&gt;;
+}
+
+// multiple segments, all dynamic
+// app/shop/[category]/[productId]/page.tsx
+//   /shop/tools/hammer
+
+// generateStaticParams: pre-render these at build time
+export async function generateStaticParams() {
+  const posts = await db.post.findMany({ select: { slug: true }, take: 100 });
+  return posts.map((p) =&gt; ({ slug: p.slug }));
+}
+// anything NOT in this list is rendered on demand (unless
+// dynamicParams = false, which 404s them instead)
+
+// generateMetadata: per-route metadata, same params
+export async function generateMetadata({ params }: { params: Promise&lt;{ slug: string }&gt; }) {
+  const { slug } = await params;
+  const post = await db.post.findUnique({ where: { slug } });
+  return { title: post?.title ?? 'Not found', openGraph: { images: [post?.imageUrl] } };
+}
+
+// param names that are reserved and mean something else
+// app/[lang]/page.tsx     -&gt; a param named lang, not a catch-all
+// app/[...slug]/page.tsx -&gt; catch-all
+// app/[[...slug]]/page.tsx -&gt; optional catch-all</code></pre></div>
+    <h3 id="ch5-catchall" data-toc>Catch-all and optional segments</h3>
+    <p><code>[...name]</code> eats one or more segments; <code>[[...name]]</code> eats zero or more. Catch-alls are the natural home for docs trees and CMS-driven paths — and the shape that most often invites path traversal.</p>
+    <h4 id="ch5-catchall-variants">Three widths, one mechanic</h4>
+    <p><code>[a]</code> matches exactly one segment; <code>[...a]</code> matches one or more; <code>[[...a]]</code> matches zero or more, which means it also renders the base URL that a plain catch-all 404s on. The parameter arrives as <code>string[]</code>, so <code>/docs/guides/routing</code> yields <code>['guides', 'routing']</code>.</p>
+    <div class="codeWrap"><pre><code>// app/docs/[...path]/page.tsx
+export default async function Page({ params }: { params: Promise&lt;{ path: string[] }&gt; }) {
+  const { path } = await params;
+  // /docs/a           -&gt; ['a']
+  // /docs/a/b/c       -&gt; ['a','b','c']
+  return &lt;Doc path={path} /&gt;;
+}
+
+// app/docs/[[...path]]/page.tsx - also matches /docs itself
+export default async function Page({ params }: { params: Promise&lt;{ path?: string[] }&gt; }) {
+  const { path = [] } = await params;
+  return path.length ? &lt;Doc path={path} /&gt; : &lt;DocsIndex /&gt;;
+}</code></pre></div>
+    <h4 id="ch5-catchall-safe">Treat the array as untrusted</h4>
+    <p>A segment of <code>..</code> — raw or percent-decoded — can escape the intended directory if you build a file path by joining segments. Reject suspicious segments, resolve the result against the root, and assert containment before reading. The check is two lines and it closes the whole class of bug.</p>
+    <div class="codeWrap"><pre><code>import { resolve } from 'node:path';
+
+export async function loadDoc(path: string[]) {
+  if (path.some((seg) =&gt; seg === '..' || seg.includes('/') || seg.includes('\\'))) {
+    throw new Error('bad path');
+  }
+  const file = resolve(DOCS_ROOT, ...path);
+  if (!file.startsWith(DOCS_ROOT)) throw new Error('escape blocked');
+  return fs.readFile(file, 'utf8');
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// [slug]      one segment       /blog/a
+// [...slug]   one or more        /blog/a/b/c
+// [[...slug]] zero or more       /blog  and  /blog/a/b
+
+// app/docs/[...path]/page.tsx
+export default async function Page({ params }: { params: Promise&lt;{ path: string[] }&gt; }) {
+  const { path } = await params;
+  // /docs            -&gt; not matched
+  // /docs/getting-started       -&gt; path = ['getting-started']
+  // /docs/guides/routing/layouts -&gt; path = ['guides','routing','layouts']
+  return &lt;Doc path={path.join('/')} /&gt;;
+}
+
+// app/shop/[[...filters]]/page.tsx
+// /shop                     -&gt; filters = undefined
+// /shop/colour/red/size/l   -&gt; filters = ['colour','red','size','l']
+
+// the practical use: a docs site where content lives in the filesystem
+// or a CMS that maps a path to a document
+const doc = await fs.readFile(`content/docs/${path.join('/')}.mdx`, 'utf8');
+
+// SECURITY: never interpolate a path segment into a file path without
+// validating it. path.join('../..') escapes the directory.
+if (path.some((seg) =&gt; seg === '..' || seg.includes('/'))) notFound();
+const file = path.join(DOCS_ROOT, ...path);
+if (!file.startsWith(DOCS_ROOT)) notFound();   // belt and braces</code></pre></div>
+    <div class="warn"><p>Path traversal in a dynamic route is a real vulnerability, not a theoretical one. A segment of <code>..%2F..%2Fetc%2Fpasswd</code> or a decoded <code>..</code> in the array can escape the intended directory. Always resolve and then assert the result is still inside the root.</p></div>
+    <h3 id="ch5-groups" data-toc>Route groups</h3>
+    <p><code>(folder)</code> segments organise the tree without appearing in URLs. Their whole purpose is to attach a different layout to a subset of routes at the same depth.</p>
+    <h4 id="ch5-groups-url">URLs are unchanged by design</h4>
+    <p>A group contributes nothing to the path — <code>app/(marketing)/about/page.tsx</code> is simply <code>/about</code>. Because groups are invisible in URLs, they cannot fix path collisions: two routes resolving to the same URL are a build error, which is the framework refusing ambiguity instead of picking one silently. Groups are for chrome, not for aliasing.</p>
+    <div class="codeWrap"><pre><code>app/
+  (marketing)/
+    layout.tsx          marketing chrome (full-width, no sidebar)
+    page.tsx            /
+    pricing/page.tsx    /pricing
+  (shop)/
+    layout.tsx          shop chrome (sidebar, header)
+    products/page.tsx   /products
+    cart/page.tsx       /cart
+// the URL derives from the folder path minus the groups</code></pre></div>
+    <h4 id="ch5-groups-layout">Groups are layout carriers</h4>
+    <p>Two sections needing different chrome is the canonical use: public pages get one layout, the authenticated area another, and each group's <code>layout.tsx</code> applies only within it. The same trick works for <code>loading.tsx</code>, <code>error.tsx</code> and <code>template.tsx</code> — a group scopes all of them to its own URLs.</p>
+    <div class="codeWrap"><pre><code>// (shop)/layout.tsx - applies to /products and /cart only
+export default function ShopLayout({ children }: { children: React.ReactNode }) {
+  return (
+    &lt;div&gt;
+      &lt;Sidebar /&gt;          {/* shop-only chrome */}
+      {children}
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// (folder) does not appear in the URL. It exists to organise and to
+// attach a layout without adding a path segment.
+
+app/
+  (marketing)/
+    layout.tsx       a different chrome: full-width, no sidebar
+    page.tsx         -&gt; /
+    about/page.tsx   -&gt; /about
+  (app)/
+    layout.tsx       the app chrome: sidebar, header
+    dashboard/
+      page.tsx       -&gt; /dashboard
+    settings/
+      page.tsx       -&gt; /settings
+
+// / and /about get the marketing layout
+// /dashboard and /settings get the app layout
+// without a group you would need /marketing/about, which is wrong
+
+// groups can nest, and can be combined with dynamic segments
+app/
+  (shop)/
+    [category]/
+      (mobile)/page.tsx
+      (desktop)/page.tsx
+// both resolve to /tools - and because they are in different groups,
+// they can have different layouts
+
+// a group cannot contain its own page.tsx AND a route file at the same
+// level in a way that produces the same URL - that is a build error,
+// which is the point</code></pre></div>
+    <h3 id="ch5-parallel" data-toc>Parallel routes and slots</h3>
+    <p>Parallel routes let one URL render several independent segments at once, and give you named slots to place them.</p>
+    <h4 id="ch5-parallel-slots">Slots render independently</h4>
+    <p>Each <code>@name</code> folder maps to a named prop in the segment's layout — <code>children</code> is just the default slot. Each slot navigates independently: a modal can change its slot's content while the page slot beneath stays mounted, which is how the URL changes without the page behind a dialog unmounting.</p>
+    <div class="codeWrap"><pre><code>// app/dashboard/layout.tsx
+export default function DashboardLayout({
+  children,          // the page slot
+  activity,          // the @activity slot
+}: {
+  children: React.ReactNode;
+  activity: React.ReactNode;
+}) {
+  return (
+    &lt;div className="dashboard"&gt;
+      &lt;main&gt;{children}&lt;/main&gt;
+      &lt;aside&gt;{activity}&lt;/aside&gt;
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <h4 id="ch5-parallel-default">default.tsx is the fallback for unmatched slots</h4>
+    <p>A hard refresh, a direct link or a back navigation can reach a URL that only some slots match — and every slot must render something. <code>default.tsx</code> is that something. Forgetting it turns an innocuous refresh into a 404 that makes no sense to the user; each slot should carry one.</p>
+    <div class="codeWrap"><pre><code>// app/dashboard/@activity/default.tsx - what the slot shows when the URL
+// matches no @activity route (e.g. a hard refresh of /dashboard/settings)
+export default function Default() {
+  return &lt;aside&gt;&lt;p&gt;No activity for this view.&lt;/p&gt;&lt;/aside&gt;;
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// the motivating case: a dashboard with a persistent sidebar that does not
+// re-render on navigation, plus a content area that does.
+
+app/dashboard/
+  layout.tsx                 the shell: sidebar + {children} + {modal}
+  @sidebar/
+    layout.tsx               persists across navigation
+    default.tsx              shown when no match
+    (withNav)/page.tsx       /dashboard       -&gt; with the nav
+    (withoutNav)/page.tsx    /dashboard/full  -&gt; without it
+  @modal/
+    default.tsx              nothing by default
+    login/page.tsx           /dashboard/login -&gt; modal
+    photo/[id]/page.tsx      /dashboard/photo/1 -&gt; modal
+  page.tsx                   /dashboard
+
+// a real modal: the page underneath keeps its state, the modal overlays it
+// app/layout.tsx
+export default function RootLayout({ children, modal }: {
+  children: React.ReactNode;
+  modal: React.ReactNode;        // the @modal slot
+}) {
+  return (
+    &lt;html&gt;
+      &lt;body&gt;
+        {children}
+        {modal}                    {/* renders on top, same URL */}
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}
+
+// navigating to /dashboard/photo/1 does NOT change the URL you see, does
+// NOT unmount the dashboard behind it, and the dashboard's state survives
+
+// on hard refresh of /dashboard/photo/1, only the @modal slot matches, so
+// the @sidebar default.tsx is used. this is why default.tsx exists in
+// every parallel slot: without it, a hard refresh 404s or errors</code></pre></div>
+    <div class="note"><p><code>default.tsx</code> is the file everyone forgets. A parallel slot needs one for the cases where only some slots match a URL — a hard refresh, a direct link, a back navigation. Without it Next.js renders a 404 that makes no sense from the user's point of view.</p></div>
+    <h3 id="ch5-intercepting" data-toc>Intercepting routes</h3>
+    <p>An intercepting route renders a different route's UI in place — usually a modal — when the navigation is client-side, while the real route still serves the full page on a direct load. The mechanism lives entirely in the folder name.</p>
+    <h4 id="ch5-intercepting-matchers">The four matchers, read as sentences</h4>
+    <p>The <code>(...)</code> group tells Next.js which level of the tree to look up when resolving a client navigation. <code>(.)</code> matches the current level, <code>(..)</code> one level up, <code>(..)(..)</code> two levels up, and <code>(...)</code> from the app root. When you write <code>app/@modal/(.)photos/[id]/page.tsx</code>, the <code>(.)</code> says "resolve <code>photos/[id]</code> at the level of the folder that contains <code>@modal</code>". The matcher is a relative path, not a fixed keyword — move the slot and the prefix moves with it.</p>
+    <div class="codeWrap"><pre><code>// the folder prefix IS the matcher. It sits between the slot and the path.
+app/
+  @modal/
+    (.)photos/[id]/page.tsx      // same level as @modal's parent
+    (..)dashboard/[id]/page.tsx  // one level up from the slot
+    (...)login/page.tsx          // from the app root, any depth
+
+// keep the slot (@folder) at the same level as the route it overlays.
+// declared too deep it still compiles, but (.) no longer resolves where
+// you expect and the interception silently stops happening.</code></pre></div>
+    <h4 id="ch5-intercepting-rule">Interception is a soft-navigation-only trick</h4>
+    <p>Interception fires only for client-side navigation. A hard refresh, a shared URL or a crawler request resolves the real route and renders the full page — which is exactly what makes the pattern safe. The modal is a progressive enhancement: the content is a real, linkable page first, and the overlay is added when JavaScript navigates to it. Because of that, the intercepted page must offer a way out that also works when it is loaded directly.</p>
+    <div class="codeWrap"><pre><code>// the close control must work in both states
+'use client';
+import { useRouter } from 'next/navigation';
+
+export function CloseButton() {
+  const router = useRouter();
+  return (
+    &lt;button onClick={() =&gt; router.back()} aria-label="Close"&gt;
+      ×
+    &lt;/button&gt;
+  );
+}
+
+// if the user pasted the URL there is no history entry to go back to,
+// so the full page has to stand on its own. Never assume the modal is
+// open -- one component renders both presentations.</code></pre></div>
+    <div class="codeWrap"><pre><code>// (...)folder means "this segment, but only in this situation".
+// The classic use: a photo URL that shows a MODAL when navigated to
+// client-side, and a full page when loaded directly.
+
+// app/feed/page.tsx                    the feed
+// app/feed/[id]/page.tsx               the photo, full page
+// app/@modal/(.)feed/[id]/page.tsx     the SAME photo, as a modal
+//   the (.) matches one segment level: app/@modal/feed/[id]
+
+// /photos/1 typed or pasted  -&gt; app/photos/[id]/page.tsx, full page
+// clicking a link in the feed -&gt; app/@modal/(.)photos/[id]/page.tsx
+// the modal, the feed stays mounted behind it
+// pressing Escape or backdrop  -&gt; router.back(), the feed is still there
+
+// matcher reference
+//   (.)   same level
+//   (..)  one level above
+//   (..)(..) two levels above
+//   (...) catch-all, from the app root
+
+// the rule: interception only applies to CLIENT-SIDE navigation. A hard
+// refresh always resolves to the real route. This is the behaviour you
+// want — a shared link should not open a modal over nothing.</code></pre></div>
+    <div class="codeWrap"><pre><code>// the full modal example
+// app/photos/[id]/page.tsx - server, the standalone page
+export default async function Page({ params }: { params: Promise&lt;{ id: string }&gt; }) {
+  const { id } = await params;
+  return &lt;PhotoPage id={id} /&gt;;      // full page, chrome included
+}
+
+// app/@modal/(.)photos/[id]/page.tsx - server, the intercepted version
+export default async function Page({ params }: { params: Promise&lt;{ id: string }&gt; }) {
+  const { id } = await params;
+  return (
+    &lt;div className="modal-backdrop" onClick={close}&gt;
+      &lt;div className="modal" onClick={(e) =&gt; e.stopPropagation()}&gt;
+        &lt;PhotoPage id={id} /&gt;
+        &lt;button onClick={close} aria-label="Close"&gt;×&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+  function close() { /* a client component or a form action */ }
+}
+
+// both use the same PhotoPage, so the content logic is written once</code></pre></div>
+    <h3 id="ch5-navigation" data-toc>Programmatic navigation</h3>
+    <p>Most navigation in an App Router app is declarative, through <code>&lt;Link&gt;</code>. The imperative API exists for the moments a link cannot express, and knowing which of the three tools to reach for keeps the client bundle small and the intent obvious.</p>
+    <h4 id="ch5-navigation-link">Reach for Link first, the router second</h4>
+    <p><code>&lt;Link&gt;</code> is the declarative default and should be the first tool you reach for. It prefetches, it works without JavaScript, and it participates in the router cache. <code>router.push</code> from <code>useRouter</code> exists for the cases a link cannot express: after a form submission, inside a callback, or conditional on state. For a server decision there is neither — call <code>redirect()</code>, which needs no client JavaScript at all.</p>
+    <div class="codeWrap"><pre><code>// 1. declarative -- works with JS disabled, prefetched
+import Link from 'next/link';
+&lt;Link href="/products"&gt;Products&lt;/Link&gt;;
+
+// 2. imperative -- only when a link cannot be used
+'use client';
+import { useRouter } from 'next/navigation';
+const router = useRouter();
+async function onSubmit() {
+  await save();
+  router.push('/products/123');   // navigate after an event
+}
+
+// 3. redirect on the server -- no client bundle involved
+import { redirect } from 'next/navigation';
+export default async function Page() {
+  const user = await getUser();
+  if (!user) redirect('/login');
+  return &lt;Dashboard user={user} /&gt;;
+}</code></pre></div>
+    <h4 id="ch5-navigation-hooks">The four navigation hooks</h4>
+    <p><code>next/navigation</code> ships four hooks you will use constantly: <code>useRouter</code> for the imperative methods, <code>usePathname</code> for the current path, <code>useSearchParams</code> for the query string, and <code>useParams</code> for the dynamic segments. All four are client hooks. <code>useSearchParams</code> is the one that bites — it suspends, so during static rendering it must sit under a <code>&lt;Suspense&gt;</code> boundary or the whole route is treated as dynamic.</p>
+    <div class="codeWrap"><pre><code>'use client';
+import {
+  useRouter, usePathname, useSearchParams, useParams,
+} from 'next/navigation';
+
+export function Filters() {
+  const router = useRouter();
+  const pathname = usePathname();      // '/products'
+  const search = useSearchParams();    // ?sort=price
+  const params = useParams();          // { id: '42' } from [id]
+
+  function setSort(value: string) {
+    const next = new URLSearchParams(search);
+    next.set('sort', value);
+    router.replace(`${pathname}?${next.toString()}`);
+  }
+
+  return &lt;select onChange={(e) =&gt; setSort(e.target.value)}&gt;...&lt;/select&gt;;
+}</code></pre></div>
+    <div class="codeWrap"><pre><code>// declarative, and the default
+import Link from 'next/link';
+
+return &lt;Link href="/products"&gt;Products&lt;/Link&gt;;
+return &lt;Link href={`/products/${id}`}&gt;Product&lt;/Link&gt;;
+return &lt;Link href="/settings" scroll={false}&gt;Keep scroll position&lt;/Link&gt;;
+return &lt;Link href="/products" prefetch={false}&gt;No prefetch on a huge list&lt;/Link&gt;;
+return &lt;Link href="/docs" replace&gt;Do not add a history entry&lt;/Link&gt;;
+
+// replacing a route group
+// a Link to /dashboard targets app/(app)/dashboard/page.tsx if that is
+// the one matching. if two groups produce the same URL, the build
+// errors — which prevents a genuinely ambiguous route
+
+// programmatic, when you must
+'use client';
+import { useRouter, usePathname, useSearchParams, useParams } from 'next/navigation';
+
+function Examples() {
+  const router = useRouter();
+  const pathname = usePathname();          // '/dashboard'
+  const search = useSearchParams();        // ?tab=stats
+  const params = useParams();              // { id: '1' } from [id]
+
+  router.push('/dashboard');               // adds a history entry
+  router.replace('/dashboard');            // does not
+  router.back();
+  router.forward();
+  router.refresh();                        // re-fetch the RSC payload
+  router.prefetch('/products');            // warm the cache
+
+  return (
+    &lt;&gt;
+      &lt;p&gt;{pathname}&lt;/p&gt;
+      &lt;p&gt;{search.get('tab')}&lt;/p&gt;
+    &lt;/&gt;
+  );
+}
+
+// IMPORTANT: useSearchParams needs a Suspense boundary above it during
+// static rendering, or the whole route becomes dynamic. This is a real
+// build-time error in Next 15, not a runtime warning.
+export default function Page() {
+  return (
+    &lt;Suspense fallback={&lt;Loading /&gt;}&gt;
+      &lt;ComponentThatUsesSearchParams /&gt;
+    &lt;/Suspense&gt;
+  );
+}</code></pre></div>
+    <h3 id="ch5-links" data-toc>Link prefetching</h3>
+    <p>Next.js prefetches links that enter the viewport, turning a click into an instant swap when it can. Understanding what is actually prefetched — and when to stop it — is the difference between a snappy app and a thousand wasted requests.</p>
+    <h4 id="ch5-links-what">What actually gets prefetched</h4>
+    <p>A <code>&lt;Link&gt;</code> in the viewport triggers a prefetch. What arrives depends on the route: a static route downloads the full RSC payload, while a dynamic route fetches only the reusable part above the nearest <code>loading.tsx</code> — the static shell. That is why adding a <code>loading.tsx</code> makes a dynamic route perceptibly faster to navigate to: it gives Next.js something cacheable to prefetch in advance.</p>
+    <div class="codeWrap"><pre><code>// static route: the whole payload is prefetched
+// app/about/page.tsx
+export default function About() { return &lt;h1&gt;About&lt;/h1&gt;; }
+
+// dynamic route: only the shell above loading.tsx is prefetched
+// app/reports/page.tsx
+export const dynamic = 'force-dynamic';
+
+// app/reports/loading.tsx -- the boundary that makes it worthwhile
+export default function Loading() { return &lt;ReportSkeleton /&gt;; }
+
+// without a loading boundary a fully dynamic route has little to
+// prefetch, so the navigation falls back to fetching on click.</code></pre></div>
+    <h4 id="ch5-links-optout">When to turn prefetching off</h4>
+    <p>Prefetching is not free: every link in the viewport is a request. A list of a thousand rows prefetches a thousand routes. Turn it off with <code>prefetch={false}</code> on links you do not expect most users to follow — admin pages, a "generate report" action, anything behind a paywall. When you want the benefit without the blanket cost, prefetch on intent instead, from <code>onMouseEnter</code>.</p>
+    <div class="codeWrap"><pre><code>// a long list: opt out of per-row prefetching
+{items.map((item) =&gt; (
+  &lt;Link key={item.id} href={`/items/${item.id}`} prefetch={false}&gt;
+    {item.name}
+  &lt;/Link&gt;
+))}
+
+// prefetch on intent instead: the user is clearly heading there
+'use client';
+import { useRouter } from 'next/navigation';
+const router = useRouter();
+&lt;Link
+  href="/report"
+  prefetch={false}
+  onMouseEnter={() =&gt; router.prefetch('/report')}
+&gt;
+  Generate report
+&lt;/Link&gt;</code></pre></div>
+    <div class="codeWrap"><pre><code>// &lt;Link&gt; prefetches automatically when it enters the viewport. For
+// static routes that is the full HTML; for dynamic routes it is the
+// RSC payload up to the nearest loading.tsx boundary, split into a
+// static shell and a dynamic part.
+
+&lt;Link href="/about"&gt;Static page&lt;/Link&gt;        {/* prefetched fully */}
+
+export const dynamic = 'force-dynamic';
+// app/reports/page.tsx
+&lt;Link href="/reports"&gt;Dynamic page&lt;/Link&gt;      {/* partially prefetched */}
+
+// the "partial" bit is the loading.tsx shell. without it, Next.js
+// prefetches nothing for a dynamic route, because it cannot know how
+// much of the payload is reusable.
+
+export const dynamic = 'force-dynamic';
+// app/reports/loading.tsx
+export default function Loading() {
+  return &lt;ReportSkeleton /&gt;;          // now this IS prefetched
+}
+
+// when to opt out
+//   - a link inside a list of 1,000 items: 1,000 prefetches
+//   - a link behind a paywall or to an admin area
+//   - a link you never expect a user to follow
+&lt;Link href="/report" prefetch={false}&gt;Generate report&lt;/Link&gt;
+
+// prefetching on demand instead
+'use client';
+const router = useRouter();
+&lt;button onMouseEnter={() =&gt; router.prefetch('/report')}&gt;
+  Generate report
+&lt;/button&gt;</code></pre></div>
+    <div class="tip"><p>If a navigation feels slow and the Network panel shows no request, the route's RSC payload was already prefetched and it is rendering on the client — the cost is then a client render, not a round trip. If you see a request, it was not prefetched. That distinction tells you which problem you have.</p></div>
+    <h3 id="ch5-middleware-routing" data-toc>Rewrites, redirects and middleware</h3>
+    <p>Rewrites, redirects and middleware all run before your page does, and choosing between them is a question of when the decision can be made. Static rules run at config time, middleware runs on every request, and the route itself has full Node access.</p>
+    <h4 id="ch5-middleware-place">Where each rule belongs</h4>
+    <p>There are three places to put request-time logic, and picking the wrong one is a common source of latency. Static <code>rewrites</code> and <code>redirects</code> in <code>next.config.js</code> are evaluated cheaply and never run code per request. Middleware runs on the edge for every matched request and is right for auth gates, A/B assignment and setting headers. Anything that needs a database or Node APIs belongs in the route itself, not in middleware.</p>
+    <div class="codeWrap"><pre><code>// next.config.js -- cheapest; no request-time code
+export default {
+  async redirects() {
+    return [{ source: '/blog', destination: '/news', permanent: true }];
+  },
+  async rewrites() {
+    return [{ source: '/docs/:path*', destination: '/documentation/:path*' }];
+  },
+};
+
+// middleware.ts -- per-request, edge runtime
+export { default } from './lib/auth-middleware';
+export const config = { matcher: ['/dashboard/:path*'] };
+
+// the route itself -- Node runtime, database allowed
+export default async function Page() {
+  const posts = await db.post.findMany();   // never in middleware
+  return &lt;Feed posts={posts} /&gt;;
+}</code></pre></div>
+    <h4 id="ch5-middleware-do">What middleware must not do</h4>
+    <p>Middleware runs before routing, on a runtime without Node's full API surface, and on every matched request. Keep it to cheap, stateless decisions: reading a cookie, checking a signed token, rewriting or redirecting, and copying request headers forward. Do not query a database, parse large bodies or block on remote calls — the latency is paid on every request, including the ones that turn out to be for a static asset.</p>
+    <div class="codeWrap"><pre><code>// good: a cheap gate that also forwards a header to the route
+import { NextResponse, type NextRequest } from 'next/server';
+
+export function middleware(req: NextRequest) {
+  const session = req.cookies.get('session')?.value;
+  if (!session &amp;&amp; req.nextUrl.pathname.startsWith('/dashboard')) {
+    const url = new URL('/login', req.url);
+    url.searchParams.set('next', req.nextUrl.pathname);
+    return NextResponse.redirect(url);       // no database call here
+  }
+  const headers = new Headers(req.headers);
+  headers.set('x-user', session ? 'authenticated' : 'guest');
+  return NextResponse.next({ request: { headers } });
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/settings/:path*'],   // not ".*"
+};</code></pre></div>
+    <div class="codeWrap"><pre><code>// next.config.js - static rules, no request body, cheap
+async rewrites() {
+  return {
+    beforeFiles: [
+      { source: '/docs/:path*', destination: '/documentation/:path*' },
+    ],
+    afterFiles: [
+      { source: '/old-blog/:slug', destination: '/blog/:slug' },
+    ],
+    fallback: [
+      { source: '/api/:path*', destination: '/api/v2/:path*' },
+    ],
+  };
+}
+
+async redirects() {
+  return [
+    { source: '/blog', destination: '/news', permanent: true },
+  ];
+}
+
+// middleware.ts - dynamic, runs on every matching request, and is where
+// auth lives
+import { NextResponse, type NextRequest } from 'next/server';
+
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const token = req.cookies.get('session')?.value;
+
+  if (!token &amp;&amp; pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/login?next=' + pathname, req.url));
+  }
+  if (token &amp;&amp; pathname === '/login') {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
+  }
+
+  // a request header the server can read
+  const headers = new Headers(req.headers);
+  headers.set('x-pathname', pathname);
+  return NextResponse.next({ request: { headers } });
+}
+
+export const config = {
+  // exclude static assets and the API routes you do not want to guard.
+  // matchers are an optimisation AND a correctness tool.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/health).*)'],
+};
+
+// middleware runs on the EDGE runtime by default, so no Node APIs.
+// it is not a place for database queries or slow crypto.
+
+// order of operations
+//   1. headers   (next.config)
+//   2. redirects (next.config)
+//   3. middleware
+//   4. beforeFiles rewrites
+//   5. filesystem routes (public/, _next/static, pages, app)
+//   6. afterFiles rewrites
+//   7. dynamic routes
+//   8. fallback rewrites
+//   9. 404</code></pre></div>
+    <div class="warn"><p>Middleware runs on <strong>every</strong> matched request including static assets, unless your matcher excludes them. A matcher that does not exclude <code>_next/static</code> can add latency to every page load in your app and, on some platforms, count against a request quota. Always exclude <code>_next/static</code>, <code>_next/image</code> and your own static files.</p></div>
+    <div class="ex"><h4>Exercises 5</h4><ol>
+      <li>Build a docs site using <code>app/docs/[...path]/page.tsx</code> reading from the filesystem. Then attempt a path traversal with <code>/docs/../../etc/passwd</code> and confirm your validation blocks it.</li>
+      <li>Restructure an existing app with <code>(marketing)</code> and <code>(app)</code> groups so both sections have their own layout without changing any URL. Verify every existing link still works.</li>
+      <li>Build a dashboard with a <code>@sidebar</code> parallel route and an <code>@modal</code> slot containing an intercepted <code>(.)photos/[id]</code> route. Verify the sidebar state survives opening and closing the modal, and that a hard refresh of the modal URL shows a usable page.</li>
+      <li>Add a <code>loading.tsx</code> to a dynamic route and measure the prefetch effect in the Network panel. Confirm the difference with <code>prefetch={false}</code>.</li>
+      <li>Write a middleware matcher that guards only <code>/dashboard</code> and <code>/settings</code>, and prove via response timing that <code>_next/static</code> requests are not passing through it.</li>
+    </ol></div>
+  </section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Next.js 15 - App Router, Server Components & Rendering.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

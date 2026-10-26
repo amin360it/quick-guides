@@ -1,0 +1,435 @@
+  <section class="chapter">
+<h2 id="ch17" data-toc>17 · Forms</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Forms</button><div class="ch-toc-list"><a href="#ch17-controlled">Controlled, uncontrolled and when</a><a href="#ch17-validation">Validation as data, not as panic</a><a href="#ch17-actions">Submit flows with useActionState</a><a href="#ch17-complex">Dependent fields and complex forms</a><a href="#ch17-a11y">Errors, focus and accessibility</a></div></div>
+    <p class="topic-desc">Forms are where React's declarative model meets the browser's oldest, most behaviour-heavy API — native validation, autofill, Enter-to-submit, file inputs — and the design question underneath every other is who owns the field's value. Get that right and validation, submission and error display become data problems; get it wrong and every form in the application accumulates its own collection of state and effects.</p>
+    <h3 id="ch17-controlled" data-toc>Controlled, uncontrolled and when</h3>
+    <p>Two ways to own a value, with a real trade rather than a legacy and a modern. A controlled input's value lives in React state and the DOM mirrors it — every keystroke flows through a change handler and back down. An uncontrolled input's value lives in the DOM and React reads it on demand, via a ref or the <code>FormData</code> handed to a submit handler. Controlled wins when React must react while the user types: enabling a submit button, formatting as they go, showing inline availability, filtering a list above the field. Uncontrolled wins when the form's value matters only at submission — which is most forms — because it removes a state variable and a re-render per keystroke per field, and it gets browser behaviours for free: autofill, spellcheck restoration, and Enter-to-submit that does not depend on your handler wiring.</p>
+    <p>The pattern that combines both honestly is uncontrolled by default with controlled islands: the form submits through native <code>FormData</code>, and only the fields that need live reactivity get state. This inverts the reflex many teams build — a state variable per field, a handler per field, a controlled input everywhere — which produces forms that re-render the whole subtree on every keystroke of any field and whose submit handler re-reads state that the DOM already holds. The tell that you have over-controlled is a change handler whose body is <code>setState</code> and nothing else on a field nothing else reads.</p>
+    <div class="codeWrap"><pre><code>// uncontrolled form: the DOM owns values until submit
+function CreateInvoice() {
+  function handleSubmit(formData) {
+    // FormData reads the DOM - no state, no per-keystroke render
+    const payload = {
+      customer: String(formData.get('customer') || ''),
+      amountCents: Math.round(Number(formData.get('amount')) * 100),
+      due: String(formData.get('due') || ''),
+    };
+    api.createInvoice(payload);
+  }
+  return (
+    &lt;form action={handleSubmit}&gt;
+      &lt;input name="customer" required /&gt;
+      &lt;input name="amount" type="number" step="0.01" required /&gt;
+      &lt;input name="due" type="date" required /&gt;
+      &lt;button type="submit"&gt;Create&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}
+
+// controlled only where React must REACT while typing
+function SearchField({ onQuery }) {
+  const [q, setQ] = useState('');          // justified: results depend on it
+  return (
+    &lt;&gt;
+      &lt;input value={q} onChange={(e) =&gt; setQ(e.target.value)} /&gt;
+      &lt;button disabled={q.length === 0} onClick={() =&gt; onQuery(q)}&gt;Search&lt;/button&gt;
+    &lt;/&gt;
+  );
+}</code></pre></div>
+    <p>Controlled inputs also impose a contract that catches teams out: a controlled input with no change handler is a field the user cannot type in, because React overwrites the DOM after every keystroke with the state that did not move. And when state and DOM disagree — a masked phone formatter that rejects the character the user typed — the cursor jumps to the end, because the browser re-rendered the value wholesale. Both failures are the same root: for a controlled input, React state is the value, and the DOM is display. Accept that for the fields where you need the reaction, and leave the rest uncontrolled.</p>
+    <div class="codeWrap"><pre><code>// the two classic controlled-input failures
+function Broken() {
+  const [v, setV] = useState('hello');
+  // no onChange: React restores "hello" after every keystroke - typing dies
+  return &lt;input value={v} /&gt;;
+}
+
+function Jumpy({ raw, setRaw }) {
+  // formatter that refuses input: state stays put, DOM resets, caret jumps
+  const formatted = formatPhone(raw);
+  return (
+    &lt;input value={formatted}
+           onChange={(e) =&gt; {
+             const digits = e.target.value.replace(/\D/g, '');
+             setRaw(digits);            // reject nothing: keep the raw value,
+           }} /&gt;                        // format only the DISPLAY
+  );
+}
+
+// the fix pattern: raw value in state, formatted value derived for display
+function PhoneField() {
+  const [raw, setRaw] = useState('');
+  return &lt;input value={formatPhone(raw)} onChange={(e) =&gt; setRaw(digitsOf(e.target.value))} /&gt;;
+}</code></pre></div>
+    <h4>Defaults, resets and dirty tracking</h4>
+    <p>Uncontrolled inputs take their initial value from <code>defaultValue</code> — and the moment a server response arrives after mount, the pattern changes: either set a <code>key</code> on the inputs to remount them with the loaded values (the simple, correct move), or read them at submit and let the loader's data sit in a ref. Dirty tracking, similarly, is native rather than React's problem: <code>form</code> elements expose <code>elements</code> and the browser tracks changes — or use a tiny ref-set of initial values compared at submit. Reaching for state to answer "did this change since load" is the sign you are re-implementing <code>form.dirty</code> by hand, with a re-render per keystroke as the price.</p>
+    <div class="codeWrap"><pre><code>// server data arrives late: remount the fields with the new defaults
+function EditProfileForm({ profilePromise }) {
+  const profile = use(profilePromise);
+  return (
+    // key change -&gt; inputs remount with fresh defaultValue
+    &lt;EditForm key={profile.id} profile={profile} /&gt;
+  );
+}
+
+function EditForm({ profile }) {
+  return (
+    &lt;form action={saveProfile}&gt;
+      &lt;input type="hidden" name="id" value={profile.id} /&gt;
+      {/* uncontrolled: defaultValue set once at mount, DOM owns it after */}
+      &lt;input name="name" defaultValue={profile.name} /&gt;
+      &lt;input name="email" defaultValue={profile.email} /&gt;
+      &lt;button type="submit"&gt;Save&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre></div>
+    <div class="note"><p>Choosing <code>key</code> remount over syncing state is not a shortcut — it is the honest expression of "these fields now describe a different record". State syncing keeps stale cursors and half-typed edits alive across an identity change; remounting makes the identity change mean what it says.</p></div>
+    <h3 id="ch17-validation" data-toc>Validation as data, not as panic</h3>
+    <p>Validation answers two different questions at two different times, and conflating them is the source of hostile form UX. During typing, the goal is guidance: format hints, availability, "must be at least 8 characters" — non-blocking, announced politely, never preventing the user from continuing to type. At submit, the goal is rejection: every rule the server enforces, evaluated in one pass, producing a complete map of what is wrong so the user fixes everything at once and resubmits once. Reactive per-keystroke rejection — an error appearing the instant a field is half-filled — optimises for the validator's correctness and against the user, who has not finished the thought.</p>
+    <p>The structural rule that keeps validation honest: the server is the enforcement point and the client is the courtesy. Every rule runs on the server in the submit action, because the client copy is advisory by definition — it can be bypassed with devtools, skipped by an autofilled payload, or simply stale after a rules change. The client copy exists to save a round trip and to give immediate guidance, and it must be derived from one shared rule description rather than a second, drifting implementation: a schema (Zod, Valibot, your own plain functions) imported by both the client validator and the server action is one source, two call sites, zero drift.</p>
+    <div class="codeWrap"><pre><code>// one schema, two call sites: client courtesy, server enforcement
+const signupSchema = {
+  email: (v) =&gt; (!/^[^@]+@[^@]+\.[^@]+$/.test(v) ? 'Enter a valid email' : null),
+  password: (v) =&gt; (v.length &lt; 8 ? 'At least 8 characters' : null),
+  plan: (v) =&gt; (['free', 'team'].includes(v) ? null : 'Choose a plan'),
+};
+
+// client: the same functions, run at submit for immediate guidance
+function validateSignup(values) {
+  return Object.fromEntries(
+    Object.entries(signupSchema)
+      .map(([field, rule]) =&gt; [field, rule(String(values[field] || ''))])
+      .filter(([, err]) =&gt; err)
+  );
+}
+
+// server action: the enforcement point - runs regardless of the above
+async function signupAction(prev, formData) {
+  const values = Object.fromEntries(formData.entries());
+  const errors = validateSignup(values);
+  if (Object.keys(errors).length) return { errors, values };   // as data
+  // ...create the account; a rule the client missed is caught HERE
+}</code></pre></div>
+    <p>Error display follows the two modes. Inline guidance renders beside its field, tied with <code>aria-describedby</code> so assistive tech reads it when focus lands; submit errors render as a summary at the top with links to each field, because after a failed submit the user's next action is to fix, and a summary turns seven trips into one. The pattern worth copying from server-rendered forms is the error summary's focus behaviour: move focus to the summary on failed submit, so the keyboard and screen-reader user is put exactly where the work is rather than left at the button they just pressed.</p>
+    <div class="codeWrap"><pre><code>// submit errors as a focused summary with links to each field
+function ErrorSummary({ errors, idFor }) {
+  const ref = useRef(null);
+  useEffect(() =&gt; { ref.current?.focus(); }, [errors]);   // on failed submit
+  if (!errors || !Object.keys(errors).length) return null;
+
+  return (
+    &lt;div role="alert" tabIndex={-1} ref={ref} className="error-summary"&gt;
+      &lt;h2&gt;Fix {Object.keys(errors).length} problems before submitting&lt;/h2&gt;
+      &lt;ul&gt;
+        {Object.entries(errors).map(([field, msg]) =&gt; (
+          &lt;li key={field}&gt;
+            &lt;a href={'#' + idFor(field)} onClick={(e) =&gt; {
+              e.preventDefault();
+              document.getElementById(idFor(field))?.focus();
+            }}&gt;{msg}&lt;/a&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <h4>When to validate: blur, change, or submit</h4>
+    <p>A per-field policy beats a global one: validate on blur for format rules (the user has left the field, the hint is no longer interrupting), on submit for cross-field and business rules (they need the whole form), and on change only for cheap, purely-local constraints where the feedback is the input itself — a character counter, a confirm-password match. What all three share is that a rule, once it has failed at submit, re-validates on the next change of that field: a user correcting an error expects the red to clear as they type, not on the following submit. That single re-check is the difference between a form that feels responsive after failure and one that feels stuck.</p>
+    <div class="codeWrap"><pre><code>// per-field timing: blur guides, submit judges, change re-checks failures
+function useFieldValidation(name, rule, formState) {
+  const [touched, setTouched] = useState(false);
+  const failedAtSubmit = Boolean(formState.errors?.[name]);
+  const error = touched || failedAtSubmit ? rule(value) : null;
+
+  return {
+    'aria-invalid': error ? true : undefined,
+    'aria-describedby': error ? name + '-error' : undefined,
+    onBlur: () =&gt; setTouched(true),
+    error,
+  };
+}
+
+// cross-field rules run once, at submit, against the whole form
+function validateAll(values) {
+  const errors = {};
+  if (values.password !== values.confirm) errors.confirm = 'Passwords must match';
+  if (values.startDate &gt; values.endDate) errors.endDate = 'Ends before it starts';
+  return errors;                       // complete map: one resubmit, not seven
+}</code></pre></div>
+    <div class="warn"><p>Never clear a field's error only on submit. A user who is told "passwords must match" and watches the red stay while they fix the confirm field has been given a form that appears not to notice them — the correction loop must close on the next keystroke of the offending field, or the guidance reads as a verdict.</p></div>
+    <h3 id="ch17-actions" data-toc>Submit flows with useActionState</h3>
+    <p>Chapter 13 introduced actions; this section is about what a production submit flow needs around them. The shape: the action validates first (server rules, as data), then mutates, then returns a state that carries either field errors or a success marker — and the component renders exactly those two outcomes. The pending flag drives the button, and because the action runs as a transition, the rest of the form stays interactive during submission: the user can fix a typo in another field while the first attempt is in flight. What disappears is the entire isLoading choreography — no <code>useState</code> for submission, no effect watching a flag, no manual reset-on-success: the hook's returned state is the flow.</p>
+    <p>Two behaviours worth designing explicitly, because the default experience omits them. Double submission: the pending flag disables the button, but Enter in a text field can still fire — make the action itself idempotent per submission (a token generated once per form mount, passed through FormData) rather than relying on UI state to serialise network calls. And success versus reset: a create-form that returns a success state should clear the uncontrolled inputs on the next render — either remount the form with a key or, better for a create-then-continue flow, keep the values and show the success inline, because silently wiping a form the user is still adding to is worse than leaving it filled.</p>
+    <div class="codeWrap"><pre><code>// a production submit flow: idempotent action, errors as data, one state
+async function createTicket(prevState, formData) {
+  const submitToken = String(formData.get('token') || '');
+  const title = String(formData.get('title') || '').trim();
+
+  if (title.length &lt; 5) {
+    return { errors: { title: 'Give it a real title (5+ characters)' },
+             values: Object.fromEntries(formData.entries()) };
+  }
+  try {
+    const ticket = await api.createTicket({ title, submitToken });  // dedupes
+    return { ok: true, ticketId: ticket.id };
+  } catch (err) {
+    return { errors: { form: err.message || 'Could not create the ticket' },
+             values: Object.fromEntries(formData.entries()) };
+  }
+}
+
+function NewTicketForm() {
+  const [state, action, pending] = useActionState(createTicket, { errors: {} });
+  const token = useRef(crypto.randomUUID()).current;   // one per mount
+
+  if (state.ok) return &lt;TicketCreated id={state.ticketId} /&gt;;
+
+  return (
+    &lt;form action={action}&gt;
+      &lt;input type="hidden" name="token" value={token} /&gt;
+      &lt;ErrorSummary errors={state.errors} /&gt;
+      &lt;input name="title" defaultValue={state.values?.title || ''}
+             aria-invalid={state.errors.title ? true : undefined} /&gt;
+      {state.errors.title &amp;&amp; &lt;p role="alert"&gt;{state.errors.title}&lt;/p&gt;}
+      &lt;button disabled={pending}&gt;{pending ? 'Creating…' : 'Create ticket'}&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre></div>
+    <p>The action's returned state should be shaped for rendering, not for transport: field errors keyed by field, the submitted values so the form can re-render filled after a failure, and a discriminated outcome (<code>ok</code> versus <code>errors</code>) the component switches on. What does not belong is transport detail — status codes, response objects, error instances the client would have to interpret. Keep the boundary thin: the action translates the world into renderable state, and the component never learns how the network works. This is also what makes the same action usable from a server submission without JavaScript, since the state shape is already the first response's content.</p>
+    <div class="codeWrap"><pre><code>// state shaped for rendering, not for transport
+async function saveSettings(prev, formData) {
+  const values = pickSettings(Object.fromEntries(formData.entries()));
+
+  const invalid = validateSettings(values);        // field-keyed map
+  if (invalid) return { status: 'invalid', errors: invalid, values };
+
+  try {
+    const saved = await api.saveSettings(values);
+    return { status: 'saved', values: saved, at: Date.now() };
+  } catch (err) {
+    // translate once, here: the component sees a message, not a status code
+    return { status: 'failed',
+             errors: { form: translateSaveError(err) },
+             values };
+  }
+}
+
+// the component renders the three outcomes it declared
+function SettingsForm() {
+  const [state, action, pending] = useActionState(saveSettings, { status: 'idle', errors: {} });
+  return (
+    &lt;form action={action}&gt;
+      {state.status === 'saved' &amp;&amp; &lt;SavedBanner at={state.at} /&gt;}
+      {state.errors.form &amp;&amp; &lt;FormError message={state.errors.form} /&gt;}
+      {/* fields + field errors as in the previous sample */}
+    &lt;/form&gt;
+  );
+}</code></pre></div>
+    <h4>After success: navigation, invalidation, next step</h4>
+    <p>A successful mutation is not the end of the flow — it decides what the user sees next. Create-then-inspect navigates to the new record's canonical URL (chapter 16: the old URL is stale, replace into the new one). Create-another stays put with a cleared form and a success banner. Edit-in-place stays and marks saved. Whichever the product calls for, the cache side is the same: invalidate the keys the mutation touched (chapter 15), so every other screen showing the old value refetches. A submit flow that returns success while three screens still show pre-mutation data has not finished, no matter what the button says.</p>
+    <div class="codeWrap"><pre><code>// the submit flow ends with the app consistent, not just the button happy
+async function createProjectAction(prev, formData) {
+  const name = String(formData.get('name') || '').trim();
+  if (name.length &lt; 3) return { errors: { name: 'Too short' }, values: { name } };
+
+  const project = await api.createProject({ name });
+  // cache: every list that will mention this project
+  await queryClient.invalidateQueries({ queryKey: ['projects'] });
+  // navigation: the canonical URL for what was created (replace: the form
+  // entry is not a place the user needs to come back to)
+  navigate('/projects/' + project.id, { replace: true });
+  return { ok: true };
+}
+
+// create-another variant: stay, clear via key, keep the success visible
+function CreateTicketForm() {
+  const [formKey, setFormKey] = useState(0);
+  const [state, action, pending] = useActionState(createTicket, { errors: {} });
+  if (state.ok) {
+    return (
+      &lt;&gt;
+        &lt;TicketCreatedBanner id={state.ticketId} /&gt;
+        &lt;button onClick={() =&gt; { setFormKey((k) =&gt; k + 1); resetAction(); }}&gt;
+          Create another
+        &lt;/button&gt;
+      &lt;/&gt;
+    );
+  }
+  return &lt;TicketFields key={formKey} action={action} pending={pending} /&gt;;
+}</code></pre></div>
+    <div class="tip"><p>Write the submit flow's outcome table before the code: invalid (errors + preserved values), failed (message + preserved values), success (navigate / clear / stay), and what each does to cache and focus. Four rows, one page — and every form in the application can be reviewed against it in a minute.</p></div>
+    <h3 id="ch17-complex" data-toc>Dependent fields and complex forms</h3>
+    <p>Real forms exceed the flat name-value model: fields that appear based on other fields, arrays of rows, groups that validate together, and inputs whose valid values depend on a server-known set. The design axis for all of them is where the shape of the form comes from. If the shape is static, uncontrolled + FormData carries you all the way. If the shape changes with the data — country select feeding state select, plan select revealing seat count — the shape itself becomes derived state, and the honest expression is a schema describing the form, rendered into fields, rather than a nest of conditionals scattered through JSX. A form schema turns "what fields exist" into data that validation, defaults and rendering all read from one place.</p>
+    <p>Dependent fields specifically: the dependency must flow through a single derived value, not through each field syncing with its neighbour. Country determines the state list — derive the state options from the selected country in render, keep the selected country in state (it is controlled: the second field reacts to it), and clear the state field's value when the country changes, because an inherited value from the previous country is invalid by definition. That clearing rule is the bug teams miss: without it, the form happily submits "California" with country "France", and the server rejects a form the UI showed as valid.</p>
+    <div class="codeWrap"><pre><code>// dependent fields: one derivation, one clearing rule
+function AddressFields() {
+  const [country, setCountry] = useState('US');
+  const [region, setRegion] = useState('');
+
+  // the options are DERIVED from the controlling field, not synced to it
+  const regions = REGIONS[country] || [];
+
+  // clearing rule: a value from the previous shape is invalid by definition
+  function handleCountry(next) {
+    setCountry(next);
+    setRegion('');                     // do NOT carry the old region forward
+  }
+
+  return (
+    &lt;fieldset&gt;
+      &lt;label&gt;Country
+        &lt;select value={country} onChange={(e) =&gt; handleCountry(e.target.value)}&gt;
+          {COUNTRIES.map((c) =&gt; &lt;option key={c} value={c}&gt;{c}&lt;/option&gt;)}
+        &lt;/select&gt;
+      &lt;/label&gt;
+      &lt;label&gt;State / region
+        &lt;select value={region} onChange={(e) =&gt; setRegion(e.target.value)}
+                disabled={regions.length === 0}&gt;
+          {regions.map((r) =&gt; &lt;option key={r} value={r}&gt;{r}&lt;/option&gt;)}
+        &lt;/select&gt;
+      &lt;/label&gt;
+      {/* the submit payload reads BOTH - the server re-checks the pair */}
+    &lt;/fieldset&gt;
+  );
+}</code></pre></div>
+    <p>Array fields — line items, attendees, phone numbers — need three operations (append, remove, reorder) each preserving each row's own field state, and the row identity question from chapter 1 reappears verbatim: rows keyed by a stable id, never by index, or removing row two reassigns every subsequent row's key and React swaps the DOM nodes instead of removing one, carrying any focused input's value into a different row's field. With uncontrolled rows the id is still required for the same reason; with controlled rows the index key produces the classic "deleting a row edits the wrong row" report. Generate the id when the row is created, keep it in the row's data, and the three operations become list transformations with no DOM surprises.</p>
+    <div class="codeWrap"><pre><code>// array fields: stable row ids, not indices
+function LineItems({ items, onChange }) {
+  function add() {
+    onChange([...items, { id: crypto.randomUUID(), desc: '', amount: '' }]);
+  }
+  function remove(id) {
+    onChange(items.filter((r) =&gt; r.id !== id));   // keys survive: one removal
+  }
+  function update(id, patch) {
+    onChange(items.map((r) =&gt; (r.id === id ? { ...r, ...patch } : r)));
+  }
+
+  return (
+    &lt;table&gt;
+      &lt;tbody&gt;
+        {items.map((row) =&gt; (
+          &lt;tr key={row.id}&gt;   {/* NEVER key={index} - deletion would shift
+                                  every field's identity below this row */}
+            &lt;td&gt;&lt;input value={row.desc}
+                       onChange={(e) =&gt; update(row.id, { desc: e.target.value })} /&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;input value={row.amount}
+                       onChange={(e) =&gt; update(row.id, { amount: e.target.value })} /&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;button type="button" onClick={() =&gt; remove(row.id)}&gt;Remove&lt;/button&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+        ))}
+      &lt;/tbody&gt;
+      &lt;tfoot&gt;&lt;tr&gt;&lt;td colSpan={3}&gt;
+        &lt;button type="button" onClick={add}&gt;Add line&lt;/button&gt;
+      &lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+    &lt;/table&gt;
+  );
+}</code></pre></div>
+    <h4>Server-shaped option sets</h4>
+    <p>When a field's options come from the server — available plans, assignable users, permitted statuses — the option set is data with its own lifecycle, and it needs its own owner. Fetch it through the cache (chapter 15) with a key, not in an effect into local state, so the select renders immediately from cached options on the next form and two forms do not disagree about what the plan list is. Guard the submitted value against the set: if the options loaded after the field was preselected, or another user's plan changed meanwhile, the value in the field may no longer exist server-side — validate membership in the action against a fresh read, because the form's option list is a cache, and caches are exactly what the server does not trust.</p>
+    <div class="codeWrap"><pre><code>// server-owned options: cached, shared, re-validated at submit
+function PlanSelect({ value }) {
+  const { data: plans = [], isPending } = useQuery({
+    queryKey: ['plans'],
+    queryFn: () =&gt; api.listPlans(),
+    staleTime: 5 * 60_000,            // plan lists change rarely
+  });
+  return (
+    &lt;select name="plan" defaultValue={value} disabled={isPending}&gt;
+      {plans.map((p) =&gt; &lt;option key={p.id} value={p.id}&gt;{p.name}&lt;/option&gt;)}
+    &lt;/select&gt;
+  );
+}
+
+// the action re-checks membership: the form's list is a cache, and the
+// server does not trust caches
+async function changePlan(prev, formData) {
+  const planId = String(formData.get('plan'));
+  const plans = await api.listPlans();               // authoritative
+  if (!plans.some((p) =&gt; p.id === planId)) {
+    return { errors: { plan: 'That plan is no longer available' } };
+  }
+  await api.changePlan(planId);
+  return { ok: true };
+}</code></pre></div>
+    <div class="note"><p>Long forms deserve persistence beyond the session: a draft written to local storage or the server on an interval, restored on mount, cleared on successful submit. A twenty-field form that loses everything to a tab crash teaches users to write their answers in a text file first — which tells you the form, not the user, is at fault.</p></div>
+    <h3 id="ch17-a11y" data-toc>Errors, focus and accessibility</h3>
+    <p>Every accessibility rule about forms follows from one fact: a visual user reads an error beside a field and a red border simultaneously, while a screen-reader user encounters them in DOM order, at focus time, if at all. The markup has to carry what the layout shows. Every field gets a real <code>&lt;label&gt;</code> bound by <code>for</code>/<code>id</code> — placeholder is not a label and disappears exactly when the user needs it most. Every error is tied to its field with <code>aria-describedby</code> and announced with <code>role="alert"</code> or a polite live region. Every field exposes <code>aria-invalid</code> while invalid. And required fields are marked with the native <code>required</code> attribute, which the browser's own validation, autofill and screen-reader announcements all understand — the ARIA re-implementation of a native behaviour is always the worse version.</p>
+    <p>Focus management is the part most often skipped, and it decides whether a failed submit is navigable. Move focus to the error summary; make the summary's links move focus to their fields; on a successful submission that replaces the form, move focus to the confirmation's heading. Without this, a keyboard user presses Submit, hears nothing (unless the alert is live), and must tab from the top to find what failed — while a screen-reader user may never learn the submit failed at all, because nothing received focus or announcement. Chapter 16's route announcer is the same discipline at navigation scope; forms are where it matters most often.</p>
+    <div class="codeWrap"><pre><code>// the accessible field, end to end: label, description, invalid, announce
+function Field({ id, label, error, hint, as = 'input', ...rest }) {
+  const describedBy = [hint &amp;&amp; id + '-hint', error &amp;&amp; id + '-error']
+    .filter(Boolean).join(' ') || undefined;
+  const Input = as;
+
+  return (
+    &lt;div className="field"&gt;
+      &lt;label htmlFor={id}&gt;
+        {label}
+        {rest.required &amp;&amp; &lt;span aria-hidden="true"&gt; *&lt;/span&gt;
+                          &lt;span className="vh"&gt; (required)&lt;/span&gt;}
+      &lt;/label&gt;
+      &lt;Input id={id} aria-invalid={error ? true : undefined}
+             aria-describedby={describedBy} {...rest} /&gt;
+      {hint &amp;&amp; &lt;p id={id + '-hint'}&gt;{hint}&lt;/p&gt;}
+      {error &amp;&amp; &lt;p id={id + '-error'} role="alert"&gt;{error}&lt;/p&gt;}
+    &lt;/div&gt;
+  );
+}
+
+// usage: one contract for every field in the application
+&lt;Field id="email" label="Work email" type="email" required
+       hint="We send the receipt here"
+       error={errors.email}
+       defaultValue={values.email} /&gt;</code></pre></div>
+    <p>Touch, mobile and autofill complete the picture. Inputs get at least 44 pixel touch targets and appropriate <code>type</code> and <code>autocomplete</code> values — <code>type="email"</code> plus <code>autocomplete="email"</code> is what makes the mobile keyboard show an @ key and what makes password managers find the field; guessing these with <code>type="text"</code> costs the user real typing on every device. Enter-to-submit should work (a submit button inside the form provides it natively — never wire keydown by hand), and no field should depend on hover, which does not exist under a thumb. These are not a polish pass at the end: autofill attributes and label bindings are structural, and retrofitting them across a form library means touching every field.</p>
+    <div class="codeWrap"><pre><code>// native affordances first: types, autocomplete, Enter-to-submit
+&lt;form action={action}&gt;
+  &lt;Field id="email" label="Email" type="email"
+         autoComplete="email" inputMode="email" required /&gt;
+  &lt;Field id="phone" label="Phone" type="tel"
+         autoComplete="tel" inputMode="tel" /&gt;
+  &lt;Field id="pwd" label="Password" type="password"
+         autoComplete="new-password"
+         hint="At least 8 characters, with a number" /&gt;
+  &lt;button type="submit"&gt;Create account&lt;/button&gt;  {/* Enter works natively */}
+&lt;/form&gt;
+
+// the anti-pattern: hand-rolled key handling replacing what the form gives you
+&lt;input onKeyDown={(e) =&gt; {
+  if (e.key === 'Enter') {            // breaks IME input, paste-into-field,
+    e.preventDefault();               // autofill-on-enter, and password managers
+    doSubmit();                       // that expect a real form submission
+  }
+}} /&gt;</code></pre></div>
+    <h4>Testing the contract</h4>
+    <p>Because the accessibility contract is uniform — label, description, invalid, announcement — it is testable uniformly. A single test that renders a form, submits it empty, and asserts that every error is announced and every field is tied to its message catches the regression class where a developer adds a field and forgets the wiring. Pair it with the keyboard-only pass: tab through the form and submit without a mouse. If the automated assertions pass and the keyboard pass feels natural, the form is accessible in the way that matters: the contract holds for the fields you thought about and the ones you added later.</p>
+    <div class="codeWrap"><pre><code>// one test for the whole accessibility contract of a form
+test('failed submit announces every error and ties it to its field', async () => {
+  render(&lt;SignupForm /&gt;);
+  await user.click(screen.getByRole('button', { name: /create account/i }));
+
+  // errors are announced and reachable
+  const alerts = await screen.findAllByRole('alert');
+  expect(alerts.length).toBeGreaterThan(0);
+
+  // every invalid field is marked and points at its message
+  for (const field of screen.getAllByLabelText(/required/i)) {
+    expect(field).toHaveAttribute('aria-invalid', 'true');
+    const described = field.getAttribute('aria-describedby');
+    expect(described).toBeTruthy();
+    expect(document.getElementById(described.split(' ')[0])).toBeInTheDocument();
+  }
+
+  // keyboard path: focus lands on the summary, links reach the fields
+  expect(screen.getByRole('alert')).toHaveFocus();
+});</code></pre></div>
+    <div class="tip"><p>Build the field components once, with the label, description, invalid and autocomplete wiring inside them, and let application forms only supply configuration. Accessibility that lives in one shared component is inherited by every form added later; accessibility written per form is a property of the forms someone remembered.</p></div>
+    <div class="ex"><h4>Exercises 17</h4><ol>
+      <li>Audit every form in your application: mark each field controlled or uncontrolled and justify it by whether React reacts while typing. Convert one over-controlled form to <code>FormData</code> and measure the render count per keystroke before and after.</li>
+      <li>Extract one validation schema shared by client and server. Break it deliberately on the client (skip the check) and confirm the server action still rejects with the same message.</li>
+      <li>Build a submit flow with all four outcomes — invalid, failed, success-navigate, create-another — and write the outcome table from the h4 above as a comment at the top of the action.</li>
+      <li>Add a dependent pair of fields with the clearing rule, then have the server reject a mismatched pair. Confirm the client-side clear prevents the case the server was catching.</li>
+      <li>Take a form and run the keyboard-only pass end to end with the screen reader on. Fix every place where a visual error had no announced counterpart, then encode the contract in the shared-field test.</li>
+    </ol></div>
+  </section>

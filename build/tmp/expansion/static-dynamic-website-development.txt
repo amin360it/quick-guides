@@ -1,0 +1,1271 @@
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation: The Static and Dynamic Spectrum</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Before you choose a stack, know what genuinely changes between a file sitting on a CDN and a page assembled per request. This chapter separates the three real differences — rendering time, visitor state, and data freshness — from the marketing, places working sites on a spectrum rather than a binary, and sets out the decision drivers the rest of the guide builds on.</p>
+
+<h3 id="ch1-1" data-toc>1.1 What actually differs</h3>
+<p class="topic-desc">"Static versus dynamic" sounds like one decision. It is three independent ones: <em>when</em> the HTML is produced, <em>whether</em> the server remembers the visitor, and <em>where</em> the data lives.</p>
+
+<h4 id="ch1-1-render">Rendering time: build once or per request</h4>
+<p>A static page is finished before anyone asks for it. The HTML is written to disk at build time and the server's only job is to hand over bytes, so throughput is limited by the CDN rather than by application code. A dynamic page does not exist until a request arrives: the server runs code, queries data, renders a template, and only then sends HTML. That single difference explains most of the rest — cost, caching, scaling and the shape of your deployments.</p>
+
+<div class="codeWrap"><pre><code>// static — the file exists before the request
+10:00  build:    content/ → public/index.html
+10:37  request:  GET /index.html
+10:37  response: the same bytes for every visitor
+
+// dynamic — the HTML is produced by this request
+10:37  request:  GET /dashboard
+10:37  server:   run code → query db → render template
+10:37  response: HTML assembled for this one visitor</code></pre></div>
+
+<h4 id="ch1-1-state">State, identity and the idea of a visitor</h4>
+<p>A static server has no memory of you. Every request is anonymous and interchangeable, which is exactly why it scales to nothing and costs almost nothing. A dynamic server keeps state: it sets a cookie, stores a session on the server side, and recognises you on the next request. The moment a page depends on <em>who</em> is asking rather than <em>what</em> is asked, you have left pure static territory.</p>
+
+<div class="codeWrap"><pre><code>Static file server            Dynamic application server
+GET /about → about.html       GET /dashboard → run code
+                              Set-Cookie: sid=9f2c41; HttpOnly
+
+no visitor identity           GET /dashboard
+no memory of last request     Cookie: sid=9f2c41
+                              → session found, user known</code></pre></div>
+
+<h4 id="ch1-1-data">Data sources and freshness</h4>
+<p>Static content is data frozen at build time: a Markdown file, a JSON fixture, or a snapshot pulled from an API while the site was being built. Dynamic content is read at request time from a database or an upstream service, so the page reflects the current truth rather than last night's build. The question to ask is not "is it in a database" but "how stale may this page be before it is wrong".</p>
+
+<div class="codeWrap"><pre><code>// static: content is a file, copied at build time
+content/posts/hello.md
+  → build step
+public/posts/hello/index.html
+
+// dynamic: content is a row, read at request time
+SELECT title, body
+FROM posts
+WHERE slug = 'hello' AND published = 1;</code></pre></div>
+<div class="note"><p>Staleness is a product decision, not a technical one. A team page may be correct for a week; a stock level is wrong within seconds. Write the acceptable staleness down before you pick a rendering model, because it decides the model for you.</p></div>
+
+<h3 id="ch1-2" data-toc>1.2 The spectrum, not a binary</h3>
+<p class="topic-desc">Real sites are not static or dynamic; they sit at a point on a spectrum, and different routes on the same site can sit at different points. Naming the points helps you choose per route instead of per project.</p>
+
+<h4 id="ch1-2-five">Five useful points on the spectrum</h4>
+<p>From cheapest to most flexible: pre-built files, generated files, static with background revalidation, per-request rendering, and browser rendering. Each step buys freshness or personalisation and pays for it in compute, operations and first-paint latency. Most production sites use at least two of these at once.</p>
+
+<div class="codeWrap"><pre><code>pure static   pre-rendered files, zero server logic
+SSG           files generated from content at build time
+ISR / hybrid  static by default, rebuilt in the background
+SSR           HTML rendered per request, usually cached
+CSR / SPA     shell shipped, page built in the browser</code></pre></div>
+
+<h4 id="ch1-2-hybrid">A single site, mapped route by route</h4>
+<p>The practical skill is decomposition. A marketing homepage barely changes and should be static; a blog post is static until its source is edited; a product page should expire in the background; an account page is different for every signed-in visitor; a search box can be a client-only widget. Assign a strategy per route and the "static or dynamic" argument dissolves.</p>
+
+<div class="codeWrap"><pre><code>/                 static     marketing copy, changes weekly
+/pricing          static     edited by hand and rebuilt
+/blog/*           SSG        rebuilt when a post is merged
+/products/*       ISR        revalidate every 60 seconds
+/account/*        SSR        rendered per signed-in user
+/search           CSR        client-only, calls an API</code></pre></div>
+
+<h4 id="ch1-2-words">The words people use loosely</h4>
+<p>"Static site", "dynamic site" and "web app" are shorthand, not specifications. A documentation site is static files plus a client-side search index; a shop is a generated catalogue plus a server-rendered checkout; a SaaS product is mostly a client-rendered app behind a login with a static marketing shell. When someone says "we need a dynamic site", translate it into the three questions from 1.1 before agreeing to anything.</p>
+
+<div class="codeWrap"><pre><code>marketing site   → usually static pages plus a hosted form
+docs site        → SSG output, search runs in the browser
+shop             → generated catalogue plus a rendered checkout
+SaaS product     → client-rendered app plus a static shell</code></pre></div>
+<div class="tip"><p>Write the strategy per route in the project README. "The homepage is static; /account is server-rendered" prevents months of accidental complexity, because every new page then has to declare which model it belongs to.</p></div>
+
+<h3 id="ch1-3" data-toc>1.3 Decision drivers</h3>
+<p class="topic-desc">Four questions decide the model: how fast content changes, whether pages differ per visitor, what must survive between requests, and how much operational burden the team can carry.</p>
+
+<h4 id="ch1-3-content">Content velocity and authorship</h4>
+<p>If a single editor edits a page a few times a month, a rebuild on publish is invisible and a static model wins. If a thousand users generate content continuously, rebuilding the world after every write is the wrong shape and you want a server rendering on demand. Content velocity maps almost directly onto a rebuild strategy.</p>
+
+<div class="codeWrap"><pre><code>how often content changes   →  rebuild strategy
+once a quarter              →  static, rebuild by hand
+daily                       →  SSG rebuilt on every commit
+every minute                →  revalidate in the background
+per visitor                 →  render per request</code></pre></div>
+
+<h4 id="ch1-3-personal">Personalisation and authentication</h4>
+<p>Any page that shows a name, a balance or a permission decision is rendered for a person, not for a URL, and cannot be cached publicly. This does not mean the whole site becomes dynamic: keep the public pages static and cacheable, and render only the signed-in routes per request. That boundary is where almost every sensible architecture draws its line.</p>
+
+<div class="codeWrap"><pre><code>public pages      →  cacheable, static
+signed-in pages   →  per-user HTML, rendered per request
+cart / checkout   →  server-side session state
+real-time data    →  client fetch, polling or sockets</code></pre></div>
+
+<h4 id="ch1-3-ops">Budget, team size and operational reality</h4>
+<p>Static hosting is a folder of files behind a CDN with almost no failure modes. A dynamic stack adds a runtime to patch, a database to back up, migrations to run, logs to read and a monitoring bill. The code may be similar in size; the operational surface is not. If nobody on the team owns the runtime, do not adopt one you cannot leave.</p>
+
+<div class="codeWrap"><pre><code>static                        dynamic
+host: CDN or object store     host: server or container
+cost: pennies per million     cost: per request plus a server
+risk: misconfig, stale cache  risk: injection, auth, uptime
+ops:  deploy a folder         ops: migrations, logs, patches</code></pre></div>
+<div class="warn"><p>Do not adopt a server "just in case". Every running process is an attack surface and an on-call page. The cheapest architecture that meets the staleness and personalisation requirements is almost always the right one.</p></div>
+
+<h3 id="ch1-4" data-toc>1.4 How this guide is organised</h3>
+<p class="topic-desc">The chapters follow the spectrum in order: foundations, then the server, then the build, then the browser, then the hybrid patterns, and finally how to choose and migrate between them.</p>
+
+<h4 id="ch1-4-arc">The arc of the guide</h4>
+<p>Chapters 2 and 3 are the two ends of the spectrum in full: hand-written static files, and a request-handling server with sessions and a database. Chapters 4 and 5 cover the two ways to get both — generating static files from content, and rendering in the browser. Chapters 6 and 7 are the hybrid patterns and the decision procedure.</p>
+
+<div class="codeWrap"><pre><code>1 orientation   what actually differs
+2 static        plain files, assets, hosting
+3 dynamic       requests, sessions, databases
+4 SSG           content → build → files
+5 client-side   SPAs, fetch, frameworks
+6 hybrid        headless CMS, JAMstack, edge
+7 choosing      matrix, migration, cost</code></pre></div>
+
+<h4 id="ch1-4-method">How each chapter is built</h4>
+<p>Every chapter is made of numbered topics; every topic is made of sub-points with a mechanism, a gotcha or a failure mode, and a complete sample you can copy and run. The samples are deliberately small and dependency-light so that the idea survives translation into whatever stack you actually use.</p>
+
+<div class="codeWrap"><pre><code>each chapter:
+  h3   = a topic you can act on
+  h4   = the mechanism or the gotcha
+  code = something you can run, copy or adapt
+
+read the topic, run the sample, then decide</code></pre></div>
+
+<h4 id="ch1-4-verify">A four-question check before you build</h4>
+<p>Before writing code, answer these four questions for every route you are about to create. The answers select the model; the model selects the tooling; the tooling selects the hosting. Answering them after you have chosen a framework is how projects end up with a static content site rendering client-side for no reason.</p>
+
+<div class="codeWrap"><pre><code>1. where does this page's data come from?
+2. must the server remember the visitor?
+3. how often does the content change?
+4. which pages must rank in a search engine?
+
+→ choose the model with the smallest ops bill that passes all four</code></pre></div>
+<div class="tip"><p>Keep this list in the repository and answer it in the pull request when a new route appears. It is the single cheapest habit that keeps a site's rendering strategy honest as it grows.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Static Foundations</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">The static end of the spectrum is HTML, CSS and JavaScript in a folder, served over HTTP with no application code in the path. This chapter covers the files themselves, the way folders become URLs, navigation and forms without a server, and how to host the result anywhere — from a thumb drive to a global CDN.</p>
+
+<h3 id="ch2-1" data-toc>2.1 Plain HTML, CSS and JavaScript</h3>
+<p class="topic-desc">A complete website can be three files. Structure lives in HTML, presentation in CSS, and behaviour in JavaScript; they are linked, never mixed, and the browser assembles them.</p>
+
+<h4 id="ch2-1-skeleton">A document that needs no server</h4>
+<p>Every page starts with the doctype, a <code>lang</code> attribute that drives pronunciation, a character set declared before any text, and a viewport tag so the layout is not secretly zoomed on phones. The scripts come last or carry <code>defer</code>, which lets the HTML paint before JavaScript runs. A plain <code>index.html</code> opened from disk is a working website; nothing above it is required.</p>
+
+<div class="codeWrap"><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  &lt;title&gt;A static page&lt;/title&gt;
+  &lt;link rel="stylesheet" href="/assets/site.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header&gt;&lt;h1&gt;My site&lt;/h1&gt;&lt;/header&gt;
+  &lt;main&gt;&lt;p&gt;No server needed.&lt;/p&gt;&lt;/main&gt;
+  &lt;footer&gt;&lt;p&gt;© 2026&lt;/p&gt;&lt;/footer&gt;
+  &lt;script src="/assets/app.js" defer&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></div>
+
+<h4 id="ch2-1-assets">CSS: tokens, layout, and one dark-mode switch</h4>
+<p>Keep colours in custom properties so a theme change is one edit, not fifty. A single <code>max-width</code> and a centred margin give readable line lengths, and a <code>prefers-color-scheme</code> block handles dark mode without any JavaScript. Because the whole page is one HTML document, the browser renders it in one pass with no data fetching to wait for.</p>
+
+<div class="codeWrap"><pre><code>:root {
+  --ink: #101828;
+  --bg: #ffffff;
+  --accent: #0b5fbf;
+  --measure: 68ch;
+}
+body { margin: 0; font: 16px/1.5 system-ui, sans-serif;
+       color: var(--ink); background: var(--bg); }
+main { max-width: var(--measure); margin: 0 auto; padding: 2rem 1rem; }
+a { color: var(--accent); }
+
+@media (prefers-color-scheme: dark) {
+  :root { --ink: #e6eefc; --bg: #0b1220; --accent: #4dd2ff; }
+}</code></pre></div>
+
+<h4 id="ch2-1-js">JavaScript: behaviour only, content stays in the HTML</h4>
+<p>The static-site discipline is to render content in HTML and use JavaScript for interaction. A menu toggle, a filter or a lightbox enhances markup that already exists; if the script fails, the page still reads. Scripts should be small, deferred, and free of any assumption that they must run for the page to be usable.</p>
+
+<div class="codeWrap"><pre><code>// assets/app.js — enhance markup that is already there
+const toggle = document.querySelector('#nav-toggle');
+const nav = document.querySelector('#nav');
+
+toggle?.addEventListener('click', () =&gt; {
+  const open = nav.toggleAttribute('data-open');   // adds/removes the attribute
+  toggle.setAttribute('aria-expanded', String(open));
+});</code></pre></div>
+<div class="warn"><p>If the page shows nothing until a script has run, it is not a static page anymore in any sense that matters — not to a crawler, not to search, and not to a user on a flaky connection. Keep the content in the markup.</p></div>
+
+<h3 id="ch2-2" data-toc>2.2 Files, folders and URLs</h3>
+<p class="topic-desc">On a static site the folder structure <em>is</em> the URL structure. Get the mapping right and hosting, linking and cache control all follow from it.</p>
+
+<h4 id="ch2-2-layout">Folders that mirror paths</h4>
+<p>A folder named after a route, containing an <code>index.html</code>, is served for that route by almost every static host. This is why <code>about/index.html</code> answers a request for <code>/about</code> and gives you a clean URL. Keep source assets in one <code>assets</code> folder so cache rules and build steps can target a single path.</p>
+
+<div class="codeWrap"><pre><code>site/
+  index.html
+  about/index.html
+  posts/hello-world/index.html
+  assets/
+    site.css
+    app.js
+    img/hero.webp
+  favicon.ico
+  404.html</code></pre></div>
+
+<h4 id="ch2-2-paths">Absolute and relative paths</h4>
+<p>An absolute path beginning with <code>/</code> resolves from the domain root and is stable no matter how deep the current page is. A relative path resolves from the current file's directory and must be adjusted with <code>../</code> as the page moves. On a static site, prefer root-absolute asset paths and document that the site is served from the domain root, not a subfolder.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- absolute: resolves from the domain root at any depth --&gt;
+&lt;link rel="stylesheet" href="/assets/site.css"&gt;
+
+&lt;!-- relative: resolves from this file's directory --&gt;
+&lt;link rel="stylesheet" href="../assets/site.css"&gt;
+
+&lt;!-- served under a subpath? every absolute link must include it --&gt;
+&lt;link rel="stylesheet" href="/guides/assets/site.css"&gt;</code></pre></div>
+
+<h4 id="ch2-2-prettyurls">Clean URLs and directory indexes</h4>
+<p>The request <code>/about</code> is served from <code>/about/index.html</code> by a directory index rule. Most static hosts and Python's <code>http.server</code> do this automatically; a bare object store such as S3 does not, so you must configure an index document and an error document there. The 404 page is a real file too, and it is what makes a static site feel complete.</p>
+
+<div class="codeWrap"><pre><code># how a clean URL resolves
+/                   → /index.html
+/about              → /about/index.html
+/posts/hello-world  → /posts/hello-world/index.html
+
+# both files must exist for the host to find them
+404.html            → the page served for unknown paths</code></pre></div>
+<div class="note"><p>If a deploy breaks every stylesheet, the usual cause is a site moved to a subpath while its links stayed root-absolute. Either set a base path or keep every link relative — but choose one and apply it consistently.</p></div>
+
+<h3 id="ch2-3" data-toc>2.3 Linking, navigation and forms</h3>
+<p class="topic-desc">Navigation on a static site is ordinary anchors, and a form still needs somewhere to post. Both work without any server of your own, using third-party endpoints or the browser itself.</p>
+
+<h4 id="ch2-3-links">Navigation is just anchors</h4>
+<p>Because each page is a real document, navigation is a normal <code>&lt;a href&gt;</code> and the browser handles history, bookmarks and the back button for free. Repeat the same nav markup on every page — or generate it with a build step later — and mark the current page with <code>aria-current="page"</code> so assistive technology announces where you are.</p>
+
+<div class="codeWrap"><pre><code>&lt;nav aria-label="Main"&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href="/"&gt;Home&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="/about/" aria-current="page"&gt;About&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="/posts/"&gt;Blog&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;!-- no router, no client code: the browser does the navigation --&gt;</code></pre></div>
+
+<h4 id="ch2-3-forms">Forms without a server of your own</h4>
+<p>An HTML form posts its named fields to whatever <code>action</code> points at. On a static site that is usually a hosted form service, which accepts the POST and emails or stores the submission for you. This keeps the site a folder of files while still collecting data — the third-party endpoint is the only moving part.</p>
+
+<div class="codeWrap"><pre><code>&lt;form action="https://formspree.io/f/abcdwxyz" method="post"&gt;
+  &lt;label for="email"&gt;Email&lt;/label&gt;
+  &lt;input id="email" name="email" type="email" required&gt;
+
+  &lt;label for="msg"&gt;Message&lt;/label&gt;
+  &lt;textarea id="msg" name="message"&gt;&lt;/textarea&gt;
+
+  &lt;input type="hidden" name="_subject" value="New enquiry"&gt;
+  &lt;button type="submit"&gt;Send&lt;/button&gt;
+&lt;/form&gt;</code></pre></div>
+
+<h4 id="ch2-3-search">Client-side search and filtering</h4>
+<p>The one feature people assume needs a server — search — can be shipped as data. A build step writes a small JSON index of every page, the browser downloads it once, and filtering happens locally with no request at all. For a few hundred pages this is faster than a server round trip and works offline.</p>
+
+<div class="codeWrap"><pre><code>// build step writes /search-index.json: [{ url, title, text }, …]
+fetch('/search-index.json')
+  .then((r) =&gt; r.json())
+  .then((pages) =&gt; {
+    const q = document.querySelector('#q').value.toLowerCase();
+    const hits = pages.filter((p) =&gt; p.text.toLowerCase().includes(q));
+    render(hits.slice(0, 20));
+  });</code></pre></div>
+<div class="tip"><p>Keep the search index to the fields people actually search. Shipping entire page bodies makes the download heavier than the pages themselves; a title plus the first paragraph and a few headings is usually enough.</p></div>
+
+<h3 id="ch2-4" data-toc>2.4 Hosting a static site anywhere</h3>
+<p class="topic-desc">A static site has one deployment artefact — a folder — and any host that can serve files over HTTP will run it. That portability is the whole point of the model.</p>
+
+<h4 id="ch2-4-hosts">The portable artefact</h4>
+<p>Netlify, Vercel, Cloudflare Pages, GitHub Pages and any S3-compatible bucket all accept the same output folder, so you are never locked in. Deploy is a single command or a push to a branch, and a rollback is re-deploying the previous folder. Because there is no runtime, there is nothing to patch while it sits idle.</p>
+
+<div class="codeWrap"><pre><code>$ npx netlify deploy --prod --dir=dist
+$ npx vercel deploy --prod            # static output
+$ npx wrangler pages deploy dist      # Cloudflare Pages
+$ git push origin main                # GitHub Pages via Actions
+
+# the artefact is always the same: a folder of files</code></pre></div>
+
+<h4 id="ch2-4-cdn">Caching and headers</h4>
+<p>Because files never change under a fixed name, fingerprinted assets can be cached for a year while the HTML revalidates on every request. That split is what makes a static site feel instant on the second visit: the page shell is checked cheaply, and every asset it references is already in the browser. Set these headers at the host or in a small config file.</p>
+
+<div class="codeWrap"><pre><code># fingerprinted asset — safe to cache for a year
+/assets/*   Cache-Control: public, max-age=31536000, immutable
+
+# HTML must revalidate so a new deploy is seen
+/*.html     Cache-Control: public, max-age=0, must-revalidate
+
+# never cache a page that must be current to the second
+/news/live  Cache-Control: no-store</code></pre></div>
+
+<h4 id="ch2-4-drawbacks">What a static site cannot do on its own</h4>
+<p>A static host does not execute your code, so it cannot read a posted body, verify a password, remember a session or enforce per-user access by itself. Every one of those needs a server or a hosted service. Recognising the boundary is the whole reason the rest of this guide exists: the static model is the base case, and dynamic behaviour is added deliberately.</p>
+
+<div class="codeWrap"><pre><code>what a static site cannot do alone:
+  read a posted form body
+  verify a password
+  remember a session
+  enforce per-user access
+  query a database from the server
+
+→ each needs a server or a third-party service</code></pre></div>
+<div class="warn"><p>Never put secrets — API keys, database credentials — in static files. Everything a browser downloads is public. Anything that needs a secret must run on a server or use short-lived tokens minted elsewhere.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Dynamic Server-Side Development</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">A dynamic server runs code for every request: it routes the path, reads the visitor's state, queries a database, renders a template and returns HTML. This chapter walks that lifecycle, the runtimes that host it, templating and escaping, sessions and cookies, and the database layer underneath.</p>
+
+<h3 id="ch3-1" data-toc>3.1 The request lifecycle on a server</h3>
+<p class="topic-desc">From the server's point of view, a page is the output of a pipeline that starts with a request line and ends with a response. Knowing the pipeline is how you know where a bug lives.</p>
+
+<h4 id="ch3-1-anatomy">The shape of an HTTP exchange</h4>
+<p>A request carries a method, a path, headers and sometimes a body; a response carries a status, headers and a body. Cookies travel as headers, cache directives travel as headers, and the content type tells the browser how to interpret the bytes. Debugging a dynamic site usually means reading exactly these headers.</p>
+
+<div class="codeWrap"><pre><code>GET /posts/42 HTTP/1.1
+Host: example.com
+Accept: text/html
+Cookie: sid=9f2c41
+
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Cache-Control: private, no-store
+Set-Cookie: sid=9f2c41; HttpOnly; Secure; SameSite=Lax</code></pre></div>
+
+<h4 id="ch3-1-routing">Routing: which handler answers</h4>
+<p>The server matches the method and path against a route table and calls one handler. Everything else in the application is reached from that handler: it parses parameters, calls services, and hands data to a template. Keep the table small and legible; a route map you can read in one screen is a design document.</p>
+
+<div class="codeWrap"><pre><code>GET   /                 → home()
+GET   /posts            → listPosts()
+GET   /posts/:id        → showPost(id)
+POST  /posts            → createPost(body)
+POST  /logout           → destroySession()</code></pre></div>
+
+<h4 id="ch3-1-middleware">Middleware: the pipeline around the handler</h4>
+<p>Logging, session loading, authentication and CSRF checks are cross-cutting concerns that run for many routes, so they live in middleware that wraps the handler. Each layer can inspect the request, enrich it, or short-circuit it with a redirect or an error. The order matters: sessions must be loaded before an auth guard can read them.</p>
+
+<div class="codeWrap"><pre><code>request
+  → logging
+  → session lookup
+  → authentication guard
+  → CSRF check (mutating verbs)
+  → route handler
+  → template render
+response</code></pre></div>
+<div class="note"><p>If a handler needs to know who the user is, that fact should have been established in middleware, not guessed inside the handler. Cross-cutting state set up once and trusted everywhere is the pattern that keeps dynamic code predictable.</p></div>
+
+<h3 id="ch3-2" data-toc>3.2 Server runtimes: PHP, Node and ASP.NET</h3>
+<p class="topic-desc">The lifecycle is the same everywhere; the runtime decides the syntax, the deployment shape and the surrounding ecosystem. Three common runtimes cover most of the web.</p>
+
+<h4 id="ch3-2-php">PHP: a script per request</h4>
+<p>PHP's model is the simplest to reason about: the web server invokes a script, the script runs, the process ends. With a front controller every URL is handled by one file that bootstraps the app. PHP ships with a database driver and a templating idiom (HTML with embedded PHP) that gets you to a working page in minutes.</p>
+
+<div class="codeWrap"><pre><code>&lt;?php
+// public/index.php — a single front controller
+declare(strict_types=1);
+$pdo = new PDO('mysql:host=db;dbname=site;charset=utf8mb4', $user, $pass, [
+  PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION,
+]);
+$slug = $_GET['slug'] ?? 'home';
+$stmt = $pdo-&gt;prepare('SELECT title, body FROM pages WHERE slug = ?');
+$stmt-&gt;execute([$slug]);
+$page = $stmt-&gt;fetch() ?: ['title' =&gt; 'Not found', 'body' =&gt; ''];
+require __DIR__ . '/../templates/page.php';</code></pre></div>
+
+<h4 id="ch3-2-node">Node.js: one long-lived process</h4>
+<p>Node runs a persistent event loop rather than starting fresh per request, which makes it a good fit for many small I/O-bound requests. A framework such as Express supplies routing and view rendering; handlers are async functions that await the database. Because the process stays up, state kept in memory is available between requests — and is also the first thing that breaks when you run more than one instance.</p>
+
+<div class="codeWrap"><pre><code>import express from 'express';
+const app = express();
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/posts/:id', async (req, res) =&gt; {
+  const post = await db.posts.findOne({ id: Number(req.params.id) });
+  if (!post) return res.status(404).render('not-found');
+  res.render('post', { post });
+});
+
+app.listen(3000);</code></pre></div>
+
+<h4 id="ch3-2-aspnet">ASP.NET Core: pages with a model</h4>
+<p>ASP.NET Core's Razor Pages pair a <code>.cshtml</code> file with a page model that handles GET and POST. Routing, model binding and HTML encoding are provided by the framework, and the compiled language means most mistakes are caught before runtime. It is the most typed of the three and scales the same way Node does.</p>
+
+<div class="codeWrap"><pre><code>@page "{id:int}"
+@model ShowModel
+
+&lt;article&gt;
+  &lt;h1&gt;@Model.Post.Title&lt;/h1&gt;
+  &lt;p&gt;@Model.Post.Body&lt;/p&gt;
+&lt;/article&gt;
+
+@code {
+  public class ShowModel : PageModel {
+    public Post Post { get; set; } = default!;
+    public async Task OnGetAsync(int id) =&gt; Post = await db.FindAsync(id);
+  }
+}</code></pre></div>
+<div class="tip"><p>Learn one runtime properly rather than three shallowly. The request lifecycle, templating and database access transfer directly; the syntax does not, and the syntax is the smallest part.</p></div>
+
+<h3 id="ch3-3" data-toc>3.3 Templating and server-side rendering</h3>
+<p class="topic-desc">Server-side rendering means the server produces finished HTML by filling a template with data. The template engine is not decoration — it is the layer that decides how data is escaped and where output bugs become security bugs.</p>
+
+<h4 id="ch3-3-template">Filling a template with data</h4>
+<p>A template is HTML with placeholders. The handler supplies the data, the engine substitutes the values, and the result is a complete document the browser can paint without a single line of JavaScript. This is why server-rendered pages are fast on first load and indexable by anything that can read HTML.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- templates/post.php --&gt;
+&lt;article&gt;
+  &lt;h1&gt;&lt;?= htmlspecialchars($post['title']) ?&gt;&lt;/h1&gt;
+  &lt;time datetime="&lt;?= $post['date'] ?&gt;"&gt;&lt;?= $post['date'] ?&gt;&lt;/time&gt;
+  &lt;div&gt;&lt;?= $post['body_html'] /* sanitised before storage */ ?&gt;&lt;/div&gt;
+&lt;/article&gt;</code></pre></div>
+
+<h4 id="ch3-3-escaping">Escaping at the point of output</h4>
+<p>Every value that reaches HTML must be escaped for the context it lands in: HTML text, an attribute, a JavaScript string or a URL each need different treatment. Escape on output, not on input, so the stored data stays clean and one template cannot accidentally trust another's choice. Encoding for the wrong context is the root of cross-site scripting.</p>
+
+<div class="codeWrap"><pre><code>// escape for the context, at the moment you output
+htmlspecialchars($title, ENT_QUOTES, 'UTF-8')    // HTML text and attributes
+json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP)  // inside &lt;script&gt;
+urlencode($segment)                              // inside a URL path
+// never: string concatenation straight into markup</code></pre></div>
+
+<h4 id="ch3-3-partials">Layouts and partials</h4>
+<p>Most pages share a head, a header and a footer, so the renderer composes a layout from partials around the page's own content. The layout receives the page's rendered body; partials are included by path. This is the server-side ancestor of the component model, and it keeps a change to the nav in exactly one file.</p>
+
+<div class="codeWrap"><pre><code>&lt;?php // templates/layout.php — every page wraps this ?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;&lt;title&gt;&lt;?= htmlspecialchars($title) ?&gt;&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;?php require __DIR__ . '/partials/header.php'; ?&gt;
+  &lt;main&gt;&lt;?= $content ?&gt;&lt;/main&gt;
+  &lt;?php require __DIR__ . '/partials/footer.php'; ?&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></div>
+<div class="warn"><p>Do not mix user data into a JavaScript block with plain interpolation. A string containing <code>&lt;/script&gt;</code> will end the block and become executable markup. Encode it as JSON with the hex flags, or pass it through a data attribute the script reads.</p></div>
+
+<h3 id="ch3-4" data-toc>3.4 Sessions, cookies and state</h3>
+<p class="topic-desc">HTTP is stateless: each request arrives with no memory of the last. Cookies and server-side sessions are how a dynamic application reconstructs a person across requests — and how it goes wrong when they are misconfigured.</p>
+
+<h4 id="ch3-4-cookies">Cookies: small values the browser repeats</h4>
+<p>A cookie is a name and value the server asks the browser to store and return on matching requests. The attributes matter: <code>HttpOnly</code> hides it from JavaScript, <code>Secure</code> sends it only over HTTPS, <code>SameSite</code> limits cross-site sending, and <code>Max-Age</code> sets the lifetime. A non-essential cookie without those flags is a security incident waiting to be reported.</p>
+
+<div class="codeWrap"><pre><code># the server asks the browser to store a value
+Set-Cookie: theme=dark; Path=/; Max-Age=31536000; SameSite=Lax
+
+# the browser repeats it on every matching request
+Cookie: theme=dark; sid=9f2c41
+
+# clear a cookie by expiring it in the past
+Set-Cookie: theme=; Path=/; Max-Age=0</code></pre></div>
+
+<h4 id="ch3-4-sessions">Sessions: state that lives on the server</h4>
+<p>A session stores the real state — the user id, the cart, a CSRF token — on the server and gives the browser only an opaque identifier. The identifier is worthless without the server-side record, so a stolen cookie is the only way in and can be revoked by destroying the session. This is the standard pattern for keeping someone logged in.</p>
+
+<div class="codeWrap"><pre><code>&lt;?php
+session_start();
+$_SESSION['user_id'] = $user['id'];
+$_SESSION['csrf'] = bin2hex(random_bytes(32));
+
+// on a later request
+session_start();
+if (empty($_SESSION['user_id'])) {
+    header('Location: /login');
+    exit;
+}</code></pre></div>
+
+<h4 id="ch3-4-secure">Hardening a session</h4>
+<p>Set the cookie flags when the session starts, and regenerate the session id on login so a pre-login id cannot be fixed and reused. Pair the session with a CSRF token on every mutating form. These three moves — flags, regeneration, token — close most of the classic session attacks.</p>
+
+<div class="codeWrap"><pre><code>session_set_cookie_params([
+  'httponly' =&gt; true,   // JavaScript cannot read it
+  'secure'   =&gt; true,   // HTTPS only
+  'samesite' =&gt; 'Lax',  // blocks most cross-site posts
+  'path'     =&gt; '/',
+]);
+// stop session fixation by issuing a new id on login
+session_regenerate_id(true);</code></pre></div>
+<div class="warn"><p>Never store personal data in a cookie the browser can read or edit. Cookies are guesses sent to you; the server-side session is the truth. Trust the id, not the contents.</p></div>
+
+<h3 id="ch3-5" data-toc>3.5 Databases behind the server</h3>
+<p class="topic-desc">The database is where a dynamic site keeps the truth. The server's job is to read and write it safely — parameterised, indexed and cached — without turning every page load into a slow full scan.</p>
+
+<h4 id="ch3-5-connect">Schema and indexes first</h4>
+<p>A table is only as fast as its indexes. A slug that is looked up on every request wants a unique index; a list ordered by publish date wants an index on that column. Getting the schema right before the first row is written costs minutes; adding the right index after a million rows costs a maintenance window.</p>
+
+<div class="codeWrap"><pre><code>-- schema
+CREATE TABLE posts (
+  id           INTEGER PRIMARY KEY,
+  slug         TEXT NOT NULL UNIQUE,
+  title        TEXT NOT NULL,
+  body         TEXT NOT NULL,
+  published_at TEXT
+);
+
+-- the list page orders by this column on every request
+CREATE INDEX idx_posts_published ON posts (published_at DESC);</code></pre></div>
+
+<h4 id="ch3-5-prepared">Prepared statements and parameter binding</h4>
+<p>Never build SQL by concatenating user input. A prepared statement sends the query and the data separately, so the database can never mistake a value for a keyword or a second statement. Bind every parameter, and give the driver the type so numbers and strings are handled correctly. This single habit removes the whole class of SQL injection bugs.</p>
+
+<div class="codeWrap"><pre><code>&lt;?php
+// parameters travel separately from the SQL text
+$stmt = $pdo-&gt;prepare(
+  'SELECT id, title FROM posts
+   WHERE published_at &lt;= ? ORDER BY published_at DESC LIMIT ?'
+);
+$stmt-&gt;bindValue(1, $now, PDO::PARAM_STR);
+$stmt-&gt;bindValue(2, $limit, PDO::PARAM_INT);
+$stmt-&gt;execute();
+$rows = $stmt-&gt;fetchAll(PDO::FETCH_ASSOC);</code></pre></div>
+
+<h4 id="ch3-5-cache">Cache the read, invalidate on write</h4>
+<p>The read path is usually far busier than the write path, so caching rendered output or query results is the highest-value optimisation. Cache with a short time to live and delete the key on write, so an edit is visible immediately rather than after the TTL. Getting invalidation wrong is how a database-backed site serves content that no longer exists.</p>
+
+<div class="codeWrap"><pre><code>// read through a cache, and drop the key when the row changes
+$key  = "post:$slug";
+$html = $cache-&gt;get($key);
+if ($html === null) {
+    $html = render_post(fetch_post($slug));
+    $cache-&gt;set($key, $html, 300);   // 300s TTL
+}
+
+// after an edit
+$cache-&gt;delete("post:$slug");        // next read refills it</code></pre></div>
+<div class="note"><p>Log the queries, not just the requests. A page that takes 400 ms usually has four queries at 90 ms each, and the fix is an index or a cache, not a bigger server.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Static Site Generators</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">A static site generator gives you the authoring comfort of a dynamic site and the deployment profile of a static one: you write content and templates, run a build, and ship files. This chapter covers the model, content in files, the build step, the popular generators, and the hydration question that follows.</p>
+
+<h3 id="ch4-1" data-toc>4.1 What a generator actually does</h3>
+<p class="topic-desc">An SSG is a program that reads content and templates and writes HTML. There is no magic and no runtime: the output is a folder of files, exactly like the hand-written site from chapter 2.</p>
+
+<h4 id="ch4-1-model">The build pipeline, end to end</h4>
+<p>The generator walks a source directory, reads each content file and its metadata, applies the matching layout, runs any plugins, and writes a finished page to an output directory. Because everything happens before deploy, the cost of rendering is paid once per build rather than once per request. The output is portable to any static host.</p>
+
+<div class="codeWrap"><pre><code>source files + content
+        │
+        ▼
+   build step (Node, Go, Ruby)
+        │  read content, apply layouts, run plugins
+        ▼
+output: a folder of .html, .css, .js, images
+        │
+        ▼
+deploy to any static host</code></pre></div>
+
+<h4 id="ch4-1-frontmatter">Front matter: metadata at the top of a file</h4>
+<p>A content file begins with a block of metadata in YAML or JSON, called front matter, separated from the body by a fence. The generator reads it to get the title, date, tags and status of the page without you maintaining a separate index. Draft posts are simply pages whose front matter says so.</p>
+
+<div class="codeWrap"><pre><code>---
+title: "Deploying a static site"
+date: 2026-10-01
+tags: [deployment, netlify]
+draft: false
+---
+
+# Deploying a static site
+
+The build reads this header and turns it into page metadata.</code></pre></div>
+
+<h4 id="ch4-1-collections">Collections: indexes generated, not typed</h4>
+<p>A collection is a group of content files the generator exposes to templates. The blog index is a loop over the collection, sorted by date, so a new post appears the moment its file exists. This is the feature that makes an SSG a system rather than a folder of hand-edited pages.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- the index is generated from the collection, not written by hand --&gt;
+&lt;ul class="post-list"&gt;
+  {% for post in collections.posts | reverse %}
+  &lt;li&gt;
+    &lt;time datetime="{{ post.date }}"&gt;{{ post.date | readableDate }}&lt;/time&gt;
+    &lt;a href="{{ post.url }}"&gt;{{ post.data.title }}&lt;/a&gt;
+  &lt;/li&gt;
+  {% endfor %}
+&lt;/ul&gt;</code></pre></div>
+<div class="tip"><p>Keep generated pages out of version control. Commit the content and templates; let the build produce the HTML. A repo full of generated files makes every editorial change look like a code change.</p></div>
+
+<h3 id="ch4-2" data-toc>4.2 Content in files</h3>
+<p class="topic-desc">In an SSG the content lives in files — usually Markdown — and is validated by a schema. That constraint is the feature: content is reviewable, diffable and versioned like code.</p>
+
+<h4 id="ch4-2-markdown">Markdown as the authoring format</h4>
+<p>Markdown keeps the source readable while the generator turns it into semantic HTML. Headings, lists, links and code blocks are written with plain punctuation, and because it is text it lives comfortably in Git. The build is where Markdown becomes HTML, so the markup stays clean by construction.</p>
+
+<div class="codeWrap"><pre><code># Hello
+
+Some **bold** text and a [link](/about).
+
+- item one
+- item two
+
+    four spaces make an indented code block</code></pre></div>
+
+<h4 id="ch4-2-schema">A schema that turns typos into build errors</h4>
+<p>The most valuable gate in an SSG is content validation. A schema checks every front matter block as it is read, so a missing title or a malformed date fails the build instead of shipping a broken page. The build is your content QA, and it runs on every change.</p>
+
+<div class="codeWrap"><pre><code>// a content schema turns a typo into a build error
+const posts = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string().max(80),
+    date: z.coerce.date(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});</code></pre></div>
+
+<h4 id="ch4-2-layouts">Layouts and inheritance</h4>
+<p>Layouts wrap content so a page only declares what is unique about it. A base layout owns the document shell, a post layout extends it with article markup, and templates can include shared partials such as navigation. Changing the header then means editing one file and rebuilding.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- layouts/base.njk --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;&lt;title&gt;{{ title }} · My site&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  {% include "partials/nav.njk" %}
+  &lt;main&gt;{{ content | safe }}&lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></div>
+<div class="warn"><p>The <code>safe</code> filter disables escaping and must only wrap HTML you generated yourself from trusted Markdown. Passing a user-submitted field through it reopens the XSS hole the templating engine closed.</p></div>
+
+<h3 id="ch4-3" data-toc>4.3 The build step</h3>
+<p class="topic-desc">The build is the heart of the SSG model. It is a program you run locally and in CI, it produces the deployable folder, and its speed decides how pleasant the authoring loop feels.</p>
+
+<h4 id="ch4-3-pipeline">What a build actually does</h4>
+<p>A build cleans the output directory, loads content, validates it, renders pages through layouts, writes HTML, copies and hashes assets, and emits supporting files such as a sitemap and feed. Every step is deterministic given the same inputs, so the same source always produces the same site.</p>
+
+<div class="codeWrap"><pre><code>$ npm run build
+  → clean dist/
+  → load content collections
+  → validate front matter against schemas
+  → render pages through layouts
+  → write dist/*.html
+  → copy and hash assets
+  → emit sitemap.xml, robots.txt, feed.xml</code></pre></div>
+
+<h4 id="ch4-3-incremental">Incremental and parallel builds</h4>
+<p>When a site grows past a few hundred pages, a full rebuild becomes slow enough to notice. Generators offer partial rebuilds and parallelism: render only what changed, and use every CPU core. Keep the content tree shallow and avoid cross-page queries that force a global rebuild.</p>
+
+<div class="codeWrap"><pre><code># Hugo: rebuild only what changed, using every core
+$ hugo --gc --minify --enableGitInfo --parallel 8
+
+# Eleventy: reuse cached templates between runs
+$ npx @11ty/eleventy --serve --incremental</code></pre></div>
+
+<h4 id="ch4-3-ci">Building in CI and deploying</h4>
+<p>The build runs in CI on every push, so nothing reaches production that was not built from a clean checkout with a locked dependency tree. The pipeline checks out, installs from the lockfile, builds, and publishes the output folder. A failed build blocks the deploy, which is exactly what you want when the build also validates content.</p>
+
+<div class="codeWrap"><pre><code># .github/workflows/deploy.yml
+name: deploy
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm run build
+      - run: npx wrangler pages deploy dist</code></pre></div>
+<div class="tip"><p>Run the build on every pull request and only publish from the default branch. Reviewers then see a build that passes, and content errors fail on the branch instead of in production.</p></div>
+
+<h3 id="ch4-4" data-toc>4.4 Choosing a generator</h3>
+<p class="topic-desc">Generators differ in build speed, templating language and how much application framework they bring. Pick by the shape of the content and the team's language, not by popularity.</p>
+
+<h4 id="ch4-4-hugo">Hugo: fastest builds, Go templates</h4>
+<p>Hugo is a single binary with no dependency install, which makes it trivial to run in CI and very fast on large content sets. Its templating is Go's, which is powerful but unlike the JavaScript ecosystem. It is a strong default for documentation and blogs where build time matters.</p>
+
+<div class="codeWrap"><pre><code>$ hugo new site myblog
+$ cd myblog
+$ git submodule add https://github.com/adityatelange/hugo-PaperMod themes/papermod
+$ hugo new posts/first-post.md
+$ hugo server -D        # -D includes drafts
+$ hugo --minify         # writes public/</code></pre></div>
+
+<h4 id="ch4-4-eleventy">Eleventy: HTML-first, chooses your templates</h4>
+<p>Eleventy is deliberately minimal: it takes whatever templating language you already know (Nunjucks, Liquid, JavaScript) and outputs plain HTML with no client runtime. Configuration is a small JavaScript file, and its ethos is to ship no JavaScript unless you add it. It suits teams that want full control over the markup.</p>
+
+<div class="codeWrap"><pre><code>// .eleventy.js
+module.exports = (eleventyConfig) =&gt; {
+  eleventyConfig.addPassthroughCopy("assets");
+  eleventyConfig.addFilter("readableDate", (d) =&gt;
+    new Date(d).toLocaleDateString("en-GB"));
+  return { dir: { input: "src", output: "dist" } };
+};</code></pre></div>
+
+<h4 id="ch4-4-next">Next.js: a framework that can export statically</h4>
+<p>Next.js is a full React framework whose build can still emit a static site. In export mode every route is rendered to HTML at build time, and the same components could later switch to server rendering without a rewrite. Choose it when static is the starting point but dynamic routes are likely to appear.</p>
+
+<div class="codeWrap"><pre><code>// next.config.js — export a fully static site
+/** @type {import('next').NextConfig} */
+module.exports = {
+  output: 'export',
+  images: { unoptimized: true },   // no optimiser runs at export time
+};</code></pre></div>
+<div class="note"><p>The right question is not "which is best" but "how much framework do I want in my static output". Hugo and Eleventy add none; Next.js adds React, which is only worth paying for if you will hydrate something.</p></div>
+
+<h3 id="ch4-5" data-toc>4.5 Hydration and islands</h3>
+<p class="topic-desc">The moment a generated page needs interactivity, JavaScript must attach to the finished HTML. How much JavaScript you attach — and when — is the difference between a fast static site and a slow one wearing a static disguise.</p>
+
+<h4 id="ch4-5-hydration">Hydration: attaching behaviour to HTML that exists</h4>
+<p>Hydration runs the component tree in the browser and connects it to the server-rendered DOM instead of rebuilding it. The page paints immediately from HTML, then becomes interactive once the bundle finishes. It is the standard bridge between server-rendered markup and client-side behaviour, and its cost is the bundle itself.</p>
+
+<div class="codeWrap"><pre><code>// the server rendered HTML; the client adopts the same DOM
+import { hydrateRoot } from 'react-dom/client';
+import App from './App.jsx';
+
+hydrateRoot(document.getElementById('root'), &lt;App /&gt;);</code></pre></div>
+
+<h4 id="ch4-5-islands">Islands: hydrate only what is interactive</h4>
+<p>Islands invert the default: the page is static HTML and only the interactive components get JavaScript, each loaded when it is needed. A search box hydrates when visible, a cart when needed, a comment widget when idle. The shipped JavaScript is proportional to behaviour, not to page size.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- Astro: the shell is static; only these ship JavaScript --&gt;
+&lt;Search client:visible /&gt;
+&lt;CartButton client:load /&gt;
+&lt;Comments client:idle /&gt;
+&lt;Map client:only="react" /&gt;
+
+&lt;!-- everything else renders to HTML with no hydration cost --&gt;</code></pre></div>
+
+<h4 id="ch4-5-partial">What partial hydration buys</h4>
+<p>Measuring the difference is the fastest way to justify the discipline. A fully hydrated marketing page often ships hundreds of kilobytes of framework code to power a hamburger menu; an island build ships a fraction of it and paints sooner. The number you care about is kilobytes of JavaScript per interactive feature.</p>
+
+<div class="codeWrap"><pre><code>JavaScript shipped for the same page:
+  full hydration   180 KB   every component runs in the browser
+  islands           24 KB   only the cart and the menu
+  zero JS            0 KB   nothing requested interactivity</code></pre></div>
+<div class="tip"><p>Audit a generated page with JavaScript disabled in DevTools. If it still reads and navigates, the content is genuinely static and only the enhancements are lost — which is the state you want.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Client-Side Dynamics</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">The opposite end of the spectrum moves rendering into the browser: the server sends a shell and data, and JavaScript builds the page and keeps it in sync. This chapter covers single-page applications, fetching from APIs, frontend frameworks, progressive enhancement, and the SEO and accessibility consequences of rendering on the client.</p>
+
+<h3 id="ch5-1" data-toc>5.1 Single-page applications</h3>
+<p class="topic-desc">A single-page application loads one HTML document and swaps views with JavaScript. Navigation feels instant once loaded, and the cost is paid up front.</p>
+
+<h4 id="ch5-1-shell">The shell and the bundle</h4>
+<p>The server sends a near-empty document with a mount point and a script tag. The browser downloads the bundle, executes it, and only then does any content appear. Everything about first-load performance follows from that sequence: until the bundle runs, the page is blank to a user, a crawler and a social preview bot alike.</p>
+
+<div class="codeWrap"><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;&lt;title&gt;App&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="root"&gt;&lt;/div&gt;
+  &lt;script type="module" src="/assets/index-4f2a.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+&lt;!-- the visible page is built only after the bundle runs --&gt;</code></pre></div>
+
+<h4 id="ch5-1-routing">Client-side routing</h4>
+<p>A router intercepts link clicks, updates the URL with the History API, and renders a new view without asking the server for a document. The back button and deep links still work because the URL is real; what changed is that no HTML is requested on navigation. The server must still serve the shell for every route, or a refresh on a deep link returns a 404.</p>
+
+<div class="codeWrap"><pre><code>// client-side routing: the URL changes without a document request
+window.addEventListener('popstate', render);
+
+document.querySelectorAll('a[data-link]').forEach((a) =&gt; {
+  a.addEventListener('click', (e) =&gt; {
+    e.preventDefault();
+    history.pushState({}, '', a.href);
+    render();
+  });
+});</code></pre></div>
+
+<h4 id="ch5-1-cost">The cost of client rendering</h4>
+<p>For the same content, a client-rendered page ships far more JavaScript and shows content later. The trade is deliberate: an app with heavy, constant interaction amortises that cost, while a content page never does. Compare the two honestly before choosing, because the difference is measured in seconds on a mid-range phone.</p>
+
+<div class="codeWrap"><pre><code>first load for identical content on a mid-range phone:
+  static HTML      12 KB   first contentful paint ~0.4 s
+  SSR + hydrate   160 KB   content paints, interactive later
+  CSR shell       190 KB   content appears after the bundle runs</code></pre></div>
+<div class="warn"><p>A deep link that 404s on refresh is the classic SPA deployment bug: the server was never told to serve the shell for client-side routes. Configure a catch-all rewrite to <code>index.html</code> before shipping.</p></div>
+
+<h3 id="ch5-2" data-toc>5.2 Fetching APIs from the browser</h3>
+<p class="topic-desc">A client-rendered page gets its data from an API over HTTP. The mechanics are a few lines of <code>fetch</code>; the discipline is handling every state and every failure the network can produce.</p>
+
+<h4 id="ch5-2-fetch">The Fetch API</h4>
+<p><code>fetch</code> returns a promise for a response, and you must check <code>ok</code> before parsing because a 500 response is still a resolved promise. Send an <code>Accept</code> header so the API returns JSON, and throw on a bad status so the error path is a single place. This is the whole of the happy path.</p>
+
+<div class="codeWrap"><pre><code>async function loadPosts() {
+  const res = await fetch('/api/posts', {
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}</code></pre></div>
+
+<h4 id="ch5-2-states">Four states, all of them visible</h4>
+<p>Any asynchronous UI has at least four states: loading, ready, empty and error. Showing only the ready state is why pages appear to do nothing on a slow connection. Render a skeleton while loading, a message when empty, and a retry when it fails, and the interface feels honest.</p>
+
+<div class="codeWrap"><pre><code>let state = 'loading';
+try {
+  const data = await loadPosts();
+  state = data.length ? 'ready' : 'empty';
+} catch (err) {
+  state = 'error';
+}
+// render: skeleton, list, empty message, or retry button</code></pre></div>
+
+<h4 id="ch5-2-cors">CORS: why a cross-origin call is refused</h4>
+<p>The browser enforces the same-origin policy, so a page on one origin cannot read a response from another unless that origin opts in with CORS headers. Non-simple requests trigger a preflight <code>OPTIONS</code> request first, and the response must allow the method and origin. The block is the browser's, not the server's, which is why the request appears in the network panel but the code never sees the body.</p>
+
+<div class="codeWrap"><pre><code>OPTIONS /api/posts HTTP/1.1
+Origin: https://app.example.com
+Access-Control-Request-Method: POST
+
+HTTP/1.1 204 No Content
+Access-Control-Allow-Origin: https://app.example.com
+Access-Control-Allow-Methods: GET, POST
+Access-Control-Allow-Credentials: true</code></pre></div>
+<div class="note"><p>Allow a specific origin, never a wildcard, when credentials are involved. <code>Access-Control-Allow-Origin: *</code> together with credentials is rejected by the browser, and a naive fix of echoing the origin back opens the door to any site.</p></div>
+
+<h3 id="ch5-3" data-toc>5.3 Frontend frameworks</h3>
+<p class="topic-desc">A framework gives you components, reactive state and a build pipeline, so the UI stays in step with data by construction. The concepts are shared across React, Vue and Svelte; the syntax is not.</p>
+
+<h4 id="ch5-3-components">Components as functions of props</h4>
+<p>A component is a reusable unit of UI that renders from its inputs. In React it is a function returning markup; in Vue it is a single-file component; in Svelte it compiles away at build time. In all three, data flows down as props and changes are requested upward, so the owner of a value is unambiguous.</p>
+
+<div class="codeWrap"><pre><code>// a component is a function of its props
+export default function Price({ amount, currency = 'GBP' }) {
+  const fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency });
+  return &lt;span className="price"&gt;{fmt.format(amount)}&lt;/span&gt;;
+}</code></pre></div>
+
+<h4 id="ch5-3-state">Reactive state and derived values</h4>
+<p>State is the data that changes; reactivity is the framework re-rendering when it does. Store the minimum — the list, not its count and its total — and derive everything else during render so the copies cannot disagree. Updating state always goes through the setter, never by mutating the value in place.</p>
+
+<div class="codeWrap"><pre><code>import { useState } from 'react';
+
+export function Cart() {
+  const [items, setItems] = useState([]);
+  const total = items.reduce((sum, i) =&gt; sum + i.price * i.qty, 0);
+  return (
+    &lt;&gt;
+      &lt;button onClick={() =&gt; setItems([])}&gt;Clear&lt;/button&gt;
+      &lt;p&gt;{items.length} items, {total.toFixed(2)}&lt;/p&gt;
+    &lt;/&gt;
+  );
+}</code></pre></div>
+
+<h4 id="ch5-3-tooling">The build tool behind the framework</h4>
+<p>A modern bundler compiles the source into a small number of fingerprinted files, serves it instantly in development, and proxies API calls to your backend so the app and the server share one origin. This is the pipeline that turns components into the bundle the browser runs, and its configuration is part of the application.</p>
+
+<div class="codeWrap"><pre><code>// vite.config.js — one entry, hashed production output
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  build: { outDir: 'dist', sourcemap: true, target: 'es2020' },
+  server: { proxy: { '/api': 'http://localhost:3000' } },
+});</code></pre></div>
+<div class="tip"><p>Learn one framework well enough to debug it — the render cycle, state updates and the dev tools. The second framework is a week; the concepts you carry between them are the part that matters.</p></div>
+
+<h3 id="ch5-4" data-toc>5.4 Progressive enhancement</h3>
+<p class="topic-desc">Progressive enhancement builds a working baseline with HTML and adds JavaScript on top. The page is usable before the script loads, and better once it does.</p>
+
+<h4 id="ch5-4-baseline">The baseline is HTML</h4>
+<p>Start with a form that submits to a URL and a link that navigates. That page works on any device, in any browser, with JavaScript disabled or still downloading. Everything you add after that is an improvement rather than a dependency, and the baseline is also what search crawlers and social bots see.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- works without JavaScript; the script only enhances it --&gt;
+&lt;form action="/search" method="get"&gt;
+  &lt;label for="q"&gt;Search&lt;/label&gt;
+  &lt;input id="q" name="q" type="search"&gt;
+  &lt;button type="submit"&gt;Go&lt;/button&gt;
+&lt;/form&gt;
+&lt;noscript&gt;&lt;p&gt;Results are shown as a full page.&lt;/p&gt;&lt;/noscript&gt;</code></pre></div>
+
+<h4 id="ch5-4-forms">Enhancing a form without breaking it</h4>
+<p>The enhancement intercepts the submit only when JavaScript is available, fetches the results and injects them. If the script never runs, the browser posts the form and the server answers with a full page. The same markup serves both paths, which is why the technique is robust rather than fragile.</p>
+
+<div class="codeWrap"><pre><code>const form = document.querySelector('#search-form');
+
+form?.addEventListener('submit', async (e) =&gt; {
+  e.preventDefault();                 // only reached if JS is running
+  const html = await fetchResults(form.q.value);
+  document.querySelector('#results').innerHTML = html;
+});</code></pre></div>
+
+<h4 id="ch5-4-pattern">Feature detection over user-agent sniffing</h4>
+<p>Decide what to load by testing for the feature, not by guessing the browser. Modern APIs are widely available but not universal, and a capability check degrades cleanly where a user-agent string does not. This is also how you honour accessibility preferences such as reduced motion.</p>
+
+<div class="codeWrap"><pre><code>// detect the capability, not the browser
+if ('serviceWorker' in navigator) registerWorker();
+if ('IntersectionObserver' in window) lazyLoad();
+
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.documentElement.dataset.motion = 'reduced';
+}</code></pre></div>
+<div class="note"><p>Progressive enhancement is not nostalgia; it is the cheapest way to be resilient. A page built this way keeps working when a CDN blocking the script fails, a corporate proxy strips it, or the user simply has a slow connection.</p></div>
+
+<h3 id="ch5-5" data-toc>5.5 SEO and accessibility of client rendering</h3>
+<p class="topic-desc">Rendering in the browser changes what a crawler and a screen reader receive. Modern search engines execute JavaScript, but not all do, not instantly, and not for every kind of bot.</p>
+
+<h4 id="ch5-5-crawl">What a crawler actually receives</h4>
+<p>A client-rendered page sends an empty mount point; the content exists only after the bundle runs. Google can render JavaScript, but reliance on it delays indexing and adds failure modes, and social preview bots generally do not execute JavaScript at all. Server-rendered or generated HTML is indexed reliably and immediately.</p>
+
+<div class="codeWrap"><pre><code>what the crawler receives:
+  client-only   &lt;div id="app"&gt;&lt;/div&gt;           empty document
+  SSR or SSG    &lt;main&gt;&lt;h1&gt;Real headline&lt;/h1&gt;…  full document
+
+social previews: a bot that does not run JavaScript
+                 sees only the Open Graph tags in the shell</code></pre></div>
+
+<h4 id="ch5-5-meta">Per-route metadata and canonicals</h4>
+<p>A single-page app has one HTML document, but every route wants its own title, description and canonical URL. Emitting them per route — server-side or with a head manager — is what makes each view indexable as its own page. Without it, every route competes with the same metadata.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- client-rendered routes must still ship real head tags --&gt;
+&lt;meta property="og:title" content="Product: Blue Widget"&gt;
+&lt;meta property="og:description" content="In stock, ships today."&gt;
+&lt;link rel="canonical" href="https://example.com/products/blue-widget"&gt;</code></pre></div>
+
+<h4 id="ch5-5-a11y">Accessibility of client-side navigation</h4>
+<p>A client-side route change swaps content without a page load, so a screen reader is never told that anything happened, and focus stays where it was. Announce the change, update the document title, and move focus to the new heading. These few lines restore the cues a normal navigation gives for free.</p>
+
+<div class="codeWrap"><pre><code>// announce client-side navigation, or screen readers stay lost
+const live = document.querySelector('#route-announcer');
+
+function announce(title) {
+  live.textContent = 'Navigated to ' + title;
+  document.title = title;
+  document.querySelector('h1')?.focus();
+}</code></pre></div>
+<div class="warn"><p>Do not ship a client-rendered marketing page and hope the crawler catches up. If a page must rank, render it to HTML on the server or at build time — the SEO risk of a JavaScript-only page is entirely avoidable.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Headless and Hybrid Patterns</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Most production sites are neither purely static nor purely dynamic; they are deliberate mixtures. This chapter covers the patterns that combine the two — headless CMS, JAMstack, SSR with revalidation, and edge rendering — and the cases where each one earns its complexity.</p>
+
+<h3 id="ch6-1" data-toc>6.1 Headless CMS</h3>
+<p class="topic-desc">A headless CMS stores and edits content but does not render it. It exposes an API, and the site — a generator, a server or a browser — decides how to present it.</p>
+
+<h4 id="ch6-1-model">Decoupling content from presentation</h4>
+<p>The CMS becomes the authors' tool and the source of truth for content; the site becomes the presentation layer that reads it through an API. The two evolve independently, so a redesign does not touch the editorial workflow and a new channel such as a mobile app reuses the same content. The cost is one more system to run and one more boundary to debug.</p>
+
+<div class="codeWrap"><pre><code>  Editor writes in the CMS ──▶ content API (JSON or GraphQL)
+                                 │
+                       build hook ▼
+                             static build ──▶ CDN
+                                 │
+                       at runtime: /account/* ──▶ app server</code></pre></div>
+
+<h4 id="ch6-1-invoke">Two ways to read content</h4>
+<p>A Git-based CMS commits content to a repository, so the site reads files and a rebuild is just a new commit. An API-first CMS keeps content in a database behind a JSON or GraphQL endpoint the build queries. The first gives you version history for free; the second gives you a real editorial UI and previews.</p>
+
+<div class="codeWrap"><pre><code>// Git-based headless: content lives in a repository
+const res = await fetch(
+  'https://api.github.com/repos/me/site/contents/posts'
+);
+
+// API-first headless: content lives behind a service
+const { data } = await client.query({ query: GET_POSTS });</code></pre></div>
+
+<h4 id="ch6-1-tradeoffs">The trade, honestly</h4>
+<p>A headless CMS widens who can publish and keeps content portable, but it moves "why is my edit not live" from a server question to a build question and adds preview plumbing. For a small team editing a handful of pages a week, plain Markdown in the repo is often simpler and strictly more reliable.</p>
+
+<div class="codeWrap"><pre><code>headless CMS
+  + editors get a real UI; developers get an API
+  + content is decoupled from presentation
+  - two systems to run; previews need wiring
+  - "why is my edit not live" becomes a build question</code></pre></div>
+<div class="tip"><p>Wire previews from day one. If editors cannot see an unpublished page before it goes live, they will publish to check, and the CMS has made the process worse.</p></div>
+
+<h3 id="ch6-2" data-toc>6.2 JAMstack</h3>
+<p class="topic-desc">JAMstack is a name for a delivery model: JavaScript for behaviour, APIs for data, Markup pre-built and served from a CDN. It is the static model plus a rebuild trigger.</p>
+
+<h4 id="ch6-2-definition">What the acronym commits you to</h4>
+<p>The letters describe where each concern lives, not a specific technology. Markup is generated ahead of time, JavaScript runs in the browser, and any data that must be current comes from an API. The original tagline claimed no servers; the honest version is that you run no servers of your own for the served content.</p>
+
+<div class="codeWrap"><pre><code>JAMstack, expanded:
+  JavaScript  behaviour in the browser
+  APIs        data from services, not your own monolith
+  Markup      pre-built HTML served from a CDN
+
+// no servers of your own for the markup; the CDN does the work</code></pre></div>
+
+<h4 id="ch6-2-hooks">Build hooks: publishing triggers a rebuild</h4>
+<p>When an editor publishes, the CMS fires a webhook at your build service, which rebuilds the affected pages and deploys atomically. The site is static at rest but current after a publish, and there is never a half-deployed state visible to a visitor. The webhook is the only glue between the CMS and the CDN.</p>
+
+<div class="codeWrap"><pre><code>POST /hooks/rebuild
+{
+  "event": "entry.publish",
+  "entryId": "9f2c41"
+}
+
+// the build service rebuilds the affected pages and deploys</code></pre></div>
+
+<h4 id="ch6-2-limits">Where JAMstack stops working</h4>
+<p>The model breaks when content changes faster than a build can run, when pages are personalised per visitor, or when the work is long-running. A build that takes four minutes is fine for a blog and useless for a live scoreboard. Recognising that boundary is what pushes you toward revalidation or server rendering.</p>
+
+<div class="codeWrap"><pre><code>when JAMstack hurts:
+  content changes faster than the build (minutes, not hours)
+  pages must be personalised per visitor
+  a request needs long-running or stateful server work
+
+→ move to incremental revalidation, server rendering or an edge function</code></pre></div>
+<div class="warn"><p>Do not trigger a full site rebuild on every keystroke in the CMS. Tie the hook to publish, not to save, or a busy editor will keep the build queue permanently full.</p></div>
+
+<h3 id="ch6-3" data-toc>6.3 SSR with revalidation</h3>
+<p class="topic-desc">The middle path renders a page once, caches the HTML, and rebuilds it in the background when it expires. Visitors get static speed and the content stays fresh without a redeploy.</p>
+
+<h4 id="ch6-3-isr">Incremental revalidation</h4>
+<p>A revalidated route is served from cache, and after its time to live a rebuild is scheduled in the background; the next visitor triggers it and the one after that gets the fresh page. There is no full-site rebuild, so a single changed product updates without touching the other thousand. This is the pattern that makes a catalogue feel static without being stale.</p>
+
+<div class="codeWrap"><pre><code>// Next.js App Router: static output, refreshed in the background
+export const revalidate = 60;   // seconds
+
+export default async function Page({ params }) {
+  const post = await getPost(params.slug);   // cached, revalidated
+  return &lt;Article post={post} /&gt;;
+}</code></pre></div>
+
+<h4 id="ch6-3-streaming">Streaming and partial rendering</h4>
+<p>Instead of holding the response until the slowest query finishes, a server can stream the HTML: send the shell immediately and fill in slower widgets as they resolve. The user sees a useful page sooner, and the slow part arrives without blocking the rest. Suspense boundaries are how a framework marks the parts that may be deferred.</p>
+
+<div class="codeWrap"><pre><code>// stream the shell first, the slow widget when it is ready
+import { Suspense } from 'react';
+
+export default function Page() {
+  return (
+    &lt;&gt;
+      &lt;Header /&gt;
+      &lt;Suspense fallback={&lt;Skeleton /&gt;}&gt;
+        &lt;SlowRecommendations /&gt;
+      &lt;/Suspense&gt;
+    &lt;/&gt;
+  );
+}</code></pre></div>
+
+<h4 id="ch6-3-cache">Cache headers are the whole contract</h4>
+<p>Whether a page is per-visitor or shared is decided by its <code>Cache-Control</code> header, not by the framework. Shared pages may be cached publicly and served stale while revalidating; per-user pages must be private and uncached. Getting this wrong is how one user's dashboard ends up served to another.</p>
+
+<div class="codeWrap"><pre><code># the contract between the app and every proxy in front of it
+public, s-maxage=3600, stale-while-revalidate=86400   # shared, may go stale
+private, no-store                                     # per user, never cached
+public, max-age=0, must-revalidate                    # must be rechecked</code></pre></div>
+<div class="warn"><p>Revalidating every second does not give you a dynamic site; it gives you a static site that pays a rebuild cost constantly. If content must be current to the second, render it per request instead.</p></div>
+
+<h3 id="ch6-4" data-toc>6.4 Edge rendering</h3>
+<p class="topic-desc">Edge functions run your code close to the visitor, in many small regions rather than one data centre. They add personalisation and header logic to a static delivery model with almost no cold start.</p>
+
+<h4 id="ch6-4-edge">What the edge is good at</h4>
+<p>An edge function runs on every request in the nearest region, so it can rewrite a URL, add security headers, do an A/B split or assemble a personalised page from cached fragments. The distance from user to compute is small, so the added latency is a few milliseconds rather than a network hop to an origin.</p>
+
+<div class="codeWrap"><pre><code>// a Cloudflare Worker adds a header at the edge, before the origin
+export default {
+  async fetch(request) {
+    const res = await fetch(request);
+    const out = new Response(res.body, res);
+    out.headers.set('X-Edge', 'lhr');
+    return out;
+  },
+};</code></pre></div>
+
+<h4 id="ch6-4-workers">Edge plus cache</h4>
+<p>The productive pattern is "cache first, edge to personalise": serve a cached static shell, and let the edge function inject the parts that must differ per visitor. That keeps the expensive rendering at build time while the per-visitor work stays tiny and cheap at the edge. It is the pragmatic blend of static speed and dynamic content.</p>
+
+<div class="codeWrap"><pre><code>// edge middleware: cached shell in, personalised markers out
+export async function middleware(request) {
+  const shell = await caches.default.match(request);
+  const html = shell ? await shell.text() : render('home');
+  return new Response(html.replace('__USER__', userName(request)), {
+    headers: { 'content-type': 'text/html; charset=utf-8' },
+  });
+}</code></pre></div>
+
+<h4 id="ch6-4-limits">Edge constraints to design around</h4>
+<p>Edge runtimes are not full servers: CPU time per request is capped, there is no local filesystem, native modules are unavailable, and only part of the Node API surface exists. Anything that needs a database connection pool, a large in-memory cache or a long computation belongs on an origin server, not at the edge.</p>
+
+<div class="codeWrap"><pre><code>edge runtime constraints (typical):
+  CPU per request:   10 to 50 ms (CPU only, not wall clock)
+  no local filesystem, no native modules
+  a reduced Node API surface
+  cold starts near zero, but a fixed set of regions</code></pre></div>
+<div class="note"><p>Treat the edge as a fast filter in front of your origin, not as a replacement for it. It is excellent at headers, routing and small personalisation, and poor at anything long, stateful or database-heavy.</p></div>
+
+<h3 id="ch6-5" data-toc>6.5 When hybrid wins</h3>
+<p class="topic-desc">Hybrid architecture wins when different routes have genuinely different needs. The skill is decomposition, not picking a single platform and forcing every page into it.</p>
+
+<h4 id="ch6-5-matrix">Match the model to the route</h4>
+<p>List the routes, then choose the cheapest model that satisfies each one's staleness and personalisation needs. Marketing pages are static, a catalogue is revalidated, search is client-side, and account pages are rendered per request. The result is a site where each part costs exactly what it must.</p>
+
+<div class="codeWrap"><pre><code>route type            best model
+marketing pages       static
+docs and blog         SSG, rebuild on push
+product catalogue     revalidated, refreshed on change
+search results        client-side plus an API
+account and checkout  rendered per request</code></pre></div>
+
+<h4 id="ch6-5-example">A shop, decomposed</h4>
+<p>The same site uses four strategies and none of them is gratuitous. The marketing shell is static and greets a crawler with full HTML; the catalogue revalidates so a price change appears without a deploy; the cart is server-rendered so it never flashes empty; checkout is per-request with no caching at all. Every dynamic route earns its cost.</p>
+
+<div class="codeWrap"><pre><code>a shop, route by route:
+  /                static marketing shell
+  /catalogue/*     revalidated, refreshed from the feed
+  /cart            session-backed, server-rendered
+  /checkout        per request, never cached
+  /api/*           JSON for the client widgets</code></pre></div>
+
+<h4 id="ch6-5-pitfalls">The pitfalls hybrids invite</h4>
+<p>Mixing models multiplies the ways caching can go wrong. A per-user page cached publicly leaks data; two systems holding the same record drift apart; a delete with no purge leaves ghosts for the whole time to live. Every cache needs an explicit invalidation path, and the rule is simple: if it can be cached, something must be able to uncache it.</p>
+
+<div class="codeWrap"><pre><code>hybrid pitfalls:
+  caching a per-user page publicly   → data leak
+  revalidating constantly             → self-inflicted load
+  two sources of truth                → silent drift
+  no purge on delete                  → ghosts live for the TTL</code></pre></div>
+<div class="tip"><p>Write the cache strategy as a table in the repository: route, model, TTL, and what invalidates it. A one-page table prevents the only class of bug that hybrids actually create.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Choosing and Migrating</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">The models are all defensible in the abstract; the work is picking one for a specific site and moving between them without a rewrite. This chapter gives a decision procedure, the migration paths, a security and performance comparison, and the maintenance and cost realities that decide the answer in practice.</p>
+
+<h3 id="ch7-1" data-toc>7.1 A decision matrix</h3>
+<p class="topic-desc">Solve for the constraints in order of how hard they are to change: data authority first, personalisation second, ranking third, and cost last. The matrix is a way to make the trade explicit rather than to hide it.</p>
+
+<h4 id="ch7-1-questions">Five questions, asked in order</h4>
+<p>Each question eliminates options. If any page must be personalised, pure static is gone; if any content changes between builds, pure SSG alone is gone unless you revalidate. Ask them before you look at a framework, because the framework is downstream of the answer.</p>
+
+<div class="codeWrap"><pre><code>Ask, in order:
+  1. Who writes the content, and how often?
+  2. Does any page differ per visitor?
+  3. What must survive between requests (sessions, carts)?
+  4. Which pages must rank in a search engine?
+  5. What is the smallest operations burden you can accept?</code></pre></div>
+
+<h4 id="ch7-1-score">Scoring the models against each other</h4>
+<p>Score each model on the qualities that matter and let the arithmetic break the tie. The point is not the exact numbers but the shape: simplicity and first-paint favour static, while per-user content favours rendering per request. Where a model scores badly on a requirement you cannot waive, it is out.</p>
+
+<div class="codeWrap"><pre><code>score 0-5, higher is better:
+                  static  SSG   ISR   SSR   CSR
+simplicity           5     4     3     2     2
+first paint          5     5     4     3     1
+per-user content     0     0     2     5     5
+search engine ready  5     5     5     5     2
+cheap at scale       5     5     4     2     3</code></pre></div>
+
+<h4 id="ch7-1-defaults">Defaults that rarely disappoint</h4>
+<p>When there is no strong reason otherwise, a handful of defaults cover most projects. They are deliberately boring, because the site that ships and stays up beats the architecture that reads well in a design document. Start here and deviate only for a named constraint.</p>
+
+<div class="codeWrap"><pre><code>defaults that rarely disappoint:
+  content site        → SSG plus a CDN
+  small business      → static pages plus a hosted form
+  authenticated app   → server rendering plus a JSON API
+  interactive product → client rendering behind auth,
+                        with a static marketing shell</code></pre></div>
+<div class="note"><p>The matrix is a conversation aid, not an oracle. If two models score within a point, choose the one with the smaller operational burden, because that cost recurs every week while the other advantages are usually smaller than they look.</p></div>
+
+<h3 id="ch7-2" data-toc>7.2 Migration paths</h3>
+<p class="topic-desc">Migrations between the models should be incremental. You move one route at a time, keep the URLs identical, and leave the old system answering everything you have not yet moved.</p>
+
+<h4 id="ch7-2-static-to-dynamic">Static toward dynamic, one route at a time</h4>
+<p>Start static and add a server only for the routes that need one. A proxy in front of the CDN sends form posts and signed-in paths to the application and everything else to the static files. This preserves the static site's speed for the majority of traffic while adding exactly the dynamic capability that was missing.</p>
+
+<div class="codeWrap"><pre><code>routes = {
+  '/':          static,
+  '/blog/*':    static,
+  '/contact':   proxy to a serverless function,   # form handling
+  '/account/*': server,                           # session required
+}</code></pre></div>
+
+<h4 id="ch7-2-dynamic-to-static">Dynamic toward static, by narrowing the boundary</h4>
+<p>Most dynamic sites render many pages that do not actually depend on the request. Identify them, generate them ahead of time, and keep the remaining per-user routes on the server. The result is the same application code with a much smaller runtime footprint and a much faster read path.</p>
+
+<div class="codeWrap"><pre><code>before: every page rendered per request, a database hit each time
+after:  public pages pre-built; only /account/* hits the server
+
+steps:
+  1. list pages whose output does not depend on the request
+  2. give them a build; keep the URLs identical
+  3. add a rebuild hook on content publish
+  4. leave the genuinely dynamic routes alone</code></pre></div>
+
+<h4 id="ch7-2-strangler">The strangler pattern</h4>
+<p>Run the new site beside the old one and move routes across one by one, using a proxy that sends each path to whichever system now owns it. Nothing is big-bang, every step is reversible, and the old application is retired only when no route points at it any more. This is the safest way to change a rendering model on a site that must stay up.</p>
+
+<div class="codeWrap"><pre><code>proxy rules during a migration:
+  /                → new static site
+  /blog/*          → new static site
+  /legacy/*        → old application
+  everything else  → old application
+
+# retire the old app when no route points at it</code></pre></div>
+<div class="warn"><p>Keep the URLs byte-identical through a migration. Changing a path while changing the rendering model means you cannot tell which change broke a page, a link or a ranking, and you cannot roll one back without the other.</p></div>
+
+<h3 id="ch7-3" data-toc>7.3 Security and performance</h3>
+<p class="topic-desc">The two models differ less in what they can achieve than in what can go wrong. Static removes whole classes of vulnerability; dynamic adds capability and new responsibilities.</p>
+
+<h4 id="ch7-3-security">Attack surface by model</h4>
+<p>A static site cannot be injected, because there is no query and no session to steal; the worst case is taking the host down or serving a compromised build. A dynamic site must handle untrusted input, guard authentication and patch its dependencies. The more code runs per request, the more there is to get right, every time.</p>
+
+<div class="codeWrap"><pre><code>attack surface by model:
+  static    take the host down; no injection, no session to steal
+  SSG       build-time supply chain; commit access is deploy access
+  SSR       input handling, injection, auth, dependency advisories
+  CSR + API everything SSR has, plus tokens stored in the browser</code></pre></div>
+
+<h4 id="ch7-3-performance">Performance expectations</h4>
+<p>Given the same content and the same host, static delivery wins on every metric because the response already exists. Server rendering adds compute latency that grows with traffic; client rendering hides that latency in the bundle instead. The honest comparison is time to first meaningful content, not the number on a synthetic benchmark.</p>
+
+<div class="codeWrap"><pre><code>same content, same host, mid-range device:
+  static    time to first byte ~20 ms, first content ~0.4 s
+  revalidated  cache hit, effectively static for readers
+  SSR       time to first byte 80 to 400 ms, scales with load
+  CSR       shell fast, content waits for the bundle</code></pre></div>
+
+<h4 id="ch7-3-measure">Measure before you argue</h4>
+<p>Most performance debates are settled by two commands and a dashboard. Measure time to first byte, run an audit, and load-test the endpoint behind the page. Numbers from your own stack end an argument that opinions cannot.</p>
+
+<div class="codeWrap"><pre><code># measure the thing you are about to argue about
+$ curl -o /dev/null -s -w 'ttfb %{time_starttransfer}s\n' https://example.com/
+$ npx lighthouse https://example.com --only-categories=performance
+$ npx autocannon -c 50 -d 20 https://staging.example.com/api/posts</code></pre></div>
+<div class="tip"><p>Track these numbers over time, not once. Performance regresses quietly as content, dependencies and third-party scripts accumulate, and a weekly check catches it long before a user complains.</p></div>
+
+<h3 id="ch7-4" data-toc>7.4 Maintenance and cost realities</h3>
+<p class="topic-desc">The cost of a site is mostly the cost of running it, not building it. This closing topic compares the ongoing bill — money and attention — across the models.</p>
+
+<h4 id="ch7-4-cost">The recurring bill</h4>
+<p>Static hosting for millions of requests costs a few pounds because it is bandwidth and storage. A server-rendered application costs a host, a database, backups and monitoring, and those scale with traffic and with the quality of the code. The difference is not the server's price tag; it is the attention the runtime demands.</p>
+
+<div class="codeWrap"><pre><code>static site, 2,000,000 requests per month:
+  CDN egress plus build minutes        ≈ a few pounds
+
+server-rendered app, same traffic, one small instance:
+  2 vCPU host, backups, monitoring     ≈ tens of pounds
+  plus the slice of every week it consumes in maintenance</code></pre></div>
+
+<h4 id="ch7-4-team">What the team has to own</h4>
+<p>A static stack needs HTML, CSS and Git. A dynamic stack adds a runtime, a database, migrations, connection limits and a dependency tree to patch. Both are maintainable; only one of them pages someone at three in the morning when it fails. Match the stack to the team that will actually run it.</p>
+
+<div class="codeWrap"><pre><code>static stack              dynamic stack
+HTML, CSS, git            plus a runtime and a database
+one deploy command        migrations, rollbacks, connection limits
+fewer advisories          a dependency tree to keep patched
+nothing idle to attack    a service that runs around the clock</code></pre></div>
+
+<h4 id="ch7-4-checklist">A last checklist before you commit</h4>
+<p>Run through this list once per project and once per significant change. It catches the decisions that are expensive to reverse: content velocity, data reachability at build time, crawlability, invalidation, and ownership. If every box is ticked, the model is the right one for now.</p>
+
+<div class="codeWrap"><pre><code>before you commit to a model, confirm:
+[ ] content velocity is known, not assumed
+[ ] no page needs data you cannot fetch at build time
+[ ] a search crawler will see real HTML
+[ ] there is a purge or rebuild story for stale content
+[ ] someone owns the runtime, not just the code</code></pre></div>
+<div class="note"><p>Revisit the decision when the traffic, the team or the content model changes. A rendering strategy is a snapshot of those constraints, and the constraints are the part that actually moves.</p></div>
+</section>

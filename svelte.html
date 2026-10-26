@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Svelte - Reactive Components Guide</title>
+<meta name="description" content="This chapter is the entry point for the entire offline Svelte course, explaining how the guide is meant to be…. 12 chapters, 65 topics and 47 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/svelte.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Svelte - Reactive Components Guide">
+<meta property="og:description" content="This chapter is the entry point for the entire offline Svelte course, explaining how the guide is meant to be…. 12 chapters, 65 topics and 47 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/svelte.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Svelte - Reactive Components Guide">
+<meta name="twitter:description" content="This chapter is the entry point for the entire offline Svelte course, explaining how the guide is meant to be…. 12 chapters, 65 topics and 47 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/svelte.html#article","headline":"Svelte - Reactive Components Guide","name":"Svelte - Reactive Components Guide","description":"This chapter is the entry point for the entire offline Svelte course, explaining how the guide is meant to be…. 12 chapters, 65 topics and 47 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/svelte.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/svelte.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Svelte - Reactive Components Guide","item":"https://amin360it.github.io/quick-guides/svelte.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Svelte</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This Svelte Guide</a><ul><li><a href="#orientation-organised" data-target="orientation-organised">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset: compiled reactivity</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use all course long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Svelte Fundamentals &amp; Setup</a><ul><li><a href="#ch1-why" data-target="ch1-why">1.1 Why Svelte: compiler over runtime</a></li><li><a href="#ch1-scaffold" data-target="ch1-scaffold">1.2 Scaffolding a project with Vite</a></li><li><a href="#ch1-anatomy" data-target="ch1-anatomy">1.3 Anatomy of a .svelte file</a></li><li><a href="#ch1-check" data-target="ch1-check">1.4 The dev loop and svelte-check</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Reactivity &amp; Components</a><ul><li><a href="#ch2-assignments" data-target="ch2-assignments">2.1 Assignments trigger updates</a></li><li><a href="#ch2-reactive" data-target="ch2-reactive">2.2 Reactive statements: the $: label</a></li><li><a href="#ch2-declarations" data-target="ch2-declarations">2.3 Reactive declarations in order</a></li><li><a href="#ch2-components" data-target="ch2-components">2.4 Components and instantiation</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Props, Events &amp; Bindings</a><ul><li><a href="#ch3-props" data-target="ch3-props">3.1 Props: export let, defaults &amp; spreading</a></li><li><a href="#ch3-events" data-target="ch3-events">3.2 Custom events: createEventDispatcher &amp; the on: directive</a></li><li><a href="#ch3-forwarding" data-target="ch3-forwarding">3.3 Event forwarding</a></li><li><a href="#ch3-bindings" data-target="ch3-bindings">3.4 Two-way bindings: value, checked &amp; group</a></li><li><a href="#ch3-bindthis" data-target="ch3-bindthis">3.5 bind:this and component bindings</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Logic Blocks</a><ul><li><a href="#ch4-if" data-target="ch4-if">4.1 if, else if &amp; else</a></li><li><a href="#ch4-each" data-target="ch4-each">4.2 each blocks, indexes &amp; keys</a></li><li><a href="#ch4-await" data-target="ch4-await">4.3 await, then &amp; catch</a></li><li><a href="#ch4-snippets" data-target="ch4-snippets">4.4 Snippets &amp; {@render}</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Stores</a><ul><li><a href="#ch5-writable" data-target="ch5-writable">5.1 writable stores &amp; the $ prefix</a></li><li><a href="#ch5-readable" data-target="ch5-readable">5.2 readable stores</a></li><li><a href="#ch5-derived" data-target="ch5-derived">5.3 derived stores</a></li><li><a href="#ch5-custom" data-target="ch5-custom">5.4 Custom stores &amp; the store contract</a></li><li><a href="#ch5-context" data-target="ch5-context">5.5 Context vs stores</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Lifecycle &amp; Scheduling</a><ul><li><a href="#ch6-onmount" data-target="ch6-onmount">6.1 onMount &amp; onDestroy</a></li><li><a href="#ch6-update" data-target="ch6-update">6.2 beforeUpdate &amp; afterUpdate</a></li><li><a href="#ch6-tick" data-target="ch6-tick">6.3 tick &amp; batching</a></li><li><a href="#ch6-actions" data-target="ch6-actions">6.4 Actions &amp; the use: directive</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Transitions, Animations &amp; Motion</a><ul><li><a href="#ch7-transitions" data-target="ch7-transitions">7.1 Built-in transitions: fade &amp; slide</a></li><li><a href="#ch7-inout" data-target="ch7-inout">7.2 in:, out:, custom transitions &amp; easing</a></li><li><a href="#ch7-flip" data-target="ch7-flip">7.3 animate:flip for reordered lists</a></li><li><a href="#ch7-motion" data-target="ch7-motion">7.4 Motion stores: tweened &amp; spring</a></li><li><a href="#ch7-reduced" data-target="ch7-reduced">7.5 Respecting prefers-reduced-motion</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Slots, Composition &amp; Special Elements</a><ul><li><a href="#ch8-slots" data-target="ch8-slots">8.1 Slots &amp; slot props</a></li><li><a href="#ch8-fragment" data-target="ch8-fragment">8.2 svelte:fragment &amp; recursive components</a></li><li><a href="#ch8-component" data-target="ch8-component">8.3 svelte:component</a></li><li><a href="#ch8-window" data-target="ch8-window">8.4 svelte:window, svelte:document &amp; svelte:head</a></li><li><a href="#ch8-element" data-target="ch8-element">8.5 svelte:element</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Context, CSS &amp; Component Styling</a><ul><li><a href="#ch9-context" data-target="ch9-context">9.1 Context: setContext &amp; getContext</a></li><li><a href="#ch9-scoped" data-target="ch9-scoped">9.2 Scoped styles &amp; the :global escape</a></li><li><a href="#ch9-class" data-target="ch9-class">9.3 The class: directive</a></li><li><a href="#ch9-style" data-target="ch9-style">9.4 style: directives &amp; CSS custom properties</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Best Practices &amp; Patterns</a><ul><li><a href="#ch10-design" data-target="ch10-design">10.1 Component design</a></li><li><a href="#ch10-reactivity" data-target="ch10-reactivity">10.2 Avoiding over-reactivity</a></li><li><a href="#ch10-performance" data-target="ch10-performance">10.3 Performance: lazy loading &amp; keyed lists</a></li><li><a href="#ch10-a11y" data-target="ch10-a11y">10.4 Accessibility</a></li><li><a href="#ch10-testing" data-target="ch10-testing">10.5 Testing with Vitest &amp; Testing Library</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Quick Reference &amp; Glossary</a><ul><li><a href="#app-directives" data-target="app-directives">A.1 Directive quick reference</a></li><li><a href="#app-lifecycle" data-target="app-lifecycle">A.2 Lifecycle &amp; scheduling</a></li><li><a href="#app-stores" data-target="app-stores">A.3 Store helpers</a></li><li><a href="#app-special" data-target="app-special">A.4 Special elements</a></li><li><a href="#app-glossary" data-target="app-glossary">A.5 Glossary</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Svelte</span>
+      <span class="am-band-s">12 chapters &middot; 65 topics &middot; 47 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This Svelte Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This Svelte Guide</button><div class="ch-toc-list"><a href="#orientation-organised">How this guide is organised</a><a href="#orientation-mindset">The right mindset: compiled reactivity</a><a href="#orientation-tools">Tools you will use all course long</a></div></div>
+    <p class="topic-desc">This chapter is the entry point for the entire offline Svelte course, explaining how the guide is meant to be read and worked through. It sets expectations for going from your first compiled component to production patterns one chapter at a time. You should type out each code example yourself and use the exercises to build muscle memory before moving on.</p>
+    <p>This is a complete, self-paced path through <strong>Svelte 5</strong>, from "hello world" to production-ready patterns. Everything runs in a single HTML file — no internet required, progress is saved in your browser.</p>
+    <h3 id="orientation-organised" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">This section lays out the three-part structure of the guide across ten chapters plus exercises. Each chapter ends with copy-ready code that you should type by hand rather than paste. Knowing where fundamentals, stores, lifecycle and best practices sit helps you navigate back whenever you need a refresher.</p>
+    <ul>
+      <li><strong>Ch. 1–3</strong> — foundations: setup, reactivity, components, props, events and bindings.</li>
+      <li><strong>Ch. 4–7</strong> — logic blocks, stores, lifecycle and transitions that make interfaces feel alive.</li>
+      <li><strong>Ch. 8–10</strong> — composition and scale: slots, special elements, contexts, styling and testing.</li>
+      <li>Every chapter ends with exercises. Code is copy-ready; type it rather than pasting to build muscle memory.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset: compiled reactivity</h3>
+    <p class="topic-desc">This section explains Svelte’s compile-time approach and why it ships no virtual DOM. Your code is compiled at build time into plain JavaScript that updates the DOM directly, so the framework largely disappears from what the browser actually runs. Understanding this model makes later topics such as reactive dependencies and scheduling easier to grasp.</p>
+    <p>Svelte is a <em>compiler</em>, not a runtime library. It reads your <code>.svelte</code> files during the build and produces tiny, imperative JavaScript that updates the DOM directly. There is no virtual DOM and no reconciliation pass — the framework mostly vanishes from your shipped bundle. That changes how you think: you write <code>count = count + 1</code> and the compiler generates the code that moves exactly the DOM nodes that need to change.</p>
+    <div class="tip"><p>Keep the official docs open beside this guide at <code>svelte.dev/docs</code>. This guide explains the why and the sequence; the docs are the exhaustive reference.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will use all course long</h3>
+    <p class="topic-desc">This section lists the tools you will rely on throughout the course, including Node, Vite and svelte-check. Install them once at the start and the same toolchain carries you through all ten chapters. Setting up the environment correctly is what lets you scaffold, develop, test and type-check without surprises.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Node.js 20+</td><td>JavaScript runtime for the toolchain</td></tr>
+      <tr><td>Vite</td><td>Development server with hot reload and the production bundler</td></tr>
+      <tr><td><code>npm create svelte</code></td><td>Official scaffolding tool for new projects</td></tr>
+      <tr><td>svelte-check</td><td>Type-checks .svelte files and reports diagnostics</td></tr>
+      <tr><td>Vitest + Testing Library</td><td>Unit and component testing (Chapter 10)</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Svelte Fundamentals &amp; Setup</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Svelte Fundamentals &amp; Setup</button><div class="ch-toc-list"><a href="#ch1-why">1.1 Why Svelte: compiler over runtime</a><a href="#ch1-scaffold">1.2 Scaffolding a project with Vite</a><a href="#ch1-anatomy">1.3 Anatomy of a .svelte file</a><a href="#ch1-check">1.4 The dev loop and svelte-check</a></div></div>
+    <p class="topic-desc">This chapter gets a working Svelte project running and explains why the compiler approach wins. You scaffold a project with Vite and then dissect your first .svelte file into its script, markup and style sections. By the end you have a dev server with hot reload and a production build on disk.</p>
+    <p>Svelte turns components into efficient imperative code at build time. This chapter gets a project running, explains the compiler philosophy, and walks through the three sections that make up every component.</p>
+    <h3 id="ch1-why" data-toc>1.1 Why Svelte: compiler over runtime</h3>
+    <p class="topic-desc">This section compares Svelte’s compile-time approach with runtime frameworks such as React and Vue. Because Svelte compiles away the framework, bundles stay smaller and less library code ships to the browser. The trade that matters is no virtual DOM, which means direct DOM updates arranged at build time instead of runtime reconciling.</p>
+    <p>Runtime frameworks ship a library that walks a virtual DOM and reconciles differences during execution. Svelte inverts the model: the compiler does that work once at build time and emits direct DOM operations. Every interaction is faster, downloads are smaller, and there is no framework to debug at run time.</p>
+    <div class="codeWrap"><pre><code>// Counter.svelte — a complete first component
+&lt;script&gt;
+  let count = 0;             // plain JavaScript state, no hooks
+  function increment() {
+    count += 1;              // an assignment signals the update
+  }
+&lt;/script&gt;
+
+&lt;button on:click={increment}&gt;Clicks: {count}&lt;/button&gt;
+&lt;style&gt;button { font-weight: bold; }&lt;/style&gt;</code></pre></div>
+    <p class="code-note">This component declares state as an ordinary variable and updates it with an assignment. The compiler turns it into direct DOM code that only touches the button’s text node.</p>
+    <h3 id="ch1-scaffold" data-toc>1.2 Scaffolding a project with Vite</h3>
+    <p class="topic-desc">This section creates a new Svelte project with the official Vite scaffolder using npm. You take the generated files into a running dev server with hot reload, then run a build to produce static output on disk. The result is a working project you can open immediately and keep using for every later chapter.</p>
+    <div class="codeWrap"><pre><code># create the project: pick "Skeleton" and TypeScript if you want it
+npm create svelte@latest my-app
+cd my-app
+npm install            # install dependencies once
+npm run dev            # dev server with hot reload — http://localhost:5173
+npm run build          # production bundle into dist/
+npm run preview        # serve the production build locally</code></pre></div>
+    <p class="code-note">npm create svelte scaffolds a Vite-powered project, npm run dev serves it with instant hot reload, and npm run build emits a static production bundle into dist/.</p>
+    <h3 id="ch1-anatomy" data-toc>1.3 Anatomy of a .svelte file</h3>
+    <p class="topic-desc">This section breaks a .svelte file into its three optional sections: the script block for logic, the markup for the template, and the style block for scoped CSS. Understanding this triad gives you the entire mental model used for the chapters ahead. Components, logic and styling all live inside a single file.</p>
+    <div class="codeWrap"><pre><code>// Card.svelte — every component is up to three sections
+&lt;script&gt;
+  let title = 'Hello';      // 1. logic: state, props and functions
+&lt;/script&gt;
+
+&lt;h1&gt;{title}&lt;/h1&gt;            // 2. markup: HTML plus {expressions}
+
+&lt;style&gt;                     // 3. styles: scoped to this component by default
+  h1 { color: teal; }
+&lt;/style&gt;</code></pre></div>
+    <p class="code-note">A .svelte file is a single component with up to three blocks — script for logic, markup for the template, style for scoped CSS — and the compiler compiles all three into one self-contained piece.</p>
+    <h3 id="ch1-check" data-toc>1.4 The dev loop and svelte-check</h3>
+    <p class="topic-desc">This section adds svelte-check, the official type-checker for Svelte files, to the development loop. It validates templates and types at build time instead of in the browser, catching mistakes before you ship. Wiring it into npm scripts and your editor keeps every later chapter safer to work in.</p>
+    <div class="codeWrap"><pre><code># svelte-check reads every .svelte file for type and template errors
+npm i -D svelte-check typescript
+
+# during development
+svelte-check --watch
+
+# before a release or in CI
+svelte-check &amp;&amp; npm run build</code></pre></div>
+    <p class="code-note">svelte-check type-checks templates, props, bindings and imports, then reports problems in the terminal. Running it in CI makes broken templates fail the build.</p>
+    <div class="ex"><h4 id="ch1-check--exercises-1">Exercises 1</h4><ol>
+      <li>Scaffold a fresh project with <code>npm create svelte@latest</code> and run the dev server.</li>
+      <li>Edit App.svelte to show your name and restyle it in the component’s style block.</li>
+      <li>Install svelte-check, introduce a deliberate type error, and watch it report the problem.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Reactivity &amp; Components</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Reactivity &amp; Components</button><div class="ch-toc-list"><a href="#ch2-assignments">2.1 Assignments trigger updates</a><a href="#ch2-reactive">2.2 Reactive statements: the $: label</a><a href="#ch2-declarations">2.3 Reactive declarations in order</a><a href="#ch2-components">2.4 Components and instantiation</a></div></div>
+    <p class="topic-desc">This chapter covers the heart of Svelte: assignment-based reactivity, reactive statements, and components as reusable units. A plain variable assignment triggers a component update, and imported components become tags in your markup. Everything else in this guide builds on these two ideas.</p>
+    <h3 id="ch2-assignments" data-toc>2.1 Assignments trigger updates</h3>
+    <p class="topic-desc">This section shows that assigning to a variable is the signal Svelte uses to know when to update the DOM. Because reactivity is triggered by assignment, array and object mutations must be followed by a reassignment to be seen. Compile-time tracking of those assignments is the core mechanism behind updates.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let count = 0;
+  let items = ['compile', 'update'];
+
+  function bump() {
+    count += 1;                       // reassigning a primitive: update fires
+  }
+  function add() {
+    items = [...items, 'ship'];       // new array reference: update fires
+    // items.push('ship') would NOT — mutation is invisible to reactivity
+  }
+&lt;/script&gt;
+
+&lt;button on:click={bump}&gt;count: {count}&lt;/button&gt;
+&lt;button on:click={add}&gt;items: {items.length}&lt;/button&gt;</code></pre></div>
+    <p class="code-note">In Svelte the assignment is the signal. Mutating an array in place with push is not noticed; building a new reference with spread is, which is why the example reassigns.</p>
+    <div class="warn"><p>Reassign, don’t mutate: prefer <code>arr = [...arr, x]</code> and <code>obj = { ...obj, key: v }</code> whenever your data must stay visible to reactivity.</p></div>
+    <h3 id="ch2-reactive" data-toc>2.2 Reactive statements: the $: label</h3>
+    <p class="topic-desc">This section introduces the dollar colon label, Svelte’s reactive statement. Svelte records which variables the statement reads and re-runs it automatically whenever any of them change. You use it to compute derived values and to run side effects that depend on reactive state.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let base = 2;
+  let exponent = 3;
+
+  $: result = base ** exponent;     // recomputed when base or exponent changes
+  $: console.log(result &lt; 100 ? 'small' : 'big');   // side effects run too
+&lt;/script&gt;
+
+&lt;button on:click={() =&gt; base += 1}&gt;raise base (now {base})&lt;/button&gt;
+&lt;p&gt;{base} ^ {exponent} = {result}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">The $: label marks a reactive statement. Both lines re-run whenever base changes because they read it, so results stay in sync without any manual wiring.</p>
+    <h3 id="ch2-declarations" data-toc>2.3 Reactive declarations in order</h3>
+    <p class="topic-desc">This section explains that reactive statements run in source order, before the markup updates. Chains of derived values therefore flow naturally from top to bottom, and each statement can rely on the results of the ones above it. Ordering your reactive statements correctly keeps derived state consistent.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let price = 40;
+  let qty = 2;
+
+  $: subtotal = price * qty;    // 1st: recomputed first
+  $: tax = subtotal * 0.1;      // 2nd: can read subtotal
+  $: total = subtotal + tax;    // 3rd: final derived value
+&lt;/script&gt;
+
+&lt;button on:click={() =&gt; qty += 1}&gt;add one&lt;/button&gt;
+&lt;p&gt;{qty} x 40 = {total}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">Reactive statements run in the order they appear, before the DOM updates. The chain subtotal, tax, total guarantees every value used downstream is already fresh.</p>
+    <h3 id="ch2-components" data-toc>2.4 Components and instantiation</h3>
+    <p class="topic-desc">This section shows how imported components become tags in your markup after an import. Each instance owns its own state, so the same component can appear many times on the page and stay fully independent. This encapsulation is exactly what makes components reusable units.</p>
+    <div class="codeWrap"><pre><code>// Counter.svelte
+&lt;script&gt;
+  let n = 0;
+&lt;/script&gt;
+&lt;button on:click={() =&gt; n += 1}&gt;{n}&lt;/button&gt;
+
+// App.svelte — import a component and use it as a tag
+&lt;script&gt;
+  import Counter from './Counter.svelte';
+&lt;/script&gt;
+
+&lt;main&gt;
+  &lt;Counter /&gt;             // self-closing form
+  &lt;Counter&gt;&lt;/Counter&gt;     // explicit closing form
+&lt;/main&gt;</code></pre></div>
+    <p class="code-note">Importing a component and writing it as a tag instantiates one independent copy per usage. Two Counter tags mean two counters, each with its own n.</p>
+    <div class="ex"><h4 id="ch2-components--exercises-2">Exercises 2</h4><ol>
+      <li>Build a counter that doubles on every click using <code>let</code> plus an assignment.</li>
+      <li>Add a <code>$:</code> statement showing whether the value is even or odd.</li>
+      <li>Import the counter twice and verify the instances stay independent.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Props, Events &amp; Bindings</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Props, Events &amp; Bindings</button><div class="ch-toc-list"><a href="#ch3-props">3.1 Props: export let, defaults &amp; spreading</a><a href="#ch3-events">3.2 Custom events: createEventDispatcher &amp; the on: directive</a><a href="#ch3-forwarding">3.3 Event forwarding</a><a href="#ch3-bindings">3.4 Two-way bindings: value, checked &amp; group</a><a href="#ch3-bindthis">3.5 bind:this and component bindings</a></div></div>
+    <p class="topic-desc">This chapter covers how components communicate with each other. Props pass data down, custom events carry messages up, and bindings move data in both directions. This is the shared vocabulary of every component tree you build, so mastering it unlocks composition.</p>
+    <h3 id="ch3-props" data-toc>3.1 Props: export let, defaults &amp; spreading</h3>
+    <p class="topic-desc">This section declares props with export let and gives them default values. Spreading a props object and using the $$restProps variable let a component accept unknown attributes without naming them at all. Props are the primary way a parent hands data down to its children.</p>
+    <div class="codeWrap"><pre><code>// Greeting.svelte
+&lt;script&gt;
+  export let name = 'friend';     // a prop with a default value
+  export let emphasis = false;    // boolean prop, defaults to false
+&lt;/script&gt;
+
+&lt;p&gt;Hello {emphasis ? name.toUpperCase() : name}&lt;/p&gt;
+
+// App.svelte
+&lt;script&gt;
+  import Greeting from './Greeting.svelte';
+&lt;/script&gt;
+
+&lt;Greeting name="Ada" /&gt;
+&lt;Greeting name="Grace" emphasis /&gt;   // bare attribute means {true}
+&lt;Greeting /&gt;                          // falls back to 'friend'</code></pre></div>
+    <p class="code-note">export let declares a prop and its default. Parents pass values as attributes, a bare attribute like emphasis is shorthand for emphasis={true}, and omitted props keep their defaults.</p>
+    <div class="codeWrap"><pre><code>// Button.svelte — pass through attributes you never declared
+&lt;script&gt;
+  export let color = 'blue';
+  let classes = `btn btn-${color}`;
+&lt;/script&gt;
+
+&lt;button class={classes} {...$$restProps}&gt;   // forward everything else
+  &lt;slot /&gt;
+&lt;/button&gt;
+
+// App.svelte
+&lt;script&gt;
+  import Button from './Button.svelte';
+&lt;/script&gt;
+
+&lt;Button color="red" type="submit" id="save" aria-label="Save" /&gt;
+// type, id and aria-label land in $$restProps and flow onto the real button</code></pre></div>
+    <p class="code-note">{...$$restProps} forwards every attribute the parent supplied that is not a declared prop, so Button accepts type, id and aria-* without declaring each one.</p>
+    <h3 id="ch3-events" data-toc>3.2 Custom events: createEventDispatcher &amp; the on: directive</h3>
+    <p class="topic-desc">This section uses createEventDispatcher to dispatch custom events from a component and listens for them with the on directive. The payload you pass along always arrives on event.detail. This pattern lets children send messages up to parents without knowing who is listening.</p>
+    <div class="codeWrap"><pre><code>// Clicker.svelte
+&lt;script&gt;
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher();
+
+  let taps = 0;
+
+  function tap() {
+    taps += 1;
+    dispatch('tap', { count: taps });   // custom event carrying a payload
+  }
+&lt;/script&gt;
+
+&lt;button on:click={tap}&gt;taps: {taps}&lt;/button&gt;
+
+// App.svelte
+&lt;script&gt;
+  import Clicker from './Clicker.svelte';
+
+  function onTap(event) {
+    console.log('received', event.detail.count);   // read the payload here
+  }
+&lt;/script&gt;
+
+&lt;Clicker on:tap={onTap} /&gt;</code></pre></div>
+    <p class="code-note">createEventDispatcher creates a dispatch function, dispatch('tap', payload) raises a custom event, and the parent listens with on:tap. The payload is always read from event.detail.</p>
+    <h3 id="ch3-forwarding" data-toc>3.3 Event forwarding</h3>
+    <p class="topic-desc">This section explains that component events do not bubble across component boundaries the way DOM events do. Writing an on directive with no handler re-dispatches the event so it can keep travelling upward. You forward events when an intermediate component needs to pass them through untouched.</p>
+    <div class="codeWrap"><pre><code>// Counter.svelte — the origin of a custom event
+&lt;script&gt;
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher();
+  let taps = 0;
+  function tap() {
+    taps += 1;
+    dispatch('tap', taps);
+  }
+&lt;/script&gt;
+&lt;button on:click={tap}&gt;{taps}&lt;/button&gt;
+
+// Card.svelte — a middle component that just forwards
+&lt;script&gt;
+  import Counter from './Counter.svelte';
+&lt;/script&gt;
+
+&lt;div class="card"&gt;
+  &lt;Counter on:tap /&gt;    // forward: no handler, the event keeps climbing
+&lt;/div&gt;
+
+// App.svelte — the listener, two levels up
+&lt;script&gt;
+  import Card from './Card.svelte';
+  function onTap(e) { alert('total ' + e.detail); }
+&lt;/script&gt;
+&lt;Card on:tap={onTap} /&gt;</code></pre></div>
+    <p class="code-note">Component events do not bubble into parent markup automatically. Writing on:tap without a handler re-dispatches the event so a grandparent can handle it.</p>
+    <h3 id="ch3-bindings" data-toc>3.4 Two-way bindings: value, checked &amp; group</h3>
+    <p class="topic-desc">This section shows how bind syncs a variable with a form field in both directions, so typing updates state and state updates the field. Checkbox groups collect their checked values into a single array. It also covers the standard bindings available on input, select and textarea elements.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let name = '';
+  let agreed = false;
+  let tags = ['svelte'];          // checkbox group collects here
+&lt;/script&gt;
+
+&lt;input bind:value={name} placeholder="Your name"&gt;
+&lt;input type="checkbox" bind:checked={agreed}&gt; I agree
+
+{#each ['svelte', 'vite', 'typescript'] as tag}
+  &lt;label&gt;
+    &lt;input type="checkbox" value={tag} bind:group={tags}&gt; {tag}
+  &lt;/label&gt;
+{/each}
+
+&lt;p&gt;Hello {name} — {agreed ? 'signed' : 'not signed'} — {tags.join(', ')}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">bind:value syncs an input with a variable, bind:checked does the same for booleans, and bind:group on checkboxes gathers every checked value into the tags array.</p>
+    <h3 id="ch3-bindthis" data-toc>3.5 bind:this and component bindings</h3>
+    <p class="topic-desc">This section stores a DOM element or a child component instance in a variable using bind:this. Once stored, you can call native methods such as focus and also call functions the child exports. This is the imperative escape hatch that stays inside the reactive model.</p>
+    <div class="codeWrap"><pre><code>// Parent.svelte
+&lt;script&gt;
+  import Child from './Child.svelte';
+  let inputEl;          // filled by bind:this once mounted
+  let child;            // the component instance itself
+
+  function focusIt() {
+    inputEl.focus();        // native DOM element method
+    child.setCount(99);     // function exported by the child component
+  }
+&lt;/script&gt;
+
+&lt;input bind:this={inputEl}&gt;
+&lt;button on:click={focusIt}&gt;focus and set&lt;/button&gt;
+&lt;Child bind:this={child} /&gt;
+
+// Child.svelte
+&lt;script&gt;
+  let count = 0;
+  export function setCount(n) { count = n; }   // callable by the parent
+&lt;/script&gt;
+&lt;p&gt;child count: {count}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">bind:this stores the DOM element or component instance in a variable. For DOM nodes you get the native element; for components you get the instance and may call its exported functions.</p>
+    <div class="ex"><h4 id="ch3-bindthis--exercises-3">Exercises 3</h4><ol>
+      <li>Make a Greeting component with a <code>name</code> prop (with a default) and render it three ways.</li>
+      <li>Dispatch a <code>love</code> event when a heart is clicked and log its <code>detail</code> in the parent.</li>
+      <li>Forward an event through a wrapper component without handling it.</li>
+      <li>Build a sign-up form using <code>bind:value</code> and a <code>bind:group</code> of interests.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Logic Blocks</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Logic Blocks</button><div class="ch-toc-list"><a href="#ch4-if">4.1 if, else if &amp; else</a><a href="#ch4-each">4.2 each blocks, indexes &amp; keys</a><a href="#ch4-await">4.3 await, then &amp; catch</a><a href="#ch4-snippets">4.4 Snippets &amp; {@render}</a></div></div>
+    <p class="topic-desc">This chapter covers the control-flow blocks you write directly inside markup. If blocks conditionally render branches, each blocks loop over arrays, await blocks handle promises, and snippets reuse chunks of template. They replace loops and conditionals with readable inline templates.</p>
+    <h3 id="ch4-if" data-toc>4.1 if, else if &amp; else</h3>
+    <p class="topic-desc">This section renders one of several branches conditionally using if, else if and else. Exactly one branch exists in the DOM at any time, and Svelte keeps state inside active branches as long as they stay mounted. Use keys or placeholder elements when you need to preserve or reset that state.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let score = 72;
+
+  $: grade =
+    score &gt;= 90 ? 'A' :
+    score &gt;= 75 ? 'B' :
+    score &gt;= 60 ? 'C' : 'F';
+&lt;/script&gt;
+
+{#if grade === 'F'}
+  &lt;p&gt;Keep practising — you will get there.&lt;/p&gt;
+{:else if grade === 'C'}
+  &lt;p&gt;Solid. Push for a B.&lt;/p&gt;
+{:else}
+  &lt;p&gt;Nice work.&lt;/p&gt;
+{/if}</code></pre></div>
+    <p class="code-note">{#if} renders a branch when its condition holds, {:else if} chains another condition, and {:else} is the fallback. Only one branch is mounted at a time.</p>
+    <h3 id="ch4-each" data-toc>4.2 each blocks, indexes &amp; keys</h3>
+    <p class="topic-desc">This section loops over arrays in markup with an each block, optionally exposing the index and a key. A keyed each block lets Svelte patch exactly the right row when items reorder instead of rebuilding the whole list. Keys matter for stable row state and for flip animations.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let todos = [
+    { id: 1, text: 'learn blocks' },
+    { id: 2, text: 'keyed each' },
+  ];
+
+  function remove(id) {
+    todos = todos.filter(t =&gt; t.id !== id);   // reassign so the block updates
+  }
+&lt;/script&gt;
+
+&lt;table&gt;
+  {#each todos as todo, i (todo.id)}   // value, index, then key in parentheses
+    &lt;tr&gt;
+      &lt;td&gt;{i}&lt;/td&gt;
+      &lt;td&gt;{todo.text}&lt;/td&gt;
+      &lt;td&gt;&lt;button on:click={() =&gt; remove(todo.id)}&gt;done&lt;/button&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  {/each}
+&lt;/table&gt;</code></pre></div>
+    <p class="code-note">Each block iterates with the value, an optional index i, and an optional key in parentheses. Keying by todo.id lets Svelte move and patch the exact row instead of rebuilding the list.</p>
+    <div class="tip"><p>Always key each blocks that can reorder or be filtered. Without a key, Svelte reuses rows by position, which loses per-row state and animates badly.</p></div>
+    <h3 id="ch4-await" data-toc>4.3 await, then &amp; catch</h3>
+    <p class="topic-desc">This section handles promises directly in markup with an await block and its then and catch branches. As the promise settles, the block switches between a pending branch, a resolved branch and a rejected branch. This keeps loading and error UI close to the data that needs it.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let promise = fetch('/api/user').then(r =&gt; r.json());
+
+  function reload() {
+    promise = fetch('/api/user').then(r =&gt; r.json());   // restarts the block
+  }
+&lt;/script&gt;
+
+{#await promise}
+  &lt;p&gt;Loading...&lt;/p&gt;
+{:then user}
+  &lt;p&gt;Hello {user.name}&lt;/p&gt;
+{:catch error}
+  &lt;p&gt;Could not load: {error.message}&lt;/p&gt;
+{/await}
+
+&lt;button on:click={reload}&gt;retry&lt;/button&gt;</code></pre></div>
+    <p class="code-note">{#await} watches a promise and swaps between three branches: pending, resolved ({:then}) and rejected ({:catch}). Reassigning the promise restarts the whole block.</p>
+    <h3 id="ch4-snippets" data-toc>4.4 Snippets &amp; {@render}</h3>
+    <p class="topic-desc">This section reuses chunks of markup by declaring them with the snippet block and invoking them with the render tag. Snippets can accept arguments, so they behave like small template functions you can pass values into. This is the modern way to build reusable fragments inside a component.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let planets = ['mercury', 'venus', 'earth'];
+&lt;/script&gt;
+
+{#snippet row(item)}
+  &lt;li&gt;&lt;strong&gt;{item}&lt;/strong&gt;&lt;/li&gt;
+{/snippet}
+
+&lt;ul&gt;
+  {#each planets as p}
+    {@render row(p)}    // invoke the snippet with this planet
+  {/each}
+&lt;/ul&gt;</code></pre></div>
+    <p class="code-note">A snippet is reusable markup defined once and invoked with {@render}. Passing arguments keeps repeated row markup in one place instead of restating it inside every loop.</p>
+    <div class="ex"><h4 id="ch4-snippets--exercises-4">Exercises 4</h4><ol>
+      <li>Show a score badge using <code>{#if}</code> with three grades.</li>
+      <li>Render a list with <code>{#each}</code>, an index and a key; delete rows and confirm state survives.</li>
+      <li>Replace a local list with an <code>{#await}</code> block fed by a fake promise.</li>
+      <li>Extract row markup into a <code>{#snippet}</code> and call it with <code>{@render}</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Stores</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Stores</button><div class="ch-toc-list"><a href="#ch5-writable">5.1 writable stores &amp; the $ prefix</a><a href="#ch5-readable">5.2 readable stores</a><a href="#ch5-derived">5.3 derived stores</a><a href="#ch5-custom">5.4 Custom stores &amp; the store contract</a><a href="#ch5-context">5.5 Context vs stores</a></div></div>
+    <p class="topic-desc">This chapter shares state between components with stores, including the writable, readable and derived constructors. The dollar prefix subscribes a component automatically and unsubscribes it on unmount. Stores give you shared state that goes beyond what props and bindings can express.</p>
+    <h3 id="ch5-writable" data-toc>5.1 writable stores &amp; the $ prefix</h3>
+    <p class="topic-desc">This section creates a writable store with the writable function and accesses its subscribe, set and update methods. Reading it in a component with the dollar prefix handles subscribing and unsubscribing for you. Use this store wherever several components need the same live value.</p>
+    <div class="codeWrap"><pre><code>// store/count.js
+import { writable } from 'svelte/store';
+export const count = writable(0);       // exposes { subscribe, set, update }
+
+// CountPanel.svelte
+&lt;script&gt;
+  import { count } from './store/count.js';
+&lt;/script&gt;
+
+&lt;button on:click={() =&gt; count.update(n =&gt; n + 1)}&gt;{$count}&lt;/button&gt;
+&lt;button on:click={() =&gt; count.set(0)}&gt;reset&lt;/button&gt;
+&lt;p&gt;Double: {$count * 2}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">writable creates a store with subscribe, set and update. In a component the $ prefix auto-subscribes and auto-unsubscribes, so $count always holds the live value.</p>
+    <h3 id="ch5-readable" data-toc>5.2 readable stores</h3>
+    <p class="topic-desc">This section creates readable stores that other code can observe but never set from outside. The start function pushes values into the store and may return a cleanup for when the last subscriber goes away. Use readable for clocks, timers and other external data sources.</p>
+    <div class="codeWrap"><pre><code>// store/clock.js
+import { readable } from 'svelte/store';
+
+export const clock = readable(null, (set) =&gt; {
+  const id = setInterval(() =&gt; set(new Date()), 1000);   // push an update every second
+  return () =&gt; clearInterval(id);   // cleanup runs when the last subscriber leaves
+});</code></pre></div>
+    <p class="code-note">readable takes an initial value and a start function that can push new values with set. Its cleanup clears the interval once nobody is subscribed, so timers never leak.</p>
+    <h3 id="ch5-derived" data-toc>5.3 derived stores</h3>
+    <p class="topic-desc">This section computes a store from one or more input stores using the derived function. The derived value recomputes automatically whenever any input changes, and the computation may be asynchronous. Use it to project shared state into the exact shape components need.</p>
+    <div class="codeWrap"><pre><code>import { derived, writable } from 'svelte/store';
+
+export const items = writable(3);
+export const perItem = writable(10);
+
+// sync derived: runs whenever any listed store changes
+export const total = derived(
+  [items, perItem],
+  ([$items, $perItem]) =&gt; $items * $perItem,
+);
+
+// async derived: set() can be called later, e.g. from a fetch
+export const label = derived(total, ($total, set) =&gt; {
+  fetch('/label').then(r =&gt; r.text()).then(set);   // push when the data arrives
+});</code></pre></div>
+    <p class="code-note">derived accepts one store or an array of stores. The callback recomputes when inputs change, and the two-argument form can set a value asynchronously via the set callback.</p>
+    <h3 id="ch5-custom" data-toc>5.4 Custom stores &amp; the store contract</h3>
+    <p class="topic-desc">This section wraps a writable store to expose a purpose-built API with methods such as increment instead of raw set and update calls. Because any object with a subscribe method is a store, the contract Svelte requires is minimal. Custom stores are the idiomatic way to give shared state a named interface.</p>
+    <div class="codeWrap"><pre><code>// store/cart.js
+import { writable } from 'svelte/store';
+
+function createCart() {
+  const { subscribe, set, update } = writable([]);
+
+  return {
+    subscribe,                    // the contract: subscribe is mandatory
+    add: (item) =&gt; update(list =&gt; [...list, item]),
+    remove: (id) =&gt; update(list =&gt; list.filter(i =&gt; i.id !== id)),
+    clear: () =&gt; set([]),
+  };
+}
+
+export const cart = createCart();</code></pre></div>
+    <p class="code-note">A store is simply any object with a subscribe method. Custom stores wrap writable and expose methods like cart.add(item), so components read intentions instead of raw updates.</p>
+    <h3 id="ch5-context" data-toc>5.5 Context vs stores</h3>
+    <p class="topic-desc">This section compares setContext and getContext with stores. Context is per-instance and scoped to a component tree, so different parts of an app can hold different values; stores are global singletons shared by every component. Choose context for dependency injection and stores for app-wide state.</p>
+    <div class="codeWrap"><pre><code>// Panel.svelte — hand a value down the tree, not globally
+&lt;script&gt;
+  import { setContext } from 'svelte';
+  import Child from './Child.svelte';
+
+  setContext('theme', { mode: 'dark' });   // visible to this subtree only
+  setContext('language', 'en');            // another key on the same element
+&lt;/script&gt;
+&lt;Child /&gt;
+
+// Child.svelte — read it back wherever needed
+&lt;script&gt;
+  import { getContext } from 'svelte';
+  const theme = getContext('theme');       // { mode: 'dark' }
+  const lang = getContext('language');
+&lt;/script&gt;
+&lt;p&gt;{lang}: theme is {theme.mode}&lt;/p&gt;
+
+// the global alternative: a store shared app-wide
+&lt;script&gt;
+  import { settings } from './store/settings.js';
+&lt;/script&gt;
+&lt;p&gt;Applied: {$settings.mode}&lt;/p&gt;   // any component, any depth</code></pre></div>
+    <p class="code-note">setContext makes a value available to every descendant component and getContext reads it back. Unlike stores it is per-instance — sibling subtrees keep their own copies — while stores share globally.</p>
+    <div class="ex"><h4 id="ch5-context--exercises-5">Exercises 5</h4><ol>
+      <li>Move a cart count into a <code>writable</code> store used by two components.</li>
+      <li>Publish the current time every second with <code>readable</code> and confirm cleanup runs.</li>
+      <li>Derive a greeting that joins a name store and a time-of-day store.</li>
+      <li>Turn the cart into a custom store with <code>add</code>, <code>remove</code> and <code>clear</code> methods.</li>
+      <li>Give each user their own cart with a context key instead of a shared store.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Lifecycle &amp; Scheduling</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Lifecycle &amp; Scheduling</button><div class="ch-toc-list"><a href="#ch6-onmount">6.1 onMount &amp; onDestroy</a><a href="#ch6-update">6.2 beforeUpdate &amp; afterUpdate</a><a href="#ch6-tick">6.3 tick &amp; batching</a><a href="#ch6-actions">6.4 Actions &amp; the use: directive</a></div></div>
+    <p class="topic-desc">This chapter connects you to the moments a component lives through: mount, update and destroy. The onMount, onDestroy, beforeUpdate and afterUpdate functions cover each one. Balancing side effects with these hooks keeps listener registration and teardown in sync.</p>
+    <h3 id="ch6-onmount" data-toc>6.1 onMount &amp; onDestroy</h3>
+    <p class="topic-desc">This section runs side effects once the component has been added to the DOM using onMount, and cleans them up when it leaves using onDestroy. Registering a listener in onMount and removing it in onDestroy is the classic pair. These functions are the right home for fetches, timers and subscriptions.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { onMount, onDestroy } from 'svelte';
+
+  let width = 0;
+
+  onMount(() =&gt; {
+    width = window.innerWidth;                    // DOM is ready here
+    const onResize = () =&gt; (width = window.innerWidth);
+    window.addEventListener('resize', onResize);
+
+    onDestroy(() =&gt; window.removeEventListener('resize', onResize));   // paired cleanup
+  });
+&lt;/script&gt;
+
+&lt;p&gt;Viewport: {width}px&lt;/p&gt;</code></pre></div>
+    <p class="code-note">onMount runs once the component is in the DOM — the right place for side effects. onDestroy pairs with it for cleanup so removing the component never leaks an event listener.</p>
+    <h3 id="ch6-update" data-toc>6.2 beforeUpdate &amp; afterUpdate</h3>
+    <p class="topic-desc">This section runs code just before and just after the DOM is patched using beforeUpdate and afterUpdate. afterUpdate is the home for imperative touches such as scrolling a chat log into view. These hooks let you observe and respond to every render cycle of the component.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { afterUpdate } from 'svelte';
+
+  let messages = [];
+  let list;
+
+  afterUpdate(() =&gt; {
+    list.scrollTo(0, list.scrollHeight);   // the DOM just patched — scroll to bottom
+  });
+
+  function send(text) {
+    messages = [...messages, text];        // this assignment triggers afterUpdate
+  }
+&lt;/script&gt;
+
+&lt;div class="chat" bind:this={list}&gt;
+  {#each messages as m}
+    &lt;p&gt;{m}&lt;/p&gt;
+  {/each}
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">afterUpdate fires after every dispatch’s DOM patch — ideal for adjusting freshly rendered nodes, like keeping a chat pinned to the bottom. beforeUpdate is its mirror, running just before.</p>
+    <h3 id="ch6-tick" data-toc>6.3 tick &amp; batching</h3>
+    <p class="topic-desc">This section explains that Svelte batches DOM updates into a single flush per microtask. The tick function returns a promise that resolves after any pending updates have been applied to the DOM. Await tick after changing state when you need to measure or read freshly updated DOM.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { tick } from 'svelte';
+
+  let count = 0;
+
+  async function showSnap() {
+    count += 1;                       // update is scheduled, not yet applied
+    await tick();                     // resolves once the DOM has been updated
+    console.log(document.body.innerText.includes('count: 1'));   // true here
+    count += 1;                       // a second update flushed independently
+  }
+&lt;/script&gt;
+
+&lt;button on:click={showSnap}&gt;increment&lt;/button&gt;
+&lt;p&gt;count: {count}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">Svelte batches updates and flushes them asynchronously. await tick() pauses until the current batch has been applied, so you can safely read the freshly updated DOM.</p>
+    <h3 id="ch6-actions" data-toc>6.4 Actions &amp; the use: directive</h3>
+    <p class="topic-desc">This section wraps third-party widgets and DOM behaviour in reusable actions using the use directive. An action receives the element it is attached to and may return destroy and update functions. Actions are the clean way to integrate non-Svelte libraries with a component.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  function tooltip(node, text) {
+    // node: the element the action is applied to
+    const show = () =&gt; node.setAttribute('title', text);
+    const hide = () =&gt; node.removeAttribute('title');
+    node.addEventListener('mouseenter', show);
+    node.addEventListener('mouseleave', hide);
+
+    return {
+      update(next) { text = next; },        // called when the argument changes
+      destroy() {                           // called when the node unmounts
+        node.removeEventListener('mouseenter', show);
+        node.removeEventListener('mouseleave', hide);
+      },
+    };
+  }
+&lt;/script&gt;
+
+&lt;button use:tooltip={'save your work'}&gt;Save&lt;/button&gt;</code></pre></div>
+    <p class="code-note">An action is a function that receives its element. Returning destroy handles teardown and update reacts to new argument values — the idiomatic way to attach widgets and listeners.</p>
+    <div class="ex"><h4 id="ch6-actions--exercises-6">Exercises 6</h4><ol>
+      <li>Fetch data in <code>onMount</code> and render it with an <code>{#await}</code> block.</li>
+      <li>Build an autoscrolling log using <code>afterUpdate</code> and <code>bind:this</code>.</li>
+      <li>Write a reusable <code>clickOutside</code> action and apply it with <code>use:</code>.</li>
+      <li>Verify <code>onDestroy</code> runs when a component is toggled away.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Transitions, Animations &amp; Motion</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Transitions, Animations &amp; Motion</button><div class="ch-toc-list"><a href="#ch7-transitions">7.1 Built-in transitions: fade &amp; slide</a><a href="#ch7-inout">7.2 in:, out:, custom transitions &amp; easing</a><a href="#ch7-flip">7.3 animate:flip for reordered lists</a><a href="#ch7-motion">7.4 Motion stores: tweened &amp; spring</a><a href="#ch7-reduced">7.5 Respecting prefers-reduced-motion</a></div></div>
+    <p class="topic-desc">This chapter adds life to interfaces with the transition directive, flip animations for reordered lists and physics-based motion stores. Ready-made effects come from svelte/transition and easing from svelte/easing. Every feature respects reduced-motion preferences so interfaces stay accessible.</p>
+    <h3 id="ch7-transitions" data-toc>7.1 Built-in transitions: fade &amp; slide</h3>
+    <p class="topic-desc">This section applies the transition directive with ready-made effects such as fade and slide imported from svelte/transition. You add the directive to an element and the effect plays when it mounts and unmounts. Options like duration and delay tune how the motion behaves.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { fade, slide } from 'svelte/transition';
+  let shown = true;
+&lt;/script&gt;
+
+&lt;button on:click={() =&gt; shown = !shown}&gt;toggle&lt;/button&gt;
+
+{#if shown}
+  &lt;p transition:fade&gt;I fade in and out&lt;/p&gt;
+  &lt;p transition:slide&gt;I slide while fading&lt;/p&gt;
+  &lt;p transition:scale={{ start: 0.5, opacity: 0 }}&gt;parameterised&lt;/p&gt;
+{/if}</code></pre></div>
+    <p class="code-note">transition:name animates an element both in and out. The animations come from svelte/transition, and options in braces such as transition:scale={{ start: 0.5 }} tune them.</p>
+    <h3 id="ch7-inout" data-toc>7.2 in:, out:, custom transitions &amp; easing</h3>
+    <p class="topic-desc">This section sets separate enter and exit animations using the in and out directives, or writes a fully custom transition function. A custom transition receives the node and parameters and returns a promise or a callback for completion. Easing functions from svelte/easing shape how fast the motion travels.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { fly, fade } from 'svelte/transition';
+  import { expoOut } from 'svelte/easing';
+  let open = false;
+&lt;/script&gt;
+
+&lt;button on:click={() =&gt; open = !open}&gt;open drawer&lt;/button&gt;
+
+{#if open}
+  &lt;div
+    in:fly={{ y: 40, opacity: 0, duration: 400, easing: expoOut }}
+    out:fade
+  &gt;drawer body&lt;/div&gt;
+{/if}</code></pre></div>
+    <p class="code-note">in: and out: set distinct enter and exit animations. Custom parameters plus an easing like expoOut give the motion its character — they shape the speed curve, not just the duration.</p>
+    <h3 id="ch7-flip" data-toc>7.3 animate:flip for reordered lists</h3>
+    <p class="topic-desc">This section animates elements to their new position when a keyed list reorders using the animate directive with the flip function. FLIP measures start and end positions and eases the difference, so rows glide into place instead of jumping. The each block must be keyed for this to work.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { flip } from 'svelte/animate';
+
+  let words = ['compile', 'bundle', 'ship'];
+
+  function shuffle() {
+    words = [...words].reverse();   // reassign; flip animates the movement
+  }
+&lt;/script&gt;
+
+{#each words as word (word)}
+  &lt;p animate:flip&gt;{word}&lt;/p&gt;
+{/each}
+&lt;button on:click={shuffle}&gt;reverse&lt;/button&gt;</code></pre></div>
+    <p class="code-note">animate:flip measures where each keyed element starts and ends and animates the difference, so reversing the list slides items smoothly instead of teleporting them.</p>
+    <h3 id="ch7-motion" data-toc>7.4 Motion stores: tweened &amp; spring</h3>
+    <p class="topic-desc">This section animates values themselves instead of elements using tweened and spring from svelte/motion. tweened glides toward a target over a fixed duration, while spring chases it with physics so it settles and bounces naturally. Both are stores, so you read them with the dollar prefix.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { tweened } from 'svelte/motion';
+  import { spring } from 'svelte/motion';
+  import { quartOut } from 'svelte/easing';
+
+  let progress = tweened(0, { duration: 900, easing: quartOut });  // timed glide
+  let size = spring(10, { stiffness: 0.15, damping: 0.9 });       // physical chase
+&lt;/script&gt;
+
+&lt;button on:click={() =&gt; progress.set(100)}&gt;run progress&lt;/button&gt;
+&lt;div class="bar" style="width: {$progress}px"&gt;&lt;/div&gt;
+
+&lt;button on:click={() =&gt; size.set(80)}&gt;grow&lt;/button&gt;
+&lt;div class="dot" style="width: {$size}px; height: {$size}px"&gt;&lt;/div&gt;</code></pre></div>
+    <p class="code-note">tweened interpolates between values over a set duration, while spring tracks velocity and behaves like physics. Setting a new value on either animates from the current value.</p>
+    <h3 id="ch7-reduced" data-toc>7.5 Respecting prefers-reduced-motion</h3>
+    <p class="topic-desc">This section gates animations behind the operating system’s motion preference. The prefersReducedMotion store exposes the CSS media query reactively, and you can subscribe to it to disable transitions for users who opt out of motion. Reading it in components keeps motion respectful.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { prefersReducedMotion } from 'svelte/motion';
+  import { fly } from 'svelte/transition';
+&lt;/script&gt;
+
+{#if !$prefersReducedMotion}
+  &lt;p transition:fly={{ y: 30 }}&gt;slides when motion is allowed&lt;/p&gt;
+{:else}
+  &lt;p&gt;appears instantly when motion is reduced&lt;/p&gt;
+{/if}</code></pre></div>
+    <p class="code-note">prefersReducedMotion is a readable store reflecting the system motion preference. Reading it inline with $ and dropping transitions keeps the UI comfortable for every user.</p>
+    <div class="ex"><h4 id="ch7-reduced--exercises-7">Exercises 7</h4><ol>
+      <li>Fade and slide an alert in and out.</li>
+      <li>Sort a keyed list and let <code>animate:flip</code> show the movement.</li>
+      <li>Drive a progress bar with <code>tweened</code> and a bouncy dot with <code>spring</code>.</li>
+      <li>Make the alert degrade to an instant show/hide under <code>prefersReducedMotion</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Slots, Composition &amp; Special Elements</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Slots, Composition &amp; Special Elements</button><div class="ch-toc-list"><a href="#ch8-slots">8.1 Slots &amp; slot props</a><a href="#ch8-fragment">8.2 svelte:fragment &amp; recursive components</a><a href="#ch8-component">8.3 svelte:component</a><a href="#ch8-window">8.4 svelte:window, svelte:document &amp; svelte:head</a><a href="#ch8-element">8.5 svelte:element</a></div></div>
+    <p class="topic-desc">This chapter composes interfaces with slots and the special svelte elements. These let components accept caller-provided content, recurse over their own structure, and reach into the window, document and head. Together they cover the escape hatches that go beyond ordinary markup.</p>
+    <h3 id="ch8-slots" data-toc>8.1 Slots &amp; slot props</h3>
+    <p class="topic-desc">This section accepts caller-provided content with a default slot, named slots and fallback content. Slot props pass values from the component back up to the content that fills the slot. This is the primary tool for building layout and wrapper components.</p>
+    <div class="codeWrap"><pre><code>// Panel.svelte — a wrapper with named and fallback content
+&lt;div class="panel"&gt;
+  &lt;header&gt;&lt;slot name="title"&gt;Untitled&lt;/slot&gt;&lt;/header&gt;
+  &lt;div class="body"&gt;&lt;slot&gt;&lt;/slot&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+// App.svelte
+&lt;script&gt;
+  import Panel from './Panel.svelte';
+&lt;/script&gt;
+
+&lt;Panel&gt;
+  &lt;span slot="title"&gt;Settings&lt;/span&gt;    // fills the named slot
+  &lt;p&gt;Your preferences live here.&lt;/p&gt;     // fills the default slot
+&lt;/Panel&gt;</code></pre></div>
+    <p class="code-note">The default slot renders whatever sits between the component tags, while slot="title" targets a named slot. When the caller provides nothing, the fallback content (Untitled) shows.</p>
+    <div class="codeWrap"><pre><code>// Item.svelte — hand data back to the caller's fill
+&lt;script&gt;
+  export let item = { name: 'ada' };
+&lt;/script&gt;
+
+&lt;div&gt;
+  &lt;slot label={item.name} count={1}&gt;&lt;/slot&gt;
+&lt;/div&gt;
+
+// App.svelte
+&lt;script&gt;
+  import Item from './Item.svelte';
+&lt;/script&gt;
+
+&lt;Item let:label let:count&gt;
+  &lt;p&gt;{label} ({count})&lt;/p&gt;    // label and count arrive from the child
+&lt;/Item&gt;</code></pre></div>
+    <p class="code-note">Slot props let a child pass values up into the content that fills the slot. let:label in the caller binds that exported value so the fill can render it.</p>
+    <h3 id="ch8-fragment" data-toc>8.2 svelte:fragment &amp; recursive components</h3>
+    <p class="topic-desc">This section uses svelte:fragment to wrap content for a slot without adding an extra DOM element, and recursive components that render themselves. Together they power trees, menus and other structures of any depth. The fragment itself is invisible in the resulting markup.</p>
+    <div class="codeWrap"><pre><code>// TreeNode.svelte — recursion via a self-import
+&lt;script&gt;
+  import TreeNode from './TreeNode.svelte';
+  export let node;
+&lt;/script&gt;
+
+&lt;div class="node"&gt;{node.name}&lt;/div&gt;
+{#if node.children &amp;&amp; node.children.length}
+  &lt;div class="children"&gt;
+    {#each node.children as child (child.id)}
+      &lt;TreeNode node={child} /&gt;   // render one level deeper
+    {/each}
+  &lt;/div&gt;
+{/if}
+
+// App.svelte — a loop inside a slot needs grouping; svelte:fragment provides it
+&lt;script&gt;
+  import Select from './Select.svelte';
+  let list = ['uncooked', 'boiling', 'ready'];
+&lt;/script&gt;
+
+&lt;Select&gt;
+  &lt;svelte:fragment&gt;                  // groups without rendering a real element
+    {#each list as item}
+      &lt;button&gt;{item}&lt;/button&gt;
+    {/each}
+  &lt;/svelte:fragment&gt;
+&lt;/Select&gt;</code></pre></div>
+    <p class="code-note">Importing its own file lets a component render itself, giving you recursion for trees. svelte:fragment groups slot content without adding a DOM node, so loops can live inside slots cleanly.</p>
+    <h3 id="ch8-component" data-toc>8.3 svelte:component</h3>
+    <p class="topic-desc">This section renders whichever component its this value points to using svelte:component. Swapping the value unmounts the old component and mounts the new one, which makes it the tool for tabs and switchable views. You can also pass props through to the chosen component.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import Home from './Home.svelte';
+  import About from './About.svelte';
+  import Contact from './Contact.svelte';
+
+  const pages = { home: Home, about: About, contact: Contact };
+  let current = 'home';
+
+  $: active = pages[current];   // a component constructor in a variable
+&lt;/script&gt;
+
+{#each Object.keys(pages) as name}
+  &lt;button on:click={() =&gt; current = name}&gt;{name}&lt;/button&gt;
+{/each}
+
+&lt;svelte:component this={active} /&gt;   // swap which component renders</code></pre></div>
+    <p class="code-note">svelte:component renders whatever component this points to. Changing the variable unmounts the old and mounts the new — a clean mechanism for tabbed and dynamic views.</p>
+    <h3 id="ch8-window" data-toc>8.4 svelte:window, svelte:document &amp; svelte:head</h3>
+    <p class="topic-desc">This section attaches listeners and document tags declaratively using svelte:window, svelte:document and svelte:head. The first two clean up their listeners automatically when the component unmounts, and svelte:head pushes content into the document head. This keeps browser ties explicit in markup.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let y = 0;
+  let title = 'My app';
+  function onScroll() { y = window.scrollY; }
+&lt;/script&gt;
+
+&lt;svelte:window on:scroll={onScroll} on:keydown={onKey} /&gt;
+&lt;svelte:document title={title} /&gt;   // sets document.title
+&lt;svelte:head&gt;
+  &lt;meta name="description" content="Set via svelte:head"&gt;
+&lt;/svelte:head&gt;
+
+&lt;p&gt;scroll: {y}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">svelte:window and svelte:document bind events on the globals and remove them on unmount, and svelte:head injects tags into the document head — the idiomatic place for per-page metadata.</p>
+    <h3 id="ch8-element" data-toc>8.5 svelte:element</h3>
+    <p class="topic-desc">This section renders a dynamic tag name from a variable using svelte:element. One component can serve as any heading level or element while keeping its props simple. The tag name resolves at runtime via the this attribute, so you stay flexible without duplicating markup.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  export let level = 2;   // caller picks the heading level
+&lt;/script&gt;
+
+&lt;svelte:element this={'h' + level} class="title"&gt;
+  My heading
+&lt;/svelte:element&gt;</code></pre></div>
+    <p class="code-note">svelte:element renders the tag named by this, letting one component serve as h1 through h6 (or any element) while attributes and event bindings stay intact.</p>
+    <div class="ex"><h4 id="ch8-element--exercises-8">Exercises 8</h4><ol>
+      <li>Build a Card with title, default and footer slots; fill all three from the parent.</li>
+      <li>Pass a count through a slot prop and read it with <code>let:count</code>.</li>
+      <li>Render a menu tree recursively with a component that imports itself.</li>
+      <li>Switch three components with <code>svelte:component</code> and set the page title with <code>svelte:head</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Context, CSS &amp; Component Styling</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Context, CSS &amp; Component Styling</button><div class="ch-toc-list"><a href="#ch9-context">9.1 Context: setContext &amp; getContext</a><a href="#ch9-scoped">9.2 Scoped styles &amp; the :global escape</a><a href="#ch9-class">9.3 The class: directive</a><a href="#ch9-style">9.4 style: directives &amp; CSS custom properties</a></div></div>
+    <p class="topic-desc">This chapter covers context for deeper tree communication and the full styling toolkit: scoped CSS, the global escape, and the class and style directives. Styling stays scoped to components by default, and context lets you share values without prop drilling. Together they keep component trees self-contained and themable.</p>
+    <h3 id="ch9-context" data-toc>9.1 Context: setContext &amp; getContext</h3>
+    <p class="topic-desc">This section passes values from a parent to any descendant without prop drilling using setContext and getContext. Symbol keys and exported helper functions keep context tidy across files. Context is scoped to the component tree, so different parts of the app can hold different values.</p>
+    <div class="codeWrap"><pre><code>// accordion/context.js
+import { setContext, getContext } from 'svelte';
+
+const key = Symbol('accordion');   // symbol keys avoid naming collisions
+
+export function setAccordion(api) {
+  setContext(key, api);            // hand the API to this subtree
+}
+
+export function getAccordion() {
+  return getContext(key);          // read it back at any depth
+}
+
+// accordion/Accordion.svelte
+&lt;script&gt;
+  import { setAccordion } from './context.js';
+  setAccordion({ register, open, close });   // descendants call open etc.
+&lt;/script&gt;
+&lt;div class="accordion"&gt;&lt;slot /&gt;&lt;/div&gt;</code></pre></div>
+    <p class="code-note">A symbol as the context key prevents collisions between libraries. Exporting set/get helpers gives you an importable API so components at any depth can reach the value without prop drilling.</p>
+    <h3 id="ch9-scoped" data-toc>9.2 Scoped styles &amp; the :global escape</h3>
+    <p class="topic-desc">This section explains that Svelte scopes component styles by default by hashing class names, and offers the global escape as a deliberate way to opt out. Scoped styles keep components self-contained so changes never leak outward. Reach for the global escape only when you truly need document-wide reach.</p>
+    <div class="codeWrap"><pre><code>// Box.svelte
+&lt;div class="box"&gt;
+  &lt;p&gt;I match the .box rule.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+  .box {                       // scoped: the compiler tags matching elements
+    border: 1px solid teal;
+    padding: 1rem;
+  }
+
+  :global(.highlight) {        // escapes scope: applies everywhere
+    background: gold;
+  }
+
+  :global(body) { margin: 0 }  // document-level, used sparingly
+&lt;/style&gt;</code></pre></div>
+    <p class="code-note">Component styles are scoped by default: the compiler adds a class to each matching element, so .box here cannot leak. :global() opts out deliberately for shared utilities.</p>
+    <h3 id="ch9-class" data-toc>9.3 The class: directive</h3>
+    <p class="topic-desc">This section toggles a class on an element from any truthy expression using the class directive. The directive takes an object, a name with a condition, or a shorthand based on a boolean variable. It is the ergonomic replacement for building class strings by hand.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let active = false;
+  let prefersDark = true;
+&lt;/script&gt;
+
+&lt;button
+  class="pill"
+  class:active              // adds 'active' when the active variable is truthy
+  class:dark={prefersDark}  // adds 'dark' from any expression
+  on:click={() =&gt; active = !active}
+&gt;toggle pill&lt;/button&gt;</code></pre></div>
+    <p class="code-note">class:name toggles that class based on a truthy expression. The bare class:active is shorthand for class:active={active}, and it merges with any static class attribute.</p>
+    <h3 id="ch9-style" data-toc>9.4 style: directives &amp; CSS custom properties</h3>
+    <p class="topic-desc">This section sets individual CSS properties on an element with the style directive and passes theme values into children via CSS custom properties. Parents can set custom property values that cascade into child components. This is the sanctioned way to theme components without hacks.</p>
+    <div class="codeWrap"><pre><code>// Chip.svelte — a themable component
+&lt;script&gt;
+  export let color = 'teal';
+&lt;/script&gt;
+
+&lt;span class="chip" style="--chip: {color}"&gt;   // exposes a CSS custom property
+  &lt;slot /&gt;
+&lt;/span&gt;
+
+&lt;style&gt;
+  .chip {
+    background: var(--chip, #eee);   // falls back when --chip is absent
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+  }
+&lt;/style&gt;
+
+// App.svelte — the parent themes the child without touching its selectors
+&lt;script&gt;
+  import Chip from './Chip.svelte';
+  let busy = true;
+&lt;/script&gt;
+
+&lt;Chip color="#e91e63"&gt;pink chip&lt;/Chip&gt;
+&lt;Chip&gt;default chip&lt;/Chip&gt;
+&lt;p style:opacity={busy ? 0.5 : 1}&gt;style: sets one property at a time&lt;/p&gt;</code></pre></div>
+    <p class="code-note">Setting a custom property on the wrapper (--chip: {color}) and reading it with var() inside the component is how parents theme children. The style: directive sets a single CSS property directly on an element.</p>
+    <div class="ex"><h4 id="ch9-style--exercises-9">Exercises 9</h4><ol>
+      <li>Provide a theme object with <code>setContext</code> in App and read it in a grandchild.</li>
+      <li>Keep a component’s styles scoped, then deliberately reach out once with <code>:global</code>.</li>
+      <li>Toggle a nav item’s active class with the <code>class:</code> directive.</li>
+      <li>Make a Button whose background comes from a parent-supplied <code>--bg</code> custom property.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Best Practices &amp; Patterns</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Best Practices &amp; Patterns</button><div class="ch-toc-list"><a href="#ch10-design">10.1 Component design</a><a href="#ch10-reactivity">10.2 Avoiding over-reactivity</a><a href="#ch10-performance">10.3 Performance: lazy loading &amp; keyed lists</a><a href="#ch10-a11y">10.4 Accessibility</a><a href="#ch10-testing">10.5 Testing with Vitest &amp; Testing Library</a></div></div>
+    <p class="topic-desc">This chapter applies everything from the guide: component design, measured reactivity, performance, accessibility and testing. These habits decide whether a project stays pleasant to maintain as it grows. Working through them turns knowledge into production discipline.</p>
+    <h3 id="ch10-design" data-toc>10.1 Component design</h3>
+    <p class="topic-desc">This section keeps components small and single purpose with explicit props and clear boundaries. Fewer props, clearer names and composition beat clever abstractions and premature flexibility. Design components around the data they receive and the events they emit.</p>
+    <div class="codeWrap"><pre><code>// TodoRow.svelte — one job: render one todo item
+&lt;script&gt;
+  export let item;            // data in
+  export let busy = false;    // UI state reflected in the row
+&lt;/script&gt;
+
+&lt;label&gt;
+  &lt;input type="checkbox" checked={item.done} disabled={busy}&gt;
+  {item.text}
+&lt;/label&gt;</code></pre></div>
+    <p class="code-note">A focused component takes a small explicit prop surface and renders one thing. When a component accumulates many props or concerns, it is ready to be split.</p>
+    <h3 id="ch10-reactivity" data-toc>10.2 Avoiding over-reactivity</h3>
+    <p class="topic-desc">This section shows how to avoid over-reactivity by keeping derived logic pure and guarding expensive side effects. Reactive statements re-run on every dependency change by default, so they should be used deliberately and kept cheap. Careful structuring keeps updates predictable.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let query = '';
+  let results = [];
+
+  // guard the expensive side effect: only fetch when the query text changed
+  let last = '';
+  $: if (query !== last) {
+    last = query;
+    fetch('/search?q=' + encodeURIComponent(query))
+      .then(r =&gt; r.json())
+      .then(rows =&gt; (results = rows));
+  }
+&lt;/script&gt;
+
+&lt;input bind:value={query} placeholder="search"&gt;
+&lt;ul&gt;{#each results as r}&lt;li&gt;{r.title}&lt;/li&gt;{/each}&lt;/ul&gt;</code></pre></div>
+    <p class="code-note">Reactive statements fire on every dependency change. Guarding with a last-query check — or debouncing — stops expensive work such as fetch from running on every keystroke.</p>
+    <h3 id="ch10-performance" data-toc>10.3 Performance: lazy loading &amp; keyed lists</h3>
+    <p class="topic-desc">This section defers heavy components until they are needed with dynamic imports, and leans on keyed each blocks for stable, fast lists. Small habits here keep initial bundles and interactions fast. Profile first and only optimise the parts that actually cost.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { onMount } from 'svelte';
+  let chart = null;
+
+  onMount(async () =&gt; {
+    const { default: Chart } = await import('./Chart.svelte');  // load on demand
+    chart = Chart;
+  });
+&lt;/script&gt;
+
+&lt;svelte:component this={chart} data={rows} /&gt;   // renders once the chunk arrives</code></pre></div>
+    <p class="code-note">Dynamically importing a heavy component defers its JavaScript until it is actually needed, shrinking the initial bundle. Combined with keyed each and reassignment-based updates, most pages stay lean.</p>
+    <div class="tip"><p>Profile, then optimise. svelte-check, keyed lists, lazy imports and avoiding in-place mutation cover the vast majority of Svelte performance issues.</p></div>
+    <h3 id="ch10-a11y" data-toc>10.4 Accessibility</h3>
+    <p class="topic-desc">This section uses the accessibility warnings that svelte-check emits to build accessible components. Sound semantics start with real button elements, proper roles and meaningful labels instead of generic divs. Keyboard support and focus management follow the same checks.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  let open = false;
+&lt;/script&gt;
+
+&lt;button aria-expanded={open} on:click={() =&gt; open = !open}&gt;
+  Toggle menu
+&lt;/button&gt;
+
+{#if open}
+  &lt;ul role="menu"&gt;
+    &lt;li role="menuitem" tabindex="0"&gt;Edit&lt;/li&gt;
+    &lt;li role="menuitem" tabindex="0"&gt;Delete&lt;/li&gt;
+  &lt;/ul&gt;
+{/if}
+
+&lt;img src="logo.svg" alt="Acme logo"&gt;   // always provide alt text</code></pre></div>
+    <p class="code-note">Svelte’s a11y checks warn on unlabelled buttons and images. aria-expanded reveals menu state to screen readers, real buttons and roles make the menu operable, and alt text covers images.</p>
+    <h3 id="ch10-testing" data-toc>10.5 Testing with Vitest &amp; Testing Library</h3>
+    <p class="topic-desc">This section renders components and simulates real user interaction using Vitest and Testing Library. Tests assert what the user sees and does rather than how the component was built internally. Keeping tests close to behaviour means refactors do not break them.</p>
+    <div class="codeWrap"><pre><code>// Counter.svelte — the subject under test
+&lt;script&gt;
+  export let start = 0;
+  let count = start;
+&lt;/script&gt;
+&lt;button on:click={() =&gt; count += 1}&gt;count is {count}&lt;/button&gt;
+
+// counter.test.js — Vitest + Testing Library
+import { render, screen } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
+import Counter from './Counter.svelte';
+import { it, expect } from 'vitest';
+
+it('increments when a user clicks', async () =&gt; {
+  render(Counter, { start: 5 });
+  await userEvent.click(screen.getByRole('button'));
+  expect(screen.getByText('count is 6')).toBeTruthy();
+});
+
+// add to package.json: "test": "vitest"</code></pre></div>
+    <p class="code-note">Vitest runs the test, Testing Library renders the component and simulates a real click with userEvent, and the assertion checks the visible DOM — testing behaviour, not implementation.</p>
+    <div class="ex"><h4 id="ch10-testing--exercises-10">Exercises 10</h4><ol>
+      <li>Refactor a large component you know into two focused ones with explicit props.</li>
+      <li>Debounce a search so <code>$:</code> stops firing on every keystroke.</li>
+      <li>Lazy-load a chart only when a tab opens.</li>
+      <li>Add Vitest + Testing Library and cover the increment behaviour, including a keyboard press.</li>
+      <li>Fix every accessibility warning svelte-check reports on one component.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Quick Reference &amp; Glossary</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Quick Reference &amp; Glossary</button><div class="ch-toc-list"><a href="#app-directives">A.1 Directive quick reference</a><a href="#app-lifecycle">A.2 Lifecycle &amp; scheduling</a><a href="#app-stores">A.3 Store helpers</a><a href="#app-special">A.4 Special elements</a><a href="#app-glossary">A.5 Glossary</a></div></div>
+    <p class="topic-desc">This appendix bundles the essential Svelte syntax, store API, lifecycle hooks and special elements into a single quick reference. Skim it whenever you forget a directive, a store constructor or a lifecycle name. It is the offline companion to every chapter in the guide.</p>
+    <h3 id="app-directives" data-toc>A.1 Directive quick reference</h3>
+    <p class="topic-desc">This section lists the most frequently used Svelte directives at a glance, from on and bind to transition, use and class. Each entry names the directive, what it does and the shape it expects. Keep it open while you build your components.</p>
+    <table>
+      <tr><th>Directive</th><th>Does</th></tr>
+      <tr><td><code>{#if cond}...{:else}...{/if}</code></td><td>Conditional rendering</td></tr>
+      <tr><td><code>{#each list as item, i (key)}...{/each}</code></td><td>Loops with index and optional key</td></tr>
+      <tr><td><code>{#await p}...{:then v}...{:catch e}{/await}</code></td><td>Promise-driven branches</td></tr>
+      <tr><td><code>{#snippet name(arg)}...{@render name(val)}</code></td><td>Reusable chunks of markup</td></tr>
+      <tr><td><code>on:click={fn}</code></td><td>Event listener</td></tr>
+      <tr><td><code>bind:value={x}</code></td><td>Two-way binding</td></tr>
+      <tr><td><code>class:active={bool}</code></td><td>Toggle a class</td></tr>
+      <tr><td><code>style:color={c}</code></td><td>Set one CSS property</td></tr>
+      <tr><td><code>use:action</code></td><td>Run an action on the element</td></tr>
+      <tr><td><code>transition:fade</code> / <code>in:fade</code> / <code>out:fade</code> / <code>animate:flip</code></td><td>Animate elements</td></tr>
+    </table>
+    <h3 id="app-lifecycle" data-toc>A.2 Lifecycle &amp; scheduling</h3>
+    <p class="topic-desc">This section names every lifecycle hook in order and what it is for, from onMount through onDestroy along with beforeUpdate, afterUpdate and tick. Timing is everything when wiring side effects, so the table shows exactly where each one fits in a component’s life. Use it to double-check where a callback runs.</p>
+    <table>
+      <tr><th>Function</th><th>Runs</th></tr>
+      <tr><td><code>onMount(fn)</code></td><td>Once, after the component is in the DOM</td></tr>
+      <tr><td><code>onDestroy(fn)</code></td><td>Once, when the component unmounts — cleanup</td></tr>
+      <tr><td><code>beforeUpdate(fn)</code></td><td>Before every DOM patch</td></tr>
+      <tr><td><code>afterUpdate(fn)</code></td><td>After every DOM patch</td></tr>
+      <tr><td><code>tick()</code></td><td>Promise resolving after the pending update flushes</td></tr>
+      <tr><td>action <code>destroy</code> / <code>update</code></td><td>Action teardown and argument changes</td></tr>
+    </table>
+    <h3 id="app-stores" data-toc>A.3 Store helpers</h3>
+    <p class="topic-desc">This section summarises the store API and motion helpers such as writable, readable, derived, tweened and spring. The only real contract is the subscribe method; everything else is convenience built on top. Use it to remember exact constructor signatures and method names.</p>
+    <table>
+      <tr><th>Helper</th><th>Provides</th></tr>
+      <tr><td><code>writable(v)</code></td><td>{ subscribe, set, update }</td></tr>
+      <tr><td><code>readable(v, start)</code></td><td>Subscribe-only store with start and cleanup</td></tr>
+      <tr><td><code>derived(store, fn)</code></td><td>Value computed from input store(s)</td></tr>
+      <tr><td><code>$store</code></td><td>Auto-subscribe inside components</td></tr>
+      <tr><td><code>tweened(v, opts)</code></td><td>Duration-based motion store</td></tr>
+      <tr><td><code>spring(v, opts)</code></td><td>Physics-based motion store</td></tr>
+    </table>
+    <h3 id="app-special" data-toc>A.4 Special elements</h3>
+    <p class="topic-desc">This section lists the special svelte elements that reach beyond ordinary markup, from svelte:component through svelte:window, svelte:head and svelte:fragment. Each one has a precise job such as dynamic tags, document access or invisible wrappers. This is the reference for escaping the box of a normal component.</p>
+    <table>
+      <tr><th>Element</th><th>Job</th></tr>
+      <tr><td><code>&lt;svelte:window&gt;</code></td><td>Window events, cleaned up on unmount</td></tr>
+      <tr><td><code>&lt;svelte:document&gt;</code></td><td>Document events and the title property</td></tr>
+      <tr><td><code>&lt;svelte:head&gt;</code></td><td>Inject tags into the document head</td></tr>
+      <tr><td><code>&lt;svelte:component this={x}&gt;</code></td><td>Render a dynamic component</td></tr>
+      <tr><td><code>&lt;svelte:element this={'h3'}&gt;</code></td><td>Render a dynamic element tag</td></tr>
+      <tr><td><code>&lt;svelte:fragment&gt;</code></td><td>Group content without rendering DOM</td></tr>
+    </table>
+    <h3 id="app-glossary" data-toc>A.5 Glossary</h3>
+    <p class="topic-desc">This section defines the terms used across the guide in plain language, from reactivity and stores to slots and special elements. Return here whenever a chapter name or concept stops making sense. The entries match the exact vocabulary used throughout the chapters.</p>
+    <ul>
+      <li><strong>Reactive statement</strong> — a <code>$:</code> labelled block that re-runs when its dependencies change.</li>
+      <li><strong>Store contract</strong> — an object with a subscribe method; all stores, custom or built-in, satisfy it.</li>
+      <li><strong>Rune</strong> — Svelte 5's compiler symbols (<code>$state</code>, <code>$derived</code>, <code>$effect</code>) for modern reactivity.</li>
+      <li><strong>Action</strong> — a function applied with <code>use:</code> that receives the element and returns lifecycle hooks.</li>
+      <li><strong>Slot / slot props</strong> — content injected from the parent; slot props hand values back up.</li>
+      <li><strong>Scoped CSS / :global</strong> — styles confined to a component unless deliberately escaped.</li>
+      <li><strong>FLIP</strong> — first-last-invert-play; the technique behind <code>animate:flip</code> position animation.</li>
+      <li><strong>Transition / animation / motion</strong> — svelte/transition (in and out moves), svelte/animate (FLIP), svelte/motion (tweened and spring stores).</li>
+      <li><strong>Keyed each</strong> — an <code>{#each}</code> with a key expression, keeping row identity stable through reorders.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Svelte — Reactive Components Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

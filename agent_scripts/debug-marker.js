@@ -1,0 +1,20 @@
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const ROOT = path.resolve(__dirname, '..');
+const s = fs.readFileSync(path.join(ROOT, process.argv[2]), 'utf8');
+const id = process.argv[3];
+const occ = [...s.matchAll(/\sid="([^"]+)"/g)].filter((m) => m[1] === id).map((m) => m.index);
+console.log('occurrences:', occ);
+const A = occ[0], A2 = occ[1];
+const unit = s.slice(A, A2);
+const mIdx = unit.lastIndexOf('<div class="codeWrap"><pre><code>');
+console.log('mIdx', mIdx, 'unitLen', unit.length);
+const marker = unit.slice(mIdx);
+console.log('marker len', marker.length);
+console.log('marker JSON:', JSON.stringify(marker.slice(0, 200)));
+let from = A2, hits = [];
+for (;;) { const at = s.indexOf(marker, from); if (at < 0) break; hits.push(at); from = at + 1; }
+console.log('marker hits after A2:', hits);
+const nextH3 = s.indexOf('<h3 ', A2);
+console.log('nextH3', nextH3, 'A2', A2);

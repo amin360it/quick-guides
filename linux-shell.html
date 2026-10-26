@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Bash and Shell Scripting</title>
+<meta name="description" content="Choosing a shell is about where the script runs, not taste. Bash from first principles to advanced scripting: quoting, pipes, job control and automation.">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/linux-shell.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Linux Bash and Shell Scripting">
+<meta property="og:description" content="Choosing a shell is about where the script runs, not taste. Bash from first principles to advanced scripting: quoting, pipes, job control and automation.">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/linux-shell.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Linux Bash and Shell Scripting">
+<meta name="twitter:description" content="Choosing a shell is about where the script runs, not taste. Bash from first principles to advanced scripting: quoting, pipes, job control and automation.">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/linux-shell.html#article","headline":"Linux Bash and Shell Scripting","name":"Linux Bash and Shell Scripting","description":"Choosing a shell is about where the script runs, not taste. Bash from first principles to advanced scripting: quoting, pipes, job control and automation.","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/linux-shell.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/linux-shell.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Linux Bash and Shell Scripting","item":"https://amin360it.github.io/quick-guides/linux-shell.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 ▸ Shell Essentials</a><ul>
+<li><a href="#ch1-1" data-target="ch1-1">1.1 Choosing a shell, and what that decision costs</a></li>
+<li><a href="#ch1-2" data-target="ch1-2">1.2 How a line expands before it runs</a></li>
+<li><a href="#ch1-3" data-target="ch1-3">1.3 The shebang, and finding the interpreter</a></li>
+<li><a href="#ch1-4" data-target="ch1-4">1.4 Exit codes, and what failure means</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 ▸ Files, Commands and Navigation</a><ul>
+<li><a href="#ch2-1" data-target="ch2-1">2.1 PATH and how a command is found</a></li>
+<li><a href="#ch2-2" data-target="ch2-2">2.2 Listing, inspecting and moving around</a></li>
+<li><a href="#ch2-3" data-target="ch2-3">2.3 Globbing vs find — knowing which one you are using</a></li>
+<li><a href="#ch2-4" data-target="ch2-4">2.4 which, whereis, type and the "command not found" autopsy</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 ▸ Variables, Parameters and Expansion</a><ul>
+<li><a href="#ch3-1" data-target="ch3-1">3.1 Names, assignment and the no-space rule</a></li>
+<li><a href="#ch3-2" data-target="ch3-2">3.2 $var and ${var}, and where braces are not optional</a></li>
+<li><a href="#ch3-3" data-target="ch3-3">3.3 Defaults, required values and the four :- forms</a></li>
+<li><a href="#ch3-4" data-target="ch3-4">3.4 Pattern removal, substring, length, case and indirection</a></li>
+<li><a href="#ch3-5" data-target="ch3-5">3.5 readonly, declare and typed variables</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 ▸ Quoting and Word Splitting</a><ul>
+<li><a href="#ch4-1" data-target="ch4-1">4.1 Single quotes, double quotes and backslash</a></li>
+<li><a href="#ch4-2" data-target="ch4-2">4.2 Why an unquoted variable splits and globs</a></li>
+<li><a href="#ch4-3" data-target="ch4-3">4.3 "$@" vs "$*" — preserving arguments exactly</a></li>
+<li><a href="#ch4-4" data-target="ch4-4">4.4 IFS and deliberate splitting</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 ▸ Conditionals and Tests</a><ul>
+<li><a href="#ch5-1" data-target="ch5-1">5.1 Exit status is the only truth</a></li>
+<li><a href="#ch5-2" data-target="ch5-2">5.2 [ ] and test — the POSIX conditional</a></li>
+<li><a href="#ch5-3" data-target="ch5-3">5.3 [[ ]] — the bash conditional with no splitting</a></li>
+<li><a href="#ch5-4" data-target="ch5-4">5.4 if/elif/else and case</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 ▸ Loops and Iteration</a><ul>
+<li><a href="#ch6-1" data-target="ch6-1">6.1 The for loop over a list</a></li>
+<li><a href="#ch6-2" data-target="ch6-2">6.2 while, until and reading files line by line</a></li>
+<li><a href="#ch6-3" data-target="ch6-3">6.3 Arrays: the container that fixes the for-loop</a></li>
+<li><a href="#ch6-4" data-target="ch6-4">6.4 break, continue and shift — keeping loops bounded</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 ▸ Functions and Libraries</a><ul>
+<li><a href="#ch7-1" data-target="ch7-1">7.1 Defining, calling and the argument contract</a></li>
+<li><a href="#ch7-2" data-target="ch7-2">7.2 Scope: local, and the global leak</a></li>
+<li><a href="#ch7-3" data-target="ch7-3">7.3 Returning values: the code channel and the output channel</a></li>
+<li><a href="#ch7-4" data-target="ch7-4">7.4 Libraries and sourcing</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 ▸ Text Processing</a><ul>
+<li><a href="#ch8-1" data-target="ch8-1">8.1 grep: selection by pattern</a></li>
+<li><a href="#ch8-2" data-target="ch8-2">8.2 sed: stream editing, one command at a time</a></li>
+<li><a href="#ch8-3" data-target="ch8-3">8.3 awk: fields, variables and the one-liner that ran</a></li>
+<li><a href="#ch8-4" data-target="ch8-4">8.4 cut, tr, sort, uniq and wc — the finishing tools</a></li>
+<li><a href="#ch8-5" data-target="ch8-5">8.5 Here-docs, here-strings and the =~ conditional</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 ▸ Processes, Jobs and Signals</a><ul>
+<li><a href="#ch9-1" data-target="ch9-1">9.1 Pipelines and subshells</a></li>
+<li><a href="#ch9-2" data-target="ch9-2">9.2 Process substitution</a></li>
+<li><a href="#ch9-3" data-target="ch9-3">9.3 Background jobs, $! and wait</a></li>
+<li><a href="#ch9-4" data-target="ch9-4">9.4 Signals and trap</a></li>
+<li><a href="#ch9-5" data-target="ch9-5">9.5 kill, pkill and the termination ladder</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 ▸ Robust Scripting and Debugging</a><ul>
+<li><a href="#ch10-1" data-target="ch10-1">10.1 set -euo pipefail in depth</a></li>
+<li><a href="#ch10-2" data-target="ch10-2">10.2 Error handling: check, fail with reason, clean up</a></li>
+<li><a href="#ch10-3" data-target="ch10-3">10.3 Logging: timestamps, channels and the audit trail</a></li>
+<li><a href="#ch10-4" data-target="ch10-4">10.4 shellcheck: the linter that reviews like a senior</a></li>
+<li><a href="#ch10-5" data-target="ch10-5">10.5 A complete script, with the whole book in it</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+<h1 class="am-band">
+      <span class="am-band-t">Linux Bash and Shell Scripting</span>
+      <span class="am-band-s">10 chapters &middot; 54 topics &middot; 91 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Shell Essentials</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 ▸ Shell Essentials</button><div class="ch-toc-list"><a href="#ch1-1">1.1 Choosing a shell, and what that decision costs</a><a href="#ch1-2">1.2 How a line expands before it runs</a><a href="#ch1-3">1.3 The shebang, and finding the interpreter</a><a href="#ch1-4">1.4 Exit codes, and what failure means</a></div></div>
+<p class="topic-desc">What a shell actually does before you need any of its features: the choice of interpreter is a deployment decision, a line of script is rewritten several times before a single command runs, and failure is carried from one command to the next in an exit code. Everything later in this guide is built on the three mechanisms in this chapter — expansion order, the shebang, and the exit status.</p>
+
+<h3 id="ch1-1" data-toc>1.1 Choosing a shell, and what that decision costs</h3>
+<p class="topic-desc">Choosing a shell is not a matter of taste and it is not about features. It is about where the script will run, who will run it, and whether the shebang you write can be honoured — because the script that fails with "bad interpreter" on a machine you do not control is a bug you shipped.</p>
+
+<h4 id="ch1-1-shells">The shells that matter, and the one that does not</h4>
+<p><strong><code>bash</code></strong> is on every Linux distribution, is the default login shell on most, and is what the overwhelming majority of documentation assumes. <strong><code>sh</code></strong> is a POSIX specification rather than an implementation: on Debian and Ubuntu it is dash, on Red Hat it is bash in POSIX mode, and a script written for it runs on both plus busybox in a minimal container. <strong><code>zsh</code></strong> is the default on macOS and has a richer interactive feature set, which is a reason to use it at a prompt and emphatically not a reason to write a deployment script in it. <strong><code>fish</code></strong> is the one to be aware of precisely because it is <em>not</em> shell syntax — its variable expansion, quoting and command substitution all differ, so a fish script fails on Debian with a syntax error rather than a subtle misbehaviour.</p>
+
+<div class="codeWrap"><pre><code># Which one is /bin/sh on this machine?
+ls -l /bin/sh
+# lrwxrwxrwx 1 root root 4 ... /bin/sh -&gt; dash     (Debian, Ubuntu)
+# lrwxrwxrwx 1 root root 9 ... /bin/sh -&gt; bash     (Red Hat, Fedora)
+
+# what does the shebang on this file actually resolve to?
+head -1 script.sh
+
+# what is available under a name, and where does it live?
+command -v bash sh zsh fish dash busybox
+</code></pre></div>
+
+<h4 id="ch1-1-writein">Which one to write in, decided by the constraint</h4>
+<p>The question is not "which is best" but "what is the most hostile environment this will run in". A script that must run on a minimal container, on a rescue image, or on a system where nobody installed anything, must be POSIX <code>sh</code> and must start <code>#!/bin/sh</code>. A script that runs on a machine you administer can be <code>bash</code> with <code>#!/usr/bin/env bash</code>. A script that runs on macOS must be <code>bash</code> version 3.2 — the one Apple ships, from 2007 — unless your script checks the version, which is the detail that catches people the moment they use an associative array or <code>mapfile</code>.</p>
+
+<div class="codeWrap"><pre><code>#!/bin/sh
+# POSIX only: no arrays, no [[ ]], no == inside [ ]
+if [ -f "$1" ]; then
+    echo "found"
+fi
+
+n=0
+while [ "$n" -lt 3 ]; do
+    echo "$n"
+    n=$((n + 1))
+done
+
+# a portable function
+log() {
+    printf '%s %s
+' "$(date +%F)" "$*"
+}
+log "runs on dash, busybox, bash and zsh"
+</code></pre></div>
+
+<h4 id="ch1-1-version">The version trap, which is the real gap between bash and sh</h4>
+<p>POSIX <code>sh</code> is a subset, and <code>bash</code> in POSIX mode is <code>sh</code> plus extensions that are simply absent otherwise. The extensions you will reach for and then miss are: arrays and <code>${arr[@]}</code>, associative arrays, <code>[[ ]]</code> with its own word-splitting rules, the <code>=~</code> regex operator, <code>mapfile</code> and <code>readarray</code>, <code>printf -v</code>, negative array indices, and <code>${var,,}</code> case conversion. Writing <code>bash</code> and shebanging it <code>sh</code> produces a script that passes a syntax check and fails at the first array — the worst possible failure, because it happens only when the line is reached, in production.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -euo pipefail
+
+# these four lines fail on dash, and only fail when reached
+declare -a files=("a.txt" "b.txt")      # dash: command not found
+declare -A conf                         # dash: syntax error
+[[ -n "$HOME" ]]                        # dash: [[: not found
+if [[ "$x" =~ ^[0-9]+$ ]]; then :; fi   # dash: syntax error
+
+# the guard that prevents a bashism from ever reaching dash
+if [ -n "${BASH_VERSION:-}" ]; then
+    :   # bashisms are safe from here on
+else
+    echo "this script needs bash" &gt;&amp;2
+    exit 1
+fi
+</code></pre></div>
+
+<div class="warn"><p><strong>Shebang <code>sh</code> is a promise.</strong> When you write <code>#!/bin/sh</code> you promise POSIX-only code. The failure mode of breaking that promise is not a syntax error on line one; it is a script that works in your test environment and fails in the container image, where <code>/bin/sh</code> is dash. Check bashisms on the destination, not on your laptop.</p></div>
+
+<h3 id="ch1-2" data-toc>1.2 How a line expands before it runs</h3>
+<p class="topic-desc">A shell does not execute the text you type. It parses it, expands it through seven documented stages, and only then runs the result. Almost every "why does this script misbehave" question in this guide is answered by one of those stages.</p>
+
+<h4 id="ch1-2-order">The expansion order is fixed and documented</h4>
+<p>Expansion happens left to right in this order: <strong>brace expansion</strong> (<code>{a,b}</code>), <strong>tilde expansion</strong> (<code>~</code>), <strong>parameter, command and arithmetic expansion</strong> (<code>$var</code>, <code>$(…)</code>, <code>$((…))</code>), <strong>word splitting</strong>, <strong>pathname expansion</strong> (globbing), and finally <strong>quote removal</strong>. The order is the whole story: brace expansion runs before parameter expansion, which is why <code>{1..$n}</code> stays a literal word (the range endpoints must be literal at brace time), and globbing runs after splitting, which is why an unquoted variable both splits and globs.</p>
+
+<div class="codeWrap"><pre><code># brace expansion happens FIRST
+echo {1..5}                 # 1 2 3 4 5
+mkdir -p /tmp/app/{bin,lib,var}
+
+# tilde expansion is not variable expansion
+echo ~                     # the user's home
+echo ~root                 # the root user's home
+echo "~"                   # literal tilde - quotes suppress it
+
+# command substitution nested inside parameter expansion
+f="$(basename "$(realpath /etc/hosts)")"
+echo "$f"                  # hosts
+</code></pre></div>
+
+<h4 id="ch1-2-textbefore">Expansion rewrites the text before a command exists</h4>
+<p>The single most important sentence in shell scripting: <strong>the shell expands a line before it runs it</strong>, and the expansion can change the number of arguments a command receives. When you write <code>echo $f</code> and <code>f</code> contains a space, the shell does not pass one argument "my file" — it passes two, <code>my</code> and <code>file</code>. The command never sees the variable at all; it sees the words that expansion produced. Globbing happens on the same expanded text, so a variable containing <code>*</code> that is left unquoted matches filenames. Both behaviours are the point of the shell, and both are disabled by one character: double quotes.</p>
+
+<div class="codeWrap"><pre><code>d=/tmp/show-eval
+mkdir -p "$d"
+cd "$d" || exit 1
+touch "report one.txt" other.txt
+
+v="report one.txt"
+ls $v        # "report" "one.txt" - two arguments, neither matches now
+ls "$v"      # one argument: "report one.txt" - correct
+
+g="*.txt"
+echo $g      # report one.txt other.txt  - globbed against the dir
+echo "$g"    # *.txt                      - literal, quoted
+
+cd / ; rm -rf "$d"
+</code></pre></div>
+
+<h4 id="ch1-2-quoteremoval">Quote removal happens last</h4>
+<p>Quotes are a parsing instruction to the shell; the quoting characters themselves are removed at the final stage and are never passed to the command. That is why <code>echo "a" b</code> prints <code>a b</code> and both words arrive looking identical, and why <code>find . -name "*.c"</code> lets the filesystem glob pattern reach <code>find</code> unexpanded — the quotes stop globbing at stage five and are then stripped, leaving <code>find</code> to match the pattern itself. Single quotes do all of this and additionally suppress every expansion inside them.</p>
+
+<div class="codeWrap"><pre><code>name="Ada Lovelace"
+printf '&lt;%s&gt;\n' "$name"     # &lt;Ada Lovelace&gt;  one word, quoted
+printf '&lt;%s&gt;\n' $name       # &lt;Ada&gt; &lt;Lovelace&gt;  two words, split
+printf '&lt;%s&gt;\n' '$name'     # &lt;$name&gt;        single quotes: literal
+printf '&lt;%s&gt;\n' "$HOME"     # &lt;/home/you&gt;     double quotes: expanded
+
+# quote removal strips the quotes the same way from every word
+set -- 'a b' c
+printf '&lt;%s&gt;\n' "$@"        # &lt;a b&gt; &lt;c&gt;
+</code></pre></div>
+
+<h3 id="ch1-3" data-toc>1.3 The shebang, and finding the interpreter</h3>
+<p class="topic-desc">The first two bytes of an executable text file decide which program interprets the rest of it. The kernel does this — not the shell — and the rules the kernel applies are different from the rules the shell applies, which is where most shebang surprises come from.</p>
+
+<h4 id="ch1-3-anatomy">Anatomy of a shebang</h4>
+<p>A shebang is <code>#!</code> followed by an absolute path to an interpreter, and the kernel honours it only on files with the execute bit set. Everything after the interpreter path is passed as a <em>single argument</em> on Linux, so <code>#!/usr/bin/env -S bash -e</code> works while <code>#!/usr/bin/env bash -e</code> does not — <code>env</code> receives <code>"bash -e"</code> as one word and fails to find it. The shebang line is also subject to the kernel's interpreter length limit, and the file must be a text file; a script saved with a UTF-16 BOM is not recognised by the kernel as having a shebang at all.</p>
+
+<div class="codeWrap"><pre><code># make a script executable and run it directly
+printf '#!/bin/sh\necho "hello from $0"\n' &gt; hi.sh
+chmod +x hi.sh
+./hi.sh              # hello from ./hi.sh
+
+# what the kernel actually sees in the first two bytes
+od -An -tx1 -N2 hi.sh        # 23 21  ->  '#!'
+
+# a shebang with options: -S is REQUIRED on Linux
+printf '#!/usr/bin/env -S bash -e\nfalse\necho "not reached"\n' &gt; e.sh
+chmod +x e.sh
+./e.sh               # exits 1 because -e is honoured
+</code></pre></div>
+
+<h4 id="ch1-3-env">Why /usr/bin/env, not /bin/bash</h4>
+<p>Bash lives at <code>/bin/bash</code> on some systems and <code>/usr/bin/bash</code> on others (Debian makes one a symlink to the other, but macOS and various minimal images do not). <code>#!/usr/bin/env bash</code> asks <code>env</code> to search <code>PATH</code> and run the first <code>bash</code> it finds — the same search the interactive shell uses, so the interpreter that runs your script is the one the environment expects. The cost is that <code>env</code> itself must be at <code>/usr/bin/env</code> (it always is on Linux and macOS), and that <code>PATH</code> may be empty in a cron or service environment — which makes <code>command -v bash</code> an early check worth having when the script is invoked by cron.</p>
+
+<div class="codeWrap"><pre><code># where does bash actually live here, and which copy wins?
+command -v bash            # /usr/bin/bash  (or /bin/bash)
+type -a bash
+
+# env honouring PATH, not a hard-coded path
+PATH=/usr/bin:/bin:/usr/local/bin /usr/bin/env bash -c 'echo "$BASH_VERSION"'
+
+# POSIX fallback that does not need env
+if command -v bash &gt;/dev/null 2&gt;&amp;1; then
+    exec bash "$0" "$@"
+else
+    echo "bash is required" &gt;&amp;2; exit 1
+fi
+</code></pre></div>
+
+<h4 id="ch1-3-notenough">When the shebang is not enough</h4>
+<p>Three silent killers sit between "the shebang is right" and "the script runs". A script edited on Windows keeps <code>\r\n</code> line endings, so the kernel tries to interpret <code>/bin/bash\r</code> and the error message is the unhelpful <code>bad interpreter: No such file or directory</code> — fix with <code>dos2unix</code> or <code>sed -i 's/\r$//'</code>. A script on a filesystem mounted <code>noexec</code> cannot run directly at all, no matter the shebang. And the kernel ignores the shebang entirely when the interpreter is passed explicitly: <code>bash script.sh</code> runs the file with the <em>shell you name</em>, so a file with no execute bit and no shebang still runs — but the file's own shebang is silently skipped, which matters when a wrapper relies on it.</p>
+
+<div class="codeWrap"><pre><code># CRLF: the classic "bad interpreter" that is invisible in the editor
+file deploy.sh          # ASCII text, with CRLF line terminators
+sed -i 's/\r$//' deploy.sh    # strip them in place (GNU sed)
+
+# the shebang is skipped when you name the interpreter yourself
+printf '#!/bin/dash\necho dash\n' &gt; ambig.sh
+bash ambig.sh           # still runs - bash reads it as a bash script
+
+# make invocation explicit in the wrapper instead of trusting the shebang
+if [ -x "$(command -v bash)" ]; then
+    exec bash "$script" "$@"
+fi
+</code></pre></div>
+
+<h3 id="ch1-4" data-toc>1.4 Exit codes, and what failure means</h3>
+<p class="topic-desc">Every command — builtin, script, or compiled program — ends with an integer between 0 and 255. Zero means success, anything else means failure of a particular kind, and the shell composes these into the truth that <code>if</code>, <code>&amp;&amp;</code> and <code>set -e</code> all consume.</p>
+
+<h4 id="ch1-4-zero">Zero is success, and the other values mean specific things</h4>
+<p>The value 0 is true; 1 to 255 are false, and the higher numbers are not "more false", they are categories. 126 means the command was found but not executable; 127 means it was not found at all; 128+N means the command died from signal N, so a kill by <code>SIGINT</code> (signal 2) yields 130 and a kill by <code>SIGTERM</code> (15) yields 143. Because a program can only return 0–255, you should treat the distinction between "failed" and "killed" as information. <code>$?</code> holds the exit status of the last foreground command — and only that, because every command overwrites it.</p>
+
+<div class="codeWrap"><pre><code>true;  echo "true: $?"    # true:  0
+false; echo "false: $?"   # false: 1
+nosuch; echo "notfound: $?"   # notfound: 127
+ls /root 2&gt;/dev/null || true
+echo "after ls: $?"
+
+# 128+N: a signal death reports itself in the status
+sleep 30 &amp; pid=$!
+sleep 0.1
+kill -TERM "$pid"
+wait "$pid"; echo "killed: $?"    # killed: 143 (128 + SIGTERM)
+
+# capture the status BEFORE running anything else
+grep -q error app.log
+status=$?
+echo "grep status: $status"   # save it - the next command wipes $?
+</code></pre></div>
+
+<h4 id="ch1-4-check">Checking failure correctly</h4>
+<p>The shell's <code>if</code>, <code>while</code>, <code>&amp;&amp;</code> and <code>||</code> do not compare values; they run a command and branch on its exit status. This is why the idiomatic tests are <code>if grep -q error log</code>, <code>if cd /var/www</code> and <code>if command -v curl</code> — no <code>$(…)</code>, no <code>[ ]</code>, nothing but the command itself. The corollary is that a pipeline's status is the last command's, so <code>grep pattern file | head</code> reports success even when grep found nothing; <code>set -o pipefail</code> (chapter 10) exists precisely to repair this.</p>
+
+<div class="codeWrap"><pre><code># branch on the command, not on captured output
+if command -v curl &gt;/dev/null; then
+    echo "curl present"
+fi
+
+if grep -qs '^root:' /etc/passwd; then
+    echo "root account exists"
+fi
+
+# &amp;&amp; and || are just if-statements in one line
+command -v git || { echo "install git" &gt;&amp;2; exit 1; }
+
+# the pipeline lie: head exits 0, so grep's failure is hidden
+grep -qs missing-mark /etc/hosts | head -1
+echo "pipeline status: $?"      # 0 - the last stage decided
+</code></pre></div>
+
+<h4 id="ch1-4-write">Writing exit codes of your own</h4>
+<p><code>exit 1</code> ends the script with that status; <code>exit</code> with no argument reuses the status of the last command, which is how a shell script fronting another command stays transparent. In an interactive shell, <code>exit</code> closes the session, so scripts use <code>return</code> inside functions and <code>exit</code> only at the top level. The convention on Linux is: 0 success, 1 general failure, 2 misuse of shell builtins (the manual's "exit codes" section of <code>grep</code> documents that its 2 means an error was made), 126/127 for execution problems, and 128+N for signals. Pick small, documented numbers and reserve 2 for usage errors.</p>
+
+<div class="codeWrap"><pre><code>#!/bin/sh
+# usage errors are 2, following the builtin convention
+usage() {
+    echo "usage: $0 [-v] file" &gt;&amp;2
+    exit 2
+}
+
+[ $# -ge 1 ] || usage
+
+verbose=0
+[ "$1" = "-v" ] &amp;&amp; { verbose=1; shift; }
+
+if [ ! -f "$1" ]; then
+    echo "no such file: $1" &gt;&amp;2
+    exit 1
+fi
+
+grep "$pattern" "$1"
+exit   # no argument: propagate grep's own status
+</code></pre></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Files, Commands and Navigation</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 ▸ Files, Commands and Navigation</button><div class="ch-toc-list"><a href="#ch2-1">2.1 PATH and how a command is found</a><a href="#ch2-2">2.2 Listing, inspecting and moving around</a><a href="#ch2-3">2.3 Globbing vs find — knowing which one you are using</a><a href="#ch2-4">2.4 which, whereis, type and the "command not found" autopsy</a></div></div>
+<p class="topic-desc">Daily shell life has two halves: getting the right command to run (PATH, built-ins, the lookup order) and getting the right files into your hands (ls, find, cd and their globbing cousins). This chapter makes the two ways of naming files — patterns the shell expands and patterns <code>find</code> evaluates — a deliberate choice rather than a habit.</p>
+
+<h3 id="ch2-1" data-toc>2.1 PATH and how a command is found</h3>
+<p class="topic-desc">When you type a bare command name, the shell does not guess. It consults a hash table, then walks PATH in order, and only considers executables — which is why your current directory is not searched unless you put <code>.</code> in PATH, and why it usually should not be.</p>
+
+<h4 id="ch2-1-hash">The lookup order: alias, function, builtin, external</h4>
+<p>Bash resolves a command name in a fixed order: alias first, then functions, then built-ins, then files on PATH. That ordering is why <code>cd</code> is a builtin (it must change the shell's own directory, which no external program could do) and why a function named <code>ls</code> silently replaces the GNU binary for every script that sources it. <code>type</code> tells you which category a name falls into, and <code>type -a</code> lists every match. Defining an alias is fine at a prompt; avoid them in scripts, and never define a function or alias with the same name as a builtin you rely on.</p>
+
+<div class="codeWrap"><pre><code>type cd          # cd is a shell builtin
+type -a ls       # every match: alias, function, then the binary
+type -a printf   # printf is a shell builtin AND /usr/bin/printf
+
+# the function wins - this is why scripts break mysteriously
+ls() { echo "shadowed"; }
+ls /tmp          # shadowed
+unset -f ls      # remove the function, the binary returns
+
+command ls /tmp  # bypass aliases, functions and builtins entirely
+</code></pre></div>
+
+<h4 id="ch2-1-path">How PATH is searched, and the hash cache</h4>
+<p>PATH is a colon-separated list, and the empty entry means the current directory: <code>PATH=:/usr/bin</code> is the same as <code>PATH=.:/usr/bin</code>. To find a command, bash first checks its hash table (populated by previous lookups), then searches PATH left to right and takes the first executable match. The hash cache is the reason a freshly compiled <code>./configure</code> script can fail with "command not found" for a program installed seconds ago — <code>hash -r</code> clears it. An empty component in PATH, or a PATH unset by cron, silently disables every external command while builtins keep working, which is the classic "my cron job does nothing" cause.</p>
+
+<div class="codeWrap"><pre><code>echo "$PATH"          # /usr/local/bin:/usr/bin:/bin:...
+
+# put the current directory onto PATH - and remove it again
+PATH="$PATH:."
+ls
+PATH="${PATH%:.}"
+
+# a stale hash entry, and the fix
+hash -t ls            # the cached path bash will use
+hash -r               # forget every cached path
+
+# cron gotcha: crond often passes a minimal PATH
+command -v mysqldump || echo "mysqldump not on PATH"
+export PATH="/usr/bin:/bin:/usr/local/bin:$PATH"
+</code></pre></div>
+
+<h4 id="ch2-1-commandv">command -v, which, and the differences that matter</h4>
+<p><code>command -v name</code> prints the path or the word <code>alias</code>/<code>function</code>/<code>builtin</code> and is POSIX, checks aliases, functions and the PATH in one step, and its exit status is exactly what an <code>if</code> needs. <code>which</code> is an external program that only looks at PATH and may report aliases incorrectly; it is also not POSIX and not present on every minimal system. <code>type</code> adds the full category explanation. In scripts the rule is simple: use <code>command -v</code> to test and locate, and prefer <code>type -a</code> interactively to understand what a name actually means.</p>
+
+<div class="codeWrap"><pre><code># test-and-use in one statement
+if command -v jq &gt;/dev/null 2&gt;&amp;1; then
+    jq . data.json
+else
+    echo "jq is required" &gt;&amp;2; exit 1
+fi
+
+# command -v with a nonexistent name FAILS, so guard the use
+jq_path="$(command -v jq)"
+[ -n "$jq_path" ] &amp;&amp; "$jq_path" -r .name data.json
+
+# do not parse which output for anything you trust
+which bash        # /usr/bin/bash   - PATH-only answer
+type -a bash      # bash is /usr/bin/bash AND /bin/bash
+</code></pre></div>
+
+<h3 id="ch2-2" data-toc>2.2 Listing, inspecting and moving around</h3>
+<p class="topic-desc">Navigation is where interactive shells earn their keep, and where scripts most often trip: <code>cd</code> works only in the current shell, and every listing command hides or shows different things depending on flags you have to choose on purpose.</p>
+
+<h4 id="ch2-2-ls">ls, stat and what the output hides</h4>
+<p><code>ls -l</code> gives permissions, owner, group, size and mtime, and <code>ls -a</code> refuses to hide dotfiles — the two flags to remember. <code>ls -d */</code> lists directories only, which is the cheap one-liner for "which subdirectories exist". For full metadata use <code>stat</code>: <code>stat -c '%s %y' file</code> (GNU) prints size and modification time on one line, and <code>stat -f</code> reports the filesystem. One compatibility trap: GNU ls clears the distinction between a directory entry and a file consistently, but <code>ls file*</code> cannot tell you whether the match is a directory or a symlink without <code>-F</code> or <code>-d</code>; scripts that need types should test with <code>[ -d ]</code> rather than parse <code>ls</code>. Parsing <code>ls</code> output in a loop is broken by spaces, newlines and locales; test the files themselves instead.</p>
+
+<div class="codeWrap"><pre><code>ls -la           # every entry, long form
+ls -d */         # directories only, with the trailing slash
+
+stat -c '%n %s bytes %y' linux-shell.html
+stat -c '%A %U:%G' linux-shell.html
+
+# the reliable way to know what a glob matched
+for f in /etc/*.conf; do
+    [ -f "$f" ] &amp;&amp; echo "file: $f"
+    [ -d "$f" ] &amp;&amp; echo "dir:  $f"
+done
+</code></pre></div>
+
+<h4 id="ch2-2-cd">cd, its memory, and the directory stack</h4>
+<p><code>cd</code> is a builtin because a subprocess could never change the parent shell's directory. <code>cd -</code> returns to the previous directory using <code>OLDPWD</code>, and <code>cd ~user</code> goes to any user's home. Two variables track you: <code>PWD</code> (logical, honouring symlinks) and <code>OLDPWD</code>. <code>pushd</code>/<code>popd</code>/<code>dirs</code> maintain a stack when one <code>cd -</code> is not enough. Scripts that must navigate should save the starting point and restore it with a trap (chapter 9) so a failure mid-script does not leave the caller somewhere else.</p>
+
+<div class="codeWrap"><pre><code>cd /var/log
+cd -            # back to where you were
+echo "$OLDPWD"  # /var/log
+
+# the directory stack
+pushd /tmp &gt;/dev/null   # stack: /tmp /var/log
+pushd /etc  &gt;/dev/null  # stack: /etc /tmp /var/log
+dirs                    # /etc /tmp /var/log
+popd &gt;/dev/null
+cd                      # cd alone goes home
+
+# scripts: remember where you started
+start_dir="$PWD"
+trap 'cd "$start_dir"' EXIT
+cd /deep/elsewhere
+</code></pre></div>
+
+<h4 id="ch2-2-finddir">find: names, types, sizes and actions</h4>
+<p><code>find</code> does not use the shell's globbing at all: a pattern you pass to <code>-name</code> is evaluated by find against each entry, so quotes are mandatory (<code>find . -name '*.log'</code>) — unquoted, the shell would expand it first and find would receive filenames. <code>-type f</code>, <code>-type d</code> and <code>-type l</code> filter by kind; <code>-maxdepth 1</code> stops descent; <code>-newer file</code> selects by age. The action <code>-exec … {} +</code> batches arguments like xargs and is far safer than the shell-globbing alternative for names with spaces, because find passes each name as one argument. <code>find . -delete</code> removes everything it matches, and it does so with no confirmation prompt and no second chance — the closest find comes to a self-contained delete.</p>
+
+<div class="codeWrap"><pre><code>find . -maxdepth 1 -name '*.log'
+find /var/log -type f -size +10M
+find . -type f -mtime -1               # modified in the last day
+find . -name '*.tmp' -delete           # DANGEROUS: no confirmation
+
+# run a command per match, one argument per file
+find . -name '*.conf' -exec grep -l ListenPort {} +
+
+# the safe loop equivalent - do not parse ls in a loop
+while IFS= read -r -d '' f; do
+    echo "found: $f"
+done &lt; &lt;(find . -type f -print0)
+</code></pre></div>
+
+<h3 id="ch2-3" data-toc>2.3 Globbing vs find — knowing which one you are using</h3>
+<p class="topic-desc">Two pattern systems produce filenames, and they are easy to confuse because the syntax overlaps. Shell globbing is done by the shell before the command runs; find's <code>-name</code> matches are evaluated by find itself. The choice decides whether filtered results respect <code>ls -a</code> conventions, whether directories count, and whether errors make the script fail.</p>
+
+<h4 id="ch2-3-glob">What globs can and cannot see</h4>
+<p>A glob expands to every matching path, and when nothing matches, bash leaves the pattern <em>as literal text</em> — the classic <code>rm *.bogus</code> that deletes nothing and returns success, because <code>rm</code> saw a single non-existent filename and reported an error, or in some setups silently did nothing. The escape hatches are the <code>nullglob</code> option (expand to no words at all) and <code>failglob</code> (treat no-match as an error). Globs are constrained to what you can express in one pattern and to the entries a single directory's listing shows: dotfiles are not matched by <code>*</code>, and recursion requires <code>**</code> with <code>globstar</code> — a bashism, not POSIX.</p>
+
+<div class="codeWrap"><pre><code># no match: the pattern survives as a literal word
+shopt -u nullglob
+printf '&lt;%s&gt;\n' *.nope          # &lt;*.nope&gt;
+
+# nullglob: expands to nothing - the loop body never runs
+shopt -s nullglob
+for f in *.nope; do echo "$f"; done    # prints nothing
+shopt -u nullglob
+
+# globstar recursion (bash 4.0+)
+shopt -s globstar
+ls **/*.md                # every .md at any depth
+shopt -s dotglob          # let * see dotfiles
+</code></pre></div>
+
+<h4 id="ch2-3-findwin">When find is the correct answer</h4>
+<p>Use <code>find</code> when your filter is about <em>metadata</em> — size, age, type, permissions — because a glob only names things; it cannot test them. Use it when you need to recurse into hidden directories, when the directory tree is big, when you want results as a stream with <code>-print0</code>, or when a missing match must be distinguished from an empty tree. The output shapes also differ: find prints one path per line (or NUL with <code>-print0</code>) whereas a glob produces words that the shell may split again. And critically, globs expand at parse-adjacent time, before your command runs, so they cannot describe a directory that does not exist yet — find can be handed to a freshly-created path in the same script.</p>
+
+<div class="codeWrap"><pre><code># metadata filters: the -size, -mtime, -type family (glob cannot)
+find builds -type f -name '*.o' -size +1M -mtime +7
+
+# count of matches, reliably
+find . -type f | wc -l
+
+# decide with a test, not a naming convention:
+#   glob  when the pattern alone defines the answer
+#   find  when attributes decide
+if [ -n "$(find . -maxdepth 1 -type f)" ]; then
+    echo "there are files here"
+fi
+</code></pre></div>
+
+<h4 id="ch2-3-choose">The hybrid: for loops over find output</h4>
+<p>The standard loop idiom — <code>for f in $(find . -name 'x')</code> — is broken by any filename containing a space or a newline, because command substitution feeds word splitting. The robust version pairs <code>-print0</code> with <code>read -d ''</code> (bash, chapter 6), or pipes to <code>while read</code>. When the whole point is "do something for each file whose name matches a pattern in the current directory", <code>for f in *.ext</code> with nullglob is the simplest correct thing; reach for find when the tree is deeper than one level or the test involves anything but the name.</p>
+
+<div class="codeWrap"><pre><code># fragile: breaks on spaces
+for f in $(find . -name '*.md'); do :; done
+
+# robust: NUL-delimited, in bash
+while IFS= read -r -d '' f; do
+    printf 'processing %s
+' "$f"
+done &lt; &lt;(find . -name '*.md' -print0)
+
+# POSIX-correct, one level, exact pattern, no spaces
+for f in ./*.md; do
+    [ -e "$f" ] || continue
+    printf 'processing %s
+' "$f"
+done
+</code></pre></div>
+
+<h3 id="ch2-4" data-toc>2.4 which, whereis, type and the "command not found" autopsy</h3>
+<p class="topic-desc">When a name does not resolve, the four tools disagree about why, and the disagreement is diagnostic. Resolving a failure means knowing which lookup each tool performs.</p>
+
+<h4 id="ch2-4-tools">The four tools and what each tests</h4>
+<p><code>type</code> is a builtin and reports the shell's own view, including aliases and functions you have defined. <code>command -v</code> is the POSIX-designed subset of that view, used in scripts for exactly the reason: it works in every shell. <code>which</code> is an external program that walks PATH only and knows nothing of your aliases or functions, so "which works but the shell says not found" is never true — the shell consults its own cache and builtins first. <code>whereis</code> additionally searches standard directories and man pages, useful for finding the binary when PATH is trimmed but slow and not authoritative. The autopsy goes: <code>type -a</code>; then <code>echo "$PATH"</code> — checking the directory really is on it and is executable; then <code>ls -l</code> on the reported path, because a missing execute bit yields 126, not 127.</p>
+
+<div class="codeWrap"><pre><code># the full autopsy for a failing name
+type -a mytool 2&gt;&amp;1
+printf 'PATH=%s
+' "$PATH"
+command -v mytool || echo "not found on PATH"
+
+# distinguish 126 (not executable) from 127 (absent)
+./mytool; echo "status: $?"
+# -> status: 126   the file exists but cannot be executed
+
+# the shell caches - clear it after installing software
+hash -r
+</code></pre></div>
+
+<div class="note"><p><strong>Never search PATH by hand.</strong> <code>echo $PATH | tr : '\n' | while read p; do ls "$p/name"</code> reproduces, badly, what <code>command -v name</code> does in one line — and gets the exit status wrong, because the loop runs in a subshell. If you find yourself writing it, you want <code>command -v</code>.</p></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Variables, Parameters and Expansion</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 ▸ Variables, Parameters and Expansion</button><div class="ch-toc-list"><a href="#ch3-1">3.1 Names, assignment and the no-space rule</a><a href="#ch3-2">3.2 $var and ${var}, and where braces are not optional</a><a href="#ch3-3">3.3 Defaults, required values and the four :- forms</a><a href="#ch3-4">3.4 Pattern removal, substring, length, case and indirection</a><a href="#ch3-5">3.5 readonly, declare and typed variables</a></div></div>
+<p class="topic-desc">Shell variables are strings with a long list of transformations available at the point of use. Where most languages have dozens of string methods, bash concentrates them in the <code>${…}</code> syntax — defaults, error cases, pattern removal, substring, case conversion, indirection — and this chapter walks the forms in the order you will actually reach for them.</p>
+
+<h3 id="ch3-1" data-toc>3.1 Names, assignment and the no-space rule</h3>
+<p class="topic-desc">Assignment looks trivial and hides three rules that produce script-breaking mistakes: no spaces around the equals sign, no special characters in names, and no way to "assign" a variable through a pipeline or a loop in a subshell.</p>
+
+<h4 id="ch3-1-names">Valid names, and assignment is not a command</h4>
+<p>A variable name is letters, digits and underscores, and must not start with a digit. <code>a = 1</code> is not an assignment — it runs the command <code>a</code> with arguments <code>=</code> and <code>1</code>, so the error is <code>command not found: a</code>. The absence of spaces is not style; it is the grammar. Assignment is a shell construct, not a command, so <code>a=1 cmd</code> sets <code>a</code> only for the environment of <code>cmd</code>, <code>a=1</code> alone sets it for the current shell, and the two are easily confused in one-liners. Values are strings; <code>x=5</code> and <code>x=hello</code> are the same kind of value until something interprets them as numbers (arithmetic expansion or <code>-eq</code>).</p>
+
+<div class="codeWrap"><pre><code>good_name=1
+_ok=2
+# 9bad=3        # syntax error near unexpected token
+# a = 1         # runs the command 'a' - command not found
+
+# temporary environment: visible to the command ONLY
+name=world env | grep '^name='        # name=world
+echo "$name"                          # empty - not in this shell
+
+# the classic "why is VAR empty" trap
+printf 'x
+' | read x
+echo "x=[$x]"         # empty: read ran in a subshell
+
+# assignment as a condition - wrong and right
+# [ $? -eq 0 ] is a value test; if cmd; then tests the status
+if grep -qs root /etc/passwd; then
+    echo "root is present"
+fi
+</code></pre></div>
+
+<h4 id="ch3-1-scope">Shell variables vs environment, and export</h4>
+<p>Every process has an environment — the list of name/value strings inherited from its parent. A shell variable becomes part of that environment only when <code>export</code>ed, and the export is a property of the name, not the value: <code>export PATH=/x</code> and <code>PATH=/x; export PATH</code> both work, and re-assigning later keeps the export. Children inherit a <em>copy</em>, so a script cannot modify its parent's variables — which is why <code>cd</code>, <code>export</code> and <code>umask</code> must be builtins. Unset a variable with <code>unset name</code>; <code>unset -f name</code> removes a function. One subtlety: exporting an array exports its element 0 only, because the environment has no array type.</p>
+
+<div class="codeWrap"><pre><code>visible=value
+export visible          # now inherited by every child
+env | grep '^visible=' # visible=value
+
+visible2=x
+bash -c 'echo "${visible2:-unset}"'   # unset - not exported
+
+# a child may set its own environment freely
+bash -c 'visible2=inner; echo "$visible2"'   # inner
+echo "$visible2"                             # x - parent unchanged
+
+# arrays do not survive export
+arr=(a b c)
+export arr
+bash -c 'echo "${arr[*]:-not arr}"'   # not arr
+</code></pre></div>
+
+<h3 id="ch3-2" data-toc>3.2 $var and ${var}, and where braces are not optional</h3>
+<p class="topic-desc">The long form exists for a reason: every transformation in the rest of this chapter needs a brace, and even plain expansion needs one whenever the variable name is followed by characters that would join it.</p>
+
+<h4 id="ch3-2-braces">Why ${var} is the default habit</h4>
+<p>In <code>$varx</code>, the name is <code>varx</code>, not <code>var</code> followed by <code>x</code>. The brace makes the boundary explicit: <code>${var}x</code> expands <code>var</code> and appends <code>x</code>. The same rule applies after <code>$</code>-prefixed constructs, and inside double quotes the braces matter identically. Braces also make destructuring obvious to a reader — <code>"${version}"</code> reads as "a parameter", while <code>"$version"</code> reads as "probably a plain variable" — and the shell substitutes the same value either way, so the choice is free. Get in the habit now, because every <code>${var:-…}</code>, <code>${var#…}</code> and <code>${#var}</code> you meet later is this same pair of braces carrying an operator.</p>
+
+<div class="codeWrap"><pre><code>app=web
+x=1
+echo "$app_version"     # empty - the variable is 'app_version'
+echo "${app}_version"   # web_version
+
+# braces required by the adjacent-text rule
+n=3
+echo "result${n}!"      # result3!
+echo "n=$n"             # fine with spaces/newlines separating
+
+# the same boundary logic applies to positional params
+set -- one two three
+echo "$10"              # 'one0' - $1 followed by a literal 0
+echo "${10}"            # the 10th parameter - only 3 were set, so empty
+</code></pre></div>
+
+<h4 id="ch3-2-pos">Positional parameters, $@, $* and $#</h4>
+<p>For a script, <code>$1</code> through <code>$9</code> are the arguments, <code>${10}</code> and up need braces, <code>$0</code> is the name of the script, and <code>$#</code> is the count. <code>$@</code> expands to every argument as separate words; <code>$*</code> merges them into one word joined by the first character of <code>IFS</code> (space by default). Inside double quotes the two diverge sharply — <code>"$@"</code> preserves each argument whole, <code>"$*"</code> joins them into one — and that is the fix for the classic "my script swallowed the arguments" bug in chapter 4. <code>set -- a b c</code> reassigns all positional parameters, which is how loops over argument lists are reset.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+# save this as args.sh and run: bash args.sh "two words" three
+printf 'count: %s\n' "$#"
+printf 'first: %s\n' "$1"
+printf 'all joined: %s\n' "$*"
+printf 'all quoted:'
+printf ' &lt;%s&gt;' "$@"
+printf '\n'
+
+set -- new first ""
+printf 'after set: &lt;%s&gt; &lt;%s&gt; &lt;%s&gt;\n' "$@"
+</code></pre></div>
+
+<h3 id="ch3-3" data-toc>3.3 Defaults, required values and the four :- forms</h3>
+<p class="topic-desc">The most useful family in the language assigns a fallback, or fails loudly, at the point of use — no pre-amble checking needed. The colon decides whether an empty string counts as "unset" or "set but blank".</p>
+
+<h4 id="ch3-3-colon">The colon: -empty- vs set</h4>
+<p>Each operator has two forms. <code>${var:-word}</code> uses <code>word</code> if <code>var</code> is unset <em>or empty</em>; <code>${var-word}</code> uses it only if <code>var</code> is unset, so an empty-but-set variable passes through untouched. Choose by what "missing" means in context: an empty <code>USER</code> should give a default (use the colon), an empty grep result might be a valid value (skip the colon). The same split applies to <code>:=</code> (assign too), <code>:? </code> (error if missing) and <code>:+</code> (use alternate if set).</p>
+
+<div class="codeWrap"><pre><code>name=""
+echo "${name:-anon}"      # anon    unset or empty  -&gt; default
+echo "${name-anon}"       #         empty survives (no colon)
+
+name="Ada"
+echo "${name:-anon}"      # Ada
+
+lang="${LANG:-en_US.UTF-8}"    # set from environment or default
+echo "$lang"
+
+# := is a side effect: it ASSIGNS the default
+: "${TMPDIR:=/tmp}"
+echo "tmp is $TMPDIR"
+</code></pre></div>
+
+<h4 id="ch3-3-error">:? fails loudly, and :+ selects an alternate</h4>
+<p><code>${var:?message}</code> prints <code>bash: var: message</code> to stderr and aborts the script if <code>var</code> is unset or empty. It is the error-handling primitive for required configuration: <code>${API_KEY:?set API_KEY in the environment}</code> cannot silently continue with an empty key. Under <code>set -u</code> thousands of scripts use <code>${var:-}</code> purely to silence the "unbound variable" complaint. <code>${var:+word}</code> expands to <code>word</code> only when <code>var</code> is set and non-empty — the boolean test in text form, handy for building command lines conditionally.</p>
+
+<div class="codeWrap"><pre><code># hard failure on a missing requirement
+API_KEY="${API_KEY:?API_KEY must be exported}"
+curl -H "Authorization: Bearer $API_KEY" https://api.example.com/me
+
+# :+ builds options only when the variable is present
+verbose_arg="${VERBOSE:+--verbose}"
+curl $verbose_arg https://example.com
+
+# nested defaults compose
+mode="${PROFILE:-${CI:+ci}${DEV:+dev}}"
+echo "mode=$mode"
+</code></pre></div>
+
+<h4 id="ch3-3-setu">The set -u interaction, and ${var:-} as an antidote</h4>
+<p>With <code>set -u</code> (chapter 10), any expansion of an unset variable is a fatal error — including inside <code>[ "${flag}" = yes ]</code> where you expected an empty string. Every one of the four forms above is exempt: <code>${x:-}</code>, <code>${x:=}</code>, <code>${x:+}</code> and <code>${x:?}</code> all name <code>x</code> in a way that set -u accepts, so they are both the default idiom and the silencing idiom. The seed script at the top of this guide already used the trick: <code>name="${1:-World}"</code> is safe under <code>set -u</code> where a bare <code>${1}</code> would not be.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -u
+# echo "$unset_var"          # FATAL: unbound variable
+echo "${unset_var:-}"        # empty and safe
+echo "${unset_var:-fallback}"# fallback
+
+# guarding an optional positional
+ext="${1:-txt}"
+echo "extension: $ext"
+
+# POSIX sh: use the same forms, they are the whole family
+if [ -n "${HOME:-}" ]; then
+    echo "home is $HOME"
+fi
+</code></pre></div>
+
+<h3 id="ch3-4" data-toc>3.4 Pattern removal, substring, length, case and indirection</h3>
+<p class="topic-desc">The string-surgery forms. They run entirely inside the expansion — no external command, no subshell — so they are the fastest and most reliable way to cut a filename or fold a value.</p>
+
+<h4 id="ch3-4-remove"># and % pattern removal</h4>
+<p><code>${var#pat}</code> removes the <em>shortest</em> match of <code>pat</code> from the <em>front</em> of the value, and <code>${var##pat}</code> removes the <em>longest</em>. The same pair on the back is <code>%</code> (shortest) and <code>%%</code> (longest). These are the workhorses for stripping directories and extensions: <code>${path##*/}</code> gives the basename without calling <code>basename</code>, <code>${file%%.*}</code> strips from the first dot, and <code>${file%.*}</code> strips just the final extension. Patterns are glob-style, not regex — literal dots match literal dots.</p>
+
+<div class="codeWrap"><pre><code>path=/var/log/app/error.log
+echo "${path##*/}"           # error.log        basename
+echo "${path%/*}"            # /var/log/app     dirname
+echo "${path%.log}"          # /var/log/app/error
+echo "${path%%.*}"           # /var/log/app/error
+
+file="archive.tar.gz"
+echo "${file%.*}"            # archive.tar      shortest back
+echo "${file%%.*}"           # archive          longest back
+
+# removing a known prefix
+version="v1.2.3"
+echo "${version#v}"          # 1.2.3
+</code></pre></div>
+
+<h4 id="ch3-4-substr">Substring, length and case conversion</h4>
+<p><code>${#var}</code> is the string length in characters (locales aside). <code>${var:offset:length}</code> slices; negative offsets count from the end of the string in bash, while POSIX <code>sh</code> treats them as an error, so portable scripts avoid negative offsets. <code>${var,,pat}</code> and <code>${var^^pat}</code> lower- and upper-case (with optional pattern, <code>${var,,}</code> for everything) are bash-only. All three families run in the current shell with no fork, which matters when you strip extensions from thousands of filenames in a loop.</p>
+
+<div class="codeWrap"><pre><code>hex=DEADbeef
+echo "${#hex}"               # 8
+echo "${hex:2}"              # ADbeef
+echo "${hex:2:3}"            # ADb
+echo "${hex: -4}"            # bee f (bash only: from the end)
+echo "${hex,,}"              # deadbeef
+echo "${hex^^}"              # DEADBEEF
+
+# uppercase only the first letter
+word=hello
+echo "${word^}"              # Hello
+
+# length is characters, so it is cheap in loops
+for f in *.txt; do
+    [ "${#f}" -lt 12 ] &amp;&amp; echo "short name: $f"
+done
+</code></pre></div>
+
+<h4 id="ch3-4-indirect">Indirect expansion with ${!name}</h4>
+<p><code>${!word}</code> performs one level of indirection: if the variable <code>word</code> contains the string <code>other</code>, then <code>${!word}</code> expands to the value of <code>other</code>. It is the portable way to get "variable variables" (bash's <code>declare -n</code> namerefs, bash 4.3+, are the cleaner mechanism and are covered in chapter 7). Indirection shines when configuration names arrive at runtime as strings. A different <code>${!prefix@}</code> and <code>${!prefix*}</code> expand to the names of variables starting with <code>prefix</code>, not their values — used to marshal a whole group of environment variables into a file.</p>
+
+<div class="codeWrap"><pre><code>db_dev=localhost
+db_prod=db.internal
+target=db_prod
+echo "${!target}"            # db.internal
+
+# expand a name from a list
+for v in db_dev db_prod; do
+    echo "$v = ${!v}"
+done
+
+# every variable whose name starts with HTTP_
+for name in ${!HTTP_*}; do
+    printf '%s=%s\n' "$name" "${!name}"
+done | sort
+</code></pre></div>
+
+<h3 id="ch3-5" data-toc>3.5 readonly, declare and typed variables</h3>
+<p class="topic-desc">Variables can be made immutable, or declared as arrays or integers, with <code>declare</code> — and both the immutability and the types survive into subshells, which is where scripts get confused.</p>
+
+<h4 id="ch3-5-readonly">readonly, and the trap of assigning later</h4>
+<p><code>readonly name=value</code> (or <code>declare -r</code>) makes any subsequent assignment — <em>including from inside a function called later</em> — a fatal error under <code>set -e</code> and a warning otherwise. The atomic form <code>readonly name=value</code> sets and protects in one step; assigning first and declaring readonly later risks a window where a sourced library overwrote it. Readonly variables cannot be <code>unset</code>. This is the right tool for the fixed constants of a script — the config path, the log file, the version string — because it converts an accidental overwrite from a silent bug into an error message.</p>
+
+<div class="codeWrap"><pre><code>readonly VERSION="2.4.1"
+readonly CONFIG_DIR="$HOME/.myapp"
+readonly NOW="$(date +%s)"      # constant snapshot; runs once
+
+# the value is readable everywhere
+bash -c 'echo "child sees ${VERSION:-unset}"'   # unset: not exported
+
+declare -r TIMEOUT=30
+# TIMEOUT=45      # readonly variable: FATAL (aborts with set -e)
+
+# declare -r combined with defaulting
+: "${MAX_RETRIES:=3}"
+declare -r MAX_RETRIES
+</code></pre></div>
+
+<h4 id="ch3-5-declare">declare for arrays, integers and environment</h4>
+<p><code>declare -a</code> and <code>declare -A</code> declare indexed and associative arrays (chapter 6); <code>declare -i</code> makes arithmetic assignments evaluate automatically (<code>declare -i n=4/2</code> gives 2, and <code>n=4/2</code> later still evaluates); <code>declare -x</code> is <code>export</code>. Two facts break most uses: <code>declare</code> and <code>local</code> are themselves <em>commands</em>, so <code>declare -i n=4/2</code> inside a function still works but a pipeline can never carry the result back; and in a sourced file <code>declare</code> at top level creates variables in the caller's shell. <code>declare -p name</code> prints the full declaration, which is the debugging equivalent of <code>set -x</code> for values — it shows the type, the name and the exact quoting-free value.</p>
+
+<div class="codeWrap"><pre><code>declare -i total=0
+total=10+5                # arithmetic: 15, not the string '10+5'
+echo "$total"
+
+declare -a langs=(sh bash zsh)
+declare -A authors
+authors[sh]=Bourne
+echo "${langs[1]} ${authors[sh]}"     # bash Bourne
+
+# the debugger's friend: print exact declarations
+n=1; s="hello world"
+declare -p n s
+# declare -- n=1
+# declare -- s="hello world"
+
+# declare -p survives into a subshell
+( declare -p s )          # still prints
+</code></pre></div>
+
+<div class="tip"><p><strong>Prefer <code>printf '%q'</code> over hand-built quotes when you must reconstruct a command or a filename.</strong> <code>%q</code> emits the value re-quoted so that re-parsing yields the identical string, including spaces and special characters, and is the building block for safe debug dumps.</p></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Quoting and Word Splitting</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 ▸ Quoting and Word Splitting</button><div class="ch-toc-list"><a href="#ch4-1">4.1 Single quotes, double quotes and backslash</a><a href="#ch4-2">4.2 Why an unquoted variable splits and globs</a><a href="#ch4-3">4.3 "$@" vs "$*" — preserving arguments exactly</a><a href="#ch4-4">4.4 IFS and deliberate splitting</a></div></div>
+<p class="topic-desc">Quoting is the difference between "the shell passes my intent" and "the shell passes its own interpretation". This chapter pins down the exact rules: when double quotes stop working, why an unquoted variable is two different values, and why <code>"$@"</code> and <code>IFS</code> are the two most-repaired bugs in real scripts.</p>
+
+<h3 id="ch4-1" data-toc>4.1 Single quotes, double quotes and backslash</h3>
+<p class="topic-desc">Three quoting mechanisms with different scopes: backslash protects one character, double quotes inhibit only word splitting and globbing, single quotes inhibit every expansion.</p>
+
+<h4 id="ch4-1-scope">What each quote permits</h4>
+<p>Inside double quotes, the shell still expands parameters (<code>"$var"</code>), command substitution (<code>"$(date)"</code>) and arithmetic (<code>"$((1+2))"</code>); what it does <em>not</em> do is split the result into words or glob it. Inside single quotes, nothing expands — even a backslash is literal, which is why you cannot escape a single quote inside single quotes (the idiom is <code>'it'\''s'</code>: close, escaped quote, reopen). A backslash quoting a character is equivalent to putting that character in single quotes, and a trailing backslash at the end of a line is a line continuation, which is how long pipelines are written.</p>
+
+<div class="codeWrap"><pre><code>v="two words"
+echo "$v"          # two words   - preserved as one argument
+echo '$v'          # $v          - literal
+echo \$v           # $v          - backslash == single quotes
+
+# command substitution still runs inside double quotes
+echo "now: $(date +%H:%M)"
+
+# "it's" with single quotes
+echo 'it'\''s here'      # it's here
+
+# line continuation: the backslash-newline disappears
+echo one \
+     two \
+     three            # one two three
+</code></pre></div>
+
+<h4 id="ch4-1-ansi">ANSI-C quoting $'…' for control characters</h4>
+<p>Bash's <code>$'…'</code> turns a single-quoted string into one where <code>\n</code>, <code>\t</code>, <code>\x41</code>, <code>\u2713</code> and friends are interpreted as the actual characters, and no other expansion occurs. It exists because <code>'it\'s'</code> is impossible and because building a tab-separated line with literal tabs is unreadable. It is the tool for <code>IFS=$'\t'</code>, for colour codes (<code>'\e[31m'</code>), and for filenames with control characters. Write <code>printf '%s\n' "$row"$'\t'"$col"</code> when a line must carry real tabs. POSIX <code>sh</code> has no <code>$'…'</code>, so the portable substitute is <code>printf '\t'</code> in command substitution.</p>
+
+<div class="codeWrap"><pre><code># real tab and newline characters
+t=$'\t'; nl=$'\n'
+printf '%s%s%s%s%s' a "$t" b "$nl" c
+# a	b
+# c
+
+# colour red on a terminal
+printf '\e[31mFAIL\e[0m\n'
+
+# IFS to a tab: splitting a TSV line
+IFS=$'\t' read -r a b &lt;&lt;&lt; "$(printf 'x\ty')"
+echo "[$a] [$b]"                # [x] [y]
+
+# portable tab via printf
+tabs=$(printf '\t')
+echo "a${tabs}b"
+</code></pre></div>
+
+<h3 id="ch4-2" data-toc>4.2 Why an unquoted variable splits and globs</h3>
+<p class="topic-desc">The sentence that explains most shell bugs: an unquoted expansion is subject to word splitting and pathname expansion, so the same variable can produce two arguments today and three tomorrow. Quoting fixes both — but the failure is invisible until a filename contains a space.</p>
+
+<h4 id="ch4-2-mechanics">The two-stage hazard, and its two unrelated consequences</h4>
+<p>After a parameter expands, the resulting text is split on <code>IFS</code> (space, tab, newline by default) into words, and each word that contains a glob character is matched against filenames. A single unquoted <code>$dir</code> can therefore deliver an attacker-controlled filename list to <code>rm</code>, because a value of <code>*</code> is not a literal star — it becomes every file in the current directory. The corollary is that <code>cp $f /dest</code> works for years and then silently treats <code>my report.pdf</code> as two files. The entire discipline is one rule: <strong>quote every expansion</strong>, unless you want splitting or globbing — and want them so visibly that an extra word would read as a bug.</p>
+
+<div class="codeWrap"><pre><code>set -- "a b" c
+for x in "$@"; do echo "arg: [$x]"; done    # two clean arguments
+
+dir=/tmp/q
+mkdir -p "$dir"; touch "$dir/x" "$dir/y"
+f="$dir/x"
+ls $f           # /tmp/q/x            - fine today
+ls "$f"         # /tmp/q/x            - the same, reliably
+
+# an unquoted value can BECOME a glob
+wild='*'
+printf '&lt;%s&gt;' $wild ; echo        # every file in this directory
+printf '&lt;%s&gt;' "$wild"; echo        # &lt;*&gt; the literal star
+
+# the space bug, for real
+touch "/tmp/q/space name.txt"
+g=$(ls /tmp/q)
+echo $g                         # two words: space name.txt split
+echo "$g"                       # one line, intact
+</code></pre></div>
+
+<h4 id="ch4-2-when">The deliberate exceptions: when unquoted is correct</h4>
+<p>Three situations rely on the split and glob: expanding an options list (<code>opts="--verbose --all"; cmd $opts</code>), expanding a file list that you <em>want</em> globbed further, and reading config where each line is one argument. Notice that in every case the contract "words, not a single string" is part of the design. The moment a value can contain user data — a path, a message, a regex — it must be quoted. As a rule of thumb, quote every expansion that names something (a file, a host, a label) and every expansion used in a condition; leave unquoted only the expansions you wrote specifically to be split.</p>
+
+<div class="codeWrap"><pre><code># deliberate split: building an option list
+opts="--recursive"
+[ "$VERBOSE" = yes ] &amp;&amp; opts="$opts --verbose"
+cp $opts src/ dest/          # intentional split of ONE name-bearing list
+
+# deliberate glob: handing a pattern to a tool that globs itself
+for f in $dir/*.log; do      # split of the dir, glob of *.log
+    echo "$f"
+done
+
+# never unquoted: anything the filesystem proved a name
+f=$(find . -name '*.tmp' | head -1)
+rm "$f"          # quoted - whatever find returned, it is ONE file
+</code></pre></div>
+
+<h3 id="ch4-3" data-toc>4.3 "$@" vs "$*" — preserving arguments exactly</h3>
+<p class="topic-desc">The two expansions of the positional parameter list behave identically when unquoted and opposite when quoted. Almost every "my wrapper lost a flag" bug is a <code>*</code> where <code>@</code> was meant.</p>
+
+<h4 id="ch4-3-at">"$@" never rewrites the argument list</h4>
+<p><code>"$@"</code> expands to each positional parameter as a separate word — even when a parameter is empty (it is passed as an empty argument) and even when there are no parameters at all (it expands to nothing, not to one empty word, which is the property that makes <code>"$@"</code> safe to forward unconditionally). In contrast, <code>"$*"</code> joins everything into a single word using the first character of <code>IFS</code>, so <code>bash -c 'printf "&lt;%s&gt;\n" "$*"' sh a "b c" d</code> prints one line. A wrapper script's most important line is therefore <code>exec "$@"
+
+</code> — repadding <code>shift</code>ed arguments is the same line with <code>"$@"</code> throughout.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+inner() {
+    printf 'count=%d\n' "$#"
+    printf '&lt;%s&gt; ' "$@"; echo
+}
+inner "a b" c
+inner "$@"
+inner "$*"      # one argument from every argument I received
+
+# forwarding to a subcommand: @ is correct, * is a bug
+wrapper() { command grep "$pattern" "$@"; }
+wrapper "two words" '*.conf'
+
+# @ with zero arguments is ZERO words
+set --
+printf 'count=%d\n' "$#"      # 0
+printf '&lt;%s&gt;\n' "$@"           # prints nothing
+</code></pre></div>
+
+<h4 id="ch4-3-star">When $* is actually what you want</h4>
+<p><code>"$*"</code> is useful exactly when a single joined string is the contract: a message printed once (<code>die "usage: prog $*"</code>), a filename built from parts, or an <code>IFS</code> change to join with a delimiter — <code>local IFS=,; echo "$*"</code> renders arguments joined by commas, which is the idiomatic CSV of a parameter list. The unquoted <code>$*</code> and <code>$@</code> are identical, both splitting every parameter on IFS and globbing the results, so neither preserves anything; if you see unquoted <code>$@</code> in reviewed code, it is usually the bug the author has not hit yet — a single argument containing a space is quietly split.</p>
+
+<div class="codeWrap"><pre><code># message with a joined list
+usage() { echo "usage: $0 [opts] $*" &gt;&amp;2; exit 2; }
+usage in out
+
+# join with a delimiter via a local IFS
+join_comma() { local IFS=,; echo "$*"; }
+join_comma alpha "beta gamma" delta        # alpha,beta gamma,delta
+
+# the unquoted forms are the same, and both are destructive
+set -- "a b" c
+printf '&lt;%s&gt; ' $@; echo     # &lt;a&gt; &lt;b&gt; &lt;c&gt;
+printf '&lt;%s&gt; ' $*; echo     # &lt;a&gt; &lt;b&gt; &lt;c&gt;
+</code></pre></div>
+
+<div class="warn"><p><strong>If you ever write <code>exec su - "$0" $@</code>, you have already lost.</strong> The most common destructive idiom in the wild is passing an unquoted <code>$@</code> or <code>$*</code> to a tool that records arguments — every space in an argument becomes an argument boundary. The fix is always the same pair of characters: <code>"$@"</code>.</p></div>
+
+<h3 id="ch4-4" data-toc>4.4 IFS and deliberate splitting</h3>
+<p class="topic-desc"><code>IFS</code> (the input field separator) is the character set on which unquoted expansions split. Changing it is how you parse CSV lines, <code>/etc/passwd</code> rows and colon lists — and forgetting to restore it is how the rest of your script changes behaviour.</p>
+
+<h4 id="ch4-4-what">What IFS controls, and how to restore it</h4>
+<p>IFS is space, tab, newline by default. Splitting treats sequences of IFS whitespace as one separator, but a non-whitespace character in IFS splits on every occurrence — <code>IFS=:</code> turns <code>a::b</code> into three fields including an empty one. Setting IFS for a single <code>read</code> is the canonical pattern (<code>IFS=: read user rest</code>), and it must be saved and restored if the change is meant to be local, because <code>"$*"</code> joins with IFS[0] and unquoted expansions split on the current value everywhere else. <code>read -r</code> without IFS also <em>strips</em> leading and trailing whitespace from the line; setting <code>IFS=</code> before read keeps the whitespace and preserves empty fields.</p>
+
+<div class="codeWrap"><pre><code># parse /etc/passwd: the colon becomes the separator
+while IFS=: read -r user rest; do
+    echo "user: $user"
+done &lt; /etc/passwd
+
+# preserve whitespace AND empty fields
+line="  a  b  "
+IFS= read -r whole &lt;&lt;&lt; "$line"
+echo "[$whole]"       # [  a  b  ] - untouched
+
+# explicit splitting of a value
+IFS=, read -r a b c &lt;&lt;&lt; "x,y,z"
+echo "$a|$b|$c"       # x|y|z
+
+# save and restore
+old="$IFS"
+IFS=:
+parts=( $PATH )          # each PATH directory as one element
+IFS="$old"
+echo "${#parts[@]} entries on PATH"
+</code></pre></div>
+
+<h4 id="ch4-4-parse">The read loop: why IFS= read -r is the only safe way</h4>
+<p>Reading a file line by line has three traps. Unquoted <code>$line</code> later splits and globs the line (chapter 6 shows the loop). Without <code>-r</code>, backslashes in the line are eaten. And without <code>IFS=</code>, leading and trailing whitespace — including a meaningful trailing space in a data file — is stripped before the variable is filled. The incantation <code>while IFS= read -r line</code> blocks all three, which is why it appears on every line-processing loop in the library. For the rare line you must split, read with a delimiter already in hand: <code>IFS='|' read -r a b</code> on each line.</p>
+
+<div class="codeWrap"><pre><code># the incantation, line by line
+while IFS= read -r line; do
+    printf '&lt;%s&gt;\n' "$line"
+done &lt; data.txt
+
+# backslashes survive with -r, vanish without
+printf 'c:\temp\n' &gt; win.txt
+read no_r &lt; win.txt;  echo "no -r:  $no_r"    # c:temp
+IFS= read -r with_r &lt; win.txt
+echo "with -r: $with_r"                        # c:\temp
+
+# newline-delimited is for POSIX - use -d for NUL boundaries
+while IFS= read -r -d '' f; do
+    echo "file: $f"
+done &lt; &lt;(find . -name '*.log' -print0)
+</code></pre></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Conditionals and Tests</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 5 ▸ Conditionals and Tests</button><div class="ch-toc-list"><a href="#ch5-1">5.1 Exit status is the only truth</a><a href="#ch5-2">5.2 [ ] and test — the POSIX conditional</a><a href="#ch5-3">5.3 [[ ]] — the bash conditional with no splitting</a><a href="#ch5-4">5.4 if/elif/else and case</a></div></div>
+<p class="topic-desc">Shell logic is built on the exit status, not on boolean expressions: <code>if</code> runs a command and branches on how it ended. This chapter covers the three test commands — <code>[ ]</code>, <code>[[ ]]</code> and bare commands — and the multi-way branches, <code>case</code> and <code>elif</code>, that structure real scripts.</p>
+
+<h3 id="ch5-1" data-toc>5.1 Exit status is the only truth</h3>
+<p class="topic-desc">There is no boolean type, no <code>true</code> value, no expression evaluator in the language proper. "Does the command succeed" is the test; everything else is sugar on top.</p>
+
+<h4 id="ch5-1-command">if runs a command — that is the pattern</h4>
+<p><code>if cmd; then</code> is not "if the output is non-empty" and not "if a variable equals X". It is the exit status of <code>cmd</code>. The idiomatic shell therefore branches directly on <code>if grep -q pattern file</code>, <code>if cd "$dir"</code>, <code>if command -v tool</code>, and <code>if mkdir "$dir"</code> — no surrounding brackets anywhere. Capturing output into a variable and testing the variable is slower (a subshell), racier (output can be huge), and loses the distinction between "grep found nothing" and "grep couldn't read the file". When you cannot avoid <code>if [ "$(…)" ]</code>, the test is on a string, not on a status.</p>
+
+<div class="codeWrap"><pre><code># branch on the status directly - the shell way
+if grep -qs root /etc/passwd; then
+    echo "a root entry exists"
+fi
+
+if cd /var/log 2&gt;/dev/null; then
+    ls -1 *.log | head -3
+fi
+
+if ! pgrep -x sshd &gt;/dev/null; then
+    echo "sshd is not running"
+fi
+
+# what NOT to do: capturing, then testing a string
+found="$(grep -q yes config &amp;&amp; echo yes)"
+[ "$found" = yes ] &amp;&amp; echo "configured"
+</code></pre></div>
+
+<h4 id="ch5-1-negate">! and the status-vs-value trap</h4>
+<p><code>!</code> negates an exit status: <code>if ! cmd</code> is true when cmd fails. Pitfall one: <code>! grep -q x f &amp;&amp; foo</code> parses correctly because <code>!</code> applies to the whole pipeline. Pitfall two: <code>! [ -n "$x" ]</code> needs a space after <code>!</code> — <code>![ -n
+</code> would be a command named <code>![</code>. Pitfall three: under <code>set -e</code>, a negated command counts as "handled", so <code>! grep …</code> does not abort. The danger of the value-comparison habit inherited from other languages is comparing <code>$?</code> to numbers instead of branching on the command — <code>[ "$?" -eq 0 ]</code> is four words longer and races if anything runs between the command and the test.</p>
+
+<div class="codeWrap"><pre><code># bare negation
+if ! [ -d "$dir" ]; then
+    mkdir -p "$dir"
+fi
+
+# with a pipeline: negation applies to the whole pipeline
+if ! grep -qs error app.log; then
+    echo "no errors found (or grep could not read it)"
+fi
+
+# the $? race: a debugging echo between the two lines changes nothing
+# here, but any real command would - branch on the command instead
+grep -qs root /etc/passwd; echo "exit was $?"   # fine, immediate
+</code></pre></div>
+
+<h3 id="ch5-2" data-toc>5.2 [ ] and test — the POSIX conditional</h3>
+<p class="topic-desc"><code>[</code> is a command — literally an alias-shaped builtin named <code>[</code> that requires a final <code>]</code> argument. Everything about writing tests correctly follows from that one fact.</p>
+
+<h4 id="ch5-2-operators">The operator set, and the quoting that makes it work</h4>
+<p>The string tests are <code>[ -n "$x" ]</code> (non-empty) and <code>[ -z "$x" ]</code> (empty); the file tests are <code>-e</code> (exists), <code>-f</code> (regular file), <code>-d</code> (directory), <code>-x</code>, <code>-r</code>, <code>-w</code>, <code>-s</code> (non-empty file), <code>file1 -nt file2</code>; the arithmetic comparisons are <code>-eq -ne -lt -le -gt -ge</code>; the string comparisons are <code>=</code>, <code>!=</code> and (in <code>[[ ]]</code> only) <code>&lt;</code> and <code>&gt;</code>. Two punctuation rules produce most failures: arguments must be separated — <code>[ -n "$x" ]</code>, never <code>[-n "$x"]</code> or <code>[ -n$x ]</code> — and every expansion must be quoted, because <code>[ $x = a ]</code> with an empty or multi-word <code>$x</code> collapses to <code>[ = a ]</code> or to <code>[ a b = a ]</code>, each a different number of arguments and a syntax error or wrong result. <code>[ "$x" = a ]</code> is always exactly four arguments plus brackets.</p>
+
+<div class="codeWrap"><pre><code># quoting is what keeps the argument count correct
+x=""
+[ -n "$x" ] &amp;&amp; echo "set" || echo "empty or unset"
+[ "$x" = "a b" ] &amp;&amp; echo "matched"      # a string with a space
+[ -f /etc/os-release ] &amp;&amp; . /etc/os-release
+
+# number tests are -eq, never =
+n=5
+[ "$n" -eq 5 ] &amp;&amp; echo "five"
+[ "$n" -gt 3 ] &amp;&amp; echo "more than three"
+
+# compose with -a (and) / -o (or): each one is an argument
+[ -f "$file" -a -r "$file" ] &amp;&amp; echo "readable file"
+[ "$USER" = root -o "$USER" = admin ] &amp;&amp; echo "privileged"
+</code></pre></div>
+
+<h4 id="ch5-2-fail">The classic empty-variable failure, and the default idiom</h4>
+<p><code>[ "$x" = yes ]</code> is safe with an empty <code>$x</code>: it becomes <code>[ "" = yes ]</code>, three arguments, correctly false. The dangerous forms are the ones that remove arguments: <code>[ -n $x ]</code> with empty <code>$x</code> collapses to <code>[ -n ]</code>, which is true (only one argument). The defence that also satisfies <code>set -u</code> is defaulting at expansion time: <code>[ "${x:-}" = yes ]</code>, <code>[ -n "${x:-}" ]</code>. Inside <code>[[ ]]</code> none of this applies, because <code>[[ </code> is a keyword that parses its own grammar — the same flavour of difference as <code>&amp;&amp;</code> vs <code>-a</code>.</p>
+
+<div class="codeWrap"><pre><code>flag=""
+[ -n $flag ] &amp;&amp; echo "set"            # WRONG: [ -n ] is TRUE
+[ -n "$flag" ] &amp;&amp; echo "set"          # safe: four arguments, FALSE
+[ -n "${flag:-}" ] || echo "absent"   # the set -u-proof default
+
+mode=""
+[ "$mode" = fast ] || echo "not fast"
+
+# a bare command without brackets is often clearer
+grep -qs '^root:' /etc/passwd || echo "no root line"
+</code></pre></div>
+
+<h3 id="ch5-3" data-toc>5.3 [[ ]] — the bash conditional with no splitting</h3>
+<p class="topic-desc">Bash's <code>[[ ]]</code> is parsed as part of the language, not run as a command, so its operands are not word-split or globbed and it gains pattern matching, regular expressions, <code>&lt;</code>/<code>&gt;</code> string comparison and <code>&amp;&amp;</code>/<code>||</code> inside the brackets. It is the right tool in bash scripts — and, being a bashism, the wrong tool in files running under <code>sh</code>.</p>
+
+<h4 id="ch5-3-double">What [[ ]] changes, and the cases where it bites back</h4>
+<p>Inside <code>[[ ]]</code> you may leave variables unquoted (<code>[[ $x = yes ]]</code> — though quoting remains good style), combine with <code>&amp;&amp;</code> and <code>||</code> instead of <code>-a</code>/<code>-o</code>, use <code>==</code> or <code>=</code>, put an unquoted pattern on the right-hand side for pattern matching, and compare strings lexically with <code>&lt;</code> and <code>&gt;</code> (which need no escaping here). The bite-back: <code>[[ $x == *.txt ]]</code> is a glob test, not a literal comparison — an exact-string test must quote the right side (<code>[[ $x == "\*.txt" ]]</code> or <code>[[ $x = '*' ]]$</code>). And under <code>sh</code>, <code>[[</code> is "command not found", which is why every POSIX script must stay with <code>[ ]</code>.</p>
+
+<div class="codeWrap"><pre><code># no quoting needed, &amp;&amp; and || work inside
+x="hello"
+[[ $x == hello ]] &amp;&amp; echo yes
+[[ -f /etc/hosts &amp;&amp; -r /etc/hosts ]] &amp;&amp; echo "readable"
+[[ $n -gt 5 || $s = skip ]] &amp;&amp; echo "branch taken"
+
+# glob patterns on the unquoted right side
+f="archive.tar.gz"
+[[ $f == *.tar.gz ]] &amp;&amp; echo "it is a tarball"
+
+# exactness: quote the pattern to defeat globbing
+[[ $f == "*.tar.gz" ]] &amp;&amp; echo "literal star" || echo "no match"
+
+# Unicode-safe string comparison
+[[ "a" &lt; "b" ]] &amp;&amp; echo "a sorts first"
+</code></pre></div>
+
+<h4 id="ch5-3-regex">The =~ regex operator and the quoting mistake</h4>
+<p><code>[[ $var =~ ^pattern$ ]]</code> runs an extended regular expression and returns its success as an exit status. The quoting trap is inverted here: a <em>quoted</em> pattern is treated as a literal string, so <code>[[ $v =~ "$re" ]]</code> matches the characters literally — to build a regex from a variable you must leave the right side bare or assign it to a variable first (<code>re='^[0-9]+$'; [[ $v =~ $re ]]</code>), which is also the fix under <code>set -o nounset</code>. The regex operators do not need escaping inside the brackets, but <code>&amp;</code>, spaces and characters meaningful to <code>[[</code> inside the pattern do. Capture groups land in <code>${BASH_REMATCH[1]}</code>…, viewable in <code>set -x</code> output and usable to validate input before arithmetic.</p>
+
+<div class="codeWrap"><pre><code>v="192.168.1.9"
+re='^([0-9]{1,3}\.){3}[0-9]{1,3}$'
+if [[ $v =~ $re ]]; then
+    echo "looks like an IPv4 address"
+fi
+
+# capture groups
+if [[ "server:8080" =~ ^([a-z]+):([0-9]+)$ ]]; then
+    echo "host=${BASH_REMATCH[1]} port=${BASH_REMATCH[2]}"
+fi
+
+# a QUOTED right side becomes a literal compare
+[[ "a+b" =~ "a+b" ]] &amp;&amp; echo "literal match"   # true: it literally is a+b
+
+# validation before arithmetic - no injection
+num=12
+[[ $num =~ ^[0-9]+$ ]] &amp;&amp; echo "result: $((num * 2))"
+</code></pre></div>
+
+<h3 id="ch5-4" data-toc>5.4 if/elif/else and case</h3>
+<p class="topic-desc">Multi-way branching in the shell comes in two shapes: <code>if … elif</code> evaluates commands in order, and <code>case</code> matches one value against patterns with glob syntax — the fastest dispatch for a single argument.</p>
+
+<h4 id="ch5-4-elif">The elif chain, and keeping it readable</h4>
+<p><code>elif</code> exists precisely so you avoid nested <code>else if</code> indentation. Each branch runs a command; the first that succeeds wins. Common bug: testing the wrong thing in the test, such as <code>elif [ -z "$x" ]</code> when you meant <code>elif ! [ -n "$x" ]</code> — they are equivalent, but the doubled negative hides intent. Chains over the same variable are usually better rewritten as <code>case</code>, which is one dispatch, not a sequence of tests. Structure the chain so defaults come last, and end the chain with <code>else</code> handling the "nothing matched" path — for arguments, that else should print usage and fail.</p>
+
+<div class="codeWrap"><pre><code>if [ -r "$file" ]; then
+    echo "readable"
+elif [ -d "$file" ]; then
+    echo "directory"
+elif [ -e "$file" ]; then
+    echo "exists but unreadable"
+else
+    echo "no such path: $file"
+fi
+
+# getopts-style first-argument dispatch in a chain
+case "$1" in
+    start) echo "starting...";;
+    stop)  echo "stopping...";;
+    restart) $0 stop; $0 start;;
+    *)     echo "usage: $0 start|stop|restart" &gt;&amp;2; exit 2;;
+esac
+</code></pre></div>
+
+<h4 id="ch5-4-case">case patterns: globs, alternation and fall-through</h4>
+<p><code>case</code> matches the word against patterns of the same glob language as the shell's own expansion: <code>*</code>, <code>?</code>, <code>[abc]</code>, and alternation <code>a|b</code>. The first matching arm wins; the <code>;;</code> terminator stops all later matching, and <code>;&amp;</code> falls through to the next arm's body while <code>;;&amp;</code> continues testing subsequent patterns with the same word. Patterns need not be quoted, but the word being tested should be quoted (<code>case "$1" in</code>); empty values fall to <code>""</code> or <code>*</code>. Splitting with <code>|</code> inside a pattern arm is where readability lives: group synonyms, keep the default arm last, and put the "unknown value" arm as the explicit failure — case is the cheapest place to validate a whitelist.</p>
+
+<div class="codeWrap"><pre><code># dispatch with synonyms and groups
+case "${1,,}" in              # lowercase the argument first
+    on|enable|start)  echo "enabled" ;;
+    off|disable|stop) echo "disabled" ;;
+    re) echo "restarting";;
+    -v|--verbose)     echo "verbose" ;;
+    *)                echo "unknown: $1" &gt;&amp;2; exit 2 ;;
+esac
+
+# fall-through runs the marked arm too
+case "$mode" in
+    debug)   echo "debug output" ;&amp;
+    verbose) echo "verbose output" ;;
+    *)       echo "normal" ;;
+esac
+
+# whitelist validation
+case "$METHOD" in
+    GET|POST|PUT|DELETE) : ;;
+    *) echo "bad method: $METHOD" &gt;&amp;2; exit 2 ;;
+esac
+</code></pre></div>
+
+<div class="tip"><p><strong>Lowercase before testing.</strong> <code>case "${1,,}"</code> (bash) or the assignment <code>arg=${1%%.*}</code>-style folding makes a whitelist accept START, Start and start without three arms. Under POSIX sh, use <code>tr '[:upper:]' '[:lower:]'</code> — a fork, but once per argument, not once per branch.</p></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Loops and Iteration</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 6 ▸ Loops and Iteration</button><div class="ch-toc-list"><a href="#ch6-1">6.1 The for loop over a list</a><a href="#ch6-2">6.2 while, until and reading files line by line</a><a href="#ch6-3">6.3 Arrays: the container that fixes the for-loop</a><a href="#ch6-4">6.4 break, continue and shift — keeping loops bounded</a></div></div>
+<p class="topic-desc">Every file, every host, every line: iteration is where shell scripts do their actual work. This chapter covers the three loop keywords, arrays as the modern container, and the line-reading incantation — plus the <code>break</code>/<code>continue</code>/<code>shift</code> controls that keep loops bounded and legible.</p>
+
+<h3 id="ch6-1" data-toc>6.1 The for loop over a list</h3>
+<p class="topic-desc"><code>for</code> iterates over words, and the list can be written literally, generated by brace expansion, produced by a glob, or brought in by command substitution — each with its own rules about splitting.</p>
+
+<h4 id="ch6-1-for">for word in list; the list is words, not lines</h4>
+<p><code>for x in a b c</code> loops three times. The list is subject to the same expansion pipeline as any command line: unquoted <code>$(ls)</code> splits each line on IFS, so a filename with a space becomes a file and a half; quoted <code>"$(…)"</code> makes the whole output a single word, so the loop runs once with the entire text — the ancient "loop runs once and prints everything" bug. For filenames, glob the names themselves: <code>for f in *.txt</code> with <code>nullglob</code> (chapter 2) is safe, because globs expand to words that already are filenames, spaces intact. <code>in list</code> may be omitted, in which case the loop consumes the positional parameters — the same as <code>in "$@"</code>.</p>
+
+<div class="codeWrap"><pre><code># literal list, brace expansion, glob
+for n in 1 2 3; do echo "n=$n"; done
+for n in {1..5}; do printf '%s ' "$n"; done; echo
+for f in *.html; do echo "html: $f"; done
+
+# the "$(…)" single-word trap
+touch "/tmp/s space"
+files=$(ls /tmp/s*)
+for f in $files; do echo "unquoted: [$f]"; done    # split: s, space
+for f in "$files"; do echo "quoted once: [$f]"; done # one giant word
+
+# no "in": loop over the positional parameters
+set -- alpha beta gamma
+for arg; do echo "arg: $arg"; done
+</code></pre></div>
+
+<h4 id="ch6-1-cstyle">The C-style for ((;;))</h4>
+<p><code>for (( init; cond; step ))</code> is the arithmetic loop drawn from C, and it is the only for-form whose variables are genuinely integers in syntax — the whole expression is arithmetic, so <code>i++</code>, <code>i+=2</code> and <code>$((…))</code> work without <code>declare -i</code>. It is a bashism (absent in dash). The loop-boundary habit — <code>&lt;</code> for an exclusive upper bound, <code>&lt;=</code> for inclusive, off-by-one errors at exactly the last iteration — is the same in the shell as anywhere else; count-down loops with <code>i--</code> are where a wrong bound silently runs one time fewer. For <em>ranges</em>, prefer <code>{1..10}</code> or a <code>seq</code> substitution, both readable; for <em>arithmetic state</em> (indexes into an array, overflow counts), C-style is clearer.</p>
+
+<div class="codeWrap"><pre><code># count up and down
+for ((i=0; i&lt;3; i++)); do printf '%s ' "$i"; done; echo   # 0 1 2
+for ((i=10; i&gt;0; i-=2)); do printf '%s ' "$i"; done; echo # 10 8 6 4 2
+
+# indexing an array arithmetically
+arr=(zero one two)
+for ((i=0; i&lt;${#arr[@]}; i++)); do
+    echo "${arr[$i]}"
+done
+
+# retry counting with an arithmetic guard
+attempts=0
+until [[ $attempts -ge 3 ]]; do
+    ((attempts++))
+    echo "attempt $attempts"
+done
+</code></pre></div>
+
+<h3 id="ch6-2" data-toc>6.2 while, until and reading files line by line</h3>
+<p class="topic-desc"><code>while</code> runs its body as long as the condition command succeeds; <code>until</code> runs it until the condition succeeds. Combined with <code>read</code>, while is the file processor; the condition's exit status decides, not a value comparison.</p>
+
+<h4 id="ch6-2-while">while and until: conditions are commands</h4>
+<p><code>while read -r line; do …; done &lt; file</code> keeps reading until <code>read</code> hits EOF and fails — the loop exits precisely because the condition command fails, which is the correct shell shape. Infinite loops are <code>while :</code> (the <code>:</code> builtin always succeeds) or <code>while true</code>. <code>until</code> inverts: <code>until pgrep -x mydaemon</code> polls until it appears. A common failure is a condition that runs a pipeline (<code>while echo x | grep y</code>), which is fine — the pipeline status is the last stage. Guard every while against a pathological exit: a service check that never flips leaves <code>while :</code> spinning; add a counter and a <code>break</code> (section 6.4) so the loop is always bounded.</p>
+
+<div class="codeWrap"><pre><code># read until EOF - the condition IS read's failure
+n=0
+while IFS= read -r line; do
+    n=$((n + 1))
+    echo "$n: $line"
+done &lt; /etc/hostname
+
+# until: poll for a condition
+pass=0
+until [ $pass -ge 5 ] || ping -c1 -W1 host.local &gt;/dev/null 2&gt;&amp;1; do
+    sleep 1
+    pass=$((pass + 1))
+done
+echo "reachable after ${pass}s of trying"
+
+# a bounded infinite loop
+count=0
+while :; do
+    count=$((count + 1))
+    [ $count -ge 10 ] &amp;&amp; { echo "giving up"; break; }
+    echo "retry $count"
+done
+</code></pre></div>
+
+<h4 id="ch6-2-lines">The line-reading incantation, and the subshell refund</h4>
+<p><code>while IFS= read -r line; do …; done &lt; file</code> uses three protections at once: <code>IFS=</code> keeps leading/trailing whitespace (and stops trailing-backslash stripping), <code>-r</code> preserves backslashes, and the redirect <code>&lt; file</code> feeds stdin directly instead of a pipe. The reason <em>not</em> to pipe <code>cat file | while read</code> is the crucial one: every element of a pipeline runs in a subshell, so a <code>count</code> accumulated inside the loop is lost when the pipe ends. With the redirect, the loop runs in the current shell and the counter survives. The same refund applies to output: <code>done &gt; out.txt</code> redirects the loop's whole output, and <code>done &lt; &lt;(generate)</code> substitutes a command's output as the input without a pipe that would lose variables.</p>
+
+<div class="codeWrap"><pre><code># the variable survives with a redirect
+total=0
+while IFS= read -r num; do
+    total=$((total + num))
+done &lt; numbers.txt
+echo "total: $total"
+
+# the SAME loop through a pipe loses total
+total=0
+cat numbers.txt | while IFS= read -r num; do
+    total=$((total + num))
+done
+echo "total: $total"     # 0 - the subshell ate it
+
+# process substitution keeps the shell AND the stream
+while IFS= read -r -d '' f; do
+    : # work per file; variables survive
+done &lt; &lt;(find . -type f -print0)
+</code></pre></div>
+
+<h3 id="ch6-3" data-toc>6.3 Arrays: the container that fixes the for-loop</h3>
+<p class="topic-desc">Indexed arrays (bash 4+) remove the two enemies of the list-for-loop: word splitting and globbing. The rules of using them correctly are few and frequently violated.</p>
+
+<h4 id="ch6-3-array">Declaring, indexing and the expansion that preserves words</h4>
+<p><code>arr[0]=x</code> creates an array implicitly; <code>arr=( a "b c" * )</code> fills it, with the <code>*</code> globbed at assignment time. <code>"${arr[@]}"</code> is the one correct way to expand all elements — one word per element, exactly like <code>"$@"</code> — while <code>${arr[@]}</code> (unquoted) or <code>${arr[*]}</code> re-splits and re-globs everything you stored. <code>${#arr[@]}</code> is the length, <code>${arr[i]}</code> indexes, negative indices count from the end, and <code>arr+=( item )</code> appends. The names-in-a-list pattern — <code>hosts=(web1 web2)</code> then <code>for h in "${hosts[@]}"</code> — is exactly the "list as data" that makes for-loops honest.</p>
+
+<div class="codeWrap"><pre><code>hosts=(web01 web02 db01)
+for h in "${hosts[@]}"; do
+    echo "host: $h"
+done
+
+# elements with spaces survive because [@] quotes each one
+files=("report one.txt" "other.txt")
+for f in "${files[@]}"; do
+    echo "file: $f"
+done
+
+# length, indexing, appending
+echo "count: ${#hosts[@]}"
+echo "first: ${hosts[0]}"
+hosts+=(cache01)
+echo "last: ${hosts[-1]}"
+
+# unquoted [@] destroys what you stored
+set -- "${files[@]}"        # passes them correctly
+printf '&lt;%s&gt; ' $files; echo       # splits "report one.txt"
+</code></pre></div>
+
+<h4 id="ch6-3-assoc">Associative arrays: keys, not indexes</h4>
+<p><code>declare -A m</code> (bash 4.0+; macOS ships 3.2 without it) gives name-keyed maps: <code>m[name]=Ada</code>, <code>m[$k]=v</code>. Iterate keys with <code>"${!m[@]}"</code>, values with <code>"${m[@]}"</code>, and both in one pass by stepping the key list. Associative arrays are the correct replacement for "count occurrences" hacks built on <code>grep -c</code> in a loop (one fork per key instead of a single in-shell map), and they make configuration readable. Two gotchas: key order is hash order, so when the output must be deterministic, sort the key list (<code>for k in $(printf '%s\n' "${!m[@]}" | sort)</code>), and <code>export</code> does not carry arrays, associative or indexed, into child processes.</p>
+
+<div class="codeWrap"><pre><code>declare -A scores
+scores[alice]=9
+scores[bob]=7
+scores[carol]=8
+
+# iterate length of map, then keys-to-values
+echo "players: ${#scores[@]}"
+for p in "${!scores[@]}"; do
+    echo "$p scored ${scores[$p]}"
+done
+
+# counting words in a file, all in-shell
+declare -A count
+while read -r w; do
+    count[$w]=$(( ${count[$w]:-0} + 1 ))
+done &lt; words.txt
+for w in "${!count[@]}"; do echo "$w: ${count[$w]}"; done
+</code></pre></div>
+
+<h3 id="ch6-4" data-toc>6.4 break, continue and shift — keeping loops bounded</h3>
+<p class="topic-desc">Iteration is only safe when it can stop itself. <code>break</code> exits the innermost loop, <code>break n</code> exits n levels, <code>continue</code> skips to the next iteration, and <code>shift</code> consumes the positional parameter list one argument at a time — the loop shape used by argument parsers.</p>
+
+<h4 id="ch6-4-break">break and continue with their numeric forms</h4>
+<p><code>break</code> leaves the enclosing loop totally; <code>continue</code> starts the next iteration without executing the rest of the body. Both accept a count to reach out past a nesting level — <code>break 2</code> from an inner loop exits an outer one too, a control flow that reads better as a <code>case</code> returning from a function instead. The common patterns: <code>continue</code> to skip unneeded files in a glob loop, <code>break</code> on a first match (<code>[ -f "$f" ] &amp;&amp; break</code>), and a guarded <code>while :</code> that <code>break</code>s after N attempts so a stuck condition cannot spin the CPU forever.</p>
+
+<div class="codeWrap"><pre><code># skip with continue, stop with break
+for f in *; do
+    case "$f" in *.tmp|*.bak) continue ;; esac
+    [ -d "$f" ] &amp;&amp; { echo "first dir: $f"; break; }
+done
+
+# break 2 leaves two loops
+for i in 1 2; do
+    for j in a b; do
+        echo "$i$j"
+        [ "$i$j" = "2b" ] &amp;&amp; break 2
+    done
+done    # prints: 1a 1b 2a 2b
+
+# bounded retry
+tries=0
+while :; do
+    tries=$((tries + 1))
+    if command -v webthing &gt;/dev/null; then break; fi
+    [ $tries -ge 5 ] &amp;&amp; { echo "gave up" &gt;&amp;2; exit 1; }
+    sleep 1
+done
+</code></pre></div>
+
+<h4 id="ch6-4-shift">shift: consuming the argument list</h4>
+<p><code>shift</code> discards <code>$1</code> and renumbers everything: <code>$2</code> becomes <code>$1</code>, and <code>$#</code> drops by one. <code>shift 2</code> discards two. The canonical use is an argument parser that peels flags one at a time: test <code>$1</code>, act, <code>shift</code>, repeat. The failure mode is shifting past the end — testing <code>$1</code> after <code>$#</code> reached zero yields an empty string and wrong behaviour, so parsers guard with <code>[ $# -gt 0 ]</code> before each read or use a counted while: <code>while [ $# -gt 0 ]</code>. <code>shift</code> destroys the original arguments, and it is the reason a wrapper that must forward everything should copy <code>"$@"</code> into an array first when it needs <code>$1</code> again later.</p>
+
+<div class="codeWrap"><pre><code># a stripped-down option parser
+verbose=0; out=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -v|--verbose) verbose=1; shift ;;
+        -o) out="$2"; shift 2 ;;
+        --) shift; break ;;
+        *)  echo "unknown option: $1" &gt;&amp;2; exit 2 ;;
+    esac
+done
+echo "verbose=$verbose out=$out remaining=$#"
+
+# save a future need: keep the original list in an array
+all=( "$@" )
+shift
+echo "original: ${all[*]:-}"
+echo "after shift: $*"
+</code></pre></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Functions and Libraries</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 7 ▸ Functions and Libraries</button><div class="ch-toc-list"><a href="#ch7-1">7.1 Defining, calling and the argument contract</a><a href="#ch7-2">7.2 Scope: local, and the global leak</a><a href="#ch7-3">7.3 Returning values: the code channel and the output channel</a><a href="#ch7-4">7.4 Libraries and sourcing</a></div></div>
+<p class="topic-desc">Functions are how a script stops being a linear list of commands and becomes a program: named units of work, each with its own arguments, its own local state, and (via sourcing) a whole library of reusable parts. The shell's function model is close to C's and far from a language with return values in the usual sense — the return code and the output are two different channels, and mixing them up is the most common function bug.</p>
+
+<h3 id="ch7-1" data-toc>7.1 Defining, calling and the argument contract</h3>
+<p class="topic-desc">A function is defined once and called by bare name — no parentheses at the call site — and inside the function, the positional parameters are no longer the script's arguments but the function's.</p>
+
+<h4 id="ch7-1-syntax">Two syntaxes, one namespace</h4>
+<p><code>name() { …; }</code> is POSIX; <code>function name { …; }</code> is a bashism; both define the same object. The body must end with a <code>;</code> or a newline before <code>}</code>. Functions share the namespace with variables and builtins: calling a function named <code>cd</code> shadows the builtin for every script that sources your file, so guard names with a prefix (<code>log_</code>, <code>json_</code>). Bodies are expanded when read, so a function defined inside an <code>if</code> branch exists only if that branch ran — define functions at the top of the file, before first use, and the "command not found" on a function name is nearly always an ordering problem.</p>
+
+<div class="codeWrap"><pre><code># POSIX-compatible definition
+greet() {
+    echo "hello, $1"
+}
+greet world
+
+# bash-only function keyword - identical behaviour
+function greet_bash {
+    echo "hello, $1"
+}
+greet_bash bash
+
+# ordering matters: call AFTER the definition line
+bye() { echo "bye, $1"; }
+bye now
+
+# the accidental shadow - never name a function after a builtin
+ls() { echo "intercepted"; }
+ls /tmp
+unset -f ls
+</code></pre></div>
+
+<h4 id="ch7-1-args">Inside the function, $1 means the function's first argument</h4>
+<p>A function sees the caller's variables and the caller's working directory — and its <em>own</em> positional parameters. <code>greet world</code> gives the function <code>$1=world</code>; the script's original <code>$1</code> is a different object, so a function that means "the script's first argument" but refers to <code>$1</code> is a bug that only shows when the function is called with arguments of its own. The safe idioms: capture the contract on the first line (<code>local name="$1"</code>), forward the whole list with <code>"$@"</code>, and remember there is no overloading — one name, one body. <code>$FUNCNAME</code> inside a function holds its name, and <code>${FUNCNAME[*]}</code> the whole call stack, which is the material for an error message that shows where a failure came from.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+main() {
+    helper "script-first" extra
+}
+helper() {
+    # $1 is helper's argument now, not main's
+    printf 'helper got: %s (count %d)\n' "$1" "$#"
+    for a in "$@"; do printf '  arg: %s\n' "$a"; done
+}
+main
+# helper got: script-first (count 2)
+
+# the call stack in a message
+who() {
+    echo "called by ${FUNCNAME[1]:-top-level}"
+}
+outer() { who; }
+outer
+</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 Scope: local, and the global leak</h3>
+<p class="topic-desc">Shell variables are global by default, even inside functions. <code>local</code> creates a function-scoped copy; forgetting it is how a loop counter leaks out and aliases itself for the rest of the script.</p>
+
+<h4 id="ch7-2-local">local, and the two ways a function mutates the world</h4>
+<p><code>local name</code> or <code>local name=value</code> marks a variable as belonging to the function and its called functions. Without <code>local</code>, an assignment inside a function silently overwrites any same-named variable in the caller — the classic "my function set a variable I never declared" report. Because functions share the current shell, a function that <code>cd</code>s changes the caller's directory; the discipline is to save and restore the directory inside the function (<code>local old="$PWD"</code>) or run the body in a subshell when the change should be disposable. Reading a global is fine; writing one is fine when intentional, and there is <code>declare -g</code> to make that explicit.</p>
+
+<div class="codeWrap"><pre><code>counter=0
+bump() {
+    local n="${1:-1}"
+    counter=$((counter + n))    # writes the GLOBAL on purpose
+}
+bump 2
+echo "counter=$counter"         # 2
+
+leak() {
+    temp=/tmp/leak               # no local: a global named temp
+}
+leak
+echo "temp=$temp"                # /tmp/leak - leaked
+
+clean() {
+    local tmp
+    tmp=/tmp/clean
+    echo "$tmp"
+}
+clean
+echo "tmp now=[$tmp]"            # still /tmp/leak - safe
+
+# local with a default in one line
+set_config() {
+    local name="${1:?name missing}"
+    local val="${2:-default}"
+    printf '%s=%s\n' "$name" "$val"
+}
+set_config host prod.example.com
+</code></pre></div>
+
+<h3 id="ch7-3" data-toc>7.3 Returning values: the code channel and the output channel</h3>
+<p class="topic-desc">A shell function has two output channels, not one: the exit code (<code>return</code>, 0–255, the condition channel) and everything printed to stdout (the value channel). Functions that print a result and then try to return a value on the code channel are conflating the two; the calibrated design picks one per call.</p>
+
+<h4 id="ch7-3-codes">return for status, stdout for values</h4>
+<p><code>return 0/1/2…</code> sets the function's exit status, which <code>if</code> and <code>&amp;&amp;</code>/<code>||</code> consume; a bare <code>return</code> reuses the last command's status. Values travel back as stdout: <code>src="$(find_src)"</code> captures everything the function printed. The rules that keep this sane: print the value <em>only</em>, send diagnostics to stderr where they will not be captured, and never put debugging output in a function whose output is a value — a stray <code>echo</code> inside <code>find_src</code> corrupts every caller. When a function both computes and fails, the pattern is <code>local out; out="$(work)" || return 1; printf '%s' "$out"</code> — the code channel reports failure, the output channel carries the payload.</p>
+
+<div class="codeWrap"><pre><code># status channel
+has_conf() {
+    [ -f "$1" ]
+}
+if has_conf /etc/hosts; then
+    echo "config present"
+fi
+
+# value channel: stdout only - diagnostics to stderr
+ext_of() {
+    local f="$1"
+    [ -f "$f" ] || { echo "no such file: $f" &gt;&amp;2; return 1; }
+    printf '%s\n' "${f##*.}"
+}
+ext="$(ext_of /etc/hosts)" || exit 1
+echo "extension: $ext"
+
+# capture-and-fail in one step
+url="$(ext_of cfg.ini)" || { echo "cannot read" &gt;&amp;2; exit 1; }
+echo "$url"
+</code></pre></div>
+
+<h4 id="ch7-3-nameref">printf -v and namerefs: values into a caller's variable</h4>
+<p>When the caller wants the value in a variable rather than as stdout, bash offers two channels. <code>printf -v varname '…'</code> writes formatted text directly into a variable without a fork — the fastest string builder in the shell. <code>declare -n</code> (bash 4.3+) creates a <em>nameref</em>: a variable that is an alias for another variable's name, so a function can assign through it and the caller sees the write. The nameref must itself be a fresh, non-<code>ref</code> name or bash refuses with a circular-reference error; <code>local -n</code> inside a function allocates it per call. Together they cover every "return a tuple" need without a global.</p>
+
+<div class="codeWrap"><pre><code># printf -v: build into a variable, no subshell
+printf -v joined '%s-%s-%s' a b c
+echo "$joined"            # a-b-c
+
+# nameref: assign into the caller's variable
+split_host() {
+    local -n out=$1      # the caller passes a NAME
+    local host=${2%%:*}
+    out=$host
+}
+target="server.example:8080"
+split_host result "$target"
+echo "host=$result"      # server.example
+
+pair() {
+    local -n a=$1 b=$2
+    a=alpha
+    b=beta
+}
+pair x y
+echo "$x $y"             # alpha beta
+</code></pre></div>
+
+<h3 id="ch7-4" data-toc>7.4 Libraries and sourcing</h3>
+<p class="topic-desc">A library is a file of function definitions and constants, pulled into the current shell with the <code>.</code> builtin (or <code>source</code>). Sourcing runs the file <em>in the current shell</em>, so its functions, variables and even <code>cd</code>s persist — the opposite of executing it as a child process.</p>
+
+<h4 id="ch7-4-source">. file vs ./file, and the path that must be right</h4>
+<p><code>. lib.sh</code> parses and runs the file in the current shell: definitions land in the caller's context. <code>./lib.sh</code> forks a child: definitions vanish and nothing the library computed survives. Because sourcing runs in your shell, a library must never execute its main work at top level — sourcing a script that runs commands is how a "load the tools" line becomes an instant deployment. The path matters more here than anywhere: <code>. lib.sh</code> searches PATH, so invoked from another directory it fails with "file not found"; the robust source resolves the calling script's own directory first — <code>$(cd "$(dirname "${BASH_SOURCE[0]}")" &amp;&amp; pwd)</code> — and sources by the absolute path it computes.</p>
+
+<div class="codeWrap"><pre><code># lib.sh - a library file
+log() { printf '%s %s\n' "$(date -Is)" "$*" &gt;&amp;2; }
+readonly LIB_EMAIL="ops@example.com"
+
+# guard the library's own test code
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    echo "lib.sh executed directly - nothing to do"
+fi
+
+# main.sh: source by the caller's directory, not PATH
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &amp;&amp; pwd)"
+. "$SCRIPT_DIR/lib.sh"
+log "starting"
+echo "email: $LIB_EMAIL"
+</code></pre></div>
+
+<h4 id="ch7-4-guard">Guard against double sourcing</h4>
+<p>Two scripts sourcing the same library is normal; a library that starts with <code>readonly</code> values blows up the second time it is sourced. The idiom that makes libraries idempotent is a guard variable checked before each definition block. Note the guard's first line: <code>return 0 2&gt;/dev/null || exit 0</code> — <code>return</code> in a sourced file leaves the caller, while <code>return</code> at the top level of a <em>script</em> is an error, so the <code>|| exit 0</code> covers that case, and the redirect hides the noise.</p>
+
+<div class="codeWrap"><pre><code># lib.sh with a re-source guard
+if [ -n "${MYLIB_LOADED:-}" ]; then
+    return 0 2&gt;/dev/null || exit 0   # already loaded
+fi
+readonly MYLIB_LOADED=1
+
+log() { printf '%s %s\n' "$(date -Is)" "$*" &gt;&amp;2; }
+die() { log "FATAL: $*"; exit 1; }
+
+# sourcing twice in one shell is now harmless
+. ./lib.sh
+. ./lib.sh
+log "loaded once"
+</code></pre></div>
+
+<div class="warn"><p><strong>Never source content you do not trust in a privileged script.</strong> Sourced code runs with full rights in the current shell — there is no sandbox and no error boundary. Libraries are code: review them, pin them in the same repository as the script, and treat a "load tools" source the way you would treat an import from a package you have never audited.</p></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch8" data-toc>8 ▸ Text Processing</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 8 ▸ Text Processing</button><div class="ch-toc-list"><a href="#ch8-1">8.1 grep: selection by pattern</a><a href="#ch8-2">8.2 sed: stream editing, one command at a time</a><a href="#ch8-3">8.3 awk: fields, variables and the one-liner that ran</a><a href="#ch8-4">8.4 cut, tr, sort, uniq and wc — the finishing tools</a><a href="#ch8-5">8.5 Here-docs, here-strings and the =~ conditional</a></div></div>
+<p class="topic-desc">The shell's strongest territory is composing small text tools — each with one job, joined by pipes until the whole becomes a query. This chapter covers the four tools you will actually reach for (grep, sed, awk and cut/tr), the pipes that join them, the <code>=~</code> regex inside conditionals, and the here-doc plumbing that feeds multi-line input without a temporary file.</p>
+
+<h3 id="ch8-1" data-toc>8.1 grep: selection by pattern</h3>
+<p class="topic-desc">grep reads lines and keeps the ones matching a pattern. The flags decide the pattern language and the shape of the output; the exit status decides the script's logic.</p>
+
+<h4 id="ch8-1-flags">The flags that change what grep means</h4>
+<p><code>-E</code> selects extended regex so <code>(…)</code> and <code>|</code> do not need backslashes; <code>-F</code> treats the pattern as a literal string (fast, and immune to regex metacharacters); <code>-i</code> ignores case; <code>-v</code> keeps non-matching lines; <code>-q</code> prints nothing and sets only the status; <code>-c</code> counts matches; <code>-l</code>/<code>-L</code> list matching/non-matching files; <code>-n</code> numbers the lines; <code>-o</code> prints only the matched part; <code>-r</code> recurses. Two surprises before production: grep matches substrings by default, so <code>grep luck</code> matches <code>unlucky</code> — anchor with <code>^</code>/<code>$</code> or word boundaries; and grep's "no match" status is 1, which under <code>set -e</code> aborts your script unless the call sits in an <code>if</code> or is guarded.</p>
+
+<div class="codeWrap"><pre><code>grep -i error /var/log/app.log
+grep -v '^#' /etc/ssh/sshd_config          # strip comments
+grep -c ' 500 ' access.log
+grep -E 'ERROR|PANIC' app.log | head -20
+grep -F -- 'a.b*c' file.txt                # dot and star are literal
+grep -n 'TODO' -- *.js
+grep -rl 'api_key' config/                 # which files mention it
+grep -o '[0-9]\+' version.txt | head -1    # the first number
+</code></pre></div>
+
+<h4 id="ch8-1-status">Using grep's status instead of its output</h4>
+<p><code>grep -q</code> is the boolean form: no output, status 0 on a match, 1 on none, 2 on an error (unreadable file, bad pattern). Branch on it directly — <code>if grep -q '^root:' /etc/passwd</code> — and reserve <code>$(grep …)</code> for when the matching lines are genuinely a value. The "no match" status is mishandled so often that <code>set -e</code> scripts routinely pepper <code>|| true</code> after every grep; the cleaner fix is to move the grep into the condition, where its status is expected to be consumed.</p>
+
+<div class="codeWrap"><pre><code>if grep -qs '^PermitRootLogin no' /etc/ssh/sshd_config; then
+    echo "root login is disabled"
+fi
+
+# a multi-line value, into an array - mapfile reads it whole
+mapfile -t hits &lt; &lt;(grep -E '^error' /var/log/app.log)
+echo "found ${#hits[@]} error lines"
+
+# distinguish "no match" (1) from "grep failed" (2)
+grep -qs root /etc/hosts; s=$?
+case $s in
+    0) echo "match" ;;
+    1) echo "no match" ;;
+    *) echo "grep itself failed ($s)" &gt;&amp;2 ;;
+esac
+</code></pre></div>
+
+<h3 id="ch8-2" data-toc>8.2 sed: stream editing, one command at a time</h3>
+<p class="topic-desc">sed reads lines, applies its script to each, and prints the result by default. Its two workhorses are the substitute command and address ranges.</p>
+
+<h4 id="ch8-2-sub">s///: the substitute command in full</h4>
+<p><code>sed 's/old/new/'</code> replaces the first match per line; <code>s/old/new/g</code> every match; a trailing <code>2</code> (<code>s/old/new/2</code>) the second. Any delimiter works — <code>sed 's|/var/log|/log|'</code> when the text contains slashes. In the replacement, <code>&amp;</code> re-inserts the whole match and <code>\1</code>… a capture group; in the pattern (basic regex by default) groups are <code>\(…\)</code>, and <code>-E</code> switches to extended so you write plain <code>(…)</code>. The single quotes around a sed script are load-bearing: they stop the shell from eating <code>$</code>, <code>&amp;</code> and backslashes, and a double-quoted script leaks your shell variables into the pattern, which is a bug in every case except the rare deliberate one.</p>
+
+<div class="codeWrap"><pre><code>echo 'aXbXc' | sed 's/X/-/'        # a-bXc   first only
+echo 'aXbXc' | sed 's/X/-/g'       # a-b-c   all
+
+echo '/var/log/app.log' | sed 's|.*/||'      # app.log
+echo 'name=jane' | sed -E 's/^name=(.*)$/\1/'  # jane
+echo version-1.2.3 | sed 's/[0-9.]*/(&amp;)/'     # version-(1.2.3)
+
+# -n with p: print only what matched
+printf 'a\nskip\nb\n' | sed -n '/skip/p'
+
+# in place, GNU sed, with a backup
+sed -i.bak 's/\r$//' file.txt
+</code></pre></div>
+
+<h4 id="ch8-2-address">Addresses and ranges</h4>
+<p>sed commands take an address: a line number (<code>5d</code>), a pattern (<code>/error/d</code>), the last line (<code>$d</code>), or a range (<code>2,5d</code>, <code>/start/,/end/p</code> — from the first line matching start to the first line matching end, inclusive). Ranges are the tool for "extract the section between two markers", and the inclusive end is the gotcha: <code>sed -n '/BEGIN/,/END/p'</code> includes the END line, so the extraction has to trim it (<code>sed '$d'</code>). Line-address arithmetic (<code>/BEGIN/,+3p</code>) is GNU-specific, the most common sed porting surprise.</p>
+
+<div class="codeWrap"><pre><code>sed -n '2,4p' file.txt                 # lines 2-4
+sed -n '/# BEGIN/,/# END/p' config.ini # the block, inclusive
+sed '/^#/d' config.ini                 # delete comment lines
+sed -n '$p' file.txt                   # the last line
+
+# extract the block, then drop the closing marker
+sed -n '/ui:/,/end ui/p' app.yaml | sed '$d'
+
+# every 3rd line (GNU): step addressing
+sed -n '1~3p' file.txt
+</code></pre></div>
+
+<h3 id="ch8-3" data-toc>8.3 awk: fields, variables and the one-liner that ran</h3>
+<p class="topic-desc">awk is a whole mini-language for "split each line into fields and compute". It is the correct tool the moment a task involves columns, sums, or a condition on a field — and the wrong tool for character-level surgery, which stays with sed and tr.</p>
+
+<h4 id="ch8-3-fields">Fields, and the default split</h4>
+<p>By default awk splits each line on runs of whitespace into <code>$1, $2, …</code>; <code>$0</code> is the whole line, <code>NF</code> the field count, <code>NR</code> the record (line) number, <code>FNR</code> the per-file record number. <code>-F</code> sets a custom separator — <code>-F:</code> for /etc/passwd, <code>-F,</code> for CSV (with the caveat that quoted commas defeat a naive <code>-F,</code>; use a real CSV tool for that). A program is <code>pattern { action }</code> pairs: no pattern means every line, a pattern expression filters (<code>NR&gt;1</code>, <code>$3 &gt; 100</code>), and <code>BEGIN</code>/<code>END</code> blocks run before and after the records. Field variables carry no <code>$</code> in arithmetic: <code>s += $3</code> accumulates field 3.</p>
+
+<div class="codeWrap"><pre><code>awk '{print $1, $NF}' data.txt            # first and last field
+awk -F: '$3 &gt;= 1000 {print $1}' /etc/passwd  # real users
+awk 'NR &gt; 1 {print NR": "$0}' file.txt    # numbered, header skipped
+awk '{s += $2} END {print s}' numbers.txt
+awk 'BEGIN{OFS="|"} {print $1, $3}' file.txt
+awk -F, '{print $2}' users.csv            # CSV columns
+</code></pre></div>
+
+<h4 id="ch8-3-programs">Pattern-action programs and printf formatting</h4>
+<p>The pattern is any expression, and <code>==</code>, <code>&gt;</code>, <code>&amp;&amp;</code>, and <code>/regex/</code> all work; a bare field as the action is a truth test (<code>awk '$3' file</code> prints lines with a non-empty third field). awk's <code>printf</code> gives column formatting echo cannot. When a program grows past a few expressions, move it to a file (<code>awk -f prog.awk</code>) or a here-doc; and because the program is single-quoted, shell values cross the boundary only via <code>-v name=value</code> — a variable used inside a single-quoted awk program is a literal string, not a substitution.</p>
+
+<div class="codeWrap"><pre><code>awk -F, '$3 &gt; 18 {print $1 " is an adult"}' people.csv
+awk 'NR&gt;1 &amp;&amp; $4 ~ /ERR/ {c++} END{print c+0}' log.csv
+
+# -v brings shell values in
+min=100
+awk -v m="$min" '$1 &gt; m {print $1}' file.txt
+
+# printf-style columns
+awk 'BEGIN{printf "%-12s %8s\n", "name", "score"}
+     {printf "%-12s %8d\n", $1, $2}' scores.txt
+</code></pre></div>
+
+<h3 id="ch8-4" data-toc>8.4 cut, tr, sort, uniq and wc — the finishing tools</h3>
+<p class="topic-desc">The small composables. Each does one thing per call; the art is in the pipeline that sequences them into a query.</p>
+
+<h4 id="ch8-4-cut">cut and tr: slicing columns and translating characters</h4>
+<p><code>cut -d: -f1</code> splits on a separator and keeps fields; <code>cut -c1-8</code> slices by character. cut has no regex — only one separator — so multi-character separators go to awk or sed first. <code>tr</code> maps or deletes characters: <code>tr 'a-z' 'A-Z'</code>, <code>tr -d '\r'</code> to strip CR, <code>tr -s ' '</code> to squeeze repeats, and the character classes <code>[:alpha:]</code> and friends. tr works byte-by-byte, so case-folding "é" fails; real case folding needs a proper tool. Both are pure filters, and both sit mid-pipeline without ever owning the glue.</p>
+
+<div class="codeWrap"><pre><code>echo 'root:x:0:0' | cut -d: -f1,3        # root:0
+echo 'hello world' | cut -c1-5           # hello
+echo '2026-10-11' | cut -d- -f1-2        # 2026-10
+
+tr '[:lower:]' '[:upper:]' &lt; name.txt
+tr -d '\r' &lt; win.txt &gt; unix.txt
+echo 'a   b' | tr -s ' '                 # a b
+echo 'ab12cd' | tr -d '0-9'              # abcd
+
+# a classic mindful pipeline: field 3 of a TSV, upper-cased
+head -5 data.tsv | cut -f3 | tr '[:lower:]' '[:upper:]'
+</code></pre></div>
+
+<h4 id="ch8-4-sort">sort, uniq and wc: order, dedupe, count</h4>
+<p><code>sort</code> defaults to lexicographic order, so 10 sorts before 2 — <code>-n</code> is numeric, <code>-h</code> human sizes, <code>-r</code> reverse, <code>-k2,2</code> a key, <code>-t:</code> a field separator, <code>-u</code> unique. <code>uniq</code> removes <em>adjacent</em> duplicates, so it always follows sort; <code>-c</code> prefixes counts, and <code>uniq -c | sort -rn</code> is the "top values" pattern. <code>wc -l</code>, <code>-w</code>, <code>-c</code> count lines, words and bytes. These three answer the two questions text pipelines get asked most: what is unique, and how often.</p>
+
+<div class="codeWrap"><pre><code>sort -n numbers.txt | tail -1          # the maximum
+sort -t: -k3 -n /etc/passwd | head     # lowest uids first
+du -sh * | sort -h | tail -5           # the five biggest dirs
+
+sort names.txt | uniq                   # unique values
+sort names.txt | uniq -c | sort -rn    # frequencies, high first
+
+wc -l access.log                       # how many requests
+awk '{print $7}' access.log | sort | uniq -c | sort -rn | head
+</code></pre></div>
+
+<h3 id="ch8-5" data-toc>8.5 Here-docs, here-strings and the =~ conditional</h3>
+<p class="topic-desc">Multi-line and literal input to a command — the mechanisms that need no temporary file — plus the built-in regex conditional that completes in-shell validation.</p>
+
+<h4 id="ch8-5-heredoc"><< EOF expands, <<'EOF' is literal</h4>
+<p>A here-doc feeds lines into a command's standard input until a line equal to the delimiter. Unquoted (<code>&lt;&lt;EOF</code>) the body undergoes parameter, command and arithmetic expansion — the natural template mechanism. Quoted (<code>&lt;&lt;'EOF'</code> or <code>&lt;&lt;"EOF"</code>) makes the body fully literal — the right choice for SQL, config files and awk programs whose <code>$</code>-signs must survive. <code>&lt;&lt;-EOF</code> strips leading tabs so a doc can be indented inside a function. Two cautions: the delimiter must be alone on its line, and a <code>$</code> in an unquoted doc is live — a document containing <code>$(uname -r)</code> will run it at expansion time.</p>
+
+<div class="codeWrap"><pre><code># expanded template
+name=JetBrains
+cat &lt;&lt;EOF
+Welcome $name
+Built on: $(date +%F)
+EOF
+
+# literal: SQL and config must not see $ or backticks
+mysql db &lt;&lt;'SQL'
+SELECT * FROM users WHERE plan = '$PROBE';
+SQL
+
+# indented doc inside a function: the hyphen strips leading TABS
+k() {
+    cat &lt;&lt;-DOC
+		indented two levels with real tabs,
+		stripped back before the shell parses
+	DOC
+}
+k
+
+# awk program from a here-doc
+awk -f /dev/stdin &lt;&lt;'AWK'
+{ total += $2 }
+END { print total }
+AWK
+</code></pre></div>
+
+<h4 id="ch8-5-herestring">Here-strings, and the =~ conditional</h4>
+<p><code>&lt;&lt;&lt;</code> feeds a single string as standard input with a trailing newline: <code>grep -o '[0-9]*' &lt;&lt;&lt; "$config"</code> and <code>IFS= read -r x &lt;&lt;&lt; "value"</code> are the two staple uses — one string argument, no subshell, no fork. Combined with <code>[[ $x =~ $re ]]</code> (chapter 5), a whole validation branch runs with zero external processes. Keep here-strings for short in-memory content; for files, use <code>&lt; file</code> or process substitution.</p>
+
+<div class="codeWrap"><pre><code># a string, not a file
+grep -c error &lt;&lt;&lt; "no errors here"       # 0
+
+# validation purely in-shell
+v="server01.example.com"
+if [[ $v =~ ^[a-z0-9.-]+$ ]]; then
+    echo "valid hostname"
+fi
+
+# feeding read without echo -n
+read -r tag &lt;&lt;&lt; "2026.10"
+echo "tag=$tag"
+</code></pre></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch9" data-toc>9 ▸ Processes, Jobs and Signals</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 9 ▸ Processes, Jobs and Signals</button><div class="ch-toc-list"><a href="#ch9-1">9.1 Pipelines and subshells</a><a href="#ch9-2">9.2 Process substitution</a><a href="#ch9-3">9.3 Background jobs, $! and wait</a><a href="#ch9-4">9.4 Signals and trap</a><a href="#ch9-5">9.5 kill, pkill and the termination ladder</a></div></div>
+<p class="topic-desc">Every shell line is a process choreography: pipelines forking stages, subshells cloning the environment, background jobs running alongside, and signals interrupting everything. This chapter covers how processes are created and grouped, how to read their exit stories, and how to make a script clean up after itself no matter what kills it.</p>
+
+<h3 id="ch9-1" data-toc>9.1 Pipelines and subshells</h3>
+<p class="topic-desc">A pipeline starts one process per stage, all in subshells. Understanding which parts of a pipeline inherit what is the difference between a script that remembers and one that forgets.</p>
+
+<h4 id="ch9-1-subshell">Every pipeline stage is a subshell — variables die with it</h4>
+<p>In <code>a | b | c</code>, each stage is a child process, so any variable a stage sets is lost when the stage ends. The famous casualty is the reading loop: <code>cat file | while read x; do n=$((n+1)); done</code> increments the <em>copy</em> of <code>n</code> in the loop's subshell. The two repairs are to move the redirection onto the loop itself (<code>while read …; done &lt; file</code>, chapter 6) or to enable <code>shopt -s lastpipe</code> so the final stage of a pipeline runs in the current shell. Subshells also reset <code>cd</code> and <code>umask</code> changes — which makes <code>( cd /deep &amp;&amp; ./build )</code> the disciplined way to run a command in another directory without moving the parent, and everywhere a subshell is the correct isolation tool.</p>
+
+<div class="codeWrap"><pre><code>n=0
+echo 1 | read n            # read runs in a subshell
+echo "n=$n"                # 0
+
+# the redirect version keeps n
+n=0
+while IFS= read -r _; do n=$((n+1)); done &lt; data.txt
+echo "n=$n"
+
+# lastpipe: the LAST stage runs in the shell with no subshell
+shopt -s lastpipe
+echo 1 | read n
+echo "n=$n"                # 1 - the shell's own variable
+
+# ( ) contains cd, umask, everything
+mkdir -p /tmp/site
+( cd /tmp/site &amp;&amp; touch index.html )
+[ -f /tmp/site/index.html ] &amp;&amp; echo "site scaffolded"
+</code></pre></div>
+
+<h4 id="ch9-1-group">( ), { } and $( ) — three ways to compose</h4>
+<p><code>( cmd )</code> runs in a subshell: everything rolled back. <code>{ cmd; }</code> runs in the <em>current</em> shell: variables and <code>cd</code> survive, and the grouping exists for redirects — <code>{ echo a; echo b; } &gt; out.txt</code> is the "both lines to one file" form (the trailing <code>;</code> or newline before <code>}</code> is mandatory). <code>$( cmd )</code> captures stdout as a value, also in a subshell. Reading order matters: <code>{ …; } | next</code> pipes the group, <code>$( … )</code> inside a pipeline is already a subshell inside a subshell, and none of the three can pass a variable outward except via stdout. Choosing between them is choosing where the boundary is.</p>
+
+<div class="codeWrap"><pre><code># current-shell grouping for one redirect
+{ echo one; echo two; } &gt; /tmp/pair.txt
+
+# subshell grouping isolates the cd
+( cd /tmp &amp;&amp; pwd )        # /tmp
+pwd                        # still wherever the script starts
+
+# $() captures stdout
+now=$(date +%s)
+echo "epoch=$now"
+
+# a captured pipeline still cannot export its internals
+x=$(echo hi | sed 's/h/H/')
+echo "x=$x"                # Hi
+</code></pre></div>
+
+<h3 id="ch9-2" data-toc>9.2 Process substitution</h3>
+<p class="topic-desc">Process substitution (<code>&lt;(…)</code>) makes the output of a command look like a filename so the command can be read where a file is expected — and, unlike a pipe, its output can be read multiple times and its variables run in the current shell.</p>
+
+<h4 id="ch9-2-procsub"><( ) and >( ) as named streams</h4>
+<p><code>diff &lt;(sort a) &lt;(sort b)</code> gives each <code>sort</code> a <code>/dev/fd/N</code> path — the command reads "files" that are other commands' output. The classic win over a pipeline is the multi-consumer case: <code>tee &gt;(grep err &gt; errors.txt) &gt;(grep warn &gt; warns.txt) &gt; log.txt</code> fans one stream into several filters. And the reading loop steals the win from chapter 6: <code>while read …; done &lt; &lt;(find …)</code> runs the loop in the current shell, so a counter survives — the pipe version would lose it. Process substitution is bash/ksh/zsh; POSIX <code>sh</code> has no <code>/dev/fd</code> guarantee, so portability checks are due when the destination shell is unknown.</p>
+
+<div class="codeWrap"><pre><code># two commands as input files
+diff &lt;(sort left.txt) &lt;(sort right.txt)
+
+# fan-out: one feed, two filters, plus the raw log
+tee &gt;(grep ERR  &gt;/tmp/errors.log) \
+    &gt;(grep WARN &gt;/tmp/warns.log) \
+    &lt; app.log &gt; /tmp/app-clean.log
+
+# the variable-surviving read loop
+total=0
+while IFS= read -r f; do
+    total=$((total + 1))
+done &lt; &lt;(find . -type f)
+echo "files: $total"
+
+# compare counts across sources
+[ "$(wc -l &lt; &lt;(echo a; echo b))" -eq 2 ] &amp;&amp; echo "two lines"
+</code></pre></div>
+
+<h3 id="ch9-3" data-toc>9.3 Background jobs, $! and wait</h3>
+<p class="topic-desc">Appending <code>&amp;</code> starts a process in the background, handing you back the prompt immediately. The discipline around background work is: know the PID, wait for it deliberately, and never orphan a job whose failure you depend on catching.</p>
+
+<h4 id="ch9-3-bg">&amp;, $! and wait — the deliberate trio</h4>
+<p><code>cmd &amp;</code> backgrounds the job; <code>$!</code> holds its PID, the only handle you have; <code>wait $pid</code> blocks until it finishes and returns <em>its</em> exit status — the way a script launches several slow jobs and harvests their results in order. <code>wait</code> with no argument waits for all background jobs; <code>wait -n</code> (bash 4.3+) returns when any one finishes, the head of a simple parallel pool. The exit status of <code>wait</code> is what your <code>set -e</code> script can rely on: an unchecked background failure is silent, because background job status is not consulted until you wait for it (or reap it). Capturing both stdout and status from a background job takes files — <code>cmd &gt; out.txt 2&gt;err.txt &amp; pid=$!; wait $pid</code> — since no "return value" exists for a background process.</p>
+
+<div class="codeWrap"><pre><code># launch, harvest in start order
+fast() { sleep 1; echo fast; }
+slow() { sleep 2; echo slow; }
+fast &amp; p1=$!
+slow &amp; p2=$!
+wait $p1; echo "p1 finished: $?"
+wait $p2; echo "p2 finished: $?"
+
+# status capture with a redirect bundle
+backup_db &gt;/tmp/bk.log 2&gt;&amp;1 &amp; bk=$!
+wait $bk; [ $? -eq 0 ] &amp;&amp; echo "backup ok" || echo "backup FAILED"
+
+# a bounded parallel fan-out
+pids=()
+for h in web01 web02 web03; do
+    ( ssh "$h" uptime ) &amp; pids+=("$!")
+done
+for p in "${pids[@]}"; do wait "$p"; done
+</code></pre></div>
+
+<h4 id="ch9-3-jobs">jobs, fg, bg and the job table</h4>
+<p>Interactive shells keep a job table: <code>jobs</code> lists entries with numbers, <code>fg %1</code> brings one to the foreground, <code>bg %1</code> resumes a stopped one in the background, and <code>kill %1</code> signals by job number. In scripts the table is largely invisible, and that is the trap: a script that backgrounds a long task and exits leaves the child running — reparented to <code>init</code>, not killed. When a script must survive its parent's exit, the deliberate tool is <code>nohup cmd &amp;</code> (ignore hangup) or <code>disown</code>; when it must be cleaned up, <code>trap 'kill $pid' EXIT</code> is the pair that keeps batch scripts honest. A backgrounded job's stdin is typically redirected from <code>/dev/null</code> in scripts, otherwise the job silently waits on a tty that never answers.</p>
+
+<div class="codeWrap"><pre><code># interactive-style job control
+sleep 30 &amp;
+jobs        # [1]+  Running                 sleep 30 &amp;
+kill %1
+
+# script-safe backgrounding: nohangup, no tty
+nohup long_task &lt;/dev/null &gt;task.log 2&gt;&amp;1 &amp;
+
+# cleanup on exit, whatever happens
+pid=
+trap 'kill $pid 2&gt;/dev/null || true' EXIT
+long_task &lt;/dev/null &gt;out.log 2&gt;&amp;1 &amp; pid=$!
+# ... script work ... (trap kills the child at exit)
+</code></pre></div>
+
+<h3 id="ch9-4" data-toc>9.4 Signals and trap</h3>
+<p class="topic-desc">Signals are the operating system's interrupts to a process. <code>trap</code> is the shell's way of intercepting one at statement boundaries, and <code>trap … EXIT</code> is the cleanup chapter of every well-structured script.</p>
+
+<h4 id="ch9-4-trap">trap: the safety net that always runs</h4>
+<p><code>trap 'commands' SIGNAL</code> registers a handler executed when the signal arrives; multiple signals take one quoted string each. <code>trap 'cleanup' EXIT</code> runs the handler <em>whenever the shell exits</em> — normal completion, <code>exit</code>, even an error under <code>set -e</code> — which makes it the right home for removing temp dirs, killing children and restoring directories. <code>trap - EXIT</code> forgets the handler. The classic shape is <code>tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT</code>, and the handler can check a flag to distinguish normal from failure exits. A trap without quoting is a parse trap of its own: the command must be text, evaluated when the signal fires, so single quotes are almost always right.</p>
+
+<div class="codeWrap"><pre><code>tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT        # cleaned on every exit path
+
+# clean up a child we started
+child=
+trap 'kill "$child" 2&gt;/dev/null' EXIT
+sleep 100 &amp; child=$!
+
+# a handler that sees the exit status
+trap 'echo "exiting with $?"' EXIT
+false; exit 7       # prints: exiting with 7
+
+# ignore a signal - rarely correct, but the form exists
+trap '' HUP
+</code></pre></div>
+
+<h4 id="ch9-4-handler">Handlers for INT and TERM, and signal numbering</h4>
+<p><code>Ctrl+C</code> sends <code>SIGINT</code> to the foreground process group; <code>kill pid</code> default-sends <code>SIGTERM</code>. Trapping <code>INT</code> lets a long loop finish its current unit of work before reacting — the pattern <code>trap 'echo interrupted; exit 130' INT</code>, where 130 is 128+2 (the conventional status of a process killed by SIGINT). <code>kill -l</code> lists signal names and numbers; <code>kill -TERM pid</code> names the signal explicitly. The sign of a healthy script is its EXIT trap; the sign of a careful one is that the EXIT trap also handles the INT/TERM path by delegating to the same cleanup.</p>
+
+<div class="codeWrap"><pre><code># finish the unit, then stop
+trap 'echo "interrupt - finishing one more"; break_pending=1' INT
+while :; do
+    ...
+    [ "${break_pending:-0}" = 1 ] &amp;&amp; break
+done
+
+# name the signals you care about together
+cleanup() { rm -rf "$tmp"; }
+trap cleanup EXIT INT TERM
+
+kill -l              # list names and numbers
+kill -TERM 1234      # polite stop
+kill -9 1234         # uncatchable - last resort only
+</code></pre></div>
+
+<h3 id="ch9-5" data-toc>9.5 kill, pkill and the termination ladder</h3>
+<p class="topic-desc">Termination is a ladder, not a light switch: SIGTERM asks, SIGINT interrupts, SIGKILL cannot be ignored. Choosing the right rung is a design decision, and knowing a signal's default path explains the 128+N exit codes every script encounters.</p>
+
+<h4 id="ch9-5-kill">TERM first, KILL only when asked</h4>
+<p>The ladder: <code>SIGTERM</code> (15) is a polite request — the default for <code>kill pid</code> — giving the process a chance to flush, close sockets and run its own cleanup, which is why services implement graceful shutdown via TERM. <code>SIGKILL</code> (9) bypasses all handlers: the kernel tears the process down, files can corrupt, shared state can wedge, so <code>kill -9</code> is the escalation, never the habit. Between them sit <code>SIGHUP</code> (1, terminals closing), <code>SIGINT</code> (2), <code>SIGQUIT</code> (3, dumps core). A process killed by signal N reports exit status 128+N — the 143 you see after a TERM, the 130 after Ctrl+C — and scripts reading <code>$?</code> should recognise the band rather than treat it as an arbitrary high number.</p>
+
+<div class="codeWrap"><pre><code># the ladder, intentionally
+kill "$pid"              # TERM: graceful
+sleep 3
+kill -0 "$pid" 2&gt;/dev/null || echo "gone"    # -0 tests existence!
+kill -9 "$pid"           # escalation, when justified
+
+# status band: 128+N means signal N
+bash -c 'trap "" TERM; sleep 10 &amp; wait' &amp; p=$!
+sleep 0.2
+kill "$p"   # TERM was trapped - process survives
+kill -9 "$p"
+wait "$p"; echo "status=$?"        # 137 = 128 + 9
+</code></pre></div>
+
+<div class="warn"><p><strong>Never <code>kill -9</code> a database or a service you want to remain healthy.</strong> The graceful path — TERM, an optional grace period, then <code>kill -0</code> to confirm — is what leaves recovery files, journals and sockets consistent. Reserve KILL for the hung process that no longer responds to anything, and for the process group you cannot otherwise stop.</p></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch10" data-toc>10 ▸ Robust Scripting and Debugging</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 10 ▸ Robust Scripting and Debugging</button><div class="ch-toc-list"><a href="#ch10-1">10.1 set -euo pipefail in depth</a><a href="#ch10-2">10.2 Error handling: check, fail with reason, clean up</a><a href="#ch10-3">10.3 Logging: timestamps, channels and the audit trail</a><a href="#ch10-4">10.4 shellcheck: the linter that reviews like a senior</a><a href="#ch10-5">10.5 A complete script, with the whole book in it</a></div></div>
+<p class="topic-desc">A robust script fails loudly, cleans up after itself, and names its reasons. This chapter covers the strict-mode trio in depth — the <code>set</code> options with the exemptions that surprise everyone — then the error-handling, logging and static-analysis habits that turn a working script into a maintainable one, and finally a complete script that puts all of it together.</p>
+
+<h3 id="ch10-1" data-toc>10.1 set -euo pipefail in depth</h3>
+<p class="topic-desc">Three flags, three failure classes: <code>-e</code> stops at unhandled failures, <code>-u</code> stops at unset variables, <code>o pipefail</code> stops at hidden pipeline failures. Each comes with a documented list of exceptions that determine whether it protects you or howls at you.</p>
+
+<h4 id="ch10-1-e">set -e, and the situations where failure is not fatal</h4>
+<p><code>set -e</code> makes the shell exit the moment a command fails, unless the failure is where it can be handled: as the condition of <code>if</code>/<code>while</code>/<code>until</code>, on either side of <code>&amp;&amp;</code>/<code>||</code> except the last, negated with <code>!</code>, inside <code>$( )</code> when the substitution is part of an assignment, or in any context where a failure is intentionally checked later. The last category is the one that bites: <code>proxy=$(get_value)</code> aborts if <code>get_value</code> fails, while <code>proxy=${get_value:-x}</code> does not. The practical rule is to treat <code>-e</code> as the default for new scripts, keep deliberate <code>||</code> guards around operations whose failure is data, and <em>never</em> silence <code>-e</code> with an unconditional <code>|| true</code> — that is how cleanup gets skipped.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -e
+
+# failure here is handled: it is the if-condition
+if grep -q root /etc/passwd; then echo found; fi
+
+# a deliberate guard keeps the script alive
+mkdir -p /tmp/x || echo "mkdir had an opinion"
+
+# the default operator runs no command, so it is always safe
+config="${CONFIG:-default}"
+echo "config=$config"
+
+# ...but assignment from a failing command substitution IS fatal.
+value=$(false)        # &lt;- the script stops on this line under -e
+</code></pre></div>
+
+<h4 id="ch10-1-u">set -u, and the ${var:-} reflex</h4>
+<p><code>set -u</code> turns an unset-variable expansion into an error with "unbound variable" — the single fastest bug finder in the language, because a typo like <code>$HOME_DIR</code> for <code>$HOME</code> becomes a crash instead of an empty string doing silent damage. The reflex it demands is defaulting at every risky expansion: <code>"${1:-}"</code>, <code>"${CONF:-}"</code>, <code>"${arr[@]:-}"</code>. Watch two details: <code>${#arr[@]}</code> of an unset array is fine, but indexing one is not, and <code>BASH_SOURCE[0]</code>, <code>PIPESTATUS</code> and other shell internals are unset until they exist — guard anything linters flag. The exemption list is short: expansions inside the four <code>${var:-word}</code>-style forms never raise, and positional parameters under no arguments are <em>all</em> unset, so <code>"$@"</code> stays safe but <code>$1</code> must be defaulted.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -u
+# echo "$MISSING"          # FATAL: MISSING: unbound variable
+echo "${MISSING:-}"        # empty, safe
+echo "${1:-default}"       # positional, defaulted
+
+name="${USER:-nobody}"     # the universal config idiom
+[ -n "${CFG_FILE:-}" ] &amp;&amp; echo "config: $CFG_FILE"
+
+# arrays: length is safe, indexing needs the switch
+unset arr
+echo "len=${#arr[@]}"      # 0 - safe
+# echo "${arr[0]}"         # FATAL under -u
+echo "${arr[0]:-none}"     # none
+</code></pre></div>
+
+<h4 id="ch10-1-pipefail">set -o pipefail and the pipeline lie</h4>
+<p>Without pipefail, a pipeline's status is its <em>last</em> stage, so <code>grep secret config | head -1</code> reports success even when grep found nothing — the "grep failed but the script kept going and took the wrong branch" bug. <code>set -o pipefail</code> makes the pipeline fail if <em>any</em> stage fails, with the exit status of the rightmost failing stage; the shell records every stage's status in the <code>PIPESTATUS</code> array, which is how you tell whether the failure was the producer or the consumer. The corollary is that the pattern <code>rbenv exec ruby "$@" 2&gt;err.txt || exit 1</code> changes meaning under pipefail only when a pipe is involved — a bare last stage is unaffected. Set the trio first, before any other statement, and let <code>trap ERR</code> (10.2) tell you where.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -u
+set -o pipefail
+
+# without pipefail, a pipeline's status is the LAST stage:
+false | true
+echo "pipeline status: $?"        # 1 with pipefail; 0 without
+
+# PIPESTATUS records every stage, so the lying stage is visible
+false | true | true
+echo "stages: ${PIPESTATUS[*]}"   # 1 0 0
+
+# the rightmost FAILING stage decides the status
+(exit 3) | true
+echo "status: $?"                 # 3 - not the last stage's 0
+</code></pre></div>
+
+<h3 id="ch10-2" data-toc>10.2 Error handling: check, fail with reason, clean up</h3>
+<p class="topic-desc">Strict mode stops the script; error handling decides that it stops <em>readably</em>. The triad is: check operations that can fail, exit with a message naming the cause, and leave no partial state behind.</p>
+
+<h4 id="ch10-2-check">Checks that name the failure</h4>
+<p>Test before you act when the test is cheap: directory exists (<code>[ -d ]</code>), file writable (<code>[ -w ]</code>), tool present (<code>command -v</code>). Then act with the operation's status as the verdict — <code>mkdir -p "$dir" || die "cannot create $dir"</code>, <code>cd "$dir" || die "cannot enter $dir"</code>. The <code>die</code> function (a <code>log</code> to stderr plus <code>exit 1</code>) is the one function every script should source from a library. Because a failure inside <code>||</code> is by definition handled, <code>set -e</code> never interferes with <code>|| die</code> — the message prints and the script exits with it, which is exactly the intent. What <code>-e</code> still catches is the <em>unhandled</em> failure: a bare <code>cp</code> between checks will abort the script without a message, so keep deliberate operations on <code>|| die</code> and let everything else stay unguarded so it fails loudly.</p>
+
+<div class="codeWrap"><pre><code>die() {
+    echo "FATAL: $*" &gt;&amp;2
+    exit 1
+}
+
+[ -d "$DEPLOY_DIR" ] || die "deploy dir missing: $DEPLOY_DIR"
+command -v rsync &gt;/dev/null || die "rsync is required"
+mkdir -p "$WORK" || die "cannot create work dir: $WORK"
+cd "$WORK"          || die "cannot enter: $WORK"
+cp app.conf "$WORK/" || die "config copy failed"
+
+# a reason for the failure, and nothing else to guess
+if ! ssh deploy@host "systemctl restart app"; then
+    die "restart failed - check service logs"
+fi
+</code></pre></div>
+
+<h4 id="ch10-2-trace">trap ERR, and what -e cannot see</h4>
+<p><code>trap 'echo "line $LINENO: $BASH_COMMAND"' ERR</code> fires immediately before the shell would exit on an unhandled failure, and it prints the failing line and the command — the cheapest stack trace in the language. It complements <code>-e</code> rather than replacing it: <code>-e</code> decides the exit, <code>ERR</code> explains it. Because the trap races the exit, the pattern is <code>trap 'err=$?; echo "failed at line $LINENO ($BASH_COMMAND) status $err" &gt;&amp;2; exit $err' ERR</code>, capturing the status before anything clears it. One blind spot: <code>ERR</code> does not fire for commands whose failure is consumed by <code>if</code> or <code>||</code> — those are, by construction, handled.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -euo pipefail
+trap 's=$?; echo "FAILED line $LINENO: $BASH_COMMAND (status $s)" &gt;&amp;2; exit $s' ERR
+
+cp /nonexistent /anywhere          # traps and explains exactly here
+# FAILED line N: cp /nonexistent /anywhere (status 1)
+
+# handled failures are not errors
+grep -q nothing /etc/hosts &amp;&amp; echo "found" || echo "not found"
+</code></pre></div>
+
+<h3 id="ch10-3" data-toc>10.3 Logging: timestamps, channels and the audit trail</h3>
+<p class="topic-desc">Logging is how a script becomes diagnosable after the fact. Three rules: messages go to stderr unless they are the program's result, every line is timestamped, and failures carry context.</p>
+
+<h4 id="ch10-3-log">A log function, and why stderr is the home of diagnostics</h4>
+<p>Results belong on stdout — that is the contract with pipelines and <code>"$(script)"</code> capture. Everything else — progress, warnings, failures — belongs on stderr, so the two channels can be separated at the call site (<code>script 2&gt;err.log</code>, <code>script 1&gt;out.json</code>) and so a capture with <code>"$(…)"</code> is not polluted. The standard library function <code>log()</code> timestamps to stderr, and <code>die()</code> is <code>log</code> plus exit. <code>logger</code> and <code>systemd-cat</code> hand lines to the system log when a script runs as a service; <code>tee</code> splits a live log stream to both console and file. A timestamp format is a contract: ISO-8601 (<code>date -Is</code>) sorts lexicographically, which is what grep across a day of logs wants.</p>
+
+<div class="codeWrap"><pre><code>log() { printf '%s %s\n' "$(date -Is)" "$*" &gt;&amp;2; }
+die() { log "FATAL: $*"; exit 1; }
+
+log "backup starting"
+rsync -a data/ /backup/data/ || die "rsync failed"
+log "backup complete"
+
+# two channels, separated at the call site
+run_deploy &gt;deploy.out.json 2&gt;deploy.err.log
+
+# live to console AND file
+run_build 2&gt;&amp;1 | tee build.log
+</code></pre></div>
+
+<h3 id="ch10-4" data-toc>10.4 shellcheck: the linter that reviews like a senior</h3>
+<p class="topic-desc">Shellcheck is a static analyser with severity-levelled findings, a CLI and a <code>--format</code> for editors. It finds the exact bugs this guide has been warning about — unquoted expansions, <code>cd</code> without checks, unsafe loops — before the script ever runs. If you install nothing else from this chapter, install shellcheck.</p>
+
+<h4 id="ch10-4-shellcheck">Install, run, read the codes</h4>
+<p><code>shellcheck script.sh</code> prints findings with an SC-code, line and level; <code>-f gcc</code> reformats for editor quickfix, <code>-x</code> follows sourced files, <code>-S error</code> raises severity thresholds so a commit gate ignores style-only noise. The codes are a curriculum: SC2086 (unquoted expansion), SC2164 (cd without <code>|| exit</code>), SC1001 (misleading characters in a here-doc delimiter), SC2046 (quote this to prevent word splitting) are the ones that appear in almost every legacy script. Integrating it is trivial — a CI step or a pre-commit hook that runs <code>shellcheck -f gcc</code> and fails on level <code>error</code>. When shellcheck flags something you believe is deliberate, that is the moment to re-read your own logic, not to add <code># shellcheck disable=SC2086</code> — suppressions are the smell of an unresearched script.</p>
+
+<div class="codeWrap"><pre><code># the findings a typical first script earns
+shellcheck deploy.sh
+# In deploy.sh line 9:
+#     cp $file /backup
+#          ^-- SC2086: Double quote to prevent globbing and
+#              word splitting.
+
+# CI-style gate: only errors fail the build
+shellcheck -S error deploy.sh || exit 1
+
+# follow sourced libraries, editor-friendly output
+shellcheck -x -f gcc ./*.sh
+
+# the fix shellcheck is asking for, every time
+cp "$file" /backup
+</code></pre></div>
+
+<h3 id="ch10-5" data-toc>10.5 A complete script, with the whole book in it</h3>
+<p class="topic-desc">Putting it together: strict mode, options parsing, a job with real work, explicit failures, a cleanup trap, a log function, and the argument discipline from the earlier chapters — one coherent script that could live in a repo and be trusted.</p>
+
+<h4 id="ch10-5-main">The shape: header, options, work, cleanup</h4>
+<p>The reference layout: a shebang and <code>set -euo pipefail</code> at the very top; <code>BASH_SOURCE[0]</code>-based directory resolution so the script works from any cwd; a <code>log</code>/<code>die</code> pair; an <code>ERR</code> trap and an <code>EXIT</code> cleanup trap; a <code>usage()</code> for misuse; a getopts loop; a <code>main</code> function called with <code>"$@"</code>; and a guard so the file can also be sourced without running (chapter 7). Every expansion is quoted, every operation that can fail is checked with <code>|| die</code>, and the temp directory is self-deleting by trap. Read it line by line: each line is a rule from an earlier chapter.</p>
+
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &amp;&amp; pwd)"
+. "$SCRIPT_DIR/lib.sh"
+
+usage() {
+    echo "usage: $0 [-v] [-n count] target" &gt;&amp;2
+    exit 2
+}
+
+verbose=0
+n=3
+while getopts "vn:" opt; do
+    case "$opt" in
+        v) verbose=1 ;;
+        n) n="$OPTARG" ;;
+        *) usage ;;
+    esac
+done
+shift $((OPTIND - 1))
+[ $# -ge 1 ] || usage
+target="$1"
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+trap 's=$?; echo "failed in $0 at line $LINENO: $BASH_COMMAND" &gt;&amp;2; exit $s' ERR
+
+log "working on $target in $tmp"
+for i in $(seq 1 "$n"); do
+    log "pass $i"
+    rsync -a "$target/" "$tmp/pass-$i/" || die "backup $i failed"
+done
+
+[ "$verbose" = 1 ] &amp;&amp; du -sh "$tmp"/*
+log "done"
+</code></pre></div>
+
+<div class="note"><p><strong>Ship the checks, not just the code.</strong> A script that passes <code>shellcheck -S error</code>, runs with <code>set -euo pipefail</code>, logs to stderr with timestamps, and cleans up in an EXIT trap is not finished work you should test — it is the base line the next script copies. Paste the header (lines 1–6 of the example) into every new file you write, then write the work.</p></div>
+
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Linux Shell.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

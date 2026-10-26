@@ -1,0 +1,131 @@
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Modules, Traits and Generics</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Programs grow by being split. This chapter covers the module system that splits a crate into files, the <code>impl</code> blocks that attach behaviour to types, and the trait system that provides polymorphism without inheritance — with generics for the statically dispatched case and <code>dyn Trait</code> for the dynamically dispatched one.</p>
+
+<h3 id="ch6-1" data-toc>6.1 Modules and visibility</h3>
+<p class="topic-desc">A module is a namespace with a privacy boundary. The module tree mirrors the directory layout, and <code>pub</code> is the only way to let the outside world see what is inside.</p>
+
+<h4 id="ch6-1-tree">A module tree mirrors the filesystem</h4>
+<p>The crate root is <code>src/main.rs</code> (a binary) or <code>src/lib.rs</code> (a library). A <code>pub mod db;</code> declaration in the root pulls in <code>src/db.rs</code>, and a nested <code>pub mod pool;</code> inside it pulls in <code>src/db/pool.rs</code> — or the directory form <code>src/db/mod.rs</code>. The path <code>mylib::db::pool::connect</code> is the same name written down as nested modules; there is no other lookup step. Modest crates can skip files entirely with inline <code>mod</code> blocks; files are for the ones that grow.</p>
+<div class="codeWrap"><pre><code>// A module tree mirrors the filesystem, but inline modules compile
+// in one file — handy for sketching before you split files out.
+mod db {
+    pub mod pool {
+        pub fn connect(conn: &amp;str) -&gt; bool {
+            !conn.is_empty()
+        }
+    }
+}
+
+fn main() {
+    println!("{}", db::pool::connect("postgres://db"));   // true
+}
+
+// With real files the same path is:  src/db.rs  +  src/db/pool.rs
+//   // src/lib.rs
+//   pub mod db;      // src/db.rs (or src/db/mod.rs)
+//   pub mod http;</code></pre></div>
+
+<h4 id="ch6-1-pub">pub gates what the outside sees</h4>
+<p>Privacy in Rust is item-level: everything is private to its module unless marked <code>pub</code>, and a private item is invisible to every module that is not its descendant. That means a module's internals — helper functions, implementation details, intermediate types — can change freely without breaking callers, because callers cannot name them at all. The public surface of a module is exactly its <code>pub</code> items, and that surface is the module's contract.</p>
+<div class="codeWrap"><pre><code>mod secret {                // private: invisible outside this crate
+    pub fn hidden() -&gt; i32 { 1 }
+}
+
+pub mod math {
+    pub fn double(x: i32) -&gt; i32 { x * 2 }
+    fn helper(x: i32) -&gt; i32 { x + 1 }   // private to math
+}
+
+fn main() {
+    // use mylib::math::double; // OK (a sibling crate)
+    // use mylib::secret;       // ERROR: module `secret` is private
+    println!("{}", math::double(21));    // 42
+    // println!("{}", math::helper(1));  // ERROR: private function
+}</code></pre></div>
+
+<h4 id="ch6-1-use">use, as, and re-exports</h4>
+<p><code>use</code> brings a path into scope; <code>as</code> renames it to avoid collisions or shorten it; <code>pub use</code> imports <em>and re-exports</em> — the classic pattern of a library exposing its façade: <code>pub use db::pool::Pool;</code> lets users write <code>my_lib::Pool</code> and keeps the internal path private. The prelude is a fixed set of <code>use</code>s the compiler applies to every file, which is why <code>Option</code>, <code>Result</code>, <code>String</code> and <code>Vec</code> need no import.</p>
+<div class="codeWrap"><pre><code>use std::collections::HashMap as Map;   // rename on import
+
+fn main() {
+    let mut m = Map::new();
+    m.insert("k", 1);
+    println!("{}", m.len());
+}
+
+// re-export (typically in src/lib.rs):
+//   pub use db::pool::Pool;
+// then users write Pool, never the private full path.</code></pre></div>
+
+<h3 id="ch6-2" data-toc>6.2 impl blocks: methods and associated functions</h3>
+<p class="topic-desc">An <code>impl</code> block attaches functions to a type. Methods take <code>self</code> in one of three forms; associated functions take no <code>self</code> and are called on the type itself.</p>
+
+<h4 id="ch6-2-method">Methods take self</h4>
+<p>A method is a function whose first parameter is <code>self</code>, and Rust's method-call syntax <code>r.area()</code> automatically borrows or moves the receiver to match the <code>self</code> form. Methods live in the <code>impl</code> block, so the type's behaviour is written next to its data. The <code>&amp;self</code> receiver is the common case: the method reads the instance and leaves it in place.</p>
+<div class="codeWrap"><pre><code>struct Rectangle {
+    w: f64,
+    h: f64,
+}
+
+impl Rectangle {
+    fn area(&amp;self) -&gt; f64 {          // &amp;self: read-only method
+        self.w * self.h
+    }
+
+    fn scale(&amp;mut self, factor: f64) {   // &amp;mut self: mutating method
+        self.w *= factor;
+        self.h *= factor;
+    }
+}
+
+fn main() {
+    let mut r = Rectangle { w: 3.0, h: 4.0 };
+    println!("{}", r.area());       // 12
+    r.scale(2.0);
+    println!("{}", r.area());       // 48
+}</code></pre></div>
+
+<h4 id="ch6-2-assoc">Associated functions: new and Self</h4>
+<p>An associated function has no <code>self</code> and is called on the type: <code>Circle::new(2.0)</code>. The conventional one is <code>new</code>, a constructor that returns <code>Self</code> — the type name spelled generically, so it stays correct if the type is renamed. <code>Self</code> in an <code>impl</code> block always means "the type this block is for".</p>
+<div class="codeWrap"><pre><code>struct Circle {
+    r: f64,
+}
+
+impl Circle {
+    fn new(r: f64) -&gt; Self {        // constructor: no self
+        Circle { r }
+    }
+
+    fn pi() -&gt; f64 {
+        std::f64::consts::PI
+    }
+}
+
+fn main() {
+    let c = Circle::new(2.0);
+    println!("r={} area={}", c.r, Circle::pi() * c.r * c.r);
+}</code></pre></div>
+
+<h4 id="ch6-2-self">self, &amp;self and &amp;mut self</h4>
+<p>The three receivers encode the effect on the instance: <code>&amp;self</code> reads, <code>&amp;mut self</code> mutates in place, <code>self</code> consumes — the method takes ownership and the instance is gone afterwards, which is how builders and <code>into_*</code> conversions work. Choosing the receiver is part of the API design: a consuming method is a promise that the caller will not need the value again.</p>
+<div class="codeWrap"><pre><code>struct Counter {
+    n: i32,
+}
+
+impl Counter {
+    fn new() -&gt; Self { Counter { n: 0 } }
+    fn get(&amp;self) -&gt; i32 { self.n }         // read
+    fn bump(&amp;mut self) { self.n += 1; }     // write in place
+    fn into_parts(self) -&gt; i32 { self.n }   // consume
+}
+
+fn main() {
+    let mut c = Counter::new();
+    c.bump();
+    c.bump();
+    println!("{}", c.get());        // 2
+    let n = c.into_parts();         // c is moved, gone for good
+    println!("{n}");
+}</code></pre></div>

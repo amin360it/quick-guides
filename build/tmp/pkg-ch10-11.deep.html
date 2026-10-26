@@ -1,0 +1,961 @@
+  <section class="chapter">
+<h2 id="ch10" data-toc>10 · Distribution Beyond a Registry</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Distribution beyond a registry</button><div class="ch-toc-list"><a href="#ch10-spectrum">The distribution spectrum</a><a href="#ch10-ghreleases">GitHub Releases</a><a href="#ch10-direct">Direct download from your own site</a><a href="#ch10-selfupdate">Self-updating clients</a><a href="#ch10-bins">Distributing binaries and executables</a><a href="#ch10-os">Deb, rpm and system packages</a><a href="#ch10-monorepo">Publishing from a monorepo</a><a href="#ch10-multi">Publishing to several places at once</a><a href="#ch10-oss">Open source and commercial licensing models</a><a href="#ch10-checklist">The release checklist</a></div></div>
+    <p class="topic-desc">A registry is one distribution channel, and it is not always the right one. This chapter covers the alternatives — release assets, direct download, self-updating binaries, system packages — and the decision that determines which one you need.</p>
+    <h3 id="ch10-spectrum" data-toc>The distribution spectrum</h3>
+    <p>Distribution is a spectrum with control at one end and reach at the other, and every channel on it is a different trade of work for discoverability. At the controlled end you host the bytes yourself on object storage: you decide what exists, what is removed, how long it is retained and who may fetch it. At the reach end you hand the artefact to a public registry, and in exchange for a namespace you cannot leave you get one-command installs, dependency resolution and a search index that a stranger can find you through. There is no single correct answer, because the correct answer depends entirely on what kind of thing you are shipping.</p>
+    <p>The mistake that produces most of the pain in this chapter is treating a registry as the default, because that is what the words "publish a package" imply. A registry is a resolver, not a download host. It exists to answer the question "given a request for a range of versions, which exact version satisfies every constraint in the graph?" That question is only meaningful for something that is consumed as a dependency and composed with other packages. A standalone CLI tool, an application binary, a design system, a font, a database dump and a plugin are all things you distribute, but none of them is a library, and none of them benefits from being resolved against a version graph.</p>
+    <h4 id="ch10-spectrum-question">The one question that picks the channel</h4>
+    <p>Ask a single question before choosing anything: does this artefact need to be resolved as a dependency? If it does, you need a registry, because dependency graphs, semantic version ranges, conflict resolution and committed lockfiles all assume a registry-shaped interface with immutable versions and machine-readable metadata. If it does not, then release assets or a direct download are simpler, cheaper and can be removed if they are wrong, which a published registry version usually cannot.</p>
+    <div class="codeWrap"><pre><code>// FROM MOST CONTROLLED TO LEAST
+   your own object storage   you control bytes, versions, retention and
+                             auth. maximum work, maximum control
+   a self-hosted registry    Verdaccio, Satis, Artifactory. see chapter 9
+   a git tag plus submodule  exact version, no service, awkward UX
+   GitHub / GitLab Releases  free, versioned, discoverable, stable URL
+   a public registry         one command to install, discovery and
+                             dependency resolution. least control
+   your own website          maximum flexibility, minimum trust: nobody
+                             knows how to install from it
+
+// THE DECISION QUESTION, and there is only one
+   "Does this need to be RESOLVED as a dependency?"
+   yes -> a registry. Dependency graphs, ranges, conflict resolution and
+          lockfiles all assume a registry-shaped interface.
+   no  -> release assets or a direct download. A CLI, an application
+          binary, a design system, a font, a database dump, a plugin.
+          None of these are libraries.
+</code></pre></div>
+    <h4 id="ch10-spectrum-tradeoffs">What each channel costs over time</h4>
+    <p>The setup cost of a channel is the least interesting number, because it is paid once and forgotten. The costs that decide the outcome are the ones you pay for years: upkeep, how easily a new user discovers you, and how hard it is to remove something you should not have shipped. A channel that is trivial to set up and very hard to remove concentrates risk exactly where you do not want it, which is why "unpublishing" is a whole section of the next chapter rather than a footnote.</p>
+    <p>Read the table below as a forecast of the third year, not the first week. The two channels with no discovery are still the right answer for a self-contained tool, because a CLI is discovered through documentation and word of mouth, not through a registry search box. The two channels with hard removal are the right answer for a library, and the difficulty of removal is the price of the resolution guarantees that make a library usable in the first place.</p>
+    <div class="codeWrap"><pre><code>// WHAT EACH CHANNEL COSTS OVER A THREE-YEAR LIFE
+    channel            setup   upkeep   discovery   removal
+    own object store   high    high     none        trivial
+    self-hosted reg.   high    high     none        trivial
+    GitHub Releases    low     none     moderate    hard
+    public registry    low     low      high        very hard
+    own website        low     medium   none        trivial
+
+// THE ARGUMENT FOR A REGISTRY ANYWAY
+   Even a self-contained application benefits from a registry when it has
+   dependencies, because your user needs those dependencies too. A Node CLI
+   with 30 dependencies is unusable as a single file unless you bundle it,
+   and bundling puts you in the business of shipping your users' dependency
+   tree - a supply-chain decision you may not want to own.
+</code></pre></div>
+    <div class="tip">Overlay channels rather than replacing them. Publishing source to a registry and binaries to GitHub Releases is three distinct purposes served by three distinct channels, not over-engineering. The mistake is publishing the same artefact in several places for no reason other than habit.</div>
+    <h3 id="ch10-ghreleases" data-toc>GitHub Releases</h3>
+    <p>GitHub Releases is the default host for binaries, and it is better than most people realise: assets attached to an immutable tag, served through a CDN, reachable at a URL that has the same shape for every project and that users already know how to find. A release is a tag plus a page of notes plus a set of files, and none of it costs you anything to operate. For the long tail of command-line tools this is the whole distribution story, and it is a good one.</p>
+    <p>The part that separates a trustworthy release from a hopeful one is verification. Binaries are the highest-value target in your supply chain, because a user runs them directly, and a checksum served from the same host as the binary proves almost nothing: an attacker who can replace the binary can replace the checksum beside it. The minimum credible bar is a signed checksum file whose signing key fingerprint is published somewhere the user already trusts, and every additional step after that — a transparency log, a reproducible build — raises the cost of an attack rather than lowering your maintenance burden.</p>
+    <h4 id="ch10-ghreleases-assets">Creating a release and its assets</h4>
+    <p>Creating a release is one command, and the discipline is in what you attach to it. Attach one archive per platform plus the licence text, one checksums file, and a detached signature over that file. Turn on generated notes so the release page is a changelog with no extra work from you: the platform reads the merged pull requests since the previous tag, which is a better changelog than most hand-written ones and costs nothing to produce. Never attach build output that you have not installed from, because the difference between your build directory and the published artefact is one of the most common sources of a broken release.</p>
+    <div class="codeWrap"><pre><code>// GITHUB RELEASES IS THE DEFAULT FOR BINARIES, and it is better than
+// most people realise: immutable assets, a stable URL, CDN-served,
+// and a release page people already know how to find.
+
+$ gh release create v1.4.2 \
+    --title "v1.4.2" \
+    --generate-notes \
+    dist/mytool_1.4.2_linux_amd64.tar.gz \
+    dist/mytool_1.4.2_linux_arm64.tar.gz \
+    dist/mytool_1.4.2_darwin_amd64.tar.gz \
+    dist/mytool_1.4.2_darwin_arm64.tar.gz \
+    dist/mytool_1.4.2_windows_amd64.zip \
+    checksums.txt \
+    dist/mytool_1.4.2_checksums.txt.sig
+
+// THE URL SHAPE, stable for as long as the tag exists
+   https://github.com/yourorg/mytool/releases/download/v1.4.2/FILE
+// A release is attached to a tag, and a tag is immutable by convention,
+// so that URL is a permanent reference you can put in a script.
+</code></pre></div>
+    <h4 id="ch10-ghreleases-verify">Checksums and signatures</h4>
+    <p>Signing is a five-line addition to a release job and most projects skip it, which is exactly why it is worth doing. The checksum file is generated over every asset, signed with a release key, and published next to the assets; the key fingerprint goes in the README where a user can find it without trusting the release page. On the user's side verification is one command against the checksum file and one against the signature, and a failure is loud and unambiguous rather than silent.</p>
+    <div class="codeWrap"><pre><code>// CHECKSUMS, and they are not optional for binaries
+   $ sha256sum dist/* &gt; checksums.txt
+   $ gpg --detach-sign --armor checksums.txt
+//   users verify:
+//      $ sha256sum -c checksums.txt --ignore-missing
+//      $ gpg --verify checksums.txt.sig
+
+// THE LIMITS, honestly
+   - no dependency resolution. A Node or Python project needs a
+     registry; you cannot distribute a dependency graph through Releases.
+   - GitHub is a single vendor. If it is blocked in your region, or
+     corporate policy bans it, the channel dies with no fallback.
+   - a deleted release is a broken link for everyone who scripted against
+     it. Mark a bad release as a prerelease instead of deleting the tag.
+//   - there is no deprecation mechanism. You can edit the notes and nothing
+//     else; the asset bytes are frozen.
+
+// THE GITLAB EQUIVALENT, and the same shape
+   $ glab release create v1.4.2 --name "v1.4.2" --notes CHANGELOG.md \
+       dist/*.tar.gz checksums.txt
+</code></pre></div>
+    <div class="note">A release asset is immutable, so a mistake in one means a new patch release, not an edit. Decide the version before you upload, and treat the upload as the point of no return rather than a draft you can still fix.</div>
+    <h3 id="ch10-direct" data-toc>Direct download from your own site</h3>
+    <p>Hosting your own downloads is occasionally the only option and it is worth doing well, because it is what several large projects use for their flagship tools. The advantage is total control: no vendor, no account, no upload limit, no licence review, and the ability to remove something the instant you decide to. The disadvantage is that you now own availability, bandwidth and the trust problem, and nobody arriving at your download page has any prior reason to believe the bytes are what you say they are.</p>
+    <p>The pattern that works has exactly three URLs per artefact set: an immutable versioned one that never changes, a mutable "latest" pointer that is convenient for humans, and a machine-readable index that a program fetches to discover the current version and its metadata. The versioned URL is the contract; the other two are conveniences layered on top of it. Files of precisely this shape are published by ripgrep, kubectl, helm, terraform and rustup, which is a strong hint that the pattern has already been validated by tools whose users run them from scripts.</p>
+    <h4 id="ch10-direct-index">The machine-readable index</h4>
+    <p>The index is the part that matters, because it turns "go to the website and pick your platform" into a single HTTP request that a client can perform unattended. Every entry names a platform key, an absolute URL, a checksum, and a size, and the checksum is what lets a client reject a corrupted or substituted download before writing anything to disk. Keep the index small and cheap to fetch, and give it a short cache lifetime so a fresh release is visible within minutes rather than days.</p>
+    <div class="codeWrap"><pre><code>// LATEST.JSON, the part that matters most
+{
+  "version": "1.4.2",
+  "released": "2026-03-14T09:31:22Z",
+  "notes": "https://github.com/yourorg/mytool/releases/tag/v1.4.2",
+  "platforms": {
+    "linux-amd64": {
+      "url": "https://example.com/dl/mytool-1.4.2-linux-amd64.tar.gz",
+      "sha256": "a3f5c9...",
+      "size": 18432000
+    },
+    "darwin-arm64": {
+      "url": "https://example.com/dl/mytool-1.4.2-darwin-arm64.tar.gz",
+      "sha256": "b7e2d1...",
+      "size": 17920000
+    }
+  }
+}
+//   a client can discover the current version, verify it, and install it
+//   with one HTTP request. This is the contract; everything else is an
+//   implementation of it.
+</code></pre></div>
+    <h4 id="ch10-direct-serving">Serving large files properly</h4>
+    <p>Object storage behind a CDN is the right origin, not a web server, because a two-hundred-megabyte tarball is not a dynamic resource and serving it from an application process wastes capacity you will pay for. Set Content-Length and ETag correctly so clients can resume and cache, mark versioned URLs as immutable with a year-long lifetime because they genuinely never change, and give the mutable "latest" path a very short TTL or no caching at all. If a browser will ever fetch the artefact — a WebAssembly module, a web installer — add CORS headers, and make the origin support range requests so an interrupted download can continue instead of restarting.</p>
+    <p>The trust problem is the one everybody gets wrong. A checksum served from the same host as the binary proves nothing at all, because whoever can replace one can replace both. You need an anchor outside that host: a signing key whose fingerprint is printed in your documentation and shipped in your other channels, a signature from a release key published in a source repository, or an entry in a transparency log. "It is served over HTTPS" is not an answer, because TLS protects the channel and not the artefact, and it protects nothing whatsoever against a compromised origin.</p>
+    <div class="codeWrap"><pre><code>// THE THREE URLS, and why each one exists
+   https://example.com/downloads/mytool-1.4.2-linux-amd64.tar.gz
+   https://example.com/downloads/mytool-1.4.2-linux-amd64.tar.gz.sha256
+   https://example.com/downloads/latest.json
+//   an immutable versioned artefact, its checksum, and a pointer index.
+
+// SERVING IT PROPERLY
+   - object storage (S3, GCS, R2) behind a CDN, not an application server
+   - Content-Length and ETag set correctly, so a download can resume
+   - Cache-Control: public, max-age=31536000, immutable on versioned URLs
+//   - the mutable "latest" path gets a very short TTL, or no caching
+//   - CORS headers if a browser will fetch it, e.g. a WASM artefact
+//   - a Range-capable origin, so a large download can continue
+
+// VERIFYING WITHOUT A TRUST ANCHOR, in increasing order of strength
+   checksum file beside the binary        proves integrity only
+   checksum signed by a documented key     proves authorship
+   signature from a release signing key    publish the fingerprint
+   an entry in a transparency log          proves it was not swapped
+//   Anything served from the same origin as the artefact cannot raise
+//   the bar above "the file was not corrupted in transit".
+</code></pre></div>
+    <div class="warn">A checksum on the same host is a corruption check, not a security control. If the download page is the only place the checksum exists, an attacker who controls the page controls both halves of the comparison.</div>
+    <h3 id="ch10-selfupdate" data-toc>Self-updating clients</h3>
+    <p>A client that updates itself is a distribution decision with a security consequence, and it is worth thinking about the consequence before writing the code rather than after. The reason clients do it is that a released binary is a version you cannot change: every user stays on it until they choose to move, and for a tool that talks to your API a stale client is a support burden and occasionally an outage. The reason clients should be careful about it is that a self-updater is a mechanism for running new code in a privileged place, which makes it an attractive target and a durable liability.</p>
+    <p>There are four approaches, and they are not equally good. Notify-only is the safest and the one most tools should use: fetch the index, compare versions, print a message, and keep running the installed version. Wrapper-based delegation hands the whole problem to a package manager, which is the correct answer on any platform that has one and costs you nothing. In-process self-update replaces the running binary and works everywhere, including a machine with no package manager, which is exactly why it is popular and exactly why it needs care. Silent background update without consent is the fourth, and it should be treated as a last resort.</p>
+    <h4 id="ch10-selfupdate-algorithm">The replace algorithm</h4>
+    <p>The algorithm has eight steps and every one of them exists for a reason that someone learned the hard way. Compare semver rather than version strings, or "1.10.0" sorts before "1.9.0" and you will refuse a genuine upgrade. Verify against a public key compiled into the binary rather than one fetched at the same time as the payload, because a fetched key means an attacker who controls the index controls the trust decision too. Download to a temporary file in the same directory as the running executable so that the final rename is atomic on one filesystem, set the executable bit, and rename over the original. Leave the original untouched on any failure and say so, because a failed update that damages the binary is worse than a failed update that does nothing.</p>
+    <div class="codeWrap"><pre><code>// THE ALGORITHM, and every step exists for a reason
+//   1. fetch latest.json over HTTPS
+//   2. if the version is not newer, stop. Compare semver, not string
+//      equality, or "1.10.0" sorts before "1.9.0"
+//   3. download the asset for this OS and architecture
+//   4. verify the signature or checksum against a PINNED public key
+//      compiled into the binary, not one fetched alongside it
+//   5. write it to a temp file in the same directory as the current
+//      executable, so the rename is atomic on one filesystem
+//   6. set the mode to 0755
+//   7. rename over the running executable. On Linux and macOS this works:
+//      the running inode is unaffected. On Windows it does not, and you
+//      need a helper process.
+//   8. on failure, leave the original untouched and say so
+
+func SelfUpdate(ctx context.Context, current string) error {
+  idx, err := fetchLatest(ctx)
+  if err != nil { return err }
+  if !semver.GreaterThan(idx.Version, current) { return nil }
+
+  asset, ok := idx.Platforms[platformKey()]     // OS + GOARCH
+  if !ok { return fmt.Errorf("no build for %s", platformKey()) }
+
+  f, err := download(ctx, asset.URL)
+  if err != nil { return err }
+  if err := verify(f, asset.SHA256, pinnedPublicKey()); err != nil {
+    return fmt.Errorf("signature invalid, not updating: %w", err)
+  }
+
+  exe, err := os.Executable()
+  if err != nil { return err }
+  tmp := filepath.Join(filepath.Dir(exe), "."+filepath.Base(exe)+".new")
+  if err := writeFileMode(tmp, f, 0o755); err != nil { return err }
+  if err := os.Rename(tmp, exe); err != nil {   // atomic on one fs
+    os.Remove(tmp)
+    return fmt.Errorf("could not replace %s: %w", exe, err)
+  }
+  return nil
+}
+</code></pre></div>
+    <h4 id="ch10-selfupdate-failure">What goes wrong in practice</h4>
+    <p>The failure modes are predictable, which makes them avoidable. Without a rollback path, one bad self-update strands every user on the bad version, so keep the previous binary and support an explicit rollback subcommand. Without a conditional request, every client checking every hour is a thundering herd on your download origin, so send ETag or Last-Modified and let the common case be a 304 with no body. A behaviour change applied silently in a patch release is a data-loss bug, so minor and major updates should be announced and applied on request, not installed behind the user's back.</p>
+    <p>There are also hard platform limits. On Windows you cannot replace a running executable, so the update needs a helper that waits for the parent to exit and then swaps the file. On Linux a system-wide install under a system directory is not writable by the user, so an update there needs elevation and must never attempt a silent privilege escalation. The honest answer for those cases is to print the exact package-manager command and exit, rather than pretend the update succeeded.</p>
+    <div class="codeWrap"><pre><code>// THE FOUR APPROACHES
+
+// A. NOTIFY ONLY. The safest, and the one most tools should use.
+   if remote.version != current.version {
+     log.Warn("mytool " + remote.version + " is available, you have " + current.version)
+     log.Warn("see " + remote.notes)
+   }
+//   no code is fetched, no code is run, nothing to compromise,
+//   and it can be disabled: MYTOOL_NO_UPDATE_CHECK=1
+
+// B. WRAPPER-BASED. A separate binary or package manager updates it.
+   brew upgrade mytool     apt install --only-upgrade mytool
+   nix profile upgrade     scoop update mytool
+//   the package manager owns signing, rollback, verification and the
+//   decision not to upgrade. Correct on any platform that has one.
+
+// C. IN-PROCESS SELF-UPDATE. The binary replaces itself. Popular
+//    because it works everywhere, including a machine with no package
+//    manager. Every security property in the algorithm above is load
+//    bearing; drop one and the updater becomes an attack vector.
+
+// D. SILENT AUTO-UPDATE. Highest risk, and only defensible for a
+//    service agent you control. Never for an interactive CLI.
+</code></pre></div>
+    <div class="tip">Make every automatic behaviour opt-out and document the opt-out. A security-conscious user who cannot disable a phone-home update check will either block it at the firewall or stop using your tool, and both outcomes are worse than a documented environment variable.</div>
+    <h3 id="ch10-bins" data-toc>Distributing binaries and executables</h3>
+    <p>Shipping a compiled program means shipping a small cross product of operating systems and architectures, and the first decision is how large that product needs to be. Aim for four targets — linux-amd64, linux-arm64, darwin-arm64 and windows-amd64 — and resist the urge to cover every combination, because each additional target is another build to test and another artefact to keep working. macOS on Intel is nearly gone, and a macOS build carries an extra cost that the others do not: it must be signed and notarised by Apple, which is a real requirement and a real annual expense rather than a checkbox.</p>
+    <p>Go is the easiest case, and it is worth saying why. A Go release build is a five-line script that cross-compiles from one host with no toolchain per target, produces a static binary when cgo is disabled, and injects version information through linker flags so the binary can print exactly what it is. Rust is nearly as easy with a cross-compilation helper, and Node is where it gets uncomfortable, because a JavaScript program has no native binary and every tool that produces one embeds your dependency tree into the output.</p>
+    <h4 id="ch10-bins-matrix">The platform matrix</h4>
+    <p>Building the matrix is mostly about removing variables. Set the target explicitly rather than relying on the host, strip the binary unless you are deliberately shipping debug symbols, trim the build path so the artefact is reproducible, and bake the commit hash and version into the binary so that a user reporting a bug can tell you exactly which build they have. For Go, disabling cgo gives a static binary that runs on any glibc or musl system, which removes an entire class of "works on my machine" reports.</p>
+    <div class="codeWrap"><pre><code>// GO, which is the easiest case
+$ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
+    -ldflags "-s -w -X main.version=1.4.2 -X main.commit=$(git rev-parse HEAD)" \
+    -o dist/mytool_linux_amd64 ./cmd/mytool
+//   CGO_ENABLED=0 gives a static binary. -trimpath removes the build
+//   path. The -X flags inject version info the binary can print.
+//   A Go release build should be a five-line script, and it works.
+
+// RUST
+$ cargo build --release --target x86_64-unknown-linux-gnu
+$ cargo build --release --target aarch64-apple-darwin
+//   use cross or cargo-zigbuild for cross-compilation from one host.
+//   strip the binary unless you are shipping debug symbols:
+//     strip = "symbols" in the release profile
+
+// NODE, and this is where it gets uncomfortable
+$ npx @electron/packager . --platform=linux --arch=x64
+$ bun build --compile --outfile mytool ./src/cli.ts
+//   All of them embed your dependency tree, which means you now own
+//   those dependencies' licences and their CVEs. That is the real cost
+//   of a bundled binary, and it is not always acknowledged.
+</code></pre></div>
+    <h4 id="ch10-bins-packaging">Archive formats and naming</h4>
+    <p>Naming is a contract with your users' scripts, and it is worth choosing once and never changing. Inconsistency here breaks Homebrew formulae, installation scripts and CI jobs that have already been written against your earlier releases, so the convention matters more than which convention you pick. If you intend to publish to Homebrew, use the underscore-separated form that every Go tool uses, because the formula generator and its test convention expect it.</p>
+    <p>Every archive should contain the licence file, not merely the repository it came from. An archive extracted into a temporary directory has no repository context, and a licence file inside the archive is what makes the redistribution compliant. This is routinely missing, and it is the cheapest compliance work in the whole pipeline.</p>
+    <div class="codeWrap"><pre><code>// ARCHIVE FORMATS
+   .tar.gz   the Unix default. universal, no dependency
+   .zip      required on Windows. Do not make Linux users install unzip
+   .tar.zst  better compression, faster. needs a recent tar; provide
+             a .tar.gz as well
+
+// NAMING, and it is a contract with your users' scripts
+   mytool-1.4.2-linux-amd64.tar.gz       the clearest
+   mytool-1.4.2_linux_amd64.tar.gz       what GoReleaser uses, and what
+                                         Homebrew's test expects
+//   if you publish to Homebrew, use the underscore form.
+
+// WHAT GOES IN EVERY ARCHIVE
+   the binary or binaries
+   LICENSE and any third-party notices
+   README.md, so an archive out of context is still self-describing
+//   a SHA256SUMS entry is published beside the archive, not inside it,
+//   because the checksum cannot bootstrap itself
+</code></pre></div>
+    <div class="note">Sign and notarise the macOS build or do not ship one. An unsigned binary is blocked by Gatekeeper on every modern Mac, so a target you cannot sign is a target that generates a bug report rather than an install.</div>
+    <h3 id="ch10-os" data-toc>Deb, rpm and system packages</h3>
+    <p>System packages exist for the cases where a self-updating binary is the wrong answer: corporate Linux desktops where policy blocks anything not installed from a signed repository, server fleets where one mechanism has to cover everything, and system-wide installs that a non-root user cannot write to. They are more work than a tarball, and the work is almost entirely metadata rather than code, which means it is predictable and can be scripted.</p>
+    <p>The reason to choose a system package is usually not the user but the administrator. An administrator wants a signed package, a version they can pin, an uninstall that removes exactly what the install added, and a repository they trust the same way they trust the distribution's own. Meeting those expectations is what makes your tool installable in an environment where nothing else is.</p>
+    <h4 id="ch10-os-deb">Building a Debian package</h4>
+    <p>A Debian package is a container: a control file with the metadata, and a data tarball with the files. The metadata is small and mostly obvious — package name, version, architecture, maintainer, dependencies, description — and the parts people get wrong are architecture and the changelog. Architecture is per-build rather than "all", so you produce one package per architecture, and the changelog is required and must be in the specific format the tools expect rather than a hand-written file.</p>
+    <p>A repository is not a directory of packages; it is an index that must be signed, because apt refuses an unsigned repository. Modern apt wants an inline-signed InRelease file, with a detached Release.gpg as the fallback, and the old apt-key mechanism is removed and must not be used. The signing key has to be distributed to users through their own trusted installation path, which is the same trust-anchor problem from the direct-download section, solved once per machine rather than once per download.</p>
+    <div class="codeWrap"><pre><code>// DEBIAN / UBUNTU
+   debian/
+     control              metadata: Package, Version, Architecture,
+                          Maintainer, Depends, Description, Homepage,
+                          Section, Priority
+     changelog            required, in the debian/changelog format
+     copyright            the licence, in machine-readable DEP-5 form
+     mytool.install       install paths
+     source/format        "3.0 (quilt)" or "3.0 (native)"
+   $ dpkg-buildpackage -us -uc      # produces .deb
+   $ debuild -S -us -uc            # source package
+//   ARCHITECTURE is per-build, not "all". One .deb per architecture:
+//   amd64, arm64, armhf.
+
+// REPOSITORY, and signing it
+   gpg --batch --yes --armor --detach-sign -o dist/Release.gpg dist/Release
+   gpg --batch --yes --clearsign -o dist/InRelease dist/Release
+//   apt refuses unsigned repositories. InRelease is what modern apt
+//   wants; Release.gpg is the fallback. apt-key is deprecated and
+//   removed. Do not use it.
+</code></pre></div>
+    <h4 id="ch10-os-rpm">Building an RPM</h4>
+    <p>An RPM is a similar shape with a different grammar: one spec file describes the metadata, the build and the file list, and the build produces a package per architecture. RPM is stricter than it looks, and the strictness is useful, because a file listed in the package that the build did not actually create is an error rather than a warning. That single rule catches a class of packaging mistake that a more permissive system would let through.</p>
+    <p>The metadata that matters is the licence, the source, and the file list with correct ownership and permissions. Configuration files belong under a config marker so an upgrade does not overwrite an administrator's edits, and a check section lets the build verify its own output. Sign the result with the package signing key and verify it with the check tool before publishing, because an unsigned package in a signed repository is exactly the kind of inconsistency that erodes trust in the whole channel.</p>
+    <div class="codeWrap"><pre><code>// RPM, a similar shape with a different grammar
+   mytool.spec
+   Name:           mytool
+   Version:        1.4.2
+   Release:        1%{?dist}
+   Summary:        A tool that does one thing well
+   License:        MIT
+   URL:            https://example.com
+   Source0:        %{name}-%{version}.tar.gz
+   BuildArch:      x86_64
+   %install
+   install -Dm755 mytool %{buildroot}%{_bindir}/mytool
+   install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
+   %files
+   %{_bindir}/mytool
+   %{_datadir}/licenses/%{name}/LICENSE
+   %changelog
+   * Mon Mar 14 2026 Your Name &lt;you@example.com&gt; - 1.4.2-1
+   - Release 1.4.2
+//   %config for files under /etc, and a %check section. RPM is strict:
+//   a %files entry for a file the build did not create is an error.
+//   Sign with rpm --addsign, then verify with rpm --checksig.
+
+// ALTERNATIVES THAT AVOID THE PACKAGING WORK
+   Nix / nixpkgs    declarative, reproducible, one expression for every
+                    platform. Steep learning curve, huge community.
+   Snap             auto-updates and the store handles signing, but it
+                    sandboxes the binary, which breaks many tools.
+   Flatpak          the desktop case. Heavily confined.
+   nix-portable     a single self-contained binary with no install.
+//                  an underrated answer for "just run this".
+</code></pre></div>
+    <div class="tip">Publish all three channels from one release job, so the tarball, the .deb and the .rpm always describe the same bytes. A version that exists as a tarball but not as a package is a support ticket waiting to be opened.</div>
+    <h3 id="ch10-monorepo" data-toc>Publishing from a monorepo</h3>
+    <p>A monorepo turns the simple question "what is the next version?" into a graph problem. Forty packages live in one repository, one file changed in one of them, and now you have to decide which version numbers move and which packages get published. Getting this wrong in one direction produces a broken publish that consumers hit immediately; getting it wrong in the other direction produces a publish nobody needed, a version bump with no user-visible change, and a changelog that trains people to stop reading changelogs.</p>
+    <p>The reasoning that matters is dependency-aware, not file-based. A change to a package affects that package directly, and it affects every package that depends on it, directly or transitively. Whether a dependent needs a bump depends on its declared range: if the range still covers the new version, the dependent does not need to move; if the range does not cover it, the dependent's minimum must rise and it must be published too. Hand-rolled scripts almost always stop at step one and publish only the file that changed, which is why a monorepo release is the classic place where the tooling earns its keep.</p>
+    <h4 id="ch10-monorepo-affected">Working out what changed</h4>
+    <p>The clean way to answer "what changed?" is with a dependency graph rather than by parsing manifests, because the graph already knows about transitive relationships, and it can be queried for the set of projects affected by a set of changed files. That is the same primitive that powers task caching, which is not a coincidence: both questions are "what is downstream of this input?" A graph-based tool is more correct than a manifest-based one and is usually faster as well.</p>
+    <div class="codeWrap"><pre><code>// WHAT A CORRECT TOOL DOES, and the reasoning matters
+   1. Which packages' files changed?
+        changed:  packages/core/src/a.ts
+                  packages/core/package.json
+   2. Which packages DEPEND on those, directly or transitively?
+        core is depended on by plugin-a, which is depended on by app-x
+   3. For each, decide the bump:
+        the changed package        -> the bump the changeset said
+        a dependent with a range that still covers the new version
+                                 -> no bump, no publish
+        a dependent whose range does NOT cover it
+                                 -> bump the minimum and publish
+        a dependent in another release train -> leave it alone
+   4. Apply the changesets, regenerate the changelog, commit, tag,
+      publish.
+//   Step 3 is the one hand-rolled scripts get wrong, and getting it
+//   wrong means either a broken publish or a publish nobody needed.
+
+// THE TOOLS, and what each does well
+   changesets    the model: a markdown file per change, a generated
+                 release PR with versions and changelog that a human
+                 merges. npm and yarn workspaces.
+   nx affected   a dependency graph from the project graph, not the
+                 package manifests. Better when outputs and caching matter.
+   turborepo     the same idea, built for a task graph and remote caching.
+   lerna         the oldest, with the fixed/locked mode distinction.
+   cargo-release Rust, one crate at a time.
+   go-modules    Go, and it is the easiest case: tag, push, done.
+</code></pre></div>
+    <h4 id="ch10-monorepo-releasepr">The release pull request</h4>
+    <p>The point of the modern monorepo workflow is not automation; it is that the version bump becomes a reviewed artefact. The CI opens a pull request containing every version change, the updated lockfile, one changelog entry per package, and the intended new versions, so a human reads it and merges. Because a release is then a single merge of a single commit, it is also a single revert, which is the property that makes a bad release survivable.</p>
+    <p>Write the release notes for the person who will read them six months later, and let the tool assemble the mechanical parts. A changeset file names the packages and the bump type and carries a one-line description of the change; that description is what ends up in the changelog, so it is worth writing as a sentence rather than a ticket number. Keep the release train distinction explicit, because a package that versions independently from the rest is a decision that consumers rely on and should not drift silently.</p>
+    <div class="codeWrap"><pre><code>// THE RELEASE PR, which is the whole point
+   packages/changesets/
+     brave-lions-jump.md
+   ---
+   "@yourorg/core": minor
+   "@yourorg/plugin": patch
+   ---
+   fix: handle a null token in refresh()
+
+//   The CI opens a PR. It contains:
+//     - the version bumps in every package.json
+//     - the lockfile update
+//     - CHANGELOG.md entries, one per package
+//     - the new versions, so they can be reverted in one revert
+//   A human reads the changelog and merges. Then a second workflow
+//   publishes everything, tags, and drafts release notes.
+//   The value is not automation. It is that the version bump is a
+//   reviewed artefact and a release is one revert.
+</code></pre></div>
+    <div class="warn">Never let a monorepo release mutate a package that did not change and does not need to. A wave of meaningless patch bumps makes every dependent's lockfile churn, trains maintainers to ignore the release feed, and hides the one bump that actually mattered.</div>
+    <h3 id="ch10-multi" data-toc>Publishing to several places at once</h3>
+    <p>Publishing to more than one place is normal, and most of the time it is not over-engineering. It is common to publish the package to a registry and the source to a registry that wants source, or to publish a CLI as a tarball, a Homebrew formula and a system package because three audiences install software three different ways. Each channel has a distinct purpose, and the fact that they overlap in content does not make the overlap redundant.</p>
+    <p>It gets messy when a release spans several registries and fails partway through. Now version 1.4.2 exists on two registries and 1.4.1 on the rest, so consumers resolve different versions depending on which registry they happen to use, and the inconsistency is invisible until someone reproduces a bug you cannot. The fix is not to avoid multiple channels; it is to make the fan-out order deterministic and the retry idempotent.</p>
+    <h4 id="ch10-multi-order">The order to publish in</h4>
+    <p>Publish to a private registry first, even when you have nothing private, because the private registry is a staging area that is re-writable and re-runnable. Run the install smoke tests against that private copy, and only then promote the same bytes to the public registries. A failure during the public fan-out then means nothing public was touched, and the private copy is already verified. This is the strongest argument for keeping a private registry, and it has nothing to do with availability.</p>
+    <p>Order the public targets by how hard they are to undo, not by how fast they are. Internal and private targets come first because they are reversible and let you test the real artefact; the public registries follow in increasing order of risk, with the most durable and least removable, such as a container registry or a central Maven repository, near the end. GitHub Releases goes last of all, because it is the most visible and the hardest to un-publish without leaving a trail of broken links.</p>
+    <div class="codeWrap"><pre><code>// DO YOU NEED TO?
+//   Common and fine: publish the package to npm AND the source to a
+//   registry that wants source (JSR, Pub), or to npm and an internal
+//   proxy that caches npm.
+//   Also fine: a source repository plus GitHub Releases for binaries,
+//   plus Homebrew and a .deb. Three channels, three distinct purposes.
+
+// THE STRATEGY: PUBLISH TO A PRIVATE REGISTRY FIRST
+   publish to Artifactory or an internal Verdaccio, which is
+   idempotent and re-runnable
+   run your install smoke tests against THAT
+   then promote the public registries
+//   the private registry is your staging area, it is re-writable, and
+//   a failure at step 3 means nothing public was touched.
+
+// THE ORDER, by ecosystem risk
+   internal/private first, so a test runs against what you will ship
+   least-critical public registry next, and it is the fastest to query
+   the slowest and most durable (Docker Hub, Maven Central) last
+//   GitHub Releases last of all, because it is the most visible and
+//   the hardest to un-publish
+</code></pre></div>
+    <h4 id="ch10-multi-retry">Retrying safely</h4>
+    <p>Most registries reject a re-publish of the same version, which is a feature and also the thing that makes retries hard. A naive retry after a partial failure will fail on every registry that already received the version, and if your script treats that failure as fatal you never reach the ones that did not. The fix is to query each registry for the version's existence before publishing, so a re-run is a no-op where the version already landed and a real publish where it did not.</p>
+    <p>The query is a few lines with whatever the ecosystem provides: the registry's own metadata endpoint, or a client command that prints the available versions. Wrapping the publish loop in that existence check turns a partial failure from a manual incident into a harmless re-run, and it costs about ten lines of CI. Use short-lived credentials from an identity provider where the registry supports it, so a compromised job cannot publish indefinitely.</p>
+    <div class="codeWrap"><pre><code>// RETRY-SAFELY
+   for r in registries; do
+     if ! published_in "$r" "$VERSION"; then publish_to "$r"; fi
+   done
+//   query each registry for the version's existence before publishing.
+//   npm view NAME VERSION, pip index versions NAME, cargo search --limit,
+//   or curl the registry's metadata endpoint. A few lines turns a partial
+//   failure from a manual incident into a no-op.
+
+// A MINIMAL FAN-OUT, in shell
+   set -euo pipefail
+   VERSION=$(jq -r .version package.json)
+   publish_to private "$VERSION"
+   smoke_test_install "$VERSION"
+   for r in npm jsr; do
+     published_in "$r" "$VERSION" || publish_to "$r" "$VERSION"
+   done
+   gh release create "v$VERSION" dist/* --generate-notes
+</code></pre></div>
+    <div class="note">Make the fan-out a script in the repository, not a sequence of manual steps in a runbook. The order is a decision worth recording, and the retry logic is exactly the kind of thing a tired person gets wrong at midnight.</div>
+    <h3 id="ch10-oss" data-toc>Open source and commercial licensing models</h3>
+    <p>How a project is licensed and how it is funded are two halves of the same decision, because the licence determines what a business may do with your code and therefore who is able to pay for it. There is no model that is best in the abstract; there are four models that work in practice, and each makes a different trade between adoption, contributor goodwill, and revenue. Choosing between them is easier once you are clear about which of those three you are optimising for.</p>
+    <p>The recurring failure is choosing a model that fights the project's own goals. A library that wants broad adoption but adopts a licence that scares companies away will lose the adoption it wanted. A project that wants enterprise revenue but publishes under a licence that permits unlimited commercial use has no product to sell except support, which is a harder business than it looks. The model has to match the business, and the business has to be one you are willing to run for years.</p>
+    <h4 id="ch10-oss-models">The four models that work</h4>
+    <p>Open core gives away a genuinely useful free version and sells a capability rather than a restriction, so adoption is not throttled by an annoying paywall. Source available publishes the code under a licence that permits reading but not unrestricted commercial use, which builds auditability while reserving the right to sell. Free core with a paid hosted cloud is the model where the code is fully open and the managed service is the product. Fully commercial keeps the source closed, which removes ambiguity and also removes the community, the audits and the GPL compatibility.</p>
+    <div class="codeWrap"><pre><code>// THE FOUR MODELS THAT WORK, and the trade-off each makes
+
+// A. OPEN CORE. The free version is genuinely useful; the paid adds a
+//    capability, not a restriction.
+//    Sentry, Grafana, GitLab, HashiCorp historically.
+//    + no artificial limits in the free tier, so adoption is not
+//      limited by the paywall being annoying
+//    + easy to explain: "the thing you need for production is paid"
+//    - the boundary must be defensible. A feature a small user can
+//      live without is a feature they will keep using.
+
+// B. SOURCE AVAILABLE. You can read the source, not necessarily use it
+//    commercially. AGPL, BUSL, SSPL, Elastic's licence, BSL.
+//    + contributors can audit it, which builds trust
+//    - AGPL is viral in a way that scares companies, and that fear is
+//      rational: it does impose obligations on network services
+//    - read the actual licence. "Source available" is not a licence.
+
+// C. FREE TIER, PAID CLOUD. The code is open; the managed service is
+//    the product. GitHub, Vercel, Netlify, Sentry.
+//    + no licence friction at all; anyone can run it
+//    - you need the self-hosted version to be genuinely usable, or
+//      users will resent you, and that resentment is public
+
+// D. FULLY COMMERCIAL. Closed source, compiled artefact.
+//    + no ambiguity
+//    - nobody can audit it, and security people will say so
+//    - enterprise procurement will want an SBOM, a pentest report and
+//      an indemnity, which is real work
+</code></pre></div>
+    <h4 id="ch10-oss-relicense">Licensing is hard to reverse</h4>
+    <p>The one mistake in this area that is genuinely hard to undo is relicensing. If you published under a permissive licence, every recipient already holds a perpetual licence to the version they received, and you cannot revoke it or relicense retroactively, however much you might want to. Adding a contributor licence agreement does not change this for past contributions, and dual-licensing later is possible but complex enough that it should be planned rather than improvised.</p>
+    <p>If there is a real chance you will change your mind, choose a licence that leaves the door open rather than one that does not. A licence with an explicit conversion path, such as the BSL that converts to an open licence after a set date, or a file-level copyleft like the MPL that permits combining with proprietary code, gives you a future option that a straight permissive grant does not. Decide with that in mind, because the version you publish today is the one you are stuck with for that version, forever.</p>
+    <div class="codeWrap"><pre><code>// THE DECISION FACTORS, concretely
+   do you need contributors?          -&gt; A, B or C. D has no community.
+   is adoption the business model?    -&gt; C, or A with a generous tier
+   is support the product?            -&gt; D, and price for the support
+   will you need enterprise sales?    -&gt; D, and the procurement paperwork
+   are you in a regulated industry?   -&gt; B or C, and document the SBOM
+
+// THE ONE MISTAKE THAT IS HARD TO REVERSE
+   relicensing. If you published under MIT or Apache-2.0, every recipient
+   holds a perpetual licence and you cannot revoke it or relicense.
+   Adding a CLA does not change this for past contributions.
+//   If you might change your mind, publish under a licence with an
+//   explicit conversion path (BSL, or MPL-2.0 for file-level copyleft
+//   that leaves the option open), or do not publish at all.
+</code></pre></div>
+    <div class="warn">A permissive licence is a permanent grant. Treat the first public release as a legal commitment rather than a draft, because for that version it is one, and no later announcement can take it back.</div>
+    <h3 id="ch10-checklist" data-toc>The release checklist</h3>
+    <p>A checklist is worth writing because releases fail in the same dozen places over and over, and the failures are almost never in the code. They are in the version constant that was updated in the manifest but not in the source, the artefact that was inspected in the build directory but not after publication, the cache that made the smoke test pass against a stale copy. A short list in the repository, run every time, catches those far more reliably than the memory of whoever is doing the release at the end of a long day.</p>
+    <p>The order of the checklist matters as much as its contents. Verify before publishing, because after publishing the correct action is always a new version rather than an edit, and the cost of a mistake rises sharply at the exact moment you push. The two steps people skip are both about verifying the artefact rather than the build: install the published version, and do it from a clean cache. A cached tarball will hide a broken publish completely, which is why the clean-cache install is on every credible checklist and missing from most.</p>
+    <h4 id="ch10-checklist-before">Before you publish</h4>
+    <p>The pre-publish half is about removing ambiguity. The version has to be correct everywhere it appears, the changelog has to say what breaks, and the artefact's file list has to be inspected rather than assumed. Confirm the licence is present, confirm no secrets or credentials are included, and confirm the build ran in CI rather than on a laptop. Then install the artefact into a clean project, in every language you support, and exercise the smallest documented example.</p>
+    <div class="codeWrap"><pre><code>// BEFORE YOU PUBLISH
+[ ] tests pass on a clean checkout with a clean dependency tree
+[ ] the version is correct everywhere: package manifest, code constant,
+    changelog, and the tag
+[ ] the changelog says what changed and what breaks
+[ ] the artefact file list is what you intend, inspected not assumed
+[ ] the artefact size is within budget
+[ ] licence file present, third-party attribution present
+[ ] no secrets, no .env, no credentials, no debug endpoints
+[ ] no node_modules, no test fixtures, no editor directories
+[ ] CI only. No laptop, ever.
+
+// BUILD
+[ ] a fixed toolchain version, recorded
+[ ] a committed lockfile
+[ ] no network access during the build
+[ ] deterministic where the ecosystem supports it, verified by building
+    twice and comparing hashes
+</code></pre></div>
+    <h4 id="ch10-checklist-after">After you publish</h4>
+    <p>The post-publish half is about confirming what actually shipped. Install the published version from the public registry, from a clean cache, and run the health check, because that is the only step that tests the bytes a user will receive rather than the bytes you produced. Tag the release, generate the notes, update the documentation, and tell the people who asked for the change, since a release nobody hears about does not get adopted however good it is. Then watch the first errors from real users for a day before moving on.</p>
+    <div class="codeWrap"><pre><code>// PUBLISH
+[ ] the private registry first, and install tests against it
+[ ] each registry verified as idempotent: query before publish
+[ ] provenance or attestation enabled
+[ ] short-lived credentials (OIDC where available)
+[ ] tags signed, releases cut from the tag
+
+// AFTER
+[ ] install the PUBLISHED version from the public registry, from a
+    clean cache
+[ ] tag the repository release and generate notes
+[ ] update the docs: the version, the install command, the changelog
+[ ] tell the people who asked for it
+[ ] watch the first errors from real users for a day
+
+// THE TWO THINGS PEOPLE SKIP, both of which have caused incidents
+[ ] install the PUBLISHED artefact, not your build output
+[ ] verify from a CLEAN cache, because a cached tarball hides a broken
+    publish entirely
+</code></pre></div>
+    <div class="ex"><h4 id="ch10-exercises">Exercises 10</h4><ol>
+      <li>Build a Go or Rust CLI for four platforms, write a <code>latest.json</code>, publish the assets to GitHub Releases with a signed checksum file, and write a one-line installer that verifies before extracting.</li>
+      <li>Implement self-update in your own CLI with notify-only, then add the full replace path. Test that a failed signature leaves the original binary untouched, and that the rename is atomic.</li>
+      <li>Build a <code>.deb</code> and an <code>.rpm</code> for the same tool, sign the repository, and verify they install and uninstall cleanly. Note every piece of metadata you had to guess.</li>
+      <li>Add a version-check endpoint to a tool that notifies but never auto-updates. Measure how many users are on which version after two weeks, and decide whether the operational cost justifies it.</li>
+      <li>Publish one package to two registries, then simulate a partial failure: succeed on the first, fail on the second, re-run. Verify the re-run is a no-op for the first and completes the second.</li>
+    </ol></div>
+  </section>
+  <section class="chapter">
+<h2 id="ch11" data-toc>11 · Deprecation, Yanking and Sustainable Maintenance</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Deprecation, yanking and sustainable maintenance</button><div class="ch-toc-list"><a href="#ch11-lifecycle">The maintenance lifecycle</a><a href="#ch11-deprecate">Deprecating a feature</a><a href="#ch11-unpublish">Unpublishing, yanking and retracting</a><a href="#ch11-per-ecosystem">What each ecosystem lets you do</a><a href="#ch11-security">A vulnerability disclosure process</a><a href="#ch11-handover">Handing a package over</a><a href="#ch11-funding">Funding and sustaining maintenance</a><a href="#ch11-goal">The operational playbook</a></div></div>
+    <p class="topic-desc">Publishing is the easy part. This chapter is about what happens in year three, when you have 4,000 dependents, a maintainer who has left, and a request to pull a version for a CVE.</p>
+    <h3 id="ch11-lifecycle" data-toc>The maintenance lifecycle</h3>
+    <p>Every package moves through a small number of stages, and the cost of each stage is very different. Active development adds features, fixes bugs, reviews pull requests and answers issues, and it is by far the most expensive phase, which is why it is the one that ends when a maintainer loses interest. Maintenance-only accepts security fixes and dependency bumps but no new features, and it is where a project should sit for most of its life because it is dramatically cheaper while still being useful. Security-only narrows the scope to critical fixes on a best-effort, explicitly time-boxed basis, and end of life freezes the project entirely.</p>
+    <p>Projects get into trouble not because they reach end of life but because the transition is invisible. A package can reach ten thousand dependents and its maintainer can stop answering issues, and the dependents have no way to tell the difference between "there are no issues" and "nobody is answering". No registry mechanism reports this, so the only fix is for the maintainer to declare the status, and almost nobody does. The second common path is a company publishing an internal library publicly, watching it become popular, and then losing the employee who was doing the releases, leaving hundreds of companies depending on something nobody owns.</p>
+    <h4 id="ch11-lifecycle-stages">The four stages</h4>
+    <p>Name the stages and their boundaries explicitly, because a stage without a definition cannot be communicated. Active means features and fixes. Maintenance means security and dependency updates only, and it is the honest default for a complete project. Security-only means critical fixes on a stated timeline, and the timeline is the entire content of the promise. End of life means the last release is the last release, with a date attached, and the README says so in the first paragraph rather than in a footnote.</p>
+    <div class="codeWrap"><pre><code>// THE STAGES, and what each one costs
+   ACTIVE           adding features, fixing bugs, reviewing PRs,
+                    answering issues. the expensive phase, and the one
+                    that ends when the maintainer loses interest.
+   MAINTENANCE      security fixes and dependency bumps only. no new
+                    features. this is where a project should sit for
+                    most of its life, and it is far cheaper than ACTIVE.
+   SECURITY ONLY    critical fixes only, on a best-effort basis.
+                    explicitly time-boxed: "supported until the next
+                    release".
+   END OF LIFE      frozen. the last release is the last release. say
+                    so, in the README, with a date.
+
+// WHY PROJECTS GET INTO TROUBLE
+//   A package reaches 10,000 dependents and its maintainer stops
+//   answering issues. The dependents cannot tell the difference between
+//   "no issues" and "nobody is answering". There is no registry
+//   mechanism for this. The only fix is declaring it.
+</code></pre></div>
+    <h4 id="ch11-lifecycle-signal">Telling consumers where you are</h4>
+    <p>The signal to give consumers costs five minutes and it is the difference between users finding out and users deciding. Put the status in the README, in the package description, and ideally as a repository badge, with a date attached when there is a date to attach. The bus factor belongs in the same place: count how many people could cut a release next week, and if the answer is one, fix it by adding a second maintainer with registry access now, while it is still easy rather than after the first person has left.</p>
+    <p>A bus factor of zero is more common than anyone admits. A repository whose sole maintainer lost access to their two-factor device is an orphan package permanently, and that has happened to packages that enormous numbers of projects depend on. The mitigation is unglamorous and should be non-negotiable: two accounts on every registry, hardware keys recorded in a company password manager rather than a personal one, and a stored copy of the recovery codes somewhere a second person can reach.</p>
+    <div class="codeWrap"><pre><code>// THE SIGNAL TO GIVE YOUR CONSUMERS
+   Status: maintenance only
+   Security fixes: until 31 March 2027
+   See SECURITY.md for the disclosure process.
+//   in the README, the package description, and a status badge.
+
+// THE BUS FACTOR, measured honestly
+   how many people could publish a release next week?
+   one  -> write it in the README, and fix it by adding a second
+           maintainer with registry access NOW, while you can
+   zero -> more common than anyone admits. A repository whose sole
+           maintainer lost access to their 2FA device is an orphan
+           package, permanently.
+//   The mitigation is boring: two accounts on every registry, hardware
+//   keys recorded in a company password manager, not a person's.
+</code></pre></div>
+    <div class="tip">Write the status line before you need it. A project that says "maintenance only, security fixes until March" is trusted; a project that says nothing and quietly stops is assumed abandoned, whether or not it is.</div>
+    <h3 id="ch11-deprecate" data-toc>Deprecating a feature</h3>
+    <p>Deprecation is a communication exercise with a schedule attached, and most of the value is in the schedule being kept. Mark the feature deprecated in a minor release and emit a runtime warning, document the replacement in the next minor with a migration guide, and remove it one major cycle later. The step people skip is the removal: a feature marked deprecated for three major versions and never removed is not deprecated, it is just labelled, and the label stops meaning anything after the second time it is ignored.</p>
+    <p>The warning itself has to be actionable or it is noise. A bare "deprecated" with no replacement named is useless, because it tells the user that something is wrong without telling them what to do, and users respond to unactionable warnings by suppressing all warnings. A good warning names the replacement, the version it was deprecated in, the version it will be removed in, and a URL to the migration guide. That is a migration instruction rather than a complaint, and it is the difference between a smooth removal and a wave of bug reports.</p>
+    <h4 id="ch11-deprecate-warning">A warning that is actionable</h4>
+    <p>Emit the warning once per process rather than once per call, because a warning on every invocation turns a deprecation into a log-flooding denial of service in a busy service. Put it at the boundary rather than deep in the implementation, because the person who needs to act on it is the caller and not some internal helper. Make it suppressible and document the mechanism, and consider offering a stack trace behind a flag, since a short stack is genuinely useful for finding the call site and genuinely noisy everywhere else.</p>
+    <div class="codeWrap"><pre><code>// THE TIMELINE, and the parts people skip
+   MINOR release     mark it deprecated. emit a runtime warning.
+   MINOR + 1         document the replacement, with a migration guide.
+   one major cycle   remove it. Do not skip this step.
+
+// THE WARNING, and it has to be actionable
+   GOOD
+/** @deprecated since 2.1.0, removed in 3.0.0. Use refresh(token).
+ *  It handles rotation and retries; this does not. Same signature. */
+     function renew(token: string): Promise&lt;Token&gt; {
+       warn('renew() is deprecated since 2.1.0 and removed in 3.0.0. '
+          + 'Use refresh(token) instead: same signature, and it handles '
+          + 'rotation. Migration: https://example.com/docs/m/renew');
+       return legacyRenew(token);
+     }
+//   names the replacement, the version, the removal version, and a URL.
+
+// WHERE TO PUT IT
+//   - once per process, not per call
+//   - at the boundary, not deep in the implementation
+//   - suppressible, and the mechanism documented:
+//       MYLIB_NO_DEPRECATION_WARNINGS=1
+</code></pre></div>
+    <h4 id="ch11-deprecate-migration">The migration guide and the removal</h4>
+    <p>The migration guide earns its keep by naming the behaviour differences, not just the rename. If the replacement retries where the old function did not, or rejects an input the old one accepted, then a guide that only shows the mechanical rename will generate the bug reports it was written to prevent. Show the diff, then show the semantics, and be explicit about the cases where a caller has to add a check that the old function made unnecessary.</p>
+    <p>Before removing, establish real usage rather than assumed usage. A registry-side download signal, a changelog that has said "removed in this version" for a full major cycle, and an issue asking who depends on the feature are all imperfect and all better than nothing. If you cannot tell whether it is safe, do not remove it: carrying a deprecated function costs you almost nothing, and breaking thousands of builds costs you the trust that made the removal worth discussing in the first place.</p>
+    <div class="codeWrap"><pre><code>// THE MIGRATION GUIDE, and what goes in it
+   ## Migrating from renew() to refresh()
+   They look the same, but:
+   - refresh() retries on a 401 once, renew() did not
+   - refresh() rotates the refresh token in place, renew() returned a
+     new one and left the old valid for 30 minutes
+   - refresh() rejects a token expiring within 60 seconds, renew()
+     accepted it and failed later.
+   ```diff
+   - const t = await renew(token);
+   + const t = await refresh(token);
+   ```
+
+// THE REMOVAL, and how to know it is safe
+   Deprecating in 2.1 and removing in 3.0 is a promise, and keeping it
+   matters more than being right the first time.
+//   Before removing, check for real usage:
+   - a registry-side usage signal, if there is one
+   - a CHANGELOG that says "removed in 3.0" for a full major cycle
+   - a GitHub issue asking "who is using X?" with the answers
+//   If you cannot tell, do not remove. Ship 3.0 with it still there and
+//   deprecated. Carrying a deprecated function costs nothing; breaking
+//   4,000 builds costs you trust.
+</code></pre></div>
+    <div class="note">A deprecation with no removal date is a suggestion. A removal with no deprecation period is a surprise. Both are remembered, and the second one is remembered for much longer.</div>
+    <h3 id="ch11-unpublish" data-toc>Unpublishing, yanking and retracting</h3>
+    <p>There are three different operations that people call "removing a version", and the differences between them decide what happens to everyone downstream. Unpublishing removes a version so it disappears from resolution entirely. Yanking keeps the version resolvable for existing lockfiles while marking it as one that new resolution should skip. Deprecating leaves the version in place and warns on install. They are not interchangeable, and using the wrong one turns a controlled problem into an uncontrolled one.</p>
+    <p>The most important thing to understand about unpublishing is what it does not do. It does not recall the code, because everyone who already installed the version keeps their copy, along with every CI log, mirror and cache that touched it. Unpublishing changes the future, not the past, and if the reason for removing a version is a security problem, the unpublish is a tidy-up step that follows the action that actually protects people, which is revocation.</p>
+    <h4 id="ch11-unpublish-three">Three different operations</h4>
+    <p>Choose yank when a release is broken and should never be selected again: a bad build, a security problem, a version that should never have been published. Yanking is the safest default for "I published something bad", because nothing that already resolved breaks and new installs get a good version automatically. Choose deprecate when the version works but you want people off it, such as a subtle correctness bug or a dependency that is now known to be compromised. Reserve unpublish for the case where you published something you should never have, like a secret, and even then understand its limits.</p>
+    <div class="codeWrap"><pre><code>// THREE DIFFERENT OPERATIONS, and the names differ per registry
+
+   UNPUBLISH    remove the version. disappears from resolution.
+//               npm: 72 hours, then impossible. PyPI: never, for an
+//               existing release. Go: no such operation at all.
+//               REACH: nothing. Everyone who already installed it
+//               keeps it. This is not a recall.
+//   YANK         keep it resolvable, mark it as "do not select this".
+//               Existing lockfiles keep working; new resolution skips
+//               it. Cargo does this natively and it is the best model.
+//   DEPRECATE    keep it, warn on install. npm, RubyGems, Composer.
+//               The gentlest option.
+
+// WHEN TO USE WHICH
+   YANK when: a broken release, a security vulnerability, a build that
+              should never have been published.
+//   DEPRECATE when: the release works but you want people off it.
+//   UNPUBLISH only when: you published something you should never have,
+//              such as a secret.
+</code></pre></div>
+    <h4 id="ch11-unpublish-secret">When a secret was published</h4>
+    <p>If a credential or key was published, revoke it first and unpublish second, never the other way around. A published artefact is already in caches, mirrors, CI logs and on every machine that installed it, so rotation is the only action that genuinely protects anyone; the unpublish merely stops new installs from picking it up. Check the registry's CDN caches as well, because mirrors such as unpkg and jsdelivr will keep serving a file long after the registry has removed it, and there is an abuse-reporting process for exactly that. Then assume it leaked anyway, because anything on a package registry is fetched by automated scanners within minutes.</p>
+    <p>Real incidents calibrate the urgency better than any policy document. In one well-known timeline, a compromised version was published, found by an automated scanner within nine minutes, yanked by the registry within forty, and written up by the maintainers within two hours. Everything after the yank is communication, and the rotation and the advisory are the two things that actually protect users and are entirely yours to do. The registry is a backstop, not a plan.</p>
+    <div class="codeWrap"><pre><code>// IF A SECRET WAS PUBLISHED
+   1. revoke it first. Rotation is the only action that works. A
+      published artefact is in caches, mirrors, CI logs and every
+      machine that installed it.
+   2. then unpublish, so nobody installs it fresh.
+   3. check every registry's CDN cache. npm's unpkg, jsdelivr and
+      similar will serve the file from cache long after the registry
+      removed it. There is an abuse-report process; use it.
+   4. assume it leaked. Anything in a package registry was fetched by
+      automated scanners within minutes.
+
+// THE WORST-CASE TIMELINE, to calibrate urgency
+   T+0        a maintainer publishes a compromised version
+   T+9min     an automated scanner has found it and flagged it
+   T+40min    the registry has yanked it
+   T+2h       the maintainers have written a postmortem
+//   Everything from the registry yank onwards is communication.
+//   Rotation and the advisory are what actually protect people.
+</code></pre></div>
+    <div class="warn">Sequence the response correctly: revoke, then unpublish, then communicate. Unpublishing first and revoking later leaves a window in which the credential is live and the evidence is gone, which is the worst of both.</div>
+    <h3 id="ch11-per-ecosystem" data-toc>What each ecosystem lets you do</h3>
+    <p>Each ecosystem answers the removal question differently, and the answers are a design decision rather than an oversight. Cargo supports yanking natively, and it is the best model: a yanked version stays in every existing lockfile but is skipped by new resolution, so nothing breaks and new installs are protected. Go handles it through the module requirements, which has the same effect for builds that respect the checksum database. npm gives a short unpublish window and then locks the version, and supports deprecation as a separate, always-available signal.</p>
+    <p>Several ecosystems, including PyPI, allow no removal at all, and this is deliberate rather than lazy. A package manager that can silently make an existing requirement unresolvable is a denial-of-service vector against every project using it, so once a build depends on a specific version, that version must always resolve. The consequence is that the answer to a bad release in those ecosystems is permanently a new version, and the place to look is not the unpublish button but the advisory process in the next section. In most ecosystems you cannot remove the artefact, so all you can really do is tell people not to use it.</p>
+    <h4 id="ch11-per-ecosystem-table">The ecosystem matrix</h4>
+    <p>Read the table before you need it, not during an incident. The columns that matter are whether you can unpublish, whether you can deprecate, whether a first-class yank or retract exists, and whether there is a way to limit who can install. A small number of ecosystems support all four; most support one or two, and knowing which is which turns a panic into a plan the moment something goes wrong.</p>
+    <div class="codeWrap"><pre><code>// THIS TABLE IS THE REASON TO CHECK BEFORE YOU NEED IT
+//          unpublish    deprecate   yank/retract   limit
+// npm       72h, owner   yes        no             no
+// PyPI      never        no         no             no
+// Cargo     never        soft       YES, native    no
+// RubyGems  3 versions   yes        no             no
+// Composer  never        yes        no             no
+// NuGet     never        yes        no             no
+// Maven     never        deprecate  no             no
+// Go        never        comment    YES, go.mod    no
+// Hex       never        no         no             no
+// pub.dev   never        no         no             no
+// Packagist never        no         no             no
+
+// THE ONES WITH NO REMOVAL MECHANISM ARE A DESIGN DECISION, not an
+// oversight. PyPI's reasoning is explicit and correct: a package
+// manager that can silently make an existing requirement unresolvable
+// is a denial-of-service vector against every project using it.
+</code></pre></div>
+    <h4 id="ch11-per-ecosystem-workaround">Working around immutability</h4>
+    <p>In an ecosystem that cannot remove a bad version, the workaround is a sequence rather than a single action. Publish a fixed version immediately, publish an advisory naming the affected and fixed ranges, and make the noise loud across every channel the project has. For npm and Maven there is a short window in which an unpublish is still possible, so if the bad version is recent enough that is worth taking as well, and for the truly unusable version some projects have published a same-numbered placeholder that throws on import with a message pointing at the fix.</p>
+    <p>That placeholder approach is hostile and it breaks builds, so it is a last resort rather than a technique. The point of even mentioning it is to show how narrow the options are once a version is immutable: you cannot un-ship it, so the only lever left is telling people not to use it, as precisely and as loudly as you can. The advisory's version range is what lets scanners protect people automatically, which is why an imprecise range is not a small inefficiency but a failure of the whole mechanism.</p>
+    <div class="codeWrap"><pre><code>// THE WORKAROUND FOR A BAD VERSION IN AN IMMUTABLE ECOSYSTEM
+   1. publish a fixed version immediately
+   2. publish an advisory with the affected and fixed ranges
+   3. if the bad version is truly unusable, publish a same-numbered
+      version that is a placeholder which throws on import with a
+      message pointing at the fix. Hostile and build-breaking, so a
+      last resort.
+//   4. for npm and Maven, unpublish within the window if the version
+//      is recent enough
+//   5. be loud: GitHub Security Advisory, the project's issue tracker,
+//      a mailing list, and the registry's own advisory channel
+
+// THE QUERY YOU WILL WANT DURING AN INCIDENT
+   npm view mypackage versions --json
+   pip index versions mypackage
+   cargo search mypackage --limit 5
+   gem list -r mypackage
+//   Knowing these before the incident is the whole benefit.
+</code></pre></div>
+    <div class="note">The ecosystems with no removal path are also the ones where a good advisory matters most, because the advisory is the only mechanism you have. Budget for it accordingly rather than discovering the limitation mid-incident.</div>
+    <h3 id="ch11-security" data-toc>A vulnerability disclosure process</h3>
+    <p>A disclosure process is two files plus a habit. The files are a security policy at the repository root and, increasingly, a machine-readable advisory when something actually happens. The habit is acknowledging quickly, which is the single strongest predictor of whether a report stays private and well-handled or escalates into public frustration. Most maintainers do not have a process, and the cost of having one is an hour of writing; the cost of not having one is discovered at the least convenient possible moment.</p>
+    <p>The supported-versions table in the policy is doing more work than it appears to. Without it, a researcher files a report against a version you stopped supporting a year ago, and you spend a day establishing that before you can even begin to triage. With it, that conversation takes a minute and starts in the right place. The table is also what makes a phrase like "security fixes only" honest and enforceable, because it names exactly which versions still receive them.</p>
+    <h4 id="ch11-security-process">The process, in order</h4>
+    <p>Acknowledge on day zero, because the acknowledgement is the number-one thing that determines whether a report escalates publicly. Triage over the next few days: is it real, what is the impact, what is the blast radius, and is it already public. Decide the fix and the disclosure timing, ship the fix on the current line and on the previous major if that major is still supported, and publish the advisory on or before the agreed date. If the report is already public when it arrives, say so immediately and move the disclosure date up rather than sitting on it.</p>
+    <div class="codeWrap"><pre><code>// TWO FILES, AND NEITHER IS OPTIONAL
+
+// SECURITY.md, at the repository root
+# Security Policy
+
+## Supported versions
+| Version | Supported |
+| ------- | --------- |
+| 1.4.x   | yes       |
+| 1.3.x   | security fixes only |
+| &lt; 1.3   | no        |
+
+## Reporting a vulnerability
+Email security@example.com. Please do not open a public issue.
+
+Include the affected version, what you observed, how to reproduce it,
+and the impact you believe it has. Encryption key on request.
+
+We aim to acknowledge within 3 working days and to have a fix or a
+mitigation plan within 14 days.
+</code></pre></div>
+    <h4 id="ch11-security-advisory">The advisory and its identifiers</h4>
+    <p>An advisory needs a precise version range, an identifier, and consistent information across every channel. A GitHub advisory is free and integrates with <code>npm audit</code> and Dependabot, so it is worth filing for anything hosted on GitHub regardless of language. A CVE from MITRE via a CNA matters because some ecosystems' tooling keys off the CVE rather than the GitHub advisory, and several registries maintain their own advisory databases that you must file with directly. The failure mode to avoid is a version range that disagrees between your advisory and the registry's, because a scanner will then either miss affected users or warn unaffected ones.</p>
+    <p>The range should name the first affected version and the first fixed version, not "everything before the latest". An imprecise range generates noise, and noise trains people to ignore advisories, which is the opposite of the goal. If you genuinely cannot determine the lower bound, say so explicitly rather than guessing low, because a range that is too wide raises an alert for every user of the package whether or not they are affected. What makes a report get taken seriously is a short chain of visible, precise actions: an acknowledgement within a day, an advisory with a tight range, an identifier where one is warranted, and a credit line if the reporter wanted one.</p>
+    <div class="codeWrap"><pre><code>// WHAT THE PROCESS ACTUALLY LOOKS LIKE, in order
+   day 0        acknowledge. This is the number one thing that
+                determines whether a report escalates publicly.
+   day 1-3      triage: is it real, what is the impact, what is the
+                blast radius, is it already public
+   day 3-7      decide the fix and the disclosure timing
+   day 7-14     ship the fix on the current line, and on the previous
+                major if the previous major is still supported
+   day 14       publish: advisory, changelog entry, release notes, a
+                post if it was serious
+
+// THE ADVISORY, and the identifiers
+   GHSA-xxxx-xxxx-xxxx   GitHub Advisory. Free, and it works with
+                         npm audit and Dependabot.
+   CVE-2026-12345        from MITRE, via a CNA.
+//                           PyPI     the Python Security Response Team
+//                           crates   RustSec / the advisory-db
+//                           RubyGems ruby-advisory-db
+//                           Maven    the OSSRH / Central process
+
+// THE VERSION RANGE, and getting it right
+   "affects &gt;= 1.0.0, &lt; 1.4.2, fixed in 1.4.2"
+//   not "all versions before the latest". Precise ranges let scanners
+//   actually protect people.
+</code></pre></div>
+    <div class="tip">File the advisory even when you consider the issue minor. The cost is minutes and the benefit is that automated scanners can protect users who will never read your release notes, which is most of them.</div>
+    <h3 id="ch11-handover" data-toc>Handing a package over</h3>
+    <p>Ownership transfer is a mechanical operation that is trivial if you do it while a second maintainer already exists and painful if you wait until the first one is unavailable. Every registries has a way to add and remove owners, and the shapes differ enough that it is worth knowing them before you need them: npm has explicit owner commands, PyPI requires transferring to an organisation rather than to an individual, and Cargo follows the repository to a new organisation. The moment to do the transfer is the moment a second maintainer appears, not the moment the first one leaves, because the gap between those two events is exactly when nothing can happen.</p>
+    <p>The real handover artefact is not the transfer command but the checklist that makes the project transferable at all. Every registry account needs a second person on it with their own hardware key rather than a shared credential. The repository needs code owners so an absent person does not silently become a bottleneck. CI must be able to publish, so no release depends on one laptop. Signing keys need to live in a shared, backed-up store with two offline copies, tested once a year. The domain must be registered to the organisation with current registrant details and auto-renew enabled, because a lapsed domain for the security contact or the repository itself means nobody can be reached at all.</p>
+    <h4 id="ch11-handover-checklist">The handover checklist</h4>
+    <p>Walk the checklist and fix what fails, in the order of how badly each item hurts when it is missing. The security contact should be a role rather than a person, so it survives someone leaving. A maintainers file names who does what, so a new maintainer knows what they inherited rather than discovering it one surprise at a time. The domain and the signing keys are the two items that are forgotten most often and hurt most when they lapse, because both are single points of failure that no amount of source code can recover.</p>
+    <div class="codeWrap"><pre><code>// TRANSFER, and the registry mechanics
+   npm      npm owner add NEWUSER PACKAGE
+            npm owner rm OLDUSER PACKAGE
+   PyPI     transfer the project to an organisation, then add a role
+            to the organisation. A personal-account project cannot be
+            transferred to an individual.
+   Cargo    the crate is owned by a GitHub org or a verified domain.
+            Transfer the repository to the new org: ownership follows.
+   RubyGems gem owner yourgem --add newowner
+   NuGet    transfer the package to an organisation in the portal
+//   Do this the moment a second maintainer appears, not when the first
+//   one leaves. The gap is when nothing happens.
+
+// A HANDOVER CHECKLIST
+   1. Every registry account has a second person on it, with their
+      OWN hardware key. Not a shared credential.
+   2. The repository has CODEOWNERS.
+   3. CI can publish, so no release depends on one laptop.
+   4. The signing keys are in a shared, backed-up store.
+   5. The domain is registered to the organisation, auto-renew on.
+   6. The security contact in SECURITY.md is a role, not a person.
+   7. A MAINTAINERS.md naming who does what.
+</code></pre></div>
+    <h4 id="ch11-handover-gone">When the maintainer is gone</h4>
+    <p>This happens, and the recovery path is narrower than people hope. Ask the registry: npm, PyPI and RubyGems all have an abandoned-package process for an unresponsive maintainer, but it requires evidence and takes weeks to months. Ask the organisation: if a company published the package, the company owns it, and if an individual did, nobody is obliged to take it. Fork it: a new maintainer can publish under a new name, which forces everyone to switch and has nonetheless worked for several very widely used packages.</p>
+    <p>The one thing not to do is publish under the same name from a different account without the owner's cooperation. That is namespace squatting, registries have been known to yank for it, and it poisons a package you might otherwise have inherited legitimately once the abandoned-package process completes. Patience and paperwork are slower, but they leave you with a package people can trust rather than one they have to distrust.</p>
+    <div class="codeWrap"><pre><code>// WHEN THE MAINTAINER IS GONE AND NOT COMING BACK
+//   This happens, and the recovery path is narrower than people hope.
+//   - ask the registry. npm, PyPI and RubyGems all have an abandoned-
+//     package process. It requires evidence and takes weeks to months.
+//   - ask the organisation. If a company published it, the company
+//     owns it. If an individual did, nobody is obliged to take it.
+//   - fork it. The new maintainer can publish under a new name and
+//     the old one stays where it is. Everyone has to switch.
+//   - the one thing not to do: publish under the same name from a
+//     different account without the owner's cooperation. That is
+//     namespace squatting, and it poisons a package you might
+//     otherwise have inherited.
+</code></pre></div>
+    <div class="warn">A shared password is not a second owner. If two people log in as the same account, the second person cannot remove the first, and the registry cannot tell them apart. Two accounts, two hardware keys, one package.</div>
+    <h3 id="ch11-funding" data-toc>Funding and sustaining maintenance</h3>
+    <p>The economics of open-source maintenance are uncomfortable and worth stating plainly. A dependency with a million weekly downloads is used by tens of thousands of companies, and most of them contribute nothing, which is a rational decision for each one of them individually. Uncompensated maintenance is the norm, and it works until the one person whose job it is leaves, at which point it stops working and the whole ecosystem discovers the fact simultaneously. This is a market failure rather than a personal failing, and the practical responses are all imperfect.</p>
+    <p>The failure follows visibility rather than importance. A critical internal dependency used by two hundred thousand companies but with no stars, no conference talks and no social presence raises nothing, because the people who would fund it have never heard of it. If your package is invisible and load-bearing, part of the fix is documentation and naming your users with permission, and part of it is simply asking them directly, since a single email to one engineering manager has a better hit rate than almost any amount of public appeal.</p>
+    <h4 id="ch11-funding-options">The funding options</h4>
+    <p>Sponsorship is zero-effort and carries no obligation, but it is irregular and stops when the visible work stops, so it suits a maintainer with a following rather than critical infrastructure. Open Collective brings governance as well as money, which is why companies will fund it: a vote in the roadmap is a purchase they can justify. A commercial tier is the most reliable funding there is, because the money arrives because a customer got value, but it splits the codebase permanently and changes who the maintainer answers to. A support contract turns "I will get to it" into a commitment, which is exactly what an enterprise audience is paying for. Tipping does not work as a model, though it is fine as an addition.</p>
+    <div class="codeWrap"><pre><code>// THE FUNDING OPTIONS, honestly assessed
+
+// SPONSORSHIP (GitHub Sponsors, Open Collective, Polar)
+   + zero effort, no product decision, no obligation
+   - irregular, and it stops the moment the visible work stops
+   - best for a maintainer with a following, not for critical
+     infrastructure
+
+// OPEN COLLECTIVE, for governance as well as money
+   + a real budget, transparent, with the power to vote on priorities
+   + companies will fund this for governance reasons
+   - administrative overhead, and the monthly reports are real work
+
+// A COMMERCIAL TIER, which is the most reliable funding there is
+   + money that arrives because a customer got value
+   + it funds the work, not the goodwill
+   - it splits the codebase, and the split must be maintained forever
+   - best practice: split on a CAPABILITY, not on scale.
+
+// A SUPPORT CONTRACT
+   + predictable revenue, and it is honestly what you are selling
+   - only works with an enterprise audience
+
+// TIPPING, WHICH DOES NOT WORK
+   - very low yield, unpredictable, and it creates an expectation of
+     responsiveness you cannot meet
+</code></pre></div>
+    <h4 id="ch11-funding-path">The practical path</h4>
+    <p>Start with sponsorship, because it costs nothing and takes a week, and put the funding links where people will actually see them: the README, the package page and the issue template. Most maintainers do this badly and the people who would fund never find the ask, which is a shame because the ask is the cheapest part. When a single company depends on you heavily enough that your outage is their outage, start the funding conversation before the outage rather than during it, because that is when they have the most reason to listen.</p>
+    <p>Move to a collective when you have money to administer rather than when you need it, because a collective will not raise money for a project with no budget history. Build the commercial tier only when goodwill can no longer keep up, and treat that as a significant change in the nature of the project rather than a small addition. The common thread is that funding follows attention, so the practical work of being fundable is the same as the practical work of being visible, and doing it early is much easier than doing it in a crisis.</p>
+    <div class="codeWrap"><pre><code>// THE PRACTICAL PATH
+   1. Start with sponsorship. It costs nothing and it takes a week.
+   2. Put funding links in the README, the package page and the issue
+      template. Most maintainers do this badly, and the people who
+      would fund never see the ask.
+   3. When one company depends on you enough to have an outage
+      problem, start a conversation about funding BEFORE the outage.
+   4. Move to Open Collective when you have money to administer, not
+      when you need it.
+   5. Build the commercial tier only when you cannot keep up on
+      goodwill.
+
+// THE TENSION NOBODY TALKS ABOUT
+//   Funding follows visibility. A critical dependency used by 200,000
+//   companies but with no stars, no talks and no social presence raises
+//   nothing. A single email to one engineering manager has a better hit
+//   rate than any amount of documentation.
+</code></pre></div>
+    <div class="tip">Ask before you are in crisis. A maintainer asking for funding while the project is healthy reads as reasonable; the same maintainer asking after announcing they are stepping away reads as a plea, and the response is different.</div>
+    <h3 id="ch11-goal" data-toc>The operational playbook</h3>
+    <p>Maintenance becomes sustainable when it runs on a cadence rather than on mood, because a cadence turns an open-ended responsibility into a list of small, bounded tasks. Daily work is triage. Weekly work is acknowledgement and review. Monthly work is a release and a look at the numbers. Quarterly work is an audit of access, secrets and renewal dates. None of it is large, and the whole point is that none of it is deferred until it becomes urgent, because the deferred version of all of it is an incident.</p>
+    <p>The cadence is also what makes a project legible to the people who depend on it. A repository with weekly releases and triaged issues signals that someone is home, which attracts both users and contributors. The same repository with six months of unanswered issues signals the opposite, and the signal is read long before anyone checks the commit dates. Consistency is worth more than intensity here, because a maintainer who does twenty minutes every week will still be doing it in a year, and a maintainer who does a heroic weekend every quarter usually will not.</p>
+    <h4 id="ch11-goal-cadence">A maintenance cadence</h4>
+    <p>Keep the daily and weekly loops small enough that they fit in the gaps of a normal working day. Triage dependency update pull requests and confirm the default branch is green daily; label, acknowledge or close open issues weekly; review or schedule pull requests weekly; and treat anything security-shaped as today's problem rather than a backlog item. The monthly release is the part that keeps the project alive, and if there is nothing to release the right output is a short note explaining why rather than silence.</p>
+    <div class="codeWrap"><pre><code>// DAILY
+[ ] dependency update PRs triaged
+[ ] CI green on the default branch
+
+// WEEKLY
+[ ] open issues triaged: label, acknowledge, or close
+[ ] new PRs reviewed, or told why they will be later
+[ ] anything security-shaped triaged today, not in the backlog
+
+// MONTHLY
+[ ] release, or a note explaining why not
+[ ] download/usage numbers checked for a sudden drop. A 40% drop
+    after a release is a bug report you have not received yet
+[ ] dependents scanning for newly published advisories against your
+    own packages
+
+// QUARTERLY
+[ ] audit registry accounts: who has access, who should not
+[ ] audit CI secrets, and rotate anything older than a year
+[ ] review the two-maintainer rule: does it still hold
+[ ] check the domain renewal and the certificate expiry
+</code></pre></div>
+    <h4 id="ch11-goal-dashboard">The dashboard that matters</h4>
+    <p>Track a small number of signals and resist adding more. Weekly downloads tell you about abandonment, and a falling number appears months before the abandoner says anything, which makes it the earliest honest warning you will get. The age of open issues is the truest single measure of maintenance, more so than any commit or release count. Time to first response matters more than time to fix, because first response is what a reporter actually experiences. The share of dependents still using a deprecated surface is what decides whether a removal is safe, and the bus factor is a number you should measure and then deliberately push to two.</p>
+    <div class="codeWrap"><pre><code>// THE DASHBOARD THAT ACTUALLY MATTERS
+   weekly downloads        a falling number is the first sign of
+                           abandonment, and it appears months before
+                           the abandoner tells you
+   open issues and their age   the truest measure of maintenance
+   time to first response      matters more than time to fix, because
+                               it is the thing a reporter experiences
+   dependents using the
+   deprecated surface          this is the number that decides whether
+                               a removal is safe
+   bus factor                  count it, and make it 2
+
+// ON A SECURITY REPORT
+[ ] acknowledge within one working day
+[ ] triage within three: real or not, impact, blast radius, public?
+[ ] fix on the current line and any still-supported major
+[ ] advisory with a PRECISE version range and a GHSA / CVE
+[ ] file with the ecosystem's own database if there is one
+[ ] publish, and credit the reporter unless they opted out
+</code></pre></div>
+    <div class="ex"><h4 id="ch11-exercises">Exercises 11</h4><ol>
+      <li>Deprecate a function in your own package with a runtime warning that names the replacement, the version and a migration URL. Verify it fires once per process rather than per call, and that it can be suppressed.</li>
+      <li>Publish a same-numbered fix over a broken release in two ecosystems — one where you can unpublish and one where you cannot — and document what users experience in each case.</li>
+      <li>Write <code>SECURITY.md</code> for one of your packages, with a supported-versions table. Then measure how long it takes you to produce an advisory with a precise version range for a hypothetical issue.</li>
+      <li>Audit your registry accounts across every ecosystem you have ever published to. Produce a list of accounts, owners and removal dates. Remove anyone who has left.</li>
+      <li>Add funding links to a README, a package page and an issue template, then track inbound funding for a month. Compare with the effort. Decide whether to keep it.</li>
+    </ol></div>
+  </section>

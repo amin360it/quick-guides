@@ -1,0 +1,311 @@
+  <section class="chapter">
+<h2 id="ch15" data-toc>15 · Data Fetching and Cache Libraries</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Data fetching and cache libraries</button><div class="ch-toc-list"><a href="#ch15-ownership">Server data has one owner</a><a href="#ch15-keys">Query keys and the cache shape</a><a href="#ch15-lifecycle">Staleness, refetch and invalidation</a><a href="#ch15-mutations">Mutations, rollbacks and retries</a><a href="#ch15-queries">Writing queries that components can trust</a></div></div>
+    <p class="topic-desc">Server data is not component state: it is shared, it arrives out of order, it goes stale while you look at it, and several screens want the same copy at once. This chapter is about handing it to a cache library — the owner chapter 10's decision table names for exactly this value — and designing the query keys, invalidation and mutation flow that make the handoff complete.</p>
+    <h3 id="ch15-ownership" data-toc>Server data has one owner</h3>
+    <p>The distinction the whole chapter rests on: <em>state you own</em> (a draft, a selection, a toggle) originates in the client and the client is its source of truth; <em>state you mirror</em> (a project record, a list of invoices, permissions) originates on the server and the client is a cache of it. Mixing them is the origin of the classic React data bugs — a component fetching into <code>useState</code> so every instance holds its own copy that disagrees with every other's, refetches on mount because nothing else knows the data is already loaded, and cannot be invalidated when a mutation elsewhere changes the record. A cache library exists to be the single place that answers "what is the current value of this server thing", with one entry per query that every component shares.</p>
+    <p>The decision table in chapter 10 ends with exactly this rule — server data goes to a cache library — and the reason it deserves its own chapter is the breadth of what the cache then handles for you: request de-duplication across components, a single in-flight promise per key, background refetch on window focus or reconnect, stale-while-revalidate rendering, structural sharing so unchanged subtrees keep referential identity, and a mutation flow that can invalidate or patch the affected entries. Writing that yourself is a two-week project that will still be wrong at the edges; using it is a configuration decision you make once per resource type.</p>
+    <div class="codeWrap"><pre><code>// WITHOUT a cache library: every mount is its own request, and the copies lie
+function InvoiceList() {
+  const [rows, setRows] = useState([]);
+  useEffect(() =&gt; {
+    api.listInvoices().then(setRows);        // fetches on every mount
+  }, []);                                     // no dedupe, no invalidation,
+  return &lt;Table rows={rows} /&gt;;               // two instances = two truths
+}
+
+// WITH a cache library: one entry per key, shared by every reader
+import { useQuery } from '@tanstack/react-query';
+
+function InvoiceList() {
+  const { data: rows = [] } = useQuery({
+    queryKey: ['invoices', { status: 'open' }],
+    queryFn: () =&gt; api.listInvoices({ status: 'open' }),
+  });
+  return &lt;Table rows={rows} /&gt;;
+}
+// mounting again reuses the cache entry; another screen asking for the
+// same invoices gets THE SAME object; a mutation invalidating
+// ['invoices'] refetches every reader at once.</code></pre></div>
+    <p>What the cache library must never become is a second place where business logic hides. The boundary to enforce: components declare <em>what</em> they read (the key and the fetcher), the library owns <em>when</em> it refetches and <em>how long</em> it keeps it, and mutations decide <em>what is now stale</em>. Application code that reaches around the cache — a direct <code>fetch</code> in an effect, a hand-rolled <code>updatedAt</code> check — reintroduces exactly the split-brain the library exists to prevent. If a piece of code needs the data, it reads the query; if it changes the data, it runs a mutation that tells the cache what changed.</p>
+    <div class="codeWrap"><pre><code>// the boundary: declare reads, declare writes, never fetch behind the cache
+// GOOD - a component declares what it reads
+function useInvoice(id) {
+  return useQuery({
+    queryKey: ['invoices', id],
+    queryFn: () =&gt; api.getInvoice(id),
+    enabled: Boolean(id),
+  });
+}
+
+// BAD - a component fetches behind the cache's back
+function Broken({ id }) {
+  const [inv, setInv] = useState(null);
+  useEffect(() =&gt; { api.getInvoice(id).then(setInv); }, [id]);  // second truth
+  const { data: cached } = useInvoice(id);                      // first truth
+  return &lt;View invoice={inv || cached} /&gt;;                      // which wins?
+}</code></pre></div>
+    <h4>Where the library stops</h4>
+    <p>A cache library does not do routing (chapter 16 owns the URL), does not own form state (chapter 17), and does not render — it answers reads and orchestrates writes. Knowing the boundary keeps the architecture legible: the router turns a URL into a set of query keys, the cache turns keys into data, the components turn data into pixels, and mutations turn user intent into new keys' worth of truth. Four owners, four jobs, no overlap.</p>
+    <div class="note"><p>The server can also be the renderer — React Server Components hand the client a resolved promise instead of a cache entry, which is what <code>use</code> in chapter 13 consumes. That model changes where the fetch happens, not the ownership rule: there is still one owner of the record's value, and if any part of the app mirrors it client-side, the mirror still needs a single shared home.</p></div>
+    <h3 id="ch15-keys" data-toc>Query keys and the cache shape</h3>
+    <p>The query key is the cache's primary key and the API's most consequential design decision, because every invalidation, refetch and structural-sharing benefit is expressed in terms of keys. A key must be a deterministic, serialisable description of the data's identity: the resource, its id, and the parameters that change the result — no more. Keys that include incidental state (a sort order that is not part of the request, a component name, a timestamp) fragment the cache into entries that never share; keys that omit parameters that matter (a filter, a page) cause one screen's fetch to poison another's entry with the wrong rows.</p>
+    <p>The convention that scales is hierarchical arrays: the resource first, then discriminating parameters as an object. Prefix invalidation then reads like SQL — <code>['invoices']</code> matches <code>['invoices', { status }]</code> and <code>['invoices', id]</code>, so marking all invoice queries stale after a create is one call, while <code>['invoices', 42]</code> precisely targets one record for an optimistic patch. Treat the key structure as a schema: agreed per resource, documented next to the fetchers, reviewed in pull requests. A key format change is a data-identity change and deserves the same scrutiny as a database migration.</p>
+    <div class="codeWrap"><pre><code>// keys as a schema: resource, then discriminating parameters, nothing else
+export const invoiceKeys = {
+  all:        ['invoices'],
+  lists:      () =&gt; ['invoices', 'list'],
+  list: (f)  =&gt; ['invoices', 'list', f],      // f = { status, page, sort }
+  detail: (id) =&gt; ['invoices', 'detail', id],
+  lineItems: (id) =&gt; ['invoices', 'detail', id, 'lines'],
+};
+
+// GOOD: parameters that change the RESULT are in the key
+useQuery({ queryKey: invoiceKeys.list({ status: 'open', page: 1 }),
+           queryFn: () =&gt; api.listInvoices({ status: 'open', page: 1 }) });
+
+// BAD: key and request disagree - the cache serves page 1's rows for page 2
+useQuery({ queryKey: ['invoices', 1],
+           queryFn: () =&gt; api.listInvoices({ page: 1 }) });
+
+// BAD: key includes state that is not part of the identity - two entries
+// for one dataset, invalidated independently, drifting apart
+useQuery({ queryKey: ['invoices', { page: 1 }, componentInstanceId], ... });</code></pre></div>
+    <p>Aggregating keys into an exported object — the <code>invoiceKeys</code> factory above — is what turns a convention into an invariant. Typo-prone string literals scattered across files are how a cache ends up with two spellings of one query, each invalidated by one code path and refreshed by the other, which presents as "the list updates but the detail page doesn't". With factories, a refactor of the key shape is a one-file edit, and invalidation call sites read as intent (<code>queryClient.invalidateQueries({ queryKey: invoiceKeys.all() })</code>) rather than as pattern matching against strings.</p>
+    <div class="codeWrap"><pre><code>// dependent queries: key B includes the id that key A produces
+function useProjectWithTasks(projectId) {
+  const project = useQuery({
+    queryKey: ['projects', projectId],
+    queryFn: () =&gt; api.getProject(projectId),
+    enabled: Boolean(projectId),
+  });
+
+  // the second query waits for the first WITHOUT an effect chain:
+  // enabled is the dependency, the cache is the communication channel
+  const tasks = useQuery({
+    queryKey: ['projects', projectId, 'tasks'],
+    queryFn: () =&gt; api.listTasks(projectId),
+    enabled: project.isSuccess,
+  });
+
+  return { project, tasks };
+}
+
+// the same relationship expressed as one query with a nested fetcher -
+// fewer round trips when the API cannot serve them in parallel:
+useQuery({
+  queryKey: ['projects', projectId, 'with-tasks'],
+  queryFn: async () =&gt; {
+    const p = await api.getProject(projectId);
+    return { ...p, tasks: await api.listTasks(projectId) };
+  },
+  enabled: Boolean(projectId),
+});</code></pre></div>
+    <h4>Entities versus lists</h4>
+    <p>Model the cache as entities and lists separately, the way a database does. The detail query holds the entity; list queries hold ids (or rows) that reference it. Updating one entity then patches every list that mentions it — a rename changes <code>['invoices','detail',42]</code> and each list entry with a matching id — instead of invalidating and refetching everything, which is correct but costs a round trip per keystroke of a rename. Invalidation is the reliable default; targeted patches are the optimisation you apply to the hot paths the profiler identifies, with the invariant that a patch must produce exactly the data a refetch would have.</p>
+    <div class="note"><p>Keep functions and dates out of keys. Keys are serialised for persistence, dedupe and structural comparison, and a <code>Date</code> or a closure in a key either stringifies inconsistently or fails outright — use the epoch number or the id that determined it.</p></div>
+    <h3 id="ch15-lifecycle" data-toc>Staleness, refetch and invalidation</h3>
+    <p>Stale-while-revalidate is the lifecycle in one phrase: serve what is cached immediately, then refresh it in the background and swap when the new copy lands. The library expresses it as two numbers — <code>staleTime</code>, how old an entry may be before it is eligible for refresh, and <code>gcTime</code>, how long an unused entry survives in memory — plus a set of triggers (mount, window focus, reconnect, interval) that act only on entries already past staleTime. The defaults are deliberately conservative (stale immediately, refetch often), which is right for a dashboard and wrong for a catalogue: every screen you open refetches what you just navigated away from, and a mobile connection pays for your caution.</p>
+    <p>Choosing values is a per-resource decision, not a global one, and the question is always "how wrong is a stale copy, and for how long". A user's permissions: staleTime measured in minutes at least, because a wrong-but-fresh copy is worse than an old one the server would correct. An exchange rate: seconds. A published document's body: long, with explicit invalidation on edit, because background swaps under a reader's cursor are a trust violation. The refetch triggers then follow the same logic — refetch-on-focus suits interactive desktop tools and is noise in an embedded kiosk. Configure per query key family, using the defaults as the base and overriding where the staleness question has a different answer.</p>
+    <div class="codeWrap"><pre><code>// staleness declared per resource, from the cost of being wrong
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,          // base: 30s of trusted freshness
+      gcTime: 5 * 60_000,         // keep inactive entries 5 minutes
+      refetchOnWindowFocus: true, // base: desktop-tool behaviour
+      retry: 2,                    // transient network errors: retry twice
+    },
+  },
+});
+
+// permissions: a stale-but-fresh copy is WORSE than an old one the server
+// would correct - refetch early, and invalidate on role changes
+queryClient.invalidateQueries({ queryKey: ['me', 'permissions'] });
+
+// published documents: background swaps under a reader are a trust
+// violation - serve from cache, refresh only on explicit navigation
+useQuery({
+  queryKey: ['docs', docId],
+  queryFn: () =&gt; api.getDoc(docId),
+  staleTime: 10 * 60_000,
+  refetchOnMount: 'never',
+  refetchOnWindowFocus: false,
+});
+
+// embedded kiosk / TV wall: never refetch on focus, it is not a user signal
+useQuery({ queryKey: ['wall'], queryFn: api.getStatus,
+           refetchOnWindowFocus: false, refetchInterval: 60_000 });</code></pre></div>
+    <p>Invalidation is the load-bearing operation and the one most often avoided for the wrong reason — it refetches, and refetching costs. But invalidation is also the only operation that cannot be wrong: it does not compute what changed, it asks the server what is true. Everything else — optimistic patches, targeted updates, key surgery — is an optimisation layered on top, valid only while it agrees with what a refetch would return. The discipline is therefore: invalidate by default so the data is honest, patch on the paths where the round trip is visible to the user, and keep a manual "invalidate everything" escape hatch for the mutations whose blast radius you cannot enumerate (imports, migrations, permission changes).</p>
+    <div class="codeWrap"><pre><code>// invalidation by default, patching where the user would notice the wait
+async function useArchiveInvoice() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id) =&gt; api.archiveInvoice(id),
+
+    // 1. optimistic: the row disappears NOW, the server confirms after
+    onMutate: async (id) =&gt; {
+      await qc.cancelQueries({ queryKey: invoiceKeys.all() });
+      const previous = qc.getQueriesData({ queryKey: invoiceKeys.lists() });
+      qc.setQueriesData({ queryKey: invoiceKeys.lists() }, (old) =&gt;
+        Array.isArray(old) ? old.filter((r) =&gt; r.id !== id) : old);
+      return { previous };                 // the rollback receipt
+    },
+
+    // 2. failure: put the world back exactly as it was
+    onError: (_err, _id, ctx) =&gt; {
+      ctx?.previous.forEach(([key, data]) =&gt; qc.setQueryData(key, data));
+    },
+
+    // 3. success: ask the server what is actually true
+    onSettled: () =&gt; qc.invalidateQueries({ queryKey: invoiceKeys.all() }),
+  });
+}</code></pre></div>
+    <h4>The wrong reasons to skip invalidation</h4>
+    <p>Two excuses surface in review constantly. "The mutation returned the new record, so I'll just write it in" — fine, so long as the write covers every cache entry that mentions it: the detail query, each list containing the row, any aggregate the row participates in. Miss one and a screen shows the old value until a refetch, with no error anywhere. And "invalidating refetches visible queries immediately, which flashes the UI" — that is a rendering problem, not an invalidation one: keep the previous data while refetching (the default), so refetch is invisible unless the data actually changed. The fix belongs in how refetches render, not in whether the truth is re-asked for.</p>
+    <div class="warn"><p>Never call <code>invalidateQueries</code> with a key that does not exist because of a typo — prefix matching means a wrong-but-similar key invalidates the wrong family while the intended one stays stale and silently wrong. Use the key factories from the previous section: a typo in <code>invoiceKeys.lists()</code> is a compile error, a typo in a string literal is a production incident.</p></div>
+    <h3 id="ch15-mutations" data-toc>Mutations, rollbacks and retries</h3>
+    <p>A mutation is a write plus its cache aftermath, and the aftermath is the part that needs design. The lifecycle hooks each have one job: <code>onMutate</code> captures the world before the write (cancel in-flight queries so they do not overwrite your optimistic state, snapshot the affected entries), <code>onError</code> restores the snapshot, <code>onSuccess</code> writes what the server returned if it is authoritative, and <code>onSettled</code> invalidates regardless of outcome, because even a failed write may have partially applied or raced with another client. Writing all four as one unit — optimistic, snapshot, rollback, reconcile — is the difference between an interface that never lies and one that occasionally strands the user in a state the server does not have.</p>
+    <p>Retries need their own policy because mutations are not idempotent by default. Retrying a GET is free; retrying a POST that already created a record doubles it, and retrying a payment charges twice. The safe pattern is idempotency keys — a client-generated key the server deduplicates on — combined with a retry policy that only retries the errors that are genuinely transient: network failures and 5xx on a request the server confirmed is safe to repeat. Timeouts are the nastiest class: the write may have succeeded, the client just does not know, so the retry must be keyed or the query must be refetched to learn the outcome rather than assumed.</p>
+    <div class="codeWrap"><pre><code>// idempotency keys: safe to retry when the outcome is unknown
+async function createInvoice(payload) {
+  const idempotencyKey = crypto.randomUUID();     // one per user intent
+  return api.post('/invoices', payload, {
+    headers: { 'Idempotency-Key': idempotencyKey },
+  });
+}
+
+// retry policy: only transient failures, never on unknown-outcome writes
+const mutation = useMutation({
+  mutationFn: (draft) =&gt; api.saveInvoice(draft),
+  retry: (failureCount, error) =&gt; {
+    if (error instanceof TimeoutError) return false;   // outcome unknown -
+    return failureCount &lt; 1;                            // REFETCH to learn it
+  },
+  onSettled: () =&gt; queryClient.invalidateQueries({ queryKey: invoiceKeys.all() }),
+});
+
+// the unknown-outcome case: ask the server what happened instead of guessing
+async function saveWithRecovery(draft) {
+  try {
+    return await api.saveInvoice(draft);
+  } catch (err) {
+    if (err instanceof TimeoutError) {
+      const current = await api.getInvoice(draft.id);   // did it land?
+      if (current &amp;&amp; current.updatedAt &gt;= draft.baseVersion) return current;
+      throw err;                                        // truly not applied
+    }
+    throw err;
+  }
+}</code></pre></div>
+    <p>Concurrent writers — two tabs, two users — are where mutation design stops being theoretical. Last-write-wins is a policy, and sometimes the right one, but it must be chosen: version fields or <code>If-Match</code> etags turn a silent overwrite into a 409 the mutation surfaces as a message ("this invoice was changed by Amina — reload") alongside an invalidation that brings both clients to the truth. The optimistic layer matters here too: an optimistic update that shows the user their write succeeded, followed by a conflict error, must roll back visibly and explain. Silent reconciliation — the UI briefly showing a save that never happened — is the failure mode that erodes trust in an application more than any crash.</p>
+    <div class="codeWrap"><pre><code>// conflict handling as a first-class mutation outcome
+async function saveInvoice(draft) {
+  try {
+    return await api.put('/invoices/' + draft.id, draft, {
+      headers: { 'If-Match': draft.etag },
+    });
+  } catch (err) {
+    if (err.status === 409) {
+      // NOT a retry: the other writer's value is now the truth.
+      // surface it, refresh, let the user re-apply their edit deliberately.
+      throw new ConflictError('Changed by ' + err.body.changedBy, err.body);
+    }
+    throw err;
+  }
+}
+
+// in the mutation: the conflict is data, not an exception to swallow
+onError: (err) =&gt; {
+  if (err instanceof ConflictError) {
+    toast.error(err.message);
+    queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(err.body.id) });
+    return;                       // snapshot rollback already ran above
+  }
+  toast.error('Save failed - your edits are kept, retry when ready');
+}</code></pre></div>
+    <h4>Queues, offline and the mutation cache</h4>
+    <p>Applications with unreliable connections take the design one step further: mutations queue while offline, replay in order on reconnect, and each queued entry carries the same optimistic-snapshot-rollback machinery. The ordering matters — replaying "archive" before "create" against a server that does not know the row exists fails permanently, so the queue must serialise per entity. And every queued mutation needs its conflict path wired before it ships, because the moment writes can be replayed hours later, a 409 stops being an edge case and becomes a scheduled event. If your application queues writes, budget the conflict UX explicitly; do not discover it in support tickets.</p>
+    <div class="tip"><p>Keep mutation side effects out of components. A mutation that both archives and emails belongs in one function with one rollback story, not in two components each invalidating half the cache — the cache's consistency follows the mutation's atomicity, and a split mutation guarantees a split cache.</p></div>
+    <h3 id="ch15-queries" data-toc>Writing queries that components can trust</h3>
+    <p>A query's contract with its consumers is stronger than a promise's: components assume that data, once present, is the current truth and will not vanish under them. Two library features make that assumable. Structural sharing means a refetch that returns equal data gives back the <em>same object reference</em>, so <code>useMemo</code> downstream keeps hitting and re-renders do not cascade for data that did not change. And keeping previous data during refetch means the <code>data</code> field never flickers to undefined on a background update — a refetch that changes nothing is invisible, and one that changes something swaps in a single commit. Design your components on those two guarantees: read <code>data</code> directly, do not defensively clone, and treat a disappearing <code>data</code> as a bug report about how the query is configured.</p>
+    <p>The loading states deserve the same precision, because "is loading" is three different questions at three different moments: is there no data yet (show the boundary fallback from chapter 14), is there data being refreshed (show nothing, or a subtle status), or is this query waiting for a dependency (render as if empty, quietly). Query libraries surface these as <code>isPending</code>, <code>isFetching</code> and <code>fetchStatus</code>; collapsing them into one boolean is what produces interfaces that flash skeletons on every navigation. Select the state that matches what the user should experience at that moment — and remember the boundary placement rule: only the first of the three deserves a fallback.</p>
+    <div class="codeWrap"><pre><code>// three questions, three states, three UI decisions
+function InvoicesPage() {
+  const query = useQuery({
+    queryKey: invoiceKeys.list({ status: 'open' }),
+    queryFn: () =&gt; api.listInvoices({ status: 'open' }),
+  });
+
+  // 1. no data ever: the region is genuinely unavailable -&gt; Suspense/fallback
+  if (query.isPending) return &lt;TableSkeleton rows={6} /&gt;;
+
+  // 2. background refresh: data EXISTS -&gt; keep it, mark the region quietly
+  return (
+    &lt;section aria-busy={query.isFetching}&gt;
+      {query.isFetching &amp;&amp; &lt;span role="status"&gt;Updating…&lt;/span&gt;}
+      &lt;InvoiceTable rows={query.data} /&gt;
+      {query.error &amp;&amp; &lt;ErrorPanel onRetry={query.refetch} /&gt;}
+    &lt;/section&gt;
+  );
+}
+
+// WRONG: one boolean for three states -&gt; skeleton on every navigation
+const { data, isLoading } = useQuery({ ... });
+if (isLoading) return &lt;Skeleton /&gt;;     // flashes when data exists but the
+                                        // entry was garbage-collected</code></pre></div>
+    <p>The error state completes the contract, and the rule from chapter 18 applies: an error in a background refetch should not unmount content the user is reading. Show the failure alongside the last good data with a retry affordance, because the stale copy is still the best answer the client has, and it is what the user was looking at a second ago. Reserve the full-region error fallback for the first load, where there is no data to preserve — that is also exactly the boundary placement distinction from chapter 14, arriving from the data side rather than the rendering side.</p>
+    <div class="codeWrap"><pre><code>// errors as a spectrum: first load fails loudly, refresh fails quietly
+function InvoiceDetail({ id }) {
+  const query = useQuery({ queryKey: invoiceKeys.detail(id),
+                           queryFn: () =&gt; api.getInvoice(id) });
+
+  if (query.isPending) return &lt;DetailSkeleton /&gt;;
+
+  if (query.isError &amp;&amp; !query.data) {
+    // FIRST load failed: there is nothing to preserve - show recovery
+    return &lt;ErrorPanel error={query.error} onRetry={query.refetch} /&gt;;
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;InvoiceView invoice={query.data} /&gt;
+      {query.isError &amp;&amp; (
+        &lt;InlineWarning role="status"&gt;
+          Could not refresh - showing the last loaded version.
+          &lt;button onClick={query.refetch}&gt;Retry&lt;/button&gt;
+        &lt;/InlineWarning&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <h4>Selecting, transforming and keeping identity</h4>
+    <p>When a component needs a derivative of query data — a sorted copy, a joined entity, a formatted total — derive it in the component with <code>useMemo</code> over <code>query.data</code>, or select it in the query so the transform runs inside the cache layer and its output participates in structural sharing. What you must not do is transform in an effect and store the result in state: that reintroduces the second-truth problem this chapter removed, complete with its own loading flags and stale closures. The cache holds the raw record; every view-specific shape is a pure function of it, computed where it is read.</p>
+    <div class="codeWrap"><pre><code>// derived in render over stable cache identity - no effect, no second truth
+function InvoiceTotal({ id }) {
+  const { data: invoice } = useQuery({ queryKey: invoiceKeys.detail(id),
+                                       queryFn: () =&gt; api.getInvoice(id) });
+  const total = useMemo(
+    () =&gt; invoice.lines.reduce((sum, l) =&gt; sum + l.amountCents, 0) / 100,
+    [invoice]
+  );
+  return &lt;Money value={total} currency={invoice.currency} /&gt;;
+}
+
+// or select at the query layer, so the transform is cached and shared:
+const { data: total } = useQuery({
+  queryKey: invoiceKeys.detail(id),
+  queryFn: () =&gt; api.getInvoice(id),
+  select: (inv) =&gt; inv.lines.reduce((s, l) =&gt; s + l.amountCents, 0) / 100,
+});
+// structural sharing makes the select output stable across unchanged
+// refetches - downstream memoisation keeps hitting.</code></pre></div>
+    <div class="tip"><p>Treat the query cache as the application's read model and mutations as its write path. When a bug appears — a screen out of date, two views disagreeing — the question is never "which component's state is wrong" but "which key was not invalidated or which patch disagrees with a refetch". One owner means one place to look, and that is the entire payoff of chapter 10's decision table.</p></div>
+    <div class="ex"><h4>Exercises 15</h4><ol>
+      <li>List every place in your application that calls <code>fetch</code> or <code>axios</code> directly. Classify each as cache-owned server data, form submission, or genuine one-off. Migrate one server-data case to a keyed query and delete its effect.</li>
+      <li>Write the key factory for your application's main resource. Verify invalidation by prefix: change one field via a mutation and watch every affected list and detail query refetch in the network panel.</li>
+      <li>Set <code>staleTime</code> per resource from the "cost of being wrong" question. Write one sentence per resource justifying its number, and put the sentences next to the factory.</li>
+      <li>Build an optimistic archive with all four lifecycle hooks. Make the server reject it, confirm the row returns with its explanation, then confirm the reconciling invalidation runs anyway.</li>
+      <li>Take a screen that shows a skeleton on navigation. Split its three loading states as in this chapter's final section and verify the skeleton appears only on first load.</li>
+    </ol></div>
+  </section>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web App Design - UX, UI and Product Thinking</title>
+<meta name="description" content="Web App Design - interface architecture, data flows, forms, error states, offline logic, and visual design for webapps.">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/webapp-design.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Web App Design - UX, UI and Product Thinking">
+<meta property="og:description" content="Web App Design - interface architecture, data flows, forms, error states, offline logic, and visual design for webapps.">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/webapp-design.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-08">
+<meta property="article:section" content="Web Basics">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Web App Design - UX, UI and Product Thinking">
+<meta name="twitter:description" content="Web App Design - interface architecture, data flows, forms, error states, offline logic, and visual design for webapps.">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/webapp-design.html#article","headline":"Web App Design - UX, UI and Product Thinking","name":"Web App Design - UX, UI and Product Thinking","description":"Web App Design - interface architecture, data flows, forms, error states, offline logic, and visual design for webapps.","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/webapp-design.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/webapp-design.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-08","articleSection":"Web Basics","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Web Basics","item":"https://amin360it.github.io/quick-guides/index.html#cat-web-basics"},{"@type":"ListItem","position":3,"name":"Web App Design - UX, UI and Product Thinking","item":"https://amin360it.github.io/quick-guides/webapp-design.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script>
+</head>
+<body>
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Web App Design</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This Web App Design Guide</a><ul>
+<li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li>
+<li><a href="#orientation-mindset" data-target="orientation-mindset">The mindset: flows first, UI second</a></li>
+<li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use throughout</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 ▸ Interface Architecture</a><ul>
+<li><a href="#ch1-structure" data-target="ch1-structure">1.1 Navigation, routing &amp; state</a></li>
+<li><a href="#ch1-components" data-target="ch1-components">1.2 Component boundaries</a></li>
+<li><a href="#ch1-data" data-target="ch1-data">1.3 Data flow &amp; side effects</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 ▸ Forms, Errors &amp; Offline States</a><ul>
+<li><a href="#ch2-forms" data-target="ch2-forms">2.1 Forms, validation &amp; submission</a></li>
+<li><a href="#ch2-errors" data-target="ch2-errors">2.2 Error states &amp; loading patterns</a></li>
+<li><a href="#ch2-offline" data-target="ch2-offline">2.3 Offline and sync behaviour</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+  <h1 class="am-band">
+    <span class="am-band-t">Web App Design</span>
+    <span class="am-band-s">14 chapters &middot; 72 topics &middot; 121 code samples &middot; works offline</span>
+  </h1>
+
+<section class="chapter">
+<h2 id="orientation" data-toc>Welcome — How to Use This Web App Design Guide</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; Welcome — How to Use This Web App Design Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The mindset: flows first, UI second</a><a href="#orientation-tools">Tools you will use throughout</a></div></div>
+<h3 id="orientation-how" data-toc>How this guide is organised</h3>
+
+<p class="topic-desc">This guide covers webapp design from interface architecture to error states and offline patterns. Every chapter follows the same rhythm: topic description, prose explanation, two code examples, and a callout flagging the most common mistake.</p>
+<h4 id="orientation-how--structure">Structure of every section</h4>
+<p>Each h3 section is self-contained: intro, walkthrough, two examples, and a callout. Chapters 1–3 cover architecture, data flow, and states. Chapters 4–8 cover forms, errors, loading, offline, and deployment readiness. The remaining chapters go deep on performance, accessibility, and handoff.</p>
+
+<h3 id="orientation-mindset" data-toc>The mindset: flows first, UI second</h3>
+
+<p class="topic-desc">A webapp is a tool, not a document. Users come to complete a task, not read a story. Every screen should answer: what is the user trying to do here?</p>
+<h4 id="orientation-mindset--sequence">Follow the user journey</h4>
+<p>Start with the primary task. Design the screens that serve it. Add visual polish after the flow works. A webapp that looks great but confuses the user is a failure.</p>
+<h4 id="orientation-mindset--test">Test with real tasks</h4>
+<p>Every chapter ends with a concrete task: can the user complete this action without help? If yes, it is done.</p>
+
+<h3 id="orientation-tools" data-toc>Tools you will use throughout</h3>
+
+<p class="topic-desc">Figma, Penpot, VS Code, and a browser’s DevTools cover every stage of webapp design. No paid tool is required for any chapter.</p>
+<h4 id="orientation-tools--workflow">A typical workflow</h4>
+<p>Sketch the flow in Figma → prototype the main task → write the HTML/CSS → test in DevTools → iterate. Repeat until the task completes without friction.</p>
+<div class="tip"><p>Before you pixel-polish, ask: can a first-time user finish the core task? If not, fix the flow first.</p></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Interface Architecture</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 ▸ Interface Architecture</button><div class="ch-toc-list"><a href="#ch1-structure">1.1 Navigation, routing &amp; state</a><a href="#ch1-components">1.2 Component boundaries</a><a href="#ch1-data">1.3 Data flow &amp; side effects</a></div></div>
+<h3 id="ch1-structure" data-toc>1.1 Navigation, routing &amp; state</h3>
+
+<p class="topic-desc">A webapp needs a clear map: where is the user, where can they go, and what state are they in? Routing is the mechanism; navigation is the pattern.</p>
+<h4 id="ch1-structure--example">A simple router sketch</h4>
+<div class="codeWrap"><pre><code>const routes = {
+  '/': homeView,
+  '/projects': projectsView,
+  '/project/:id': projectView,
+  '/settings': settingsView
+};
+
+function render(route) {
+  const view = routes[route] || notFoundView;
+  document.getElementById('app').innerHTML = view();
+}</code></pre></div>
+
+<h3 id="ch1-components" data-toc>1.2 Component boundaries</h3>
+
+<p class="topic-desc">Components are the units of reuse in a webapp. Each boundto a single responsibility: a button is a button, a card is a card, a page is a page.</p>
+<h4 id="ch1-components--pattern">Component boundary checklist</h4>
+<div class="codeWrap"><pre><code>// One component, one responsibility
+function Button({ label, onClick }) {
+  return `&lt;button&gt;${label}&lt;/button&gt;`;
+}
+function Card({ title, body }) {
+  return `&lt;section&gt;...&lt;/section&gt;`;
+}
+function Page() {
+  return `&lt;main&gt;...&lt;/main&gt;`;
+}</code></pre></div>
+
+<h3 id="ch1-data" data-toc>1.3 Data flow &amp; side effects</h3>
+
+<p class="topic-desc">State changes should be predictable. User input triggers an action; the action updates state; the UI re-renders. Side effects are isolated to the action layer.</p>
+<h4 id="ch1-data--pattern">A predictable data flow</h4>
+<div class="codeWrap"><pre><code>const state = { items: [] };
+function setState(patch) {
+  Object.assign(state, patch);
+  render();
+}
+function addItem(text) {
+  setState({ items: [...state.items, text] });
+}
+function render() {
+  document.getElementById('list').innerHTML = state.items.map(i =&gt; `&lt;li&gt;${i}&lt;/li&gt;`).join('');
+}</code></pre></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Forms, Errors &amp; Offline States</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 ▸ Forms, Errors &amp; Offline States</button><div class="ch-toc-list"><a href="#ch2-forms">2.1 Forms, validation &amp; submission</a><a href="#ch2-errors">2.2 Error states &amp; loading patterns</a><a href="#ch2-offline">2.3 Offline and sync behaviour</a></div></div>
+<h3 id="ch2-forms" data-toc>2.1 Forms, validation &amp; submission</h3>
+
+<p class="topic-desc">Forms are the primary input surface of a webapp. Validation should be immediate and specific; submission should be idempotent and acknowledged.</p>
+<h4 id="ch2-forms--pattern">A minimal form handler</h4>
+<div class="codeWrap"><pre><code>form.addEventListener('submit', async (e) =&gt; {
+  e.preventDefault();
+  const data = new FormData(form);
+  try {
+    await fetch('/api/submit', { method: 'POST', body: data });
+    showSuccess();
+  } catch (err) {
+    showError(err.message);
+  }
+});</code></pre></div>
+
+<h3 id="ch2-errors" data-toc>2.2 Error states &amp; loading patterns</h3>
+
+<p class="topic-desc">Loading and error states are features, not exceptions. A webapp that never shows a spinner or an error message is hiding its state from the user.</p>
+<h4 id="ch2-errors--skeleton">A loading skeleton</h4>
+<div class="codeWrap"><pre><code>&lt;div class="skeleton"&gt;
+  &lt;div class="skeleton-line"&gt;&lt;/div&gt;
+  &lt;div class="skeleton-line"&gt;&lt;/div&gt;
+  &lt;div class="skeleton-line"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+
+<h3 id="ch2-offline" data-toc>2.3 Offline and sync behaviour</h3>
+
+<p class="topic-desc">A modern webapp must work when the network drops. Service workers cache assets; IndexedDB stores data locally; sync queues pending actions.</p>
+<h4 id="ch2-offline--pattern">A minimal service worker</h4>
+<div class="codeWrap"><pre><code>self.addEventListener('install', (e) =&gt; {
+  e.waitUntil(caches.open('v1').then(c =&gt; c.addAll(assetList)));
+});
+self.addEventListener('fetch', (e) =&gt; {
+  e.respondWith(caches.match(e.request).then(r =&gt; r || fetch(e.request)));
+});</code></pre></div>
+
+</section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Web App Design - UX, UI and Product Thinking.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

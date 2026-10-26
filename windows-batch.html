@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows Batch Scripting</title>
+<meta name="description" content="Windows Batch Scripting runs the cmd.exe interpreter on .bat or .cmd files. It predates PowerShell and…. 8 chapters, 40 topics and 96 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/windows-batch.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Windows Batch Scripting">
+<meta property="og:description" content="Windows Batch Scripting runs the cmd.exe interpreter on .bat or .cmd files. It predates PowerShell and…. 8 chapters, 40 topics and 96 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/windows-batch.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Windows Batch Scripting">
+<meta name="twitter:description" content="Windows Batch Scripting runs the cmd.exe interpreter on .bat or .cmd files. It predates PowerShell and…. 8 chapters, 40 topics and 96 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/windows-batch.html#article","headline":"Windows Batch Scripting","name":"Windows Batch Scripting","description":"Windows Batch Scripting runs the cmd.exe interpreter on .bat or .cmd files. It predates PowerShell and…. 8 chapters, 40 topics and 96 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/windows-batch.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/windows-batch.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Windows Batch Scripting","item":"https://amin360it.github.io/quick-guides/windows-batch.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 ▸ Orientation</a><ul>
+<li><a href="#ch1-1" data-target="ch1-1">1.1 cmd.exe and the batch language</a></li>
+<li><a href="#ch1-2" data-target="ch1-2">1.2 Creating and running a script</a></li>
+<li><a href="#ch1-3" data-target="ch1-3">1.3 Help that ships with Windows</a></li>
+<li><a href="#ch1-4" data-target="ch1-4">1.4 Exit codes: how scripts report success</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 ▸ Commands and Navigation</a><ul>
+<li><a href="#ch2-1" data-target="ch2-1">2.1 The current directory</a></li>
+<li><a href="#ch2-2" data-target="ch2-2">2.2 Listing files with dir</a></li>
+<li><a href="#ch2-3" data-target="ch2-3">2.3 Copying, moving and mirroring files</a></li>
+<li><a href="#ch2-4" data-target="ch2-4">2.4 Deleting and managing files</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 ▸ Variables, Arguments and the Environment</a><ul>
+<li><a href="#ch3-1" data-target="ch3-1">3.1 set: creating and reading variables</a></li>
+<li><a href="#ch3-2" data-target="ch3-2">3.2 Expansion timing and the !var! form</a></li>
+<li><a href="#ch3-3" data-target="ch3-3">3.3 Arguments passed to a script</a></li>
+<li><a href="#ch3-4" data-target="ch3-4">3.4 The environment, the clock and keyboard input</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 ▸ Control Flow</a><ul>
+<li><a href="#ch4-1" data-target="ch4-1">4.1 if, else and comparisons</a></li>
+<li><a href="#ch4-2" data-target="ch4-2">4.2 exist, defined and errorlevel tests</a></li>
+<li><a href="#ch4-3" data-target="ch4-3">4.3 for loops: lists, directories, recursion and numbers</a></li>
+<li><a href="#ch4-4" data-target="ch4-4">4.4 goto and labels</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 ▸ Strings and Text Handling</a><ul>
+<li><a href="#ch5-1" data-target="ch5-1">5.1 find and findstr — searching text</a></li>
+<li><a href="#ch5-2" data-target="ch5-2">5.2 for /f — parsing files, tokens and command output</a></li>
+<li><a href="#ch5-3" data-target="ch5-3">5.3 Substrings and substitution</a></li>
+<li><a href="#ch5-4" data-target="ch5-4">5.4 Escaping metacharacters</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 ▸ Subroutines and Functions</a><ul>
+<li><a href="#ch6-1" data-target="ch6-1">6.1 call :label and exit /b</a></li>
+<li><a href="#ch6-2" data-target="ch6-2">6.2 setlocal and endlocal scoping</a></li>
+<li><a href="#ch6-3" data-target="ch6-3">6.3 Macros: named command lines</a></li>
+<li><a href="#ch6-4" data-target="ch6-4">6.4 Return values and errorlevel conventions</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 ▸ Error Handling and Robust Scripts</a><ul>
+<li><a href="#ch7-1" data-target="ch7-1">7.1 Checking errorlevel correctly</a></li>
+<li><a href="#ch7-2" data-target="ch7-2">7.2 Redirecting and silencing output</a></li>
+<li><a href="#ch7-3" data-target="ch7-3">7.3 Pausing, waiting and reading answers</a></li>
+<li><a href="#ch7-4" data-target="ch7-4">7.4 Verification and logging</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 ▸ Automation and Administration</a><ul>
+<li><a href="#ch8-1" data-target="ch8-1">8.1 Scheduled tasks with schtasks</a></li>
+<li><a href="#ch8-2" data-target="ch8-2">8.2 Persisting environment variables with setx</a></li>
+<li><a href="#ch8-3" data-target="ch8-3">8.3 Starting programs with start</a></li>
+<li><a href="#ch8-4" data-target="ch8-4">8.4 Utility scripts worth keeping</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+<h1 class="am-band">
+      <span class="am-band-t">Windows Batch Scripting</span>
+      <span class="am-band-s">8 chapters &middot; 40 topics &middot; 96 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 ▸ Orientation</button><div class="ch-toc-list"><a href="#ch1-1">1.1 cmd.exe and the batch language</a><a href="#ch1-2">1.2 Creating and running a script</a><a href="#ch1-3">1.3 Help that ships with Windows</a><a href="#ch1-4">1.4 Exit codes: how scripts report success</a></div></div>
+<p class="topic-desc">This chapter places batch in its environment: what the language actually is, how <code>.bat</code> and <code>.cmd</code> files reach the interpreter, how to create and run a first script, where the built-in help lives, and how scripts report success or failure through exit codes.</p>
+
+<h3 id="ch1-1" data-toc>1.1 cmd.exe and the batch language</h3>
+<p class="topic-desc">Batch is not a compiled language and has no runtime library. A batch file is a plain-text list of commands that the Windows command interpreter, <code>cmd.exe</code>, reads and executes one line at a time.</p>
+
+<h4 id="ch1-1-what">What a batch file actually is</h4>
+<p>Each line of a batch file is handed to <code>cmd.exe</code>, the Windows NT console host, which parses it, expands variables and then runs it. Internal commands such as <code>cd</code>, <code>set</code>, <code>if</code>, <code>for</code> and <code>echo</code> are implemented inside <code>cmd.exe</code> itself, while external tools — <code>findstr.exe</code>, <code>where.exe</code>, <code>robocopy.exe</code> — are separate executables resolved through the <code>PATH</code> environment variable. Because there is no compile step, a mistake on line 20 of a script is only noticed when line 20 runs, which is why careful scripts validate their inputs up front.</p>
+
+<h4 id="ch1-1-extensions">.bat and .cmd</h4>
+<p>Both extensions execute through <code>cmd.exe</code> and behave identically on modern Windows. The distinction is historical: on 16-bit Windows, a <code>.bat</code> file launched from a DOS context ran under <code>COMMAND.COM</code>, which could switch off command extensions mid-import, while <code>.cmd</code> always ran under <code>cmd.exe</code> and preserved them. In practice, prefer <code>.cmd</code> for new scripts so that <code>for</code>, <code>if /i</code>, <code>setlocal</code> and the <code>%~dp0</code> argument modifiers are guaranteed to be available.</p>
+
+<h4 id="ch1-1-skeleton">The skeleton every script starts from</h4>
+<p>Three lines do the heavy lifting in almost every real script. <code>@echo off</code> stops commands being echoed back before they run — the <code>@</code> suppresses just that one line. <code>setlocal</code> gives the script its own variable scope. <code>enabledelayedexpansion</code> turns on the <code>!var!</code> syntax so a variable inside a loop or parenthesised block is re-read when the line runs, not when it was parsed.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal enabledelayedexpansion
+rem --- your script body goes here ---
+endlocal
+</code></pre></div>
+<div class="codeWrap"><pre><code>:: hello.cmd - greet whoever runs the script
+@echo off
+setlocal enabledelayedexpansion
+set "NAME=%USERNAME%"
+echo Hello, %NAME%!
+echo We are running from %CD%.
+pause
+endlocal
+</code></pre></div>
+<div class="note">The <code>::</code> double-colon is the traditional comment leader. It is not documented as a comment, so one warning applies: <code>::</code> can behave oddly inside parenthesised blocks; use <code>rem</code> there.</div>
+
+<h3 id="ch1-2" data-toc>1.2 Creating and running a script</h3>
+<p class="topic-desc">A script is just a text file that Windows has associated with the interpreter. How you save it and how you launch it change what you see on screen.</p>
+
+<h4 id="ch1-2-writing">Saving the file: encoding and the BOM</h4>
+<p>Notepad defaults decide the bytes that cmd reads. <code>cmd.exe</code> interprets the file using the console code page, normally 437 or 1252; <code>chcp 65001</code> switches it to UTF-8 at runtime. Two traps follow: a UTF-8 byte-order mark written at the start of the file becomes part of the first command, so <code>@echo off</code> can fail silently — save without a BOM — and characters outside the active code page are mangled. Either keep files in the legacy code page or switch code page as the first real statement.</p>
+<div class="codeWrap"><pre><code>:: utf8.cmd - run under UTF-8 after chcp 65001
+@echo off
+chcp 65001 &gt;nul
+echo Café and Zürich now render from a UTF-8 file.
+pause
+</code></pre></div>
+<h4 id="ch1-2-running">Launching from a prompt or from Explorer</h4>
+<p>Double-clicking a batch file in Explorer starts it through the registered association, and the console window closes the moment the script ends — the reason scripts end with <code>pause</code>. From within an existing <code>cmd</code> window, typing the file name runs it in the same window; cmd checks the current directory before it searches <code>PATH</code>, so <code>hello.cmd</code> works without a <code>.\</code> prefix. Dragging a file onto the script in Explorer passes that file's path as the first argument. What you see when echo is left on explains why <code>@echo off</code> is the first line of almost every file:</p>
+<div class="codeWrap"><pre><code>C:\scripts&gt;hello.cmd
+
+C:\scripts&gt;rem  hello.cmd - greet whoever runs the script
+C:\scripts&gt;echo Hello, Amin.
+Hello, Amin.
+C:\scripts&gt;pause
+Press any key to continue . . .
+</code></pre></div>
+<h4 id="ch1-2-echo">How echo and echo off interact</h4>
+<p>Echo state is a script property, not a window property. Once a file has run <code>echo off</code> — with or without the <code>@</code> — the state applies to the rest of that file only. Turning it back on shows exactly why the convention exists:</p>
+<div class="codeWrap"><pre><code>@echo off
+echo one
+echo on
+echo two
+echo off
+echo three
+</code></pre></div>
+<p>Output shows <code>one</code>, then the literal line <code>echo two</code> being printed as <code>C:\&gt;echo two</code> before its output, then the same for <code>echo off</code>, then quietly <code>three</code>. Note that <code>echo on</code> and <code>echo off</code> echo the current state when typed bare, which is how you inspect it.</p>
+
+<h3 id="ch1-3" data-toc>1.3 Help that ships with Windows</h3>
+<p class="topic-desc">You never need to memorise batch syntax: every command can print its own reference, and the reference lives on the machine you are already using.</p>
+
+<h4 id="ch1-3-help">The help command</h4>
+<p>Typing <code>help</code> lists the internal commands. <code>help for</code>, <code>help set</code> and so on print the full syntax page for that command — the same text you get from the command's own <code>/?</code> switch. The pages are terse and assume you know the conventions, but they are complete and authoritative.</p>
+<div class="codeWrap"><pre><code>help
+help for
+help setlocal
+help call
+</code></pre></div>
+<h4 id="ch1-3-slash">Every command documents itself with /?</h4>
+<p>Running <code>command /?</code> displays that command's syntax and, crucially, the exit codes and the modifiers. <code>for /?</code> is the definitive reference for the <code>for</code> syntax including the <code>usebackq</code> and <code>tokens</code> options; <code>set /?</code> documents substring and replacement expansion; <code>cmd /?</code> documents the interpreter's own switches such as <code>/c</code> (run and close) and <code>/k</code> (run and stay open).</p>
+<div class="codeWrap"><pre><code>for /?
+set /?
+if /?
+cmd /?
+</code></pre></div>
+<h4 id="ch1-3-docs">Finding the interpreter and the online reference</h4>
+<p><code>where</code> resolves where an executable on <code>PATH</code> actually lives, which is the first debugging step when a script works interactively but fails under a service account. <code>ver</code> prints the Windows version. Microsoft's online "Windows Commands" documentation mirrors the <code>/?</code> text and adds examples; it is the reference to reach for when a flag does something surprising.</p>
+<div class="codeWrap"><pre><code>where cmd
+where findstr
+ver
+</code></pre></div>
+
+<h3 id="ch1-4" data-toc>1.4 Exit codes: how scripts report success</h3>
+<p class="topic-desc">Every program in a batch script, and the script itself, communicates its outcome through a single integer: the exit code. Reading and returning it correctly is the foundation of every later chapter.</p>
+
+<h4 id="ch1-4-codes">What an exit code is</h4>
+<p>A finished process hands a 32-bit integer back to its parent. By convention 0 means success and any non-zero value means failure, but the specific numbers are per-command: <code>findstr</code> returns 0 for "match found", 1 for "no match" and 2 for "error"; <code>robocopy</code> returns a bitmask where even success can be a number above zero. The pseudo-variable <code>%errorlevel%</code> holds the code of the last command that ran.</p>
+<div class="codeWrap"><pre><code>@echo off
+dir no-such-folder-xyz
+echo The directory check returned %errorlevel%.
+</code></pre></div>
+<p>Expect <code>1</code>. A missing argument or bad flag in <code>dir</code> is an error, and the script's own next line sees it.</p>
+<h4 id="ch1-4-returning">Returning a code from your own script</h4>
+<p><code>exit /b N</code> ends the script and sets its exit code to N without closing the console window — the form to use inside a script launched from a prompt. A bare <code>exit</code> (no <code>/b</code>) also terminates the whole <code>cmd</code> window, which is almost never what a script wants. Scripts called from other scripts read the returned code through <code>%errorlevel%</code> after the call.</p>
+<div class="codeWrap"><pre><code>@echo off
+if "%1"=="--clean" (
+  echo leaving with code 5
+  exit /b 5
+)
+echo continuing normally
+exit /b 0
+</code></pre></div>
+<h4 id="ch1-4-without-checking">Acting on codes without an explicit check</h4>
+<p>The operators <code>&amp;&amp;</code> and <code>||</code> branch on the previous command's exit code directly: <code>&amp;&amp;</code> runs the next command only on success (code 0), <code>||</code> only on failure. They are the tersest way to express "do this, and if it worked, do that".</p>
+<div class="codeWrap"><pre><code>@echo off
+dir C:\Windows &amp;&amp; echo Windows folder reachable || echo Windows folder missing
+dir C:\no-such-folder &amp;&amp; echo surprising || echo expected failure
+</code></pre></div>
+<div class="warn">Chaining consumes the exit code: after <code>a &amp;&amp; b</code>, <code>%errorlevel%</code> is whatever <code>b</code> (or the skipped command) left, not <code>a</code>'s code. If the original code matters, capture it into a variable first.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Commands and Navigation</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 ▸ Commands and Navigation</button><div class="ch-toc-list"><a href="#ch2-1">2.1 The current directory</a><a href="#ch2-2">2.2 Listing files with dir</a><a href="#ch2-3">2.3 Copying, moving and mirroring files</a><a href="#ch2-4">2.4 Deleting and managing files</a></div></div>
+<p class="topic-desc">Chapter two covers the everyday file and directory commands a script is built from: moving around the filesystem, listing files, copying and mirroring trees, and deleting and managing them. These commands are also the raw material the looping constructs in chapter four iterate over.</p>
+
+<h3 id="ch2-1" data-toc>2.1 The current directory</h3>
+<p class="topic-desc">Batch has a per-process current directory, and most commands interpret relative paths against it. Controlling the current directory precisely is the first habit of robust scripts.</p>
+
+<h4 id="ch2-1-cd">cd and its /d switch</h4>
+<p>Bare <code>cd</code> prints the current directory; <code>cd path</code> changes it. <code>..</code> is the parent, <code>\</code> the root of the current drive, and paths with spaces must be quoted. The one switch that newcomers miss is <code>/d</code>: without it, <code>cd D:\data</code> from <code>C:\</code> prints the directory but does not leave drive C:. With <code>/d</code> the change is real and stays.</p>
+<div class="codeWrap"><pre><code>cd
+cd C:\Windows\System32
+cd ..\..
+cd /d D:\data
+cd "%USERPROFILE%\Documents\My Projects"
+</code></pre></div>
+<h4 id="ch2-1-pushpop">pushd and popd: enter, then always return</h4>
+<p><code>pushd path</code> saves the current directory on a stack and changes into <code>path</code>; <code>popd</code> restores the top of the stack. The pair guarantees that a script's working directory ends where it began even if later logic fails — and <code>pushd</code> to a UNC path such as <code>\\server\share</code> temporarily maps a drive letter for it, removing the mapping again on <code>popd</code>. The technique also protects the caller's directory against a buggy script that forgot to <code>cd</code> back.</p>
+<div class="codeWrap"><pre><code>@echo off
+pushd "\\server\share\docs"
+echo Now inside %CD%
+popd
+echo Back in %CD%
+</code></pre></div>
+<h4 id="ch2-1-cdvar">%CD% — the directory as a value</h4>
+<p><code>%CD%</code> expands to the current directory as a string value, so it can be embedded in variable assignments. <code>%__CD__%</code> is the same value with a trailing backslash. Building absolute paths from <code>%CD%</code> or <code>%~dp0</code> (chapter three) instead of hard-coding them is what lets a script run identically from anywhere.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo Working in %CD%
+set "appdir=%CD%\app"
+echo The app directory will be %appdir%
+</code></pre></div>
+<div class="tip">A path containing <code>&amp;</code> — a folder named <code>R&amp;D</code>, say — must always be quoted, or the <code>&amp;</code> will be treated as a command separator.</div>
+
+<h3 id="ch2-2" data-toc>2.2 Listing files with dir</h3>
+<p class="topic-desc"><code>dir</code> is the workhorse for seeing what exists and, with the right switches, for feeding filenames into other commands.</p>
+
+<h4 id="ch2-2-switches">The core switches every script uses</h4>
+<p><code>dir /b</code> prints bare file names only — one per line, no headers, no totals — which is the form designed for piping and <code>for /f</code> parsing. <code>/s</code> recurses into subdirectories, <code>/o:n</code> sorts by name, <code>/p</code> pauses between pages of on-screen output, and <code>/w</code> uses the wide multi-column layout.</p>
+<div class="codeWrap"><pre><code>dir
+dir /b /o:n *.log
+dir /s /b C:\Windows\*.ini
+dir /p /s C:\Windows
+</code></pre></div>
+<h4 id="ch2-2-filters">Filtering with attribute letters and wildcards</h4>
+<p><code>/a:</code> filters on attributes: <code>/a:d</code> directories only, <code>/a:h</code> files with the hidden attribute, <code>/a:-h</code> everything except hidden, each attribute letter optionally prefixed by <code>-</code> to negate. Wildcards follow the DOS rules: <code>*</code> matches any run of characters, <code>?</code> exactly one. Note <code>dir *.txt</code> also matches files with a <code>.txtx</code> extension because of how the 8.3 short-name matching works — a classic surprise.</p>
+<div class="codeWrap"><pre><code>dir /b /a:d
+dir /b /a:h "%USERPROFILE%"
+dir /b /a:-h *.log
+dir /s /b /a:d C:\
+</code></pre></div>
+<h4 id="ch2-2-pipe">Feeding dir output into other commands</h4>
+<p>Because <code>/b</code> output is one clean name per line, it slots straight into a pipeline: filter with <code>findstr</code>, count lines with <code>find /c</code>, or redirect the whole list to a file that another script consumes later.</p>
+<div class="codeWrap"><pre><code>dir /b *.log | findstr /i "error"
+dir /s /b *.tmp > temp-files.txt
+dir /b | find /c /v ""
+</code></pre></div>
+
+<h3 id="ch2-3" data-toc>2.3 Copying, moving and mirroring files</h3>
+<p class="topic-desc">Windows provides three copy commands of increasing power. Choosing between them is choosing how much you trust the destination to match the source.</p>
+
+<h4 id="ch2-3-copy">copy — the everyday file duplicator</h4>
+<p><code>copy source dest</code> copies single files or matched sets. <code>/y</code> overwrites existing destinations without prompting (the prompt otherwise appears when stdin is interactive — inside scripts this hangs). The lesser-known form <code>copy a.txt + b.txt combined.txt</code> concatenates files. <code>copy /v</code> verifies each written byte; it is slower but cheap insurance for a one-off critical file.</p>
+<div class="codeWrap"><pre><code>copy config.ini config.ini.bak /y
+copy *.c C:\archive\ /y
+copy a.txt + b.txt combined.txt
+</code></pre></div>
+<h4 id="ch2-3-xcopy">xcopy — trees, options and exit codes</h4>
+<p><code>xcopy</code> copies directory trees: <code>/s</code> copies subdirectories (except empty ones), <code>/e</code> also creates empty subdirectories, <code>/i</code> assumes the destination is a directory, <code>/d</code> copies only files newer than the destination's, and <code>/y</code> suppresses prompts. Its exit codes are meaningful: 0 success, 1 nothing found to copy, 2 aborted by the user, 4 initialisation or permission error, 5 disk-write error.</p>
+<div class="codeWrap"><pre><code>xcopy C:\app D:\deploy /s /e /i /y
+xcopy C:\app D:\deploy /s /e /i /y /d
+</code></pre></div>
+<h4 id="ch2-3-robocopy">robocopy — the modern workhorse</h4>
+<p><code>robocopy</code> is the reliable choice for real backups. <code>/mir</code> mirrors the tree — deleting files in the destination that no longer exist in the source — while <code>/e</code> alone only adds. <code>/mt:N</code> multithreads the copy, <code>/r:N</code> and <code>/w:N</code> limit retries and the wait between them (the defaults, 1 million retries, will stall a matter of hours), and <code>/log:file</code> writes a transcript. Robocopy's exit code is a bitmask: 0 nothing copied, 1 files copied, 2 extra files, 4 mismatches; any value under 8 is success, 8 or above is a real error.</p>
+<div class="codeWrap"><pre><code>robocopy C:\data D:\backup /mir /r:2 /w:1 /log:backup.log
+robocopy C:\data D:\backup /e /xo /mt:16
+</code></pre></div>
+<div class="warn">Never test robocopy's result with <code>if errorlevel 1 echo failed</code> — a perfect copy with changes returns 1 and you would report the wrong thing. See chapter seven for the correct <code>if errorlevel 8</code> test.</div>
+
+<h3 id="ch2-4" data-toc>2.4 Deleting and managing files</h3>
+<p class="topic-desc">Creating, renaming, moving and removing files is the destructive side of the job; these commands are where a wrongly quoted variable costs data, so read the warning at the end of each sample.</p>
+
+<h4 id="ch2-4-del">del and rmdir / rd</h4>
+<p><code>del /s file</code> deletes the file from the current directory and all subdirectories; <code>/q</code> skips the confirm prompt. <code>rmdir /s /q directory</code> removes a directory tree without asking — <code>/s</code> is what lets it delete a non-empty tree, and <code>/q</code> suppresses the prompt. <code>rd</code> is a synonym. Both are silent and permanent: there is no recycle bin. The destructive one-liner <code>del /s /q build\*.o</code> is safe only if <code>build</code> is a variable you proved is set.</p>
+<div class="codeWrap"><pre><code>del /s /q build\tmp\*.o
+rmdir /s /q build\tmp
+cd build &amp;&amp; rmdir /s /q tmp
+</code></pre></div>
+<h4 id="ch2-4-mkdir">mkdir, ren and move</h4>
+<p><code>mkdir</code> (or <code>md</code>) creates a directory and, unlike most shells, creates missing intermediate directories in one go: <code>mkdir a\b\c</code> makes all three. <code>ren</code> renames a file or directory without moving it. <code>move</code> relocates a file or directory to another folder and can rename in the same operation when both paths are on the same volume.</p>
+<div class="codeWrap"><pre><code>mkdir releases\v1\logs
+ren config.ini settings.ini
+move settings.ini releases\v1
+move releases\v1\settings.ini settings-backup.ini
+</code></pre></div>
+<h4 id="ch2-4-attrib">attrib and where</h4>
+<p><code>attrib</code> views or sets file attributes — <code>R</code> read-only, <code>H</code> hidden, <code>S</code> system, <code>A</code> archive — with <code>+</code> to set and <code>-</code> to clear. A read-only file cannot be deleted until the flag is cleared, a failure mode that shows up as "Access is denied" in scripts. <code>where</code> searches <code>PATH</code> for an executable and with <code>/r</code> walks a whole tree for any name pattern.</p>
+<div class="codeWrap"><pre><code>attrib +r notes.txt
+attrib -r notes.txt
+where python
+where /r C:\tools *.exe
+</code></pre></div>
+<div class="warn">Quote every path variable before it reaches <code>del</code>, <code>rmdir</code> or <code>move</code>: an empty variable produces <code>del /s /q \*.o</code>, which attempts to delete from the root of the current drive. Check <code>if defined</code> (chapter four) before any destructive command on a variable-sourced path.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Variables, Arguments and the Environment</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 ▸ Variables, Arguments and the Environment</button><div class="ch-toc-list"><a href="#ch3-1">3.1 set: creating and reading variables</a><a href="#ch3-2">3.2 Expansion timing and the !var! form</a><a href="#ch3-3">3.3 Arguments passed to a script</a><a href="#ch3-4">3.4 The environment, the clock and keyboard input</a></div></div>
+<p class="topic-desc">Variables are the memory of a batch script. This chapter covers creating and reading them, the delayed-expansion syntax that fixes the language's most confusing parser behaviour, the arguments a script is invoked with, and the environment, clock and keyboard input a script inherits or requests.</p>
+
+<h3 id="ch3-1" data-toc>3.1 set: creating and reading variables</h3>
+<p class="topic-desc">There is one command for creating a variable, and the difference between its safe and unsafe forms is a trailing-space bug waiting to happen.</p>
+
+<h4 id="ch3-1-set">Setting values without surprises</h4>
+<p><code>set NAME=value</code> creates <code>NAME</code>. Spaces are significant: <code>set NAME = Amin</code> creates a variable literally named <code>NAME </code> (with a trailing space) holding the value <code> Amin</code>, so comparisons later fail invisibly. The robust form is <code>set "NAME=Amin"</code> — the quotes keep stray spaces out of both the name and the value while the value itself may still contain spaces. Never write a space before the <code>=</code>.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "NAME=Amin"
+set "MESSAGE=Hello %NAME%"
+echo %MESSAGE%
+</code></pre></div>
+<h4 id="ch3-1-read">Reading variables and detecting an empty one</h4>
+<p><code>%NAME%</code> expands to the value. An undefined variable does not raise an error — it expands to an empty string. That makes an empty-or-missing variable indistinguishable from a set-but-empty one, and the standard test is to compare the quoted expansion against the empty string. <code>set</code> with no arguments lists every variable in the current environment.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "A="
+if "%A%"=="" (echo A is set but empty) else (echo A has a value)
+if "%NOTSET%"=="" echo NOTSET is missing entirely
+set
+</code></pre></div>
+<h4 id="ch3-1-arithmetic">set /a arithmetic</h4>
+<p><code>set /a NAME=expression</code> evaluates an integer expression: <code>+ - * / % ( )</code> with normal precedence, increments via <code>+=</code>, and hexadecimal (<code>0x</code>) and octal (leading <code>0</code>) literals. The modulo operator uses the double percent in a file — <code>%%</code> — and handing it a number such as <code>08</code> fails because that reads as invalid octal, a genuine surprise for anyone writing date math.</p>
+<div class="codeWrap"><pre><code>@echo off
+set /a X = 5 + 3 * 2
+echo X is %X%
+set /a X += 10
+set /a DICE = %RANDOM% %% 6 + 1
+echo You rolled %DICE%
+set /a HEX = 0x1F
+echo 0x1F is %HEX%
+</code></pre></div>
+
+<h3 id="ch3-2" data-toc>3.2 Expansion timing and the !var! form</h3>
+<p class="topic-desc">Batch expands <code>%var%</code> when a line is parsed, not when it runs. Inside a loop or parenthesised block that one fact silently produces wrong values, and <code>!var!</code> exists to fix it.</p>
+
+<h4 id="ch3-2-timing">Why %var% lies inside blocks</h4>
+<p>cmd reads a whole parenthesised block or <code>for</code> body as one unit, expands every <code>%var%</code> in it at that moment, and only then starts executing lines. A variable changed inside the block therefore still holds its parse-time value everywhere in the block, and even more confusingly, a variable created inside the block is expanded to empty throughout it. The classic symptom:</p>
+<div class="codeWrap"><pre><code>@echo off
+set "N=0"
+for %%f in (a b c) do (
+  set /a N+=1
+  echo file %%f is number %N%
+)
+</code></pre></div>
+<p>Every line prints "number 0": <code>%N%</code> was resolved with the parse-time value and never re-read.</p>
+<h4 id="ch3-2-delayed">enabledelayedexpansion and !var!</h4>
+<p><code>setlocal enabledelayedexpansion</code> switches on a second expansion syntax: <code>!var!</code> is evaluated as each line runs, not when its block was parsed. The same loop written with <code>!N!</code> prints 1, 2, 3. The common convention is to keep using <code>%var%</code> for values fixed at parse time and <code>!var!</code> for anything the script itself changes within a block.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal enabledelayedexpansion
+set "N=0"
+for %%f in (a b c) do (
+  set /a N+=1
+  echo file %%f is number !N!
+)
+endlocal
+</code></pre></div>
+<h4 id="ch3-2-percent">Percent signs in files versus at the prompt</h4>
+<p>Inside a batch file, <code>for</code> metavariables are written doubled — <code>%%f</code> — while the identical loop typed interactively at a prompt uses <code>%f</code>. The parser itself gives the reason: at the prompt, <code>%f</code> would be interpreted as variable <code>f</code>. The doubling rule extends to any literal percent sign you want <code>echo</code> to print: <code>echo 100%%</code> outputs <code>100%</code>, and a lone <code>^%</code> (caret-escaped) outputs a single <code>%</code>.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo 100%% ready
+echo The percent sign looks like this: ^%
+for %%f in (a b) do echo item %%f
+</code></pre></div>
+
+<h3 id="ch3-3" data-toc>3.3 Arguments passed to a script</h3>
+<p class="topic-desc">Arguments arrive in a fixed set of slots. Understanding the slots — and the modifiers that transform them into full paths — is what turns a script from a one-trick file into a reusable tool.</p>
+
+<h4 id="ch3-3-positional">%0 through %9 and %*</h4>
+<p><code>%0</code> is the script's own name as it was invoked, <code>%1</code> through <code>%9</code> the first nine arguments in order, and <code>%*</code> all arguments exactly as typed — a single string that passes through unchanged. A tenth argument is beyond <code>%9</code>; reaching it requires <code>shift</code>.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo Script invoked as: %0
+echo First argument:    %1
+echo Second argument:   %2
+echo Everything passed: %*
+</code></pre></div>
+<h4 id="ch3-3-shift">shift: walking past nine arguments</h4>
+<p><code>shift</code> moves every slot down one: <code>%2</code> becomes <code>%1</code>, and so on, freeing <code>%9</code> for a tenth argument. A typical loop consumes arguments until <code>%1</code> is empty, checking <code>if "%1"==""</code> to stop. Because <code>shift</code> is destructive, capture what you need into named variables before looping.</p>
+<div class="codeWrap"><pre><code>@echo off
+:next
+if "%1"=="" goto :done
+echo processing %1
+shift
+goto :next
+:done
+echo all arguments consumed
+</code></pre></div>
+<h4 id="ch3-3-modifiers">Argument modifiers: %~dp0 and friends</h4>
+<p>Each <code>%N</code> can be followed by a modifier that expands into a property of the file or directory named by the argument: <code>%~1</code> strips surrounding quotes, <code>%~f1</code> a full absolute path, <code>%~d1</code> the drive, <code>%~p1</code> the path, <code>%~n1</code> the name without extension, <code>%~x1</code> the extension, <code>%~a1</code> attributes, <code>%~t1</code> the modification timestamp and <code>%~z1</code> the size. Combined modifiers such as <code>%~dp1</code> and <code>%~nx1</code> compose. Applied to <code>%0</code>, <code>%~dp0</code> yields the directory containing the script itself — the one modifier every self-contained script uses to find its own files regardless of the current directory.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo This script lives in %~dp0
+echo Its own file name is %~nx0
+rem pass a file path as the first argument:
+echo Full path:  %~f1
+echo Size:       %~z1 bytes
+echo Modified:   %~t1
+echo Name only:  %~n1
+</code></pre></div>
+
+<h3 id="ch3-4" data-toc>3.4 The environment, the clock and keyboard input</h3>
+<p class="topic-desc">Beyond the variables a script defines itself, it inherits a full environment, can read pseudo-variables that change on their own, and can ask the user for input.</p>
+
+<h4 id="ch3-4-inherited">The inherited environment</h4>
+<p>Every script starts with the environment of whatever launched it — the Explorer session, a calling script, or a scheduled task's service context. The useful ones to rely on are <code>%PATH%</code>, <code>%WINDIR%</code>, <code>%USERPROFILE%</code>, <code>%APPDATA%</code>, <code>%TEMP%</code> and <code>%PROGRAMFILES%</code>. A plain <code>set</code> prints them all; never assume a variable exists — a service account's environment is famously leaner than an interactive session's.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo Temp folder:  %TEMP%
+echo Profile:      %USERPROFILE%
+echo Architecture: %PROCESSOR_ARCHITECTURE%
+echo Search path:  %PATH%
+</code></pre></div>
+<h4 id="ch3-4-dynamic">%errorlevel%, %date%, %time% and %random%</h4>
+<p>Four pseudo-variables change on their own. <code>%ERRORLEVEL%</code> holds the last command's exit code (chapter one); <code>%CD%</code> the current directory (chapter two); <code>%DATE%</code> and <code>%TIME%</code> the system clock at expansion time; <code>%RANDOM%</code> a pseudo-random number between 0 and 32767 on every read. Note that <code>%DATE%</code> and <code>%TIME%</code> formats are locale-dependent — slicing them by character position works, but the positions differ on a Dutch or Japanese system.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo Right now: %DATE% at %TIME%
+echo A random number: %RANDOM%
+findstr /c:"panic" app.log >nul 2>&amp;1
+echo The search exited with %errorlevel%
+</code></pre></div>
+<h4 id="ch3-4-input">Reading input with set /p</h4>
+<p><code>set /p NAME=prompt text</code> prints the prompt (with no newline) and stores one typed line in <code>NAME</code>. Pressing Enter with empty input leaves the variable unchanged rather than clearing it, which is why the reliable pattern assigns a default first, then overwrites: whatever the keypress leaves, the variable is guaranteed set. Guard the prompt text, not the reply — a quote or <code>&amp;</code> inside the prompt string itself breaks the line.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "name=Anonymous"
+set /p "name=What is your name? "
+echo Hello, %name%!
+if "%name%"=="Anonymous" echo (you pressed Enter and kept the default)
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Control Flow</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 ▸ Control Flow</button><div class="ch-toc-list"><a href="#ch4-1">4.1 if, else and comparisons</a><a href="#ch4-2">4.2 exist, defined and errorlevel tests</a><a href="#ch4-3">4.3 for loops: lists, directories, recursion and numbers</a><a href="#ch4-4">4.4 goto and labels</a></div></div>
+<p class="topic-desc">Control flow is where a script stops being a list of commands and becomes a program: conditional branches with <code>if</code>, file and variable tests, the <code>for</code> loop in its four forms, and <code>goto</code> with labels. Chapter three's delayed expansion reappears here — blocks are exactly where parse-time expansion bites.</p>
+
+<h3 id="ch4-1" data-toc>4.1 if, else and comparisons</h3>
+<p class="topic-desc">The <code>if</code> command is the only branching construct. Its quoting habits and its numeric and case-insensitive modes cover most decisions a script makes.</p>
+
+<h4 id="ch4-1-basic">The if statement and its parentheses</h4>
+<p><code>if condition (command) else (command)</code> groups multiple commands in parentheses — the multi-line block form used throughout this guide. Two conventions matter. First, quote every operand: <code>if "%var%"=="install"</code>, because an empty <code>%var%</code> would otherwise produce <code>if ==install</code> and a syntax error. Second, put the opening parenthesis on the same line as the condition and <code>else</code> on the same line as the closing parenthesis of the first block; a line break in the wrong place splits the structure.</p>
+<div class="codeWrap"><pre><code>@echo off
+if "%1"=="install" (
+  echo Installing...
+  copy app.dll deploy\
+) else (
+  echo Usage: %~nx0 install
+  exit /b 1
+)
+</code></pre></div>
+<h4 id="ch4-1-compare">Case-insensitive and numeric comparisons</h4>
+<p><code>if /i</code> makes string comparison case-insensitive. Comparing numbers with <code>==</code> is wrong — <code>"10"=="2"</code> is false because string comparison is lexical — so numeric tests use the six operators <code>equ</code>, <code>neq</code>, <code>lss</code>, <code>leq</code>, <code>gtr</code> and <code>geq</code>, and these accept either quoted or unquoted operands. Chained <code>else if</code> builds a switch without <code>goto</code>.</p>
+<div class="codeWrap"><pre><code>@echo off
+set /a score=72
+if %score% GEQ 90 (
+  echo grade A
+) else if %score% GEQ 75 (
+  echo grade B
+) else (
+  echo grade C
+)
+if /i "%1"=="yes" echo affirmative
+</code></pre></div>
+<h4 id="ch4-1-blocks">Blocks are parsed as one unit</h4>
+<p>A whole parenthesised block is parsed once, and that has consequences: variables changed inside it take their new values only after the block ends, and <code>%var%</code> inside the block holds its pre-block value for all of it. The fix is the <code>!var!</code> form from chapter three, enabled with <code>setlocal enabledelayedexpansion</code>. Any script that assigns variables inside a block should start with that line.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal enabledelayedexpansion
+set "total=0"
+for %%f in (1 2 3) do (
+  set /a total+=%%f
+  echo after adding %%f total is !total!
+)
+echo grand total %total%
+</code></pre></div>
+
+<h3 id="ch4-2" data-toc>4.2 exist, defined and errorlevel tests</h3>
+<p class="topic-desc">Three specialised conditions answer the questions a script asks constantly: does this file exist, is this variable set, and did the last command succeed.</p>
+
+<h4 id="ch4-2-exist">if exist: files and folders</h4>
+<p><code>if exist path</code> is true when the path exists, and works for both files and folders. Quote the path so a space or <code>&amp;</code> inside it does not end the condition early. A standalone trailing backslash — <code>if exist "C:\Temp\"</code> — is the way to test for a directory specifically, since a file could otherwise match. <code>if not exist</code> is the corresponding guard for creating things idempotently.</p>
+<div class="codeWrap"><pre><code>@echo off
+if exist "config.ini" (
+  echo config.ini found
+) else (
+  echo config.ini missing - writing defaults
+  copy default.ini config.ini
+)
+if exist "C:\Temp\" echo the Temp folder exists
+if not exist "logs" mkdir logs
+</code></pre></div>
+<h4 id="ch4-2-defined">if defined: is the variable set</h4>
+<p><code>if defined NAME</code> tests whether a variable exists, without caring about its value. This is the correct gate before a destructive command that uses a variable in its path — see the warning in chapter two — because an unset variable would delete against an empty path. Note that a variable set to an empty value is removed by that assignment, so <code>if defined</code> and "set but empty" are the same thing.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "DEBUG=1"
+if defined DEBUG echo Debug mode is on
+set "DEBUG="
+if not defined DEBUG echo Debug mode has been cleared
+set "builddir=%CD%\build"
+if defined builddir if exist "%builddir%" rmdir /s /q "%builddir%"
+</code></pre></div>
+<h4 id="ch4-2-errorlevel">if errorlevel N means "N or greater"</h4>
+<p><code>if errorlevel N</code> is true when the last command's exit code is N or higher — a rank test, not an equality test. Because of that, the checks must run highest-first: <code>if errorlevel 2</code> before <code>if errorlevel 1</code>, or the lower test always wins. This form has one major advantage inside blocks and loops: unlike <code>%errorlevel%</code>, it is re-evaluated at run time, so it does not need delayed expansion.</p>
+<div class="codeWrap"><pre><code>@echo off
+findstr /i "error" app.log
+if errorlevel 2 echo input file could not be read
+if errorlevel 1 echo no matching lines found
+if errorlevel 0 echo search completed normally
+</code></pre></div>
+
+<h3 id="ch4-3" data-toc>4.3 for loops: lists, directories, recursion and numbers</h3>
+<p class="topic-desc"><code>for</code> has four distinct shapes. The metavariable is <code>%%v</code> in a file and <code>%v</code> at a prompt — miss the doubling and the loop body never sees a value.</p>
+
+<h4 id="ch4-3-list">for over a list of items</h4>
+<p><code>for %%v in (a b c) do command</code> iterates the space-separated items. This is the form used to loop over command-line residues after <code>shift</code>, over file wildcards (<code>for %%f in (*.log) do ...</code>), and over literal sets. The loop variable is a single letter, case-insensitive, and its modifiers from chapter three apply directly to it.</p>
+<div class="codeWrap"><pre><code>@echo off
+for %%v in (red green blue) do echo colour: %%v
+for %%f in (*.log) do echo log file: %%f
+rem one-line form with a body:
+for %%i in (1 2 3) do (echo number %%i &amp; echo next)
+</code></pre></div>
+<h4 id="ch4-3-recursive">for /d and for /r</h4>
+<p><code>for /d %%d in (paths) do ...</code> iterates directory names instead of files, including matching the wildcard against names only — which is how you loop the subfolders of a project. <code>for /r root %%f in (*.txt) do ...</code> walks the directory tree below <code>root</code> and yields each matching file with its full path, the building block of whole-tree operations such as "delete every <code>.tmp</code> below this folder".</p>
+<div class="codeWrap"><pre><code>@echo off
+for /d %%d in (*) do echo subfolder: %%d
+for /r C:\src %%f in (*.cs) do echo source file: %%f
+for /r "" %%f in (*.bak) do del /q "%%f"
+</code></pre></div>
+<h4 id="ch4-3-numeric">for /l: counting loops</h4>
+<p><code>for /l %%v in (start,step,end) do ...</code> generates a numeric sequence — start, then start+step, and so on until it passes end. A negative step counts down. This is the form for "repeat N times" or index arithmetic; the variable arrives pre-expanded as <code>%%v</code> on each iteration, so delays are needed only for variables you mutate yourself.</p>
+<div class="codeWrap"><pre><code>@echo off
+for /l %%i in (1,1,5) do echo iteration %%i
+for /l %%i in (10,-2,2) do echo countdown %%i
+rem build a sequence of log files: log1.txt ... log3.txt
+for /l %%i in (1,1,3) do echo run %%i &gt; log%%i.txt
+</code></pre></div>
+
+<h3 id="ch4-4" data-toc>4.4 goto and labels</h3>
+<p class="topic-desc">Labels give a script landmarks; <code>goto</code> jumps between them. Modern batch still needs <code>goto</code> for user confirmation loops and for bailing out of the middle of a script.</p>
+
+<h4 id="ch4-4-labels">Labels and unconditional jumps</h4>
+<p>A label is a line beginning with <code>:</code> followed by a name; the <code>:label</code> line itself does nothing when execution reaches it — it is a marker. <code>goto :label</code> jumps to it. Label names are case-insensitive and may contain letters, digits, underscore and a few symbols. Two labels with the same name are not an error; <code>goto</code> silently takes the first, which makes duplicate names a debugging trap. The special label <code>:eof</code> always means the end of the file.</p>
+<div class="codeWrap"><pre><code>@echo off
+goto :start
+echo this line is never reached
+:start
+echo execution starts here
+if "%1"=="" goto :eof
+goto :start
+</code></pre></div>
+<h4 id="ch4-4-errors">goto as the error-exit pattern</h4>
+<p>Branches fanning out to <code>:ok</code> and <code>:fail</code> labels keep a script readable when the alternative is deeply nested parentheses. Because <code>goto</code> abandons the surrounding block entirely, jumping to a label after a failed step skips every later step cleanly — the primitive version of exception handling available to batch.</p>
+<div class="codeWrap"><pre><code>@echo off
+if not exist "input.csv" goto :missing
+if not exist "tool.exe" goto :missing_tool
+echo running the tool...
+tool.exe input.csv
+if errorlevel 1 goto :failed
+echo succeeded
+exit /b 0
+
+:missing
+echo input.csv is absent
+exit /b 2
+
+:missing_tool
+echo tool.exe is absent
+exit /b 3
+
+:failed
+echo the tool returned an error
+exit /b 1
+</code></pre></div>
+<h4 id="ch4-4-structured">Structured alternatives to goto spaghetti</h4>
+<p>Heavy use of <code>goto</code> produces the legendary spaghetti batch file. The structured alternatives are: <code>call :label</code> for reusable code with a return address (chapter six), <code>for /f</code> for iterating data (chapter five), and nested <code>else if</code> chains for decisions. Keep <code>goto</code> for one thing file-level control flow genuinely needs: user loops that must be re-entered, and top-of-script validation that must skip to the end.</p>
+<div class="codeWrap"><pre><code>@echo off
+set /p "again=Loop again? (y/n) "
+if /i not "%again%"=="y" exit /b 0
+echo looping once
+goto :eof
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Strings and Text Handling</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 5 ▸ Strings and Text Handling</button><div class="ch-toc-list"><a href="#ch5-1">5.1 find and findstr — searching text</a><a href="#ch5-2">5.2 for /f — parsing files, tokens and command output</a><a href="#ch5-3">5.3 Substrings and substitution</a><a href="#ch5-4">5.4 Escaping metacharacters</a></div></div>
+<p class="topic-desc">Text is the native data format of batch: files arrive as lines, configuration is key-value text, and logs are lines of it. This chapter covers searching text, parsing it into variables with <code>for /f</code>, and the substring and substitution expansion operators that edit a string in place.</p>
+
+<h3 id="ch5-1" data-toc>5.1 find and findstr — searching text</h3>
+<p class="topic-desc">Two search commands cover the spectrum between literal substrings and full regular expressions; both return codes a script can branch on.</p>
+
+<h4 id="ch5-1-find">find — literal substring search</h4>
+<p><code>find "text" file(s)</code> prints matching lines. The search string is literal — no regex — and must be quoted. Switches: <code>/i</code> case-insensitive, <code>/v</code> the lines that do NOT match, <code>/n</code> prefixes line numbers, <code>/c</code> prints a count instead of lines, <code>/offline</code> searches files with the offline attribute. Exit codes: 0 at least one match, 1 no match, 2 the file could not be opened. The classic line-counting idiom is <code>find /c /v ""</code>, which counts non-empty lines.</p>
+<div class="codeWrap"><pre><code>@echo off
+find /i /n "warning" app.log
+find /c "ERROR" app.log
+find /v "ok" status.txt | find /c /v ""
+</code></pre></div>
+<h4 id="ch5-1-findstr">findstr — regular expressions</h4>
+<p><code>findstr</code> is the regex engine: <code>.</code> any character, <code>^</code> start of line, <code>$</code> end, <code>[a-z]</code> classes, <code>\</code> escaping a literal metacharacter. Switch to literal mode with <code>/c:"exact phrase"</code>, which is how spaces survive a search argument. <code>/i</code> ignores case, <code>/m</code> prints only the file name, <code>/v</code> inverts. Its exit codes mirror <code>find</code>: 0 match, 1 no match, 2 a file could not be opened.</p>
+<div class="codeWrap"><pre><code>@echo off
+findstr /i "error pattern" *.log
+findstr /c:"not found" *.txt
+findstr /r "[0-9][0-9]:[0-9][0-9]" times.log
+findstr /m "panic" *.log
+</code></pre></div>
+<h4 id="ch5-1-pipe">Searching inside pipelines</h4>
+<p>Pipes chain a producer with a filter: list the system folder and keep only DLL files, then count them. <code>find</code> and <code>findstr</code> both read stdin when no file is named, which makes them the natural filter stage. The metacharacter trap to remember is that a literal <code>.</code> in findstr patterns must be written <code>\.</code>, or it matches any character including the dot it appears to match.</p>
+<div class="codeWrap"><pre><code>dir /b C:\Windows\System32 | findstr /r "\.dll$"
+dir /b C:\Windows\System32 | findstr /r "\.dll$" | find /c /v ""
+type app.log | findstr /i /c:"fatal error"
+</code></pre></div>
+
+<h3 id="ch5-2" data-toc>5.2 for /f — parsing files, tokens and command output</h3>
+<p class="topic-desc"><code>for /f</code> turns external text — a file's lines, a command's standard output, or a string — into loop iterables. It is the single most powerful text tool in the language.</p>
+
+<h4 id="ch5-2-lines">Reading a file line by line</h4>
+<p><code>for /f %%i in (file) do ...</code> iterates over the file's lines. With <code>usebackq</code> the file argument is quoted (allowing spaces in the path): <code>for /f "usebackq" %%i in ("names.txt") do ...</code>. By default <code>for /f</code> splits each line on spaces and tabs and takes only the first token — the very first thing to override for whole-line handling is <code>delims=</code>, an empty delimiter set meaning "split on nothing". A line that is empty is skipped entirely unless handled specially.</p>
+<div class="codeWrap"><pre><code>@echo off
+for /f "usebackq delims=" %%i in ("names.txt") do (
+  echo Hello, %%i
+)
+</code></pre></div>
+<h4 id="ch5-2-tokens">Splitting on delimiters and selecting tokens</h4>
+<p><code>delims=,;</code> splits each line on any comma or semicolon. <code>tokens=1,3</code> keeps the first and third pieces, <code>tokens=2-4</code> a range, and the pieces land in successive metavariables: <code>%%a</code> gets token 1, <code>%%b</code> token 2 if listed, and so on. This makes processing a simple CSV direct: no quotes handling, but perfectly serviceable for square, well-formed files.</p>
+<div class="codeWrap"><pre><code>@echo off
+for /f "tokens=1,2 delims=," %%a in (users.csv) do (
+  echo user %%a has email %%b
+)
+for /f "skip=1 tokens=2 delims==" %%v in (settings.ini) do echo value: %%v
+</code></pre></div>
+<h4 id="ch5-2-command">Capturing command output</h4>
+<p>With a single-quoted argument — <code>for /f "delims=" %%i in ('dir /b') do ...</code> — the loop iterates over the command's output one line at a time, the way to collect a snapshot into variables. Escape characters inside the command for the outer parser: a redirection there needs a caret, as in <code>('dir /b 2^&gt;nul')</code>. <code>skip=N</code> discards the first N lines, and <code>eol=;</code> treats lines beginning with <code>;</code> as comments to skip.</p>
+<div class="codeWrap"><pre><code>@echo off
+for /f "delims=" %%i in ('dir /b *.log 2^&gt;nul') do echo log: %%i
+for /f "skip=1 delims=" %%i in ('type users.txt') do echo line: %%i
+</code></pre></div>
+
+<h3 id="ch5-3" data-toc>5.3 Substrings and substitution</h3>
+<p class="topic-desc">Variables support two edit operators at expansion time: slicing into substrings and replacing text. Both are pure expansion — the variable itself is unchanged — which makes them safe to chain.</p>
+
+<h4 id="ch5-3-substring">Slicing with %var:~start,length%</h4>
+<p><code>%var:~5%</code> takes everything from index 5; <code>%var:~5,3%</code> takes 3 characters starting at index 5; <code>%var:~-3%</code> takes the last 3 characters; <code>%var:~-6,2%</code> the 2 characters 6 from the end. Indices are zero-based. Without delayed expansion these work anywhere, but inside a block the eaten-by-parser rule applies as for any expansion.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "path=C:\data\logs\gamma.log"
+echo tail-3:      %path:~-3%
+echo char 4-5:    %path:~3,2%
+echo without C:\: %path:~3%
+set "name=abcdef"
+if "%name:~0,1%"=="a" echo name starts with a
+</code></pre></div>
+<h4 id="ch5-3-replace">Replacing text with %var:old=new%</h4>
+<p><code>%var:old=new%</code> replaces every occurrence of <code>old</code> with <code>new</code>. The two sides are literal strings; either may be empty, so <code>%var:.=%</code> strips every dot and <code>%var: =_%</code> turns spaces into underscores. This is the standard way to turn a file name into a variable name or to normalise user input. Replacement happens at parse time like any expansion.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "version=v1.2.3"
+echo dots removed: %version:.=%
+set "title=My Great Project"
+echo sanitised:    %title: =_%
+set "ext=docs"
+echo joined:       %ext:ocs=OCS%
+</code></pre></div>
+<h4 id="ch5-3-strip">Stripping and testing strings</h4>
+<p>Combining slicing with <code>==</code> comparison gives the string tests batch otherwise lacks: a prefix check via <code>%var:~0,N%</code>, an extension check via <code>%~x1</code> on arguments, and emptiness via quoting. Because substitution does not modify the variable, edits that must stick need a fresh assignment: <code>set "var=%var: =_%"</code>.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "file=report-2026.csv"
+if /i "%file:~-4%"==".csv" echo a csv file
+set "clean=%file:_=-%"
+echo cleaned: %clean%
+set "text=Hello World"
+set "text=%text: =-%"
+echo joined: %text%
+</code></pre></div>
+
+<h3 id="ch5-4" data-toc>5.4 Escaping metacharacters</h3>
+<p class="topic-desc">Batch has ten characters with special meaning. Knowing how to print one, pass one, or keep one out of the parser is the difference between a script that runs and one that misbehaves in a way no error message explains.</p>
+
+<h4 id="ch5-4-special">The metacharacter set and the caret</h4>
+<p>The specials are <code>&amp;</code> (command separator), <code>|</code> (pipe), <code>&lt;</code> and <code>&gt;</code> (redirection), <code>^</code> (escape), <code>%</code> (variable), <code>!</code> (delayed variable), <code>"</code> (quoting) and the parentheses (grouping). The caret <code>^</code> escapes one character, making it literal: <code>echo a ^&amp; b</code> prints <code>a &amp; b</code> instead of running <code>b</code> as a second command. A caret cannot quote a caret at the end of a line comfortably, and inside double quotes most specials are already literal.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo A caret ^^ prints one caret
+echo rock ^&amp; roll
+echo 50 ^| for the pipe symbol
+rem enclosed in quotes the metacharacters are inert:
+echo "this &amp; that &gt; nothing" | find /v "nothing"
+</code></pre></div>
+<h4 id="ch5-4-print">Printing and echoing special characters</h4>
+<p><code>echo</code> has its own peculiarities. A quoted <code>"text"</code> keeps the quotes in the output — quotes are echoed literally. The three characters that defeat <code>echo</code> are a leading <code>&lt;</code> or <code>&gt;</code> at the start of a value (echoed but interpreted as redirection if the parser gets first pick) and a trailing space (dropped, not printed). To print a variable that may contain specials, guard with a nesting technique or accept the limitation — this is honest batch, not a PowerShell escape hatch.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo The redirect symbol ">" prints fine here.
+echo Pipe ^| and ampersand ^&amp; must be caret-escaped.
+echo 50%% complete
+</code></pre></div>
+<h4 id="ch5-4-files">One-liners at the prompt versus files</h4>
+<p>Interaction between escape layers shows up twice. In <code>for /f ('command')</code> the inner command needs carets for ITS redirection and pipe — <code>('dir 2^&gt;nul ^| findstr x')</code> — because the outer parser would otherwise consume them. And in a file, <code>%</code> must be doubled where the interpreter expects a variable (<code>%%f</code> in <code>for</code>, <code>%%</code> for a literal percent in <code>echo</code>). Forgetting doubles in the middle of a <code>for /f</code> single-quoted command is the commonest source of "flickering" scripts that work at the prompt but not from a file.</p>
+<div class="codeWrap"><pre><code>@echo off
+rem in a file the loop variable is doubled, the redirection caret-escaped:
+for /f "delims=" %%i in ('dir /b *.tmp 2^&gt;nul') do echo found %%i
+rem the same command typed interactively uses a single %i:
+rem   for /f "delims=" %i in ('dir /b *.tmp 2^&gt;nul') do echo found %i
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Subroutines and Functions</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 6 ▸ Subroutines and Functions</button><div class="ch-toc-list"><a href="#ch6-1">6.1 call :label and exit /b</a><a href="#ch6-2">6.2 setlocal and endlocal scoping</a><a href="#ch6-3">6.3 Macros: named command lines</a><a href="#ch6-4">6.4 Return values and errorlevel conventions</a></div></div>
+<p class="topic-desc">Reusable code in batch takes two forms: subroutines reached with <code>call :label</code>, and the variable scoping that keeps them from leaking state into the caller. This chapter covers both, the <code>endlocal &amp; set</code> return-value trick, command-alias macros, and the exit-code conventions that make subroutines composable.</p>
+
+<h3 id="ch6-1" data-toc>6.1 call :label and exit /b</h3>
+<p class="topic-desc">Unlike <code>goto</code>, which abandons its position, <code>call</code> remembers where it came from. That single difference turns a label into a function.</p>
+
+<h4 id="ch6-1-call">Calling a label as a subroutine</h4>
+<p><code>call :label args... </code> jumps to the label, running it with <code>%1</code>, <code>%2</code> and so on replaced by the supplied arguments — a fresh argument scope, independent of the caller's. When the subroutine reaches <code>exit /b</code> or <code>goto :eof</code>, control returns to the line after the <code>call</code>. The main body should itself end with <code>exit /b</code>, or it will fall through into the first label below it.</p>
+<div class="codeWrap"><pre><code>@echo off
+call :greet Amin
+call :greet Reader
+exit /b
+
+:greet
+echo Hello, %1!
+exit /b
+</code></pre></div>
+<h4 id="ch6-1-exitb">exit /b with a return code</h4>
+<p>Inside a subroutine, a plain <code>exit /b</code> returns; <code>exit /b N</code> also sets <code>%errorlevel%</code> for the caller to inspect. A subroutine that forgets its <code>exit /b</code> falls through line by line into whatever follows — usually the next label's code or the end of the file — which produces baffling duplicated output. The convention is one <code>exit /b</code> per exit path, each carrying an intent-revealing code.</p>
+<div class="codeWrap"><pre><code>@echo off
+call :check
+echo check returned in the main body
+exit /b
+
+:check
+if exist "flag.txt" exit /b 0
+echo flag.txt is missing
+exit /b 1
+</code></pre></div>
+<h4 id="ch6-1-eof">goto :eof and calling other scripts</h4>
+<p><code>goto :eof</code> is the predefined label at the end of the file — the idiomatic "return from subroutine" that needs no numbered label. <code>call other.cmd</code> (no colon) runs another script in the same window and returns when it finishes; <code>call</code> without <code>call</code> would transfer control permanently. Batching a sequence of steps as <code>call</code>ed scripts is the standard way to keep a large build readable.</p>
+<div class="codeWrap"><pre><code>@echo off
+call setup.cmd
+if errorlevel 1 goto :eof
+call build.cmd
+if errorlevel 1 goto :eof
+call deploy.cmd
+</code></pre></div>
+
+<h3 id="ch6-2" data-toc>6.2 setlocal and endlocal scoping</h3>
+<p class="topic-desc">Variables set in a script are visible to its caller unless scoping fences them. <code>setlocal</code> and <code>endlocal</code> are those fences, and they are also the mechanism behind a subroutine's private space.</p>
+
+<h4 id="ch6-2-scoping">Localising changes with setlocal</h4>
+<p><code>setlocal</code> snapshots the entire environment — every variable, not just the ones you name — and <code>endlocal</code> restores it. Between the two, any <code>set</code> is private. Nested pairs nest: each <code>endlocal</code> returns to the snapshot above it. A script that runs <code>setlocal</code> on line two and <code>endlocal</code> on its last line cannot leak variables into whoever called it, which is the difference between a polite utility and one that silently overwrites a caller's <code>TEMP</code>.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "X=outer"
+setlocal
+set "X=inner"
+echo inside the block:  %X%
+endlocal
+echo after endlocal:    %X%
+</code></pre></div>
+<h4 id="ch6-2-options">Options: EnableExtensions and EnableDelayedExpansion</h4>
+<p><code>setlocal EnableExtensions</code> guarantees the extended command syntax, and <code>setlocal EnableDelayedExpansion</code> enables <code>!var!</code>. The two combine on one line. Because <code>setlocal</code> resets when the script ends even without a matching <code>endlocal</code>, a subroutine can set up its own delayed expansion without disturbing the caller's — and that independence is what makes the <code>endlocal</code>-boundary tricks in this chapter safe.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal EnableExtensions EnableDelayedExpansion
+set "i=0"
+for %%p in (A B C) do (
+  set /a i+=1
+  echo !i! - %%p
+)
+endlocal
+</code></pre></div>
+<h4 id="ch6-2-returns">Returning values across endlocal</h4>
+<p>A subroutine that <code>endlocal</code>s destroys the variables it set — so returning a value needs the classic one-line trick: <code>endlocal &amp; set "RESULT=%local%"</code> or, better, <code>endlocal &amp; set RESULT=%local%</code> with quotes positioned so the <code>%local%</code> expands before <code>endlocal</code> runs. Both halves of the line are parsed and expanded at the same moment, so the substitution reads the local value just before the restore destroys it, and the restore then happens before the <code>set</code> executes.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal
+set "value=from-local-scope"
+endlocal &amp; set "captured=%value%"
+echo captured is "%captured%"
+</code></pre></div>
+<div class="warn">The same mechanism explains a frequent bug: <code>endlocal &amp; exit /b %errorlevel%</code> is correct only because <code>%errorlevel%</code> expands before <code>endlocal</code> resets it. If you need the exit code computed <em>after</em> the restore, capture it into a variable first.</div>
+
+<h3 id="ch6-3" data-toc>6.3 Macros: named command lines</h3>
+<p class="topic-desc">A macro is a variable whose value is a piece of command line. Batched scripts reuse them the way other languages reuse functions — with the caveat that they expand exactly where they are written, with no call stack.</p>
+
+<h4 id="ch6-3-simple">Alias-style macros</h4>
+<p>The simplest macro binds a frequently-used line to a short name, and expansion is just variable substitution: <code>%Name%</code> in a command position turns into the stored text, which the parser then executes. Because the expansion happens at parse time, a macro cannot see run-time state without delayed expansion — but for fixed commands like a standard silence or a repeated option set, it removes duplication without ceremony.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "QIET=2^&gt;nul"
+set "LIST=dir /b /o:n"
+%LIST% *.log %QIET%
+%LIST% *.txt %QIET%
+echo done listing
+</code></pre></div>
+<h4 id="ch6-3-pointer">Storing a label: function pointers</h4>
+<p>Because <code>call</code> accepts any expansion in its label position, a variable can name a subroutine: <code>set "HANDLER=:save"</code> then <code>call %HANDLER% %1</code>. This is batch's closest analogue to a function pointer, and it is the mechanism behind dispatch tables — choose which handler to run based on an argument, not an <code>else if</code> ladder. The variable must hold the colon: <code>call</code> distinguishes an external <code>call</code> (no colon) from a label call by that first character.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "op=:save"
+call %op% notes.txt
+exit /b
+
+:save
+echo saving %1
+set "copy=%1.safe"
+copy "%1" "%copy%" &gt;nul
+echo done
+exit /b
+</code></pre></div>
+<div class="tip">Real argument-taking macros exist — the delayed-expansion macro idiom bound with <code>^!</code> — but they are fragile and maintenance-hostile. The robust alternatives are <code>call :label</code> subroutines and variable-held labels; both are debuggable line by line, which a macro that self-escapes is not.</div>
+
+<h3 id="ch6-4" data-toc>6.4 Return values and errorlevel conventions</h3>
+<p class="topic-desc">Subroutines communicate outward two ways: through a set-after-endlocal variable on the standard one-liner, and through exit codes. Matching Windows conventions keeps your subroutines composable with <code>&amp;&amp;</code>, <code>||</code> and <code>if errorlevel</code> in the caller.</p>
+
+<h4 id="ch6-4-pattern">The full return-value pattern</h4>
+<p>Bundling the <code>endlocal &amp; set</code> trick with a <code>goto :eof</code> produces a complete function: local computing, a result smuggled across the boundary, and a controlled return. The caller reads the result from the named variable. This is how batch implements "functions with return values" without any function machinery at all.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal
+call :compute 4 5
+echo the sum is %SUM%
+endlocal &amp; exit /b 0
+
+:compute
+set /a SUM=%1+%2
+endlocal &amp; set "SUM=%SUM%"
+goto :eof
+</code></pre></div>
+<h4 id="ch6-4-conventions">Exit-code conventions</h4>
+<p>Consistent conventions make code reviewable: 0 success; 1 generic error; 2 bad or missing arguments; 3 missing prerequisites; 4+ command-specific failures, or the documented codes of tools such as <code>xcopy</code> and <code>findstr</code>. The caller's <code>if errorlevel N</code> tests read highest-first. A subroutine that can fail should return a code on every exit path — an unreachable fall-through is how a "success" silently becomes whatever integer was lying around.</p>
+<div class="codeWrap"><pre><code>@echo off
+call :deploy "%1"
+if errorlevel 4 echo fatal: deployment aborted
+exit /b %errorlevel%
+
+:deploy
+if "%1"=="" exit /b 2
+if not exist "%1" exit /b 3
+echo deploying %~nx1 ...
+exit /b 0
+</code></pre></div>
+<h4 id="ch6-4-external">Chaining calls with the standard operators</h4>
+<p>Because every subroutine honours the exit-code contract, callers can use the operators from chapter one: <code>call :step1 &amp;&amp; call :step2 || echo step failed</code>. This composes scripts exactly the way tools compose, and it is the reason disciplined batch files are legible even at a hundred lines: each <code>call :label</code> is a sentence, and its exit code is its punctuation.</p>
+<div class="codeWrap"><pre><code>@echo off
+call :step1 &amp;&amp; call :step2 &amp;&amp; echo both steps ok || echo a step failed
+exit /b %errorlevel%
+
+:step1
+dir "C:\Windows" &gt;nul
+exit /b 0
+
+:step2
+exit /b 1
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Error Handling and Robust Scripts</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 7 ▸ Error Handling and Robust Scripts</button><div class="ch-toc-list"><a href="#ch7-1">7.1 Checking errorlevel correctly</a><a href="#ch7-2">7.2 Redirecting and silencing output</a><a href="#ch7-3">7.3 Pausing, waiting and reading answers</a><a href="#ch7-4">7.4 Verification and logging</a></div></div>
+<p class="topic-desc">A robust batch script assumes every command can fail and every input is hostile. This chapter covers reading exit codes correctly (including inside loops), redirecting and silencing streams, safe user interaction, and the verification and logging patterns that make a script explain itself later.</p>
+
+<h3 id="ch7-1" data-toc>7.1 Checking errorlevel correctly</h3>
+<p class="topic-desc">Two syntaxes read exit codes — <code>if errorlevel N</code> and <code>%errorlevel%</code> — and each fails differently if misused. Knowing which applies where prevents both silent wrong-branching and the classic <code>%errorlevel%</code>-in-a-loop trap.</p>
+
+<h4 id="ch7-1-ranked">if errorlevel N tests "N or higher"</h4>
+<p><code>if errorlevel 5</code> is true for codes 5, 6, 7 and everything above. Two consequences: tests must be ordered from highest to lowest, and a specific code needs the alternative syntax. The high-first order is the one habit to internalise, because the reversed order never looks wrong in testing — the first test just swallows every branch.</p>
+<div class="codeWrap"><pre><code>@echo off
+dir "C:\no-such-folder" &gt;nul 2&gt;&amp;1
+if errorlevel 1 (
+  echo the folder does not exist
+) else (
+  echo the folder opened fine
+)
+xcopy C:\data D:\backup /e /i /y &gt;nul
+if errorlevel 5 echo a serious copy error
+if errorlevel 1 echo some files were not copied
+</code></pre></div>
+<h4 id="ch7-1-loop">Inside loops: re-evaluate every iteration</h4>
+<p><code>%errorlevel%</code> expands at parse time, so inside a <code>for</code> body or a block it freezes at the value from before the loop started. Two correct forms survive: the <code>if errorlevel</code> rank test, which re-reads at run time, and delayed expansion by assigning <code>set "code=!errorlevel!"</code> after <code>setlocal enabledelayedexpansion</code>. The suppressed-output idiom <code>cmd &gt;nul 2&gt;&amp;1</code> here uses both stdout and stderr silencing — documented next.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal enabledelayedexpansion
+set "missing=0"
+for %%f in (a.txt b.txt c.txt) do (
+  dir "%%f" &gt;nul 2&gt;&amp;1
+  if errorlevel 1 (
+    echo missing: %%f
+    set /a missing+=1
+  )
+)
+echo %missing% files were missing
+</code></pre></div>
+<h4 id="ch7-1-exact">Exact-value tests with %errorlevel%</h4>
+<p>When the code must equal one number — never mind higher ones — compare the quoted expansion: <code>if "%errorlevel%"=="1"</code>. This is the precise test that the rank form cannot express. Remember the parse-time caveat: on the same line outside a block it is fine; inside a block use <code>!errorlevel!</code> or the rank form.</p>
+<div class="codeWrap"><pre><code>@echo off
+findstr /m "panic" app.log &gt;nul
+if "%errorlevel%"=="0" (
+  echo matches found
+) else (
+  echo no matches - continuing
+)
+</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 Redirecting and silencing output</h3>
+<p class="topic-desc">Every command has three numbered streams: 0 stdin, 1 stdout, 2 stderr. Redirecting them is how a script runs quietly, keeps a transcript, and stops error text from polluting a result.</p>
+
+<h4 id="ch7-2-silence">>nul 2>&1: the complete mute</h4>
+<p><code>command &gt;nul</code> discards stdout; <code>2&gt;nul</code> discards stderr; <code>&gt;nul 2&gt;&amp;1</code> discards both — <code>2&gt;&amp;1</code> meaning "send stream 2 to wherever stream 1 currently points". Order matters: <code>2&gt;&amp;1 &gt;nul</code> first points stderr at the console output and only then discards stdout, so error text still reaches the screen. The correct order is <code>&gt;nul 2&gt;&amp;1</code>, and it is one of the most common one-character-class bugs in legacy scripts.</p>
+<div class="codeWrap"><pre><code>@echo off
+dir "C:\no-such-folder" &gt;nul 2&gt;&amp;1
+echo quieted dir returned %errorlevel%
+copy missing.txt extra.txt &gt;nul 2&gt;&amp;1
+echo quieted copy returned %errorlevel%
+</code></pre></div>
+<h4 id="ch7-2-files">Writing output into log files</h4>
+<p><code>&gt;</code> overwrites a file and <code>&gt;&gt;</code> appends; both create it if absent. A separate <code>2&gt;errors.log</code> captures only the error stream, and <code>&gt;&gt;build.log 2&gt;&amp;1</code> merges both streams into one growing log. Every embedded <code>cmd /c</code> or spawned tool writes where its own redirection says; the script's redirection only governs the streams of the command it is attached to.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo build started &gt; build.log
+msbuild project.sln &gt;&gt; build.log 2&gt;&amp;1
+echo exit code %errorlevel% &gt;&gt; build.log
+type build.log
+</code></pre></div>
+<h4 id="ch7-2-chain">Chaining steps with && and ||</h4>
+<p>The operators from chapter one support the tersest error handling: <code>step &amp;&amp; next || fallback</code> runs <code>next</code> only on success (code 0) and <code>fallback</code> only on failure. A practical pattern is a chain that logs its own failure at the end of the line, so each step's outcome is recorded with the step name. Remember the chain leaves <code>%errorlevel%</code> as the last executed command's code — the fallback's, if the failure branch ran.</p>
+<div class="codeWrap"><pre><code>@echo off
+copy app.dll deploy\ &gt;nul &amp;&amp; echo copied ok || echo copy failed
+findstr /i "error" app.log &gt;nul &amp;&amp; (echo found problems) || echo log is clean
+</code></pre></div>
+
+<h3 id="ch7-3" data-toc>7.3 Pausing, waiting and reading answers</h3>
+<p class="topic-desc">Interaction is where scripts hang or accept garbage: a prompt meant for a person should not read a file line, and a yes/no question should never accept free text.</p>
+
+<h4 id="ch7-3-pause">pause and pause >nul</h4>
+<p><code>pause</code> prints "Press any key to continue . . ." and waits for a keypress; <code>pause &gt;nul</code> waits for the keypress without the message, the form used mid-script when the prompt would be noise. Because <code>pause</code> consumes one character from stdin, a script whose stdin is a file will skip a prompt and eat a line of input instead — redirect stdin explicitly to avoid that surprise.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo Review the results above, then continue.
+pause
+echo Continuing.
+pause &gt;nul
+echo Done.
+</code></pre></div>
+<h4 id="ch7-3-timeout">timeout — delay with or without a keypress</h4>
+<p><code>timeout /t 10</code> waits ten seconds, counting down on screen, and is interruptible by a keypress; <code>timeout /t 10 /nobreak</code> ignores keys; <code>timeout /t -1</code> waits indefinitely. Its documented quirk: when stdin is redirected, <code>timeout</code> errors and returns a non-zero code — call it as <code>timeout /t 5 &gt;nul</code> in scripts to both silence the countdown and avoid the redirected-stdin failure.</p>
+<div class="codeWrap"><pre><code>@echo off
+echo waiting 5 seconds...
+timeout /t 5 /nobreak &gt;nul
+echo done waiting
+</code></pre></div>
+<h4 id="ch7-3-choice">choice — bounded key selection</h4>
+<p><code>choice /c yn /n /m "Continue?"</code> accepts only the listed keys, with <code>/n</code> hiding the list and <code>/m</code> supplying a message. The picked key's position becomes the exit code: <code>y</code> is 1, <code>n</code> is 2, and so on, read with the high-first rank test. Because the input space is bounded, <code>choice</code> cannot be fed a malicious string — the reason it is the right tool for yes/no and menus while <code>set /p</code> is for free text.</p>
+<div class="codeWrap"><pre><code>@echo off
+choice /c yn /m "Backup the database now"
+if errorlevel 2 goto :skipped
+echo running the backup...
+goto :done
+:skipped
+echo backup skipped
+:done
+</code></pre></div>
+<h4 id="ch7-3-answer">Validating set /p answers</h4>
+<p>Free-text input needs explicit validation. The pattern is: give the variable a safe default, read the answer, normalise with <code>/i</code> comparison, and treat anything unexpected as the abort path. `set /p` leaves the variable untouched on a bare Enter, so the default survives. This closes the loop chapter three opened.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "answer=no"
+set /p "answer=Type yes to continue: "
+if /i not "%answer%"=="yes" (
+  echo Aborted by the user.
+  exit /b 1
+)
+echo Proceeding...
+</code></pre></div>
+
+<h3 id="ch7-4" data-toc>7.4 Verification and logging</h3>
+<p class="topic-desc">The final layer of robustness is proving the script's own work: check prerequisites before starting, write a log that outlives the run, and verify that the bytes that should have moved really moved.</p>
+
+<h4 id="ch7-4-prereq">Checking prerequisites up front</h4>
+<p>A script fails more legibly when it validates its own guarantees before doing work: required files exist, required tools are on <code>PATH</code>, the destination is writable. Each check exits with a distinct code so a caller can branch on the exact cause rather than a generic 1. <code>where</code> in silent mode with <code>||</code> is the tool test; <code>if not exist</code> the file test.</p>
+<div class="codeWrap"><pre><code>@echo off
+if not exist "input.csv" (
+  echo input.csv is required; nothing done.
+  exit /b 2
+)
+where msbuild &gt;nul 2&gt;&amp;1 || (
+  echo msbuild is not on PATH.
+  exit /b 3
+)
+echo prerequisites satisfied
+</code></pre></div>
+<h4 id="ch7-4-stamp">Timestamped log files</h4>
+<p>Logs earn their keep when each run is distinguishable. Build a stamp from <code>%DATE%</code> and <code>%TIME%</code>; the format is locale-dependent, so the robust approach splits the date on its delimiters with <code>for /f</code>. The hour from <code>%TIME:~0,2%</code> can start with a space when the clock is single-digit — sanitise it with substitution before it reaches a file name.</p>
+<div class="codeWrap"><pre><code>@echo off
+for /f "tokens=2-4 delims=/ " %%a in ("%date%") do set "stamp=%%c%%a%%b"
+set "log=backup-%stamp%.log"
+echo === %date% %time% === &gt; "%log%"
+robocopy C:\data D:\backup /mir &gt;&gt; "%log%"
+echo finished at %time% &gt;&gt; "%log%"
+type "%log%"
+</code></pre></div>
+<h4 id="ch7-4-verify">Verifying copies and checksums</h4>
+<p><code>copy /v</code> verifies every byte it writes; on a flaky disk it is the difference between detecting a bad sector and shipping a corrupt artifact. For absolute certainty, <code>certutil -hashfile file SHA256</code> prints the hash, and <code>fc</code> compares two files line by line, returning 0 when identical. Backups and deployed binaries deserve at least one of these; the gold standard is hash-before and hash-after.</p>
+<div class="codeWrap"><pre><code>@echo off
+copy /v app.exe deploy\app.exe
+certutil -hashfile app.exe SHA256
+fc app.exe deploy\app.exe &gt;nul
+if errorlevel 1 echo deploy copy differs from source
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch8" data-toc>8 ▸ Automation and Administration</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 8 ▸ Automation and Administration</button><div class="ch-toc-list"><a href="#ch8-1">8.1 Scheduled tasks with schtasks</a><a href="#ch8-2">8.2 Persisting environment variables with setx</a><a href="#ch8-3">8.3 Starting programs with start</a><a href="#ch8-4">8.4 Utility scripts worth keeping</a></div></div>
+<p class="topic-desc">The payoff chapter: batch's administrative superpowers. Scheduled tasks run scripts without a user at the keyboard, <code>setx</code> and <code>reg</code> persist configuration machine-wide, <code>start</code> launches applications, and four utility scripts show the patterns from the whole guide assembled into real tools.</p>
+
+<h3 id="ch8-1" data-toc>8.1 Scheduled tasks with schtasks</h3>
+<p class="topic-desc"><code>schtasks.exe</code> is the Task Scheduler's command-line face. It creates, queries, runs and deletes scheduled tasks — the way batch scripts run on their own long after the console is gone.</p>
+
+<h4 id="ch8-1-create">Creating a task</h4>
+<p><code>schtasks /create /tn name /tr command /sc trigger /st time /f</code> is the minimal form: task name, the command line to run — which should almost always be a batch file rather than a bare EXE when more than one step is needed — the schedule (<code>daily</code>, <code>weekly</code> with <code>/d MON</code>, <code>onlogon</code>, <code>onstart</code>, <code>hourly</code>) and the start time. <code>/f</code> overwrites an existing task of the same name; without it, creating over an existing task errors. The <code>/tr</code> command's executable needs a full path; Task Scheduler does not resolve <code>PATH</code> the way a console does.</p>
+<div class="codeWrap"><pre><code>schtasks /create /tn "BackupData" /tr "C:\scripts\backup.cmd" /sc daily /st 02:30 /f
+schtasks /create /tn "Report" /tr "C:\scripts\report.cmd" /sc weekly /d MON /st 09:00 /f
+schtasks /create /tn "OnLogonScan" /tr "C:\scripts\scan.cmd" /sc onlogon /f
+</code></pre></div>
+<h4 id="ch8-1-manage">Querying, running, changing and deleting</h4>
+<p>Operational verbs share the shape: <code>/query /tn name</code> prints the task's schedule and state; <code>/run /tn name</code> starts it immediately; <code>/end /tn name</code> stops a running instance; <code>/change /tn name /st 03:00</code> edits a field in place; <code>/delete /tn name /f</code> removes it. <code>/query /tn name /v /fo LIST</code> gives the verbose per-field listing. A task that errors leaves a <code>%errorlevel%</code> worth checking in the calling script: 0 for success, non-zero for an access or name problem.</p>
+<div class="codeWrap"><pre><code>@echo off
+schtasks /query /tn BackupData /v /fo LIST
+schtasks /run /tn BackupData
+if errorlevel 1 echo failed to start the task
+schtasks /change /tn BackupData /st 03:00
+schtasks /delete /tn Report /f
+</code></pre></div>
+<h4 id="ch8-1-system">Rights and the SYSTEM account</h4>
+<p>Creating or changing tasks for other users, and any machine-wide task, requires an elevated console. A non-elevated <code>schtasks /create</code> fails with error 5 (access is denied) — the first thing to check when a task silently never appears. <code>/ru SYSTEM</code> runs the task as the local system account, which has no interactive desktop session — the <code>pause</code>-at-the-end habit from chapter one hangs such a task forever. Give service-scheduled scripts a log file instead of prompts, and give them their own working directory via a <code>pushd "%~dp0"</code> first line.</p>
+<div class="codeWrap"><pre><code>schtasks /create /tn "CleanTmp" /tr "C:\scripts\clean.cmd" /sc daily /st 04:00 /ru SYSTEM /f
+schtasks /query /tn CleanTmp | findstr /i "Status"
+</code></pre></div>
+<div class="warn">A scheduled task runs with the environment of the Task Scheduler service, not the interactive user's. Its <code>PATH</code> is shorter and its <code>%USERPROFILE%</code> is the system profile. Use absolute paths throughout the <code>/tr</code> script and <code>setx</code>-persisted variables (next section) rather than assuming anything inherits.</div>
+
+<h3 id="ch8-2" data-toc>8.2 Persisting environment variables with setx</h3>
+<p class="topic-desc">Environment variables set with <code>set</code> vanish with the window. <code>setx</code> writes them into the registry so every future process sees them — the difference between today's quick fix and a durable configuration.</p>
+
+<h4 id="ch8-2-setx">setx basics and its limits</h4>
+<p><code>setx NAME value</code> stores a user-level variable (under <code>HKCU\Environment</code>) for future processes; <code>setx NAME value /m</code> stores it machine-wide under <code>HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment</code> and needs elevation. Three limits matter: <code>setx</code> does not change the current window — only processes started afterwards see the new value; the stored value is truncated at 1024 characters; and values with spaces must be quoted on the command line but stored without quotes.</p>
+<div class="codeWrap"><pre><code>setx APP_ENV production
+setx APP_ENV production /m
+setx "BUILD_ROOT=C:\build tools"
+</code></pre></div>
+<h4 id="ch8-2-path">Editing PATH without destroying it</h4>
+<p>The famous footgun: <code>setx PATH "%PATH%;C:\new"</code> takes the current merged <code>%PATH%</code> — system and user parts combined — and writes the whole merged string into the user variable, cloning every system entry into the user hive. Do it twice and entries duplicate. The safer pattern appends only after checking the target is not already present, and prefers <code>reg add</code> against the user key, or the modern <code>setx /k</code> source-from-registry flag where available.</p>
+<div class="codeWrap"><pre><code>@echo off
+set "tool=C:\tools"
+echo %PATH% | findstr /i /c:"%tool%" &gt;nul &amp;&amp; echo already on PATH || setx PATH "%PATH%;%tool%"
+</code></pre></div>
+<h4 id="ch8-2-registry">Reading configuration with reg</h4>
+<p><code>reg query "HKCU\Console" /v FontSize</code> prints a registry value in the console; <code>reg add "HKLM\Software\MyApp" /v Mode /t REG_SZ /d auto /f</code> writes one (machine keys need elevation). Dragging a value into a variable needs <code>for /f</code>, iterating the query output lines. Registry access is case-insensitive, and both <code>reg</code> verbs return meaningful errorlevels — 1 for "not found" is the branch a script should consume.</p>
+<div class="codeWrap"><pre><code>@echo off
+reg query "HKCU\Console" /v FontSize
+reg add "HKCU\Console" /v FontSize /t REG_DWORD /d 0x00100000 /f
+for /f "tokens=3" %%v in ('reg query "HKCU\Environment" /v APP_ENV 2^&gt;nul ^| findstr /i APP_ENV') do set "APP_ENV=%%v"
+echo APP_ENV is "%APP_ENV%"
+</code></pre></div>
+
+<h3 id="ch8-3" data-toc>8.3 Starting programs with start</h3>
+<p class="topic-desc">Launching an application, a document or a second console from a script is the domain of <code>start</code>. Its quoting rules are the subtle part — a path is not a title, and a title is not a path.</p>
+
+<h4 id="ch8-3-start">start: detach, wait or run inline</h4>
+<p><code>start</code> launches a program and returns immediately; <code>/wait</code> makes the script pause until the child exits — essential for "install then continue" semantics; <code>/b</code> runs the child in the same console without a new window. The first quoted argument is a TITLE, so launching a quoted path requires an explicit empty title: <code>start "" "C:\Program Files\app.exe"</code>. Without the empty pair, the path is consumed as the title and the command silently does nothing. This is the single most common <code>start</code> bug in real scripts.</p>
+<div class="codeWrap"><pre><code>@echo off
+start "" notepad.exe readme.txt
+start /wait "" setup.exe /S
+start /b "" server.exe
+start "" "C:\Program Files\MyApp\app.exe"
+</code></pre></div>
+<h4 id="ch8-3-assoc">Opening by association: assoc and ftype</h4>
+<p><code>start "" report.html</code> opens the file with its registered application — the default browser for HTML, the default editor for text. <code>assoc .html</code> reports the file-type key a registered extension maps to, and <code>ftype htmlfile</code> reports the command template that key runs; both take modifiers, so <code>assoc</code> alone lists every mapping. Opening a document by association is the polite way for an installer to show its help without hard-coding a browser path.</p>
+<div class="codeWrap"><pre><code>@echo off
+assoc .html
+ftype htmlfile
+start "" report.html
+</code></pre></div>
+<h4 id="ch8-3-env">Environment and working directory for the child</h4>
+<p>A child process inherits the script's environment and its current directory. Two consequences: set environment variables before <code>start</code> to configure the child (a server's <code>PORT</code>, a build's <code>CONFIGURATION</code>), and set the working directory with <code>pushd</code> if the child resolves relative paths — a Web server that cannot find its <code>index.html</code> is usually a directories problem, not a code problem. Pair every <code>pushd</code> with the matching <code>popd</code>.</p>
+<div class="codeWrap"><pre><code>@echo off
+pushd "C:\apps\web"
+set "PORT=8080"
+start /wait "" node server.js
+popd
+</code></pre></div>
+
+<h3 id="ch8-4" data-toc>8.4 Utility scripts worth keeping</h3>
+<p class="topic-desc">Four complete scripts tie the guide together. Each is written to run unattended, from a scheduled task or a double-click, and each shows a different combination of the patterns from chapters one through eight.</p>
+
+<h4 id="ch8-4-backup">Timestamped mirror backup</h4>
+<p>Robocopy mirrors the source into a dated folder and logs every run. The exit-code test below is the one from chapter seven's warning: <code>if errorlevel 8</code> catches only genuine failures, because robocopy's 1–7 are success. The log path is built with the stamp technique, so no two runs overwrite each other.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal
+set "src=C:\Projects\myapp"
+set "dst=D:\Backup\myapp"
+robocopy "%src%" "%dst%" /mir /r:2 /w:1 /log:backup.log
+if errorlevel 8 (
+  echo FATAL: backup failed with code %errorlevel%
+  endlocal
+  exit /b 1
+)
+echo backup finished ok
+endlocal
+</code></pre></div>
+<h4 id="ch8-4-forfiles">Retention cleanup with forfiles</h4>
+<p>Deleting logs older than <em>n</em> days is a two-line job with <code>forfiles</code>: <code>/d -30</code> selects files modified more than 30 days ago, and the <code>/c</code> command deletes each matched <code>@path</code>. The <code>/s</code> flag recurses. This is the classic scheduled-task body: silent, idempotent, and safe because the mask scopes it to one name pattern.</p>
+<div class="codeWrap"><pre><code>@echo off
+forfiles /p "C:\Logs" /s /m *.log /d -30 /c "cmd /c del /q @path"
+echo retention cleanup finished
+</code></pre></div>
+<h4 id="ch8-4-pipeline">Build, test and deploy in one file</h4>
+<p>A miniature pipeline proves the patterns compose: <code>cd /d</code> to the source with a <code>||</code> guard, build into a log, branch on the result, copy the artifact out, and report a timestamped outcome. The variable <code>%errorlevel%</code> used here on the final line of a block-free script is safe under the chapter-seven rule; inside the block the rank-form <code>if errorlevel</code> is doing the work instead.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal
+set "src=C:\src\myapp"
+cd /d "%src%" || (echo source folder missing &amp; exit /b 2)
+msbuild myapp.sln /p:Configuration=Release /v:m &gt; build.log 2&gt;&amp;1
+if errorlevel 1 (
+  type build.log
+  endlocal
+  exit /b 1
+)
+xcopy "%src%\bin\Release\*.*" "\\deploy\apps\myapp" /e /i /y &gt;nul
+echo deployed at %date% %time%
+endlocal &amp; exit /b 0
+</code></pre></div>
+<h4 id="ch8-4-skeleton">The robust skeleton, complete</h4>
+<p>Every professional batch file starts from one shape: <code>@echo off</code>, extensions and delayed expansion on, an immediate <code>cd /d "%~dp0"</code> so paths are relative to the script itself no matter where it is launched from, a started-log line, the work, and a single <code>endlocal &amp; exit /b %errorlevel%</code> exit. Because <code>%errorlevel%</code> is expanded before <code>endlocal</code> restores the environment — chapter six's rule — the script exits with the true code of its last real action.</p>
+<div class="codeWrap"><pre><code>@echo off
+setlocal EnableExtensions EnableDelayedExpansion
+cd /d "%~dp0"
+echo [%date% %time%] script started &gt;&gt; "%~dp0run.log"
+rem --- the work, with each step guarded ---
+call :do_work
+echo [%date% %time%] script finished with %errorlevel% &gt;&gt; "%~dp0run.log"
+endlocal &amp; exit /b %errorlevel%
+
+:do_work
+echo working...
+exit /b 0
+</code></pre></div>
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Batch Scripting.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

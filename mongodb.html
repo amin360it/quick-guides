@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MongoDB - Document Database Guide</title>
+<meta name="description" content="This guide teaches MongoDB from the ground up, starting with a single document and ending with sharded…. 13 chapters, 76 topics and 48 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/mongodb.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="MongoDB - Document Database Guide">
+<meta property="og:description" content="This guide teaches MongoDB from the ground up, starting with a single document and ending with sharded…. 13 chapters, 76 topics and 48 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/mongodb.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="MongoDB - Document Database Guide">
+<meta name="twitter:description" content="This guide teaches MongoDB from the ground up, starting with a single document and ending with sharded…. 13 chapters, 76 topics and 48 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/mongodb.html#article","headline":"MongoDB - Document Database Guide","name":"MongoDB - Document Database Guide","description":"This guide teaches MongoDB from the ground up, starting with a single document and ending with sharded…. 13 chapters, 76 topics and 48 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/mongodb.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/mongodb.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"MongoDB - Document Database Guide","item":"https://amin360it.github.io/quick-guides/mongodb.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">MongoDB</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This MongoDB Guide</a><ul><li><a href="#orientation-organised" data-target="orientation-organised">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use all course long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · MongoDB Fundamentals &amp; Setup</a><ul><li><a href="#ch1-model" data-target="ch1-model">1.1 The document model vs the relational model</a></li><li><a href="#ch1-collections" data-target="ch1-collections">1.2 Databases and collections</a></li><li><a href="#ch1-install" data-target="ch1-install">1.3 Running MongoDB locally and on Atlas</a></li><li><a href="#ch1-mongosh" data-target="ch1-mongosh">1.4 mongosh basics</a></li><li><a href="#ch1-crudtour" data-target="ch1-crudtour">1.5 A CRUD-first tour</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Documents &amp; BSON Types</a><ul><li><a href="#ch2-bson" data-target="ch2-bson">2.1 From JSON to BSON</a></li><li><a href="#ch2-id" data-target="ch2-id">2.2 _id and ObjectId</a></li><li><a href="#ch2-embed" data-target="ch2-embed">2.3 Embedded documents vs references</a></li><li><a href="#ch2-arrays" data-target="ch2-arrays">2.4 Arrays and dates</a></li><li><a href="#ch2-limits" data-target="ch2-limits">2.5 Type coercion, flexible schema and limits</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · CRUD Operations</a><ul><li><a href="#ch3-insert" data-target="ch3-insert">3.1 Inserting documents</a></li><li><a href="#ch3-find" data-target="ch3-find">3.2 Reading documents with find</a></li><li><a href="#ch3-update" data-target="ch3-update">3.3 Updating with $set, $inc, $push and $pull</a></li><li><a href="#ch3-replace" data-target="ch3-replace">3.4 replaceOne, upserts and deletes</a></li><li><a href="#ch3-bulk" data-target="ch3-bulk">3.5 bulkWrite and findOneAndUpdate</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Querying &amp; Projection</a><ul><li><a href="#ch4-comparison" data-target="ch4-comparison">4.1 Comparison and logical operators</a></li><li><a href="#ch4-exists" data-target="ch4-exists">4.2 Membership, existence and type</a></li><li><a href="#ch4-dot" data-target="ch4-dot">4.3 Dot notation for embedded fields</a></li><li><a href="#ch4-array" data-target="ch4-array">4.4 Array queries: $elemMatch, $size, $all</a></li><li><a href="#ch4-regex" data-target="ch4-regex">4.5 Regex, paging and projections</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Indexing &amp; Performance</a><ul><li><a href="#ch5-why" data-target="ch5-why">5.1 How indexes work and the _id index</a></li><li><a href="#ch5-create" data-target="ch5-create">5.2 Creating single-field indexes</a></li><li><a href="#ch5-compound" data-target="ch5-compound">5.3 Compound indexes</a></li><li><a href="#ch5-variants" data-target="ch5-variants">5.4 Unique, sparse, partial and TTL indexes</a></li><li><a href="#ch5-strategy" data-target="ch5-strategy">5.5 Covered queries and an index strategy</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Aggregation Framework</a><ul><li><a href="#ch6-pipeline" data-target="ch6-pipeline">6.1 Pipelines, $match and $sort</a></li><li><a href="#ch6-group" data-target="ch6-group">6.2 $group and accumulators</a></li><li><a href="#ch6-project" data-target="ch6-project">6.3 $project and $addFields</a></li><li><a href="#ch6-unwind" data-target="ch6-unwind">6.4 $unwind and array reshaping</a></li><li><a href="#ch6-lookup" data-target="ch6-lookup">6.5 $lookup, $facet and $bucket</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Schema Design &amp; Data Modeling</a><ul><li><a href="#ch7-embedref" data-target="ch7-embedref">7.1 Embedding vs referencing</a></li><li><a href="#ch7-onetomany" data-target="ch7-onetomany">7.2 One-to-many patterns</a></li><li><a href="#ch7-normalise" data-target="ch7-normalise">7.3 Normalisation vs denormalisation</a></li><li><a href="#ch7-validate" data-target="ch7-validate">7.4 Schema validation with $jsonSchema</a></li><li><a href="#ch7-patterns" data-target="ch7-patterns">7.5 Polymorphic and bucket patterns</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Transactions &amp; Consistency</a><ul><li><a href="#ch8-single" data-target="ch8-single">8.1 Single-document atomicity</a></li><li><a href="#ch8-multi" data-target="ch8-multi">8.2 Multi-document transactions</a></li><li><a href="#ch8-sessions" data-target="ch8-sessions">8.3 Sessions and retryable writes</a></li><li><a href="#ch8-concerns" data-target="ch8-concerns">8.4 Read and write concerns</a></li><li><a href="#ch8-preference" data-target="ch8-preference">8.5 Read preference and causal consistency</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Replication &amp; Sharding</a><ul><li><a href="#ch9-replset" data-target="ch9-replset">9.1 Replica sets</a></li><li><a href="#ch9-failover" data-target="ch9-failover">9.2 Failover and the oplog</a></li><li><a href="#ch9-shardkey" data-target="ch9-shardkey">9.3 Shard keys, chunks and the balancer</a></li><li><a href="#ch9-when" data-target="ch9-when">9.4 When to shard</a></li><li><a href="#ch9-atlas" data-target="ch9-atlas">9.5 Atlas managed clusters</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · MongoDB with Node &amp; Mongoose</a><ul><li><a href="#ch10-driver" data-target="ch10-driver">10.1 The Node driver basics</a></li><li><a href="#ch10-pooling" data-target="ch10-pooling">10.2 Connection pooling</a></li><li><a href="#ch10-mongoose" data-target="ch10-mongoose">10.3 Mongoose schemas and models</a></li><li><a href="#ch10-validation" data-target="ch10-validation">10.4 Validation and middleware</a></li><li><a href="#ch10-populate" data-target="ch10-populate">10.5 Population</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · Security &amp; Operations</a><ul><li><a href="#ch11-auth" data-target="ch11-auth">11.1 Authentication and RBAC</a></li><li><a href="#ch11-tls" data-target="ch11-tls">11.2 TLS and network exposure</a></li><li><a href="#ch11-backups" data-target="ch11-backups">11.3 Backups</a></li><li><a href="#ch11-monitoring" data-target="ch11-monitoring">11.4 Monitoring</a></li><li><a href="#ch11-checklist" data-target="ch11-checklist">11.5 The performance tuning checklist</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Quick Reference &amp; Glossary</a><ul><li><a href="#app-crud" data-target="app-crud">A.1 CRUD method cheat sheet</a></li><li><a href="#app-operators" data-target="app-operators">A.2 Query and update operator reference</a></li><li><a href="#app-stages" data-target="app-stages">A.3 Aggregation stage reference</a></li><li><a href="#app-indexes" data-target="app-indexes">A.4 Index types at a glance</a></li><li><a href="#app-glossary" data-target="app-glossary">A.5 Glossary</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">MongoDB</span>
+      <span class="am-band-s">13 chapters &middot; 76 topics &middot; 48 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This MongoDB Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This MongoDB Guide</button><div class="ch-toc-list"><a href="#orientation-organised">How this guide is organised</a><a href="#orientation-mindset">The right mindset</a><a href="#orientation-tools">Tools you will use all course long</a></div></div>
+    <p class="topic-desc">This guide teaches MongoDB from the ground up, starting with a single document and ending with sharded clusters and Node.js applications, all readable offline. Work through the twelve chapters in order and run each mongosh command yourself so the syntax becomes automatic. Every chapter builds on the previous one, so typing the code reinforces each concept before you move on.</p>
+    <p>This is a complete, self-paced path through <strong>MongoDB</strong>, from your first document to production operations and Mongoose applications. Everything runs in a single HTML file — no internet required, progress is saved in your browser.</p>
+    <h3 id="orientation-organised" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">The guide is split into three parts: fundamentals, advanced database features, and application development with Node.js. Every chapter opens by naming what you will achieve, then leads you through short worked examples in mongosh. Each chapter ends with copy-ready code blocks that you should retype yourself to build muscle memory.</p>
+    <ul>
+      <li><strong>Part I (Ch. 1–6)</strong> — foundations: the document model, BSON, CRUD, queries, indexes and the aggregation framework.</li>
+      <li><strong>Part II (Ch. 7–9)</strong> — design and scale: schema design, transactions, replication and sharding.</li>
+      <li><strong>Part III (Ch. 10–11)</strong> — applications and operations: MongoDB with Node and Mongoose, security, backups and monitoring.</li>
+      <li>Every chapter ends with exercises. Code is copy-ready; type it rather than pasting to build muscle memory.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset</h3>
+    <p class="topic-desc">The core idea is to model your data for how you will query it, not for how relational tables are numbered. Before choosing embedding or referencing, ask what reads your application performs most often. This query-first thinking drives every schema decision in the rest of the guide.</p>
+    <p>MongoDB rewards thinking in <em>documents</em>, not tables. You design the shape of a document around the queries your application actually runs, then verify with <code>explain()</code> and indexes. Learn to ask "what does a page in my app need?" before you model anything.</p>
+    <div class="tip"><p>Keep the official docs open beside this guide at <code>mongodb.com/docs</code>. This guide explains the why and the sequence; the docs are the exhaustive reference.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will use all course long</h3>
+    <p class="topic-desc">You will rely on the MongoDB Shell (mongosh) for interactive learning, MongoDB Compass for visual inspection, and MongoDB Atlas for a hosted cluster. Install them once at the start and they carry you through every chapter. The guide shows you exactly when and how each tool is used.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>mongosh</td><td>The modern MongoDB shell (JavaScript playground for the database)</td></tr>
+      <tr><td>mongod</td><td>The MongoDB server daemon you run locally</td></tr>
+      <tr><td>MongoDB Compass</td><td>GUI for inspecting documents, building queries and visualising indexes</td></tr>
+      <tr><td>MongoDB Atlas</td><td>Fully managed clusters in the cloud (free tier available)</td></tr>
+      <tr><td>Node.js + <code>mongodb</code> driver / Mongoose</td><td>Building applications and ODM layers on top of MongoDB</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · MongoDB Fundamentals &amp; Setup</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · MongoDB Fundamentals &amp; Setup</button><div class="ch-toc-list"><a href="#ch1-model">1.1 The document model vs the relational model</a><a href="#ch1-collections">1.2 Databases and collections</a><a href="#ch1-install">1.3 Running MongoDB locally and on Atlas</a><a href="#ch1-mongosh">1.4 mongosh basics</a><a href="#ch1-crudtour">1.5 A CRUD-first tour</a></div></div>
+    <p class="topic-desc">This chapter gets MongoDB running on your machine and introduces the document model, databases, collections, and a first CRUD tour. You install mongod locally or create an Atlas cluster, then connect with mongosh. By the end you have live documents in a working database and can insert and read data yourself.</p>
+    <p>MongoDB is a <strong>document database</strong>: data lives in JSON-like documents inside collections instead of rigid table rows. This chapter gets a server running, explains where the model differs from SQL, and walks your first CRUD operations.</p>
+    <h3 id="ch1-model" data-toc>1.1 The document model vs the relational model</h3>
+    <p class="topic-desc">Documents map closely to the objects your application already works with, while relational tables split data across rows and foreign keys. The comparison shows why embedding related fields is natural and where joins used to come from. Understanding this trade-off explains almost every later design decision in the guide.</p>
+    <table>
+      <tr><th>Relational (SQL)</th><th>Document (MongoDB)</th></tr>
+      <tr><td>A fixed table schema with columns</td><td>Flexible documents; each can vary in fields</td></tr>
+      <tr><td>Rows joined across tables via foreign keys</td><td>Related data embedded in, or referenced from, one document</td></tr>
+      <tr><td>Schema changes need migrations</td><td>New fields are just new fields in new documents</td></tr>
+      <tr><td>Transactions span tables</td><td>Operations are atomic per document; multi-doc transactions exist too</td></tr>
+      <tr><td>Normalised by default</td><td>Model data for the queries you run</td></tr>
+    </table>
+    <p>Relational databases normalise to avoid redundancy; document databases <em>shape</em> data to match application reads, accepting some duplication as the price of fast, simple queries.</p>
+    <h3 id="ch1-collections" data-toc>1.2 Databases and collections</h3>
+    <p class="topic-desc">A database is the top-level container and holds one or more collections, and each collection stores many similar documents. You create them implicitly by inserting, since neither exists until data arrives. The naming and sizing rules here shape how you organise everything that follows.</p>
+    <div class="codeWrap"><pre><code>mongosh                        # connect to mongodb://localhost:27017
+use shop                       # select the shop database (created lazily)
+db.getName()                   // -&gt; shop
+show dbs                       # only non-empty databases appear
+show collections               # collections in the current database
+```
+Not valid: this is a comment; run the real commands in mongosh.</code></pre></div>
+    <p class="code-note">mongosh connects to the local server, use switches or lazily creates a database, and nothing appears in show dbs until it holds data.</p>
+    <div class="tip"><p>Nothing is physically created until you write your first document. MongoDB creates databases and collections lazily on first insert.</p></div>
+    <h3 id="ch1-install" data-toc>1.3 Running MongoDB locally and on Atlas</h3>
+    <p class="topic-desc">You can run MongoDB locally with the mongod server binary or use the hosted MongoDB Atlas service. Locally you start mongod and connect to mongodb://localhost:27017 with mongosh. On Atlas you create a cluster, whitelist your IP, and use the generated connection string, so you finish with a working connection either way.</p>
+    <div class="codeWrap"><pre><code># Local install on macOS with Homebrew
+brew tap mongodb/brew
+brew install mongodb-community@8.0
+
+# Start MongoDB as a background service
+brew services start mongodb-community@8.0
+
+# Or run mongod directly with an explicit data path
+mongod --dbpath /data/db --bind_ip 127.0.0.1</code></pre></div>
+    <p class="code-note">The package manager installs mongod, brew services keeps it running in the background, and mongod --dbpath lets you run a server manually pointing at a data directory.</p>
+    <div class="codeWrap"><pre><code># Altas: create a free cluster, then paste its connection string into mongosh
+mongosh "mongodb+srv://alice:PASSWORD@cluster0.example.mongodb.net/shop?retryWrites=true"</code></pre></div>
+    <p class="code-note">Atlas hands you a connection string with the srv prefix that mongosh or your driver uses to reach the hosted cluster over TLS.</p>
+    <h3 id="ch1-mongosh" data-toc>1.4 mongosh basics</h3>
+    <p class="topic-desc">mongosh is the interactive JavaScript shell for MongoDB, and this lesson covers its most useful built-in helpers. You will use show dbs, show collections, db, and use, plus help to inspect the current state. Learning to drive the shell is learning to drive MongoDB itself.</p>
+    <div class="codeWrap"><pre><code>help                       # built-in summary of shell commands
+db.help()                  # methods available on a database object
+db.products.help()         # methods on a collection
+show users                 # users in the current database
+db.stats()                 # sizes and counts for the current database</code></pre></div>
+    <p class="code-note">These helpers summarise everything the shell can do and report current database state, so they are the natural starting point when you are stuck.</p>
+    <h3 id="ch1-crudtour" data-toc>1.5 A CRUD-first tour</h3>
+    <p class="topic-desc">This tour runs each CRUD operation once in sequence: insertOne, find, updateOne, and deleteOne. You see how a filter selects documents and how each verb transforms the collection. This is the exact shape the next two chapters expand into full detail.</p>
+    <div class="codeWrap"><pre><code>db.products.insertOne({ name: 'Notebook', price: 4, tags: ['office', 'paper'] })
+db.products.find({})                       # read: every product in the collection
+db.products.updateOne(
+  { name: 'Notebook' },
+  { $inc: { price: 1 } }                   # update: raise the price by 1
+)
+db.products.deleteOne({ name: 'Notebook' })   # delete: remove exactly one match
+db.products.countDocuments({})             # how many rows remain</code></pre></div>
+    <p class="code-note">This tour shows the four verbs: insertOne, find, updateOne with an update operator, and deleteOne — the pattern you will repeat in every MongoDB application.</p>
+    <div class="ex"><h4 id="ch1-crudtour--exercises-1">Exercises 1</h4><ol>
+      <li>Install MongoDB locally (or create a free Atlas cluster) and connect with mongosh.</li>
+      <li>Run a full CRUD sequence on a <code>movies</code> collection of your own.</li>
+      <li>Use <code>db.stats()</code> and <code>show collections</code> to confirm what you created.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Documents &amp; BSON Types</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Documents &amp; BSON Types</button><div class="ch-toc-list"><a href="#ch2-bson">2.1 From JSON to BSON</a><a href="#ch2-id">2.2 _id and ObjectId</a><a href="#ch2-embed">2.3 Embedded documents vs references</a><a href="#ch2-arrays">2.4 Arrays and dates</a><a href="#ch2-limits">2.5 Type coercion, flexible schema and limits</a></div></div>
+    <p class="topic-desc">This chapter explains how documents are physically stored as BSON, the special role of the _id field and ObjectId, and how to embed data inside documents. Everything you type in JSON later becomes typed BSON values on disk. This is the vocabulary every query in the rest of the guide is written in.</p>
+    <p>Every document is BSON: a binary form of JSON with extra native types — dates, ObjectIds, and numbers. This chapter explains those types, the mandatory <code>_id</code> field, and how embedded subdocuments and arrays are represented.</p>
+    <h3 id="ch2-bson" data-toc>2.1 From JSON to BSON</h3>
+    <p class="topic-desc">BSON is the binary-encoded JSON format MongoDB stores documents in, adding features plain JSON cannot express. It supplies typed values such as 32-bit and 64-bit integers, doubles, dates, and ObjectId. Knowing how the shell renders these types helps you interpret query results accurately.</p>
+    <table>
+      <tr><th>JSON type</th><th>BSON adds</th><th>Example</th></tr>
+      <tr><td>string</td><td>—</td><td><code>"Ada"</code></td></tr>
+      <tr><td>number</td><td>int (32-bit), long (64-bit), double</td><td><code>42</code>, <code>NumberLong("9000000000")</code></td></tr>
+      <tr><td>—</td><td>date</td><td><code>new Date("2026-09-18T12:00:00Z")</code></td></tr>
+      <tr><td>—</td><td>ObjectId</td><td><code>ObjectId("6650e3c9f1a2b3c4d5e6f708")</code></td></tr>
+      <tr><td>object</td><td>embedded subdocuments</td><td><code>{ address: { city: "London" } }</code></td></tr>
+      <tr><td>array</td><td>—</td><td><code>[1, 2, 3]</code></td></tr>
+      <tr><td>—</td><td>binary / regex / decimal128 / UUID</td><td><code>BinData(0, "...")</code></td></tr>
+    </table>
+    <p>The shell hides most of this, but knowing the underlying types explains why a number queried as an integer does not match a stored double.</p>
+    <h3 id="ch2-id" data-toc>2.2 _id and ObjectId</h3>
+    <p class="topic-desc">Every document must have an _id field, which is automatically generated as an ObjectId when you insert. The ObjectId is a 12-byte value combining a timestamp, machine identifier, process id, and counter, so it is unique without coordination. You should treat _id as immutable and index it, since MongoDB already maintains a unique index on it.</p>
+    <div class="codeWrap"><pre><code>db.users.insertOne({ name: 'Ada' })          // Mongo adds _id: ObjectId(...) for you
+const u = db.users.findOne({ name: 'Ada' })
+u._id instanceof ObjectId                    // true
+u._id.getTimestamp()                         // when the ObjectId was generated
+u._id.toString()                             // the well-known 24-hex-digit string
+// You may supply your own _id: a string, number, or anything immutable
+db.users.insertOne({ _id: 'u-42', name: 'Lin' })</code></pre></div>
+    <p class="code-note">If you omit _id, MongoDB generates an ObjectId that embeds a timestamp and machine identifier, making it roughly sortable by creation time; you can also supply your own unique _id.</p>
+    <div class="warn"><p>Never change <code>_id</code> once a document exists. MongoDB indexes it and treats it as immutable; "renaming" a document means a new insert plus a delete.</p></div>
+    <h3 id="ch2-embed" data-toc>2.3 Embedded documents vs references</h3>
+    <p class="topic-desc">You represent related data either by embedding subdocuments or arrays inside a document or by storing a reference to another document’s _id. Embedded data is read in a single round trip and keeps related fields together. References keep related data separate and require either the aggregation $lookup stage or a second query to join.</p>
+    <div class="codeWrap"><pre><code>// Embedded: order lines live inside the order document
+db.orders.insertOne({
+  _id: ObjectId(),
+  status: 'placed',
+  items: [
+    { sku: 'nbk-100', qty: 2, price: 4 },
+    { sku: 'pen-200', qty: 5, price: 1.5 }
+  ]
+})
+
+// Referenced: the customer lives in its own collection, pointed to by ObjectId
+db.orders.insertOne({ customerId: ObjectId('6650e3c9f1a2b3c4d5e6f708'), total: 15.5 })</code></pre></div>
+    <p class="code-note">The first order embeds its line items so one read returns the whole order, while the second references a customer so it must be resolved with an extra lookup.</p>
+    <h3 id="ch2-arrays" data-toc>2.4 Arrays and dates</h3>
+    <p class="topic-desc">Arrays store list-shaped fields naturally, and BSON dates are Date objects that sort and range-query correctly. You can push into arrays with $push and query them with $in, $all, and $elemMatch. These two types cover most of the "list of things" data real documents need.</p>
+    <div class="codeWrap"><pre><code>db.events.insertOne({
+  title: 'Release party',
+  startsAt: new Date('2026-06-01T20:00:00Z'),   // stored as ms since the Unix epoch
+  attendees: ['ada', 'linus', 'grace']
+})
+
+db.events.updateOne(
+  { title: 'Release party' },
+  { $push: { attendees: 'alonzo' } }           // append one value to the array
+)
+
+db.events.find({ startsAt: { $lt: new Date() } })   // events already started</code></pre></div>
+    <p class="code-note">Arrays store repeating values and get $push/$pull operators, while BSON dates sort and compare like numbers — perfect for range queries.</p>
+    <h3 id="ch2-limits" data-toc>2.5 Type coercion, flexible schema and limits</h3>
+    <p class="topic-desc">Documents are capped at 16 megabytes, field names count toward the size, and the order of fields is preserved as stored. Flexible schema still demands discipline because type coercion can silently change a number to a string. These practical constraints guide how you name fields and choose data types.</p>
+    <div class="codeWrap"><pre><code>db.runCommand({ collStats: 'users' })       // size, avgObjSize, and index stats
+db.users.find({ age: 25 })                  // matches 25 but NOT NumberLong(25) or "25"
+// Because types matter, normalise how your app writes numbers.</code></pre></div>
+    <p class="code-note">collStats reports storage facts, and the find example shows why type coercion rules matter: an int 25, a long 25, and the string "25" are three different values.</p>
+    <div class="tip"><p>Each document is capped at 16 MB and a field name repeats in every document, so short field names shrink the collection. Discipline comes from your application layer or schema validation.</p></div>
+    <div class="ex"><h4 id="ch2-limits--exercises-2">Exercises 2</h4><ol>
+      <li>Insert a document without a supplied <code>_id</code> and inspect the generated ObjectId’s timestamp.</li>
+      <li>Model a blog post with embedded comments, then one with referenced author.</li>
+      <li>Verify that <code>find({ age: 25 })</code> misses a document whose age was stored as <code>NumberLong(25)</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · CRUD Operations</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · CRUD Operations</button><div class="ch-toc-list"><a href="#ch3-insert">3.1 Inserting documents</a><a href="#ch3-find">3.2 Reading documents with find</a><a href="#ch3-update">3.3 Updating with $set, $inc, $push and $pull</a><a href="#ch3-replace">3.4 replaceOne, upserts and deletes</a><a href="#ch3-bulk">3.5 bulkWrite and findOneAndUpdate</a></div></div>
+    <p class="topic-desc">This chapter covers the full CRUD surface: insertOne and insertMany, find, updateOne with $set and $inc, replaceOne, deleteOne and deleteMany, plus upserts and bulkWrite. Each operation is a real mongosh command you run yourself. These seven verbs are the entire CRUD toolkit you will ever need.</p>
+    <p>CRUD in MongoDB is a small set of well-named methods, most of them plural or singular versions of the same idea. This chapter runs each one and explains the update operators that make updates fast.</p>
+    <h3 id="ch3-insert" data-toc>3.1 Inserting documents</h3>
+    <p class="topic-desc">insertOne inserts a single document and insertMany inserts an array of documents in one call. Each returns an insertedId in the result, and writes are atomic per document. Use insertMany for bulk loading while staying under the 16-megabyte document and message size limits.</p>
+    <div class="codeWrap"><pre><code>const result = db.products.insertOne({ name: 'Stapler', price: 8 })
+result.insertedId                          // the generated or supplied _id
+
+db.products.insertMany([
+  { name: 'Ruler', price: 2 },
+  { name: 'Pencil', price: 1 },
+  { name: 'Pen', price: 1.5 }
+], { ordered: false })   // continue inserting even if one document fails</code></pre></div>
+    <p class="code-note">insertOne and insertMany both return the ids they wrote, and the ordered option lets a failed batch keep going instead of stopping at the first error.</p>
+    <h3 id="ch3-find" data-toc>3.2 Reading documents with find</h3>
+    <p class="topic-desc">find filters documents using a query document, and an empty filter returns every document in the collection. It returns a cursor rather than an array, so you must iterate with forEach, next, or toArray to fetch results. Optional projection and sort apply before results stream back.</p>
+    <div class="codeWrap"><pre><code>db.products.find({ price: { $lt: 5 } })      // matches priced under 5
+db.products.find({})                         // every document
+const cur = db.products.find({})
+cur.toArray()                                // pull everything into memory
+cur.count()                                  // number of matching documents
+db.products.findOne({ name: 'Ruler' })       // exactly one document, or null</code></pre></div>
+    <p class="code-note">find builds a cursor you can iterate, count, or materialise with toArray, while findOne is the convenience form for "give me the first match".</p>
+    <h3 id="ch3-update" data-toc>3.3 Updating with $set, $inc, $push and $pull</h3>
+    <p class="topic-desc">updateOne applies update operators to the first matching document, and updateMany applies them to all matches. The operators $set, $inc, $push, and $pull change only the named fields, leaving the rest of the document untouched. This targeted behaviour avoids rewriting the whole document on every change.</p>
+    <div class="codeWrap"><pre><code>db.products.updateOne(
+  { name: 'Ruler' },
+  { $set: { price: 3, onSale: true } }       // set (or add) fields; others untouched
+)
+
+db.products.updateMany({}, { $inc: { price: 1 } })   // every product costs 1 more
+
+db.parts.updateOne({ _id: 1 }, { $push: { revisions: 'v2' } })   // append to array
+db.parts.updateOne({ _id: 1 }, { $pull: { revisions: 'v2' } })   // remove from array</code></pre></div>
+    <p class="code-note">$set patches fields, $inc adds atomically, and $push/$pull grow or shrink arrays — the operator style means no whole-document rewrite and no lost field races.</p>
+    <div class="tip"><p><code>updateMany</code> with no filter, or a broad one, lets you rename a field across a collection in one statement — a scheme for what would be a migration in SQL.</p></div>
+    <h3 id="ch3-replace" data-toc>3.4 replaceOne, upserts and deletes</h3>
+    <p class="topic-desc">replaceOne swaps a whole document for a new one, while deleteOne and deleteMany remove documents by filter. The upsert option turns a failed update or replace into an insert when no match exists. Upsert therefore converts an update into an insert while keeping the filter in place.</p>
+    <div class="codeWrap"><pre><code>db.products.replaceOne(
+  { name: 'Ruler' },
+  { name: 'Ruler', price: 3, material: 'steel' }   // the whole document is replaced
+)
+
+db.inventory.updateOne(
+  { sku: 'nbk-100' },
+  { $set: { qty: 3 } },
+  { upsert: true }        // insert a fresh document if the filter matched nothing
+)
+
+db.products.deleteOne({ name: 'Ruler' })
+db.products.deleteMany({})                        // empty the collection
+db.products.drop()                                // drop collection and indexes</code></pre></div>
+    <p class="code-note">replaceOne swaps the whole document body, upsert inserts when nothing matches, and deleteOne/deleteMany remove one or all matches while drop removes the entire collection.</p>
+    <h3 id="ch3-bulk" data-toc>3.5 bulkWrite and findOneAndUpdate</h3>
+    <p class="topic-desc">bulkWrite batches insertOne, updateOne, replaceOne, and deleteOne operations into a single round trip for application-side efficiency. findOneAndUpdate returns the document as it was before or after the update and is atomic. Together these round out production CRUD beyond the basic verbs.</p>
+    <div class="codeWrap"><pre><code>db.products.bulkWrite([
+  { insertOne: { document: { name: 'Eraser', price: 1 } } },
+  { updateOne: { filter: { name: 'Notebook' }, update: { $inc: { price: 1 } } } },
+  { deleteOne: { filter: { name: 'Pen' } } }
+], { ordered: true })    // stop at the first error, or false to keep going
+
+const ticket = db.tickets.findOneAndUpdate(
+  { status: 'open' },
+  { $set: { status: 'claimed' } },
+  { returnDocument: 'after' }    // default returns the pre-update document; 'after' returns the new one
+)</code></pre></div>
+    <p class="code-note">bulkWrite sends a mixed batch of inserts, updates, and deletes in one request, and findOneAndUpdate grabs the claimed document while flipping its state in a single atomic step.</p>
+    <div class="ex"><h4 id="ch3-bulk--exercises-3">Exercises 3</h4><ol>
+      <li>Insert a batch of five products with <code>insertMany</code> and inspect <code>insertedIds</code>.</li>
+      <li>Use <code>updateMany</code> with <code>$inc</code> to raise every price, then verify with a find.</li>
+      <li>Build a queue with <code>findOneAndUpdate</code> that claims jobs with <code>returnDocument: 'after'</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Querying &amp; Projection</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Querying &amp; Projection</button><div class="ch-toc-list"><a href="#ch4-comparison">4.1 Comparison and logical operators</a><a href="#ch4-exists">4.2 Membership, existence and type</a><a href="#ch4-dot">4.3 Dot notation for embedded fields</a><a href="#ch4-array">4.4 Array queries: $elemMatch, $size, $all</a><a href="#ch4-regex">4.5 Regex, paging and projections</a></div></div>
+    <p class="topic-desc">This chapter covers query operators, dot notation for embedded fields, array queries, regex, pagination, and projections. Queries combine comparison and logical operators with cursor methods like sort, skip, and limit. Filtering well is the difference between a correct app and a fast one.</p>
+    <p>A query filter is a document describing what to match, and every operator starts with a dollar sign. This chapter builds from comparison operators up to array matching and projection.</p>
+    <h3 id="ch4-comparison" data-toc>4.1 Comparison and logical operators</h3>
+    <p class="topic-desc">Comparison operators such as $eq, $ne, $gt, $gte, $lt, and $lte test values inside query filters. The logical operators $and, $or, and $not combine conditions into richer filters, with $and implicit between fields. These operators compose into almost every filter you will write.</p>
+    <div class="codeWrap"><pre><code>db.products.find({ price: { $gt: 10, $lte: 50 } })        // 10 &lt; price &lt;= 50
+db.products.find({ price: { $ne: 0 } })                    // anything priced non-zero
+db.products.find({ name: { $eq: 'Ruler' } })              // same as { name: 'Ruler' }
+db.products.find({
+  $or: [ { price: { $lt: 5 } }, { onSale: true } ]        // cheap OR featured
+})
+db.products.find({ $and: [ { price: { $gt: 1 } }, { qty: { $gt: 0 } } ] })</code></pre></div>
+    <p class="code-note">Comparison operators sit inside a field, while $or and $and combine whole conditions; the implicit default is already "and", so the explicit $and shows the intent.</p>
+    <h3 id="ch4-exists" data-toc>4.2 Membership, existence and type</h3>
+    <p class="topic-desc">$in tests whether a field equals any of a list of values, and $nin is its complement. $exists checks whether a field is present regardless of value, and $type matches the BSON type of a field. Together they answer "is the value one of these" and "does the field exist at all".</p>
+    <div class="codeWrap"><pre><code>db.products.find({ sku: { $in: ['nbk-100', 'pen-200'] } })   // any listed value matches
+db.products.find({ sku: { $nin: ['nbk-100'] } })            // exclusive membership
+db.users.find({ emailVerified: { $exists: true } })          // field must be present
+db.users.find({ age: { $type: 'int' } })                     // only 32-bit integers
+db.users.find({ tags: { $type: 'array' } })                  // field must be an array</code></pre></div>
+    <p class="code-note">$in/$nin test membership in a list, $exists checks a field’s presence (useful for schema drift), and $type queries by BSON type.</p>
+    <h3 id="ch4-dot" data-toc>4.3 Dot notation for embedded fields</h3>
+    <p class="topic-desc">Dot notation addresses fields inside embedded documents and arrays of documents, for example address.city or items.price. It lets you query, project, and sort any depth of nested structure using a simple field path. This is the standard way to reach subdocument fields in MongoDB.</p>
+    <div class="codeWrap"><pre><code>db.customers.insertOne({
+  name: 'Ada',
+  address: { city: 'London', zip: 'W1' }       // a subdocument
+})
+db.customers.find({ 'address.city': 'London' })
+
+db.orders.find({ 'items.sku': 'nbk-100' })     // any element of the array matches</code></pre></div>
+    <p class="code-note">The quoted path 'address.city' descends into the subdocument, and 'items.sku' reaches inside every array element to find one matching sku.</p>
+    <h3 id="ch4-array" data-toc>4.4 Array queries: $elemMatch, $size, $all</h3>
+    <p class="topic-desc">When a plain dot query is not enough, you use the array-specific operators. $elemMatch requires a single array element to satisfy every condition in the expression, $size matches arrays of a given length, and $all matches arrays containing every listed element. These operators handle the tricky cases of querying inside arrays.</p>
+    <div class="codeWrap"><pre><code>db.products.find({ tags: 'office' })                      // array contains the value
+db.products.find({ tags: { $all: ['office', 'paper'] } }) // contains every listed value
+db.products.find({ tags: { $size: 3 } })                  // exact array length
+db.orders.find({
+  items: { $elemMatch: { sku: 'nbk-100', qty: { $gte: 2 } } }   // one element satisfies BOTH
+})</code></pre></div>
+    <p class="code-note">A bare value, $all and $size answer "contains", "contains all", and "that length", while $elemMatch requires a single array element to meet every condition at once.</p>
+    <h3 id="ch4-regex" data-toc>4.5 Regex, paging and projections</h3>
+    <p class="topic-desc">Regex filters use the $regex operator to match patterns, and anchored patterns that start with a literal prefix can still use an index. Pagination uses cursor methods sort, skip, and limit. Projection documents keep or drop fields, cut transfer size, and can even allow a covered query.</p>
+    <div class="codeWrap"><pre><code>db.users.find({ name: /^ada/i })                     // case-insensitive prefix
+db.products.find({})
+  .sort({ price: 1, name: 1 })    // ascending price, then ascending name
+  .skip(20)                       // skip the first twenty (page 2)
+  .limit(10)                      // return at most ten</code></pre></div>
+    <p class="code-note">A regex with an anchored prefix can still use an index, and sort, skip, and limit combine into page-based paging that matches the compound index shape.</p>
+    <div class="codeWrap"><pre><code>db.orders.find(
+  { customerId },
+  { _id: 0, items: 1, total: 1, status: 1 }   // include these, drop _id
+)
+// Exclude style: everything except the big payload field
+db.orders.find({}, { payload: 0 })</code></pre></div>
+    <p class="code-note">The second argument to find projects a subset — include with 1, exclude with 0 (mixing the two styles is not allowed) — shrinking what travels over the wire.</p>
+    <div class="ex"><h4 id="ch4-regex--exercises-4">Exercises 4</h4><ol>
+      <li>Write a filter for products whose price is between 5 and 50 and tagged <code>office</code>.</li>
+      <li>Query orders where exactly two line items include <code>sku: 'nbk-100'</code>.</li>
+      <li>Build a paged listing with <code>sort</code>, <code>skip</code>, and <code>limit</code>, and project away heavy fields.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Indexing &amp; Performance</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Indexing &amp; Performance</button><div class="ch-toc-list"><a href="#ch5-why">5.1 How indexes work and the _id index</a><a href="#ch5-create">5.2 Creating single-field indexes</a><a href="#ch5-compound">5.3 Compound indexes</a><a href="#ch5-variants">5.4 Unique, sparse, partial and TTL indexes</a><a href="#ch5-strategy">5.5 Covered queries and an index strategy</a></div></div>
+    <p class="topic-desc">This chapter covers how indexes work, the always-present _id index, and creating single-field and compound indexes. You will also meet unique, sparse, partial, and TTL variants plus explain() to verify plans. This is where slow collection scans turn into fast indexed lookups.</p>
+    <p>Without indexes MongoDB scans every document. A good index turns a full collection scan into a direct lookup. This chapter shows how to create, inspect and prove the value of indexes.</p>
+    <h3 id="ch5-why" data-toc>5.1 How indexes work and the _id index</h3>
+    <p class="topic-desc">Indexes are B-tree structures that let MongoDB find and sort documents without scanning the whole collection. Every collection already has a unique index on _id that you cannot drop. Understanding the B-tree trade-off explains the write cost and disk space every additional index adds.</p>
+    <div class="codeWrap"><pre><code>db.users.getIndexes()            // see every index on the collection
+// Every collection ships with the unique index on _id:
+// [ { "v": 2, "key": { "_id": 1 }, "name": "_id_" } ]
+db.users.find({ _id: ... })      // answered straight from that index</code></pre></div>
+    <p class="code-note">getIndexes lists the collection’s indexes, and the mandatory _id index is why lookups by primary key never scan the collection.</p>
+    <h3 id="ch5-create" data-toc>5.2 Creating single-field indexes</h3>
+    <p class="topic-desc">You create an index with db.collection.createIndex({ field: 1 }) and an ascending or descending sort order. A query that filters on that field can then use the index instead of a collection scan. Indexes trade write overhead and disk for faster reads, so you should create only the ones queries actually need.</p>
+    <div class="codeWrap"><pre><code>db.users.createIndex({ email: 1 })          // 1 = ascending, -1 = descending
+db.users.find({ email: 'ada@example.com' }).explain('executionStats')
+// executionStats.totalDocsExamined falls from N to 1 once the index exists</code></pre></div>
+    <p class="code-note">createIndex builds a lookup structure on email, and explain('executionStats') proves the win by showing how many documents the query actually examined.</p>
+    <h3 id="ch5-compound" data-toc>5.3 Compound indexes</h3>
+    <p class="topic-desc">Compound indexes cover several fields, with the key order you list deciding which query shapes the index can serve. Equal-constraint fields should come before range or sort fields. The ESR rule (equality, sort, range) helps you pick the field order that best supports your queries.</p>
+    <div class="codeWrap"><pre><code>db.orders.createIndex({ customerId: 1, createdAt: -1 })
+// serves: filter by customerId, sort by createdAt
+db.orders.find({ customerId }).sort({ createdAt: -1 })
+
+db.orders.createIndex({ customerId: 1, status: 1, total: 1 })  // a "cover" candidate
+db.orders.find(
+  { customerId, status: 'open' },
+  { _id: 0, total: 1 }          // every needed field lives in the index itself
+)</code></pre></div>
+    <p class="code-note">Compound indexes follow a leftmost-prefix rule, so the same index serves different filters and sorts, and the last example reads entirely from the index.</p>
+    <h3 id="ch5-variants" data-toc>5.4 Unique, sparse, partial and TTL indexes</h3>
+    <p class="topic-desc">The special index flavours each encode a rule in the database itself. A unique index rejects duplicate values, sparse indexes skip documents missing the field, partial indexes use a filter expression to index only matching documents, and TTL indexes expire documents after a set number of seconds. All four are created via createIndex options.</p>
+    <div class="codeWrap"><pre><code>db.users.createIndex({ email: 1 }, { unique: true })          // reject duplicate emails
+
+db.reviews.createIndex({ userId: 1 }, { sparse: true })       // skip docs lacking the field
+
+db.orders.createIndex(
+  { createdAt: 1 },
+  { partialFilterExpression: { status: 'open' } }              // index only open orders
+)
+
+db.sessions.createIndex({ lastSeen: 1 }, { expireAfterSeconds: 3600 })   // TTL: auto-delete after 1h</code></pre></div>
+    <p class="code-note">Unique enforces a constraint, sparse ignores missing fields, partial indexes a subset, and a TTL index makes MongoDB delete documents automatically after the stated seconds.</p>
+    <div class="tip"><p>TTL indexes are the easiest correct way to expire sessions, notifications and logs. The background job that purges runs about every 60 seconds.</p></div>
+    <h3 id="ch5-strategy" data-toc>5.5 Covered queries and an index strategy</h3>
+    <p class="topic-desc">A practical strategy starts by identifying the read patterns with the highest frequency and impact, then builds indexes to serve them. You use explain() to confirm an index is actually used and check covering potential. Following this disciplined order beats guessing at indexes after a query is already slow.</p>
+    <ul>
+      <li>Profile first: log slow queries (<code>--slowms 100</code>) or read <code>explain()</code> before adding anything.</li>
+      <li>Cover the hottest query shapes with compound indexes; keep prefixes reusable.</li>
+      <li>Make equality filters the leading keys, range keys next, and sort keys last.</li>
+      <li>Drop or shrink indexes you never use — every one slows writes.</li>
+      <li>Use <code>hint()</code> to test a candidate index before keeping it long term.</li>
+    </ul>
+    <div class="ex"><h4 id="ch5-strategy--exercises-5">Exercises 5</h4><ol>
+      <li>Time a query with and without an index using <code>explain('executionStats')</code>.</li>
+      <li>Build a compound index that serves one of your app’s sort-by-created queries.</li>
+      <li>Add a TTL index to a <code>sessions</code> collection and read <code>getIndexes()</code> to confirm.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Aggregation Framework</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Aggregation Framework</button><div class="ch-toc-list"><a href="#ch6-pipeline">6.1 Pipelines, $match and $sort</a><a href="#ch6-group">6.2 $group and accumulators</a><a href="#ch6-project">6.3 $project and $addFields</a><a href="#ch6-unwind">6.4 $unwind and array reshaping</a><a href="#ch6-lookup">6.5 $lookup, $facet and $bucket</a></div></div>
+    <p class="topic-desc">This chapter covers the aggregation pipeline from $match and $sort through $group, $project, $addFields, $unwind, $lookup, $facet, and $bucket. Aggregations transform raw documents into reports, graphs, and dashboard data. Each stage passes its output documents to the next in the chain.</p>
+    <p>The aggregation framework pipes documents through stages, each transforming the stream. It replaces SQL’s GROUP BY, JOIN and SELECT in a way that maps onto document shapes.</p>
+    <h3 id="ch6-pipeline" data-toc>6.1 Pipelines, $match and $sort</h3>
+    <p class="topic-desc">The aggregation pipeline is an array of stages processed in order, starting with collection documents. Cheap stages such as $match and $sort should run early because $match uses indexes and shrinks the data every later stage sees. This ordering keeps the pipeline fast and readable.</p>
+    <div class="codeWrap"><pre><code>db.orders.aggregate([
+  { $match: { status: 'paid' } },      // stage 1: keep only paid orders
+  { $sort: { total: -1 } }             // stage 2: biggest first
+])
+// Put $match before $group, $sort, or $lookup to let it use indexes.</code></pre></div>
+    <p class="code-note">An aggregation is an array of stages applied in order; a $match at the front filters early so later stages process far fewer documents and can use indexes.</p>
+    <h3 id="ch6-group" data-toc>6.2 $group and accumulators</h3>
+    <p class="topic-desc">$group groups documents by an _id key and computes accumulator expressions across each group. The accumulator operators include $sum, $avg, $min, $max, and $push, while $count counts documents. This is the MongoDB equivalent of SQL GROUP BY.</p>
+    <div class="codeWrap"><pre><code>db.orders.aggregate([
+  { $match: { status: 'paid' } },
+  { $group: {
+      _id: '$productId',                 // group by this field
+      total:  { $sum: '$amount' },       // sum the amount per product
+      count:  { $sum: 1 },               // count documents in the group
+      avgAmount: { $avg: '$amount' },
+      lastReview: { $last: '$review' }
+  } },
+  { $sort: { total: -1 } }               // best sellers first
+])</code></pre></div>
+    <p class="code-note">A $field expression reads the field, and each accumulator folds the group’s documents into one result per distinct _id, giving totals, counts and averages.</p>
+    <h3 id="ch6-project" data-toc>6.3 $project and $addFields</h3>
+    <p class="topic-desc">$project reshapes output documents, keeping only the fields you name or computing new ones with expressions, similar to SELECT in SQL. $addFields adds new computed fields while preserving all existing fields. Use $addFields for temporary values that later stages need.</p>
+    <div class="codeWrap"><pre><code>db.orders.aggregate([
+  { $addFields: {
+      totalCents:   { $multiply: ['$amount', 100] },
+      yearMonth:    { $dateToString: { format: '%Y-%m', date: '$createdAt' } }
+  } },
+  { $project: { _id: 0, productId: 1, totalCents: 1, yearMonth: 1 } }
+])</code></pre></div>
+    <p class="code-note">$addFields computes derived values for later stages, while $project keeps only the listed fields — together they rename, reshape and compute in place.</p>
+    <h3 id="ch6-unwind" data-toc>6.4 $unwind and array reshaping</h3>
+    <p class="topic-desc">$unwind deconstructs an array field into one output document per element, duplicating the other fields. It turns array data into rows that aggregations can then group and filter. Nearly every array report in MongoDB starts with $unwind.</p>
+    <div class="codeWrap"><pre><code>db.orders.aggregate([
+  { $unwind: '$items' },                       // one document per line item
+  { $group: {
+      _id: '$items.sku',
+      qtySold: { $sum: '$items.qty' },
+      revenue: { $sum: { $multiply: ['$items.qty', '$items.price'] } }
+  } },
+  { $sort: { revenue: -1 } }
+])</code></pre></div>
+    <p class="code-note">$unwind duplicates each parent document once per array element, so a following $group can total quantities and revenue grouped by line-item sku.</p>
+    <h3 id="ch6-lookup" data-toc>6.5 $lookup, $facet and $bucket</h3>
+    <p class="topic-desc">$lookup performs a left outer join against another collection, matching local and foreign fields and attaching the results as an array. $facet runs several independent sub-pipelines in one pass, and $bucket groups values into defined ranges. Together these answer several related questions in a single query.</p>
+    <div class="codeWrap"><pre><code>db.orders.aggregate([
+  { $lookup: {
+      from: 'customers',                  // the other collection
+      localField: 'customerId',           // field in orders
+      foreignField: '_id',                // field in customers
+      as: 'customer'                      // the joined result lands here
+  } }
+])
+// Each order now carries a customer array (usually one element).</code></pre></div>
+    <p class="code-note">$lookup joins the current pipeline against another collection by matching localField to foreignField, storing the matches in a new array field.</p>
+    <div class="codeWrap"><pre><code>db.sales.aggregate([
+  { $facet: {
+      byCategory: [ { $group: { _id: '$category',  total: { $sum: '$amount' } } } ],
+      byMonth:    [ { $group: { _id: { $dateToString: { format: '%Y-%m', date: '$soldAt' } }, total: { $sum: '$amount' } } } ],
+      priceBands: [ { $bucket: { groupBy: '$amount', boundaries: [0, 10, 50, 100], default: 'Other' } } ]
+  } }
+])</code></pre></div>
+    <p class="code-note">$facet runs several independent pipelines over the same stream and returns one document with each result, while $bucket counts documents into numeric ranges.</p>
+    <div class="tip"><p>Use <code>find</code> when you need documents back page by page; use aggregation when you need computed shape — counts, totals, joins or histograms.</p></div>
+    <div class="ex"><h4 id="ch6-lookup--exercises-6">Exercises 6</h4><ol>
+      <li>Report total revenue per product from <code>orders</code>, sorted descending.</li>
+      <li>Flatten order items with <code>$unwind</code> and compute a top-ten best sellers list.</li>
+      <li>Add <code>$lookup</code> to fetch each order’s customer name in the same pipeline.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Schema Design &amp; Data Modeling</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Schema Design &amp; Data Modeling</button><div class="ch-toc-list"><a href="#ch7-embedref">7.1 Embedding vs referencing</a><a href="#ch7-onetomany">7.2 One-to-many patterns</a><a href="#ch7-normalise">7.3 Normalisation vs denormalisation</a><a href="#ch7-validate">7.4 Schema validation with $jsonSchema</a><a href="#ch7-patterns">7.5 Polymorphic and bucket patterns</a></div></div>
+    <p class="topic-desc">This chapter covers the core modeling decisions: embedding versus referencing, one-to-many patterns, normalisation trade-offs, $jsonSchema validation, and the bucket pattern. You learn rules for both common and advanced shapes. Design decisions made here save years of pain later.</p>
+    <p>Document design is a deliberate act: what you embed, what you reference, and how you validate decides query speed, consistency and code simplicity. This chapter gives you the decision rules.</p>
+    <h3 id="ch7-embedref" data-toc>7.1 Embedding vs referencing</h3>
+    <p class="topic-desc">The decision rule is simple: embed data that is always read together and bounded in size, and reference data that grows without limit or is shared across many documents. Embedding gives single-round-trip reads, while referencing keeps one copy of the truth. You apply this rule to every pair of related fields.</p>
+    <table>
+      <tr><th>Embed when</th><th>Reference when</th></tr>
+      <tr><td>Read together nearly always</td><td>Read separately or only sometimes</td></tr>
+      <tr><td>Small and bounded (addresses, line items)</td><td>Grows unboundedly (activity logs, posts)</td></tr>
+      <tr><td>No other document needs it</td><td>Shared (customer, product) and must stay consistent</td></tr>
+      <tr><td>Atomicity per parent matters</td><td>You need to query the child on its own</td></tr>
+    </table>
+    <p>The trade-off: embedding is one fast read and atomic, but inline copies go stale; referencing stays consistent but costs lookups or <code>$lookup</code>.</p>
+    <h3 id="ch7-onetomany" data-toc>7.2 One-to-many patterns</h3>
+    <p class="topic-desc">A one-to-many relationship can be modelled three ways: embed the many side in the one side, reference the many side in an array in the one side, or reference the one side from each many document. Choose by how often you read the related data and how large the sets grow. One relationship, three valid data models.</p>
+    <div class="codeWrap"><pre><code>// Pattern A: embed the many (bounded): a blog post with its three comments
+db.posts.insertOne({ title: 'Hello', comments: [ { body: 'Nice', by: 'ada' } ] })
+
+// Pattern B: reference the many (unbounded): one user, thousands of posts
+db.posts.insertOne({ title: 'Hello', authorId: ObjectId('6650e3c9f1a2b3c4d5e6f708') })
+db.posts.find({ authorId }).sort({ createdAt: -1 }).limit(20)   // + index on authorId
+
+// Pattern C: reference the one (denormalised): the rare case of a "title" denormalised
+db.posts.insertOne({ title: 'Hello', author: { id: ..., name: 'Ada' } })</code></pre></div>
+    <p class="code-note">Bounded children like comments drop straight in, unbounded children like posts move to their own collection with a referenced authorId, and occasional writes keep a denormalised copy fresh.</p>
+    <h3 id="ch7-normalise" data-toc>7.3 Normalisation vs denormalisation</h3>
+    <p class="topic-desc">Normalisation removes duplication and saves storage, but it costs extra round trips to reassemble data. Denormalisation duplicates values for fast, consistent reads at the cost of coordinated writes. Document databases intentionally bias towards denormalised, read-shaped data.</p>
+    <table>
+      <tr><th>Normalised (references)</th><th>Denormalised (embedded copies)</th></tr>
+      <tr><td>One source of truth per fact</td><td>Fast single-read pages</td></tr>
+      <tr><td>Extra lookups and joins</td><td>Extra writes keep copies in sync</td></tr>
+      <tr><td>No stale duplicates</td><td>Risk of inconsistent copies</td></tr>
+      <tr><td>More round trips</td><td>Fewer round trips, smaller transfers</td></tr>
+    </table>
+    <p>Start embedded, split out only what genuinely needs to stand alone, and denormalise the read-heavy summary fields — for example the customer name on a finished order.</p>
+    <h3 id="ch7-validate" data-toc>7.4 Schema validation with $jsonSchema</h3>
+    <p class="topic-desc">The $jsonSchema validator enforces document structure at the database layer using bsonType, required, properties, and patternProperties. You attach it to a collection with collMod or at creation time. It makes the flexible schema just strict enough without forcing a fixed table shape.</p>
+    <div class="codeWrap"><pre><code>db.createCollection('users', {
+  validator: { $jsonSchema: {
+      bsonType: 'object',
+      required: ['name', 'email'],
+      properties: {
+        name:  { bsonType: 'string', description: 'must be a string and is required' },
+        email: { bsonType: 'string', pattern: '^[^@]+@[^@]+$' },
+        age:   { bsonType: 'int', minimum: 0, maximum: 120 }
+      }
+  } }
+})
+
+db.runCommand({
+  collMod: 'users',
+  validator: { $jsonSchema: { ... } },   // tighten or relax the rule on a live collection
+  validationLevel: 'moderate'            // warn instead of reject for old documents
+})</code></pre></div>
+    <p class="code-note">A validator attached to a collection rejects writes that break the rule, and collMod can change or relax that validator on a live collection without a migration.</p>
+    <div class="warn"><p>Validation runs on writes only — existing documents are untouched. Pick <code>validationAction: 'warn'</code> to report violations without blocking inserts.</p></div>
+    <h3 id="ch7-patterns" data-toc>7.5 Polymorphic and bucket patterns</h3>
+    <p class="topic-desc">The polymorphic pattern stores many document kinds in one collection, discriminated by a type field, which keeps queries and indexes practical when shapes vary. The bucket pattern groups time-series measurements into bounded arrays per time window. Both keep cardinality and index sizes under control.</p>
+    <div class="codeWrap"><pre><code>// Polymorphic: one field flags the document kind
+db.events.insertMany([
+  { kind: 'click',  userId, url: '/home' },
+  { kind: 'purchase', userId, amount: 12 }
+])
+db.events.createIndex({ kind: 1, createdAt: 1 })
+
+// Bucket: sensor readings packed per sensor per hour, shrinking index entries
+db.iot.readings.insertOne({
+  sensorId: 's01',
+  bucket: new Date('2026-09-18T10:00:00Z'),
+  samples: [ { t: 0, v: 21.5 }, { t: 30, v: 21.7 }, { t: 60, v: 21.8 } ]
+})
+db.iot.readings.createIndex({ sensorId: 1, bucket: 1 })</code></pre></div>
+    <p class="code-note">The polymorphic pattern tags documents by a discriminator field for one indexed stream, and the bucket pattern packs many small readings into one document so one index entry covers many samples.</p>
+    <div class="ex"><h4 id="ch7-patterns--exercises-7">Exercises 7</h4><ol>
+      <li>Model a forum with embedded replies and referenced authors; justify each choice in a sentence.</li>
+      <li>Add a <code>$jsonSchema</code> validator to a <code>products</code> collection requiring name and non-negative price.</li>
+      <li>Design a bucketed telemetry collection holding one hour of readings per document.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Transactions &amp; Consistency</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Transactions &amp; Consistency</button><div class="ch-toc-list"><a href="#ch8-single">8.1 Single-document atomicity</a><a href="#ch8-multi">8.2 Multi-document transactions</a><a href="#ch8-sessions">8.3 Sessions and retryable writes</a><a href="#ch8-concerns">8.4 Read and write concerns</a><a href="#ch8-preference">8.5 Read preference and causal consistency</a></div></div>
+    <p class="topic-desc">This chapter covers single-document atomicity, multi-document transactions, sessions, read and write concerns, and read preference. Each mechanism controls a different layer of the consistency story. Understanding the layers tells you exactly what guarantee your application actually gets.</p>
+    <p>Every document write is atomic, and since MongoDB 4.0 multi-document transactions bring full ACID semantics for replica sets and sharded clusters. This chapter maps the consistency options and when to use them.</p>
+    <h3 id="ch8-single" data-toc>8.1 Single-document atomicity</h3>
+    <p class="topic-desc">MongoDB guarantees that every operation on a single document is atomic and all-or-nothing, so partially applied updates cannot happen. This is a real isolation guarantee, not a convention. Design documents so that one document represents one business transaction wherever possible.</p>
+    <p>A single <code>updateOne</code> with operators like <code>$inc</code> is atomic: no reader ever sees a half-applied update. Because documents hold related data, many "transactions" fit inside one document and need no transaction at all — prefer this shape first.</p>
+    <div class="tip"><p>Started with <code>$inc</code>? Counters, balances and availability flags inside one document update atomically and stay consistent under any number of concurrent writers.</p></div>
+    <h3 id="ch8-multi" data-toc>8.2 Multi-document transactions</h3>
+    <p class="topic-desc">Multi-document transactions group several reads and writes so they commit as one atomic unit. They require a replica set and a session, and you begin them with session.startTransaction() and then commit or abort. This is how you keep multiple documents consistent in changing business data.</p>
+    <div class="codeWrap"><pre><code>const session = db.getMongo().startSession()   // a session backs the transaction
+session.startTransaction()
+try {
+  db.getSiblingDB('bank').accounts.updateOne(
+    { _id: 'alice' }, { $inc: { balance: -100 } }, { session }
+  )
+  db.getSiblingDB('bank').accounts.updateOne(
+    { _id: 'bob' }, { $inc: { balance: 100 } }, { session }
+  )
+  session.commitTransaction()      // both updates become visible together
+} catch (err) {
+  session.abortTransaction()       // undo everything if either leg fails
+  throw err
+} finally {
+  session.endSession()
+}</code></pre></div>
+    <p class="code-note">startSession and startTransaction begin a scope, every statement carries the session, and commit or abort decides whether both balance changes land or neither does.</p>
+    <div class="warn"><p>Transactions need a replica set — a standalone mongod rejects them. In Atlas and production every deployment is a replica set anyway.</p></div>
+    <h3 id="ch8-sessions" data-toc>8.3 Sessions and retryable writes</h3>
+    <p class="topic-desc">Sessions are server-side contexts that group a sequence of operations, and retryable writes automatically retry a write when the network fails. Drivers use sessions and retryable writes by default, so you mostly get this for free. Sessions are also a prerequisite for transactions and causal consistency.</p>
+    <div class="codeWrap"><pre><code>const session = db.getMongo().startSession()
+const order = session.getDatabase('shop').orders.insertOne({ total: 12 }, { session })
+// Retryable writes: the driver retries a failed write automatically
+mongosh "mongodb+srv://.../shop?retryWrites=true"   // modern defaults send this automatically</code></pre></div>
+    <p class="code-note">A session scopes related operations, and retryWrites lets the driver replay a write that failed mid-flight, so a dropped connection no longer means a lost insert.</p>
+    <h3 id="ch8-concerns" data-toc>8.4 Read and write concerns</h3>
+    <p class="topic-desc">Write concern declares when a write is acknowledged, from w:1 up to w:"majority" for a replica set. Read concern declares how fresh a read must be, from "local" to "majority" and snapshot. Both are dials that trade availability, durability, and consistency.</p>
+    <table>
+      <tr><th>Option</th><th>Value</th><th>Meaning</th></tr>
+      <tr><td>writeConcern</td><td><code>w: 1</code> (default)</td><td>Acknowledged by the primary</td></tr>
+      <tr><td>writeConcern</td><td><code>w: majority</code></td><td>Acknowledged by the majority of members</td></tr>
+      <tr><td>writeConcern</td><td><code>j: true</code></td><td>Durable in the journal before acknowledging</td></tr>
+      <tr><td>readConcern</td><td><code>local</code> (default)</td><td>Read data as stored, may not be majority</td></tr>
+      <tr><td>readConcern</td><td><code>majority</code></td><td>Only read data committed by the majority</td></tr>
+    </table>
+    <p>If an acknowledged-but-unapplied write is acceptable you keep the cheap default; durable and majority levels trade latency for safety.</p>
+    <h3 id="ch8-preference" data-toc>8.5 Read preference and causal consistency</h3>
+    <p class="topic-desc">Read preference routes reads to primary or secondary nodes, with modes such as primary, secondary, and nearest. Causal consistency, enabled on a session, guarantees that causally related operations are seen in copy order across secondaries. Both shape what a distributed read can actually observe.</p>
+    <div class="codeWrap"><pre><code>const cursor = db.orders.find({}).readPref('secondaryPreferred')  // offload reads
+// A causally consistent session: the read is guaranteed to see earlier writes
+const session = db.getMongo().startSession({ causalConsistency: true })
+const result = session.getDatabase('shop').orders.insertOne({ total: 9 }, { session })
+const found = session.getDatabase('shop').orders.findOne({ _id: result.insertedId }, { session })</code></pre></div>
+    <p class="code-note">readPref routes scans to secondaries to protect the primary, and a causally consistent session orders reads after your own writes even when they hit different cluster members.</p>
+    <div class="tip"><p>Secondary reads are eventually consistent: right after a majority write, a secondary may still lag briefly. Use <code>readPreference: 'primary'</code> for anything that must reflect the latest write.</p></div>
+    <div class="ex"><h4 id="ch8-preference--exercises-8">Exercises 8</h4><ol>
+      <li>Model a transfer as one embedded business transaction, then as a two-document transaction.</li>
+      <li>Run a multi-document transaction that commits, then one that aborts, and check both outcomes.</li>
+      <li>Write a causal-consistent session that inserts a doc and immediately finds it.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Replication &amp; Sharding</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Replication &amp; Sharding</button><div class="ch-toc-list"><a href="#ch9-replset">9.1 Replica sets</a><a href="#ch9-failover">9.2 Failover and the oplog</a><a href="#ch9-shardkey">9.3 Shard keys, chunks and the balancer</a><a href="#ch9-when">9.4 When to shard</a><a href="#ch9-atlas">9.5 Atlas managed clusters</a></div></div>
+    <p class="topic-desc">This chapter covers replica sets, automatic failover, the oplog, shard keys, chunks, and the balancer. Replication keeps data available when a node dies, and sharding spreads a huge collection across many servers. Together they are what keep MongoDB highly available and able to scale.</p>
+    <p>Replication makes copies of your data for availability; sharding splits data across many servers for scale. Atlas manages both for you — but you must understand them to size and design.</p>
+    <h3 id="ch9-replset" data-toc>9.1 Replica sets</h3>
+    <p class="topic-desc">A replica set is a group of mongod instances where one primary handles writes and the others replicate its data as secondaries. You launch it with rs.initiate() and inspect members with rs.status(). The application always talks to the primary for writes.</p>
+    <div class="codeWrap"><pre><code># Start three mongod processes with the same replSet name
+mongod --replSet rs0 --dbpath /data/rs0 --port 27017
+mongod --replSet rs0 --dbpath /data/rs1 --port 27018
+mongod --replSet rs0 --dbpath /data/rs2 --port 27019
+
+# On the first member, define the set
+rs.initiate({
+  _id: 'rs0',
+  members: [
+    { _id: 0, host: 'localhost:27017' },
+    { _id: 1, host: 'localhost:27018' },
+    { _id: 2, host: 'localhost:27019', priority: 0 }   // priority 0: never primary
+  ]
+})
+rs.status()    // who is primary, who is secondary, replication lag</code></pre></div>
+    <p class="code-note">Three mongod processes sharing one replSet name form a set; rs.initiate declares the members and rs.status shows the elected primary and the current replication lag.</p>
+    <h3 id="ch9-failover" data-toc>9.2 Failover and the oplog</h3>
+    <p class="topic-desc">When the primary fails, the replica set detects it and an election promotes a secondary to primary automatically. The oplog is a capped collection on the primary that records every write, and secondaries replay it to stay in sync. This is the mechanism that drives all replication.</p>
+    <p>Secondaries read the primary’s <strong>oplog</strong> — a capped collection of every write — and replay it. If the primary dies, the set holds an election and one secondary is promoted within seconds; drivers reconnect to the new primary. A long-down secondary that falls behind the oplog window must resync.</p>
+    <div class="codeWrap"><pre><code>rs.stepDown(10)                      # force an election (planned maintenance)
+db.getSiblingDB('local').oplog.rs.count()   # see how much write history the oplog holds</code></pre></div>
+    <p class="code-note">rs.stepDown triggers a clean handover for maintenance, and the oplog’s size decides how long a lagging secondary can catch up before it must rebuild.</p>
+    <h3 id="ch9-shardkey" data-toc>9.3 Shard keys, chunks and the balancer</h3>
+    <p class="topic-desc">Sharding splits a collection across shards using a shard key, and ranges of key values are delivered as chunks. The balancer migrates chunks between shards to keep distribution even. The shard key you choose decides which data lands on which server and how evenly it spreads.</p>
+    <div class="codeWrap"><pre><code># From mongos (the sharding router), not a mongod
+sh.enableSharding('shop')
+db.orders.createIndex({ customerId: 1 })     // index the shard key first
+sh.shardCollection('shop.orders', { customerId: 1 })
+sh.status()      // chunks, their ranges, and which shard owns each
+
+# Chunks are ranges of the shard key; the balancer migrates them between shards
+sh.startBalancer()
+sh.enableAutoSplit().enable()    // allow big ranges to split</code></pre></div>
+    <p class="code-note">The shard key’s ranges become chunks distributed across shards, and the balancer quietly moves chunks to keep the cluster balanced while auto-split breaks oversize ranges apart.</p>
+    <div class="warn"><p>The shard key is permanent — choose it for even, repeated value distribution. A key that is monotonic (like <code>_id</code>) piles new writes onto one shard.</p></div>
+    <h3 id="ch9-when" data-toc>9.4 When to shard</h3>
+    <p class="topic-desc">Shard only when you have exhausted vertical scaling, run out of disk or memory, or cannot fit the working set in RAM. The honest rule is that most teams should never shard, because the operating cost and complexity are real. Exhaust cheaper options first.</p>
+    <ul>
+      <li>Shard only when one replica set cannot hold the working set or keep up with writes.</li>
+      <li>Exhaust single-set levers first: indexes, a bigger instance, read preference, archiving.</li>
+      <li>Sharding pays off past several hundred gigabytes or tens of thousands of writes per second.</li>
+      <li>Count the cost: distributed transactions, cross-shard queries, and an extra router tier (mongos).</li>
+      <li>Pick the shard key for a hot, high-cardinality, evenly distributed field.</li>
+    </ul>
+    <h3 id="ch9-atlas" data-toc>9.5 Atlas managed clusters</h3>
+    <p class="topic-desc">Atlas maps these concepts onto its managed product, hiding the mechanics of replica set setup and sharding while keeping the choices visible. You select cluster tiers, enable backups, and configure read preference from the console. The same geos concepts apply underneath, just without manual host installation.</p>
+    <p>Atlas provisions the replica set for you, runs elections invisibly, and offers the sharded tier (M10+ with hash sharding) behind a GUI. You still choose instance size, read preference in the connection string, and whether a collection is sharded — knowledge of this chapter makes those choices deliberate instead of accidental.</p>
+    <div class="ex"><h4 id="ch9-atlas--exercises-9">Exercises 9</h4><ol>
+      <li>Launch a three-member replica set locally and read <code>rs.status()</code> after a <code>rs.stepDown</code>.</li>
+      <li>Explain, in writing, why a monotonically increasing shard key is a bad idea.</li>
+      <li>Size a hypothetical cluster: state when you would shard and pick a shard key.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · MongoDB with Node &amp; Mongoose</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · MongoDB with Node &amp; Mongoose</button><div class="ch-toc-list"><a href="#ch10-driver">10.1 The Node driver basics</a><a href="#ch10-pooling">10.2 Connection pooling</a><a href="#ch10-mongoose">10.3 Mongoose schemas and models</a><a href="#ch10-validation">10.4 Validation and middleware</a><a href="#ch10-populate">10.5 Population</a></div></div>
+    <p class="topic-desc">This chapter covers the Node driver, connection pooling, Mongoose schemas and models, validation, middleware, and population. This is MongoDB the way real applications use it, with JavaScript instead of raw shell commands. You build the same operations from Chapter 3 through a driver API.</p>
+    <p>The shell teaches MongoDB; applications talk to it through a driver or an ODM. Mongoose layers schemas, validation and middleware over the official driver — the pragmatic default for Node projects.</p>
+    <h3 id="ch10-driver" data-toc>10.1 The Node driver basics</h3>
+    <p class="topic-desc">You connect with the official MongoDB Node driver using the connect method with a connection string and then pick a database and collection. Queries return a typed cursor and documents come back as JavaScript objects. Every MongoDB client in Node is built on this same API.</p>
+    <div class="codeWrap"><pre><code>npm install mongodb
+
+const { MongoClient } = require('mongodb')
+const client = new MongoClient('mongodb+srv://cluster0.example.mongodb.net/shop')
+async function main() {
+  await client.connect()
+  const db = client.db('shop')
+  const user = await db.collection('users').findOne({ email: 'ada@example.com' })
+  console.log(user?.name)
+}
+main().catch(console.error)</code></pre></div>
+    <p class="code-note">The driver turns a connection string into a client, a client into databases and collections, and collection methods carry the same CRUD verbs as the shell.</p>
+    <h3 id="ch10-pooling" data-toc>10.2 Connection pooling</h3>
+    <p class="topic-desc">You should create one client at startup and reuse it for the whole process, because the MongoClient maintains an internal pool of TCP connections. Creating a client per request exhausts connections and slows the app. A shared client keeps the pool warm, and you close it once at shutdown.</p>
+    <div class="codeWrap"><pre><code>const client = new MongoClient(uri, {
+  maxPoolSize: 50,          // cap concurrent sockets
+  minPoolSize: 5,           // keep a few warm
+  serverSelectionTimeoutMS: 5000   // fail fast if the cluster is unreachable
+})
+// Export one shared client (module singleton) — do NOT connect per request.</code></pre></div>
+    <p class="code-note">Pool settings bound how many sockets the one long-lived client opens, and the singleton pattern across the module keeps a warm pool instead of churning connections.</p>
+    <div class="warn"><p>Connecting a new MongoClient inside every request exhausts file descriptors and stalls under load. Create one client at boot and reuse it for the process lifetime.</p></div>
+    <h3 id="ch10-mongoose" data-toc>10.3 Mongoose schemas and models</h3>
+    <p class="topic-desc">Mongoose maps a schema definition to a collection and its model provides typed operations such as create, find, findOneAndUpdate, and deleteOne. The schema declares field types and defaults, and documents become validated BSON on save. This is the layer most Express applications interact with instead of the raw driver.</p>
+    <div class="codeWrap"><pre><code>npm install mongoose
+
+const { Schema, model } = require('mongoose')
+await require('mongoose').connect('mongodb://localhost:27017/shop')
+
+const userSchema = new Schema({
+  name:  { type: String, required: true, trim: true },
+  email: { type: String, required: true, unique: true },
+  age:   { type: Number, min: 13, max: 120 },
+  roles: [{ type: String, enum: ['user', 'admin'] }]
+}, { timestamps: true })          // adds createdAt and updatedAt
+
+const User = model('User', userSchema)      // uses the "users" collection
+const ada = await User.create({ name: 'Ada', email: 'ada@example.com', age: 40 })
+console.log(ada._id, ada.createdAt)</code></pre></div>
+    <p class="code-note">A schema describes fields, types, constraints and options, a model turns it into a collection handle, and create inserts while every schema rule runs as validation first.</p>
+    <h3 id="ch10-validation" data-toc>10.4 Validation and middleware</h3>
+    <p class="topic-desc">Schema rules declare required fields, enum values, min and max ranges, and custom validators that run before a document is saved. Middleware hooks like pre and post run around save, validate, and remove operations. Mongoose validates on save and lets you inject logic before and after each operation.</p>
+    <div class="codeWrap"><pre><code>userSchema.pre('save', function (next) {
+  // 'this' is the document being saved (not an arrow function)
+  if (this.isModified('password') &amp;&amp; !this.passwordHash) {
+    this.passwordHash = hashPassword(this.password)   // never store plain text
+    this.password = undefined
+  }
+  next()
+})
+
+userSchema.post('save', function (doc) {
+  console.log('Saved', doc.email)      // runs after a successful save
+})
+
+// Schema validation double-checks on the way in
+await User.validate({ name: 'Too young?', age: 5 })   // rejects: age below min 13</code></pre></div>
+    <p class="code-note">The pre('save') hook runs before persist and can transform fields, while post('save') observes the result; schema-level constraints run inside validate automatically.</p>
+    <h3 id="ch10-populate" data-toc>10.5 Population</h3>
+    <p class="topic-desc">Population automatically resolves a stored reference into the full referenced document in one call. You store the foreign _id in the child and call model.find().populate('field') to fetch the related data with a join. populate is the ergonomic aggregation $lookup.</p>
+    <div class="codeWrap"><pre><code>const postSchema = new Schema({
+  title:  { type: String, required: true },
+  author: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+})
+const Post = model('Post', postSchema)
+
+const posts = await Post.find()
+  .populate('author', 'name email')          // replace ObjectId with the real user
+  .sort('-createdAt')
+console.log(posts[0].author.name)            // a full user object, not a bare id</code></pre></div>
+    <p class="code-note">A ref on the ObjectId field declares the relationship, and populate('author') fetches the user documents in one extra query while letting you pick the fields.</p>
+    <div class="tip"><p>populate has the same pitfall as SQL JOINs: populate in a loop causes N+1 queries. Fetch lists, then call populate once on the array of documents.</p></div>
+    <div class="ex"><h4 id="ch10-populate--exercises-10">Exercises 10</h4><ol>
+      <li>Connect the driver, insert a document, and read it back in one Node script.</li>
+      <li>Define a User schema with required fields and a unique email; observe validation failures.</li>
+      <li>Model <code>Post</code>-references-<code>User</code>, save a few, and populate the author list without N+1.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · Security &amp; Operations</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Security &amp; Operations</button><div class="ch-toc-list"><a href="#ch11-auth">11.1 Authentication and RBAC</a><a href="#ch11-tls">11.2 TLS and network exposure</a><a href="#ch11-backups">11.3 Backups</a><a href="#ch11-monitoring">11.4 Monitoring</a><a href="#ch11-checklist">11.5 The performance tuning checklist</a></div></div>
+    <p class="topic-desc">This chapter covers authentication, role-based access control, TLS, network exposure, backups, monitoring, and a performance checklist. Operations keeps your data safe, available, and fast in production. Each lesson gives you commands you can run against your own server.</p>
+    <p>Enabling authentication, encrypting traffic, backing up and watching metrics turns a hobby server into a production one. This chapter is the operational checklist before any MongoDB goes to production.</p>
+    <h3 id="ch11-auth" data-toc>11.1 Authentication and RBAC</h3>
+    <p class="topic-desc">You create users with db.createUser and grant least-privilege roles such as read, readWrite, and dbAdmin scoped to a database. Authentication in mongod settings forces every connection to log in with a named identity. Authorization therefore means each connection carries a scoped set of permissions.</p>
+    <div class="codeWrap"><pre><code>// Start mongod with auth enabled
+mongod --auth --bind_ip 127.0.0.1
+
+// As the admin, create a least-privilege user for the app
+db.getSiblingDB('admin').createUser({
+  user: 'appUser',
+  pwd: passwordPrompt(),                  // prompt instead of typing the secret
+  roles: [ { role: 'readWrite', db: 'shop' }, { role: 'read', db: 'analytics' } ]
+})
+
+db.getSiblingDB('admin').getUsers()       // list users and their roles
+db.getSiblingDB('admin').dropUser('appUser')</code></pre></div>
+    <p class="code-note">mongod --auth refuses unauthenticated connections, and an admin grants the app user read and write on shop but only read on analytics — least privilege in action.</p>
+    <h3 id="ch11-tls" data-toc>11.2 TLS and network exposure</h3>
+    <p class="topic-desc">TLS encrypts traffic between clients and servers, and you enable it with net.tls settings and the --tls- options at startup or on the connection string. Network hardening limits exposure so only trusted hosts can reach the port. Credentials are useless if the connection itself leaks data.</p>
+    <div class="codeWrap"><pre><code># mongod.conf
+net:
+  bindIp: 127.0.0.1          # never listen on 0.0.0.0 by default
+  tls:
+    mode: requireTLS
+    certificateKeyFile: /etc/ssl/mongodb.pem
+security:
+  authorization: enabled
+
+# Driver connects with the srv string, which implies TLS in Atlas; locally:
+mongosh "mongodb://appUser:pass@localhost:27017/shop?authSource=admin&amp;tls=true"</code></pre></div>
+    <p class="code-note">The config binds to localhost, forces TLS via a certificate, and requires authorization, while the connection string carries the authSource database and tls=true.</p>
+    <div class="warn"><p>A public, unauthenticated, TLS-less MongoDB on 27017 is a well-known attack magnet. Default to <code>bind_ip: 127.0.0.1</code> and expose through a firewall only what the app truly needs.</p></div>
+    <h3 id="ch11-backups" data-toc>11.3 Backups</h3>
+    <p class="topic-desc">Logical backups use mongodump to export a database or collection and mongorestore to load it back, with --db and --collection to narrow scope. You can also snapshot to disk. A backup you cannot restore is a decoration, so practice restores on a test server.</p>
+    <div class="codeWrap"><pre><code># Dump one database to a folder
+mongodump --uri="mongodb://localhost:27017" --db=shop --out=/backups/shop-2026-09-18
+
+# Dump everything as a compressed archive
+mongodump --archive=/backups/shop.full.gz --gzip --uri="mongodb://localhost:27017"
+
+# Restore from either form
+mongorestore --uri="mongodb://localhost:27017" /backups/shop-2026-09-18
+mongorestore --archive=/backups/shop.full.gz --gzip --uri="mongodb://localhost:27017"</code></pre></div>
+    <p class="code-note">mongodump exports data to disk and mongorestore replays it; archives combine the dump and compression into one file you can ship to object storage.</p>
+    <div class="tip"><p>Add your own <code>oplog</code> usage or Atlas continuous backups for point-in-time recovery; a nightly dump alone loses the writes of the current day.</p></div>
+    <h3 id="ch11-monitoring" data-toc>11.4 Monitoring</h3>
+    <p class="topic-desc">Built-in commands give live health checks without extra tooling. Use db.serverStatus(), db.currentOp() and db.setProfilingLevel() to watch the server, plus the $currentOp aggregation and the explain plan for slow queries. Watch for slow queries, connection growth, and lagging secondaries.</p>
+    <div class="codeWrap"><pre><code>mongostat --discover             # live reads, writes, connections and queue per second
+mongosh --eval 'db.serverStatus().opcounters'   # total inserts/updates/deletes counters
+mongosh --eval 'db.currentOp()'  # what is running right now (find slow queries)
+db.killOp(opId)                  # terminate a runaway operation
+rs.printSecondaryReplicationInfo()   # replication lag per secondary</code></pre></div>
+    <p class="code-note">mongostat gives the at-a-glance load, serverStatus and currentOp expose counters and in-flight operations, and the replication helper flags a lagging secondary.</p>
+    <h3 id="ch11-checklist" data-toc>11.5 The performance tuning checklist</h3>
+    <p class="topic-desc">The performance checklist lists fixes in the order most likely to make MongoDB fast, starting with missing indexes and bad query shapes, then moving to schema design and server resources. You verify each with explain() before changing hardware. Work the checklist before buying bigger machines.</p>
+    <ul>
+      <li>Add the missing indexes (Chapter 5) — the highest-impact fix by far.</li>
+      <li>Reduce documents: project away heavy fields; shorten field names; archive old data.</li>
+      <li>Move reads to secondaries where eventual consistency is acceptable.</li>
+      <li>Put <code>$match</code> first in pipelines and keep write batches small.</li>
+      <li>Up the working set: enough RAM so hot documents live in cache, not on disk.</li>
+      <li>Watch <code>mongostat</code> for queue length and 100% disk or CPU before scaling out.</li>
+    </ul>
+    <div class="ex"><h4 id="ch11-checklist--exercises-11">Exercises 11</h4><ol>
+      <li>Enable auth, create a least-privilege user, and log in with it from mongosh.</li>
+      <li>Take a compressed backup, drop a test collection, and restore it.</li>
+      <li>Run <code>mongostat</code> and <code>db.currentOp()</code> while issuing queries, and report what changed.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Quick Reference &amp; Glossary</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Quick Reference &amp; Glossary</button><div class="ch-toc-list"><a href="#app-crud">A.1 CRUD method cheat sheet</a><a href="#app-operators">A.2 Query and update operator reference</a><a href="#app-stages">A.3 Aggregation stage reference</a><a href="#app-indexes">A.4 Index types at a glance</a><a href="#app-glossary">A.5 Glossary</a></div></div>
+    <p class="topic-desc">The appendix bundles the CRUD methods, query operators, aggregation stages, and index types into one quick reference, plus a glossary of terms. It is designed for skimming whenever you forget a verb or operator. Use it as the destination of the whole guide.</p>
+    <h3 id="app-crud" data-toc>A.1 CRUD method cheat sheet</h3>
+    <p class="topic-desc">This cheat sheet lists the most useful collection methods at a glance, mirroring the shell verbs from Chapters 3 and 4. Each entry names the method, its arguments, and one example of use. It is the fastest way to recall an insert or update signature.</p>
+    <table>
+      <tr><th>Method</th><th>Does</th></tr>
+      <tr><td><code>insertOne(doc)</code> / <code>insertMany(docs)</code></td><td>Insert with optional ordered flag</td></tr>
+      <tr><td><code>find(filter, projection)</code></td><td>Cursor of matching documents</td></tr>
+      <tr><td><code>findOne(filter)</code></td><td>First match or null</td></tr>
+      <tr><td><code>updateOne / updateMany</code></td><td>Patch fields via update operators</td></tr>
+      <tr><td><code>replaceOne(filter, doc)</code></td><td>Swap the whole document body</td></tr>
+      <tr><td><code>deleteOne / deleteMany</code></td><td>Remove one or all matches</td></tr>
+      <tr><td><code>findOneAndUpdate</code></td><td>Atomic read-modify-write with returnDocument</td></tr>
+      <tr><td><code>bulkWrite([])</code></td><td>Mixed batch in one round trip</td></tr>
+      <tr><td><code>countDocuments(filter)</code></td><td>Count matching documents</td></tr>
+    </table>
+    <h3 id="app-operators" data-toc>A.2 Query and update operator reference</h3>
+    <p class="topic-desc">This reference summarises the query filter and update document operators used in the guide, each with its one-line job. It groups comparison, logical, element, array, evaluation, and update operators so you can find the right dollar sign fast. Use it to pick the correct operator without searching chapters.</p>
+    <table>
+      <tr><th>Operator</th><th>Family</th><th>Meaning</th></tr>
+      <tr><td><code>$eq $ne</code></td><td>comparison</td><td>Equal / not equal</td></tr>
+      <tr><td><code>$gt $gte $lt $lte</code></td><td>comparison</td><td>Greater / less ranges</td></tr>
+      <tr><td><code>$in $nin</code></td><td>comparison</td><td>In / not in a list</td></tr>
+      <tr><td><code>$and $or $not</code></td><td>logical</td><td>Combine conditions</td></tr>
+      <tr><td><code>$exists $type</code></td><td>element</td><td>Field present / of a BSON type</td></tr>
+      <tr><td><code>$all $size $elemMatch</code></td><td>array</td><td>Contains all / exact length / one element matching all</td></tr>
+      <tr><td><code>$set $unset</code></td><td>update</td><td>Set or remove a field</td></tr>
+      <tr><td><code>$inc $mul $min $max</code></td><td>update</td><td>Arithmetic changes</td></tr>
+      <tr><td><code>$push $pull $addToSet</code></td><td>update</td><td>Array append, remove, unique append</td></tr>
+    </table>
+    <h3 id="app-stages" data-toc>A.3 Aggregation stage reference</h3>
+    <p class="topic-desc">This reference lists every aggregation pipeline stage the guide covered and what each transforms. Staging order matters: put $match and $sort early, and $project and $addFields late. Use it to recall a stage signature before building a pipeline.</p>
+    <table>
+      <tr><th>Stage</th><th>Purpose</th></tr>
+      <tr><td><code>$match</code></td><td>Filter documents (use indexes if first)</td></tr>
+      <tr><td><code>$sort</code></td><td>Order the stream</td></tr>
+      <tr><td><code>$group</code></td><td>Bucket by _id with accumulators</td></tr>
+      <tr><td><code>$project</code> / <code>$addFields</code></td><td>Include/compute fields</td></tr>
+      <tr><td><code>$unwind</code></td><td>One document per array element</td></tr>
+      <tr><td><code>$lookup</code></td><td>Left-join from another collection</td></tr>
+      <tr><td><code>$facet</code> / <code>$bucket</code></td><td>Parallel pipelines / numeric ranges</td></tr>
+    </table>
+    <h3 id="app-indexes" data-toc>A.4 Index types at a glance</h3>
+    <p class="topic-desc">This reference summarizes the index flavours and their one-line jobs, from single-field and compound to unique, sparse, partial, and TTL. Each entry shows the createIndex options that produce it. Use it to pick the right index type without rereading Chapter 5.</p>
+    <table>
+      <tr><th>Index</th><th>Job</th></tr>
+      <tr><td>Single-field (<code>{ f: 1 }</code>)</td><td>Speed up queries on one field</td></tr>
+      <tr><td>Compound (<code>{ a: 1, b: -1 }</code>)</td><td>Multi-field filters and sorts</td></tr>
+      <tr><td>Unique (<code>{ unique: true }</code>)</td><td>Enforce a uniqueness constraint</td></tr>
+      <tr><td>Sparse (<code>{ sparse: true }</code>)</td><td>Index only docs with the field</td></tr>
+      <tr><td>Partial (<code>{ partialFilterExpression }</code>)</td><td>Index only a subset of docs</td></tr>
+      <tr><td>TTL (<code>{ expireAfterSeconds }</code>)</td><td>Auto-delete after a delay</td></tr>
+    </table>
+    <h3 id="app-glossary" data-toc>A.5 Glossary</h3>
+    <p class="topic-desc">The glossary defines the core vocabulary of the guide, from BSON and ObjectId to oplog, shard key, and populated. Every term links to where the guide teaches it. Read it so chapter reading never stalls on an unfamiliar word.</p>
+    <ul>
+      <li><strong>Document</strong> — a single record; a BSON object that can nest subdocuments and arrays.</li>
+      <li><strong>Collection</strong> — a named group of documents, roughly a table without a fixed schema.</li>
+      <li><strong>BSON</strong> — the binary JSON encoding MongoDB stores and transfers, with extra types.</li>
+      <li><strong>ObjectId</strong> — the default 12-byte <code>_id</code> value with an embedded timestamp.</li>
+      <li><strong>Cursor</strong> — the lazily evaluated result of <code>find</code>, iterated page by page.</li>
+      <li><strong>Update operator</strong> — a dollar-prefixed modifier (<code>$set</code>, <code>$inc</code>) applied inside an update.</li>
+      <li><strong>Projection</strong> — the filter that selects which fields a query returns.</li>
+      <li><strong>Index</strong> — a B-tree structure that turns scans into lookups.</li>
+      <li><strong>Pipeline</strong> — the ordered array of stages in an aggregation.</li>
+      <li><strong>Shard key</strong> — the field (or fields) whose ranges divide a collection across shards.</li>
+      <li><strong>Oplog</strong> — the capped collection of writes secondaries replay for replication.</li>
+      <li><strong>Replica set</strong> — one primary plus secondaries that elect a new primary on failure.</li>
+      <li><strong>Write concern</strong> — how many members must acknowledge a write before it is accepted.</li>
+      <li><strong>Read concern</strong> — how fresh and "committed" a read must be.</li>
+      <li><strong>Session</strong> — a client-scoped context that powers transactions and causal consistency.</li>
+      <li><strong>Mongos</strong> — the router process that fronts a sharded cluster.</li>
+      <li><strong>Validator</strong> — a <code>$jsonSchema</code> rule a collection enforces on writes.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>MongoDB — Document Database Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

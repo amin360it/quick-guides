@@ -1,0 +1,381 @@
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Interaction Design and Components</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">A component is the states it can be in, not the picture of its default state. This chapter turns the design systems work of the earlier chapters into behaviour: states and focus, feedback and status, microinteractions and motion, the anatomy of forms, and the navigation patterns that hold it all together.</p>
+
+<h3 id="ch6-1" data-toc>6.1 States: designing behaviour, not pictures</h3>
+<p class="topic-desc">Every interactive component has a family of states — default, hover, focus, active, disabled, busy — and each is a design decision with its own colours and contrast to pass. The component spec is the list of those states and what each one does.</p>
+<h4 id="ch6-1-states">The state map comes before the artwork</h4>
+<p>Write the states down before styling anything, one line each, with the background, text and border token per state. The states that get skipped in the map are the ones that fail in production: the disabled state that passes nothing along, the busy state that offers no feedback. The map below is the shape every interactive component should fill in, and the CSS shows the tokens doing the work.</p>
+<div class="codeWrap"><pre><code>// component state map — fill this in before styling the component
+STATE    TRIGGER                BACKGROUND       TEXT            BORDER
+default  rendered               --accent         --on-accent     --
+hover    pointer over           --accent-hover   --on-accent     --
+active   pointer down           --accent-deep    --on-accent     --
+focus    keyboard arrives       --accent         --on-accent     2px ring,
+                                 (visible, see next section)      2px offset
+disabled not available          --surface-sunken --text-disabled --
+busy     work in progress       --accent         (spinner)       --
+
+// the same map as CSS
+.btn {
+  background: var(--accent);
+  color: var(--on-accent);
+  min-height: 44px;
+}
+.btn:hover  { background: var(--accent-hover); }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.btn:disabled {
+  background: var(--surface-sunken);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+.btn[aria-busy="true"] { cursor: progress; }</code></pre></div>
+<h4 id="ch6-1-focus">Focus is a requirement, not decoration</h4>
+<p>A visible focus indicator is WCAG 2.4.7, and for keyboard users it is the entire navigation system — they move by Tab and look for the ring. Never remove the outline without replacing it with something equally visible; the modern pattern is <code>:focus-visible</code>, which shows the ring only when the keyboard is in use and leaves mouse clicks clean. Pick one focus style — a 2 px ring with 2 px offset is the common one — and apply it consistently, because a ring that appears in half the components is worse than none.</p>
+<div class="codeWrap"><pre><code>// visible focus, consistent across every interactive element
+a:focus-visible, button:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius);   /* keep the ring's corners honest */
+}
+
+/* touch screens: enlarge the whole target, not just the ring */
+@media (pointer: coarse) {
+  button, a.btn { min-height: 48px; min-width: 48px; }
+}
+
+// rules
+- never `outline: none` without a replacement focus style
+- the ring must clear 3:1 against both the element and the page
+- focus order follows visual order (ch8-1 has the keyboard audit)
+- a modal traps focus, but must also offer an escape (Esc, and a close)</code></pre></div>
+<div class="warn"><p>The "remove the outline for a cleaner look" pattern ships a lot, and it is the fastest way to make a product unusable by keyboard. If a stakeholder asks why the ring is there, the answer is WCAG 2.4.7 — and the fix, if the ring looks wrong, is to style it better, never to remove it.</p></div>
+
+<h3 id="ch6-2" data-toc>6.2 Feedback and system status</h3>
+<p class="topic-desc">Every action needs a visible result, and every system that takes time needs to say so. Feedback is a component: toasts and live regions for events, inline messaging for errors, and progress for anything slower than a blink.</p>
+<h4 id="ch6-2-live">Announcing changes, politely and correctly</h4>
+<p>The browser announces dynamic content to screen readers through live regions, and the choice of <code>polite</code> versus <code>assertive</code> is a design decision: a successful save can wait politely; a payment failure that must interrupt gets <code>role="alert"</code>. The markup is nearly invisible — a container with the attributes — and the JS is one assignment. The content rule matters as much: announce what changed and what to do next, not the raw technical detail.</p>
+<div class="codeWrap"><pre><code>&lt;!-- transient success: polite, non-interrupting --&gt;
+&lt;div class="toast" role="status" aria-live="polite"&gt;Project saved.&lt;/div&gt;
+
+&lt;!-- must interrupt: assertive --&gt;
+&lt;div class="toast toast--error" role="alert"&gt;
+  Payment failed — your card was not charged. Try again.
+&lt;/div&gt;
+
+// the JS is one assignment, because the region already exists
+function announce(message, assertive) {
+  const box = document.getElementById(assertive ? "alertBox" : "statusBox");
+  box.textContent = message;   // textContent, never innerHTML
+}
+
+// rules
+- one live region per role, present in the DOM from the start
+- "Saved", "Deleted", "2 items filtered" — announce the result and state
+- a toast is transient for sighted users; the live region is what
+  screen readers hear, so it must say the same thing
+- never put focus-stealing dialogs behind a polite region</code></pre></div>
+<h4 id="ch6-2-inline">Inline validation: the error lives with the field</h4>
+<p>Validation errors belong next to the field they describe, announced by that field, and they must survive the extra information the user already typed. The pattern is three linked nodes: the hint (optional), the error (hidden until it fires), and the association via <code>aria-describedby</code>. The red border is decoration; the text is the message, and the message never relies on colour alone (ch5-2).</p>
+<div class="codeWrap"><pre><code>&lt;label for="email"&gt;Work email&lt;/label&gt;
+&lt;input id="email" name="email" type="email"
+       aria-describedby="email-hint email-error"&gt;
+&lt;p id="email-hint" class="hint"&gt;We only send receipts here.&lt;/p&gt;
+&lt;p id="email-error" class="error" role="alert" hidden&gt;Enter a valid email.&lt;/p&gt;
+
+// rules
+- the error text names the problem and the fix ("Enter a valid email,
+  like name@company.com")
+- the field stays labelled and the hint stays available after the error
+- validate on blur or submit, never on every keystroke for emails
+- an error summary at the top of the form links to each failing field
+  for long forms (WCAG 3.3.1, 3.3.3)</code></pre></div>
+
+<h3 id="ch6-3" data-toc>6.3 Microinteractions and motion</h3>
+<p class="topic-desc">Motion communicates state change faster than colour or text, and it is the easiest part of a design to get both pleasing and wrong. The specs are small: durations by role, one easing, and an explicit off switch for users who ask for one.</p>
+<h4 id="ch6-3-timing">Durations, easing and what not to move</h4>
+<p>Duration is role, not taste: 100–200 ms for feedback (button presses, toggles), 200–500 ms for movement (panels, menus), and 500 ms only for big reveals — anything longer reads as broken. Pick one easing and use it everywhere; <code>ease-out</code> for entrances, <code>ease-in-out</code> for loops, and never <code>linear</code> for UI, which looks mechanical. The first law of motion design: animate position, opacity and transform — the properties the compositor handles cheaply — and never layout-triggering properties like width or height on the main thread.</p>
+<div class="codeWrap"><pre><code>/* durations: 100-200ms feedback, 200-500ms movement, 500ms+ is a reveal */
+.btn:active { transition: transform 100ms ease-out; }
+
+.panel {
+  transition:
+    transform 250ms cubic-bezier(0.2, 0, 0, 1),   /* entrances ease out */
+    opacity   250ms ease;
+}
+
+/* what NOT to animate: layout properties that force reflow */
+/* width, height, margin, top — animate transform/opacity instead */
+.panel {
+  transform: translateY(-8px);   /* instead of animating margin-top */
+}
+
+// microinteraction checklist
+[ ] the animation answers "what state am I now in?"
+[ ] one eas<strong>ing</strong> per product, listed in the motion tokens
+[ ] feedback under 200ms; nothing decorative over 500ms
+[ ] motion never the only channel for a state change (ch5-2)</code></pre></div>
+<h4 id="ch6-3-reduce">Respect the user's motion setting</h4>
+<p>Every product ships to people who have "reduce motion" on in the OS — some because vestibular disorders make parallax and large slides genuinely sickening. The response is a media query that collapses animation durations to near zero without removing the state change itself: the swap still happens, it just stops sliding. The design rule underneath is that motion is decoration layered on a state change that works without it.</p>
+<div class="codeWrap"><pre><code>/* the standard off switch: state changes stay, motion stops */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// the design rule
+//   a state change must survive motion being off:
+//   a tab switch still selects; a dialog still opens; an error still
+//   appears. If the transition was the only signal, the design is
+//   wrong for everyone, not just for reduced-motion users.
+//
+// test it: turn on the OS setting (or the browser emulation) and
+// walk the primary flows. Every one must still complete.</code></pre></div>
+
+<h3 id="ch6-4" data-toc>6.4 Forms and inputs</h3>
+<p class="topic-desc">Forms are where UX is won and lost: the most-tested, most-abandoned component class in the product. The anatomy is small and fixed — label, control, hint, error — and the browser itself cooperates if the markup is honest.</p>
+<h4 id="ch6-4-structure">Label, control, hint, error</h4>
+<p>A form field is four coordinated nodes: a visible label bound to its control (an invisible placeholder is not a label — it disappears on input and is a placeholder for everyone, a problem for autofill and translation), the control with the right <code>type</code>, an optional hint, and an error (ch6-2). The label belongs above the field on narrow viewports and can sit beside it on wide ones — never inside where typing hides it.</p>
+<div class="codeWrap"><pre><code>&lt;form action="/signup" method="post" novalidate&gt;
+  &lt;div class="field"&gt;
+    &lt;label for="name"&gt;Full name&lt;/label&gt;
+    &lt;input id="name" name="name" type="text" autocomplete="name" required&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;label for="card"&gt;Card number&lt;/label&gt;
+    &lt;input id="card" name="card" type="text" inputmode="numeric"
+           autocomplete="cc-number"&gt;
+  &lt;/div&gt;
+  &lt;button type="submit"&gt;Start free trial&lt;/button&gt;
+&lt;/form&gt;
+
+// field rules
+- placeholder is never the label; a label that vanishes on input
+  fails autofill, translation and memory
+- the right type/inputmode gives the right mobile keyboard:
+  email, tel, url, number, search, inputmode="numeric"
+- error text and hints are wired with aria-describedby (ch6-2)
+- disabled fields are avoided entirely — a read-only value with an
+  explanation beats a disabled mystery</code></pre></div>
+<h4 id="ch6-4-autofill">The browser's form brain</h4>
+<p>Browsers autofill forms they recognise, and recognition is driven by <code>autocomplete</code> tokens. The correct token buys free behaviour — the phone keyboard, the saved-password flow, the address book — and the omission of it makes your form the one users type out, and then abandon. The token list is the smallest useful subset; the full registry is in the HTML spec's "autofill field" section.</p>
+<div class="codeWrap"><pre><code>// autocomplete tokens the browser understands (subset)
+name, given-name, family-name, email, tel, url,
+organization, street-address, address-level2, postal-code, country,
+cc-name, cc-number, cc-exp, cc-csc,
+username, current-password, new-password
+
+// the pattern
+&lt;input id="password" name="password" type="password"
+       autocomplete="current-password"&gt;
+
+// what correct tokens fix, without writing any code
+- the right mobile keyboard (email keyboard for email, numeric for cards)
+- the saved-password flow works, so users can actually log in
+- address autofill works, so shipping forms stop dying at "country"
+- password managers recognise the form and stop guessing</code></pre></div>
+<div class="tip"><p>If a form has more than seven fields, consider a single-column layout — multi-column forms break the reading flow and double the perceived effort. And write the button in the user's language: "Start free trial" beats "Submit", and users who know what happens next are users who finish.</p></div>
+
+<h3 id="ch6-5" data-toc>6.5 Navigation patterns</h3>
+<p class="topic-desc">Tabs, breadcrumbs, pagination and load-more are each a contract between the UI and the user about how much structure is visible. The right pattern is chosen by task, not by habit, and each has accessibility wiring that is part of the design.</p>
+<h4 id="ch6-5-tabs">Tabs with real semantics</h4>
+<p>Tabs are for switching between views of the same data without leaving the page — they are not a substitute for pages, and they are not a way to hide content behind discovery. The accessible pattern wires three roles together — <code>tablist</code>, <code>tab</code>, <code>tabpanel</code> — with <code>aria-selected</code> and <code>aria-controls</code> so keyboard and screen-reader users get the same structure the mouse user sees. Arrow-key navigation inside the tablist is part of the pattern, and the panel must not be focus-hidden.</p>
+<div class="codeWrap"><pre><code>&lt;div role="tablist" aria-label="Billing period"&gt;
+  &lt;button role="tab" id="tab-monthly" aria-controls="panel-monthly"
+          aria-selected="true"&gt;Monthly&lt;/button&gt;
+  &lt;button role="tab" id="tab-yearly" aria-controls="panel-yearly"
+          aria-selected="false"&gt;Yearly&lt;/button&gt;
+&lt;/div&gt;
+&lt;div role="tabpanel" id="panel-monthly" aria-labelledby="tab-monthly"&gt;
+  &lt;!-- the monthly pricing --&gt;
+&lt;/div&gt;
+&lt;div role="tabpanel" id="panel-yearly" aria-labelledby="tab-yearly" hidden&gt;
+  &lt;!-- the yearly pricing --&gt;
+&lt;/div&gt;
+
+// tab rules
+- the selected tab carries aria-selected="true", and the panel is shown
+- arrow keys move focus between tabs; Tab enters the panel
+- tabs do not create a page-change; a browser back button is not lost
+- if the content differs in structure, it is probably pages, not tabs</code></pre></div>
+<h4 id="ch6-5-paging">Pagination versus infinite scroll</h4>
+<p>Numbered pagination fits search results and logs, where the user hunts for a specific page and needs to know where they are. "Load more" fits a recent-first list that is secondary to the page's purpose, and it appends rather than replaces. Infinite scroll fits an endless feed with no goal — and it is wrong the moment the user needs a footer, a position, or an endpoint. The decision is task-first: the user must be able to say where they are and go back to it.</p>
+<div class="codeWrap"><pre><code>// numbered pages: when the user hunts for a specific result
+//    (search results, transaction logs) keep the position explicit
+[Prev]  1 2 3 4 5  [Next]    "Page 3 of 12" — always in the heading
+
+// load more: when the list is secondary and the order is newest-first
+[Load more]   appends to the list, never replaces it
+             announces the new count ("added 20 of 40")
+
+// infinite scroll: only for an endless feed with no goal and no end
+// the failure cases that end product careers:
+- the footer becomes unreachable at the bottom of an infinite list
+- the user's position is lost on reload (scroll restoration fails)
+- a keyboard user has no way to step the pagination
+
+// the acceptance test for any paging pattern
+[ ] the user can say where they are, out loud
+[ ] the user can return to a previous position
+[ ] the pattern works without a mouse</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Prototyping and Testing</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">A prototype is a design you can disagree with cheaply. Fidelity rises as questions narrow — structure first, then content, then polish — and every level is testable. This chapter covers the fidelity ladder, prototype logic, the testing methods that give you answers, and the loop that turns findings into the next version.</p>
+
+<h3 id="ch7-1" data-toc>7.1 From wireframes to high fidelity</h3>
+<p class="topic-desc">The fidelity of an artifact should match the question it is answering. A wireframe cannot test whether the brand feels right, and a polished mockup is wasted money while the structure is still wrong. The ladder below is the order that question follows.</p>
+<h4 id="ch7-1-wireframe">The wireframe: structure with no colour</h4>
+<p>A wireframe is the layout without the visual system: boxes and lines that say what is where and how big, so that hierarchy and flow can be argued about before anyone falls in love with a blue. It is fast deliberately — minutes, not days — and its defeat condition is the pixel-polished wireframe that nobody dares to change. ASCII is a perfectly good first form; the sketch below is a full page in ten seconds.</p>
+<div class="codeWrap"><pre><code>+--------------------------------------------------------------+
+| [logo]    Home  Docs  Pricing            [Sign in]  [CTA]     |
++--------------------------------------------------------------+
+|                                                              |
+|  H1  "Design systems that ship"                              |
+|  Subhead — one sentence, 65ch max, real copy                 |
+|  [  Primary CTA  ]    Learn more (text link)                 |
+|                                                              |
+|  +----------+   +----------+   +----------+                 |
+|  | icon     |   | icon     |   | icon     |                 |
+|  | heading  |   | heading  |   | heading  |                 |
+|  | body text|   | body text|   | body text|                 |
+|  +----------+   +----------+   +----------+                 |
+|                                                              |
+|  footer: links, legal, social                               |
++--------------------------------------------------------------+
+
+// wireframe review questions — the only ones allowed at this stage
+[ ] what is the one thing this page does?
+[ ] what do you read first, second, third?
+[ ] what is the exit — the next action?
+// colour, fonts and imagery are not in scope yet</code></pre></div>
+<h4 id="ch7-1-fidelity">Matching fidelity to the decision at risk</h4>
+<p>Each rung answers a different question, and the cost jumps by an order of magnitude per rung. Paper structure and wireframes are for IA and hierarchy; mid-fi with real content tests navigation and usability; hi-fi with motion tests polish, brand and sign-off. The discipline is refusing the next rung until the current question is answered — mockups are the most expensive way to discover a flow problem.</p>
+<div class="codeWrap"><pre><code>// the fidelity ladder: question first, cost second
+FIDELITY   PURPOSE                        COST      REVIEW IT GETS
+paper      explore structure in minutes   minutes   stakeholders, not usability
+wireframe  layout, hierarchy, flows       hours     content and IA, not colour
+mid-fi     real content, real states      days      usability and navigation
+hi-fi      motion, polish, brand          weeks     final sign-off, design QA
+
+// the discipline
+[ ] structure is agreed before mid-fi (flow problems are cheapest here)
+[ ] mid-fi carries REAL content — lorem ipsum hides both readability
+    and content-shape problems (ch5-3, ch3-1)
+[ ] hi-fi is entered with the test plan already written (ch7-3)
+// a "polished wireframe" that nobody edits is a sign the rung was
+// skipped in the wrong direction: too much craft, too little decision.</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 Prototyping: tools and logic</h3>
+<p class="topic-desc">A prototype is a flow you can press, and the difference between a demo and a prototype is which states are wired. Tools differ, but the specification that matters — the flow spec — is a table of the frames, the states and the hand-off, and it lives in the repo.</p>
+<h4 id="ch7-2-flows">The flow spec: frames, states, entry points</h4>
+<p>Before wiring anything, write the spec: the frame sizes you are actually shipping to, the states every screen admits, whether transitions are in scope, and the entry points a tester will start from. This table is the difference between a prototype the team shares and a prototype that answers a question — and it is exactly what a developer needs later, which is why it outlives the tool that made it.</p>
+<div class="codeWrap"><pre><code>// prototype flow spec — write it before opening the tool
+FIELDS                     VALUE
+frames                     1440 x 900 (desktop)  390 x 844 (phone)
+states per screen          default, error, empty, loading
+transitions                none in click-through; animate only the key flow
+entry points               dashboard CTA, empty state CTA
+real content               yes — five key screens use final copy
+hand-off                   tokens file + redlines for the five key screens
+
+// screens that must be wired even though they are "boring"
+- the error path of the primary flow (ch3-2)
+- the empty states of every list that can be empty (ch3-5)
+- the loading states, so testers do not mistake latency for design</code></pre></div>
+<h4 id="ch7-2-logic">Click-through versus real logic</h4>
+<p>A click-through prototype links screen to screen; a logic prototype encodes decisions — "if the email is invalid, show this error". Testers do not need full logic, but they need the states that would make them think the prototype is broken: the button that does nothing, the back button that is not there, the empty state that never loads. The checklist is the quality bar for any prototype you put in front of a user, because a tester who gets stuck on a missing state is testing your prototype, not your design.</p>
+<div class="codeWrap"><pre><code>// the prototype readiness checklist
+[ ] the "cancel" and "back" paths exist, end to end
+[ ] error states are wired for at least the primary flow
+[ ] empty states exist for every list that can be empty
+[ ] loading states shown, not skipped
+[ ] text is real content from the content inventory (ch3-1)
+[ ] the prototype runs on a phone, not only a laptop
+[ ] click targets are the sizes they will ship at (44px, ch4-5)
+
+// the test worth running before the test
+walk the prototype end to end yourself with the checklist open.
+every gap you find is a tester about to find it for you — and
+charge you the session to do so.</code></pre></div>
+
+<h3 id="ch7-3" data-toc>7.3 Testing methods</h3>
+<p class="topic-desc">Three methods cover most rounds: moderated testing (why), unmoderated testing (how many), and controlled comparison (which of two). Each earns its place by the question it answers; none of them is a substitute for the others.</p>
+<h4 id="ch7-3-plan">The plan: tasks, metrics, pass bars</h4>
+<p>Every session needs the same skeleton — scenarios written as goals, a metric per task, and a pass bar agreed before anyone opens the room (the full mechanics are in ch2-4). The table below is a complete round: four tasks, four metrics, and a pass bar that turns the session into a decision at the end of the day rather than an argument.</p>
+<div class="codeWrap"><pre><code>TASK  SCENARIO                        METRIC              PASS BAR
+T1    "sign up and create a project"  task success        80%+ complete unaided
+T2    "find the price for 40 seats"   time on task        under 90 seconds
+T3    "export this week's report"     errors per task     one or fewer
+T4    "cancel and confirm the change" mis-clicks          none on destructive paths
+
+// decide before the session, not after
+- which tasks, in which order (calm first, stressful last)
+- who recruits, and the screen that recruits them (ch2-2)
+- who moderates and who only takes notes (separate people)
+- the pass bar per task — "we will ship this if T1 and T3 pass"</code></pre></div>
+<h4 id="ch7-3-fivesec">The five-second test and the ambiguity it finds</h4>
+<p>The cheapest test in the discipline tests hierarchy, not usability: show the screen for five seconds, cover it, and ask what the page is for and what the main action is. Five people, ten minutes, and the result is binary — if four of five agree on both answers, the hierarchy is doing its job; any disagreement is a specific, localisable defect. It is the first test to run on any new screen, because it costs nothing and catches the failures that usability-testing sessions politely attribute to "task confusion".</p>
+<div class="codeWrap"><pre><code># the five-second test — run on five people, score on agreement
+1. show the screen for exactly five seconds
+2. cover it
+3. ask: "what is this page for?"
+4. ask: "what is the main action?"
+5. score: 4 of 5 agree on BOTH answers -> hierarchy works
+
+# reading the results
+"it's a pricing page" but the main action is "sign up" -> good, exit clear
+nobody said "export report" on a reporting screen     -> level 1 is wrong
+two different main actions named                      -> two entries, ch4-4
+
+# why it works
+hierarchy is judged in the first seconds or not at all.
+a five-second pass does not prove the flow, but a failure proves
+the hierarchy is broken and no downstream test will rescue it.</code></pre></div>
+<h4 id="ch7-3-compare">A/B testing: one metric, pre-registered</h4>
+<p>A controlled comparison is how you decide between two real designs, and the rules that make it science are the same as anywhere: one metric chosen before the test, a sample size agreed in advance, and a fixed stopping rule. A change without a pre-registered metric and a sample size is not an experiment — it is a redesign with extra steps.</p>
+<div class="codeWrap"><pre><code>// pre-register the metric, the sample, and the stopping rule first
+// metric: task success rate (completed / started)
+function successRate(completed, started) {
+  return completed / started;
+}
+
+// decide before the test starts
+[ ] the ONE metric that decides ("signup completion", not "engagement")
+[ ] n per arm (200 completions is a working minimum for UI changes)
+[ ] the stopping rule ("run until n met, then compare with Fisher's
+    exact test"; never "watch it until it looks better")
+[ ] both variants pass the same accessibility checks first
+
+// the discipline
+a winner with p confidence against the pre-registered metric is a
+decision. a winner you noticed while watching is a preference.</code></pre></div>
+
+<h3 id="ch7-4" data-toc>7.4 Iterating from findings</h3>
+<p class="topic-desc">A test that produces no change is a test that was not worth running. The closing loop of the process is triage: turn findings into an issue log, severity-rank them against the pass bars, fix, and re-test the changed tasks so the loop provably closed.</p>
+<h4 id="ch7-4-log">The issue log: findings, not feelings</h4>
+<p>Every finding gets a row with the evidence — the task, the frequency, the observed behaviour — so the fix can be argued against the data rather than against the moderator's memory. The discipline is the same as synthesis in ch2-5: a finding without the session, the task and the frequency attached is a claim without evidence.</p>
+<div class="codeWrap"><pre><code>// issue log — one row per finding, evidence attached
+ID  FINDING                                   SEVERITY  FREQUENCY/SOURCE
+A   export link sits below the fold           P1        2 of 5 failed T3
+B   "Cancel" looks like a ghost button,       P1        every session,
+    users click it by accident                          missed in T4
+C   error text contradicts the field label    P2        rare, survey note
+D   primary CTA competes with the hero image  P3        opinion, check T1
+
+// log rules
+- one finding per row; a row with two findings is two rows
+- the source is the session or task, never "I noticed"
+- severity is assigned against the pass bars, not the pain felt:

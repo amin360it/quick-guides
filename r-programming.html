@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R Programming - Statistics, Data Frames and ggplot2</title>
+<meta name="description" content="R is a language designed for statistics and data analysis, and it is the tool of choice for data science…. 7 chapters, 39 topics and 67 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/r-programming.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="R Programming - Statistics, Data Frames and ggplot2">
+<meta property="og:description" content="R is a language designed for statistics and data analysis, and it is the tool of choice for data science…. 7 chapters, 39 topics and 67 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/r-programming.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="R Programming - Statistics, Data Frames and ggplot2">
+<meta name="twitter:description" content="R is a language designed for statistics and data analysis, and it is the tool of choice for data science…. 7 chapters, 39 topics and 67 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/r-programming.html#article","headline":"R Programming - Statistics, Data Frames and ggplot2","name":"R Programming - Statistics, Data Frames and ggplot2","description":"R is a language designed for statistics and data analysis, and it is the tool of choice for data science…. 7 chapters, 39 topics and 67 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/r-programming.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/r-programming.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"R Programming - Statistics, Data Frames and ggplot2","item":"https://amin360it.github.io/quick-guides/r-programming.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 ▸ Orientation: why R, RStudio and how R runs code</a><ul>
+<li><a href="#ch1-1" data-target="ch1-1">1.1 Why R, and what it is for</a></li>
+<li><a href="#ch1-2" data-target="ch1-2">1.2 The console, scripts and notebooks</a></li>
+<li><a href="#ch1-3" data-target="ch1-3">1.3 Getting help from the language itself</a></li>
+<li><a href="#ch1-4" data-target="ch1-4">1.4 Packages and the project workflow</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 ▸ Vectors and basic data types</a><ul>
+<li><a href="#ch2-1" data-target="ch2-1">2.1 Atomic types and the coercion ladder</a></li>
+<li><a href="#ch2-2" data-target="ch2-2">2.2 Element-wise arithmetic and recycling</a></li>
+<li><a href="#ch2-3" data-target="ch2-3">2.3 Indexing, named vectors and subsetting</a></li>
+<li><a href="#ch2-4" data-target="ch2-4">2.4 Missing data: NA and NaN</a></li>
+<li><a href="#ch2-5" data-target="ch2-5">2.5 Factors: categorical data done properly</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 ▸ Data structures: lists, matrices and tabular data</a><ul>
+<li><a href="#ch3-1" data-target="ch3-1">3.1 Lists: the one heterogeneous container</a></li>
+<li><a href="#ch3-2" data-target="ch3-2">3.2 Matrices and arrays</a></li>
+<li><a href="#ch3-3" data-target="ch3-3">3.3 Data frames: the workhorse table</a></li>
+<li><a href="#ch3-4" data-target="ch3-4">3.4 Tibbles and attributes</a></li>
+<li><a href="#ch3-5" data-target="ch3-5">3.5 str(), typeof() and class()</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 ▸ Control flow and functions</a><ul>
+<li><a href="#ch4-1" data-target="ch4-1">4.1 Conditionals</a></li>
+<li><a href="#ch4-2" data-target="ch4-2">4.2 Loops, and why you rarely need them</a></li>
+<li><a href="#ch4-3" data-target="ch4-3">4.3 Defining functions</a></li>
+<li><a href="#ch4-4" data-target="ch4-4">4.4 Scoping and environments</a></li>
+<li><a href="#ch4-5" data-target="ch4-5">4.5 Vectorised thinking and the apply family</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 ▸ Data manipulation with base R and dplyr</a><ul>
+<li><a href="#ch5-1" data-target="ch5-1">5.1 Importing data</a></li>
+<li><a href="#ch5-2" data-target="ch5-2">5.2 The dplyr verbs</a></li>
+<li><a href="#ch5-3" data-target="ch5-3">5.3 Piping: |&gt;, %&gt;% and when each</a></li>
+<li><a href="#ch5-4" data-target="ch5-4">5.4 Reshaping with tidyr</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 ▸ Visualisation with base R and ggplot2</a><ul>
+<li><a href="#ch6-1" data-target="ch6-1">6.1 Base R plotting</a></li>
+<li><a href="#ch6-2" data-target="ch6-2">6.2 ggplot2: the grammar of graphics</a></li>
+<li><a href="#ch6-3" data-target="ch6-3">6.3 Geoms, layers and facets</a></li>
+<li><a href="#ch6-4" data-target="ch6-4">6.4 Saving and exporting figures</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 ▸ Statistics, reporting and reproducibility</a><ul>
+<li><a href="#ch7-1" data-target="ch7-1">7.1 Common statistical tests</a></li>
+<li><a href="#ch7-2" data-target="ch7-2">7.2 Regression with lm()</a></li>
+<li><a href="#ch7-3" data-target="ch7-3">7.3 R Markdown and Quarto</a></li>
+<li><a href="#ch7-4" data-target="ch7-4">7.4 renv: dependency snapshots</a></li>
+<li><a href="#ch7-5" data-target="ch7-5">7.5 File and data hygiene</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+<h1 class="am-band">
+      <span class="am-band-t">R Programming</span>
+      <span class="am-band-s">7 chapters &middot; 39 topics &middot; 67 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation: why R, RStudio and how R runs code</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 ▸ Orientation: why R, RStudio and how R runs code</button><div class="ch-toc-list"><a href="#ch1-1">1.1 Why R, and what it is for</a><a href="#ch1-2">1.2 The console, scripts and notebooks</a><a href="#ch1-3">1.3 Getting help from the language itself</a><a href="#ch1-4">1.4 Packages and the project workflow</a></div></div>
+<p class="topic-desc">R is a language designed for statistics and data analysis, and it is the tool of choice in data science, academic research and quantitative work. This chapter explains what R is for, how a session executes code, where to find help, and how to keep a project organised from the first line you write.</p>
+
+<h3 id="ch1-1" data-toc>1.1 Why R, and what it is for</h3>
+<p class="topic-desc">Three properties make R the default for analysis rather than general-purpose programming: vectorised semantics, first-class tabular data, and a package ecosystem built for statistics.</p>
+
+<h4 id="ch1-1-reasons">Three reasons to pick R</h4>
+<p><strong>Vectorised semantics.</strong> Most R functions operate on whole vectors at once; you rarely write explicit loops. R delegates the arithmetic to optimised C and Fortran routines, so a vectorised expression is both shorter and faster than the equivalent loop. <strong>Data frames</strong> are R's native table format — a list of equal-length vectors treated as one rectangular object — and the whole ecosystem speaks them. <strong>Packages on CRAN</strong> cover nearly every discipline in academia, medicine, finance and machine learning, and the standard statistical tests ship in base R, so there is no dependency gap between describing data and testing it.</p>
+<div class="codeWrap"><pre><code>x &lt;- rnorm(1000)            # a vector of 1000 draws
+mean(x)                     # one number - no loop anywhere
+x[x &gt; 0]                    # every positive draw, one expression
+sum(x &gt; 0)                  # how many were positive
+</code></pre></div>
+<div class="note">Assignment uses <code>&lt;-</code> — read it as "becomes". <code>=</code> is legal for top-level assignment but is reserved for named arguments inside a call, and mixing the two is how style-guide violations appear. The R community convention is <code>&lt;-</code>.</div>
+
+<h4 id="ch1-1-minimal">The shape of a minimal script</h4>
+<p>An R script is a flat sequence of expressions. The console evaluates an expression and prints the result; the same expression inside a <code>.R</code> file is evaluated when the file runs. This is the entire skeleton of an analysis: load data, transform it, summarise it, plot it. Everything later in this guide is a refinement of that four-step shape.</p>
+<div class="codeWrap"><pre><code># hello.R
+age &lt;- c(25, 30, 35)
+mean(age)          # 30
+plot(age, 1:3)     # a scatter plot
+</code></pre></div>
+
+<h4 id="ch1-1-data-step">A more realistic data step</h4>
+<p>Real analyses rarely stop at one vector. The pattern that appears constantly is: read a table, split it by a group, and reduce each group to a summary. The <code>%&gt;%</code> in the example pipes the data frame into the next function, so the pipeline reads top to bottom: <code>df</code> becomes the grouped data, which becomes the summary. You will meet pipes properly in chapter 5; for now, recognise the shape.</p>
+<div class="codeWrap"><pre><code># load a CSV and compute per-group summaries
+library(dplyr)
+df &lt;- read.csv("data.csv")
+summary_stats &lt;- df %&gt;%
+  group_by(group) %&gt;%
+  summarise(mean_y = mean(y), n = n())
+</code></pre></div>
+
+<h4 id="ch1-1-vs-python">Why R beats plain Python for statistics</h4>
+<p>R was built for statistical software from the ground up. Its model formulas — <code>y ~ x1 + x2</code> — are a first-class syntax and appear unchanged in <code>lm()</code>, <code>glm()</code>, <code>aov()</code> and dozens of model families. The tests you reach for most (<code>t.test</code>, <code>cor.test</code>, <code>chisq.test</code>) are built in and documented with real references. A mixed-effects model that takes several dependencies and careful object plumbing in a general-purpose language is one <code>lmer()</code> call here. The trade-off is the flip side of that focus: general programming — HTTP servers, heavy string manipulation — is more awkward in R, which is why common stacks pair R for analysis with Python or JavaScript for engineering.</p>
+<div class="codeWrap"><pre><code>summary(lm(mpg ~ wt, data = mtcars))
+# the model, its coefficients, R-squared and an F-test in one call;
+# plot(model) then draws four diagnostic plots for the assumptions.
+</code></pre></div>
+
+<h3 id="ch1-2" data-toc>1.2 The console, scripts and notebooks</h3>
+<p class="topic-desc">R code runs in one of three places — the interactive console, a script file, or a notebook document. Each has a different feedback loop, and knowing which one you are in explains how errors and objects behave.</p>
+
+<h4 id="ch1-2-console">The console: one expression at a time</h4>
+<p>RStudio's Console is a live R process. Every expression is evaluated immediately and printed, and everything the expression creates stays in the session until you close it. The console is where you probe: try <code>mean()</code>, inspect a column, test a hypothesis about the data. Because it is interactive, an error there costs you nothing; the same error at line 40 of a batch run is a failure of the whole file.</p>
+<div class="codeWrap"><pre><code>1 + 1                    # 2
+sqrt(2)                  # 1.414214
+c(1, 2, 3) + 1           # 2 3 4  - vector arithmetic in action
+"two" + 1                # Error: non-numeric argument to binary operator
+</code></pre></div>
+
+<h4 id="ch1-2-scripts">Scripts: source() and Run</h4>
+<p>A <code>.R</code> file is evaluated the same way the console is, but as one batch. <code>source("file.R")</code> runs the whole file in the global environment; Ctrl+Enter runs just the current line or selection, and Ctrl+Shift+Enter runs the whole file, so you can develop an analysis line by line and never leave the script. Objects created by a sourced script land in your global environment and persist — convenient, and the main way sessions accumulate unrelated state.</p>
+<div class="codeWrap"><pre><code># analysis.R - a whole pipeline as one batch
+df &lt;- read.csv("data.csv")
+df$ratio &lt;- df$x / df$y
+source("analysis.R")     # run the file from the console
+ls()                     # everything the file just created
+</code></pre></div>
+
+<h4 id="ch1-2-notebooks">Notebooks: R Markdown and Quarto</h4>
+<p>Notebook documents interleave prose, code and output in a single file. The code lives in fenced chunks, delimited by triple backticks and <code>{r}</code>, and each chunk's result — a table, a plot, a message — is rendered inline. The cost is that chunk order is the execution order only if you run every chunk top to bottom; running them out of order is the classic source of "it worked in the notebook but not in the script". Use a notebook when the deliverable is a report, and a script when the deliverable is a pipeline.</p>
+<div class="codeWrap"><pre><code>---
+title: "My report"
+output: html_document
+---
+
+```{r}
+summary(mtcars)
+```
+</code></pre></div>
+
+<h3 id="ch1-3" data-toc>1.3 Getting help from the language itself</h3>
+<p class="topic-desc">R ships its documentation with the language, indexed and searchable from the console. Four entry points cover nearly every question.</p>
+
+<h4 id="ch1-3-pages">Help pages, ? and example()</h4>
+<p><code>?</code> is the fastest way to get help: <code>?mean</code> opens the help page for <code>mean</code>, and <code>help("mean")</code> is the spelled-out form of the same operation. <code>args()</code> prints only the function signature — invaluable when you need the argument names and not the essay. <code>example()</code> runs every example from a help page, which is often faster than reading it: dozens of R functions demonstrate their own edge cases in their examples.</p>
+<div class="codeWrap"><pre><code>?mean               # the help page for mean
+help("mean")        # the same page, spelled out
+args(mean)          # function (x, ...) - just the signature
+example(mean)       # runs every example on the help page
+</code></pre></div>
+
+<h4 id="ch1-3-find">Finding things: apropos, ?? and vignettes</h4>
+<p><code>apropos()</code> lists the names visible on the search path that match a fragment — the way to discover that the function you half-remember is called <code>relevel</code> and not <code>reset_levels</code>. <code>??pattern</code> searches the help index across every installed package, so it finds functions you have never loaded. Vignettes are long-form guides bundled with a package; <code>vignette()</code> lists them and <code>browseVignettes()</code> opens them in the browser.</p>
+<div class="codeWrap"><pre><code>apropos("anova")                # every visible name containing "anova"
+??"chi.squared"                 # search the help index of all packages
+vignette(package = "dplyr")     # what is installed
+browseVignettes("ggplot2")      # open the HTML guides
+</code></pre></div>
+
+<h3 id="ch1-4" data-toc>1.4 Packages and the project workflow</h3>
+<p class="topic-desc">Packages extend R well beyond its base; projects keep a session's state, paths and outputs in one place. Getting both right at the start saves hours of path-and-version debugging later.</p>
+
+<h4 id="ch1-4-install">Installing and attaching packages</h4>
+<p><code>install.packages()</code> downloads a package from CRAN once; <code>library()</code> attaches it at the start of every session that needs it. Attaching puts the package's functions on the search path so you can call them bare. <code>require()</code> does the same but returns <code>FALSE</code> instead of stopping when the package is missing, which makes it the right choice where a script should degrade gracefully. Package files live in library directories reported by <code>.libPaths()</code>. A package installed once is available to all your projects — but the version you pin is shared too, which is the gap renv closes in chapter 7.</p>
+<div class="codeWrap"><pre><code>install.packages("dplyr")                # once, from CRAN
+library(dplyr)                           # every session that needs it
+.libPaths()                              # where packages live on disk
+ok &lt;- require("DBI", quietly = TRUE)     # FALSE instead of an error
+</code></pre></div>
+
+<h4 id="ch1-4-projects">RStudio projects and the working directory</h4>
+<p><code>getwd()</code> reports the working directory; <code>setwd()</code> changes it — and a script that starts with <code>setwd("C:/Users/you/Documents/...")</code> breaks for the next person and breaks on the next machine. An RStudio Project (<code>.Rproj</code>) fixes that: opening the project sets the working directory to the project root, so relative paths such as <code>"data/raw.csv"</code> resolve everywhere. Keep data, scripts and outputs in named subfolders (<code>data/</code>, <code>R/</code>, <code>output/</code>, <code>figures/</code>) and never write outside them.</p>
+<div class="codeWrap"><pre><code>getwd()                  # the working directory right now
+list.files()             # what is in it
+# an analysis.Rproj file roots the session: opening it sets the
+# working directory, so relative paths always resolve
+read.csv("data/raw.csv") # works from any RStudio project
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Vectors and basic data types</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 ▸ Vectors and basic data types</button><div class="ch-toc-list"><a href="#ch2-1">2.1 Atomic types and the coercion ladder</a><a href="#ch2-2">2.2 Element-wise arithmetic and recycling</a><a href="#ch2-3">2.3 Indexing, named vectors and subsetting</a><a href="#ch2-4">2.4 Missing data: NA and NaN</a><a href="#ch2-5">2.5 Factors: categorical data done properly</a></div></div>
+<p class="topic-desc">In R every object is built from vectors, and almost every surprising behaviour follows from that one fact: there is no scalar type, arithmetic applies element-wise, and a vector's length is whatever an operation produced rather than what you asked for. Getting vectors right removes most of the mystery from the rest of the language.</p>
+
+<h3 id="ch2-1" data-toc>2.1 Atomic types and the coercion ladder</h3>
+<p class="topic-desc">R has four atomic types — logical, integer, double and character — plus factors and lists, which are composites. Mixed-type construction never fails; it silently promotes along a fixed ladder, and knowing the ladder explains most "why did my numbers become strings?" bugs.</p>
+
+<h4 id="ch2-1-atomic">The four atomic types</h4>
+<p><code>c()</code> — "combine" — builds a vector from its arguments, coercing mixed inputs along the ladder. A trailing <code>L</code> marks an integer literal (<code>1L</code>); without it, <code>1</code> is a double. There is no scalar type: what other languages call a scalar is a length-1 vector here, and every operation on it is still a vector operation, which is why <code>length(42)</code> is 1 rather than an error.</p>
+<div class="codeWrap"><pre><code>x &lt;- c(1, 2, 3)                    # double
+i &lt;- c(1L, 2L, 3L)                # integer
+b &lt;- c(TRUE, FALSE)               # logical
+s &lt;- c("a", "b")                  # character
+
+typeof(x)                          # "double"
+length(x)                          # 3
+
+# there is no scalar type: a "scalar" is a length-1 vector
+length(42)                         # 1
+is.vector(42, "double")            # TRUE
+</code></pre></div>
+
+<h4 id="ch2-1-coercion">The coercion ladder</h4>
+<p>When a vector holds mixed types, R promotes along a fixed ladder: logical to integer, integer to double, double to character. The ladder is total, so <code>c(TRUE, 1)</code> gives you <code>1 1</code> rather than an error, and <code>c(1, "a")</code> gives two strings rather than a warning. Implicit coercion is the default; explicit coercion with <code>as.integer()</code>, <code>as.character()</code> and friends is how you take control when the default choice matters.</p>
+<div class="codeWrap"><pre><code>c(TRUE, 1)                         # 1 1         (logical -&gt; integer)
+c(TRUE, 1.5)                       # 1 1.5       (integer -&gt; double)
+c(1, "a")                          # "1" "a"     (double -&gt; character)
+
+# use explicit coercion when the implicit choice matters:
+as.integer(c(2.7, 3.9))            # 2 3         truncates, does not round
+as.character(c(1, 2))              # "1" "2"
+as.numeric(c("1", "2.5"))          # 1.0 2.5
+</code></pre></div>
+
+<h3 id="ch2-2" data-toc>2.2 Element-wise arithmetic and recycling</h3>
+<p class="topic-desc">Because arithmetic is element-wise and vectors recycle, <code>x * 2</code> multiplies every element and a loop is almost never the right tool. The one genuine hazard is recycling, which R performs silently when operand lengths differ.</p>
+
+<h4 id="ch2-2-arithmetic">Element-wise arithmetic</h4>
+<p>Every arithmetic operator in R — <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>, <code>%%</code>, <code>%/%</code> — compares or combines the vectors element by element. A length-1 operand is broadcast across the whole vector, which is how <code>a + 1</code> adds one to every element. This is the mechanism behind the idiom "no loops": the operation you would have written as a <code>for</code> is already a single expression.</p>
+<div class="codeWrap"><pre><code>a &lt;- c(1, 2, 3)
+a * 2            # 2 4 6
+a + 1            # 2 3 4
+a^2              # 1 4 9
+a %% 2           # 1 0 1   (modulo)
+</code></pre></div>
+
+<h4 id="ch2-2-recycling">Recycling, and rep_len</h4>
+<p>R will repeat a shorter operand to match a longer one, silently, and warns only when the lengths are not a whole multiple. A length-3 vector added to a length-2 vector produces a length-6 result and a warning you might not notice — so a silent bug becomes a six-element vector that everyone reads as intended. The clean fix is <code>rep_len()</code>, which makes the shorter vector the length you actually mean and removes the ambiguity entirely.</p>
+<div class="codeWrap"><pre><code>b &lt;- c(10, 20)
+a + b            # 11 22 31 12 22 32   recycling to length 6, with warning
+rep_len(b, length(a)) + a   # 11 22 31  the lengths match, no ambiguity
+</code></pre></div>
+<div class="warn">Recycling a length-2 against a length-3 succeeds and only warns. If you rely on the fallback, <code>rep_len()</code> is the deliberate version of the same operation; a wrong result from recycling is almost never diagnosed as recycling.</div>
+
+<h3 id="ch2-3" data-toc>2.3 Indexing, named vectors and subsetting</h3>
+<p class="topic-desc">Subsetting a vector has three forms — by position, by name, and by logical filter — and each can change its length. Knowing which one you have is what makes a surprising length change explicable rather than mysterious.</p>
+
+<h4 id="ch2-3-positions">Numeric and character indexing</h4>
+<p><code>x[i]</code> selects elements and always returns a vector. Numeric indices select by position; character indices select by name once a vector has <code>names()</code>. <code>[[ ]]</code> on a vector returns the element itself and drops the name — the contrast that matters on lists, where <code>[[ ]]</code> and <code>[ ]</code> return different types. A negative index drops positions rather than selecting them.</p>
+<div class="codeWrap"><pre><code>v &lt;- c(alpha = 10, beta = 20, gamma = 30)
+names(v)           # "alpha" "beta" "gamma"
+v[2]               # beta 20      by position
+v[c(1, 3)]         # alpha gamma  several positions at once
+v["beta"]          # beta 20      by name
+v[["beta"]]        # 20           [[ ]] drops the name
+v[-1]              # beta gamma   everything except position 1
+</code></pre></div>
+
+<h4 id="ch2-3-logical">Logical filtering changes length</h4>
+<p>A logical index filters: <code>n[n &gt; 3]</code> keeps only the elements where the test is true, and the result's length is whatever passed — never the length you started with. The off-by-N bug class follows directly: using <code>length(n[n &gt; 3])</code> as an index into another vector when you meant <code>length(n)</code>. <code>which()</code> returns the positions that pass, which is often what you actually wanted to index with.</p>
+<div class="codeWrap"><pre><code>n &lt;- c(1, 2, 3, 4, 5)
+n[n &gt; 3]           # 4 5   length 2 - correct, but easy to forget
+which(n &gt; 3)       # 4 5   the positions, not the values
+n[n &gt; 3] &lt;- NA     # 1 2 3 NA NA   write through a logical filter
+</code></pre></div>
+
+<h3 id="ch2-4" data-toc>2.4 Missing data: NA and NaN</h3>
+<p class="topic-desc">Missing values are first-class in R. An <code>NA</code> is a real value meaning "unknown", and arithmetic with it propagates: one missing observation makes a mean <code>NA</code> unless you say otherwise.</p>
+
+<h4 id="ch2-4-na">NA is a value that means "unknown"</h4>
+<p><code>mean(x)</code> on a vector containing <code>NA</code> returns <code>NA</code>, because the mean of "unknown plus three numbers" is itself unknown. Nearly every summary function therefore takes <code>na.rm = TRUE</code> — and almost none applies it for you. <code>is.na()</code> asks which elements are missing, <code>anyNA()</code> asks whether any are, and <code>sum(is.na(x))</code> counts them. Get into the habit of counting missing values the moment data arrives; most "my model collapsed" reports trace back to a silent <code>NA</code>.</p>
+<div class="codeWrap"><pre><code>x &lt;- c(1, 2, NA, 4)
+is.na(x)                  # FALSE FALSE TRUE FALSE
+anyNA(x)                  # TRUE
+sum(is.na(x))             # 1
+mean(x)                   # NA
+mean(x, na.rm = TRUE)     # 2.333333
+</code></pre></div>
+
+<h4 id="ch2-4-complete">Comparing to NA, and complete.cases</h4>
+<p><code>x == NA</code> is never <code>TRUE</code>: comparisons with a missing value propagate to a missing result, so filtering on <code>x == NA</code> drops the missing rows and keeps the rest, which is probably not what you meant. Test missingness with <code>is.na()</code> and drop whole rows with <code>complete.cases()</code>, which returns one logical value per row of a data frame telling you whether every column is present.</p>
+<div class="codeWrap"><pre><code>x == NA                  # NA NA NA NA - never TRUE, the comparison spreads
+df &lt;- data.frame(a = c(1, 2, NA), b = c("u", NA, "z"))
+complete.cases(df)       # TRUE FALSE FALSE   a row with an NA is incomplete
+df[complete.cases(df), ] # only the complete rows
+</code></pre></div>
+
+<h3 id="ch2-5" data-toc>2.5 Factors: categorical data done properly</h3>
+<p class="topic-desc">A factor is an integer vector with a fixed table of labels — its levels — attached. It is the right type for categorical columns, and the source of a whole class of classic bugs, both from its alphabetical default ordering and from its silent conversion of text to codes.</p>
+
+<h4 id="ch2-5-levels">Levels, and the alphabetical default</h4>
+<p><code>factor()</code> stores integers and a separate level table; the labels default to alphabetical order. Sorting a factor therefore sorts by its internal codes, so <code>sort(grade)</code> on default levels can be a no-op that looks wrong, and every plot axis and table that inherits the factor inherits that order. The codes themselves leak into arithmetic: <code>as.integer(grade)</code> hands you the codes, not the text, which is the classic route to an off-by-one grouping.</p>
+<div class="codeWrap"><pre><code>grade &lt;- factor(c("medium", "low", "high"))
+levels(grade)                    # "high" "low" "medium"  (alphabetical)
+as.integer(grade)                # 2 1 3          codes, not labels
+levels(grade)[as.integer(grade)] # back to the labels
+</code></pre></div>
+
+<h4 id="ch2-5-ordered">Ordered factors and the leading-zero trap</h4>
+<p>Where order matters — surveys, severity scales, grades — declare it with <code>ordered = TRUE</code> and an explicit <code>levels =</code> argument, and both sorts and plot axes will follow it. The second trap is lossy conversion: values that look numeric but are really codes — postal codes, phone numbers, IDs — become numbers when converted through the codes. The fix for a factor-derived numeric is to go through the character labels first: <code>as.numeric(as.character(zip))</code>, never <code>as.numeric(zip)</code>.</p>
+<div class="codeWrap"><pre><code>grade &lt;- factor(c("medium", "low", "high"),
+                levels = c("low", "medium", "high"),
+                ordered = TRUE)
+sort(grade)                      # low medium high   the order you declared
+
+# the leading-zero trap: code-like values become numbers
+zip &lt;- factor(c("02134", "02135"))
+as.numeric(zip)                  # 1 2        the codes
+as.numeric(as.character(zip))    # 2134 2135  the zeros are gone
+</code></pre></div>
+<div class="warn">Always set <code>levels =</code> on a factor used for ordering or plotting. The default is alphabetical, and both sorting and axes inherit it silently — a genuinely ordered factor and an accidentally alphabetised one look identical until you read the chart.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Data structures: lists, matrices and tabular data</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 ▸ Data structures: lists, matrices and tabular data</button><div class="ch-toc-list"><a href="#ch3-1">3.1 Lists: the one heterogeneous container</a><a href="#ch3-2">3.2 Matrices and arrays</a><a href="#ch3-3">3.3 Data frames: the workhorse table</a><a href="#ch3-4">3.4 Tibbles and attributes</a><a href="#ch3-5">3.5 str(), typeof() and class()</a></div></div>
+<p class="topic-desc">Vectors hold one type in one dimension. Everything richer — heterogeneous collections, two-dimensional grids, tabular data — is a structure built on top of them. This chapter covers the four structures you will meet constantly and the two functions, <code>str()</code> and <code>typeof()</code>/<code>class()</code>, that tell you which one you actually have.</p>
+
+<h3 id="ch3-1" data-toc>3.1 Lists: the one heterogeneous container</h3>
+<p class="topic-desc">A list holds elements of any type, including other lists. It is R's equivalent of a JSON object or a dictionary, and it is what most functions return when they return several different things at once.</p>
+
+<h4 id="ch3-1-build">Building and reading lists</h4>
+<p><code>list()</code> assembles a list; <code>$name</code> and <code>[["name"]]</code> read an element by name, and both are equivalent — <code>$</code> is shorthand that only works with a literal name. <code>[[1]]</code> reads by position. Nested access chains naturally: <code>config$db$name</code> walks two levels in one expression. Lists also behave like vectors of elements, so <code>lapply()</code> and friends (chapter 4) can apply a function to every element.</p>
+<div class="codeWrap"><pre><code>config &lt;- list(
+  host  = "localhost",
+  port  = 8080,
+  flags = c(TRUE, TRUE, FALSE),
+  db    = list(user = "app", name = "prod")
+)
+class(config)               # "list"
+length(config)              # 4
+config$port                 # 8080    ($ is shorthand for [[ ]])
+config[["port"]]            # 8080
+config[[1]]                 # "localhost"
+config$db$name              # "prod"  nested access
+</code></pre></div>
+
+<h4 id="ch3-1-brackets">The [ ] vs [[ ]] distinction</h4>
+<p>The single most common source of confusion in R is the difference between <code>[ ]</code> and <code>[[ ]]</code> on a list. Single brackets always return a list; double brackets return the element inside it. For a list of length one — which is what most "returned a list" situations are — that is the difference between a list and the thing inside it, and it surfaces three lines later as <code>class(x)</code> vs <code>class(x[1])</code>.</p>
+<div class="codeWrap"><pre><code>config["port"]              # a LIST of length 1, not 8080
+class(config["port"])       # "list"   &lt;- the gotcha
+is.list(config["port"])     # TRUE
+length(config["port"])      # 1
+
+# general rule:
+#   [   always gives back the container type
+#   [[  gives the thing inside (and $ is shorthand for [[ on names)
+</code></pre></div>
+<div class="tip">When a function returns "a list" and you want one value out of it, reach for <code>[[</code>. When you want to keep a sub-list to pass on, use <code>[</code>. The type difference is the whole distinction.</div>
+
+<h3 id="ch3-2" data-toc>3.2 Matrices and arrays</h3>
+<p class="topic-desc">A matrix is a vector with a <code>dim</code> attribute of length 2; an array generalises this to any number of dimensions. Both hold a single atomic type.</p>
+
+<h4 id="ch3-2-matrix">Matrices</h4>
+<p><code>matrix()</code> fills its data column-wise by default — the first column, then the second — and the <code>dim()</code> attribute records rows and columns. Indexing with <code>[i, j]</code> selects rows and columns; a whole column or row indexed with a blank position (<code>m[, 2]</code>) is returned as a plain vector, which surprises people switching from numerics-heavy languages where the column keeps its shape. Maybe that vector shape is why <code>drop = FALSE</code> exists: <code>m[, 2, drop = FALSE]</code> keeps the matrix shape.</p>
+<div class="codeWrap"><pre><code>m &lt;- matrix(1:6, nrow = 2, ncol = 3)   # filled column-wise
+m
+#      [,1] [,2] [,3]
+# [1,]    1    3    5
+# [2,]    2    4    6
+dim(m)                # 2 3
+m[1, 2]               # 3     one cell
+m[, 2]                # 3 4   a whole column (a vector)
+m[2, ]                # 2 4 6 a whole row
+t(m)                  # transpose: 3 x 2
+</code></pre></div>
+
+<h4 id="ch3-2-array">Arrays beyond two dimensions</h4>
+<p><code>array(data, dim = ...)</code> builds an n-dimensional box: <code>dim = c(2, 3, 4)</code> is a 2-by-3-by-4 array holding 24 elements. Indexing takes one index per dimension. <code>apply(x, MARGIN, FUN)</code> sweeps a function over whole margins — <code>apply(a, 3, sum)</code> collapses the first two dimensions and returns one sum per level of the third. For the common two-dimensional cases, the specialised <code>rowSums()</code>, <code>colMeans()</code> and friends are far faster than <code>apply()</code>.</p>
+<div class="codeWrap"><pre><code>a &lt;- array(1:24, dim = c(2, 3, 4))    # 2 x 3 x 4
+dim(a)                                 # 2 3 4
+length(a)                              # 24 = 2*3*4
+a[1, 2, 3]                             # a single cell
+apply(a, 3, sum)                       # sum over the first two dimensions
+rowMeans(matrix(1:6, 2))               # mean of each row, the fast way
+</code></pre></div>
+
+<h3 id="ch3-3" data-toc>3.3 Data frames: the workhorse table</h3>
+<p class="topic-desc">A data frame is a list of equal-length vectors treated as one rectangle: rows are observations, columns are variables. Almost every analysis starts and ends with one.</p>
+
+<h4 id="ch3-3-build">Building and inspecting a data frame</h4>
+<p><code>data.frame()</code> builds a table from named vectors, recycling shorter ones to a common length. Columns are accessed three ways — <code>df$name</code>, <code>df[["name"]]</code> and <code>df[, "name"]</code> — and all three return the column as a vector. Rows behave differently: <code>df[2, ]</code> returns a one-row data frame, not a vector, because a row has no atomic type to fall back on. <code>summary()</code> is the first inspection tool: it gives per-column five-number summaries for numeric columns and counts for factors.</p>
+<div class="codeWrap"><pre><code>df &lt;- data.frame(
+  name   = c("Ada", "Grace", "Katherine"),
+  year   = c(1815, 1906, 1918),
+  works  = c(TRUE, TRUE, TRUE)
+)
+df$name                 # a vector
+df[, "year"]            # a vector
+df[2, ]                 # a one-row data frame (still rectangular)
+df$year[df$works]       # filter with $ and a logical index
+summary(df)             # per-column: min/median/max, or counts
+</code></pre></div>
+
+<h4 id="ch3-3-strings">stringsAsFactors and column types</h4>
+<p>Before R 4.0, <code>data.frame()</code> and <code>read.csv()</code> converted every character column to a factor unless you passed <code>stringsAsFactors = FALSE</code>. Since R 4.0 character columns stay character by default, but legacy code and older tutorials still set the argument. The lesson is not the argument — it is that text columns can arrive as factors without you asking, and <code>str()</code> is the way to see what actually happened.</p>
+<div class="codeWrap"><pre><code>df &lt;- data.frame(x = c("a", "b"))            # character since R 4.0
+class(df$x)                # "character"
+df &lt;- data.frame(x = c("a", "b"), stringsAsFactors = TRUE)
+class(df$x)                # "factor"   - older behaviour, on demand
+str(df)                    # how a data frame really looks
+</code></pre></div>
+
+<h3 id="ch3-4" data-toc>3.4 Tibbles and attributes</h3>
+<p class="topic-desc">Tibbles are the tidyverse's data frames: the same rectangle with stricter, friendlier behaviour — no accidental row names, no silent partial matching, and printing that never floods the console.</p>
+
+<h4 id="ch3-4-tibble">Tibbles</h4>
+<p><code>tibble()</code> creates one; <code>as_tibble()</code> converts existing data. The two differences that matter most: a tibble's <code>[ ]</code> always returns a tibble, even for a single column, so the <code>[ ]</code> vs <code>[[ ]]</code> distinction from lists becomes explicit here; and the default print shows the type of every column underneath its name, which makes <code>chr</code> versus <code>fct</code> visible at a glance.</p>
+<div class="codeWrap"><pre><code>library(tibble)
+tbl &lt;- tibble(
+  name = c("Ada", "Grace"),
+  year = c(1815, 1906)
+)
+tbl                        # prints compactly: type under each column
+tbl$name                   # same access as a data frame
+tbl["name"]                # ALWAYS a tibble, even for one column
+class(tbl["name"])         # c("tbl_df", "tbl", "data.frame")
+tbl[["name"]]              # a plain vector: [[ ]], not [ ]
+</code></pre></div>
+
+<h4 id="ch3-4-attributes">Attributes: the invisible luggage</h4>
+<p>Everything that makes a structure more than a bare vector — <code>names</code>, <code>dim</code>, <code>levels</code>, <code>class</code> — is stored as an attribute. <code>attr()</code> reads and sets one; <code>attributes()</code> lists them all. This is why a factor is "an integer with a level set attached": strip the attributes and the codes are all that is left, which is exactly how <code>as.numeric(factor)</code> becomes a footgun.</p>
+<div class="codeWrap"><pre><code>v &lt;- 1:3
+attr(v, "unit") &lt;- "kg"    # attach metadata
+attributes(v)              # $unit: "kg"
+attr(v, "unit")            # "kg"
+# class(), names(), dim() and levels() are all stored as attributes
+unclass(factor("a"))       # 1   the factor with its class stripped
+</code></pre></div>
+
+<h3 id="ch3-5" data-toc>3.5 str(), typeof() and class()</h3>
+<p class="topic-desc">No matter how deep a structure goes, three calls tell you what you are looking at. They answer different questions, and mixing them up produces diagnoses like "it's a list" when the real issue is elsewhere.</p>
+
+<h4 id="ch3-5-str">str(): the skeleton key</h4>
+<p><code>str()</code> prints a compact recursive description of any object: the data frame's rectangular shape, each column's type and first few values, a list's element types and lengths. It is the first thing to run on data you did not create, because the file header says "7 columns" and <code>str()</code> shows you that one of them is a factor with three levels and another is logical. It also shows nested structure that <code>head()</code> hides.</p>
+<div class="codeWrap"><pre><code>df &lt;- data.frame(a = 1:3, b = c("x", "y", "z"))
+str(df)
+# 'data.frame':	3 obs. of  2 variables:
+#  $ a: int  1 2 3
+#  $ b: chr  "x" "y" "z"
+str(list(n = 1:5, lab = "top"))
+# List of 2
+#  $ n  : int [1:5] 1 2 3 4 5
+#  $ lab: chr "top"
+</code></pre></div>
+
+<h4 id="ch3-5-typeof">typeof vs class: storage and behaviour</h4>
+<p><code>typeof()</code> reports how an object is stored; <code>class()</code> reports how it behaves. A factor's <code>typeof()</code> is <code>"integer"</code> and its <code>class()</code> is <code>"factor"</code> — both true, one answer to a different question. A matrix of integers is <code>typeof() == "integer"</code> with <code>class() == "matrix"</code>. When a function misbehaves, the first question is which of these two descriptions the error message is using.</p>
+<div class="codeWrap"><pre><code>y &lt;- factor(c("a", "b"))
+typeof(y)            # "integer"  - how it is stored
+class(y)             # "factor"   - how it behaves
+m &lt;- matrix(1:4, 2)
+typeof(m)            # "integer"  - one atomic type inside
+class(m)             # "matrix"   - plus a dim attribute
+# typeof() is the storage, class() is the behaviour; the two
+# disagree precisely on the objects people find surprising.
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Control flow and functions</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 ▸ Control flow and functions</button><div class="ch-toc-list"><a href="#ch4-1">4.1 Conditionals</a><a href="#ch4-2">4.2 Loops, and why you rarely need them</a><a href="#ch4-3">4.3 Defining functions</a><a href="#ch4-4">4.4 Scoping and environments</a><a href="#ch4-5">4.5 Vectorised thinking and the apply family</a></div></div>
+<p class="topic-desc">R's control flow looks familiar — <code>if/else</code>, <code>for</code>, <code>while</code> — but its idioms often avoid those entirely in favour of vectorised equivalents. This chapter covers the syntax you must know, the cases where loops are genuinely right, and the function rules that govern every analysis script.</p>
+
+<h3 id="ch4-1" data-toc>4.1 Conditionals</h3>
+<p class="topic-desc"><code>if</code> handles one condition at a time; <code>ifelse()</code> vectorises the same decision across a whole vector; <code>switch()</code> dispatches over several named cases.</p>
+
+<h4 id="ch4-1-ifelse">if/else, and the vectorised ifelse()</h4>
+<p><code>if (condition) { ... } else { ... }</code> takes exactly one logical value. Feed it a whole vector and it evaluates the condition's first element and warns — because "if" a vector of tests is ill-posed. The vectorised form is <code>ifelse(test, yes, no)</code>, which evaluates <code>yes</code> and <code>no</code> element-wise and returns a vector the length of <code>test</code>. Reach for <code>ifelse()</code> whenever the decision applies to a column rather than a single check.</p>
+<div class="codeWrap"><pre><code>score &lt;- 74
+if (score &gt;= 70) {
+  "pass"
+} else {
+  "fail"
+}
+# if() takes exactly one logical value. For a whole vector:
+scores &lt;- c(45, 80, 62, 91)
+ifelse(scores &gt;= 60, "pass", "fail")
+# "fail" "pass" "pass" "pass"
+</code></pre></div>
+
+<h4 id="ch4-1-switch">switch() for dispatch</h4>
+<p>When a value chooses between several branches, nested <code>if</code> statements get unreadable fast. <code>switch(x, name1 = value1, name2 = value2)</code> matches the first argument against its named cases and returns the winner; the final unnamed argument acts as a default. The classic misuse is forgetting the default, so an unlisted value falls through to <code>NULL</code> and the error surfaces two functions away.</p>
+<div class="codeWrap"><pre><code>level &lt;- "verbose"
+switch(level,
+  quiet   = "silent",
+  normal  = "warnings only",
+  verbose = "everything",
+  stop("unknown level: ", level)
+)
+</code></pre></div>
+
+<h3 id="ch4-2" data-toc>4.2 Loops, and why you rarely need them</h3>
+<p class="topic-desc"><code>for</code>, <code>while</code> and <code>repeat</code> exist and are occasionally the right tool — but most iteration over vectors is better expressed as a vectorised operation or an apply-family call.</p>
+
+<h4 id="ch4-2-for">Writing a for loop that does not crawl</h4>
+<p>A <code>for</code> loop over a growing vector is O(n-squared): every <code>c(x, new)</code> copies the whole vector. Pre-allocate with <code>numeric(n)</code> and fill by index, and the loop is linear. Iterate over <code>seq_along(x)</code> when you need the index, and over the vector itself when you are only reading it. Loops are the right tool when a step depends on the previous one — random-walk accumulators, simulation runs — or when each iteration has side effects such as writing a file.</p>
+<div class="codeWrap"><pre><code>squares &lt;- numeric(5)        # pre-allocate: grow-by-c is slow
+for (i in seq_along(squares)) {
+  squares[i] &lt;- i^2
+}
+squares                      # 1 4 9 16 25
+# iterate over the vector itself when you only read it:
+for (s in squares) print(s)
+</code></pre></div>
+
+<h4 id="ch4-2-vectorised">The vectorised alternative</h4>
+<p>The loop above is one line as a vectorised expression — faster, shorter, and immune to the off-by-one in <code>1:n</code> versus <code>seq_along(x)</code>. <code>while</code> loops are even rarer: most "keep going until" logic is a <code>seq()</code> or <code>seq_len()</code> call away. When a vectorised idiom exists, use it; the loop survives mainly in simulations and in code that must be comprehensible to people who have not internalised vectorisation yet.</p>
+<div class="codeWrap"><pre><code># every loop above is this one line - faster and clearer:
+(1:5)^2                      # 1 4 9 16 25
+# a while loop is rarely needed either; seq gives you the values:
+x &lt;- 0
+while (x &lt; 3) { print(x); x &lt;- x + 1 }   # 0 1 2
+0:2                          # the same result, without mutable state
+</code></pre></div>
+
+<h3 id="ch4-3" data-toc>4.3 Defining functions</h3>
+<p class="topic-desc">Functions are objects like any other; <code>function()</code> creates one, and the last evaluated expression is returned automatically.</p>
+
+<h4 id="ch4-3-def">Your first function</h4>
+<p><code>name &lt;- function(arg1, arg2) { ... }</code> binds a function to a name. The body evaluates its expressions and the value of the last one is returned; <code>return()</code> is only needed to leave early, as in the early-exit loop below. Functions are ordinary objects — they can be arguments, return values, and list elements — which is the mechanism behind the apply family and <code>lapply()</code>.</p>
+<div class="codeWrap"><pre><code>zscore &lt;- function(x, na.rm = FALSE) {
+  if (na.rm) x &lt;- x[!is.na(x)]
+  (x - mean(x)) / sd(x)
+}
+zscore(c(10, 20, 30))        # -1  0  1
+# the last expression is returned automatically; return() is
+# only needed to leave early:
+first_positive &lt;- function(xs) {
+  for (x in xs) if (x &gt; 0) return(x)
+  NA_real_
+}
+first_positive(c(-2, -1, 5)) # 5
+</code></pre></div>
+
+<h4 id="ch4-3-args">Arguments, defaults and ...</h4>
+<p>Every argument can carry a default, evaluated when the argument is not supplied. <code>...</code> (ellipsis) collects any unnamed arguments and forwards them to another function — the way <code>wrapper</code> below forwards to <code>c()</code>. Named arguments may be given in any order once name = is used, and named arguments always win over position. Defaults are a contract: they are the documented, sensible behaviour that a caller overrides only deliberately.</p>
+<div class="codeWrap"><pre><code>rescale &lt;- function(x, lo = 0, hi = 1) {
+  r &lt;- range(x, na.rm = TRUE)
+  (x - r[1]) / (r[2] - r[1]) * (hi - lo) + lo
+}
+rescale(c(10, 20, 30))            # 0.0 0.5 1.0
+rescale(c(10, 20, 30), hi = 5)    # 0.0 2.5 5.0
+# ... collects anything unnamed and forwards it:
+wrapper &lt;- function(...) mean(c(...))
+wrapper(1, 2, 3, 4)               # 2.5
+</code></pre></div>
+<div class="note">Because the last expression is returned, a function that ends in <code>invisible(x)</code> returns <code>x</code> without printing it — the pattern used by assignment-returning functions. Worth knowing when a function "returns nothing" on the console but does have a value.</div>
+
+<h3 id="ch4-4" data-toc>4.4 Scoping and environments</h3>
+<p class="topic-desc">R uses lexical scoping: a function's name lookups follow where it was defined, not where it was called. That one rule explains most "where did that variable come from" mysteries.</p>
+
+<h4 id="ch4-4-lexical">Assignment shadows, it does not overwrite</h4>
+<p>Inside a function, <code>x &lt;- ...</code> creates a new local binding even if <code>x</code> already exists in the global environment. The global value is untouched. This is why scripts assemble so many small functions: each is a sealed environment that can only read what it needs from outside, and accidental interference is impossible in the local-vs-global direction. Name conflicts with base R functions are the risk instead: a local <code>mean</code> shadows base <code>mean</code> for the whole body.</p>
+<div class="codeWrap"><pre><code>x &lt;- 10
+f &lt;- function() {
+  x &lt;- 20             # a NEW local binding
+  x + 1
+}
+f()                  # 21
+x                    # 10   the global is untouched
+</code></pre></div>
+
+<h4 id="ch4-4-super">When a function must reach upward: &lt;&lt;-</h4>
+<p><code>&lt;&lt;-</code> walks up the enclosing environments and assigns in the first one that already has the name. It is the correct tool for a small set of patterns — counters, caches, closure state — and a footgun for everything else, because the function's result no longer describes everything it changed. Prefer returning a value; use <code>&lt;&lt;-</code> only when state genuinely lives outside the return value.</p>
+<div class="codeWrap"><pre><code>counter &lt;- 0
+bump &lt;- function() counter &lt;&lt;- counter + 1
+bump(); bump(); bump()
+counter              # 3
+# &lt;&lt;- walks up the enclosing environments and assigns in the
+# first one that has the name; prefer returning a value.
+</code></pre></div>
+
+<h3 id="ch4-5" data-toc>4.5 Vectorised thinking and the apply family</h3>
+<p class="topic-desc">When no built-in covers your operation, the apply family and purrr apply a function to every element of a list or vector without an explicit loop.</p>
+
+<h4 id="ch4-5-apply">lapply, sapply and vapply</h4>
+<p><code>lapply(x, f)</code> applies <code>f</code> to every element and always returns a list; <code>sapply()</code> simplifies that result to a vector or matrix when it can. The simplification is the liability: <code>sapply</code> happily returns a list instead when lengths differ, and its returned type depends on the data. <code>vapply(x, f, FUN.VALUE)</code> is the strict version — you declare the result type and it errors if the actual results do not match, which turns a silent type change into an immediate failure.</p>
+<div class="codeWrap"><pre><code>groups &lt;- list(a = 1:3, b = 4:6)
+lapply(groups, sum)              # a list, one result per element
+sapply(groups, sum)              # simplified: a named vector  a=6 b=15
+vapply(groups, sum, numeric(1))  # like sapply, but it CHECKS the type
+</code></pre></div>
+
+<h4 id="ch4-5-purrr">purrr: map with type-stable output</h4>
+<p>purrr's <code>map_*</code> family takes the same idea and makes the output type part of the function name: <code>map_dbl()</code> returns a double vector, <code>map_chr()</code> a character vector, <code>map_df()</code> a data frame. Type stability is the point — the function name announces the contract the way <code>vapply</code>'s <code>FUN.VALUE</code> does. Use map/apply for collecting results; if your loop has side effects such as writing files, a plain <code>for</code> is clearer and fine.</p>
+<div class="codeWrap"><pre><code>library(purrr)
+groups &lt;- list(a = 1:3, b = 4:6)
+map_dbl(groups, sum)                        # always a double vector
+map_chr(groups, paste, collapse = "-")      # "1-2-3" "4-5-6"
+# map_dbl(groups, sum, ..., .purrr = NULL)  # see ?map for more variants
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Data manipulation with base R and dplyr</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 5 ▸ Data manipulation with base R and dplyr</button><div class="ch-toc-list"><a href="#ch5-1">5.1 Importing data</a><a href="#ch5-2">5.2 The dplyr verbs</a><a href="#ch5-3">5.3 Piping: |&gt;, %&gt;% and when each</a><a href="#ch5-4">5.4 Reshaping with tidyr</a></div></div>
+<p class="topic-desc">The middle of an analysis is data manipulation: getting a table in, cleaning its types, filtering rows, deriving columns and summarising by group. Base R can do all of it, and dplyr packages the common verbs into functions whose names state exactly what they do.</p>
+
+<h3 id="ch5-1" data-toc>5.1 Importing data</h3>
+<p class="topic-desc">How a table arrives decides how much of your first hour is spent fixing what the importer guessed. The base functions are adequate; the readr variants tell you what they guessed.</p>
+
+<h4 id="ch5-1-base">read.csv and friends</h4>
+<p><code>read.csv()</code> reads a comma-separated file into a data frame, guessing each column's type from its values. The guess is where the work is: a column that should be character but looks numeric loses its leading zeros, a <code>"NA"</code> in the data becomes a missing value unless you say otherwise, and a mixed column becomes a factor if you are on an old default. <code>colClasses</code> overrides the guess per column and is the disciplined way to import.</p>
+<div class="codeWrap"><pre><code>sales &lt;- read.csv("data/sales.csv", stringsAsFactors = FALSE)
+head(sales)              # first six rows
+nrow(sales); ncol(sales) # dimensions
+sapply(sales, class)     # what types arrived
+# a leading zero in an ID column is silently lost unless you
+# say what the column really is:
+sales &lt;- read.csv("data/sales.csv",
+                  colClasses = c(id = "character"))
+</code></pre></div>
+
+<h4 id="ch5-1-readr">readr: parse once, show the guess</h4>
+<p>readr's <code>read_csv()</code> prints the column types it parsed as it reads, so a wrong guess is visible in the success message instead of surfacing as a bug three analyses later. <code>col_types =</code> is the explicit contract, and typed <code>col_number()</code>, <code>col_character()</code>, <code>col_date()</code> parsers exist for every family. For Excel workbooks, <code>readxl</code> lists worksheets and reads a chosen sheet — the same type-visible, type-controllable approach.</p>
+<div class="codeWrap"><pre><code>library(readr)
+sales &lt;- read_csv("data/sales.csv")
+# prints the parsed column types as it reads - the guess is visible
+sales &lt;- read_csv("data/sales.csv",
+                  col_types = cols(price = col_number(),
+                                   id = col_character()))
+library(readxl)
+sheets &lt;- excel_sheets("data/book.xlsx")   # list worksheets
+book &lt;- read_excel("data/book.xlsx", sheet = 2)
+</code></pre></div>
+
+<h3 id="ch5-2" data-toc>5.2 The dplyr verbs</h3>
+<p class="topic-desc">Five verbs cover most of what people do to tables: filter rows, pick columns, derive columns, reorder, and summarise by group. Each does one thing, and because each takes a data frame and returns a data frame, they compose.</p>
+
+<h4 id="ch5-2-verbs">Filter, select, mutate, arrange</h4>
+<p><code>filter()</code> keeps the rows where a condition is true — a logical subset on the data-frame level. <code>select()</code> picks columns by name. <code>mutate()</code> adds new columns computed from existing ones, keeping everything else. <code>arrange()</code> sorts rows, with <code>desc()</code> for descending. A genuine advantage of verbs over base brackets is that they operate by name, never by position, so reordering the input table does not silently change what a column refers to.</p>
+<div class="codeWrap"><pre><code>library(dplyr)
+d &lt;- data.frame(
+  name  = c("Ada", "Grace", "Katherine", "Dorothy"),
+  team  = c("A", "B", "A", "B"),
+  score = c(88, 74, 95, 81)
+)
+filter(d, score &gt;= 80)          # rows that satisfy a predicate
+select(d, name, score)          # columns, by name
+mutate(d, doubled = score * 2)  # new columns, keeping the rest
+arrange(d, desc(score))         # sort rows
+</code></pre></div>
+
+<h4 id="ch5-2-grouped">group_by and summarise</h4>
+<p><code>group_by()</code> records a grouping; every verb after it runs per group until <code>ungroup()</code> or the end of the chain. <code>summarise()</code> reduces each group to one row, and <code>n()</code> inside it counts rows per group. The result is immediately a <code>tibble</code> whose grouping survives unless you drop it — <code>.groups = "drop"</code> is the explicit way to say the summary is final, and it silences the standard message about the grouping.</p>
+<div class="codeWrap"><pre><code>d |&gt;
+  group_by(team) |&gt;
+  summarise(avg = mean(score), n = n(), .groups = "drop")
+# # A tibble: 2 x 3
+#   team   avg     n
+# 1 A      91.5    2
+# 2 B      77.5    2
+</code></pre></div>
+<div class="tip"><code>summarise()</code> keeps the grouping on its result, which surprises people who pipe it straight into a plot. The <code>.groups = "drop"</code> argument, or an explicit <code>ungroup()</code>, makes the summary a plain table.</div>
+
+<h3 id="ch5-3" data-toc>5.3 Piping: |&gt;, %&gt;% and when each</h3>
+<p class="topic-desc">Pipes thread the left-hand value into a function call on the right, so a pipeline reads top to bottom instead of inside out — and data manipulation suddenly reads like a recipe.</p>
+
+<h4 id="ch5-3-native">The native pipe</h4>
+<p>The base pipe <code>|&gt;</code> (R 4.1+) inserts its left side into the first argument position of the right side. It needs no library and no parentheses beyond what the call already has. When the value belongs in a later argument, the <code>_</code> placeholder (R 4.2+) marks the spot. Pipes stop on the first error, and each stop names the failing function, which is the debugging story: the pipe tells you where, not why.</p>
+<div class="codeWrap"><pre><code>x &lt;- c(1, 2, 3, 4)
+sqrt(mean(x))            # inside-out
+x |&gt; mean() |&gt; sqrt()    # the same, read left to right
+# |&gt; sends its left side to the FIRST argument of the right side:
+x |&gt; mean(na.rm = TRUE)  # exactly mean(x, na.rm = TRUE)
+# for any other argument position, use the "_" placeholder (R 4.2+):
+mtcars |&gt; lm(mpg ~ wt, data = _)
+</code></pre></div>
+
+<h4 id="ch5-3-magrittr">%&gt;% and the difference that matters</h4>
+<p>dplyr exports the magrittr pipe <code>%&gt;%</code>, which is what older code and much of the web uses. The functional difference is the placeholder: <code>%&gt;%</code> uses <code>.</code> and can appear multiple times, while <code>|&gt;</code> uses <code>_</code> exactly once. Both compose with dplyr verbs, and the two pipes can coexist in one script, but a chain should pick one and stay with it.</p>
+<div class="codeWrap"><pre><code># %>% is the tidyverse pipe; "." places the value anywhere:
+d %&gt;% group_by(team) %&gt;% summarise(avg = mean(score))
+# the native pipe has no "." placeholder - use "_" (R 4.2+) or
+# rewrite. Both stop on an error with a short message.
+</code></pre></div>
+
+<h3 id="ch5-4" data-toc>5.4 Reshaping with tidyr</h3>
+<p class="topic-desc">The same facts can sit in a wide table — one column per question — or a long one — one row per observation. Models and ggplot want long; spreadsheets and reporting want wide. tidyr moves between the two.</p>
+
+<h4 id="ch5-4-long">pivot_longer: wide to long</h4>
+<p><code>pivot_longer()</code> gathers a set of columns into two: <code>names_to</code> holds the old column names, <code>values_to</code> the old values. One row per id and question results, which is exactly the shape regression and ggplot need. The <code>cols =</code> argument selects which columns to gather, and it takes tidyselect helpers such as <code>starts_with("q")</code> and <code>contains("_")</code> rather than forcing a list of names.</p>
+<div class="codeWrap"><pre><code>library(tidyr)
+wide &lt;- data.frame(
+  id = 1:2,
+  q1 = c(3, 5),
+  q2 = c(4, 2)
+)
+long &lt;- pivot_longer(wide, cols = c(q1, q2),
+                     names_to = "question", values_to = "score")
+long
+# # A tibble: 4 x 3
+#      id question score
+# 1     1 q1           3
+# 2     1 q2           4
+# 3     2 q1           5
+# 4     2 q2           2
+</code></pre></div>
+
+<h4 id="ch5-4-wide">pivot_wider: long to wide</h4>
+<p><code>pivot_wider()</code> is the exact inverse: <code>names_from</code> names the column whose values become column names, <code>values_from</code> names the column whose values fill the cells. The two pivots use the same vocabulary, so a round trip is written by swapping <code>cols</code> for <code>names_from</code>/<code>values_from</code>. A long table with duplicate keys will error loudly on the wider side — which is the tidy data guarantee doing its job rather than silently overwriting rows.</p>
+<div class="codeWrap"><pre><code>long |&gt;
+  pivot_wider(names_from = question, values_from = score)
+# back to one row per id, one column per question
+# cols = also accepts tidyselect helpers:
+pivot_longer(wide, cols = starts_with("q"),
+             names_to = "question", values_to = "score")
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Visualisation with base R and ggplot2</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 6 ▸ Visualisation with base R and ggplot2</button><div class="ch-toc-list"><a href="#ch6-1">6.1 Base R plotting</a><a href="#ch6-2">6.2 ggplot2: the grammar of graphics</a><a href="#ch6-3">6.3 Geoms, layers and facets</a><a href="#ch6-4">6.4 Saving and exporting figures</a></div></div>
+<p class="topic-desc">R has two plotting traditions. Base graphics draw directly and start instantly, with every detail under your control through low-level additions. ggplot2 composes plots from data, mappings and layers. Knowing when each is appropriate is a real skill.</p>
+
+<h3 id="ch6-1" data-toc>6.1 Base R plotting</h3>
+<p class="topic-desc">Base <code>plot()</code> is always available and draws a complete chart from a vector or a formula in one call — which makes it ideal for the quick look that happens before any formal chart.</p>
+
+<h4 id="ch6-1-base">plot() from vectors and formulas</h4>
+<p><code>plot(x, y)</code> draws a scatter plot from two vectors; the formula form <code>plot(y ~ x, data = df)</code> pulls both from a data frame, which keeps the call self-contained and closer to a model formula. High-level base functions — <code>plot()</code>, <code>hist()</code>, <code>boxplot()</code> — open a new plot, while low-level functions (<code>points()</code>, <code>lines()</code>, <code>abline()</code>, <code>legend()</code>) add to the current one. That split is base graphics' entire mental model: start a chart, then decorate it.</p>
+<div class="codeWrap"><pre><code>plot(iris$Sepal.Length, iris$Petal.Length)
+plot(Petal.Length ~ Sepal.Length, data = iris)   # formula form
+title(main = "Iris: sepal length against petal length")
+# high-level plots (plot, hist, boxplot) open a new device;
+# points, lines, abline and legend add to the last one.
+</code></pre></div>
+
+<h4 id="ch6-1-compose">Composing a finished figure</h4>
+<p>One call sets the frame, and every subsequent call adds one element: colours and point shapes in the initial <code>plot()</code>, a <code>legend()</code> keyed to the same values, a damping <code>abline()</code> from a fitted model, <code>las = 1</code> to keep axis labels horizontal. The discipline is to echo the same <code>col</code> and <code>pch</code> values in the legend that you used in the data, so legend and points cannot drift apart.</p>
+<div class="codeWrap"><pre><code>plot(iris$Sepal.Length, iris$Petal.Length,
+     col = iris$Species, pch = 19, las = 1,
+     xlab = "Sepal length (cm)", ylab = "Petal length (cm)")
+legend("topleft", legend = levels(iris$Species),
+       col = 1:3, pch = 19)
+abline(lm(Petal.Length ~ Sepal.Length, data = iris), lty = 2)
+</code></pre></div>
+
+<h3 id="ch6-2" data-toc>6.2 ggplot2: the grammar of graphics</h3>
+<p class="topic-desc">ggplot2 is not a function, it is a grammar. A plot is assembled from a dataset, mappings from variables to visual properties, one or more layers, scales, facets, a theme and labels — and the pieces compose, so a plot can be built incrementally and evolved without rewriting it.</p>
+
+<h4 id="ch6-2-pieces">The six pieces of a ggplot</h4>
+<p><code>ggplot(data, aes(...))</code> establishes the data and the aesthetic mappings: which column becomes which visual property. A <code>geom_*</code> layer draws something and inherits the mappings. <code>scale_*</code> transforms or relabels an axis. <code>facet_*</code> splits the plot into small multiples. <code>theme_*</code> handles everything that is not data — fonts, grid lines, background. <code>labs()</code> sets the title and axis labels. Because layers join with <code>+</code>, adding a colour mapping or a theme is one line and never a rewrite.</p>
+<div class="codeWrap"><pre><code>library(ggplot2)
+df &lt;- data.frame(
+  age    = c(25, 30, 35, 40, 28, 33, 45),
+  height = c(165, 175, 180, 170, 162, 172, 185),
+  weight = c(60, 78, 85, 72, 55, 74, 92),
+  gender = c("F", "M", "M", "F", "F", "M", "M")
+)
+ggplot(df, aes(x = age, y = height)) +
+  geom_point(size = 3) +
+  theme_minimal() +
+  labs(title = "Height vs Age", x = "Age", y = "Height (cm)")
+</code></pre></div>
+
+<h4 id="ch6-2-aes">Mappings: in ggplot() or in the layer</h4>
+<p>Aesthetics declared in <code>ggplot()</code> apply to every layer; aesthetics inside a geom apply to that layer only. A fixed visual property — <code>size = 3</code>, <code>colour = "steelblue"</code> — is a constant, not a mapping, and lives <em>outside</em> <code>aes()</code>; only column names go inside. Confusing the two — putting a constant in <code>aes()</code> or a column outside it — is the most common first-ggplot error, and it shows up as "colour does nothing" or "legend appears for a constant".</p>
+<div class="codeWrap"><pre><code>ggplot(df, aes(x = age, y = height)) +
+  geom_point(aes(color = gender), size = 3)   # colour: this layer only
+ggplot(df, aes(x = age, y = height, color = gender)) +
+  geom_point()                                # colour: inherited everywhere
+# constants like size = 3 live OUTSIDE aes(); only column names
+# go inside aes(). Mixing the two up does nothing - silently.
+</code></pre></div>
+
+<h3 id="ch6-3" data-toc>6.3 Geoms, layers and facets</h3>
+<p class="topic-desc">Every geometry understands a different set of aesthetics, and facets repeat the whole plot per group. Both are where the grammar earns its keep — and where the most common ggplot mistakes live.</p>
+
+<h4 id="ch6-3-geoms">Every geom is a layer</h4>
+<p><code>geom_point</code> uses x, y, colour, shape, size, alpha. <code>geom_bar</code> counts by default and needs <code>stat = "identity"</code> to plot a supplied y. <code>geom_line</code> requires a <code>group</code> mapping when the colour is categorical: colour alone connects every point in order into one zigzag. <code>geom_boxplot</code> summarises a numeric y per categorical x with its five-number statistics. Layering point and line geoms together — <code>geom_line() + geom_point()</code> — is the standard way to make a series both connected and legible.</p>
+<div class="codeWrap"><pre><code>ggplot(df, aes(x = gender)) +
+  geom_bar()                       # counts, by default
+ggplot(df, aes(x = gender, y = height)) +
+  geom_boxplot()                   # five-number summaries per group
+ggplot(df, aes(x = age, y = height, color = gender, group = gender)) +
+  geom_line() + geom_point()       # one line per gender: group IS required
+</code></pre></div>
+<div class="warn"><code>geom_line</code> needs a <code>group</code> mapping whenever the colour mapping is categorical. Colour alone produces one line through every point in the order they appear — the classic multi-series zigzag.</div>
+
+<h4 id="ch6-3-facets">Faceting: small multiples</h4>
+<p><code>facet_wrap(~ var)</code> arranges panels in an automatically wrapped grid, treating the variable as unordered — right for many levels. <code>facet_grid(a ~ b)</code> arranges panels by two factors, one per axis, and shows every combination including empty ones. Both inherit every mapping and every layer, so a faceted plot is the same plot repeated rather than a separate construction. <code>scales = "free_y"</code> lets each panel scale its own axis, which stops one outlier from flattening every other panel.</p>
+<div class="codeWrap"><pre><code>ggplot(df, aes(x = age, y = height)) +
+  geom_point() +
+  facet_wrap(~ gender)             # one panel per level, wrapped
+df$cohort &lt;- ifelse(df$age &gt; 30, "over30", "under30")
+ggplot(df, aes(x = age, y = height)) +
+  geom_point() +
+  facet_grid(cohort ~ gender)      # rows and columns of panels
+ggplot(df, aes(x = age, y = weight)) +
+  geom_point() +
+  facet_wrap(~ gender, scales = "free_y")   # per-panel axes
+</code></pre></div>
+
+<h3 id="ch6-4" data-toc>6.4 Saving and exporting figures</h3>
+<p class="topic-desc">A plot produced and a plot saved are two different jobs. The saving API decides the format from the filename, and the size and resolution must be explicit or the device defaults decide for you.</p>
+
+<h4 id="ch6-4-ggsave">ggsave(): format comes from the filename</h4>
+<p><code>ggsave()</code> writes the current or named plot and infers the format from the extension — <code>.png</code>, <code>.pdf</code>, <code>.svg</code>. <code>width</code> and <code>height</code> are in inches; the default is the current device's size, which is why a plot saved from RStudio and one saved from a script come out different sizes. Set both explicitly for anything published or version-controlled, and use <code>bg = "white"</code> for <code>.png</code> — a transparent background renders black in many viewers.</p>
+<div class="codeWrap"><pre><code>p &lt;- ggplot(df, aes(x = age, y = height, color = gender)) +
+  geom_point(size = 3) +
+  theme_minimal()
+ggsave("height-vs-age.png", p, width = 8, height = 5,
+       dpi = 300, bg = "white")      # print-quality raster
+ggsave("height-vs-age.pdf", p, width = 8, height = 5)   # vector
+ggsave("height-vs-age.svg", p, width = 8, height = 5)   # vector
+</code></pre></div>
+
+<h4 id="ch6-4-devices">Base devices for the base plots</h4>
+<p>Base graphics save through devices: <code>png()</code> or <code>pdf()</code> opens a file, drawing goes to it, and <code>dev.off()</code> closes it. The pair is a block — forget <code>dev.off()</code> and the file stays open, empty and locked until the device rolls over or the session ends. <code>units = "in"</code> with <code>res = 300</code> is the print standard; a device opened without them inherits a 72-dpi screen default.</p>
+<div class="codeWrap"><pre><code>png("figures/plot.png", width = 8, height = 5, units = "in", res = 300)
+plot(iris$Sepal.Length, iris$Petal.Length)
+dev.off()   # REQUIRED: the file stays locked and half-written until then
+pdf("figures/plot.pdf", width = 8, height = 5)
+plot(iris$Sepal.Length, iris$Petal.Length)
+dev.off()
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Statistics, reporting and reproducibility</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 7 ▸ Statistics, reporting and reproducibility</button><div class="ch-toc-list"><a href="#ch7-1">7.1 Common statistical tests</a><a href="#ch7-2">7.2 Regression with lm()</a><a href="#ch7-3">7.3 R Markdown and Quarto</a><a href="#ch7-4">7.4 renv: dependency snapshots</a><a href="#ch7-5">7.5 File and data hygiene</a></div></div>
+<p class="topic-desc">R has the deepest statistical ecosystem of any language: the fundamental tests are built in, the modelling syntax is a first-class formula, and the reporting stack turns an analysis into a document. The last chapter is about honesty — checking tests properly — and discipline — pinning packages and seeds so the analysis can be rerun.</p>
+
+<h3 id="ch7-1" data-toc>7.1 Common statistical tests</h3>
+<p class="topic-desc">The four functions you will reach for most map onto four questions: is a mean different, are variables related, are counts unusual, and do several groups differ.</p>
+
+<h4 id="ch7-1-ttest">t.test and cor.test</h4>
+<p><code>t.test(x, y)</code> runs a Welch two-sample t-test — the two means question — and returns the statistic, degrees of freedom, p-value and a confidence interval for the mean difference. <code>cor.test(x, y)</code> answers the relationship question with a correlation coefficient and its confidence interval. Both are formula-aware too (<code>t.test(height ~ gender, data = df)</code>), which keeps the data and the grouping together in one call.</p>
+<div class="codeWrap"><pre><code>group_a &lt;- c(170, 175, 165, 180, 172)
+group_b &lt;- c(178, 182, 175, 185, 180)
+t.test(group_a, group_b)      # Welch two-sample t-test
+x &lt;- rnorm(100); y &lt;- x + rnorm(100, 0, 0.5)
+cor.test(x, y)                # correlation with a confidence interval
+</code></pre></div>
+
+<h4 id="ch7-1-chisq">Tests for counts and several groups</h4>
+<p><code>chisq.test(observed)</code> tests whether the counts in a contingency table depart from what independence predicts; pass it a matrix of counts and it returns the chi-squared statistic, degrees of freedom and p-value. <code>aov()</code> generalises the two-group t-test to several groups, and its summary gives the F-test for whether the group means differ at all. These four — <code>t.test</code>, <code>cor.test</code>, <code>chisq.test</code>, <code>aov</code> — cover the first year of applied statistics in four function names.</p>
+<div class="codeWrap"><pre><code>observed &lt;- matrix(c(50, 30, 20, 40, 60, 10), nrow = 2)
+chisq.test(observed)          # independence of rows and columns
+aov(Sepal.Length ~ Species, data = iris)
+</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 Regression with lm()</h3>
+<p class="topic-desc"><code>lm()</code> fits a linear model from a formula and a data frame in one line, and <code>summary()</code> turns it into the standard regression table. The discipline is what you do after fitting, not before.</p>
+
+<h4 id="ch7-2-lm">Fitting and reading a model</h4>
+<p><code>lm(height ~ age, data = df)</code> fits the model and returns a fitted object. <code>summary(model)</code> prints coefficients with standard errors and p-values, overall R-squared, the F-statistic and its p-value. <code>coef()</code> extracts just the estimates; <code>confint()</code> gives a confidence interval for each. Formulas extend naturally — <code>y ~ x1 + x2</code> adds predictors, <code>y ~ x1 * x2</code> adds their interaction — and the same formula syntax is used by <code>glm()</code>, <code>aov()</code> and the extension packages, so model fitting is one vocabulary.</p>
+<div class="codeWrap"><pre><code>df &lt;- data.frame(age = 20:30, height = 165:175 + rnorm(11, 0, 2))
+model &lt;- lm(height ~ age, data = df)
+summary(model)      # coefficients, R-squared, F-statistic, p-values
+coef(model)         # just the estimates
+confint(model)      # confidence intervals for each coefficient
+</code></pre></div>
+
+<h4 id="ch7-2-check">The four things to check on every result</h4>
+<p><strong>The p-value is not the probability the null is true.</strong> It is the probability of seeing data this extreme if the null holds; a small p-value means the data is unlikely under the null, not that the null is unlikely given the data. <strong>Effect size matters more than significance.</strong> With a large sample a trivial difference is "significant" but meaningless — Cohen's d, R-squared and the confidence interval are the honest numbers. <strong>Plot before you test.</strong> The assumptions — independence, normality, equal variance — are visible in the data, not in the test output. <strong>Diagnose the model, not just its p-value.</strong> <code>plot(model)</code> draws the four residual diagnostics that show whether the model's assumptions are plausible at all.</p>
+<div class="codeWrap"><pre><code># 1. p is NOT the probability the null is true; it is P(data this
+#    extreme | null). A small p means the data is unlikely under
+#    the null - it does not mean the null is unlikely.
+# 2. Effect size beats significance. Huge samples make trivial
+#    effects "significant" (p &lt; 0.05); report Cohen's d, R-squared
+#    or the confidence interval as well.
+# 3. Plot before you test: assumptions (independence, normality,
+#    equal variance) are visible in the data, not in test output.
+# 4. Diagnose the model, not just its p-value:
+par(mfrow = c(2, 2)); plot(model)
+# residuals vs fitted, normal Q-Q, scale-location, leverage
+</code></pre></div>
+<div class="note">Nothing in the tests list guarantees the analysis is truthful. A p-value is one number in a chain of assumptions; the tests check the assumptions, and honesty is a habit, not an argument.</div>
+
+<h3 id="ch7-3" data-toc>7.3 R Markdown and Quarto</h3>
+<p class="topic-desc">A report that runs is the difference between a result and the story of a result. R Markdown and Quarto interleave prose with executable chunks so the numbers in the text are computed, never retyped.</p>
+
+<h4 id="ch7-3-rmarkdown">R Markdown: a report that runs</h4>
+<p>An <code>.Rmd</code> file is plain text with three parts: a YAML front matter block for metadata, prose in Markdown, and fenced code chunks delimited by triple backticks and <code>{r}</code>. Knitting runs every chunk in order and folds the outputs — tables, plots, messages — into the rendered document. Inline code like <code>`r round(mean(mtcars$mpg), 2)`</code> computes a number into the prose, which is how the text and the data stay in agreement.</p>
+<div class="codeWrap"><pre><code>---
+title: "Analysis results"
+output: html_document
+---
+```{r setup, include = FALSE}
+library(dplyr)
+```
+The fitted mean is `r round(mean(mtcars$mpg), 2)`.
+```{r fig}
+plot(mpg ~ wt, data = mtcars)
+```
+</code></pre></div>
+
+<h4 id="ch7-3-quarto">Quarto: the successor format</h4>
+<p>Quarto (<code>.qmd</code>) is the same idea with a wider remit: it renders to HTML, PDF and Word, and its chunks accept R, Python, Julia and Observable JavaScript in the same document. Chunk options move from parentheses into a label line prefixed with <code>#|</code>, which reads better once a chunk grows options. Choosing between them in 2026: R Markdown for existing ecosystems and teams, Quarto for new projects and anything multilingual.</p>
+<div class="codeWrap"><pre><code>---
+title: "Analysis results"
+format: html
+---
+## Method
+```{r}
+#| echo: false
+#| warning: false
+summary(model)
+```
+# .qmd files accept R, Python, Julia or Observable chunks; the
+# option lines prefixed with #| replace the old chunk arguments.
+</code></pre></div>
+
+<h3 id="ch7-4" data-toc>7.4 renv: dependency snapshots</h3>
+<p class="topic-desc">R's global library is the reproducibility gap: two projects can demand different versions of the same package, and <code>install.packages("dplyr")</code> upgrades everyone at once. renv gives each project its own private library and a lockfile.</p>
+
+<h4 id="ch7-4-lifecycle">init, snapshot, restore</h4>
+<p><code>renv::init()</code> once per project creates the project's private library and its first lockfile. After adding packages, <code>renv::snapshot()</code> records the exact used versions. On a new machine, <code>renv::restore()</code> reinstalls precisely what the lockfile names. <code>renv::status()</code> reports the drift between the library, the project and the lockfile. The workflow reads like version control because it is version control for packages: install, use, snapshot, commit, restore.</p>
+<div class="codeWrap"><pre><code>renv::init()          # once per project: creates renv/ + renv.lock
+# after adding a package:
+renv::snapshot()      # record the used package versions in renv.lock
+# on a new machine or after a break:
+renv::restore()       # reinstall exactly what the lockfile says
+renv::status()        # what differs between project and lockfile
+</code></pre></div>
+
+<h4 id="ch7-4-lockfile">The lockfile is the contract</h4>
+<p>renv.lock is a plain JSON file listing the R version and every package with its exact version — the minimum record needed to reproduce the environment. It belongs in version control, and <code>renv::dependencies()</code> lists the packages your scripts actually use so the lockfile stays honest rather than growing by rumour. Cache aside, the point is simple: a colleague who clones the repository and runs <code>renv::restore()</code> gets your environment, not theirs.</p>
+<div class="codeWrap"><pre><code># renv.lock is plain JSON - commit it to version control:
+# {
+#   "R": { "Version": "4.4.1" },
+#   "Packages": {
+#     "dplyr": { "Package": "dplyr", "Version": "1.1.4" }
+#   }
+# }
+renv::dependencies()  # which packages your scripts actually use
+</code></pre></div>
+<div class="note">Commit <code>renv.lock</code>. It is small, it is text, and it is the single file that turns "works on my machine" into "works on the machine".</div>
+
+<h3 id="ch7-5" data-toc>7.5 File and data hygiene</h3>
+<p class="topic-desc">The final 20 per cent of a reproducible analysis is discipline around random seeds, output directories, saved objects and recorded sessions.</p>
+
+<h4 id="ch7-5-paths">Seeds, directories and saved models</h4>
+<p><code>set.seed()</code> at the top of a script makes every random draw — simulations, splits, bootstrap samples — identical across runs; without it, two runs of the same analysis can disagree. <code>dir.create(showWarnings = FALSE)</code> makes an output folder idempotently. <code>saveRDS()</code> serialises any single object — a fitted model is the classic case — and <code>readRDS()</code> takes it back, so an expensive fit is saved once and loaded many times. <code>all.equal()</code> is how you verify the round trip.</p>
+<div class="codeWrap"><pre><code>set.seed(42)              # identical random draws every run
+dir.create("figures", showWarnings = FALSE)   # idempotent
+ggsave("figures/height-vs-age.png", p, width = 8, height = 5, dpi = 300)
+saveRDS(model, "output/model.rds")   # R's native object serialisation
+model2 &lt;- readRDS("output/model.rds")
+all.equal(model, model2)             # TRUE - byte-for-byte identical
+</code></pre></div>
+
+<h4 id="ch7-5-session">Recording the session</h4>
+<p><code>sessionInfo()</code> prints the R version, platform and attached packages — paste it at the end of every report, because it is the minimum information needed to reproduce the environment. <code>warnings()</code> retrieves the messages that were suppressed mid-run, so a script that "completed" but warned everywhere reveals itself. During development, <code>options(warn = 2)</code> escalates warnings to errors, which is the fastest way to find the warning you have been ignoring.</p>
+<div class="codeWrap"><pre><code>sessionInfo()      # R version, platform, attached packages
+# paste this at the end of every report: it is the minimum
+# information needed to reproduce the environment.
+warnings()         # retrieve messages suppressed mid-run
+options(warn = 2)  # escalate warnings to errors while developing
+</code></pre></div>
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>R Programming.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

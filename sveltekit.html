@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SvelteKit - Full-Stack Svelte Guide</title>
+<meta name="description" content="This guide walks you through building a complete SvelteKit application from your first route to a deployed…. 12 chapters, 64 topics and 52 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/sveltekit.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="SvelteKit - Full-Stack Svelte Guide">
+<meta property="og:description" content="This guide walks you through building a complete SvelteKit application from your first route to a deployed…. 12 chapters, 64 topics and 52 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/sveltekit.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="SvelteKit - Full-Stack Svelte Guide">
+<meta name="twitter:description" content="This guide walks you through building a complete SvelteKit application from your first route to a deployed…. 12 chapters, 64 topics and 52 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/sveltekit.html#article","headline":"SvelteKit - Full-Stack Svelte Guide","name":"SvelteKit - Full-Stack Svelte Guide","description":"This guide walks you through building a complete SvelteKit application from your first route to a deployed…. 12 chapters, 64 topics and 52 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/sveltekit.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/sveltekit.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"SvelteKit - Full-Stack Svelte Guide","item":"https://amin360it.github.io/quick-guides/sveltekit.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">SvelteKit</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This SvelteKit Guide</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset: one framework for client and server</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use all course long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · SvelteKit Fundamentals &amp; Routing</a><ul><li><a href="#ch1-scaffold" data-target="ch1-scaffold">1.1 Scaffolding a project</a></li><li><a href="#ch1-filebased" data-target="ch1-filebased">1.2 File-based routes: +page.svelte</a></li><li><a href="#ch1-dynamic" data-target="ch1-dynamic">1.3 Dynamic routes: [param]</a></li><li><a href="#ch1-restoptional" data-target="ch1-restoptional">1.4 Rest [...rest] and optional [[param]] routes</a></li><li><a href="#ch1-navigation" data-target="ch1-navigation">1.5 Navigation and route groups</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Layouts, Pages &amp; Head</a><ul><li><a href="#ch2-nested" data-target="ch2-nested">2.1 Nested layouts and the slot</a></li><li><a href="#ch2-reset" data-target="ch2-reset">2.2 Layout reset and groups</a></li><li><a href="#ch2-modules" data-target="ch2-modules">2.3 +page.js vs +page.svelte</a></li><li><a href="#ch2-options" data-target="ch2-options">2.4 Page options: prerender, ssr, csr</a></li><li><a href="#ch2-head" data-target="ch2-head">2.5 Head management with &lt;svelte:head&gt;</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Loading Data</a><ul><li><a href="#ch3-universal-vs-server" data-target="ch3-universal-vs-server">3.1 Universal load vs server load</a></li><li><a href="#ch3-serverload" data-target="ch3-serverload">3.2 Using fetch and auth in +page.server.js</a></li><li><a href="#ch3-parent" data-target="ch3-parent">3.3 Parent data, depends and invalidate</a></li><li><a href="#ch3-streaming" data-target="ch3-streaming">3.4 Streaming promises and fetch in load</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Form Actions</a><ul><li><a href="#ch4-actions" data-target="ch4-actions">4.1 The default action</a></li><li><a href="#ch4-named" data-target="ch4-named">4.2 Named actions and redirect() after writes</a></li><li><a href="#ch4-validation" data-target="ch4-validation">4.3 Validation with fail()</a></li><li><a href="#ch4-enhance" data-target="ch4-enhance">4.4 Progressive enhancement with use:enhance</a></li><li><a href="#ch4-files" data-target="ch4-files">4.5 Handling uploaded files</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · API Routes</a><ul><li><a href="#ch5-serverfile" data-target="ch5-serverfile">5.1 A +server.js GET endpoint</a></li><li><a href="#ch5-rest" data-target="ch5-rest">5.2 POST, PUT and DELETE handlers</a></li><li><a href="#ch5-request" data-target="ch5-request">5.3 Request and Response, and the json helper</a></li><li><a href="#ch5-errors" data-target="ch5-errors">5.4 Endpoint params and error handling</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Hooks &amp; Middleware</a><ul><li><a href="#ch6-handle" data-target="ch6-handle">6.1 The handle hook and event.locals</a></li><li><a href="#ch6-sequence" data-target="ch6-sequence">6.2 Composing hooks with sequence</a></li><li><a href="#ch6-fetch" data-target="ch6-fetch">6.3 handleFetch</a></li><li><a href="#ch6-errors" data-target="ch6-errors">6.4 handleError and an authorization pattern</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · State, Stores &amp; Context</a><ul><li><a href="#ch7-stores" data-target="ch7-stores">7.1 The page and navigating stores</a></li><li><a href="#ch7-ssr" data-target="ch7-ssr">7.2 Store SSR caveats</a></li><li><a href="#ch7-context" data-target="ch7-context">7.3 setContext and getContext</a></li><li><a href="#ch7-load" data-target="ch7-load">7.4 Sharing load data with components</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Errors, Auth &amp; Sessions</a><ul><li><a href="#ch8-error" data-target="ch8-error">8.1 The error page: expected vs unexpected</a></li><li><a href="#ch8-cookies" data-target="ch8-cookies">8.2 Session cookies with the cookies API</a></li><li><a href="#ch8-guards" data-target="ch8-guards">8.3 Auth guards with redirect</a></li><li><a href="#ch8-flow" data-target="ch8-flow">8.4 A complete session flow</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Adapters &amp; Deployment</a><ul><li><a href="#ch9-node" data-target="ch9-node">9.1 adapter-auto and adapter-node</a></li><li><a href="#ch9-static" data-target="ch9-static">9.2 adapter-static and prerendering</a></li><li><a href="#ch9-env" data-target="ch9-env">9.3 $env modules and environment variables</a></li><li><a href="#ch9-build" data-target="ch9-build">9.4 build, preview and the production checklist</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Advanced Patterns</a><ul><li><a href="#ch10-streaming" data-target="ch10-streaming">10.1 Streaming data and progressive resolution</a></li><li><a href="#ch10-snapshot" data-target="ch10-snapshot">10.2 Snapshots</a></li><li><a href="#ch10-sw" data-target="ch10-sw">10.3 Service workers for offline apps</a></li><li><a href="#ch10-testing" data-target="ch10-testing">10.4 Testing with Playwright and Vitest</a></li><li><a href="#ch10-perf" data-target="ch10-perf">10.5 Performance levers</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Quick Reference &amp; Glossary</a><ul><li><a href="#app-files" data-target="app-files">A.1 File conventions at a glance</a></li><li><a href="#app-load" data-target="app-load">A.2 Load functions compared</a></li><li><a href="#app-hooks" data-target="app-hooks">A.3 Hooks and adapters</a></li><li><a href="#app-commands" data-target="app-commands">A.4 Command cheat sheet</a></li><li><a href="#app-glossary" data-target="app-glossary">A.5 Glossary</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">SvelteKit</span>
+      <span class="am-band-s">12 chapters &middot; 64 topics &middot; 52 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This SvelteKit Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This SvelteKit Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The right mindset: one framework for client and server</a><a href="#orientation-tools">Tools you will use all course long</a></div></div>
+    <p class="topic-desc">This guide walks you through building a complete SvelteKit application from your first route to a deployed full-stack site, fully offline. It is organised into chapters and exercises that build on one another and that you type out yourself. Work chapter by chapter and write the code to build muscle memory as you go.</p>
+    <p>This is a complete, self-paced path through <strong>SvelteKit</strong>, from your first route to streaming data, sessions, and deployment. SvelteKit is the application framework for Svelte: file-based routing, server rendering, form actions, API endpoints, and adapters for every host — all with one language and one component model. Everything runs in a single HTML file — no internet required, progress is saved in your browser.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">Explains the three-part structure of the guide, which spans ten chapters plus exercises and an appendix. Each chapter ends with copy-ready code you should type out yourself, and later chapters build on earlier ones. Skim the appendix any time you forget a convention or a command.</p>
+    <ul>
+      <li><strong>Part I (Ch. 1–3)</strong> — foundations: routing, layouts, pages, and loading data.</li>
+      <li><strong>Part II (Ch. 4–6)</strong> — real applications: form actions, API routes, and hooks.</li>
+      <li><strong>Part III (Ch. 7–10)</strong> — advanced and scale: state, auth and sessions, adapters and deployment, streaming and testing.</li>
+      <li>Every chapter ends with exercises. Code is copy-ready; type it rather than pasting to build muscle memory.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset: one framework for client and server</h3>
+    <p class="topic-desc">Explains the SvelteKit philosophy that one component model serves both client and server, so a component can render on either side. Because SvelteKit uses plain files and conventions you already know, most questions answer themselves once you learn the file naming rules. Keep that mental model and the rest of the guide follows naturally.</p>
+    <p>SvelteKit is built on <em>file conventions</em>: a page is always <code>+page.svelte</code>, its layout is <code>+layout.svelte</code>, and an API endpoint is <code>+server.js</code>. Almost every "how do I…" is answered by "create a file with the right prefix." The same component runs on the server for rendering, then hydrates in the browser — you write it once.</p>
+    <div class="tip"><p>Keep the official docs open beside this guide at <code>svelte.dev/docs</code>. This guide explains the why and the sequence; the docs are the exhaustive reference.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will use all course long</h3>
+    <p class="topic-desc">Lists the tools you will use all course long, from Node and npm to Vite, the Svelte compiler, and the adapter system. Vite provides the dev server, hot module replacement, and the production build. Install these once and they carry you through every chapter and into deployment.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Node.js 20+</td><td>Runtime for the toolchain, the dev server, and the build</td></tr>
+      <tr><td>npm</td><td>Package manager; installs SvelteKit, Svelte, and adapters</td></tr>
+      <tr><td>Vite</td><td>Dev server with instant reload and module bundling</td></tr>
+      <tr><td>SvelteKit CLI</td><td><code>npm create svelte</code> scaffolds a new project</td></tr>
+      <tr><td>Adapter</td><td>Swaps the hosting target (<code>node</code>, <code>static</code>, <code>vercel</code>, ...)</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · SvelteKit Fundamentals &amp; Routing</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · SvelteKit Fundamentals &amp; Routing</button><div class="ch-toc-list"><a href="#ch1-scaffold">1.1 Scaffolding a project</a><a href="#ch1-filebased">1.2 File-based routes: +page.svelte</a><a href="#ch1-dynamic">1.3 Dynamic routes: [param]</a><a href="#ch1-restoptional">1.4 Rest [...rest] and optional [[param]] routes</a><a href="#ch1-navigation">1.5 Navigation and route groups</a></div></div>
+    <p class="topic-desc">Builds your first pages with file-based routing and explains the project skeleton. A route is simply a folder under src/routes containing a +page.svelte component, and the folder path becomes the URL. This chapter lays the foundation that every later feature builds on.</p>
+    <p>SvelteKit’s routing is filesystem-based: a folder inside <code>src/routes</code> becomes a URL, and the file that renders it is always named <code>+page.svelte</code>. This chapter maps the scaffold and every route shape you will use for the rest of the guide.</p>
+    <h3 id="ch1-scaffold" data-toc>1.1 Scaffolding a project</h3>
+    <p class="topic-desc">Creates a new SvelteKit project with the create command and explains what the generated folders do. The interactive CLI asks whether you want TypeScript, ESLint, Prettier, or Playwright before writing any files. It then walks through src/routes, src/lib, and the static directory so you know what each one is for.</p>
+    <div class="codeWrap"><pre><code># create a new project with the official scaffold
+npm create svelte@latest my-app
+cd my-app
+npm install
+npm run dev          # start Vite at http://localhost:5173
+npm run build        # build the app for your chosen adapter</code></pre></div>
+    <p class="code-note">The scaffold answers a few prompts, installs dependencies, and npm run dev boots a dev server with instant reload on port 5173.</p>
+    <p>The parts of the skeleton that matter most: <code>src/routes/</code> holds every page, <code>src/app.html</code> is the single HTML shell, and <code>svelte.config.js</code> points at the adapter that publishes your app.</p>
+    <h3 id="ch1-filebased" data-toc>1.2 File-based routes: +page.svelte</h3>
+    <p class="topic-desc">Shows the core rule of SvelteKit routing: a folder under src/routes maps to a URL, and its +page.svelte file renders that page. The file name is the API, so adding a folder with the right file is all it takes to add a route. The page component receives its data through props supplied by its load functions.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/about/+page.svelte --&gt;
+&lt;script&gt;
+  let founded = 2019;
+&lt;/script&gt;
+
+&lt;h1&gt;About us&lt;/h1&gt;
+&lt;p&gt;We have existed since {founded}.&lt;/p&gt;</code></pre></div>
+    <p class="code-note">Creating src/routes/about/+page.svelte makes /about a real page served and hydrating on request — nested folders become nested URL paths automatically.</p>
+    <h3 id="ch1-dynamic" data-toc>1.3 Dynamic routes: [param]</h3>
+    <p class="topic-desc">Covers square-bracket parameters for per-item URLs. A folder named [slug] matches any single segment, and the captured value is exposed through params, which load functions and pages can read. This is how product pages, post pages, and other dynamic resources are built.</p>
+    <div class="codeWrap"><pre><code>// src/routes/blog/[slug]/+page.server.js
+import { error } from '@sveltejs/kit';
+import { getPost } from '$lib/server/posts';
+
+export function load({ params }) {
+  const post = getPost(params.slug);   // "hello-world" for /blog/hello-world
+  if (!post) throw error(404, 'Post not found');
+  return { post };
+}</code></pre></div>
+    <p class="code-note">The [slug] folder captures one URL segment into params, and the server load looks the post up and returns it, throwing a 404 when it is missing.</p>
+    <h3 id="ch1-restoptional" data-toc>1.4 Rest [...rest] and optional [[param]] routes</h3>
+    <p class="topic-desc">Shows how rest parameters with three dots inside square brackets catch multiple segments, and how optional parameters inside double brackets let a segment disappear. Together they cover documentation trees, deep URL structures, and i18n paths. Both work with load functions and server files the same way.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/docs/[...slug]/+page.svelte --&gt;
+&lt;script&gt;
+  import { page } from '$app/stores';
+  let parts = $page.params.slug || [];   // [] for /docs, ['a','b'] for /docs/a/b
+&lt;/script&gt;
+
+&lt;h1&gt;Docs&lt;/h1&gt;
+&lt;p&gt;Path: {parts.join(' / ')}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">A [...slug] folder catches zero or more segments as an array, while an [[lang]] folder makes /about and /en/about both resolve to the same page.</p>
+    <h3 id="ch1-navigation" data-toc>1.5 Navigation and route groups</h3>
+    <p class="topic-desc">Shows client-side navigation with plain anchor tags plus the goto helper from the navigation module. Links to internal routes are intercepted by the router so navigation happens without full page reloads. It also explains that parentheses group folders to organise the route tree without adding URL segments.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { goto } from '$app/navigation';
+&lt;/script&gt;
+
+&lt;!-- plain links are intercepted: no full page reload --&gt;
+&lt;a href="/blog"&gt;Blog&lt;/a&gt;
+&lt;a href="/blog/{slug}"&gt;Open post&lt;/a&gt;
+
+&lt;button on:click={() =&gt; goto('/checkout')}&gt;Checkout&lt;/button&gt;</code></pre></div>
+    <p class="code-note">SvelteKit prefetches and navigates plain links client-side, and goto() does the same from code, keeping the page alive instead of reloading.</p>
+    <div class="codeWrap"><pre><code>src/routes/
+  (marketing)/                  # parentheses: groups only, no URL part
+    about/+page.svelte          # still served at /about
+  account/
+    profile/+page.svelte        # served at /account/profile</code></pre></div>
+    <p class="code-note">Route groups wrap folders in parentheses to organise code or attach a layout without changing the URL, which matters when you meet layout resets in Chapter 2.</p>
+    <div class="ex"><h4 id="ch1-navigation--exercises-1">Exercises 1</h4><ol>
+      <li>Scaffold a project and add a <code>/contact</code> page with a paragraph.</li>
+      <li>Create <code>blog/[slug]</code> and render the slug on the page.</li>
+      <li>Add a <code>docs/[...section]</code> route and link to a few paths from the home page.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Layouts, Pages &amp; Head</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Layouts, Pages &amp; Head</button><div class="ch-toc-list"><a href="#ch2-nested">2.1 Nested layouts and the slot</a><a href="#ch2-reset">2.2 Layout reset and groups</a><a href="#ch2-modules">2.3 +page.js vs +page.svelte</a><a href="#ch2-options">2.4 Page options: prerender, ssr, csr</a><a href="#ch2-head">2.5 Head management with &lt;svelte:head&gt;</a></div></div>
+    <p class="topic-desc">Covers layouts, page options, and the svelte:head API for managing the document head. Layouts give every route a shared shell such as a header and footer without repeating markup a single time. Page options and head management then let each route control its own rendering and metadata.</p>
+    <h3 id="ch2-nested" data-toc>2.1 Nested layouts and the slot</h3>
+    <p class="topic-desc">Shows how a +layout.svelte file wraps every page beneath it in the route tree. Nested layouts compose like matryoshka templates, so each level adds its own shell around the content below it. A page renders inside its nearest layout, which itself renders inside the layout above it.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/+layout.svelte --&gt;
+&lt;nav&gt;
+  &lt;a href="/"&gt;Home&lt;/a&gt;
+  &lt;a href="/blog"&gt;Blog&lt;/a&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+  &lt;slot /&gt;    &lt;!-- the child page renders here --&gt;
+&lt;/main&gt;</code></pre></div>
+    <p class="code-note">The root layout renders once for the whole app, and the slot is replaced by whichever page or child layout matches the current route.</p>
+    <h3 id="ch2-reset" data-toc>2.2 Layout reset and groups</h3>
+    <p class="topic-desc">Explains how route groups let different pages use different layouts, and how +layout@.svelte resets to a specific parent layout. The @ selector names the parent whose shell you want to escape. This is how login and error pages break out of the main app shell.</p>
+    <div class="codeWrap"><pre><code>src/routes/
+  (app)/
+    +layout.svelte          # sidebar layout for the app
+    dashboard/+page.svelte
+  (auth)/
+    +layout@.svelte         # resets to the root layout — bare screen
+    login/+page.svelte</code></pre></div>
+    <p class="code-note">Both groups live at the same depth, so none adds a URL segment, and the @. reset drops the sidebar layout so login renders on a bare canvas.</p>
+    <h3 id="ch2-modules" data-toc>2.3 +page.js vs +page.svelte</h3>
+    <p class="topic-desc">Separates the module scripts that run first from the component that renders. The +page.js file exports load and the page options while +page.svelte holds the markup. Keeping logic in the module file keeps components simple and lets data arrive before render.</p>
+    <div class="codeWrap"><pre><code>// src/routes/posts/+page.js
+export const load = ({ url }) =&gt; {
+  const q = url.searchParams.get('q');
+  return {
+    title: q ? `Results for "${q}"` : 'All posts',
+    page: Number(url.searchParams.get('page')) || 1,
+  };
+};</code></pre></div>
+    <p class="code-note">The +page.js module exports a load function that runs before render and returns data; the sibling +page.svelte receives it through the data prop.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/posts/+page.svelte --&gt;
+&lt;script&gt;
+  export let data;   // what load() returned becomes {data.title}
+&lt;/script&gt;
+
+&lt;h1&gt;{data.title}&lt;/h1&gt;
+&lt;p&gt;Page {data.page}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">The component exports a data prop that the framework fills from load, keeping the script that fetches strictly separate from the markup that shows it.</p>
+    <h3 id="ch2-options" data-toc>2.4 Page options: prerender, ssr, csr</h3>
+    <p class="topic-desc">Introduces the prerender, ssr, and csr page options that control how a page is produced. Prerender builds static HTML at build time, ssr renders on every request, and csr off emits a shell that fills in later. They are plain exports from the page module.</p>
+    <div class="codeWrap"><pre><code>// src/routes/landing/+page.js
+export const prerender = true;   // bake to static HTML at build time
+export const ssr = true;         // server-render each request (default)
+
+// src/routes/analytics/+page.js
+export const ssr = false;        // client-only: no server render at all
+export const csr = true;         // hydrate in the browser (default)</code></pre></div>
+    <p class="code-note">Prerender turns a route into a static file, and ssr:false skips server rendering for pages that only make sense after the browser loads.</p>
+    <h3 id="ch2-head" data-toc>2.5 Head management with &lt;svelte:head&gt;</h3>
+    <p class="topic-desc">Shows per-page title, description, and meta tags using the svelte:head element. Anything inside it is rendered into the document head on both server and client. This is the standard way to set SEO metadata and dynamic titles per route.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/blog/[slug]/+page.svelte --&gt;
+&lt;script&gt;
+  export let data;
+&lt;/script&gt;
+
+&lt;svelte:head&gt;
+  &lt;title&gt;{data.post.title} | my-blog&lt;/title&gt;
+  &lt;meta name="description" content={data.post.excerpt} /&gt;
+&lt;/svelte:head&gt;
+
+&lt;h1&gt;{data.post.title}&lt;/h1&gt;</code></pre></div>
+    <p class="code-note">svelte:head injects title and meta tags right from the page component, so every route controls its own document head without touching the shell.</p>
+    <div class="ex"><h4 id="ch2-head--exercises-2">Exercises 2</h4><ol>
+      <li>Give the app a root layout with a header and footer and a <code>slot</code>.</li>
+      <li>Create a <code>(auth)</code> group whose login page resets the layout with <code>+layout@.svelte</code>.</li>
+      <li>Add per-page titles to three routes with <code>svelte:head</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Loading Data</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Loading Data</button><div class="ch-toc-list"><a href="#ch3-universal-vs-server">3.1 Universal load vs server load</a><a href="#ch3-serverload">3.2 Using fetch and auth in +page.server.js</a><a href="#ch3-parent">3.3 Parent data, depends and invalidate</a><a href="#ch3-streaming">3.4 Streaming promises and fetch in load</a></div></div>
+    <p class="topic-desc">Explains how data reaches your pages through load functions, from universal load that runs everywhere to server-only streams. Load functions run before the component renders and supply its data prop. Load is where SvelteKit does most of its heavy lifting.</p>
+    <h3 id="ch3-universal-vs-server" data-toc>3.1 Universal load vs server load</h3>
+    <p class="topic-desc">Distinguishes +page.js universal load, which runs during SSR and again on the client, from +page.server.js server load, which runs only on the server. Server load can read cookies, headers, and private secrets, while universal load is limited to public code. The choice is about what data you trust and where it can run.</p>
+    <div class="codeWrap"><pre><code>// +page.js — universal: SSR first, then runs again on the client
+export function load({ url }) {
+  return { path: url.pathname };   // fine for public, shared data
+}
+
+// +page.server.js — server only: never shipped to the browser
+export async function load() {
+  const secret = await db.query(...);   // safe: the browser never sees this file
+  return { secret };
+}</code></pre></div>
+    <p class="code-note">Universal load runs during server render and again on navigation, while server load runs only where the server exists — which is where secrets, cookies, and the database belong.</p>
+    <h3 id="ch3-serverload" data-toc>3.2 Using fetch and auth in +page.server.js</h3>
+    <p class="topic-desc">Shows a realistic server load function that talks to an API and guards access. The function receives cookies, fetch, params, url, and locals through its event argument. Fetching from the server lets you forward cookies and keep credentials off the client.</p>
+    <div class="codeWrap"><pre><code>// src/routes/account/+page.server.js
+import { error, redirect } from '@sveltejs/kit';
+
+export async function load({ locals, fetch }) {
+  if (!locals.user) throw redirect(302, '/login');   // bounce guests early
+
+  const res = await fetch(`/api/orders?user=${locals.user.id}`);
+  if (!res.ok) throw error(502, 'Order service failed');
+
+  return { orders: await res.json() };
+}</code></pre></div>
+    <p class="code-note">The server load checks auth first, calls the internal API with a server-side fetch, and turns a bad response into a readable 502 error.</p>
+    <h3 id="ch3-parent" data-toc>3.3 Parent data, depends and invalidate</h3>
+    <p class="topic-desc">Shows how child loads merge with the parent layout’s data and how depends and invalidate re-run loads on demand. Returning a promise that awaits parent data merges the two results. Call invalidate with the matching dependency string to refresh data when the underlying source changes.</p>
+    <div class="codeWrap"><pre><code>// src/routes/+layout.server.js
+export function load() {
+  return { settings: await getSettings(), user: await getCurrentUser() };
+}
+
+// src/routes/+page.server.js — a child of the same layout
+export async function load({ parent }) {
+  const { user, settings } = await parent();   // merge parent data in
+  return { greeting: `Hello, ${user.name}`, theme: settings.theme };
+}</code></pre></div>
+    <p class="code-note">await parent() pulls the layout’s data into the page load, so layout-level work is loaded once and reused rather than repeated per route.</p>
+    <div class="codeWrap"><pre><code>// src/routes/orders/+page.server.js
+export async function load({ depends }) {
+  depends('app:orders');                       // tag this load's data
+  return { orders: await getOrders() };
+}
+
+// anywhere after a mutation:
+import { invalidate } from '$app/navigation';
+await invalidate('app:orders');   // re-run every load that depends on the tag</code></pre></div>
+    <p class="code-note">depends tags data with a name so a later invalidate() call re-runs only the loads that declared they depend on it — a targeted refresh after a mutation.</p>
+    <h3 id="ch3-streaming" data-toc>3.4 Streaming promises and fetch in load</h3>
+    <p class="topic-desc">Shows how returning a promise from server load streams its resolution to the browser. The page shell renders instantly while slow data arrives later in chunks. This keeps the first paint fast even when some queries take a while.</p>
+    <div class="codeWrap"><pre><code>// src/routes/report/+page.server.js
+import { slowStats } from '$lib/server/stats';
+
+export function load() {
+  return {
+    quick: { name: 'Summary' },   // sent with the first pass of the response
+    stats: slowStats(),           // a promise: streamed when it resolves
+  };
+}</code></pre></div>
+    <p class="code-note">Server load can return unresolved promises, and SvelteKit streams each one to the client as it completes instead of holding the whole page hostage.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/report/+page.svelte --&gt;
+&lt;script&gt;
+  export let data;
+&lt;/script&gt;
+
+&lt;h1&gt;Report&lt;/h1&gt;
+&lt;p&gt;{data.quick.name}&lt;/p&gt;
+
+{#await data.stats}
+  &lt;p class="muted"&gt;Calculating…&lt;/p&gt;
+{:then stats}
+  &lt;table&gt;&lt;tr&gt;&lt;th&gt;Total&lt;/th&gt;&lt;td&gt;{stats.total}&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+{/await}</code></pre></div>
+    <p class="code-note">The page renders the sync data immediately and uses svelte’s {#await} blocks to swap in the streamed stats the moment the promise resolves.</p>
+    <div class="ex"><h4 id="ch3-streaming--exercises-3">Exercises 3</h4><ol>
+      <li>Load posts in <code>+page.server.js</code> and render them, handling a 404.</li>
+      <li>Use <code>await parent()</code> to share a user across the layout and pages.</li>
+      <li>Stream one slow query and show a loading state with <code>{#await}</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Form Actions</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Form Actions</button><div class="ch-toc-list"><a href="#ch4-actions">4.1 The default action</a><a href="#ch4-named">4.2 Named actions and redirect() after writes</a><a href="#ch4-validation">4.3 Validation with fail()</a><a href="#ch4-enhance">4.4 Progressive enhancement with use:enhance</a><a href="#ch4-files">4.5 Handling uploaded files</a></div></div>
+    <p class="topic-desc">Shows the SvelteKit answer to forms: actions defined in +page.server.js that handle form submissions. Validation uses fail() to return errors together with the submitted values, and progressive enhancement is added with use:enhance. File uploads are handled through formData file objects as well.</p>
+    <h3 id="ch4-actions" data-toc>4.1 The default action</h3>
+    <p class="topic-desc">Introduces the actions export in +page.server.js and a plain form posting to it. Submitting sets form props on the page in return, so the page re-renders with the result. No client-side JavaScript is required for the basic flow to work.</p>
+    <div class="codeWrap"><pre><code>// src/routes/todos/+page.server.js
+export const actions = {
+  default: async ({ request }) =&gt; {
+    const form = await request.formData();
+    const title = form.get('title');
+
+    if (!title || !String(title).trim()) {
+      return fail(400, { missing: true });   // same page, error state
+    }
+    await createTodo(String(title));
+    return { created: String(title) };       // becomes the {form} prop
+  },
+};</code></pre></div>
+    <p class="code-note">The default action reads the posted form data, rejects empty titles with fail(400), and otherwise creates the todo and returns data that becomes the page’s form prop.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/todos/+page.svelte --&gt;
+&lt;script&gt;
+  export let form;   // whatever the last action returned
+&lt;/script&gt;
+
+&lt;form method="POST" action="?/create"&gt;
+  &lt;input name="title" placeholder="New todo" /&gt;
+  &lt;button&gt;Add&lt;/button&gt;
+&lt;/form&gt;
+
+{#if form?.missing}&lt;p class="error"&gt;A title is required.&lt;/p&gt;{/if}</code></pre></div>
+    <p class="code-note">A plain HTML form posts to the action, and the returned object arrives as the form prop so the page can show validation messages without any custom JS.</p>
+    <h3 id="ch4-named" data-toc>4.2 Named actions and redirect() after writes</h3>
+    <p class="topic-desc">Shows the ?/action selector that lets a form choose a named action, and the redirect() helper for after successful writes. Named actions let one page handle many intents such as create, update, and delete. Return a redirect after a write so refreshing the page does not resubmit.</p>
+    <div class="codeWrap"><pre><code>// src/routes/todos/+page.server.js
+import { fail, redirect } from '@sveltejs/kit';
+
+export const actions = {
+  create: async ({ request }) =&gt; { /* as before */ },
+  toggle: async ({ request }) =&gt; {
+    const done = Boolean((await request.formData()).get('done'));
+    await setDone(params.id, done);
+  },
+  delete: async ({ params }) =&gt; {
+    await deleteTodo(params.id);
+    throw redirect(303, '/todos');   // stop here and bounce to a fresh page
+  },
+};</code></pre></div>
+    <p class="code-note">Forms address named actions with action="?/delete", and throw redirect(303) after a write to apply the Post/Redirect/Get pattern and refresh the data.</p>
+    <h3 id="ch4-validation" data-toc>4.3 Validation with fail()</h3>
+    <p class="topic-desc">Shows field-level validation errors collected in one pass with fail(). Each failed field keeps its submitted value so the user can correct it without retyping. Read the returned errors and data in the page component to display the messages inline.</p>
+    <div class="codeWrap"><pre><code>// src/routes/register/+page.server.js
+import { fail, redirect } from '@sveltejs/kit';
+
+export const actions = {
+  register: async ({ request, cookies }) =&gt; {
+    const data = Object.fromEntries(await request.formData());
+    const errors = {};
+
+    if (!data.name) errors.name = 'Name is required.';
+    if (!data.email || !String(data.email).includes('@')) errors.email = 'Invalid email.';
+    if (String(data.password).length &lt; 8) errors.password = 'Use 8+ characters.';
+
+    if (Object.keys(errors).length) {
+      return fail(400, { errors, data });   // keep input, show every error
+    }
+    const user = await createUser(data);
+    cookies.set('session', user.sessionId, { path: '/' });
+    throw redirect(303, '/account');
+  },
+};</code></pre></div>
+    <p class="code-note">Validation runs server-side, every bad field is collected into errors, and fail(400) returns them with the original values so the form repopulates.</p>
+    <h3 id="ch4-enhance" data-toc>4.4 Progressive enhancement with use:enhance</h3>
+    <p class="topic-desc">Adds use:enhance to the form element so the same form submits as a fetch under the hood. Without JavaScript it falls back to a plain POST, and with it the page updates without a full reload. Extra options can show pending states and reset the form after success.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { enhance } from '$app/forms';
+  export let form;
+  let saving = false;
+&lt;/script&gt;
+
+&lt;form method="POST" use:enhance={() =&gt; {
+  saving = true;                    // show a spinner while submitting
+  return async ({ result }) =&gt; {    // receives update, result, formElement
+    saving = false;
+    if (result.type === 'error') alert('Something went wrong');
+  };
+}}&gt;
+  &lt;input name="title" placeholder="New todo" /&gt;
+  &lt;button disabled={saving}&gt;{saving ? 'Saving…' : 'Add'}&lt;/button&gt;
+&lt;/form&gt;</code></pre></div>
+    <p class="code-note">use:enhance submits the form with fetch, applies the action’s returned form prop, and runs your callback — so the same form works with or without JavaScript.</p>
+    <h3 id="ch4-files" data-toc>4.5 Handling uploaded files</h3>
+    <p class="topic-desc">Handles multipart uploads inside an action. The formData file field arrives as a File object whose buffer you write to disk or remote storage. Always validate the filename and content type, and never trust the submitted name directly.</p>
+    <div class="codeWrap"><pre><code>// src/routes/upload/+page.server.js
+import { fail } from '@sveltejs/kit';
+import { writeFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+
+export const actions = {
+  upload: async ({ request }) =&gt; {
+    const form = await request.formData();
+    const file = form.get('avatar');
+
+    if (!file || !(file instanceof File)) return fail(400, { noFile: true });
+
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const name = `${randomUUID()}.${file.name.split('.').pop()}`;   // safe name
+    await writeFile(`static/uploads/${name}`, bytes);
+
+    return { uploaded: name };
+  },
+};</code></pre></div>
+    <p class="code-note">The action reads the File, writes its bytes to disk under a server-generated name, and returns the safe filename — client filenames are never trusted or reused.</p>
+    <div class="ex"><h4 id="ch4-files--exercises-4">Exercises 4</h4><ol>
+      <li>Build a <code>todos</code> page with create and delete actions.</li>
+      <li>Add field-level validation to a register form and repopulate values on failure.</li>
+      <li>Upgrade the form with <code>use:enhance</code> and a saving spinner.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · API Routes</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · API Routes</button><div class="ch-toc-list"><a href="#ch5-serverfile">5.1 A +server.js GET endpoint</a><a href="#ch5-rest">5.2 POST, PUT and DELETE handlers</a><a href="#ch5-request">5.3 Request and Response, and the json helper</a><a href="#ch5-errors">5.4 Endpoint params and error handling</a></div></div>
+    <p class="topic-desc">Covers +server.js endpoints that speak JSON through GET, POST, PUT, and DELETE handlers. The exported functions handle each HTTP verb for the same URL, and the json helper builds responses cleanly. Consistent error responses keep API clients predictable across every endpoint.</p>
+    <h3 id="ch5-serverfile" data-toc>5.1 A +server.js GET endpoint</h3>
+    <p class="topic-desc">Shows the file convention for API routes and the simplest JSON response. Exporting a GET function from +server.js is all it takes to expose an endpoint. Every function you export corresponds to the HTTP verb it handles.</p>
+    <div class="codeWrap"><pre><code>// src/routes/api/posts/+server.js
+import { json } from '@sveltejs/kit';
+import { listPosts } from '$lib/server/posts';
+
+export async function GET() {
+  const posts = await listPosts();
+  return json(posts);                    // 200 with Content-Type: application/json
+}</code></pre></div>
+    <p class="code-note">A +server.js file under src/routes/api/posts maps to GET /api/posts and returns the post list as JSON via the json helper.</p>
+    <h3 id="ch5-rest" data-toc>5.2 POST, PUT and DELETE handlers</h3>
+    <p class="topic-desc">Shows a full CRUD endpoint for one resource using separate exported handlers. Each exported method handles one HTTP verb for the same URL. Read the request body or params to identify the resource, then respond with the appropriate status code.</p>
+    <div class="codeWrap"><pre><code>// src/routes/api/posts/[id]/+server.js
+import { json, error } from '@sveltejs/kit';
+
+export async function GET({ params }) {
+  const post = await findPost(params.id);
+  if (!post) throw error(404, 'Post not found');
+  return json(post);
+}
+
+export async function PUT({ params, request }) {
+  const body = await request.json();
+  const updated = await updatePost(params.id, body);   // params works here too
+  return json(updated);
+}
+
+export async function DELETE({ params }) {
+  await removePost(params.id);
+  return new Response(null, { status: 204 });   // 204 = no content
+}</code></pre></div>
+    <p class="code-note">The same +server.js exports a handler per HTTP verb, sharing the [id] param, so /api/posts/42 supports GET, PUT, and DELETE with one file.</p>
+    <h3 id="ch5-request" data-toc>5.3 Request and Response, and the json helper</h3>
+    <p class="topic-desc">Shows how handlers read query strings and JSON bodies, and how to build responses. Handlers are plain Web-standard functions that receive a Request and return a Response. The json helper serialises data and sets an appropriate content type for you.</p>
+    <div class="codeWrap"><pre><code>// src/routes/api/search/+server.js
+import { json } from '@sveltejs/kit';
+
+export async function POST({ request, url }) {
+  const q = url.searchParams.get('q');      // GET-style query: ?q=hello
+  const body = await request.json();          // parsed POST body
+  const results = await search(String(q).trim(), body.limit ?? 10);
+
+  // status codes and headers ride along with the data
+  return json({ q, results }, { status: 200 });
+}</code></pre></div>
+    <p class="code-note">Handlers receive the standard Request with query string, headers, and body, and json() packages a Response with the right content type and status.</p>
+    <h3 id="ch5-errors" data-toc>5.4 Endpoint params and error handling</h3>
+    <p class="topic-desc">Combines params, validation, and error() so clients always get a structured failure. Use params to identify the resource, validate the request, then throw error() with a status and message, and SvelteKit shapes the JSON response. This keeps error handling consistent across the whole API.</p>
+    <div class="codeWrap"><pre><code>// src/routes/api/posts/+server.js
+import { json, error } from '@sveltejs/kit';
+
+export async function POST({ request }) {
+  const { title } = await request.json();
+
+  if (!title || String(title).length &lt; 3) {
+    throw error(422, 'Title must be at least 3 characters');   // Unprocessable Entity
+  }
+
+  const post = await createPost(String(title));
+  return json(post, { status: 201 });       // 201 = Created
+}
+
+// throw error() with your own code for the client:
+export function GET({ url }) {
+  if (!url.searchParams.get('key')) {
+    throw error(403, { message: 'API key missing', code: 'NO_KEY' });
+  }
+  return json({ ok: true });
+}</code></pre></div>
+    <p class="code-note">throw error() produces a JSON error body with the status and message, so validation failures and auth problems reach API clients in a consistent shape.</p>
+    <div class="ex"><h4 id="ch5-errors--exercises-5">Exercises 5</h4><ol>
+      <li>Serve a <code>GET /api/todos</code> endpoint returning an array.</li>
+      <li>Add <code>POST</code> and <code>DELETE</code> handlers respecting the <code>[id]</code> param.</li>
+      <li>Return a documented 422 with a custom code when validation fails.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Hooks &amp; Middleware</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Hooks &amp; Middleware</button><div class="ch-toc-list"><a href="#ch6-handle">6.1 The handle hook and event.locals</a><a href="#ch6-sequence">6.2 Composing hooks with sequence</a><a href="#ch6-fetch">6.3 handleFetch</a><a href="#ch6-errors">6.4 handleError and an authorization pattern</a></div></div>
+    <p class="topic-desc">Covers the server hooks that run around every request: handle, sequence, handleFetch, and handleError. Hooks are where cross-cutting concerns such as auth, logging, and header manipulation live. They run at the edge of every request, before and after the routes themselves execute.</p>
+    <h3 id="ch6-handle" data-toc>6.1 The handle hook and event.locals</h3>
+    <p class="topic-desc">Shows the entry point for server requests. The handle hook runs before any route and can inspect and modify the request or resolve a response directly. event.locals carries per-request data through the whole stack, from hooks down to load functions and components.</p>
+    <div class="codeWrap"><pre><code>// src/hooks.server.js
+import { getUserFromToken } from '$lib/server/session';
+
+export async function handle({ event, resolve }) {
+  const token = event.cookies.get('session');
+  event.locals.user = token ? await getUserFromToken(token) : null;
+  // locals is per-request: safe for any load or action to read
+  return resolve(event);      // hand the request to the router
+}</code></pre></div>
+    <p class="code-note">handle reads the session cookie, attaches the user to event.locals before the route runs, and every load function in the app can read locals user.</p>
+    <h3 id="ch6-sequence" data-toc>6.2 Composing hooks with sequence</h3>
+    <p class="topic-desc">Chains multiple handle hooks in order with sequence from the SvelteKit module. Each hook stays small and does exactly one thing, such as parsing a cookie or setting a header. The first hook receives the raw request and the last one resolves the final response.</p>
+    <div class="codeWrap"><pre><code>// src/hooks.server.js
+import { sequence } from '@sveltejs/kit/hooks';
+
+async function logging({ event, resolve }) {
+  const start = Date.now();
+  const response = await resolve(event);
+  console.log(`${event.request.method} ${event.url.pathname} ${Date.now() - start}ms`);
+  return response;
+}
+
+async function auth({ event, resolve }) {
+  event.locals.user = await loadUser(event.cookies.get('session'));
+  return resolve(event);
+}
+
+export const handle = sequence(logging, auth);   // run in listed order</code></pre></div>
+    <p class="code-note">sequence runs logging first and auth second, each wrapping resolve, so hooks stay composable and additive instead of one giant function.</p>
+    <h3 id="ch6-fetch" data-toc>6.3 handleFetch</h3>
+    <p class="topic-desc">Shows how to intercept fetch calls made by load functions and forward credentials. This closes the classic internal-API auth gap by baking cookies or tokens into the outgoing request. The hook returns a modified fetch, or falls back to the original one.</p>
+    <div class="codeWrap"><pre><code>// src/hooks.server.js
+export async function handleFetch({ request, fetch, event }) {
+  if (request.url.startsWith('http://api.internal/')) {
+    // forward the user's session cookie to the internal API
+    request.headers.set('cookie', event.request.headers.get('cookie') ?? '');
+  }
+  return fetch(request);   // otherwise, fetch normally
+}</code></pre></div>
+    <p class="code-note">handleFetch rewrites every fetch your load functions make, forwarding the visitor’s cookies to an internal API so it sees the same user.</p>
+    <h3 id="ch6-errors" data-toc>6.4 handleError and an authorization pattern</h3>
+    <p class="topic-desc">Centralises unexpected error logging in one place. The handleError hook receives the error and the event that caused it on the server, while a client-side variant handles browser errors. It also demonstrates the guard pattern that protects whole subtrees from a hook or layout.</p>
+    <div class="codeWrap"><pre><code>// src/hooks.server.js
+export function handleError({ error, event }) {
+  console.error('Unhandled error on', event.url.pathname, error);
+  // never leak stack traces or DB details to the client
+  return { message: 'Something went wrong. Please retry.' };
+}</code></pre></div>
+    <p class="code-note">handleError captures unexpected errors once, logs them server-side, and returns a safe message the error page is allowed to show.</p>
+    <div class="codeWrap"><pre><code>// src/routes/admin/+layout.server.js
+import { redirect } from '@sveltejs/kit';
+
+export function load({ locals }) {
+  if (!locals.user) throw redirect(302, '/login');        // guests out
+  if (!locals.user.isAdmin) throw redirect(302, '/');     // members out
+  return { user: locals.user };
+}</code></pre></div>
+    <p class="code-note">A layout server load running for /admin and every route beneath it enforces authorization in one place, short-circuiting before any page renders.</p>
+    <div class="ex"><h4 id="ch6-errors--exercises-6">Exercises 6</h4><ol>
+      <li>Write a handle hook that times every request and logs slow ones.</li>
+      <li>Compose it with an auth hook using <code>sequence</code>.</li>
+      <li>Protect an <code>/admin</code> subtree with a guard layout that redirects guests.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · State, Stores &amp; Context</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · State, Stores &amp; Context</button><div class="ch-toc-list"><a href="#ch7-stores">7.1 The page and navigating stores</a><a href="#ch7-ssr">7.2 Store SSR caveats</a><a href="#ch7-context">7.3 setContext and getContext</a><a href="#ch7-load">7.4 Sharing load data with components</a></div></div>
+    <p class="topic-desc">Covers the built-in stores from the app stores module, the server-side pitfalls of module stores, and how setContext and getContext share state down a component tree. Together they give you safe, scoped state across pages and components. This is the chapter that makes your state behave correctly under SSR.</p>
+    <h3 id="ch7-stores" data-toc>7.1 The page and navigating stores</h3>
+    <p class="topic-desc">Introduces the page and navigating stores from the app stores module. They expose URL, params, data, and the in-flight navigation state anywhere in your components. Reading them auto-subscribes and updates reactively as navigation happens.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  import { page, navigating } from '$app/stores';
+&lt;/script&gt;
+
+{#if $navigating}
+  &lt;div class="loader"&gt;Loading {$navigating.to?.url.pathname}…&lt;/div&gt;
+{/if}
+
+&lt;p&gt;You are on &lt;code&gt;{$page.url.pathname}&lt;/code&gt;&lt;/p&gt;</code></pre></div>
+    <p class="code-note">$page gives any component the current URL, params, and rendered data, while $navigating goes truthy during a client-side navigation and names the target.</p>
+    <h3 id="ch7-ssr" data-toc>7.2 Store SSR caveats</h3>
+    <p class="topic-desc">Warns about module-level stores holding shared state across requests. Because SSR renders many requests in one server process, a module store would leak one user’s state to another. Importable stores must be created outside components and kept request-neutral, or created fresh per request with context.</p>
+    <div class="codeWrap"><pre><code>// src/lib/stores/counter.js — NOT inside a .svelte file
+import { writable } from 'svelte/store';
+
+export const count = writable(0);   // importable from any component
+
+// Dangerous pattern: this store is shared across ALL requests during SSR
+// export const currentUser = writable(null);  // do not do this with user data
+
+// Safe: derive state from $page.data instead
+import { page } from '$app/stores';
+export const currentUser = derived(page, ($p) =&gt; $p.data.user);</code></pre></div>
+    <p class="code-note">svelte/store is safe for counters and theme, but per-user data belongs in load results or context — a module store shared in SSR would leak across requests.</p>
+    <h3 id="ch7-context" data-toc>7.3 setContext and getContext</h3>
+    <p class="topic-desc">Shares objects with descendants without prop drilling. A parent calls setContext to offer an object, and any child in that tree calls getContext to read it. Context is scoped to the component tree, so per-user state stays isolated between requests.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/+layout.svelte --&gt;
+&lt;script&gt;
+  import { setContext } from 'svelte';
+  import { writable } from 'svelte/store';
+
+  // one store per request, handed to every descendant below this slot
+  setContext('user', writable($page.data.user));
+&lt;/script&gt;
+
+&lt;slot /&gt;</code></pre></div>
+    <p class="code-note">The layout creates a per-request store and registers it as 'user' context, so every component below inherits it without prop drilling.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- any descendant component --&gt;
+&lt;script&gt;
+  import { getContext } from 'svelte';
+  import { page } from '$app/stores';
+
+  const user = getContext('user');   // the store created by the nearest ancestor
+
+  $: greeting = $user?.name &amp;&amp; `Hi, ${$user.name}`;
+&lt;/script&gt;
+&lt;p&gt;{greeting}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">getContext pulls the store back out in the child, and because context matches the tree, server rendering keeps each request’s state separate.</p>
+    <h3 id="ch7-load" data-toc>7.4 Sharing load data with components</h3>
+    <p class="topic-desc">Shows the cleanest sharing mechanism: load returns data that flows through the page store’s data property. Components read that property reactively with zero plumbing. This works identically for both universal and server load results.</p>
+    <div class="codeWrap"><pre><code>// src/routes/+layout.server.js
+export function load() {
+  return { workspace: await getWorkspace() };
+}
+
+// any component anywhere in the app:
+import { page } from '$app/stores';
+
+// $page.data.workspace is reactive and SSR-safe
+const workspace = $page.data.workspace;</code></pre></div>
+    <p class="code-note">Returning data from a layout load merges it into $page.data, giving every component under the layout reactive, server-safe access by default.</p>
+    <div class="ex"><h4 id="ch7-load--exercises-7">Exercises 7</h4><ol>
+      <li>Show a top progress bar using the <code>navigating</code> store.</li>
+      <li>Share a theme store through context and consume it in a grandchild.</li>
+      <li>Expose the logged-in user to all components via <code>$page.data</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Errors, Auth &amp; Sessions</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Errors, Auth &amp; Sessions</button><div class="ch-toc-list"><a href="#ch8-error">8.1 The error page: expected vs unexpected</a><a href="#ch8-cookies">8.2 Session cookies with the cookies API</a><a href="#ch8-guards">8.3 Auth guards with redirect</a><a href="#ch8-flow">8.4 A complete session flow</a></div></div>
+    <p class="topic-desc">Covers the error page, expected versus unexpected failures, session cookies, and authorization guards. Together they complete the auth story that began with event.locals in an earlier chapter. You learn to build a login, protect routes, and handle failures gracefully.</p>
+    <h3 id="ch8-error" data-toc>8.1 The error page: expected vs unexpected</h3>
+    <p class="topic-desc">Shows +error.svelte and the two failure channels. Throwing error() is an expected failure, and its message reaches the page for rendering. Anything else is unexpected and is filtered by handleError so internal details never leak to users.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/+error.svelte --&gt;
+&lt;script&gt;
+  import { page } from '$app/stores';
+&lt;/script&gt;
+
+&lt;h1&gt;{$page.status}&lt;/h1&gt;
+&lt;p&gt;{$page.error.message}&lt;/p&gt;
+&lt;a href="/"&gt;Back home&lt;/a&gt;</code></pre></div>
+    <p class="code-note">+error.svelte renders for any failed navigation or render, reading status and message from $page so expected throw error(...) messages show and internals never do.</p>
+    <h3 id="ch8-cookies" data-toc>8.2 Session cookies with the cookies API</h3>
+    <p class="topic-desc">Sets a secure session cookie from an action and reads it later with the cookies API. Options such as httpOnly, sameSite, and secure are non-negotiable for web auth. Set and delete cookies from hooks, actions, load functions, and server endpoints.</p>
+    <div class="codeWrap"><pre><code>// src/routes/login/+page.server.js
+import { fail, redirect } from '@sveltejs/kit';
+
+export const actions = {
+  default: async ({ request, cookies }) =&gt; {
+    const data = Object.fromEntries(await request.formData());
+    const user = await verifyLogin(data.email, data.password);
+
+    if (!user) return fail(401, { email: data.email });
+
+    cookies.set('session', user.sessionId, {
+      path: '/',                // send it for every route
+      httpOnly: true,           // invisible to JavaScript in the browser
+      secure: true,             // HTTPS only in production
+      sameSite: 'lax',          // CSRF mitigation
+      maxAge: 60 * 60 * 24 * 7, // one week
+    });
+
+    throw redirect(303, '/account');
+  },
+};</code></pre></div>
+    <p class="code-note">The action verifies credentials, writes an httpOnly same-site cookie for the path, and redirects — the cookie then rides on every subsequent request.</p>
+    <h3 id="ch8-guards" data-toc>8.3 Auth guards with redirect</h3>
+    <p class="topic-desc">Reads the session cookie in hooks and bounces unauthenticated visitors with redirect(). The cookie value is the only proof of identity the server needs to trust. A guard placed in a hook or layout protects every route beneath it.</p>
+    <div class="codeWrap"><pre><code>// src/hooks.server.js
+import { redirect } from '@sveltejs/kit';
+import { userFromSession } from '$lib/server/session';
+import { protectedPaths } from '$lib/server/routes';
+
+export async function handle({ event, resolve }) {
+  const sessionId = event.cookies.get('session');
+  event.locals.user = sessionId ? await userFromSession(sessionId) : null;
+
+  // catch protected prefixes before the router resolves anything
+  if (protectedPaths.some((p) =&gt; event.url.pathname.startsWith(p)) &amp;&amp; !event.locals.user) {
+    throw redirect(302, `/login?next=${encodeURIComponent(event.url.pathname)}`);
+  }
+
+  return resolve(event);
+}</code></pre></div>
+    <p class="code-note">The hook resolves the session into locals.user and short-circuits protected prefixes with a redirect that remembers where the visitor was headed.</p>
+    <h3 id="ch8-flow" data-toc>8.4 A complete session flow</h3>
+    <p class="topic-desc">Ties login, guard, and logout into one loop. Session creation happens on a successful login action, verification runs per request in a hook, and deletion happens on logout. This is the complete, working auth lifecycle you can carry into any app.</p>
+    <div class="codeWrap"><pre><code>// src/routes/logout/+page.server.js
+export const actions = {
+  default: async ({ cookies }) =&gt; {
+    cookies.delete('session', { path: '/' });   // drop it client-side too
+    return { loggedOut: true };
+  },
+};
+
+// src/routes/account/+layout.server.js — the guard side
+export function load({ locals }) {
+  if (!locals.user) throw redirect(302, '/login');
+  return { user: locals.user };
+}</code></pre></div>
+    <p class="code-note">Logout deletes the session cookie, and the account layout guard only lets locals.user through — the complete create-verify-delete session loop.</p>
+    <div class="warn"><p>Use <code>httpOnly</code> and <code>sameSite</code> together, never stash secrets in localStorage, and rotate session IDs on login to defeat fixation.</p></div>
+    <div class="ex"><h4 id="ch8-flow--exercises-8">Exercises 8</h4><ol>
+      <li>Build a login action that sets a session cookie and a logout that clears it.</li>
+      <li>Guard <code>/account</code> with a layout load that redirects guests.</li>
+      <li>Render a friendly <code>+error.svelte</code> for 404s and expected errors.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Adapters &amp; Deployment</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Adapters &amp; Deployment</button><div class="ch-toc-list"><a href="#ch9-node">9.1 adapter-auto and adapter-node</a><a href="#ch9-static">9.2 adapter-static and prerendering</a><a href="#ch9-env">9.3 $env modules and environment variables</a><a href="#ch9-build">9.4 build, preview and the production checklist</a></div></div>
+    <p class="topic-desc">Covers adapters, prerendering, and the environment-variable modules. An adapter is the only thing that changes when you move hosts, reshaping the build for a target platform. With the right adapter your app runs on Node servers, CDNs, or serverless platforms.</p>
+    <h3 id="ch9-node" data-toc>9.1 adapter-auto and adapter-node</h3>
+    <p class="topic-desc">Shows the default auto adapter and the Node server adapter for baremetal hosts. adapter-node builds a standalone Node server with no port assumptions and reads its configuration from environment variables at runtime. The result is a single build that runs anywhere you run Node.</p>
+    <div class="codeWrap"><pre><code>npm add -D @sveltejs/adapter-node
+
+// svelte.config.js
+import adapter from '@sveltejs/adapter-node';
+
+export default {
+  kit: {
+    adapter: adapter({ out: 'build' }),
+  },
+};
+
+// then
+npm run build          # produces build/ with a server and prerendered assets
+PORT=3000 node build   # run the server anywhere Node.js exists</code></pre></div>
+    <p class="code-note">Swapping the adapter changes the build output, and adapter-node produces a tiny Node server you can run with node build on any host or container.</p>
+    <h3 id="ch9-static" data-toc>9.2 adapter-static and prerendering</h3>
+    <p class="topic-desc">Builds the entire app as plain static files for CDN hosting. Every route must be prerendered or marked csr-only for this to work. The result is a folder of HTML, CSS, and JavaScript you can serve from any static host or file server.</p>
+    <div class="codeWrap"><pre><code>npm add -D @sveltejs/adapter-static
+
+// svelte.config.js
+import adapter from '@sveltejs/adapter-static';
+
+export default {
+  kit: {
+    adapter: adapter({ pages: 'build', assets: 'build', fallback: null }),
+  },
+};
+
+// src/routes/+layout.js — every route must agree to be static
+export const prerender = true;</code></pre></div>
+    <p class="code-note">With the static adapter the build emits only HTML, JS, and assets — deployable to any CDN or static host, provided every route is prerenderable.</p>
+    <h3 id="ch9-env" data-toc>9.3 $env modules and environment variables</h3>
+    <p class="topic-desc">Shows which environment-variable module fits each variable. Public variables come from the env static or dynamic public modules and are compiled into the client bundle. The private and dynamic private modules keep secrets and runtime values on the server forever.</p>
+    <div class="codeWrap"><pre><code># .env
+PUBLIC_API_URL=https://api.example.com    # PUBLIC_ prefix: safe for browsers
+DATABASE_URL=postgres://user:pass@localhost/db
+
+// src/routes/+page.server.js
+import { DATABASE_URL } from '$env/dynamic/private';     // read at runtime, server only
+export async function load() {
+  return { db: DATABASE_URL };   // safe: this file never ships to the client
+}
+
+// src/routes/+page.js
+import { PUBLIC_API_URL } from '$env/static/public';     // compiled into the bundle
+export function load({ fetch }) {
+  return { api: `${PUBLIC_API_URL}/posts` };
+}</code></pre></div>
+    <p class="code-note">PUBLIC_-prefixed variables are safe to compile into client code, while $env/dynamic/private variables exist only on the server and refresh without a rebuild.</p>
+    <h3 id="ch9-build" data-toc>9.4 build, preview and the production checklist</h3>
+    <p class="topic-desc">Lists the commands that complete a release and the checks to run before you ship. Build produces the final output, preview serves it locally, and svelte-kit sync keeps the generated types honest after config changes. Walk the checklist before every deployment.</p>
+    <div class="codeWrap"><pre><code>npx svelte-kit sync          # regenerate route types after changing files
+npm run build                # adapt the app for the target host
+npm run preview              # serve the production build locally
+
+# production checklist
+# - set a strong COOKIE_SECRET and rotate on deploy
+# - pin the SvelteKit and adapter versions
+# - assert directives for the document head in app.html
+# - confirm PRERENDERED routes in the build output</code></pre></div>
+    <p class="code-note">Build then preview reproduces the production server locally, and the checklist pins secrets, versions, and security headers before the deploy.</p>
+    <div class="tip"><p>Prefer <code>adapter-auto</code> while developing and only pin a specific adapter when you commit to a host — the app code never changes.</p></div>
+    <div class="ex"><h4 id="ch9-build--exercises-9">Exercises 9</h4><ol>
+      <li>Deploy locally with <code>adapter-node</code> and serve it on a custom port.</li>
+      <li>Build a fully static site with <code>adapter-static</code> and prerender everything.</li>
+      <li>Move secrets to <code>$env/dynamic/private</code> and verify they never appear in the client bundle.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Advanced Patterns</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Advanced Patterns</button><div class="ch-toc-list"><a href="#ch10-streaming">10.1 Streaming data and progressive resolution</a><a href="#ch10-snapshot">10.2 Snapshots</a><a href="#ch10-sw">10.3 Service workers for offline apps</a><a href="#ch10-testing">10.4 Testing with Playwright and Vitest</a><a href="#ch10-perf">10.5 Performance levers</a></div></div>
+    <p class="topic-desc">Covers streaming, snapshots, service workers, testing, and the performance levers SvelteKit gives you. These advanced techniques take a good app and make it polished. Each pattern builds on the fundamentals covered in the earlier chapters.</p>
+    <h3 id="ch10-streaming" data-toc>10.1 Streaming data and progressive resolution</h3>
+    <p class="topic-desc">Streams independent server queries to the client as they finish. The page paints instantly and each chunk of data arrives when it is ready. This keeps the first paint fast without waiting on the slowest query.</p>
+    <div class="codeWrap"><pre><code>// src/routes/report/[id]/+page.server.js
+export function load() {
+  return {
+    meta: getMeta(),           // fast: blocks nothing
+    chart: slowChart(),        // promise: streams in when resolved
+    table: slowerTable(),      // another independent promise
+  };
+}
+
+// limit what streams to specific clients if needed
+export const config = { ssr: true };</code></pre></div>
+    <p class="code-note">Returning several promises from server load lets each resolve on its own timeline, and SvelteKit streams each chunk to the browser as it completes.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/report/[id]/+page.svelte --&gt;
+&lt;script&gt;
+  export let data;
+  let { meta } = data;   // already available at first paint
+&lt;/script&gt;
+
+&lt;h1&gt;{meta.title}&lt;/h1&gt;
+
+{#await data.chart}
+  &lt;p&gt;Chart loading…&lt;/p&gt;
+{:then chart}
+  &lt;img alt="chart" src={chart.src} /&gt;
+{/await}</code></pre></div>
+    <p class="code-note">The page renders the resolved meta immediately and each {#await} block swaps in its own data the moment its promise resolves — progressive enhancement of rendering.</p>
+    <h3 id="ch10-snapshot" data-toc>10.2 Snapshots</h3>
+    <p class="topic-desc">Preserves ephemeral component state across client-side navigations. The snapshot module registers capture and restore functions so a partially-filled form survives leaving and returning to a page. SvelteKit saves and restores the returned state hash on each navigation automatically.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- src/routes/search/+page.svelte --&gt;
+&lt;script&gt;
+  let query = '';
+  let results = [];
+  let loading = false;
+
+  // exported from the instance script: SvelteKit wires it up automatically
+  export const snapshot = {
+    capture: () =&gt; ({ query, results }),   // saved when you navigate away
+    restore: (value) =&gt; {                   // replayed when you come back
+      query = value.query;
+      results = value.results;
+    },
+  };
+&lt;/script&gt;
+
+&lt;input bind:value={query} placeholder="Search…" /&gt;</code></pre></div>
+    <p class="code-note">The snapshot export saves the search state before the Svelte component is destroyed and restores it on return, so back-navigation keeps your query and results.</p>
+    <div class="warn"><p>Do not put secrets or large blobs in snapshots — the value lives in <code>history.state</code> and is visible in the browser.</p></div>
+    <h3 id="ch10-sw" data-toc>10.3 Service workers for offline apps</h3>
+    <p class="topic-desc">Adds an offline layer with the service-worker module. The worker caches the app shell and static assets, and only revalidates on new builds based on the version string. This is how you build apps that keep working without a connection.</p>
+    <div class="codeWrap"><pre><code>// src/service-worker.js — automatically wired up and registered in production
+import { build, files, version } from '$service-worker';
+
+const CACHE = `static-${version}`;   // version changes on every build
+
+self.addEventListener('install', () =&gt; {
+  caches.open(CACHE).then((c) =&gt; c.addAll(build));   // cache the app shell
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) =&gt; {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) =&gt; Promise.all(keys
+        .filter((k) =&gt; k !== CACHE)
+        .map((k) =&gt; caches.delete(k))))   // purge stale caches
+  );
+});</code></pre></div>
+    <p class="code-note">The service worker caches the built app shell under a versioned key, and activate purges old versions, so updates arrive without stale assets.</p>
+    <h3 id="ch10-testing" data-toc>10.4 Testing with Playwright and Vitest</h3>
+    <p class="topic-desc">Covers end-to-end browser tests and fast unit tests. Playwright drives a real browser against the built app, while Vitest covers functions and components in isolation. Both were offered by the scaffolder and run as scripts in your project.</p>
+    <div class="codeWrap"><pre><code>npm create svelte@latest my-app      # pick "Playwright" and "Vitest" options
+npx playwright install chromium      # download the browser, once
+
+// tests/home.spec.js
+import { expect, test } from '@playwright/test';
+
+test('home shows the heading', async ({ page }) =&gt; {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Home' })).toBeVisible();
+});
+
+// src/lib/title.test.js
+import { describe, expect, it } from 'vitest';
+import { slugify } from './title';
+
+describe('slugify', () =&gt; {
+  it('lowercases and dashes', () =&gt; {
+    expect(slugify('Hello World!')).toBe('hello-world');
+  });
+});</code></pre></div>
+    <p class="code-note">Playwright opens a real browser and asserts against the DOM, while Vitest unit-tests pure functions like slugify in milliseconds without a server.</p>
+    <h3 id="ch10-perf" data-toc>10.5 Performance levers</h3>
+    <p class="topic-desc">Lists the highest-impact performance levers: prerendering static routes, prefetching link data, splitting bundles, and streaming. Measure with an audit or a profiler before you optimise so you fix real bottlenecks. Small, targeted changes give the biggest wins.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- prefetch the target page's data while the user hovers the link --&gt;
+&lt;a href="/checkout" data-sveltekit-preload-data="hover"&gt;Checkout&lt;/a&gt;
+
+// src/routes/+layout.js — prerender the static marketing routes once
+export const prerender = true;
+
+// lazy-load a heavy chart library only when it is actually used
+async function openChart() {
+  const { renderChart } = await import('$lib/chart');   // separate chunk
+  renderChart();
+}</code></pre></div>
+    <p class="code-note">Preload attributes warm up data before navigation, prerendering skips server work for static pages, and dynamic import keeps the initial bundle small.</p>
+    <ul>
+      <li><strong>Prerender</strong> anything static — free CDN edge caching, zero SSR cost.</li>
+      <li><strong>Stream</strong> slow independent queries instead of awaiting them.</li>
+      <li><strong>Preload</strong> the next page’s data on hover with <code>data-sveltekit-preload-data</code>.</li>
+      <li><strong>Split</strong> large libraries behind <code>await import(...)</code>.</li>
+      <li><strong>Measure</strong> with Lighthouse before and after each change.</li>
+    </ul>
+    <div class="ex"><h4 id="ch10-perf--exercises-10">Exercises 10</h4><ol>
+      <li>Stream two fake slow queries and render each with its own loading state.</li>
+      <li>Add a snapshot that preserves a form’s draft across navigation.</li>
+      <li>Write one Playwright spec and one Vitest test, then run both commands.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Quick Reference &amp; Glossary</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Quick Reference &amp; Glossary</button><div class="ch-toc-list"><a href="#app-files">A.1 File conventions at a glance</a><a href="#app-load">A.2 Load functions compared</a><a href="#app-hooks">A.3 Hooks and adapters</a><a href="#app-commands">A.4 Command cheat sheet</a><a href="#app-glossary">A.5 Glossary</a></div></div>
+    <p class="topic-desc">Bundles cheat sheets and a glossary into one reference. Skim it whenever you forget a filename, a load rule, or the right command. Everything you covered earlier is gathered in one place for quick lookup.</p>
+    <h3 id="app-files" data-toc>A.1 File conventions at a glance</h3>
+    <p class="topic-desc">Lists every special filename and what it does. Route files inside src/routes such as +page.svelte, +layout.svelte, and +server.js are the heart of SvelteKit. This is the quick reference for the whole file-based API.</p>
+    <table>
+      <tr><th>File</th><th>Purpose</th></tr>
+      <tr><td><code>+page.svelte</code></td><td>A page rendered for a URL</td></tr>
+      <tr><td><code>+page.js</code></td><td>Universal load and page options</td></tr>
+      <tr><td><code>+page.server.js</code></td><td>Server-only load and form actions</td></tr>
+      <tr><td><code>+layout.svelte</code></td><td>Layout wrapping the pages below it</td></tr>
+      <tr><td><code>+layout.server.js</code></td><td>Server load and guards for a layout tree</td></tr>
+      <tr><td><code>+server.js</code></td><td>API endpoint (GET/POST/PUT/DELETE)</td></tr>
+      <tr><td><code>+error.svelte</code></td><td>Error page for a route segment</td></tr>
+      <tr><td><code>src/hooks.server.js</code></td><td>handle, handleFetch, handleError</td></tr>
+      <tr><td><code>src/service-worker.js</code></td><td>Service worker for the app</td></tr>
+    </table>
+    <h3 id="app-load" data-toc>A.2 Load functions compared</h3>
+    <p class="topic-desc">Distinguishes universal from server load by where they run and what they may touch. Universal load runs on the server and again on the client, while server load stays serverside and may read cookies, headers, and secrets. Pick server load for anything private.</p>
+    <table>
+      <tr><th>File</th><th>Runs on</th><th>Use for</th></tr>
+      <tr><td><code>+page.js</code> / <code>+layout.js</code></td><td>Server, then client</td><td>Shared public data, URL and query parsing</td></tr>
+      <tr><td><code>+page.server.js</code> / <code>+layout.server.js</code></td><td>Server only</td><td>Databases, secrets, cookies, form actions</td></tr>
+    </table>
+    <h3 id="app-hooks" data-toc>A.3 Hooks and adapters</h3>
+    <p class="topic-desc">Lists the server hooks and the shipping targets side by side. Hooks such as handle, sequence, handleFetch, and handleError run per request around routing, while the adapter decides where the build lands. This is the quick map of request lifecycle and deployment options in one glance.</p>
+    <table>
+      <tr><th>Hook</th><th>When it runs</th></tr>
+      <tr><td><code>handle</code></td><td>First thing on every server request; set event.locals</td></tr>
+      <tr><td><code>handleFetch</code></td><td>Every fetch() inside a load or action</td></tr>
+      <tr><td><code>handleError</code></td><td>Any unexpected error thrown while rendering</td></tr>
+      <tr><td><code>sequence</code></td><td>Composes several handle hooks in order</td></tr>
+    </table>
+    <table>
+      <tr><th>Adapter</th><th>Output / host</th></tr>
+      <tr><td><code>adapter-auto</code></td><td>Auto-detects Vercel, Netlify, Cloudflare, Node</td></tr>
+      <tr><td><code>adapter-node</code></td><td>Standalone Node.js server</td></tr>
+      <tr><td><code>adapter-static</code></td><td>Plain static files for any CDN</td></tr>
+      <tr><td><code>adapter-cloudflare</code></td><td>Cloudflare Workers + Assets</td></tr>
+    </table>
+    <h3 id="app-commands" data-toc>A.4 Command cheat sheet</h3>
+    <p class="topic-desc">Lists the commands you will type daily, from scaffolding to deployment checks. Each command shows what it does and when to run it. Keep this cheat sheet open while you work through the guide, and run svelte-kit sync the moment generated types fall out of date.</p>
+    <table>
+      <tr><th>Command</th><th>Does</th></tr>
+      <tr><td><code>npm create svelte@latest</code></td><td>Scaffold a new project</td></tr>
+      <tr><td><code>npm run dev</code></td><td>Start the Vite dev server</td></tr>
+      <tr><td><code>npm run build</code></td><td>Build for the configured adapter</td></tr>
+      <tr><td><code>npm run preview</code></td><td>Serve the production build locally</td></tr>
+      <tr><td><code>npx svelte-kit sync</code></td><td>Regenerate route types and sync config</td></tr>
+      <tr><td><code>npm run test:e2e</code></td><td>Run Playwright browser tests</td></tr>
+      <tr><td><code>npm run test:unit</code></td><td>Run Vitest unit tests</td></tr>
+    </table>
+    <h3 id="app-glossary" data-toc>A.5 Glossary</h3>
+    <p class="topic-desc">Defines the terms used throughout the guide in one place. Flip back here whenever a word sounds familiar but fuzzy, from adapters and load to prerender and SSR. Each definition is short and tied to the chapters that explain it in full.</p>
+    <ul>
+      <li><strong>Adapter</strong> — the plugin that turns the app into deployable output for a specific host.</li>
+      <li><strong>Prerender</strong> — generating static HTML at build time instead of rendering per request.</li>
+      <li><strong>SSR</strong> — server-side rendering: the page HTML is produced on the server.</li>
+      <li><strong>CSR</strong> — client-side rendering: the browser builds the page with JavaScript.</li>
+      <li><strong>Universal load</strong> — a load that runs on the server then again on the client.</li>
+      <li><strong>Server load</strong> — a load that runs only on the server and can touch secrets.</li>
+      <li><strong>Streaming</strong> — sending data from load to the browser as promises resolve.</li>
+      <li><strong>Action</strong> — a server-side function that a form posts to (<code>?/actionName</code>).</li>
+      <li><strong>form prop</strong> — the value an action returned, available as <code>{form}</code> in the page.</li>
+      <li><strong>use:enhance</strong> — SvelteKit’s progressive-enhancement directive for forms.</li>
+      <li><strong>hooks</strong> — server functions that wrap every request (handle, handleFetch, handleError).</li>
+      <li><strong>event.locals</strong> — per-request data you attach in hooks and read in loads and actions.</li>
+      <li><strong>Snapshot</strong> — component state saved and restored across client-side navigation.</li>
+      <li><strong>invalidate</strong> — the API that re-runs tagged loads to refresh page data after mutations.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>SvelteKit — Full-Stack Svelte Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

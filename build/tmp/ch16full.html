@@ -1,0 +1,365 @@
+  <section class="chapter">
+<h2 id="ch16" data-toc>16 · Routing and the URL as State</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Routing and the URL as state</button><div class="ch-toc-list"><a href="#ch16-ownership">The router owns the URL</a><a href="#ch16-structure">Route structure and nesting</a><a href="#ch16-params">Search params as component state</a><a href="#ch16-loading">Loading data with the router</a><a href="#ch16-navigation">Navigation, guards and scroll</a></div></div>
+    <p class="topic-desc">The URL is application state that the user owns: they can copy it, bookmark it, send it to a colleague, and press back. A router is the component that takes that ownership seriously — turning a string into a render plan, a render plan into data loads, and every in-app decision about "which screen am I on" back into the string. Chapter 10's decision table ends the argument: the value is the URL, the router owns it.</p>
+    <h3 id="ch16-ownership" data-toc>The router owns the URL</h3>
+    <p>The principle in one sentence: no component writes to <code>window.location</code>, keeps a "current page" variable in state, or decides which screen to show on its own. There is exactly one writer — the router, through navigation calls — and exactly one reader of record — the URL, resolved back through the router's route table. Everything else is downstream. When a modal, a tab, a selected row or a filter becomes part of "which screen am I on", it moves into the URL as a parameter, and the router becomes the thing that serialises it. The payoff is that every state the user would want to share now survives a paste into chat, and every back button press does what the label promises.</p>
+    <p>The failure mode this prevents has a familiar shape: a component holds <code>const [page, setPage] = useState(1)</code>, the user filters, clicks into a detail view, presses back, and the list resets to page 1 with cleared filters — because the state lived in a component that unmounted, while the URL, which did survive, said nothing about it. The fix is not a persistence layer for the state; it is recognising that this state was URL-shaped all along. The test for whether something belongs in the URL: would the user be surprised if a bookmark of this screen did not reproduce it? If no, it belongs in the URL. If yes — a half-written draft, a dismissed tooltip — it belongs in component or server-adjacent state.</p>
+    <div class="codeWrap"><pre><code>// WRONG: two sources of truth - the URL says "/", the state says page 3
+function Products() {
+  const [page, setPage] = useState(1);
+  const [category, setCategory] = useState('all');
+  // back button: component remounts, state resets, URL unchanged
+  // share link: recipient sees page 1, category "all"
+  return &lt;ProductList page={page} category={category} /&gt;;
+}
+
+// RIGHT: the router owns it - navigation IS the state update
+import { useSearchParams } from 'react-router';
+
+function Products() {
+  const [params, setParams] = useSearchParams();
+  const page = Number(params.get('page')) || 1;
+  const category = params.get('category') || 'all';
+
+  function go(next) {
+    // replace for filter changes (no history spam), push for page turns
+    const opts = { replace: next.page === page };
+    setParams(toParams(next), opts);
+  }
+  return &lt;ProductList page={page} category={category} onChange={go} /&gt;;
+}
+// share: ?page=3&amp;category=tools reproduces the screen exactly
+// back: the router restores the previous params from history</code></pre></div>
+    <p>Draw the line deliberately, because the opposite mistake is real too: stuffing volatile, private state into the URL produces unreadable addresses that leak intent and defeat history. A filter the user set once in a session, a selection that follows the last click, a local sort order — these are legitimately ephemeral. The distinction to hold is <em>reproducible screen identity</em> versus <em>session working state</em>. Screens are URLs; the way you happened to be looking at one is state that may or may not be worth encoding — encode it when sharing it would be useful, leave it out when the parameter would only add noise.</p>
+    <div class="codeWrap"><pre><code>// the encoding scale: identity in the path, intent in the query,
+// session working state nowhere
+//   /projects/acme/tasks/task_89            identity  -&gt; path
+//   ?view=list&amp;assignee=amina&amp;status=open   intent    -&gt; query (shareable)
+//   last visited tab, scroll position        session   -&gt; component state
+
+// parse defensively: the URL is user-editable input, not your setter
+function useListParams() {
+  const [params, setParams] = useSearchParams();
+  const page = Math.max(1, Number(params.get('page')) || 1);
+  const sort = ['name', 'created', 'status'].includes(params.get('sort'))
+    ? params.get('sort')
+    : 'name';                       // whitelist beats blacklist for enums
+  return { page, sort,
+    set: (patch, opts) =&gt; setParams(mergeParams(params, patch), opts) };
+}</code></pre></div>
+    <h4>The URL is user input</h4>
+    <p>Every parameter arrives potentially mangled: hand-typed, truncated by a chat client, crafted. Parse into a validated shape at the boundary — numbers coerced and clamped, enums whitelisted, unknown keys dropped — so the components below receive a domain object, never the raw strings. A component that renders <code>params.get('id')</code> directly into a query call turns a typo into an API request; a boundary parser turns it into a redirect to the sane default. The boundary is also where encoding decisions live, so the rest of the application never sees percent-encoding at all.</p>
+    <div class="note"><p>Never build a URL by string concatenation — <code>'/search?q=' + query</code> breaks on the first ampersand or hash the user types. <code>URLSearchParams</code> and the router's own param helpers encode correctly by construction, and string building is the one place that is not true, which is exactly the place a future change will forget.</p></div>
+    <h3 id="ch16-structure" data-toc>Route structure and nesting</h3>
+    <p>Route structure is information architecture expressed as a tree, and the tree should mirror how the product is actually organised: a layout that owns the chrome (nav, sidebar, breadcrumbs), children that own the regions inside it. Nested routes give that structure real mechanics — the layout route stays mounted while children change, so its state and scroll survive navigation, and each child route renders into the parent's outlet rather than remounting the whole page. The corollary that takes teams a while to learn: a route boundary is a remount boundary. State inside a route that unmounts on navigation is gone, which is correct for screen-scoped state and infuriating for state that should have been in the URL or the cache (chapters 15 and 16 respectively).</p>
+    <p>Flat route tables age badly: twenty sibling routes each repeating the same layout wrapper, guards and loaders, with the relationship between a list and its detail view existing only as a string convention. Nesting makes the relationship structural — the detail route is <em>inside</em> the list route, so the parent can render the list with the selected row highlighted while the child fills the detail pane, both sharing one data load. This is the path-to-layout correspondence worth defending in review: if two screens share chrome, they share a layout route; if one screen has regions that load independently, those regions are child routes, not tabs built from local state.</p>
+    <div class="codeWrap"><pre><code>// route tree mirrors the product's structure
+const routes = [
+  {
+    path: '/',
+    element: &lt;AppLayout /&gt;,              // chrome: nav, sidebar, crumbs
+    children: [
+      { index: true, element: &lt;Home /&gt; },
+      {
+        path: 'projects',
+        element: &lt;ProjectsLayout /&gt;,     // stays mounted across children
+        children: [
+          { index: true, element: &lt;ProjectList /&gt; },
+          { path: ':projectId', element: &lt;ProjectDetail /&gt; },
+          {
+            path: ':projectId/tasks',
+            element: &lt;TaskTabs /&gt;,
+            children: [
+              { index: true, element: &lt;TaskBoard /&gt; },
+              { path: 'board', element: &lt;TaskBoard /&gt; },
+              { path: 'table', element: &lt;TaskTable /&gt; },
+            ],
+          },
+        ],
+      },
+      { path: '*', element: &lt;NotFound /&gt; },
+    ],
+  },
+];</code></pre></div>
+    <p>Two structural decisions inside the tree earn their keep. First, layout routes as data boundaries: <code>AppLayout</code> loads what every child needs — the user, the nav items — and children load their own, so no child ever fetches the shell's data and the shell never refetches when a child changes. Second, the detail-inside-list pattern for master-detail screens: because <code>:projectId</code> nests under the index route, the URL <code>/projects/acme</code> can render the list <em>and</em> the detail pane, with the parent reading the param to highlight the selection. The alternative — a separate full-page detail route — throws away the list context and makes "back" the only way to return, which is a worse experience for a workflow built around comparing records.</p>
+    <div class="codeWrap"><pre><code>// master-detail: the param IS the selection, both panes from one URL
+function ProjectsLayout() {
+  return (
+    &lt;div className="split"&gt;
+      &lt;ProjectList /&gt;                     {/* left pane, always mounted */}
+      &lt;Outlet /&gt;                          {/* right pane: index or detail */}
+    &lt;/div&gt;
+  );
+}
+
+function ProjectDetail() {
+  const { projectId } = useParams();
+  const project = useQuery({ queryKey: ['projects', projectId],
+                             queryFn: () =&gt; api.getProject(projectId) });
+  // no "selectedProject" state anywhere - the URL selected it
+  return &lt;ProjectPane project={project.data} /&gt;;
+}
+
+// the index child renders the placeholder in the same slot
+//   { index: true, element: &lt;SelectAPrompt /&gt; }</code></pre></div>
+    <h4>Route files and code ownership</h4>
+    <p>On a team, the route table doubles as a map of who owns what: a feature's routes, layouts, loaders and screens live in the feature's directory and are exported as a route fragment, and the root table composes the fragments. Two properties follow that matter at ten people: a merge conflict in the route table becomes one line per feature instead of a contested section, and the directory structure of the features becomes the URL structure by construction — a reviewer can see that <code>projects</code> gained a child route because the file appeared. Keep the table composed, not centralised; a single file that every feature branch edits is a permanent queue.</p>
+    <div class="codeWrap"><pre><code>// feature-owned route fragments, composed at the root
+// features/projects/routes.tsx
+export const projectRoutes = {
+  path: 'projects',
+  element: &lt;ProjectsLayout /&gt;,
+  children: [
+    { index: true, element: &lt;ProjectList /&gt;, loader: listProjects },
+    { path: ':projectId', element: &lt;ProjectDetail /&gt;, loader: loadProject },
+  ],
+};
+
+// app/routes.tsx - one line per feature; merge conflicts stay one line
+import { projectRoutes } from '@/features/projects/routes';
+import { billingRoutes } from '@/features/billing/routes';
+export const routes = [
+  { path: '/', element: &lt;AppLayout /&gt;, children: [
+    projectRoutes, billingRoutes,
+    { path: '*', element: &lt;NotFound /&gt; },
+  ]},
+];</code></pre></div>
+    <div class="tip"><p>Write the route table as the product's table of contents and review it as such. If the tree does not read like the application's information architecture — if a screen you would describe as "inside projects" sits beside <code>/projects</code> — the routing has drifted from the product, and users feel that drift as a URL they did not expect.</p></div>
+
+    <h3 id="ch16-params" data-toc>Search params as component state</h3>
+    <p>Search params are where most URL-as-state adoption actually happens, because they are the parameters that change while the user works: filters, sort, page, view mode, a query string, a selected tab. Treat them as the component's state API — read with a hook, written through a setter that knows whether a change deserves a history entry. The distinction between <code>replace</code> and <code>push</code> is the whole of good param UX: typing a search term should replace the history entry (nobody wants fourteen back presses to undo one keystroke), while changing page or opening a record should push (that is a place the user went). A router that defaults to push everywhere produces a back button users learn to avoid; defaulting to replace everywhere produces one that does nothing. Choose per interaction.</p>
+    <p>The second design question is granularity: one blob parameter versus many. Many small parameters (<code>?q=…&amp;status=…&amp;sort=…</code>) compose — any subset can be shared, a partner team can link to one filter, the URL reads as configuration. One encoded blob (<code>?f=eyJzdGF0dXMiOiJvcGVuIn0=</code>) does not, and it also breaks the moment a user or a mail client mangles it. Keep parameters flat, primitive and named after the user's vocabulary. The one case for encoding is genuinely structured state — a multi-field advanced filter — and even then prefer an editable serialisation (JSON-ish or delimited) over base64, so that a support engineer reading a bug report can see what the URL asked for.</p>
+    <div class="codeWrap"><pre><code>// param updates as the component's state API, with history intent
+function useFilterParams() {
+  const [params, setParams] = useSearchParams();
+
+  // typing: replace - one history entry for the whole search session
+  const setQuery = (q) =&gt; setParams(withParam(params, 'q', q), { replace: true });
+
+  // paging: push - going to page 2 is a place the user went
+  const setPage = (p) =&gt; setParams(withParam(params, 'page', p));
+
+  // opening a filter drawer: replace on commit, not on every toggle
+  const setFilters = (f, open) =&gt;
+    setParams(withParams(params, encodeFilters(f), { drawer: open ? '1' : null }));
+
+  return {
+    q: params.get('q') || '',
+    page: Number(params.get('page')) || 1,
+    status: params.get('status') || 'all',
+    setQuery, setPage, setFilters,
+  };
+}
+
+// the component consumes plain values - the hook owns serialisation
+function OrdersPage() {
+  const { q, page, setQuery, setPage } = useFilterParams();
+  return &lt;OrderTable query={q} page={page} onQuery={setQuery} onPage={setPage} /&gt;;
+}</code></pre></div>
+    <p>Centralising param handling in one hook per screen is what keeps the serialisation rules in one place: defaults applied in one direction, coercion in the other, history intent declared beside each field. Without it, every component that touches <code>useSearchParams</code> re-implements defaulting and push-versus-replace, and the screen ends up with three fields that push and one that silently replaces, producing an inconsistent back button — an inconsistency no test catches because each call site is locally reasonable. The hook is also where you put the invariant that the params and the UI never disagree: if the component renders from the params and only the params, there is nothing else to sync.</p>
+    <div class="codeWrap"><pre><code>// derived state: the UI renders FROM the params, never alongside them
+function SearchPage() {
+  const { q, setQuery, status } = useFilterParams();
+
+  // correct: results keyed on the same values the inputs show
+  const results = useQuery({
+    queryKey: ['search', { q, status }],
+    queryFn: () =&gt; api.search({ q, status }),
+    enabled: q.length &gt; 0,
+  });
+
+  return (
+    &lt;&gt;
+      &lt;input value={q} onChange={(e) =&gt; setQuery(e.target.value)}
+             aria-label="Search orders" /&gt;
+      {results.isPending &amp;&amp; &lt;Spinner /&gt;}
+      &lt;ResultList items={results.data} /&gt;
+    &lt;/&gt;
+  );
+}
+
+// WRONG: mirroring params into state - the two drift the first time
+// a field is edited without updating its partner
+function Broken() {
+  const [params] = useSearchParams();
+  const [q, setQ] = useState(params.get('q'));   // second truth, syncs nowhere
+  return &lt;input value={q} onChange={(e) =&gt; setQ(e.target.value)} /&gt;;
+}</code></pre></div>
+    <h4>Debouncing and navigation churn</h4>
+    <p>A param that changes per keystroke interacts with everything reading the URL: the query cache keys on it (chapter 15 — fine, that is the point), the router writes history (handled by replace), and any effect watching location re-runs. The remaining question is request volume, and the answer is not to stop writing the URL — it is to let the URL be immediate and the network be patient. The param updates at once, so share and back are always correct; the fetch debounces on top of the param, so the network sees the settled value. Keeping the network fast and the URL honest are separate concerns, and conflating them is how debounces end up hiding state the user cannot see.</p>
+    <div class="codeWrap"><pre><code>// URL immediate, network patient: two clocks, deliberately separated
+function SearchBox() {
+  const [params, setParams] = useSearchParams();
+  const q = params.get('q') || '';
+
+  // the URL updates on every keystroke - history-safe via replace
+  function handleChange(next) {
+    setParams(withParam(params, 'q', next), { replace: true });
+  }
+
+  return &lt;input value={q} onChange={(e) =&gt; handleChange(e.target.value)} /&gt;;
+}
+
+function Results() {
+  const q = new URLSearchParams(useLocation().search).get('q') || '';
+  const debounced = useDebouncedValue(q, 250);       // 250ms of stillness
+  return useQuery({
+    queryKey: ['search', debounced],
+    queryFn: () =&gt; api.search(debounced),
+    enabled: debounced.length &gt; 0,
+    placeholderData: keepPreviousData,               // no skeleton per key
+  });
+}</code></pre></div>
+    <div class="warn"><p>Do not debounce the navigation itself. A navigation guard that waits 300 ms before committing the URL breaks deep links typed into the address bar and makes the back button feel broken. Debounce the expensive follower — the fetch, the autosave — never the state the user believes they already changed.</p></div>
+    <h3 id="ch16-loading" data-toc>Loading data with the router</h3>
+    <p>Once routing is the source of screen identity, it is also the natural place to declare what each screen needs: loaders that run before (or alongside) the route rendering, actions that handle its mutations, and an error element per route. The advantage over component-initiated fetching is sequencing — the router can start every loader for the matched branch in parallel, show the navigation's pending state coherently, and let the route render with its data already in hand, which removes the cascade of per-component effects each discovering they needed something. It also unifies failure: a loader that throws lands in the route's error element, giving each screen a recovery UI without wrapping every component in its own boundary.</p>
+    <p>The composability point is what makes loaders scale: nested routes load nested data in parallel along the matched branch, so <code>/projects/:id/tasks</code> runs the layout's shell loader and the tasks loader together rather than in sequence. The design rule for what goes where mirrors chapter 15's ownership: the layout loader fetches what the branch shares (the project record), a leaf loader fetches what only it shows (the task page), and anything several screens read goes through the cache library keyed identically, so a loader and a component asking for the same record get the same entry. Loaders and cache are not rivals — a loader is one more reader of the key, with the router deciding when it runs.</p>
+    <div class="codeWrap"><pre><code>// loaders along the matched branch, in parallel, keyed into the same cache
+const routes = [
+  { path: '/projects/:projectId',
+    element: &lt;ProjectsLayout /&gt;,
+    loader: ({ params }) =&gt; queryClient.ensureQueryData({
+      queryKey: ['projects', params.projectId],
+      queryFn: () =&gt; api.getProject(params.projectId),
+    }),
+    children: [
+      { path: 'tasks',
+        element: &lt;TaskBoard /&gt;,
+        // sibling-level data: starts WITH the layout loader, not after it
+        loader: ({ params }) =&gt; queryClient.ensureQueryData({
+          queryKey: ['projects', params.projectId, 'tasks'],
+          queryFn: () =&gt; api.listTasks(params.projectId),
+        }),
+        errorElement: &lt;TaskLoadError /&gt;,   // failure lands HERE, not at root
+      },
+    ],
+  },
+];
+
+// components then READ the same entry - no second fetch, no divergence
+function TaskBoard() {
+  const { projectId } = useParams();
+  const { data } = useQuery({ queryKey: ['projects', projectId, 'tasks'],
+                              queryFn: () =&gt; api.listTasks(projectId) });
+  return &lt;Board tasks={data} /&gt;;
+}</code></pre></div>
+    <p>Two timing patterns to be able to choose between. Blocking loaders hold navigation until data is ready — the outgoing screen stays visible (a transition, per chapter 14) and the new route appears complete; right for screens that are meaningless without their data, wrong when a slow endpoint would make the whole app feel stuck. Non-blocking loaders let the route render immediately and suspend its regions behind Suspense boundaries — right when the shell of the next screen is itself useful, wrong when an empty table flashes before rows arrive. The default to prefer is blocking for the branch's primary data and Suspense for secondary panels within it: navigation feels atomic, and the panels that genuinely arrive later do.</p>
+    <div class="codeWrap"><pre><code>// blocking navigation for primary data, suspense for secondary panels
+async function projectLoader({ params }) {
+  const project = await api.getProject(params.projectId);   // blocking:
+  return { project };                                        // route waits
+}
+
+function ProjectPage() {
+  const { project } = useLoaderData();
+  return (
+    &lt;&gt;
+      &lt;ProjectHeader project={project} /&gt;      {/* data in hand at render */}
+      &lt;Suspense fallback={&lt;AuditSkeleton /&gt;}&gt;
+        &lt;AuditTrail projectId={project.id} /&gt;  {/* secondary: streams in */}
+      &lt;/Suspense&gt;
+    &lt;/&gt;
+  );
+}
+
+// the error side: every route failure has a home
+function RouteErrorElement() {
+  const error = useRouteError();
+  if (isRouteNotFound(error)) return &lt;NotFound /&gt;;
+  return &lt;ScreenRecovery error={error} onRetry={() =&gt; window.location.reload()} /&gt;;
+}</code></pre></div>
+    <h4>Loaders versus effects: the honest comparison</h4>
+    <p>A component fetching in an effect still works, and for data that exists only while the component is mounted — a typeahead's suggestions, a websocket subscription — it remains correct. The difference appears on navigation: effect fetching begins after the component mounts, renders empty first, and cannot be cancelled by the route change that superseded it, so a fast navigation sequence leaves responses landing out of order. The loader runs as part of navigation, can be aborted when a newer navigation wins, and renders with data present. The rule is ownership again: route-scoped data is declared with the route, component-scoped data lives with the component, and both write into the same cache keyed the same way.</p>
+    <div class="note"><p>Route errors and render errors are different channels. A loader that throws goes to the nearest <code>errorElement</code>; a component that throws during render goes to the nearest React error boundary (chapter 18). A screen that has both — recovery for load failure, a boundary for render failure — covers the two ways "show this page" fails, and neither substitutes for the other.</p></div>
+    <h3 id="ch16-navigation" data-toc>Navigation, guards and scroll</h3>
+    <p>Navigation is more than swapping the URL: a real navigation has a pending state, an origin, and a place to land. Use the router's link element rather than an anchor with a click handler for in-app destinations, because it preserves middle-click, ctrl-click, copy-link and right-click — the browser affordances that make a URL feel like a URL — while still participating in client-side transition. Programmatic navigation is for outcomes, not for clicks: after a mutation that renames a record, navigate to the new canonical URL with replace (the old URL no longer resolves, and pushing would put a dead entry in history). The test: if a human clicks it, it should be a link; if the program decides, it is a navigate call.</p>
+    <p>Guards are where routing meets permissions, and the shape that ages well separates three questions: is the user authenticated (route-level, before load), is this user allowed this record (loader-level, where the 403 arrives with the data request), and is this view permitted by feature flags (render-level, where the flag is read). Collapsing them into one component that checks everything on mount produces the flicker pattern — protected content renders, the check fails, it disappears — and pushes the redirect into an effect that races with the data load. Redirecting in the loader, before the route commits, makes "not allowed" a navigation result the user perceives as one step, not a flash of content.</p>
+    <div class="codeWrap"><pre><code>// guards at the layer that knows: loader-level auth, link-level affordance
+function requireSession({ request }) {
+  const session = getSession(request);
+  if (!session) throw redirect('/login?next=' + encodeURIComponent(new URL(request.url).pathname));
+  return session;
+}
+
+const routes = [
+  { path: '/login', element: &lt;Login /&gt; },
+  { path: '/admin',
+    loader: requireSession,                 // redirects BEFORE the route renders
+    element: &lt;AdminLayout /&gt;,
+    children: [
+      { path: 'users',
+        loader: async ({ request }) =&gt; {
+          const session = requireSession({ request });
+          // record-level: the 403 travels with the load that discovered it
+          return api.listUsers(session.orgId);   // throws 403 -&gt; errorElement
+        },
+        errorElement: &lt;Forbidden /&gt;,
+      },
+    ],
+  },
+];
+
+// links stay links: middle-click and copy-link keep working
+&lt;NavLink to={'/orders/' + order.id} className={({ isActive }) =&gt;
+  isActive ? 'row row--current' : 'row'}&gt;{order.number}&lt;/NavLink&gt;</code></pre></div>
+    <p>Scroll restoration is the last piece of URL ownership, and it is genuinely part of routing rather than a DOM chore: pressing back should return the user to where they were in the list they left, not to the top of a page they scrolled past twenty rows ago. Routers implement it as position memory keyed per history entry — restore on pop, reset to top on push — with one escape hatch teams always need: a screen where "top" is correct after a filter change even though the entry was pushed. Declare that per route rather than patching it in an effect, because the moment scroll behaviour is computed from component state it disagrees with history entries the component never saw.</p>
+    <div class="codeWrap"><pre><code>// scroll restoration declared per route, not patched in effects
+const routes = [
+  { path: '/orders',
+    element: &lt;Orders /&gt;,
+    // pop: restore the remembered offset; push: start at the top
+    handle: { scrollRestoration: 'position' },
+  },
+  { path: '/orders/:id',
+    element: &lt;OrderDetail /&gt;,
+    handle: { scrollRestoration: 'top' },   // detail screens always start clean
+  },
+];
+
+// focus belongs to navigation too: move focus to the new screen's heading
+// so keyboard and screen-reader users are NOT left on the old page's link
+function RouteAnnouncer() {
+  const location = useLocation();
+  useEffect(() =&gt; {
+    const heading = document.querySelector('#content h1');
+    if (heading) heading.focus({ preventScroll: true });
+  }, [location.pathname]);
+  return null;   // plus the visually-hidden "Navigated to ..." live region
+}</code></pre></div>
+    <h4>Navigation as an announced event</h4>
+    <p>Client-side navigation is silent by default: no page load, no focus move, no announcement — a screen-reader user activates a link and hears nothing happen, a keyboard user's focus stays on an element that may no longer exist. The fix is small and belongs with routing: after each navigation, move focus to the new screen's main heading and announce the destination through a polite live region. Combined with scroll restoration and pending states, this is what makes a single-page application behave like the document-based web its users already know: focus follows the destination, history means what it says, and the URL is always the thing you could have typed.</p>
+    <div class="codeWrap"><pre><code>// the navigation checklist, as one announcer component
+function RouteAnnouncer() {
+  const location = useLocation();
+  const [message, setMessage] = useState('');
+
+  useEffect(() =&gt; {
+    const title = document.querySelector('#content h1')?.textContent || 'Page';
+    setMessage('Navigated to ' + title);
+    document.querySelector('#content h1')?.focus({ preventScroll: true });
+  }, [location.pathname]);
+
+  return (
+    &lt;div role="status" aria-live="polite"
+         style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden' }}&gt;
+      {message}
+    &lt;/div&gt;
+  );
+}
+
+// and pending state so a slow navigation is visible, not silent:
+function NavIndicator() {
+  const navigation = useNavigation();
+  if (navigation.state === 'idle') return null;
+  return &lt;ProgressBar role="progressbar" aria-label="Loading next screen" /&gt;;
+}</code></pre></div>
+    <div class="tip"><p>Test routing the way users exercise it: paste a deep link into a cold tab, press back three times, middle-click a row, and resize until the mobile nav appears. Routing bugs live in those paths — not in the happy click-through — because they are bugs about the URL, the history stack and the browser, and each of them is a thing only a real browser does.</p></div>
+    <div class="ex"><h4>Exercises 16</h4><ol>
+      <li>Find three pieces of screen state currently held in component state that satisfy the bookmark test. Move them into search params with one hook per screen, and declare push versus replace for each field.</li>
+      <li>Take a flat route table and restructure it into layout routes with an outlet. Confirm the layout's state survives child navigation and that its loader runs once per branch, not per child.</li>
+      <li>Move one screen's fetching from a mount effect into a loader backed by the chapter 15 cache keys. Confirm a back navigation renders with data present and issues no duplicate request.</li>
+      <li>Convert a click handler that calls navigate onto a link, then verify middle-click, ctrl-click and copy-link all behave. Write down which affordances were broken before.</li>
+      <li>Add a route announcer and scroll restoration. With a screen reader or one running, navigate between three screens and confirm focus and announcement follow each move.</li>
+    </ol></div>
+  </section>

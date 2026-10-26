@@ -1,0 +1,197 @@
+<h3 id="ch7-3" data-toc>7.3 Send and Sync</h3>
+<p class="topic-desc"><code>Send</code> and <code>Sync</code> are the marker traits that encode thread-safety into the type system: <code>Send</code> means the value may move to another thread, <code>Sync</code> means <code>&amp;T</code> may be shared across threads. The compiler derives them automatically, so most types are both without you writing anything.</p>
+
+<h4 id="ch7-3-send">Send: the value may cross threads</h4>
+<p>A type is <code>Send</code> if moving it to another thread cannot cause unsafety. <code>String</code>, <code>Vec</code>, numbers, <code>Arc</code> are all <code>Send</code>; <code>Rc</code> is not, because its reference count is a plain integer that two threads would race. <code>thread::spawn`</code> requires its closure to be <code>Send</code>, so trying to move an <code>Rc</code> into a thread is a compile error with the exact type in the message — the check happens before the race can. The fix is either <code>Arc</code> (atomic counting) or not sharing at all.</p>
+<div class="codeWrap"><pre><code>use std::rc::Rc;
+
+fn main() {
+    let rc = Rc::new(5);         // reference-counted, thread-UNSAFE
+    // thread::spawn(move || println!("{rc}"));
+    // ERROR: `Rc&lt;i32&gt;` cannot be sent between threads safely
+    //        (Rc counts refs without atomics; another thread could
+    //         race the count). Use Arc, or move an owned value.
+    println!("{rc}");
+}</code></pre></div>
+
+<h4 id="ch7-3-sync">Sync: &amp;T may be shared across threads</h4>
+<p><code>Sync</code> means a shared reference to the type can be sent between threads, which is what lets several threads read one value safely. <code>Arc&lt;String&gt;</code> is <code>Send</code> and <code>Sync</code>, so cloning the handle in each thread and printing through it is safe — every <code>Arc::clone</code> bumps an atomic count, and each thread reads through its own <code>Arc</code>. The rule of thumb: a type is <code>Sync</code> when <code>&amp;T</code> cannot observe mutation; interior mutability types like <code>Mutex&lt;T&gt;</code> are <code>Sync</code> precisely because they make mutation exclusive.</p>
+<div class="codeWrap"><pre><code>use std::sync::Arc;
+use std::thread;
+
+fn main() {
+    let name = Arc::new(String::from("shared"));
+    let mut handles = vec![];
+    for _ in 0..4 {
+        let n = Arc::clone(&amp;name);     // atomic refcount bump
+        handles.push(thread::spawn(move || println!("{n}")));
+    }
+    for h in handles {
+        h.join().unwrap();
+    }
+    // Arc&lt;String&gt; is Send + Sync: sharing reads is safe by design
+}</code></pre></div>
+
+<h3 id="ch7-4" data-toc>7.4 Unit and integration tests</h3>
+<p class="topic-desc">Testing ships with cargo: unit tests beside the code, integration tests in <code>tests/</code>, and documentation tests inside doc comments — all run by the one command <code>cargo test</code>.</p>
+
+<h4 id="ch7-4-unit">Unit tests with #[cfg(test)]</h4>
+<p>A unit test is a <code>#[test]</code>-marked function in a <code>mod tests</code> block annotated <code>#[cfg(test)]</code>. The attribute means the module compiles only when testing, so the test helpers never ship. <code>assert!</code> and <code>assert_eq!</code> fail the test with the differing values; <code>#[should_panic]</code> asserts that a panic happens — the way you test a contract violation. <code>cargo test</code> runs them, and the convention of <code>use super::*;</code> imports the module under test.</p>
+<div class="codeWrap"><pre><code>pub fn add(a: i32, b: i32) -&gt; i32 {
+    a + b
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn adds_two_numbers() {
+        assert_eq!(add(2, 3), 5);
+    }
+
+    #[test]
+    fn addition_is_commutative() {
+        assert_eq!(add(3, 2), add(2, 3));
+    }
+
+    #[test]
+    #[should_panic(expected = "assertion failed")]
+    fn failing_assert_panics() {
+        assert!(add(1, 1) == 3);
+    }
+}
+
+fn main() {
+    println!("{}", add(1, 2));
+}</code></pre></div>
+
+<h4 id="ch7-4-integration">Integration tests in tests/</h4>
+<p>Integration tests live in <code>tests/</code>, outside <code>src/</code>, and each file compiles as its own crate that links the library — so they can only use the public API, exactly like a real consumer. That is their whole job: to fail if the public surface is broken or the pieces do not fit together, even when every unit test passes. A binary crate cannot be integration-tested this way without also having a library, which is why the pattern is a thin <code>src/main.rs</code> over a fat <code>src/lib.rs</code>.</p>
+<div class="codeWrap"><pre><code>// tests/cli.rs — integration tests live in tests/, can touch only
+// the crate's PUBLIC API — exactly what a real user sees.
+use mylib::parse_port;
+
+#[test]
+fn parses_a_valid_port() {
+    assert_eq!(parse_port("8080").unwrap(), 8080);
+}
+
+#[test]
+fn rejects_an_out_of_range_port() {
+    assert!(parse_port("99999").is_err());
+}
+
+// src/lib.rs must expose it:
+//   pub fn parse_port(s: &amp;str) -&gt; Result&lt;u16, std::num::ParseIntError&gt; {
+//       s.parse()
+//   }</code></pre></div>
+
+<h4 id="ch7-4-doc">Doc tests: examples that cannot lie</h4>
+<p>Code fences inside <code>///</code> doc comments are compiled and executed by <code>cargo test</code>. A doc example that no longer compiles, or whose assertions fail, fails the test run — so the documentation cannot drift from the code. This is the most undervalued testing surface in the language: every example you write for humans is also a running test, and <code>#[should_panic]</code>-style expectations work there too via the <code>should_panic</code> attribute in the fence.</p>
+<div class="codeWrap"><pre><code>/// Adds two numbers together.
+///
+/// # Examples
+///
+/// ```
+/// let n = mylib::add(1, 2);
+/// assert_eq!(n, 3);
+/// ```
+pub fn add(a: i32, b: i32) -&gt; i32 {
+    a + b
+}
+
+// The `rust` fence above is compiled and RUN by `cargo test`.
+// A doc example that lies about the API is a failing test.</code></pre></div>
+
+<h3 id="ch7-5" data-toc>7.5 The ecosystem: serde, clap, tokio and cargo tooling</h3>
+<p class="topic-desc">Three crates carry a large share of real Rust programs: <code>serde</code> for serialisation, <code>clap</code> for command-line parsing, and <code>tokio</code> for asynchronous I/O. Around them, the cargo tooling — linting, formatting, docs, dependency inspection — is what makes a project shippable.</p>
+
+<h4 id="ch7-5-serde">serde: serialise and deserialise anything</h4>
+<p><code>serde</code> is a framework: derive <code>Serialize</code>/<code>Deserialize</code> on your struct, and a companion crate (<code>serde_json</code>, <code>toml</code>, <code>yaml</code>, <code>bincode</code>…) moves it in and out of that format. Field names become keys by default; <code>#[serde(rename = "...")]</code> and <code>#[serde(default)]</code> bend it to match existing schemas. Because the derive is checked at compile time, a struct with a field <code>serde</code> cannot serialise is a compile error, not a runtime surprise.</p>
+<div class="codeWrap"><pre><code>use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Server {
+    host: String,
+    port: u16,
+    tls: bool,
+}
+
+fn main() {
+    let server = Server {
+        host: "db.internal".into(),
+        port: 5432,
+        tls: true,
+    };
+
+    let json = serde_json::to_string(&amp;server).unwrap();
+    println!("{json}");
+
+    let back: Server = serde_json::from_str(&amp;json).unwrap();
+    println!("{}:{}", back.host, back.port);
+}</code></pre></div>
+
+<h4 id="ch7-5-clap">clap: command-line parsing from a struct</h4>
+<p><code>clap</code>'s derive mode turns a struct into your CLI: fields are arguments, doc comments become help text, <code>#[arg(short, long)]</code> toggles flags, and <code>--version</code>/<code>--help</code> come from the <code>#[command]</code> attribute. <code>Args::parse()</code> reads <code>std::env::args()</code>, validates types and requiredness, and prints usage and exits on a bad invocation — which is exactly the behaviour a well-behaved tool should have, and a dozen lines of hand-written parsing you no longer maintain.</p>
+<div class="codeWrap"><pre><code>use clap::Parser;
+
+/// Count lines in a file.
+#[derive(Parser)]
+#[command(version, about = "counts lines in files")]
+struct Args {
+    /// the file to read
+    path: String,
+
+    /// print extra diagnostics
+    #[arg(short, long)]
+    verbose: bool,
+}
+
+fn main() {
+    let args = Args::parse();          // parses std::env::args()
+    let text = std::fs::read_to_string(&amp;args.path).unwrap();
+    println!("{} lines", text.lines().count());
+    if args.verbose {
+        println!("reading {}", args.path);
+    }
+}</code></pre></div>
+
+<h4 id="ch7-5-tokio">tokio: the async runtime</h4>
+<p><code>async fn</code> returns a future, and a future does nothing until it is awaited — the compiler turns each <code>async</code> body into a state machine with one struct per await point, which is why an unawaited future costs nothing. <code>tokio</code> is the executor that polls futures: an async runtime with a multithreaded work-stealing scheduler and OS-level I/O events (epoll on Linux, kqueue on macOS, IOCP on Windows). <code>#[tokio::main]</code> initialises it, <code>tokio::spawn</code> runs tasks concurrently, and <code>tokio::join!</code> awaits several futures at once. Three failures dominate beginners' async: holding a <code>std::sync::MutexGuard</code> across an <code>await</code> (not <code>Send</code> — the compiler rejects it), calling a blocking function inside async (it freezes the executor thread — use <code>tokio::time::sleep</code>), and never awaiting a future at all.</p>
+<div class="codeWrap"><pre><code>use tokio::time::{Duration, sleep};
+
+// async fn returns a Future: the body does nothing until awaited.
+async fn wait_and_say(secs: u64, msg: &amp;str) {
+    sleep(Duration::from_secs(secs)).await;
+    println!("{msg}");
+}
+
+#[tokio::main]
+async fn main() {
+    // sequential awaits would take 3 seconds; join! runs concurrently
+    tokio::join!(
+        wait_and_say(1, "first done"),
+        wait_and_say(2, "second done"),
+    );
+}
+
+// The three async pitfalls:
+//   1. a std::sync::MutexGuard held across .await is not Send —
+//      the compiler rejects it; use tokio::sync::Mutex
+//   2. std::thread::sleep inside async blocks the executor thread —
+//      use tokio::time::sleep
+//   3. a future never awaited is just a value — silently inert</code></pre></div>
+
+<h4 id="ch7-5-tools">Cargo tooling and the pre-merge checklist</h4>
+<p>The command set that turns working code into shippable code: <code>cargo fmt</code> reformats, <code>cargo clippy</code> adds several hundred lints over rustc's, <code>cargo test --release</code> runs the suite with optimisations and without the debug-only checks (the profile that matters), <code>cargo doc</code> builds the docs, <code>cargo tree</code> answers "why is this dependency here" transitively, and <code>cargo audit</code> scans the resolved tree for known vulnerabilities. Wire the first three into CI with <code>-- --check</code> / <code>-D warnings</code> and formatting drift, lint regressions and release-only failures all stop arriving by pull request.</p>
+<div class="codeWrap"><pre><code># The pre-merge checklist, in order:
+$ cargo fmt -- --check       # fail CI on unformatted code
+$ cargo clippy -- -D warnings
+$ cargo test
+$ cargo test --release       # debug assertions are off out there
+$ cargo doc --open           # docs for the version you are shipping
+$ cargo tree -i tokio        # who pulls tokio in, transitively?
+$ cargo add serde_json       # dependencies are a one-line command
+$ cargo audit                # known-vulnerability scan of the tree</code></pre></div>
+<div class="note">Async is not faster than threads by magic: it overlaps I/O waits. CPU-bound work gains nothing from <code>async</code> — keep that on plain threads, and use tokio for the I/O-heavy service in between.</div></section>

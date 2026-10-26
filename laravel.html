@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laravel 13 - Basic to Advanced Guide</title>
+<meta name="description" content="Explains how to get the most from this offline Laravel mastery course. It shows the chapter by chapter…. 18 chapters, 75 topics and 43 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/laravel.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Laravel 13 - Basic to Advanced Guide">
+<meta property="og:description" content="Explains how to get the most from this offline Laravel mastery course. It shows the chapter by chapter…. 18 chapters, 75 topics and 43 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/laravel.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Laravel 13 - Basic to Advanced Guide">
+<meta name="twitter:description" content="Explains how to get the most from this offline Laravel mastery course. It shows the chapter by chapter…. 18 chapters, 75 topics and 43 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/laravel.html#article","headline":"Laravel 13 - Basic to Advanced Guide","name":"Laravel 13 - Basic to Advanced Guide","description":"Explains how to get the most from this offline Laravel mastery course. It shows the chapter by chapter…. 18 chapters, 75 topics and 43 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/laravel.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/laravel.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Laravel 13 - Basic to Advanced Guide","item":"https://amin360it.github.io/quick-guides/laravel.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Laravel 13</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This Laravel Guide</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use all course long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Getting Started</a><ul><li><a href="#ch1-install" data-target="ch1-install">1.1 Installing Laravel</a></li><li><a href="#ch1-structure" data-target="ch1-structure">1.2 The directory structure that matters</a></li><li><a href="#ch1-lifecycle" data-target="ch1-lifecycle">1.3 The request lifecycle</a></li><li><a href="#ch1-artisan" data-target="ch1-artisan">1.4 Artisan: your command centre</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Routing, Views &amp; Blade</a><ul><li><a href="#ch2-routes" data-target="ch2-routes">2.1 Defining routes</a></li><li><a href="#ch2-blade" data-target="ch2-blade">2.2 Blade basics</a></li><li><a href="#ch2-layouts" data-target="ch2-layouts">2.3 Layouts, components and slots</a></li><li><a href="#ch2-named" data-target="ch2-named">2.4 Named routes, redirects and URLs</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Controllers, Requests &amp; Responses</a><ul><li><a href="#ch3-resource" data-target="ch3-resource">3.1 Resource controllers</a></li><li><a href="#ch3-request" data-target="ch3-request">3.2 Reading the request</a></li><li><a href="#ch3-responses" data-target="ch3-responses">3.3 Responses and helpers</a></li><li><a href="#ch3-formrequest" data-target="ch3-formrequest">3.4 Form requests</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Eloquent ORM &amp; Migrations</a><ul><li><a href="#ch4-migrations" data-target="ch4-migrations">4.1 Migrations: schema as version control</a></li><li><a href="#ch4-model" data-target="ch4-model">4.2 Models and relationships</a></li><li><a href="#ch4-crud" data-target="ch4-crud">4.3 CRUD and query building</a></li><li><a href="#ch4-casts" data-target="ch4-casts">4.4 Casts, accessors and scopes</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Validation, Forms &amp; Files</a><ul><li><a href="#ch5-rules" data-target="ch5-rules">5.1 The validation toolbox</a></li><li><a href="#ch5-old" data-target="ch5-old">5.2 Repopulating forms</a></li><li><a href="#ch5-files" data-target="ch5-files">5.3 File uploads</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Authentication &amp; Authorization</a><ul><li><a href="#ch6-starter" data-target="ch6-starter">6.1 Starter kits</a></li><li><a href="#ch6-guards" data-target="ch6-guards">6.2 Guards and protecting routes</a></li><li><a href="#ch6-gates" data-target="ch6-gates">6.3 Gates and policies</a></li><li><a href="#ch6-roles" data-target="ch6-roles">6.4 Roles and permissions</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Middleware, Sessions &amp; Cookies</a><ul><li><a href="#ch7-middleware" data-target="ch7-middleware">7.1 Writing middleware</a></li><li><a href="#ch7-sessions" data-target="ch7-sessions">7.2 Sessions, flash data and cookies</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Frontend, Vite, Livewire &amp; Inertia</a><ul><li><a href="#ch8-vite" data-target="ch8-vite">8.1 Vite and assets</a></li><li><a href="#ch8-options" data-target="ch8-options">8.2 Livewire vs Inertia vs plain Vue/React</a></li><li><a href="#ch8-livewire" data-target="ch8-livewire">8.3 A taste of Livewire</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Building APIs with Laravel</a><ul><li><a href="#ch9-routes" data-target="ch9-routes">9.1 API routes and resources</a></li><li><a href="#ch9-sanctum" data-target="ch9-sanctum">9.2 Authentication with Sanctum</a></li><li><a href="#ch9-versioning" data-target="ch9-versioning">9.3 Versioning, pagination, errors</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Queues, Jobs, Events &amp; Broadcasting</a><ul><li><a href="#ch10-queues" data-target="ch10-queues">10.1 Queues and jobs</a></li><li><a href="#ch10-events" data-target="ch10-events">10.2 Events and listeners</a></li><li><a href="#ch10-broadcast" data-target="ch10-broadcast">10.3 Broadcasting and real-time</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · Caching, Sessions &amp; Performance</a><ul><li><a href="#ch11-cache" data-target="ch11-cache">11.1 Cache stores and usage</a></li><li><a href="#ch11-redis" data-target="ch11-redis">11.2 Redis: cache, queue and session</a></li><li><a href="#ch11-optimize" data-target="ch11-optimize">11.3 The performance checklist</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch12" data-target="ch12">12 · Testing &amp; Security</a><ul><li><a href="#ch12-tests" data-target="ch12-tests">12.1 Feature and unit tests</a></li><li><a href="#ch12-security" data-target="ch12-security">12.2 Security essentials</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch13" data-target="ch13">13 · Advanced Laravel: Container, Providers &amp; Packages</a><ul><li><a href="#ch13-container" data-target="ch13-container">13.1 The service container</a></li><li><a href="#ch13-providers" data-target="ch13-providers">13.2 Service providers</a></li><li><a href="#ch13-macros" data-target="ch13-macros">13.3 Macros and higher-order collections</a></li><li><a href="#ch13-packages" data-target="ch13-packages">13.4 Publishing your own package</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch14" data-target="ch14">14 · Scaling: Octane, Horizon &amp; Infrastructure</a><ul><li><a href="#ch14-octane" data-target="ch14-octane">14.1 Laravel Octane</a></li><li><a href="#ch14-horizon" data-target="ch14-horizon">14.2 Horizon for queues at scale</a></li><li><a href="#ch14-scale" data-target="ch14-scale">14.3 Horizontal scaling blueprint</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch15" data-target="ch15">15 · Deployment &amp; CI/CD for Laravel</a><ul><li><a href="#ch15-deploy" data-target="ch15-deploy">15.1 Deployment steps</a></li><li><a href="#ch15-envoy" data-target="ch15-envoy">15.2 Zero-downtime releases</a></li><li><a href="#ch15-cicd" data-target="ch15-cicd">15.3 A minimal GitHub Actions pipeline</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch16" data-target="ch16">16 · Laravel 13 Notes &amp; Upgrade Discipline</a><ul><li><a href="#ch16-whatsnew" data-target="ch16-whatsnew">16.1 Working with the current release</a></li><li><a href="#ch16-upgrade" data-target="ch16-upgrade">16.2 A safe upgrade process</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Cheat Sheets &amp; Roadmap</a><ul><li><a href="#app-artisan" data-target="app-artisan">A.1 Artisan cheat sheet</a></li><li><a href="#app-roadmap" data-target="app-roadmap">A.2 Roadmap: basic to advanced</a></li><li><a href="#app-cheatsheets" data-target="app-cheatsheets">A.3 Elegant defaults to remember</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Laravel 13</span>
+      <span class="am-band-s">18 chapters &middot; 75 topics &middot; 43 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This Laravel Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This Laravel Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The right mindset</a><a href="#orientation-tools">Tools you will use all course long</a></div></div>
+    <p class="topic-desc">Explains how to get the most from this offline Laravel mastery course. It shows the chapter by chapter workflow and why typing out every example yourself builds lasting muscle memory. Treat the guide as a hands-on manual and follow its three parts in order, from your first routes through routing, Eloquent, APIs, and production architecture.</p>
+    <p>This is a complete, self-paced path through <strong>Laravel 13</strong>, from your first route to advanced production architecture. Everything runs in a single HTML file — no internet required, progress is saved in your browser.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">Shows the three-part structure of the guide across seventeen chapters and its exercises. Each chapter ends with copy-ready code you should type out yourself rather than paste. This repeated read then type cycle turns passive reading into active learning and makes the concepts stick.</p>
+    <ul>
+      <li><strong>Part I (Ch. 1–6)</strong> — foundations: setup, routing, Blade, controllers, Eloquent, validation and auth.</li>
+      <li><strong>Part II (Ch. 7–12)</strong> — real applications: APIs, Sanctum, queues, events, caching, testing and security.</li>
+      <li><strong>Part III (Ch. 13–17)</strong> — advanced and scale: the service container, packages, Octane, deployment and Laravel 13 changes.</li>
+      <li>Every chapter ends with exercises. Code is copy-ready; type it rather than pasting to build muscle memory.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset</h3>
+    <p class="topic-desc">Covers the Laravel philosophy of convention over configuration. Names for tables, models, and controllers are not arbitrary: follow the framework naming rules and it resolves files and relationships for you automatically. Learn these conventions up front and most questions about where code belongs answer themselves.</p>
+    <p>Laravel rewards understanding the <em>conventions</em>. Almost every "how do I…" is answered by "name it the way Laravel expects and it works." Learn the conventions first, the escape hatches second.</p>
+    <div class="tip"><p>Keep the official docs open beside this guide at <code>laravel.com/docs</code>. This guide explains the why and the sequence; the docs are the exhaustive reference.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will use all course long</h3>
+    <p class="topic-desc">Describes the toolchain used all course long, from PHP and Composer for dependencies to Artisan for command line work and Vite for frontend assets. You install these once and they carry you through every chapter. Ensure your PHP version and required extensions match the Laravel requirements before you begin.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>PHP 8.3+</td><td>Language runtime (Laravel 13 targets modern PHP)</td></tr>
+      <tr><td>Composer</td><td>PHP dependency manager</td></tr>
+      <tr><td>Laravel installer / <code>composer create-project</code></td><td>Scaffold a new app</td></tr>
+      <tr><td>Artisan</td><td>The command-line companion (<code>php artisan …</code>)</td></tr>
+      <tr><td>Node + Vite</td><td>Asset bundling and frontend tooling</td></tr>
+      <tr><td>MySQL / PostgreSQL / SQLite</td><td>Database</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Getting Started</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Getting Started</button><div class="ch-toc-list"><a href="#ch1-install">1.1 Installing Laravel</a><a href="#ch1-structure">1.2 The directory structure that matters</a><a href="#ch1-lifecycle">1.3 The request lifecycle</a><a href="#ch1-artisan">1.4 Artisan: your command centre</a></div></div>
+    <p class="topic-desc">Gets a working Laravel application running and explains the request lifecycle. You install the framework, meet the Artisan command line, and trace how a request enters the front controller, passes middleware and routing, and returns a response. This foundation shows where almost every framework feature plugs in.</p>
+    <p>Laravel is a batteries-included PHP framework built around a small set of ideas: a routing layer, a container, Eloquent, and convention over configuration. This chapter gets a working app running and teaches the request lifecycle you’ll rely on forever.</p>
+    <h3 id="ch1-install" data-toc>1.1 Installing Laravel</h3>
+    <p class="topic-desc">Shows the two ways to create a new Laravel project: the Laravel installer through composer create-project laravel/laravel or the laravel new command. Either path gives you a fully bootstrapped application ready to serve. Run php artisan serve to finish with a working site on port 8000.</p>
+    <div class="codeWrap"><pre><code># Option A: the Laravel installer (fastest)
+composer global require laravel/installer
+laravel new blog        # answer the prompts (starter kit, testing, DB)
+
+# Option B: Composer directly
+composer create-project laravel/laravel blog
+
+cd blog
+php artisan serve       # http://127.0.0.1:8000
+php artisan about       # environment summary</code></pre></div>
+    <p class="code-note">Both options produce a working Laravel app, then php artisan serve starts the local development server on port 8000.</p>
+    <h3 id="ch1-structure" data-toc>1.2 The directory structure that matters</h3>
+    <p class="topic-desc">Maps the directories you touch day to day, such as routes, app for controllers and models, database for migrations and seeders, and resources for views. Knowing where each kind of file lives is half of mastering Laravel conventions. Most placement decisions come with a default answer.</p>
+    <table>
+      <tr><th>Path</th><th>What lives there</th></tr>
+      <tr><td><code>routes/</code></td><td>web.php (browser), api.php (JSON), console.php</td></tr>
+      <tr><td><code>app/Models/</code></td><td>Eloquent models</td></tr>
+      <tr><td><code>app/Http/Controllers/</code></td><td>Controllers</td></tr>
+      <tr><td><code>resources/views/</code></td><td>Blade templates</td></tr>
+      <tr><td><code>database/migrations/</code></td><td>Schema version control</td></tr>
+      <tr><td><code>config/</code></td><td>Framework configuration</td></tr>
+      <tr><td><code>.env</code></td><td>Environment-specific secrets and settings</td></tr>
+    </table>
+    <h3 id="ch1-lifecycle" data-toc>1.3 The request lifecycle</h3>
+    <p class="topic-desc">Traces a browser request through the Laravel lifecycle: the public index.php front controller, application bootstrap, middleware, route matching, controller logic, and finally the response returned to the client. Understanding this pipeline makes debugging easier because you can localize each failure to a single stage. Almost every framework problem lives somewhere in this chain.</p>
+    <div class="codeWrap"><pre><code>Browser request
+  -&gt; public/index.php        (front controller)
+  -&gt; HTTP Kernel             (global middleware)
+  -&gt; Router                  (matches a route)
+  -&gt; Route middleware        (auth, throttle, ...)
+  -&gt; Controller / Closure
+  -&gt; Response
+  -&gt; Middleware on the way out
+  -&gt; Browser</code></pre></div>
+    <p class="code-note">This is the journey a request takes through the framework, out to the controller and back through middleware, and locating your position in the chain explains most problems.</p>
+    <p>Every "why is my middleware not running" question is answered by locating where you sit in this chain.</p>
+    <h3 id="ch1-artisan" data-toc>1.4 Artisan: your command centre</h3>
+    <p class="topic-desc">Introduces Artisan, the command line interface built into every Laravel application. Commands such as make:controller, make:model, and make:migration scaffold files, while migrate, tinker, route:list, and test handle schema, debugging, and testing. It is your everyday companion from the very first chapter.</p>
+    <div class="codeWrap"><pre><code>php artisan list                 # every command
+php artisan make:controller PostController
+php artisan make:model Post -mcr # model + migration + controller + resource
+php artisan route:list           # inspect all routes
+php artisan migrate              # run migrations
+php artisan tinker               # REPL with your app booted</code></pre></div>
+    <p class="code-note">These Artisan commands generate code and run migrations, so most everyday Laravel work starts here. The -mcr flag scaffolds a model, migration, controller, and resource routes at once.</p>
+    <div class="ex"><h4 id="ch1-artisan--exercises-1">Exercises 1</h4><ol>
+      <li>Create a fresh app, run it, and open <code>php artisan about</code>.</li>
+      <li>List all routes and find the default welcome route.</li>
+      <li>In tinker, evaluate <code>config('app.name')</code> and <code>app()->environment()</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Routing, Views &amp; Blade</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Routing, Views &amp; Blade</button><div class="ch-toc-list"><a href="#ch2-routes">2.1 Defining routes</a><a href="#ch2-blade">2.2 Blade basics</a><a href="#ch2-layouts">2.3 Layouts, components and slots</a><a href="#ch2-named">2.4 Named routes, redirects and URLs</a></div></div>
+    <p class="topic-desc">Covers routing, the Blade templating engine, layouts, and named routes. These are the core building blocks behind every page your application renders, connecting URLs to logic and to HTML output. Master them and you can build anything from a simple landing page to a multi-section dashboard.</p>
+    <h3 id="ch2-routes" data-toc>2.1 Defining routes</h3>
+    <p class="topic-desc">Shows how to define routes in the routes directory using URL and action pairs, with support for parameters, constraints, prefixes, and groups. Route definitions stay small and readable in routes/web.php and usually point to controllers that hold the real logic. Review the full map anytime with php artisan route:list.</p>
+    <div class="codeWrap"><pre><code>use Illuminate\Support\Facades\Route;
+
+Route::get('/', fn () =&gt; view('welcome'));
+
+Route::get('/posts/{post}', function (string $post) {
+    return "Post: {$post}";
+})-&gt;whereNumber('post');        // constrain {post} to digits only
+
+Route::prefix('admin')-&gt;name('admin.')-&gt;middleware('auth')-&gt;group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])-&gt;name('dashboard');
+});   // all admin routes sit behind auth and get the admin. name prefix</code></pre></div>
+    <p class="code-note">Routes map URLs to closures or controllers. whereNumber constrains the route parameter, and the admin group shows prefixing, naming, and the auth middleware in one go.</p>
+    <h3 id="ch2-blade" data-toc>2.2 Blade basics</h3>
+    <p class="topic-desc">Introduces Blade, the templating engine that compiles view files into plain PHP. Use directives such as @foreach, @if, and @section to write loops, conditionals, and layout output with readable syntax. Blade escapes echoed variables automatically, which defends your pages against cross site scripting.</p>
+    <div class="codeWrap"><pre><code>{{-- resources/views/posts/index.blade.php --}}
+@extends('layouts.app')
+
+@section('content')
+  &lt;h1&gt;{{ $title }}&lt;/h1&gt;
+
+  {{-- loops and conditionals --}}
+  @forelse ($posts as $post)
+    &lt;article&gt;
+      &lt;h2&gt;{{ $post-&gt;title }}&lt;/h2&gt;
+      &lt;p&gt;{{ Str::limit($post-&gt;body, 140) }}&lt;/p&gt;
+    &lt;/article&gt;
+  @empty                  {{-- fallback rendered when there are no posts --}}
+    &lt;p&gt;No posts yet.&lt;/p&gt;
+  @endforelse
+@endsection</code></pre></div>
+    <p class="code-note">This Blade view extends a layout and loops over posts with @forelse, which has a built-in empty state. Output inside double braces is escaped automatically.</p>
+    <div class="warn"><p><strong>{{ }}</strong> escapes output automatically. Only use <code>{!! !!}</code> when you truly trust the content — that is the XSS door.</p></div>
+    <h3 id="ch2-layouts" data-toc>2.3 Layouts, components and slots</h3>
+    <p class="topic-desc">Shows how to compose reusable user interfaces with layouts, components, and slots. A parent layout defines the shared HTML shell while child views fill named sections, and components wrap repeated markup. Slots pass content into a component so it behaves like a custom tag and keeps your views DRY.</p>
+    <div class="codeWrap"><pre><code>{{-- components/alert.blade.php --}}
+&lt;div class="alert alert-{{ $type }}"&gt;
+  {{ $slot }}          {{-- holds the content passed between the component tags --}}
+&lt;/div&gt;
+
+{{-- usage --}}
+&lt;x-alert type="warning"&gt;Careful!&lt;/x-alert&gt;
+
+{{-- anonymous component with attributes --}}
+&lt;x-button :disabled="$saving"&gt;Save&lt;/x-button&gt;</code></pre></div>
+    <p class="code-note">Components combine markup with a $slot, and attributes like type flow into the component. Anonymous components simply live in resources/views/components.</p>
+    <h3 id="ch2-named" data-toc>2.4 Named routes, redirects and URLs</h3>
+    <p class="topic-desc">Covers named routes and the helper functions that generate their URLs. Give a route a name with the name method, then reference it through the route helper in redirects, links, and form actions. Naming routes means your URLs survive changes without breaking every reference.</p>
+    <div class="codeWrap"><pre><code>return redirect()-&gt;route('admin.dashboard');   // redirect by route name, not URL
+$url = route('posts.show', ['post' =&gt; 7]);   // /posts/7
+// In Blade: {{ route('posts.show', $post) }}</code></pre></div>
+    <p class="code-note">Route helpers generate URLs and redirects from route names instead of hardcoded paths, so changing a URL later only touches one route definition.</p>
+    <div class="ex"><h4 id="ch2-named--exercises-2">Exercises 2</h4><ol>
+      <li>Build a <code>/hello/{name}</code> route that greets in a Blade view.</li>
+      <li>Create a layout and two child views extending it.</li>
+      <li>Make an <code>x-card</code> component with a title slot and a body slot.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Controllers, Requests &amp; Responses</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Controllers, Requests &amp; Responses</button><div class="ch-toc-list"><a href="#ch3-resource">3.1 Resource controllers</a><a href="#ch3-request">3.2 Reading the request</a><a href="#ch3-responses">3.3 Responses and helpers</a><a href="#ch3-formrequest">3.4 Form requests</a></div></div>
+    <p class="topic-desc">Moves logic out of route closures and into controllers, and explains requests and responses. You will validate incoming input, handle form submissions, and shape output with view, json, and redirect helpers. Controllers keep routes declarative and put business behavior somewhere testable.</p>
+    <h3 id="ch3-resource" data-toc>3.1 Resource controllers</h3>
+    <p class="topic-desc">Scaffolds a full set of CRUD routes and controller methods with one command. The artisan make:controller PostController -r command generates the seven conventional methods, and Route::resource wires them to REST style URLs. Review the generated routes with route:list and customize only what your app actually needs.</p>
+    <div class="codeWrap"><pre><code>php artisan make:controller PostController --resource --model=Post   # generate the CRUD methods
+
+// routes/web.php
+Route::resource('posts', PostController::class);   // registers every CRUD route</code></pre></div>
+    <p class="code-note">One make:controller command scaffolds the full CRUD pattern, and a single Route::resource line registers all its routes with conventional URLs and names.</p>
+    <p>A resource controller gives you <code>index, create, store, show, edit, update, destroy</code> with conventions for names and URLs.</p>
+    <h3 id="ch3-request" data-toc>3.2 Reading the request</h3>
+    <p class="topic-desc">Shows how to read validated input from the incoming request. Type hint Illuminate\Http\Request in a controller method and use methods such as all, input, query, and collect to fetch submitted values. The validate helper and FormRequest classes authorize and validate data before your action ever runs.</p>
+    <div class="codeWrap"><pre><code>public function store(Request $request)
+{
+    $data = $request-&gt;validate([      // fails? redirects back with errors
+        'title' =&gt; ['required', 'string', 'max:255'],
+        'body'  =&gt; ['required', 'string'],
+    ]);
+
+    $post = Post::create($data);      // mass-assign the validated fields
+
+    return redirect()-&gt;route('posts.show', $post);   // PRG: redirect after a write
+}</code></pre></div>
+    <p class="code-note">The store method validates input, creates the model in one line, and redirects to the new post. Validation failure bounces the user back with error messages.</p>
+    <h3 id="ch3-responses" data-toc>3.3 Responses and helpers</h3>
+    <p class="topic-desc">Lists the common response helpers for shaping output in controllers. Use view for Blade templates, json for API data, redirect for safe post redirect get flows, and response download for files. Choosing the right helper keeps controller code short and makes the result of every action obvious.</p>
+    <div class="codeWrap"><pre><code>return view('posts.show', compact('post'));
+return response()-&gt;json($post, 201);          // 201 = Created
+return redirect()-&gt;back()-&gt;with('status', 'Saved!');   // flash, survives one request
+return response()-&gt;download($path);</code></pre></div>
+    <p class="code-note">These four lines cover the responses you will reach for daily: views, JSON with status codes, redirects with flash data, and file downloads.</p>
+    <h3 id="ch3-formrequest" data-toc>3.4 Form requests</h3>
+    <p class="topic-desc">Moves validation out of the controller and into its own class. Generate one with php artisan make:request, define rules in its rules method and messages in messages, then type hint the form request directly in your controller method. Controllers stay thin and the same validation rules remain reusable across actions.</p>
+    <div class="codeWrap"><pre><code>php artisan make:request StorePostRequest
+
+public function rules(): array
+{
+    return [
+        'title' =&gt; ['required', 'string', 'max:255'],
+        'body'  =&gt; ['required', 'string', 'min:10'],   // enforce a minimum length
+    ];
+}
+// Then: public function store(StorePostRequest $request)</code></pre></div>
+    <p class="code-note">A form request moves validation rules into their own class, keeping controllers thin. Type-hinting it in a method signature validates and authorizes automatically.</p>
+    <div class="ex"><h4 id="ch3-formrequest--exercises-3">Exercises 3</h4><ol>
+      <li>Scaffold a resource controller for <code>Post</code> and wire the routes.</li>
+      <li>Move validation into a form request and add a custom message.</li>
+      <li>Return JSON from <code>show</code> when the request expects JSON.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Eloquent ORM &amp; Migrations</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Eloquent ORM &amp; Migrations</button><div class="ch-toc-list"><a href="#ch4-migrations">4.1 Migrations: schema as version control</a><a href="#ch4-model">4.2 Models and relationships</a><a href="#ch4-crud">4.3 CRUD and query building</a><a href="#ch4-casts">4.4 Casts, accessors and scopes</a></div></div>
+    <p class="topic-desc">Introduces the Eloquent ORM and migrations for database work. Migrations version your schema, models represent tables as objects, and relationships express joins as method calls. You will write expressive queries, seed sample data, and keep every developer database in sync with an exact shared schema.</p>
+    <h3 id="ch4-migrations" data-toc>4.1 Migrations: schema as version control</h3>
+    <p class="topic-desc">Shows how to version your database schema with migration files. Each migration defines up and down methods that apply and reverse a change, and php artisan migrate runs all pending migrations in order. The whole team can rebuild the exact same schema on any machine by simply running migrate.</p>
+    <div class="codeWrap"><pre><code>php artisan make:migration create_posts_table
+
+Schema::create('posts', function (Blueprint $table) {
+    $table-&gt;id();
+    $table-&gt;foreignId('user_id')-&gt;constrained()-&gt;cascadeOnDelete();   // FK with index
+    $table-&gt;string('title');
+    $table-&gt;text('body');
+    $table-&gt;timestamps();
+    $table-&gt;softDeletes();   // adds a deleted_at column for soft deletes
+});</code></pre></div>
+    <p class="code-note">This migration defines the posts schema, including a foreign key to users and a soft-deletes column. Applied with php artisan migrate, it becomes the source of truth for the schema.</p>
+    <h3 id="ch4-model" data-toc>4.2 Models and relationships</h3>
+    <p class="topic-desc">Introduces Eloquent models and the relationships you define on them with methods such as hasMany, belongsTo, and belongsToMany. Eager loading with the with method avoids slow N+1 queries when models reference each other. Table and primary key names follow conventions automatically, so model classes stay tiny.</p>
+    <div class="codeWrap"><pre><code>class Post extends Model
+{
+    protected $fillable = ['title', 'body'];   // fields allowed for mass assignment
+
+    public function user(): BelongsTo { return $this-&gt;belongsTo(User::class); }
+    public function tags(): BelongsToMany { return $this-&gt;belongsToMany(Tag::class); }
+}
+
+$posts = Post::with('user', 'tags')-&gt;latest()-&gt;paginate(20);   // eager load, then paginate
+</code></pre></div>
+    <p class="code-note">A model ties a table to relationships and controls mass assignment via $fillable. The query eagerly loads both relationships and paginates in one readable line.</p>
+    <div class="tip"><p><strong>Eager loading</strong> (<code>with()</code>) is the single biggest performance fix in Laravel. Watch for <code>N+1</code> queries in the debug bar.</p></div>
+    <h3 id="ch4-crud" data-toc>4.3 CRUD and query building</h3>
+    <p class="topic-desc">Demonstrates create, read, update, and delete through Eloquent and the query builder. Chain fluent methods like where, orderBy, and get to build queries that read like sentences, then persist with methods such as create, update, and delete. Mass assignment protection keeps records safe from unexpected form fields.</p>
+    <div class="codeWrap"><pre><code>$post = Post::create(['title' =&gt; 'Hi', 'body' =&gt; '...']);
+
+$post-&gt;update(['title' =&gt; 'Updated']);
+$post-&gt;delete();                    // soft delete if trait present
+
+$published = Post::where('published', true)
+    -&gt;whereHas('tags', fn ($q) =&gt; $q-&gt;where('name', 'php'))   // only posts with this tag
+    -&gt;orderByDesc('created_at')
+    -&gt;get();</code></pre></div>
+    <p class="code-note">Creating, updating, and deleting happen through the model, while whereHas filters by a related model’s field. Every method uses bound queries, so there is no SQL injection.</p>
+    <h3 id="ch4-casts" data-toc>4.4 Casts, accessors and scopes</h3>
+    <p class="topic-desc">Covers casts, accessors, and query scopes for cleaner models. Casts convert column values automatically, such as turning JSON strings into arrays, while accessors and mutators shape attribute values in and out. Define scopes with the scope prefix to package common query filters into reusable model methods.</p>
+    <div class="codeWrap"><pre><code>protected function casts(): array
+{
+    return ['published_at' =&gt; 'datetime', 'meta' =&gt; 'array'];   // auto-convert on read and write
+}
+
+public function scopePublished(Builder $q): void
+{
+    $q-&gt;whereNotNull('published_at')-&gt;where('published_at', '&lt;=', now());
+}
+// Post::published()-&gt;get();</code></pre></div>
+    <p class="code-note">Casts convert column values to PHP types automatically, while scopes wrap common filters so queries read like Post::published()->get().</p>
+    <div class="ex"><h4 id="ch4-casts--exercises-4">Exercises 4</h4><ol>
+      <li>Create <code>posts</code> and <code>tags</code> with a pivot table; seed some data.</li>
+      <li>List posts with their author and tags without N+1.</li>
+      <li>Add a <code>published</code> scope and a cast for a JSON column.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Validation, Forms &amp; Files</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Validation, Forms &amp; Files</button><div class="ch-toc-list"><a href="#ch5-rules">5.1 The validation toolbox</a><a href="#ch5-old">5.2 Repopulating forms</a><a href="#ch5-files">5.3 File uploads</a></div></div>
+    <p class="topic-desc">Covers validation rules, repopulating forms with old input, and handling file uploads. Solid server side validation is the difference between robust and brittle forms. You will define rule arrays, surface field errors, and safely store uploaded files with the Laravel storage system.</p>
+    <h3 id="ch5-rules" data-toc>5.1 The validation toolbox</h3>
+    <p class="topic-desc">Shows the validation rule toolbox for emails, numbers, arrays, and files. Rules such as required, email, min, max, unique, and array read like a contract describing what the data must look like. Combine them into rule arrays and pass them to the validate helper or a FormRequest.</p>
+    <div class="codeWrap"><pre><code>$request-&gt;validate([
+    'email'    =&gt; ['required', 'email', 'unique:users,email'],
+    'age'      =&gt; ['nullable', 'integer', 'between:13,120'],
+    'avatar'   =&gt; ['nullable', 'image', 'max:2048'],   // max size is in kilobytes
+    'tags'     =&gt; ['array', 'max:5'],
+    'tags.*'   =&gt; ['string', 'distinct'],              // each tag must be different
+]);</code></pre></div>
+    <p class="code-note">This validate call defines rules for each field, including uniqueness, ranges, and upload size. The unique rule automatically checks the users table’s email column.</p>
+    <h3 id="ch5-old" data-toc>5.2 Repopulating forms</h3>
+    <p class="topic-desc">Explains how to repopulate form fields after a validation failure. The old helper returns the previously submitted value for a field, and the @error directive shows the matching validation message. Together they prevent users from retyping every input after a single mistake.</p>
+    <div class="codeWrap"><pre><code>&lt;input name="email" value="{{ old('email') }}"&gt;   {{-- keeps the value after a failed submit --}}
+@error('email') &lt;p class="error"&gt;{{ $message }}&lt;/p&gt; @enderror
+
+{{-- CSRF token is mandatory for POST/PUT/DELETE --}}
+&lt;form method="POST" action="/posts"&gt;
+  @csrf             {{-- hidden token required on every POST --}}
+  ...
+&lt;/form&gt;</code></pre></div>
+    <p class="code-note">old() repopulates the input after a failed validation, and @error prints one message per field. The @csrf token is mandatory on every POST form.</p>
+    <h3 id="ch5-files" data-toc>5.3 File uploads</h3>
+    <p class="topic-desc">Shows how to handle uploaded files safely with the Laravel storage system. Validate declared type and size before accepting a file, then persist it with the store and storeAs methods on the request. Generate safe storage names and never trust the client supplied filename.</p>
+    <div class="codeWrap"><pre><code>if ($request-&gt;hasFile('avatar')) {
+    $path = $request-&gt;file('avatar')-&gt;store('avatars', 'public');   // store on the public disk
+    // store path; serve via php artisan storage:link
+}</code></pre></div>
+    <p class="code-note">Uploaded files are stored on the public disk under avatars, and a symlink makes them web-reachable. The returned path is what you save in the database.</p>
+    <div class="warn"><p>Always validate file <em>type and size</em>. Never trust the client-provided filename — Laravel generates safe names for you.</p></div>
+    <div class="ex"><h4 id="ch5-files--exercises-5">Exercises 5</h4><ol>
+      <li>Build a registration form with server-side validation and old input.</li>
+      <li>Add image upload with size limits and a storage symlink.</li>
+      <li>Write a custom validation rule for a "strong password".</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Authentication &amp; Authorization</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Authentication &amp; Authorization</button><div class="ch-toc-list"><a href="#ch6-starter">6.1 Starter kits</a><a href="#ch6-guards">6.2 Guards and protecting routes</a><a href="#ch6-gates">6.3 Gates and policies</a><a href="#ch6-roles">6.4 Roles and permissions</a></div></div>
+    <p class="topic-desc">Covers authentication with starter kits and authorization with gates and policies. Starter kits such as Breeze provide login, registration, and password reset out of the box, while the auth middleware protects your routes. Gates and policies enforce exactly who may perform each action in your application.</p>
+    <h3 id="ch6-starter" data-toc>6.1 Starter kits</h3>
+    <p class="topic-desc">Installs Breeze to get login, registration, password reset, and more in minutes. Run php artisan breeze:install, pick your stack, then migrate and compile the shipped frontend assets. Jetstream is the step up when you need teams, API tokens, and two factor authentication.</p>
+    <div class="codeWrap"><pre><code>composer require laravel/breeze --dev
+php artisan breeze:install blade   # or vue / react / livewire
+php artisan migrate                # build the auth tables</code></pre></div>
+    <p class="code-note">Installing Breeze and running its installer drops in complete login, registration, and profile scaffolding in minutes, then migrate builds the auth tables.</p>
+    <p>Breeze gives login, registration, password reset, email verification and profile management in minutes. Fortify/Jetstream add two-factor and team features.</p>
+    <h3 id="ch6-guards" data-toc>6.2 Guards and protecting routes</h3>
+    <p class="topic-desc">Shows how to protect routes with the auth middleware and read the current user. Add auth middleware to guard routes, then use the Auth facade or auth helper to fetch the logged in user. Guards decide how users are authenticated, such as the session based web guard or token based guards for APIs.</p>
+    <div class="codeWrap"><pre><code>Route::middleware('auth')-&gt;group(function () {   // every route inside requires login
+    Route::get('/dashboard', DashboardController::class);
+});
+
+auth()-&gt;user();          // current user (or null)
+auth()-&gt;id();
+Auth::check();</code></pre></div>
+    <p class="code-note">Wrapping routes in the auth middleware blocks guests, while the auth() helper gives you the current user anywhere in the app.</p>
+    <h3 id="ch6-gates" data-toc>6.3 Gates and policies</h3>
+    <p class="topic-desc">Introduces policies and gates for authorization rules. Generate a policy with php artisan make:policy to keep a model’s permission checks together, or define gates with Gate::define for simpler app wide rules. Enforce them with the can and cannot methods in controllers and the @can directive in views.</p>
+    <div class="codeWrap"><pre><code>php artisan make:policy PostPolicy --model=Post
+
+public function update(User $user, Post $post): bool
+{
+    return $user-&gt;id === $post-&gt;user_id;   // only the author passes
+}
+
+// In controller:
+$this-&gt;authorize('update', $post);
+// In Blade: @can('update', $post) ... @endcan</code></pre></div>
+    <p class="code-note">The policy method answers one question: may this user edit this post? authorize() in the controller and @can in Blade enforce the same rule in two places.</p>
+    <h3 id="ch6-roles" data-toc>6.4 Roles and permissions</h3>
+    <p class="topic-desc">Compares a simple role column on the users table with the spatie permissions package. A role string with a small helper covers small apps, while the package adds roles and permissions tables with helpers such as hasRole and givePermissionTo. Pick the simplest option that still covers your needs.</p>
+    <p>For simple apps a <code>role</code> column plus gates is enough. For complex needs use <em>spatie/laravel-permission</em> (roles, permissions, teams). Resist inventing your own ACL until you’ve outgrown the two above.</p>
+    <div class="ex"><h4 id="ch6-roles--exercises-6">Exercises 6</h4><ol>
+      <li>Install Breeze and register a user.</li>
+      <li>Protect a route with <code>auth</code> and show the user’s name.</li>
+      <li>Write a policy so only authors can edit their posts; enforce it in a controller and a Blade view.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Middleware, Sessions &amp; Cookies</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Middleware, Sessions &amp; Cookies</button><div class="ch-toc-list"><a href="#ch7-middleware">7.1 Writing middleware</a><a href="#ch7-sessions">7.2 Sessions, flash data and cookies</a></div></div>
+    <p class="topic-desc">Explains middleware, sessions, flash data, and cookies. Middleware filters every request for cross-cutting concerns like authentication, logging, and rate limits, while sessions and cookies carry per-request state across visits. Flash data lives for exactly one request and powers save notices after a redirect.</p>
+    <h3 id="ch7-middleware" data-toc>7.1 Writing middleware</h3>
+    <p class="topic-desc">Shows how to write and register your own middleware. Generate a class with php artisan make:middleware, implement the handle method, and register it in the bootstrap HTTP kernel. A Terminable middleware can also run cleanup work after the response has been sent.</p>
+    <div class="codeWrap"><pre><code>php artisan make:middleware EnsureUserIsActive
+
+public function handle(Request $request, Closure $next): Response
+{
+    if ($request-&gt;user()?-&gt;isBanned()) {
+        abort(403, 'Account suspended');
+    }
+    return $next($request);   // otherwise let the request continue down the pipeline
+}
+
+// Register in bootstrap/app.php (Laravel 11+ style):
+-&gt;withMiddleware(function (Middleware $middleware) {
+    $middleware-&gt;appendToGroup('web', EnsureUserIsActive::class);
+})</code></pre></div>
+    <p class="code-note">Middleware runs before the route and either short-circuits with a 403 or passes the request on with $next(). Registration happens in bootstrap/app.php.</p>
+    <h3 id="ch7-sessions" data-toc>7.2 Sessions, flash data and cookies</h3>
+    <p class="topic-desc">Covers session state, flash data that lives for one request, and cookies. The session helper reads and writes per-visit values, with and flash stage data for the next request, and cookie helpers manage browser cookies. Pick the file, database, or redis driver in the session config.</p>
+    <div class="codeWrap"><pre><code>session(['cart' =&gt; $items]);
+$cart = session('cart', []);            // read the session with a default
+
+return redirect()-&gt;back()-&gt;with('status', 'Saved');
+@if (session('status')) &lt;div class="ok"&gt;{{ session('status') }}&lt;/div&gt; @endif
+
+Cookie::queue('theme', 'dark', 60 * 24 * 365);</code></pre></div>
+    <p class="code-note">The session helper stores and reads user data, with() flashes a value for the next request only, and Cookie::queue sets a cookie the response sends.</p>
+    <div class="tip"><p>Flash data survives exactly one request — perfect for "Saved!" notices after a redirect (Post/Redirect/Get).</p></div>
+    <div class="ex"><h4 id="ch7-sessions--exercises-7">Exercises 7</h4><ol>
+      <li>Build middleware that logs slow requests.</li>
+      <li>Flash a success message after creating a record and show it once.</li>
+      <li>Persist a user’s theme preference in a cookie.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Frontend, Vite, Livewire &amp; Inertia</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Frontend, Vite, Livewire &amp; Inertia</button><div class="ch-toc-list"><a href="#ch8-vite">8.1 Vite and assets</a><a href="#ch8-options">8.2 Livewire vs Inertia vs plain Vue/React</a><a href="#ch8-livewire">8.3 A taste of Livewire</a></div></div>
+    <p class="topic-desc">Compares frontend approaches from plain Blade to Livewire and Inertia. Plain Blade with Vite suits server rendered sites, Livewire adds interactivity while staying in PHP, and Inertia pairs Blade with a Vue or React frontend. Pick the approach whose complexity matches your project’s needs.</p>
+    <h3 id="ch8-vite" data-toc>8.1 Vite and assets</h3>
+    <p class="topic-desc">Shows how to compile assets with Vite and load them in Blade. Add your entry points to resources, run npm install and npm run dev for hot reloading during development, or npm run build for production files. The @vite directive in your layout injects the correct asset links.</p>
+    <div class="codeWrap"><pre><code>npm install
+npm run dev      # hot reload
+npm run build    # production assets
+
+{{-- Blade --}}
+@vite(['resources/css/app.css', 'resources/js/app.js'])   {{-- inject the compiled assets --}}</code></pre></div>
+    <p class="code-note">npm run dev serves assets with hot reload during development, and @vite injects the compiled CSS and JS tags into your view.</p>
+    <h3 id="ch8-options" data-toc>8.2 Livewire vs Inertia vs plain Vue/React</h3>
+    <p class="topic-desc">Weighs Blade, Livewire, Inertia, and a separate Vue or React SPA against your project needs. Blade is simplest, Livewire keeps all logic in PHP with per-component state, Inertia lets you use a SPA framework without an API layer, and a standalone SPA gives full frontend freedom. Each trade trades interactivity for complexity.</p>
+    <table>
+      <tr><th>Approach</th><th>Best for</th><th>Trade-off</th></tr>
+      <tr><td>Blade + Alpine</td><td>Content sites, dashboards, small interactivity</td><td>Limited rich UI</td></tr>
+      <tr><td>Livewire</td><td>Interactive apps in PHP (no JS build)</td><td>Round-trips unless using Volt</td></tr>
+      <tr><td>Inertia + Vue/React</td><td>Full SPA feel with Laravel routing</td><td>Two ecosystems to learn</td></tr>
+      <tr><td>API + separate SPA</td><td>Mobile + web, clear separation</td><td>Most plumbing</td></tr>
+    </table>
+    <h3 id="ch8-livewire" data-toc>8.3 A taste of Livewire</h3>
+    <p class="topic-desc">Gives a first taste of Livewire components written entirely in PHP. Generate a component with php artisan make:livewire, then use wire:click and wire:model in the Blade template to react to clicks and form input without writing JavaScript. Livewire handles the AJAX, state, and re-rendering for you.</p>
+    <div class="codeWrap"><pre><code>class Counter extends Component
+{
+    public int $count = 0;                 // public properties are the live state
+    public function increment(): void { $this-&gt;count++; }
+    public function render() { return view('livewire.counter'); }
+}
+
+&lt;button wire:click="increment"&gt;Count: {{ $count }}&lt;/button&gt;   {{-- no full page reload --}}</code></pre></div>
+    <p class="code-note">A Livewire component pairs a PHP class with a Blade view. Public properties are live state, and wire:click calls increment over the wire without a full reload.</p>
+    <div class="ex"><h4 id="ch8-livewire--exercises-8">Exercises 8</h4><ol>
+      <li>Set up Vite and compile a Tailwind stylesheet.</li>
+      <li>Build a Livewire counter and a Livewire search box.</li>
+      <li>Decide, in writing, which frontend approach fits a project you know.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Building APIs with Laravel</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Building APIs with Laravel</button><div class="ch-toc-list"><a href="#ch9-routes">9.1 API routes and resources</a><a href="#ch9-sanctum">9.2 Authentication with Sanctum</a><a href="#ch9-versioning">9.3 Versioning, pagination, errors</a></div></div>
+    <p class="topic-desc">Covers building JSON APIs with resource routes, Sanctum authentication, and versioning. APIs share the same routing, controllers, validation, and Eloquent foundations as web apps, but shape responses for machines with resources and pagination. Sanctum provides token based access for mobile and SPA clients.</p>
+    <h3 id="ch9-routes" data-toc>9.1 API routes and resources</h3>
+    <p class="topic-desc">Shows apiResource routes, API resources, and how to shape JSON output. Model resources generated with php artisan make:resource wrap a model and map it to clean JSON keys through their toArray method. Combine resources with pagination helpers so every client receives a consistent response shape.</p>
+    <div class="codeWrap"><pre><code>// routes/api.php — prefixed with /api automatically
+Route::apiResource('posts', Api\PostController::class);
+
+php artisan make:resource PostResource
+
+return [
+    'id'    =&gt; $this-&gt;id,
+    'title' =&gt; $this-&gt;title,
+    'author'=&gt; $this-&gt;whenLoaded('user', fn () =&gt; new UserResource($this-&gt;user)),   // only when eager-loaded
+    'links' =&gt; ['self' =&gt; route('api.posts.show', $this)],
+];</code></pre></div>
+    <p class="code-note">apiResource registers JSON-only CRUD routes, while a resource class controls exactly how a model appears in JSON, with whenLoaded keeping eager loads optional.</p>
+    <h3 id="ch9-sanctum" data-toc>9.2 Authentication with Sanctum</h3>
+    <p class="topic-desc">Adds token based API authentication with Sanctum. Force authentication with the sanctum middleware or use token authentication on your API routes, then have users create personal access tokens with createToken. Clients send the token to authenticate without a browser session.</p>
+    <div class="codeWrap"><pre><code>composer require laravel/sanctum
+php artisan install:api
+
+// issue a token
+$token = $user-&gt;createToken('mobile')-&gt;plainTextToken;   // return this to the client
+
+// protect routes
+Route::middleware('auth:sanctum')-&gt;get('/user', fn (Request $r) =&gt; $r-&gt;user());</code></pre></div>
+    <p class="code-note">Sanctum hands out API tokens, and the auth:sanctum middleware requires one on protected routes. Clients send the token in an Authorization header.</p>
+    <h3 id="ch9-versioning" data-toc>9.3 Versioning, pagination, errors</h3>
+    <p class="topic-desc">Shows URL versioning, pagination shape, and consistent error responses. Prefix API route groups with versions such as v1 or v2, paginate with paginate or simplePaginate, and keep error responses uniform across endpoints. A stable contract lets clients upgrade on their own schedule.</p>
+    <div class="codeWrap"><pre><code>Route::prefix('v1')-&gt;group(function () { ... });
+
+Post::paginate(20);            // { data, links, meta }
+
+// Consistent error shape
+abort(response()-&gt;json(['error' =&gt; 'Not found'], 404));</code></pre></div>
+    <p class="code-note">Versioning keeps your URL space stable under a prefix, paginate returns a standard pagination envelope, and the abort line produces a consistent JSON error shape.</p>
+    <div class="tip"><p>Design the JSON contract first (OpenAPI), generate docs, then implement. Clients integrate against the contract, not your feelings.</p></div>
+    <div class="ex"><h4 id="ch9-versioning--exercises-9">Exercises 9</h4><ol>
+      <li>Expose posts as an API resource with pagination.</li>
+      <li>Issue a Sanctum token and call a protected endpoint with curl.</li>
+      <li>Version the API under <code>/api/v1</code> and document one endpoint.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Queues, Jobs, Events &amp; Broadcasting</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Queues, Jobs, Events &amp; Broadcasting</button><div class="ch-toc-list"><a href="#ch10-queues">10.1 Queues and jobs</a><a href="#ch10-events">10.2 Events and listeners</a><a href="#ch10-broadcast">10.3 Broadcasting and real-time</a></div></div>
+    <p class="topic-desc">Covers queues, jobs, events, listeners, and broadcasting. Dispatch slow work to a queue so requests stay responsive, use events and listeners to decouple parts of the app, and broadcast changes to the browser for real-time updates. These patterns keep your application fast and easy to extend.</p>
+    <h3 id="ch10-queues" data-toc>10.1 Queues and jobs</h3>
+    <p class="topic-desc">Shows how to dispatch jobs onto queues with delays and chains. Define a job with php artisan make:job and dispatch it with the dispatch method, optionally on a named connection with delays or chained after other jobs. Start php artisan queue:work so a worker processes items in the background.</p>
+    <div class="codeWrap"><pre><code>php artisan make:job SendWelcomeEmail
+dispatch(new SendWelcomeEmail($user));            // off it goes to the queue
+
+// with delay and chain
+SendWelcomeEmail::dispatch($user)-&gt;delay(now()-&gt;addMinutes(5));
+Bus::chain([new ResizeImage($img), new NotifyUser($user)])-&gt;dispatch();   // run in order</code></pre></div>
+    <p class="code-note">dispatching a job pushes work to the queue, delay() schedules it for later, and Bus::chain runs several jobs in sequence, one after another.</p>
+    <div class="codeWrap"><pre><code># .env
+QUEUE_CONNECTION=redis
+php artisan queue:work --tries=3 --timeout=60   # retry failed jobs up to 3 times</code></pre></div>
+    <p class="code-note">Point the queue at Redis in .env, then php artisan queue:work runs a worker that processes jobs and retries failures up to the given tries.</p>
+    <h3 id="ch10-events" data-toc>10.2 Events and listeners</h3>
+    <p class="topic-desc">Introduces events and listeners as loose coupling. Fire an event with the Event facade or event helper, and let listeners generated with php artisan make:listener react to it. Mark a listener as ShouldQueue to process that reaction asynchronously.</p>
+    <div class="codeWrap"><pre><code>event(new OrderShipped($order));              // every registered listener reacts
+// Listeners can be queued automatically
+class SendShipmentNotification implements ShouldQueue { ... }</code></pre></div>
+    <p class="code-note">event() fires OrderShipped to every registered listener, and implementing ShouldQueue runs those listeners on the queue automatically.</p>
+    <h3 id="ch10-broadcast" data-toc>10.3 Broadcasting and real-time</h3>
+    <p class="topic-desc">Shows real-time updates with broadcasting and Reverb. Declare authorized channels in routes/channels.php, push changes from the server with the broadcast helper, and subscribe on the client with Laravel Echo. Reverb is the first party WebSocket server that Laravel ships for live applications.</p>
+    <div class="codeWrap"><pre><code>// Reverb (Laravel's websocket server)
+php artisan install:broadcasting
+
+broadcast(new OrderShipped($order))-&gt;toOthers();   // skip the sender's own channel
+// Frontend: Laravel Echo listens on a private channel</code></pre></div>
+    <p class="code-note">install:broadcasting sets up Reverb, Laravel’s WebSocket server. broadcast() sends the event to clients, and toOthers() excludes the sender.</p>
+    <div class="warn"><p>Make jobs <strong>idempotent</strong>. Queues retry; a job that charges a card twice on retry is a support nightmare.</p></div>
+    <div class="ex"><h4 id="ch10-broadcast--exercises-10">Exercises 10</h4><ol>
+      <li>Queue a welcome email and process it with a worker.</li>
+      <li>Fire an event and react to it with a queued listener.</li>
+      <li>Make one of your jobs safe to retry twice.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · Caching, Sessions &amp; Performance</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Caching, Sessions &amp; Performance</button><div class="ch-toc-list"><a href="#ch11-cache">11.1 Cache stores and usage</a><a href="#ch11-redis">11.2 Redis: cache, queue and session</a><a href="#ch11-optimize">11.3 The performance checklist</a></div></div>
+    <p class="topic-desc">Covers caching, Redis, and the performance checklist. Cache repeated work such as query results and rendered fragments, then invalidate it deliberately when data changes. Redis serves as a shared cache, queue, and session store, and the checklist orders the fixes that speed up slow applications.</p>
+    <h3 id="ch11-cache" data-toc>11.1 Cache stores and usage</h3>
+    <p class="topic-desc">Shows the cache API for storing, remembering, and forgetting values. Use the Cache facade methods put, remember, add, and forget across stores such as file, database, and redis. The remember method combines fetch and store in one step, which removes most cache boilerplate.</p>
+    <div class="codeWrap"><pre><code>Cache::put('stats', $stats, now()-&gt;addMinutes(10));            // set a value with a TTL
+$stats = Cache::remember('stats', 600, fn () =&gt; $this-&gt;computeStats());   // fetch or compute
+Cache::forget('stats');</code></pre></div>
+    <p class="code-note">Cache::remember fetches the value if it exists or computes and stores it, ideal for expensive calculations. forget() lets you invalidate deliberately.</p>
+    <h3 id="ch11-redis" data-toc>11.2 Redis: cache, queue and session</h3>
+    <p class="topic-desc">Positions Redis as the shared cache, queue, and session store in scaled applications. Configure the connection details in config/database.php, then point the cache, queue, and session drivers at redis. One robust Redis instance serves many concerns across web and worker servers.</p>
+    <p>Redis becomes the shared brain of a scaled app: cache, queues, sessions and rate limiting. Configure one robust Redis and use logical separation (databases/prefixes) per concern.</p>
+    <h3 id="ch11-optimize" data-toc>11.3 The performance checklist</h3>
+    <p class="topic-desc">Gives a practical performance checklist: eager load, index, cache, queue, paginate. Follow it in order to fix slow applications, measuring with a profiler before and after each change. This repeatable sequence turns performance guesswork into a reliable optimization loop.</p>
+    <ul>
+      <li>Eager load relationships; install a debug bar and hunt N+1s.</li>
+      <li>Add indexes for every column you filter or join on.</li>
+      <li>Cache expensive reads; invalidate deliberately.</li>
+      <li>Move heavy work to queues.</li>
+      <li>Run <code>php artisan optimize</code> and route/config caching in production.</li>
+      <li>Paginate — never load a whole table into a view.</li>
+    </ul>
+    <div class="ex"><h4 id="ch11-optimize--exercises-11">Exercises 11</h4><ol>
+      <li>Cache a dashboard statistic for 10 minutes.</li>
+      <li>Find one N+1 in a project and fix it.</li>
+      <li>Add an index and measure the query before/after.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch12" data-toc>12 · Testing &amp; Security</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Testing &amp; Security</button><div class="ch-toc-list"><a href="#ch12-tests">12.1 Feature and unit tests</a><a href="#ch12-security">12.2 Security essentials</a></div></div>
+    <p class="topic-desc">Covers feature tests and the security essentials Laravel gives you. Tests lock in behavior while built-in defences stop common attacks. Feature tests act as a user and hit routes, while conventions such as escaping, CSRF tokens, and parameterized queries cover the biggest threats.</p>
+    <h3 id="ch12-tests" data-toc>12.1 Feature and unit tests</h3>
+    <p class="topic-desc">Shows feature tests that act as a user, hit routes, and assert database results. Use methods such as get, post, followingRedirects, assertSee, and assertDatabaseHas in your test case classes. Feature tests verify behavior end to end the way a real visitor experiences it.</p>
+    <div class="codeWrap"><pre><code>php artisan make:test PostTest
+
+public function test_user_can_create_a_post(): void
+{
+    $user = User::factory()-&gt;create();
+
+    $this-&gt;actingAs($user)                          // logged in as $user
+         -&gt;post('/posts', ['title' =&gt; 'Hi', 'body' =&gt; 'Body text'])
+         -&gt;assertRedirect();
+
+    $this-&gt;assertDatabaseHas('posts', ['title' =&gt; 'Hi']);   // the row really exists
+}</code></pre></div>
+    <p class="code-note">This feature test acts as a user, posts to a route, asserts the redirect, then checks the row landed in the database. It exercises the whole stack.</p>
+    <div class="codeWrap"><pre><code>php artisan test
+php artisan test --filter=PostTest   # run just one test class
+php artisan test --parallel          # spread across CPU cores</code></pre></div>
+    <p class="code-note">php artisan test runs the suite, --filter targets one class, and --parallel spreads the load across CPU cores.</p>
+    <h3 id="ch12-security" data-toc>12.2 Security essentials</h3>
+    <p class="topic-desc">Maps the top web attack risks to their Laravel defences. Blade escaping blocks XSS, the CSRF token middleware stops cross site request forgery, parameterized queries prevent SQL injection, and the auth middleware guards sensitive routes. Most protection comes free if you follow framework conventions.</p>
+    <table>
+      <tr><th>Risk</th><th>Laravel defence</th></tr>
+      <tr><td>CSRF</td><td><code>@csrf</code> + VerifyCsrfToken middleware</td></tr>
+      <tr><td>XSS</td><td>Blade auto-escaping with <code>{{ }}</code></td></tr>
+      <tr><td>Mass assignment</td><td><code>$fillable</code> / <code>$guarded</code></td></tr>
+      <tr><td>SQL injection</td><td>Query builder / bindings (avoid raw concatenation)</td></tr>
+      <tr><td>Brute force</td><td><code>RateLimiter</code>, throttle middleware</td></tr>
+      <tr><td>Insecure uploads</td><td>Validate type/size; store outside webroot or with safe names</td></tr>
+    </table>
+    <div class="warn"><p>Run <code>composer audit</code> and keep Laravel + packages updated. Most breaches are unpatched dependencies, not clever attacks.</p></div>
+    <div class="ex"><h4 id="ch12-security--exercises-12">Exercises 12</h4><ol>
+      <li>Write a feature test for creating and viewing a post.</li>
+      <li>Add rate limiting to a login route.</li>
+      <li>Attempt (and block) a mass-assignment exploit using an unexpected field.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch13" data-toc>13 · Advanced Laravel: Container, Providers &amp; Packages</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Advanced Laravel: Container, Providers &amp; Packages</button><div class="ch-toc-list"><a href="#ch13-container">13.1 The service container</a><a href="#ch13-providers">13.2 Service providers</a><a href="#ch13-macros">13.3 Macros and higher-order collections</a><a href="#ch13-packages">13.4 Publishing your own package</a></div></div>
+    <p class="topic-desc">Explains the service container, service providers, macros, and publishing packages. The container resolves dependencies automatically, providers boot and register services, macros extend core classes, and packages wrap it all into reusable code. This is where the framework opens up for serious customization.</p>
+    <h3 id="ch13-container" data-toc>13.1 The service container</h3>
+    <p class="topic-desc">Shows how the container binds interfaces and resolves dependencies. Register bindings with the bind and singleton methods on the app, then resolve through the make method or constructor injection. Type hinting a class or interface is exactly how your code asks for what it needs.</p>
+    <div class="codeWrap"><pre><code>// bind an interface to an implementation
+$this-&gt;app-&gt;bind(PaymentGateway::class, StripeGateway::class);
+
+// singleton (one instance per request lifecycle)
+$this-&gt;app-&gt;singleton(CacheWarmer::class);
+
+// constructor injection
+public function __construct(private PaymentGateway $gateway) {}</code></pre></div>
+    <p class="code-note">The container maps interfaces to implementations and manages instances. Constructor injection hands your classes exactly what they need automatically.</p>
+    <h3 id="ch13-providers" data-toc>13.2 Service providers</h3>
+    <p class="topic-desc">Explains providers as the boot sequence that wires up your application. Each provider defines register and boot methods and is listed in bootstrap/providers.php, generated with php artisan make:provider. Keep providers thin so they register services rather than doing the actual work.</p>
+    <p>Providers are the boot sequence of your app. Use them to bind services, register event listeners, publish config and register routes. Keep them thin — business logic belongs in classes, not providers.</p>
+    <h3 id="ch13-macros" data-toc>13.3 Macros and higher-order collections</h3>
+    <p class="topic-desc">Shows macros and higher-order collection helpers. Register a macro with the Macroable trait to add methods to framework classes such as Str or Collection, and chain helpers like map, filter, and reduce to transform data. Macros extend classes without forking core framework code.</p>
+    <div class="codeWrap"><pre><code>Collection::macro('toUpper', function () {
+    return $this-&gt;map(fn ($v) =&gt; strtoupper($v));
+});
+
+collect(['a', 'b'])-&gt;toUpper();   // ['A', 'B']
+</code></pre></div>
+    <p class="code-note">Collection::macro adds a brand-new method to every collection instance, letting you extend the framework’s fluent API without touching its source.</p>
+    <h3 id="ch13-packages" data-toc>13.4 Publishing your own package</h3>
+    <p class="topic-desc">Walks through the anatomy of a publishable Laravel package. A package is basically a folder with a composer.json, a service provider, and src code, tested in your app through a path or VCS repository. Publish its config and migrations with the publishable method for consumers.</p>
+    <div class="codeWrap"><pre><code>composer init
+# src/, composer.json with "autoload": {"psr-4": {"Acme\\": "src/"}}
+# PackageServiceProvider with $this-&gt;loadViewsFrom(...), loadMigrationsFrom(...)
+composer require acme/your-package   # in another app</code></pre></div>
+    <p class="code-note">A package is just a composer.json plus a service provider that declares PSR-4 autoloading and registers views and migrations. Requiring it in another app loads everything.</p>
+    <div class="ex"><h4 id="ch13-packages--exercises-13">Exercises 13</h4><ol>
+      <li>Bind an interface to a fake implementation and inject it.</li>
+      <li>Write a collection macro you actually use.</li>
+      <li>Scaffold a tiny local package and require it via a path repository.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch14" data-toc>14 · Scaling: Octane, Horizon &amp; Infrastructure</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Scaling: Octane, Horizon &amp; Infrastructure</button><div class="ch-toc-list"><a href="#ch14-octane">14.1 Laravel Octane</a><a href="#ch14-horizon">14.2 Horizon for queues at scale</a><a href="#ch14-scale">14.3 Horizontal scaling blueprint</a></div></div>
+    <p class="topic-desc">Covers Octane, Horizon, and the infrastructure blueprint for scale. Octane holds one booted app in memory across requests, Horizon monitors Redis-backed queues, and the blueprint spreads state across shared services. Together these tools let the same codebase handle far more traffic.</p>
+    <h3 id="ch14-octane" data-toc>14.1 Laravel Octane</h3>
+    <p class="topic-desc">Explains Octane, which keeps one booted application in memory across requests using a RoadRunner or Swoole server. Throughput rises sharply, but because state persists between requests you must avoid static properties and other shared state traps. Run php artisan octane:start to launch it.</p>
+    <div class="codeWrap"><pre><code>composer require laravel/octane
+php artisan octane:install --server=frankenphp   # pick FrankenPHP, Swoole, or RoadRunner
+php artisan octane:start --workers=4 --max-requests=500   # run with 4 worker processes</code></pre></div>
+    <p class="code-note">Octane install picks a long-running server like FrankenPHP, and octane:start boots it with a set number of workers. The app stays warm in memory between requests for a major speed boost.</p>
+    <p>Octane boots the app once and serves many requests from memory — huge throughput gains. The price: be careful with in-memory state between requests (singletons that hold user data are now dangerous).</p>
+    <h3 id="ch14-horizon" data-toc>14.2 Horizon for queues at scale</h3>
+    <p class="topic-desc">Shows Horizon, the dashboard for Redis-backed queues at scale. Configure your queues in config/queue.php, then run php artisan horizon to get a live dashboard showing throughput, wait times, and failed jobs. Horizon supervises workers and lets you retry failures from the browser.</p>
+    <div class="codeWrap"><pre><code>composer require laravel/horizon
+php artisan horizon
+// Dashboard at /horizon (protect it!) shows throughput, wait time, failures.</code></pre></div>
+    <p class="code-note">Running php artisan horizon starts a supervised queue dashboard. The /horizon page shows throughput, wait times, and failed jobs — protect it behind auth.</p>
+    <h3 id="ch14-scale" data-toc>14.3 Horizontal scaling blueprint</h3>
+    <p class="topic-desc">Presents the blueprint for scaling horizontally across many servers. Keep web servers stateless, share cache sessions and locks through Redis, and run a fleet of queue workers that scale independently. Migrations run once, and a load balancer distributes traffic across the fleet.</p>
+    <ul>
+      <li>Stateless web servers behind a load balancer; sessions in Redis.</li>
+      <li>Separate worker fleet for queues (Horizon), autoscaled by backlog.</li>
+      <li>Shared cache/session across nodes; database with read replicas.</li>
+      <li>Object storage (S3-compatible) for uploads; never local disk across nodes.</li>
+      <li>CDN for assets; queue slow third-party calls.</li>
+    </ul>
+    <div class="ex"><h4 id="ch14-scale--exercises-14">Exercises 14</h4><ol>
+      <li>Run Octane locally and benchmark before/after.</li>
+      <li>Install Horizon and inspect a job’s wait time.</li>
+      <li>Sketch (diagram or list) your app scaled to 3 web nodes + 2 workers.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch15" data-toc>15 · Deployment &amp; CI/CD for Laravel</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Deployment &amp; CI/CD for Laravel</button><div class="ch-toc-list"><a href="#ch15-deploy">15.1 Deployment steps</a><a href="#ch15-envoy">15.2 Zero-downtime releases</a><a href="#ch15-cicd">15.3 A minimal GitHub Actions pipeline</a></div></div>
+    <p class="topic-desc">Covers deployment steps, zero-downtime releases, and CI pipelines. A deploy script installs dependencies, caches config and routes, migrates, and restarts workers, while releases switch a symlink atomically. CI runs the test suite on every push so breakage is caught long before production.</p>
+    <h3 id="ch15-deploy" data-toc>15.1 Deployment steps</h3>
+    <p class="topic-desc">Lists the exact commands to run on a production server. The sequence is composer install without dev dependencies, then php artisan optimize, config:cache, route:cache, view:cache, event:cache, migrate --force, and queue:restart. Each step is repeatable and safe to run on every release.</p>
+    <div class="codeWrap"><pre><code>composer install --no-dev --optimize-autoloader   # locked deps, optimized for production
+php artisan migrate --force                        # run without the confirmation prompt
+php artisan optimize          # config + route + view cache
+php artisan queue:restart     # tell workers to pick up new code
+npm ci &amp;&amp; npm run build</code></pre></div>
+    <p class="code-note">This is the production release sequence: locked dependencies, forced migration, cached config, a queue restart so workers load new code, and freshly built assets.</p>
+    <h3 id="ch15-envoy" data-toc>15.2 Zero-downtime releases</h3>
+    <p class="topic-desc">Explains zero-downtime releases by switching a symlink to a fresh release. Every deploy creates a new versioned directory and only points the current symlink at it once it is complete. Backward-compatible migrations are the tricky part: run them before the switch so old and new code both work.</p>
+    <p>Deploy into a fresh release directory, then switch a symlink atomically. Tools: Deployer, Envoyer, or a GitHub Actions pipeline. The database migration must be backward compatible for the window where old and new code both run.</p>
+    <h3 id="ch15-cicd" data-toc>15.3 A minimal GitHub Actions pipeline</h3>
+    <p class="topic-desc">Shows a minimal GitHub Actions pipeline that checks out the repo, sets up PHP, installs dependencies, and runs the test suite. Declare the workflow in a .github file with your environment secrets for the database, then run php artisan test. Automating tests catches breakage on every single push.</p>
+    <div class="codeWrap"><pre><code>name: ci
+on: [push]                 # triggered on every push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4           # fetch the repository
+      - uses: shivammathur/setup-php@v2     # install PHP
+        with: { php-version: '8.3' }
+      - run: composer install --prefer-dist --no-progress
+      - run: cp .env.example .env &amp;&amp; php artisan key:generate
+      - run: php artisan test               # run the suite on every push</code></pre></div>
+    <p class="code-note">This workflow runs on every push: it checks out the repo, installs PHP 8.3 and dependencies, generates an app key, and runs the test suite.</p>
+    <div class="ex"><h4 id="ch15-cicd--exercises-15">Exercises 15</h4><ol>
+      <li>Write a deploy script (Envoy or shell) for a Laravel app.</li>
+      <li>Add a CI job that runs tests on every push.</li>
+      <li>Explain why you must run <code>queue:restart</code> after deploy.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch16" data-toc>16 · Laravel 13 Notes &amp; Upgrade Discipline</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Laravel 13 Notes &amp; Upgrade Discipline</button><div class="ch-toc-list"><a href="#ch16-whatsnew">16.1 Working with the current release</a><a href="#ch16-upgrade">16.2 A safe upgrade process</a></div></div>
+    <p class="topic-desc">Summarizes the modern Laravel skeleton and a safe upgrade process. Bootstrap app.php now holds configuration that used to live in Kernel classes, and the skeleton ships a streamlined baseline. Upgrading is routine maintenance: read the upgrade guide, fix deprecations, and verify tests before releasing.</p>
+    <h3 id="ch16-whatsnew" data-toc>16.1 Working with the current release</h3>
+    <p class="topic-desc">Highlights the streamlined skeleton and modern baseline features in the current release. Bootstrap app.php now holds configuration that used to live in Kernel classes, and the framework bundles purpose-built packages in the skeleton. New generators and a lighter core make everyday tasks faster with each release.</p>
+    <ul>
+      <li>The streamlined application skeleton (no <code>app/Http/Kernel.php</code>) centralises middleware, exceptions and routing config in <code>bootstrap/app.php</code>.</li>
+      <li>Health routing, per-second rate limiting, graceful queue encryption options and first-class Reverb broadcasting are part of the modern baseline.</li>
+      <li>Always check <code>laravel.com/docs/upgrade</code> and the upgrade guide for your exact version before bumping.</li>
+    </ul>
+    <h3 id="ch16-upgrade" data-toc>16.2 A safe upgrade process</h3>
+    <p class="topic-desc">Shows a branch-based upgrade with tests green before it ships. Create an upgrade branch, read the upgrade guide, bump the version in composer.json, resolve deprecation warnings, and run the full test suite. Pin versions and review deprecations before ever rolling to production.</p>
+    <div class="codeWrap"><pre><code>git checkout -b upgrade/laravel
+composer require laravel/framework:^13.0 --no-update   # pin the version before installing
+composer update --with-all-dependencies
+php artisan test
+# then review deprecations, run in staging, and only then production</code></pre></div>
+    <p class="code-note">Upgrades happen on a dedicated branch: pin the new framework version, update dependencies, and keep tests green before anything touches production.</p>
+    <div class="tip"><p>Upgrade on a branch, with tests green, behind a feature flag or on staging. Framework upgrades are normal maintenance, not a rewrite.</p></div>
+    <div class="ex"><h4 id="ch16-upgrade--exercises-16">Exercises 16</h4><ol>
+      <li>Read the upgrade guide index and list 3 changes that could affect you.</li>
+      <li>Add a framework-version assertion to a test so drift is caught.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Cheat Sheets &amp; Roadmap</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Cheat Sheets &amp; Roadmap</button><div class="ch-toc-list"><a href="#app-artisan">A.1 Artisan cheat sheet</a><a href="#app-roadmap">A.2 Roadmap: basic to advanced</a><a href="#app-cheatsheets">A.3 Elegant defaults to remember</a></div></div>
+    <p class="topic-desc">Bundles cheat sheets and a learning roadmap into one reference. Skim it whenever you forget the right command or the next step, using the Artisan cheat sheet for day to day commands and the roadmap to place yourself in the course journey. It links every chapter back into one actionable big picture.</p>
+    <h3 id="app-artisan" data-toc>A.1 Artisan cheat sheet</h3>
+    <p class="topic-desc">Lists the most useful Artisan commands at a glance: make commands for scaffolding, migrate for the schema, plus serve, tinker, route:list, and the queue and cache commands. Keep the cheat sheet open while you build to avoid looking up syntax every time. It covers every command used in the course.</p>
+    <table>
+      <tr><th>Command</th><th>Does</th></tr>
+      <tr><td><code>make:model Post -mcr</code></td><td>Model + migration + resource controller</td></tr>
+      <tr><td><code>make:request</code></td><td>Form request validation class</td></tr>
+      <tr><td><code>make:middleware</code></td><td>Middleware</td></tr>
+      <tr><td><code>make:job</code> / <code>make:event</code></td><td>Queue job / event</td></tr>
+      <tr><td><code>migrate:fresh --seed</code></td><td>Rebuild schema and seed</td></tr>
+      <tr><td><code>route:list</code></td><td>All routes and middleware</td></tr>
+      <tr><td><code>test --parallel</code></td><td>Run tests in parallel</td></tr>
+    </table>
+    <h3 id="app-roadmap" data-toc>A.2 Roadmap: basic to advanced</h3>
+    <p class="topic-desc">Maps your progression from beginner to advanced across the chapters. Use it to see where each chapter fits and what comes next, from first routes through Eloquent, APIs, queues, and scaling to deployment. The roadmap turns the guide into a clear learning path with measurable milestones.</p>
+    <table>
+      <tr><th>Stage</th><th>You can…</th></tr>
+      <tr><td>Beginner</td><td>Routes, Blade, controllers, CRUD with Eloquent, forms + validation</td></tr>
+      <tr><td>Intermediate</td><td>Auth + policies, APIs with Sanctum, queues, events, tests</td></tr>
+      <tr><td>Advanced</td><td>Container + providers, packages, Octane, Horizon, deployment, scaling</td></tr>
+    </table>
+    <h3 id="app-cheatsheets" data-toc>A.3 Elegant defaults to remember</h3>
+    <p class="topic-desc">Collects the elegant defaults that make Laravel code clean, such as naming conventions, the standard directory layout, and mass assignment protection. These rules of thumb apply to every Laravel project and resolve most design decisions quickly. Treat them as the default answer until you have a real reason to differ.</p>
+    <ul>
+      <li><strong>Fat models, thin controllers, dedicated services.</strong></li>
+      <li><strong>Validate at the edge</strong> (form requests), then trust; never trust raw input deeper in.</li>
+      <li><strong>Queue anything slow or external.</strong></li>
+      <li><strong>Eager load, index, cache, paginate.</strong></li>
+      <li><strong>Test behavior, not implementation</strong> — feature tests pay the rent.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Laravel 13 — Basic to Advanced Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

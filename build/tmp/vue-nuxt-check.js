@@ -1,0 +1,22 @@
+'use strict';
+/* vue-nuxt-check.js — check h3/h4 state */
+const fs = require('fs');
+const s = fs.readFileSync('vue-nuxt-capacitor.html', 'utf8');
+const chapters = (s.match(/<section class="chapter">/g) || []).length;
+const h3 = (s.match(/<h3 id=/g) || []).length;
+const h4 = (s.match(/<h4 id=/g) || []).length;
+const code = (s.match(/<div class="codeWrap"><pre><code>/g) || []).length;
+const mainStart = s.indexOf('<main id="content">');
+const mainEnd = s.indexOf('</main>');
+const main = mainStart >= 0 && mainEnd > mainStart ? s.slice(mainStart, mainEnd) : '';
+const chaptersInMain = (main.match(/<section class="chapter">/g) || []).length;
+const topicCount = (main.match(/data-toc/g) || []).length;
+const codeCount = (main.match(/<div class="codeWrap"><pre><code>/g) || []).length;
+console.log('vue-nuxt-capacitor.html');
+console.log('chapters (file):', chapters);
+console.log('chapters (main):', chaptersInMain);
+console.log('h3:', h3);
+console.log('h4:', h4);
+console.log('code blocks:', code);
+console.log('topics in main:', topicCount);
+console.log('code blocks in main:', codeCount);

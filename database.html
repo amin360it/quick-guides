@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Databases - SQL Server Express, MySQL &amp; PostgreSQL Guide</title>
+<meta name="description" content="This is the welcome module of a hands-on, three-engine course in which you build and query real databases in…. 19 chapters, 86 topics and 44 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/database.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Databases - SQL Server Express, MySQL &amp; PostgreSQL Guide">
+<meta property="og:description" content="This is the welcome module of a hands-on, three-engine course in which you build and query real databases in…. 19 chapters, 86 topics and 44 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/database.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Databases - SQL Server Express, MySQL &amp; PostgreSQL Guide">
+<meta name="twitter:description" content="This is the welcome module of a hands-on, three-engine course in which you build and query real databases in…. 19 chapters, 86 topics and 44 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/database.html#article","headline":"Databases - SQL Server Express, MySQL & PostgreSQL Guide","name":"Databases - SQL Server Express, MySQL & PostgreSQL Guide","description":"This is the welcome module of a hands-on, three-engine course in which you build and query real databases in…. 19 chapters, 86 topics and 44 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/database.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/database.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Databases - SQL Server Express, MySQL & PostgreSQL Guide","item":"https://amin360it.github.io/quick-guides/database.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Databases &amp; SQL</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — Databases from Basic to Enterprise</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-engines" data-target="orientation-engines">The three engines at a glance</a></li><li><a href="#orientation-clients" data-target="orientation-clients">Clients you will use</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Relational Foundations</a><ul><li><a href="#ch1-model" data-target="ch1-model">1.1 Tables, rows and columns</a></li><li><a href="#ch1-keys" data-target="ch1-keys">1.2 Keys and relationships</a></li><li><a href="#ch1-acid" data-target="ch1-acid">1.3 ACID</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Installing &amp; Connecting</a><ul><li><a href="#ch2-install" data-target="ch2-install">2.1 Install</a></li><li><a href="#ch2-connect" data-target="ch2-connect">2.2 Connect from the CLI</a></li><li><a href="#ch2-output" data-target="ch2-output">2.3 Verify with a query + output</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Data Types Across Engines</a><ul><li><a href="#ch3-numeric" data-target="ch3-numeric">3.1 Numeric types</a></li><li><a href="#ch3-string" data-target="ch3-string">3.2 String and binary types</a></li><li><a href="#ch3-datetime" data-target="ch3-datetime">3.3 Date and time</a></li><li><a href="#ch3-bool-json" data-target="ch3-bool-json">3.4 Boolean, JSON and other types</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · DDL — Databases, Schemas &amp; Tables</a><ul><li><a href="#ch4-createdb" data-target="ch4-createdb">4.1 Create a database</a></li><li><a href="#ch4-schema" data-target="ch4-schema">4.2 Schemas and namespaces</a></li><li><a href="#ch4-createtable" data-target="ch4-createtable">4.3 Create a table</a></li><li><a href="#ch4-verify" data-target="ch4-verify">4.4 Verify the schema + output</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Constraints &amp; Keys</a><ul><li><a href="#ch5-constraints" data-target="ch5-constraints">5.1 The constraint family</a></li><li><a href="#ch5-fk" data-target="ch5-fk">5.2 Foreign keys with actions</a></li><li><a href="#ch5-violation" data-target="ch5-violation">5.3 What a violation looks like + output</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Indexes</a><ul><li><a href="#ch6-basics" data-target="ch6-basics">6.1 Why indexes exist</a></li><li><a href="#ch6-create" data-target="ch6-create">6.2 Create indexes</a></li><li><a href="#ch6-explain" data-target="ch6-explain">6.3 Reading a query plan + output</a></li><li><a href="#ch6-covering" data-target="ch6-covering">6.4 Covering and partial indexes</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · DML — Create, Read, Update, Delete</a><ul><li><a href="#ch7-insert" data-target="ch7-insert">7.1 INSERT + output</a></li><li><a href="#ch7-select" data-target="ch7-select">7.2 SELECT + output</a></li><li><a href="#ch7-update" data-target="ch7-update">7.3 UPDATE + output</a></li><li><a href="#ch7-delete" data-target="ch7-delete">7.4 DELETE + output</a></li><li><a href="#ch7-upsert" data-target="ch7-upsert">7.5 UPSERT — the dialects diverge</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Joins, Aggregates &amp; Analytics</a><ul><li><a href="#ch8-joins" data-target="ch8-joins">8.1 Joins + output</a></li><li><a href="#ch8-aggregate" data-target="ch8-aggregate">8.2 GROUP BY and HAVING + output</a></li><li><a href="#ch8-window" data-target="ch8-window">8.3 Window functions + output</a></li><li><a href="#ch8-cte" data-target="ch8-cte">8.4 CTEs and recursion</a></li><li><a href="#ch8-pagination" data-target="ch8-pagination">8.5 Pagination — three syntaxes</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Transactions &amp; Isolation</a><ul><li><a href="#ch9-tx" data-target="ch9-tx">9.1 Transactions in each engine</a></li><li><a href="#ch9-isolation" data-target="ch9-isolation">9.2 Isolation levels</a></li><li><a href="#ch9-deadlock" data-target="ch9-deadlock">9.3 Deadlocks + output</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Views, Procedures, Functions &amp; Triggers</a><ul><li><a href="#ch10-views" data-target="ch10-views">10.1 Views</a></li><li><a href="#ch10-procs" data-target="ch10-procs">10.2 Stored procedures — dialects diverge most</a></li><li><a href="#ch10-functions" data-target="ch10-functions">10.3 Functions</a></li><li><a href="#ch10-triggers" data-target="ch10-triggers">10.4 Triggers</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · Normalisation &amp; Schema Design</a><ul><li><a href="#ch11-normal" data-target="ch11-normal">11.1 The normal forms</a></li><li><a href="#ch11-denormalize" data-target="ch11-denormalize">11.2 When to denormalise</a></li><li><a href="#ch11-naming" data-target="ch11-naming">11.3 Naming and modelling conventions</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch12" data-target="ch12">12 · Enterprise Design — Partitioning, Replication &amp; HA</a><ul><li><a href="#ch12-partition" data-target="ch12-partition">12.1 Table partitioning</a></li><li><a href="#ch12-replication" data-target="ch12-replication">12.2 Replication and read replicas</a></li><li><a href="#ch12-ha" data-target="ch12-ha">12.3 High availability and failover</a></li><li><a href="#ch12-sharding" data-target="ch12-sharding">12.4 Sharding and federation</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch13" data-target="ch13">13 · Performance Tuning</a><ul><li><a href="#ch13-index" data-target="ch13-index">13.1 Index strategy</a></li><li><a href="#ch13-plans" data-target="ch13-plans">13.2 Reading plans and finding the bottleneck</a></li><li><a href="#ch13-stats" data-target="ch13-stats">13.3 Statistics and maintenance</a></li><li><a href="#ch13-pool" data-target="ch13-pool">13.4 Connection pooling</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch14" data-target="ch14">14 · Security</a><ul><li><a href="#ch14-users" data-target="ch14-users">14.1 Users, roles and grants</a></li><li><a href="#ch14-rls" data-target="ch14-rls">14.2 Row-level security</a></li><li><a href="#ch14-encrypt" data-target="ch14-encrypt">14.3 Encryption and auditing</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch15" data-target="ch15">15 · JSON &amp; Semi-Structured Data</a><ul><li><a href="#ch15-store" data-target="ch15-store">15.1 Store a JSON document</a></li><li><a href="#ch15-query" data-target="ch15-query">15.2 Query inside JSON + output</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch16" data-target="ch16">16 · Backup, Restore &amp; Migration</a><ul><li><a href="#ch16-backup" data-target="ch16-backup">16.1 Backups</a></li><li><a href="#ch16-restore" data-target="ch16-restore">16.2 Restores</a></li><li><a href="#ch16-pitr" data-target="ch16-pitr">16.3 Point-in-time recovery</a></li><li><a href="#ch16-migrate" data-target="ch16-migrate">16.4 Schema migrations and cross-engine moves</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch17" data-target="ch17">17 · Scaling &amp; Architecture Patterns</a><ul><li><a href="#ch17-scale" data-target="ch17-scale">17.1 Scaling the database</a></li><li><a href="#ch17-patterns" data-target="ch17-patterns">17.2 Patterns that pay off</a></li><li><a href="#ch17-polyglot" data-target="ch17-polyglot">17.3 Polyglot persistence</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Cheat Sheets &amp; Roadmap</a><ul><li><a href="#app-syntax" data-target="app-syntax">A.1 Cross-engine syntax cheat sheet</a></li><li><a href="#app-roadmap" data-target="app-roadmap">A.2 Roadmap: basic to enterprise</a></li><li><a href="#app-rules" data-target="app-rules">A.3 Rules of thumb</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Databases</span>
+      <span class="am-band-s">19 chapters &middot; 86 topics &middot; 44 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — Databases from Basic to Enterprise</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — Databases from Basic to Enterprise</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-engines">The three engines at a glance</a><a href="#orientation-clients">Clients you will use</a></div></div>
+    <p class="topic-desc">This is the welcome module of a hands-on, three-engine course in which you build and query real databases in SQL Server, MySQL and PostgreSQL side by side. Work through the same exercises in each engine so you can compare syntax, output formats and dialect gotchas directly. The practical setup keeps every later chapter testable on your own machine.</p>
+    <p>A hands-on, comparative course in relational database <strong>design and implementation</strong> covering the three engines you will meet most in the field: <strong>SQL Server Express</strong> (T-SQL), <strong>MySQL</strong> and <strong>PostgreSQL</strong>. Every topic shows the code <em>and</em> the output for all three.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">This guide is organised as a straight line: foundations, schema, data work, then enterprise concerns such as scaling, security and backup. Read the chapters in order so each topic builds on the previous ones without gaps. Individual chapters also work standalone as reference when you need to revisit a specific concept later.</p>
+    <ul>
+      <li><strong>Foundations (Ch. 1–3)</strong> — relational model, installing and connecting, data types across engines.</li>
+      <li><strong>Building schemas (Ch. 4–6)</strong> — DDL, constraints, indexes.</li>
+      <li><strong>Working with data (Ch. 7–10)</strong> — CRUD, joins and analytics, transactions, programmable objects.</li>
+      <li><strong>Enterprise design (Ch. 11–17)</strong> — normalisation, partitioning, replication, tuning, security, JSON, backup and scaling.</li>
+    </ul>
+    <h3 id="orientation-engines" data-toc>The three engines at a glance</h3>
+    <p class="topic-desc">One comparative table shows the big picture across SQL Server, MySQL and PostgreSQL: vendor, default ports, SQL dialects, size limits and the workloads each engine handles best. Use it to choose which engine to start with and to foresee where syntax will diverge. It is a quick orientation before you install anything.</p>
+    <table>
+      <tr><th>Aspect</th><th>SQL Server Express</th><th>MySQL</th><th>PostgreSQL</th></tr>
+      <tr><td>Vendor</td><td>Microsoft</td><td>Oracle</td><td>PostgreSQL Global Dev Group</td></tr>
+      <tr><td>Default port</td><td>1433</td><td>3306</td><td>5432</td></tr>
+      <tr><td>Dialect</td><td>T-SQL</td><td>MySQL SQL</td><td>PL/pgSQL + standard SQL</td></tr>
+      <tr><td>Limits (Express)</td><td>10 GB DB, 1 GB RAM, 4 cores</td><td>None (Community)</td><td>None</td></tr>
+      <tr><td>Identity column</td><td><code>IDENTITY(1,1)</code></td><td><code>AUTO_INCREMENT</code></td><td><code>GENERATED ... AS IDENTITY</code></td></tr>
+      <tr><td>Best at</td><td>Windows/.NET shops, BI (SSMS)</td><td>Web apps, read-heavy workloads</td><td>Standards compliance, JSON, geospatial</td></tr>
+      <tr><td>License</td><td>Free (Express)</td><td>GPL / commercial</td><td>PostgreSQL License (permissive)</td></tr>
+    </table>
+    <div class="tip"><p>SQL understood by one engine is often 80% portable to another. The <em>outputs</em> shown here are representative; exact column widths and messages differ slightly by version.</p></div>
+    <h3 id="orientation-clients" data-toc>Clients you will use</h3>
+    <p class="topic-desc">Every engine ships both a GUI and a command line tool: sqlcmd for SQL Server, mysql for MySQL and psql for PostgreSQL. The CLI clients are what you will script in automation, so get comfortable running queries, describing tables and checking connections through them. The GUIs are convenient for exploration but not for reproducible work.</p>
+    <table>
+      <tr><th>Engine</th><th>GUI</th><th>CLI</th></tr>
+      <tr><td>SQL Server</td><td>SSMS / Azure Data Studio</td><td><code>sqlcmd</code></td></tr>
+      <tr><td>MySQL</td><td>Workbench / DBeaver</td><td><code>mysql</code></td></tr>
+      <tr><td>PostgreSQL</td><td>pgAdmin / DBeaver</td><td><code>psql</code></td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Relational Foundations</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Relational Foundations</button><div class="ch-toc-list"><a href="#ch1-model">1.1 Tables, rows and columns</a><a href="#ch1-keys">1.2 Keys and relationships</a><a href="#ch1-acid">1.3 ACID</a></div></div>
+    <p class="topic-desc">Relational foundations give you the mental model behind every relational database: tables, rows, keys and the ACID guarantees that make transactions trustworthy. Master the mapping between a schema and its data before touching SQL. Getting this right makes every later chapter on queries, joins and design click into place.</p>
+    <h3 id="ch1-model" data-toc>1.1 Tables, rows and columns</h3>
+    <p class="topic-desc">The core mapping is that a table is a relation, a row is a record and a column is a typed field. Instead of pointers, keys link tables to each other. Model entities and their relationships this way and every query and join you later write follows naturally from the schema.</p>
+    <p>A relational database stores data in <strong>tables</strong> (relations). Each <strong>row</strong> is one record; each <strong>column</strong> has a type and optional constraints. Relationships are expressed with keys, not pointers.</p>
+    <div class="codeWrap"><pre><code>customers                 orders
++----+--------+          +----+-------------+--------+
+| id | name   |          | id | customer_id | total  |
++----+--------+          +----+-------------+--------+
+| 1  | Ada    |          | 10 | 1           | 99.90  |
+| 2  | Grace  |          | 11 | 1           | 12.00  |
++----+--------+          +----+-------------+--------+
+   PK                        FK customer_id -&gt; customers.id</code></pre></div>
+    <p class="code-note">Two ASCII tables show the shape of relational data: customers keys into orders through a foreign key, never a pointer.</p>
+    <h3 id="ch1-keys" data-toc>1.2 Keys and relationships</h3>
+    <p class="topic-desc">Primary keys uniquely identify each row, while foreign keys tie tables together and enforce referential integrity between them. In practice you declare them with PRIMARY KEY and FOREIGN KEY constraints in CREATE TABLE or ALTER TABLE. Understanding keys underlies every join and every index you will build.</p>
+    <table>
+      <tr><th>Key</th><th>Purpose</th></tr>
+      <tr><td>Primary key (PK)</td><td>Uniquely identifies each row; cannot be null.</td></tr>
+      <tr><td>Foreign key (FK)</td><td>Points to a PK in another table; enforces referential integrity.</td></tr>
+      <tr><td>Unique key</td><td>Enforces uniqueness without being the PK.</td></tr>
+      <tr><td>Composite key</td><td>Made of two or more columns.</td></tr>
+    </table>
+    <h3 id="ch1-acid" data-toc>1.3 ACID</h3>
+    <p class="topic-desc">ACID is the four guarantees that make transactions trustworthy: atomicity, consistency, isolation and durability. Databases that honour these survive crashes and concurrent access without corrupting data. Apply the model when deciding how to batch writes and which isolation level protects a given workload.</p>
+    <ul>
+      <li><strong>Atomicity</strong> — all or nothing.</li>
+      <li><strong>Consistency</strong> — constraints hold before and after.</li>
+      <li><strong>Isolation</strong> — concurrent transactions don’t corrupt each other.</li>
+      <li><strong>Durability</strong> — committed data survives a crash.</li>
+    </ul>
+    <div class="ex"><h4 id="ch1-acid--exercises-1">Exercises 1</h4><ol>
+      <li>Model customers, orders and order lines; mark PKs and FKs.</li>
+      <li>Explain why a foreign key prevents orphan rows.</li>
+      <li>Give an example of an atomic transfer between two accounts.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Installing &amp; Connecting</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Installing &amp; Connecting</button><div class="ch-toc-list"><a href="#ch2-install">2.1 Install</a><a href="#ch2-connect">2.2 Connect from the CLI</a><a href="#ch2-output">2.3 Verify with a query + output</a></div></div>
+    <p class="topic-desc">This chapter is about standing up SQL Server Express, MySQL and PostgreSQL on your own machine and reaching them from their command line clients. Follow the installer defaults, pick one engine to start and add the other two when you want to compare dialects directly. A working setup makes every later chapter testable.</p>
+    <h3 id="ch2-install" data-toc>2.1 Install</h3>
+    <p class="topic-desc">Getting each engine running is quick with modern installers for Windows and other platforms. Choose one engine to start with, accept sensible defaults for ports and service accounts, then add the other two when you want to compare dialects. Write down the credentials you set because every later chapter connects to these servers.</p>
+    <div class="codeWrap"><pre><code># SQL Server Express — download installer, choose "Basic"
+#   instance name default: .\SQLEXPRESS   (Windows auth by default)
+# pick one engine first; SQL Server differs most from the others
+
+# MySQL (Windows / Linux / macOS)
+winget install Oracle.MySQL
+# or: apt install mysql-server
+
+# PostgreSQL
+winget install PostgreSQL.PostgreSQL
+# or: apt install postgresql</code></pre></div>
+    <p class="code-note">Covers one-line installers for all three engines on Windows and Linux. Notice the SQL Server instance name .\SQLEXPRESS and the two package managers.</p>
+    <h3 id="ch2-connect" data-toc>2.2 Connect from the CLI</h3>
+    <p class="topic-desc">The CLI is the fastest way to reach a database: run a query, inspect a table or try a syntax variant. Learn the one command per engine, sqlcmd for SQL Server, mysql for MySQL and psql for PostgreSQL, together with the flags for host, user and database. This is the base pattern you will use in almost every chapter.</p>
+    <div class="codeWrap"><pre><code># SQL Server
+sqlcmd -S .\SQLEXPRESS -E            # -E = trusted (Windows) auth
+
+# MySQL
+mysql -u root -p
+# prompts for the password interactively
+
+# PostgreSQL
+psql -U postgres -h localhost
+# -h names the host; the default port is 5432</code></pre></div>
+    <p class="code-note">Shows the one command per engine to reach a database from the CLI. The flags -S, -u and -U select server, user and host.</p>
+    <h3 id="ch2-output" data-toc>2.3 Verify with a query + output</h3>
+    <p class="topic-desc">A one-line version query proves your install and connection work end to end: SELECT VERSION in SQL Server, MySQL and PostgreSQL. Keep it as your first sanity check on any new server. Seeing real output from the engine confirms drivers, authentication and network are all correct.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- @@VERSION returns build, edition and OS
+SELECT @@VERSION AS version;
+-- Output
+-- version
+-- Microsoft SQL Server 2022 - 16.0.x (Express Edition) ...
+
+-- MySQL
+SELECT VERSION() AS version;
+-- the +---+ box is the CLI's result grid
+-- +-----------+
+-- | version   |
+-- +-----------+
+-- | 8.4.0     |
+-- +-----------+
+
+-- PostgreSQL
+SELECT version();
+-- psql prints the raw banner text
+-- PostgreSQL 16.3 on x86_64-pc-linux-gnu, compiled by gcc ...</code></pre></div>
+    <p class="code-note">Each engine answers the same question, version, with a different function and output shape. Use it as the first smoke test of a fresh install.</p>
+    <div class="warn"><p>SQL Server Express defaults to <strong>Windows authentication</strong> and disables TCP/IP. For app connections enable TCP and either mixed-mode auth or a dedicated least-privilege login.</p></div>
+    <div class="ex"><h4 id="ch2-output--exercises-2">Exercises 2</h4><ol>
+      <li>Install one engine and connect from its CLI.</li>
+      <li>Print the server version.</li>
+      <li>Create a dedicated app login instead of using root/sa.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Data Types Across Engines</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Data Types Across Engines</button><div class="ch-toc-list"><a href="#ch3-numeric">3.1 Numeric types</a><a href="#ch3-string">3.2 String and binary types</a><a href="#ch3-datetime">3.3 Date and time</a><a href="#ch3-bool-json">3.4 Boolean, JSON and other types</a></div></div>
+    <p class="topic-desc">The type system is where the engines differ first, so this chapter maps the numeric, string, datetime and JSON types across SQL Server, MySQL and PostgreSQL. Use the mapping to choose an equivalent type in each engine for the same column. Knowing the differences up front prevents subtle portability bugs later.</p>
+    <h3 id="ch3-numeric" data-toc>3.1 Numeric types</h3>
+    <p class="topic-desc">For numbers, choose exact decimal types such as DECIMAL and NUMERIC for money and counts, and reserve floating point types like FLOAT and REAL for scientific data where rounding is acceptable. SQL Server also offers MONEY, MySQL adds scaled DECIMAL and PostgreSQL provides NUMERIC and the integer family. Wrong numeric types are a silent source of rounding bugs.</p>
+    <table>
+      <tr><th>Use</th><th>SQL Server</th><th>MySQL</th><th>PostgreSQL</th></tr>
+      <tr><td>Integer</td><td><code>INT</code> / <code>BIGINT</code></td><td><code>INT</code> / <code>BIGINT</code></td><td><code>INTEGER</code> / <code>BIGINT</code></td></tr>
+      <tr><td>Exact decimal</td><td><code>DECIMAL(12,2)</code></td><td><code>DECIMAL(12,2)</code></td><td><code>NUMERIC(12,2)</code></td></tr>
+      <tr><td>Floating point</td><td><code>FLOAT</code></td><td><code>DOUBLE</code></td><td><code>DOUBLE PRECISION</code></td></tr>
+      <tr><td>Auto key</td><td><code>IDENTITY(1,1)</code></td><td><code>AUTO_INCREMENT</code></td><td><code>GENERATED ALWAYS AS IDENTITY</code></td></tr>
+    </table>
+    <div class="tip"><p>Use <code>DECIMAL/NUMERIC</code> for money, never <code>FLOAT</code>. Binary floating point cannot represent 0.10 exactly and rounding errors compound.</p></div>
+    <h3 id="ch3-string" data-toc>3.2 String and binary types</h3>
+    <p class="topic-desc">Unicode text, long text, fixed-length char and binary blobs each have an engine-specific spelling: NVARCHAR and VARCHAR(MAX) in SQL Server, CHAR, VARCHAR and TEXT in MySQL, and TEXT and BYTEA in PostgreSQL. Match the right type to your data so international characters and large payloads stay intact. VARCHAR is the usual default for normal strings.</p>
+    <table>
+      <tr><th>Use</th><th>SQL Server</th><th>MySQL</th><th>PostgreSQL</th></tr>
+      <tr><td>Variable text</td><td><code>NVARCHAR(n)</code></td><td><code>VARCHAR(n)</code></td><td><code>TEXT</code> / <code>VARCHAR(n)</code></td></tr>
+      <tr><td>Long text</td><td><code>NVARCHAR(MAX)</code></td><td><code>TEXT</code></td><td><code>TEXT</code></td></tr>
+      <tr><td>Fixed length</td><td><code>CHAR(n)</code></td><td><code>CHAR(n)</code></td><td><code>CHAR(n)</code></td></tr>
+      <tr><td>Binary</td><td><code>VARBINARY(MAX)</code></td><td><code>BLOB</code></td><td><code>BYTEA</code></td></tr>
+      <tr><td>UUID</td><td><code>UNIQUEIDENTIFIER</code></td><td><code>CHAR(36)</code></td><td><code>UUID</code></td></tr>
+    </table>
+    <h3 id="ch3-datetime" data-toc>3.3 Date and time</h3>
+    <p class="topic-desc">Date and time values carry precision and timezone baggage that differs per engine. The timestamp with time zone type, DATETIMEOFFSET in SQL Server and TIMESTAMP WITH TIME ZONE in PostgreSQL, is usually the safe default. Also store the timezone itself and prefer storing UTC so instants stay unambiguous across servers.</p>
+    <table>
+      <tr><th>Use</th><th>SQL Server</th><th>MySQL</th><th>PostgreSQL</th></tr>
+      <tr><td>Timestamp (tz)</td><td><code>DATETIMEOFFSET</code></td><td><code>TIMESTAMP</code></td><td><code>TIMESTAMPTZ</code></td></tr>
+      <tr><td>Timestamp (no tz)</td><td><code>DATETIME2</code></td><td><code>DATETIME</code></td><td><code>TIMESTAMP</code></td></tr>
+      <tr><td>Date only</td><td><code>DATE</code></td><td><code>DATE</code></td><td><code>DATE</code></td></tr>
+      <tr><td>Current time</td><td><code>SYSDATETIME()</code></td><td><code>NOW()</code></td><td><code>NOW()</code></td></tr>
+    </table>
+    <div class="codeWrap"><pre><code>-- All three return the current instant
+SELECT SYSDATETIME();   -- SQL Server  -&gt; 2026-09-17 10:24:31.1234567
+-- note: 7 fractional digits, no timezone
+SELECT NOW();           -- MySQL       -&gt; 2026-09-17 10:24:31
+SELECT NOW();           -- PostgreSQL  -&gt; 2026-09-17 10:24:31.123456+00</code></pre></div>
+    <p class="code-note">All three engines return the current instant, but precision and timezone differ: 7 digits, none, or 6 with UTC. Pick the type that matches your needs.</p>
+    <h3 id="ch3-bool-json" data-toc>3.4 Boolean, JSON and other types</h3>
+    <p class="topic-desc">Beyond the basics each engine has extras such as boolean, JSON and array types. MySQL has a dedicated JSON type, PostgreSQL offers BOOLEAN, JSONB and ARRAY, and SQL Server supports BIT and JSON text handling. Know where the engines line up and where a type exists in only one of them.</p>
+    <table>
+      <tr><th>Concept</th><th>SQL Server</th><th>MySQL</th><th>PostgreSQL</th></tr>
+      <tr><td>Boolean</td><td><code>BIT</code></td><td><code>TINYINT(1)</code> / <code>BOOL</code></td><td><code>BOOLEAN</code></td></tr>
+      <tr><td>JSON</td><td><code>NVARCHAR(MAX)</code> + <code>JSON</code></td><td><code>JSON</code></td><td><code>JSONB</code></td></tr>
+      <tr><td>Array</td><td>—</td><td>—</td><td><code>INTEGER[]</code>, <code>TEXT[]</code></td></tr>
+      <tr><td>Enum</td><td><code>CHECK</code> constraint</td><td><code>ENUM('a','b')</code></td><td><code>CHECK</code> / domain</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch3-bool-json--exercises-3">Exercises 3</h4><ol>
+      <li>Pick types for a money column, a name, and a created-at timestamp in each engine.</li>
+      <li>Explain why <code>FLOAT</code> is wrong for prices.</li>
+      <li>Store a JSON document in MySQL and PostgreSQL.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · DDL — Databases, Schemas &amp; Tables</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · DDL — Databases, Schemas &amp; Tables</button><div class="ch-toc-list"><a href="#ch4-createdb">4.1 Create a database</a><a href="#ch4-schema">4.2 Schemas and namespaces</a><a href="#ch4-createtable">4.3 Create a table</a><a href="#ch4-verify">4.4 Verify the schema + output</a></div></div>
+    <p class="topic-desc">DDL, data definition language, is how you define the shape of the database: databases, schemas and the tables inside them using CREATE, ALTER and DROP statements. Precise DDL set before data arrives prevents rework later. This chapter covers creating databases, schemas and tables and verifying the result.</p>
+    <h3 id="ch4-createdb" data-toc>4.1 Create a database</h3>
+    <p class="topic-desc">A single CREATE DATABASE statement creates a database everywhere, but MySQL adds CHARSET and COLLATE choices that affect string comparison and correctness. SQL Server and PostgreSQL let you set collation per database too. Decide these defaults up front because changing them later on populated data is painful.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+CREATE DATABASE shop;
+-- the simplest form works in every engine
+-- Output: Commands completed successfully.
+
+-- MySQL (charset + collation matter!)
+CREATE DATABASE shop CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+-- utf8mb4 covers full Unicode incl. emoji
+-- Query OK, 1 row affected (0.01 sec)
+
+-- PostgreSQL
+CREATE DATABASE shop;
+-- CREATE DATABASE</code></pre></div>
+    <p class="code-note">CREATE DATABASE works in all three, but MySQL asks you to pin down charset and collation. The utf8mb4 choice is the one that prevents mojibake.</p>
+    <h3 id="ch4-schema" data-toc>4.2 Schemas and namespaces</h3>
+    <p class="topic-desc">Schemas are organising layers inside a database that group tables and other objects, though MySQL treats schema as a synonym for database. Use CREATE SCHEMA in SQL Server and PostgreSQL to separate modules or tenants, then qualify objects as schema.table. This keeps a shared database tidy and permissions precise.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server: schemas are containers inside a DB
+CREATE SCHEMA sales;
+-- MySQL: schema == database (no separate namespace)
+CREATE DATABASE sales;
+-- PostgreSQL: rich schema support
+CREATE SCHEMA sales;
+-- search_path sets the default lookup schema
+SET search_path TO sales, public;</code></pre></div>
+    <p class="code-note">Two engines put schemas inside databases; MySQL treats schema as a synonym for database. search_path makes PostgreSQL resolve names your way.</p>
+    <h3 id="ch4-createtable" data-toc>4.3 Create a table</h3>
+    <p class="topic-desc">The CREATE TABLE statement is where columns, data types and defaults come together in every engine. Notice the small but important identity syntax differences: IDENTITY in SQL Server, AUTO_INCREMENT in MySQL and GENERATED AS IDENTITY in PostgreSQL. Match the identity column style to your engine when defining tables.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+CREATE TABLE customers (
+    id        INT IDENTITY(1,1) PRIMARY KEY,
+    -- IDENTITY auto-generates the primary key
+    name      NVARCHAR(120) NOT NULL,
+    email     NVARCHAR(200) NOT NULL UNIQUE,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+
+-- MySQL
+CREATE TABLE customers (
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name      VARCHAR(120) NOT NULL,
+    email     VARCHAR(200) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- PostgreSQL
+CREATE TABLE customers (
+    id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    -- GENERATED ALWAYS blocks manual key values
+    name      VARCHAR(120) NOT NULL,
+    email     VARCHAR(200) NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);</code></pre></div>
+    <p class="code-note">The same customers table created three ways; identity and autoincrement keywords differ but the pattern is identical. PK, NOT NULL, UNIQUE and defaults appear in all three.</p>
+    <h3 id="ch4-verify" data-toc>4.4 Verify the schema + output</h3>
+    <p class="topic-desc">Describing a table back to yourself is the fastest way to confirm DDL did what you intended. Each engine has its own command: sp_help or the INFORMATION_SCHEMA tables in SQL Server, SHOW CREATE TABLE in MySQL, and backslash d in psql for PostgreSQL. Use these to check columns, types, keys and defaults after creation.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- sp_help reports columns, types, indexes, constraints
+EXEC sp_help 'customers';
+-- name        type          nullable
+-- id          int identity  no
+-- name        nvarchar      no
+-- email       nvarchar      no
+-- created_at  datetime2     no
+
+-- MySQL
+-- DESCRIBE is short for SHOW COLUMNS
+DESCRIBE customers;
+-- +------------+--------------+------+-----+-------------------+--+
+-- | Field      | Type         | Null | Key | Default           |  |
+-- | id         | bigint       | NO   | PRI | NULL              |  |
+-- | name       | varchar(120) | NO   |     | NULL              |  |
+-- | email      | varchar(200) | NO   | UNI | NULL              |  |
+-- | created_at | timestamp    | NO   |     | CURRENT_TIMESTAMP |  |
+-- +------------+--------------+------+-----+-------------------+--+
+
+-- PostgreSQL
+-- \d is psql's describe shortcut
+\d customers
+-- Column     | Type        | Nullable | Default
+-- id         | bigint      | not null | generated always as identity
+-- name       | varchar(120)| not null |
+-- email      | varchar(200)| not null |
+-- created_at | timestamptz | not null | now()</code></pre></div>
+    <p class="code-note">Three describe commands confirm the same table definition. Each output is a different CLI grid, but the columns match, which is the real test.</p>
+    <div class="ex"><h4 id="ch4-verify--exercises-4">Exercises 4</h4><ol>
+      <li>Create a <code>customers</code> table in all three engines.</li>
+      <li>Inspect it with the engine’s describe command.</li>
+      <li>Explain what utf8mb4 solves in MySQL.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Constraints &amp; Keys</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Constraints &amp; Keys</button><div class="ch-toc-list"><a href="#ch5-constraints">5.1 The constraint family</a><a href="#ch5-fk">5.2 Foreign keys with actions</a><a href="#ch5-violation">5.3 What a violation looks like + output</a></div></div>
+    <p class="topic-desc">Constraints are the database self-defence mechanism that rejects bad data at the door and keeps a schema trustworthy. PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK, NOT NULL and DEFAULT are the tools you declare in CREATE TABLE or ALTER TABLE. Rely on them instead of trusting application code to filter invalid input.</p>
+    <h3 id="ch5-constraints" data-toc>5.1 The constraint family</h3>
+    <p class="topic-desc">Six constraint tools keep data honest: PRIMARY KEY for identity, FOREIGN KEY for relationships, UNIQUE for alternatives, CHECK for business rules, NOT NULL for required columns and DEFAULT for fill-in values. Declare each with the matching constraint clause in CREATE TABLE or ALTER TABLE. Know the job of each one before designing a schema.</p>
+    <table>
+      <tr><th>Constraint</th><th>Enforces</th></tr>
+      <tr><td><code>PRIMARY KEY</code></td><td>Unique + not null identity of a row.</td></tr>
+      <tr><td><code>FOREIGN KEY</code></td><td>Value must exist in the referenced table.</td></tr>
+      <tr><td><code>UNIQUE</code></td><td>No duplicate values.</td></tr>
+      <tr><td><code>CHECK</code></td><td>A boolean rule on the column.</td></tr>
+      <tr><td><code>NOT NULL</code></td><td>Value is mandatory.</td></tr>
+      <tr><td><code>DEFAULT</code></td><td>Value used when none supplied.</td></tr>
+    </table>
+    <h3 id="ch5-fk" data-toc>5.2 Foreign keys with actions</h3>
+    <p class="topic-desc">Foreign keys define what happens to dependent rows on update or delete through ON DELETE and ON UPDATE actions. CASCADE carries the deletion to children, RESTRICT or NO ACTION blocks it, and SET NULL clears the reference. Choose deliberately per relationship because the action shapes how data disappears.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- ON DELETE CASCADE removes child rows with the parent
+CREATE TABLE orders (
+    id          INT IDENTITY(1,1) PRIMARY KEY,
+    customer_id INT NOT NULL,
+    total       DECIMAL(12,2) NOT NULL CHECK (total &gt;= 0),
+    CONSTRAINT fk_orders_customer
+        FOREIGN KEY (customer_id) REFERENCES customers(id)
+        ON DELETE CASCADE
+);
+
+-- MySQL
+CREATE TABLE orders (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    customer_id BIGINT NOT NULL,
+    total       DECIMAL(12,2) NOT NULL,
+    CONSTRAINT fk_orders_customer
+        FOREIGN KEY (customer_id) REFERENCES customers(id)
+        ON DELETE CASCADE,
+    CONSTRAINT chk_total CHECK (total &gt;= 0)
+);
+
+-- PostgreSQL
+-- PostgreSQL allows an inline REFERENCES on the column
+CREATE TABLE orders (
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    total       NUMERIC(12,2) NOT NULL CHECK (total &gt;= 0)
+);</code></pre></div>
+    <p class="code-note">A foreign key with ON DELETE CASCADE: deleting a customer removes their orders automatically. SQL Server and MySQL name the constraint; PostgreSQL inlines it.</p>
+    <h3 id="ch5-violation" data-toc>5.3 What a violation looks like + output</h3>
+    <p class="topic-desc">When a row breaks a constraint the engines reply with loud, instructive diagnostics: SQL Server names the constraint, MySQL reports the key name and PostgreSQL states the exact check that failed. Use these messages to find which rule rejected the row. They are your feedback loop when debugging bad inserts and updates.</p>
+    <div class="codeWrap"><pre><code>-- customer 999 doesn't exist: FK violation
+INSERT INTO orders (customer_id, total) VALUES (999, 10.00);
+-- each engine names the constraint it rejected
+
+-- SQL Server
+-- Msg 547: The INSERT statement conflicted with the FOREIGN KEY constraint "fk_orders_customer".
+
+-- MySQL
+-- ERROR 1452 (23000): Cannot add or update a child row:
+--   a foreign key constraint fails (`shop`.`orders`, CONSTRAINT `fk_orders_customer`)
+
+-- PostgreSQL
+-- ERROR:  insert or update on table "orders" violates foreign key constraint "orders_customer_id_fkey"
+-- DETAIL: Key (customer_id)=(999) is not present in table "customers".</code></pre></div>
+    <p class="code-note">Inserting an order for customer 999 fails in all three engines because no such customer exists. Each engine names the broken constraint, which makes debugging easy.</p>
+    <div class="tip"><p>Prefer <code>ON DELETE RESTRICT</code> (the default) for business data so you cannot silently delete history. Reserve <code>CASCADE</code> for genuinely dependent child rows.</p></div>
+    <div class="ex"><h4 id="ch5-violation--exercises-5">Exercises 5</h4><ol>
+      <li>Add a check constraint that rejects negative totals.</li>
+      <li>Trigger a foreign-key violation and read the message.</li>
+      <li>Choose cascade vs restrict for a blog’s comments.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Indexes</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Indexes</button><div class="ch-toc-list"><a href="#ch6-basics">6.1 Why indexes exist</a><a href="#ch6-create">6.2 Create indexes</a><a href="#ch6-explain">6.3 Reading a query plan + output</a><a href="#ch6-covering">6.4 Covering and partial indexes</a></div></div>
+    <p class="topic-desc">Indexes are the difference between instant point lookups and full-table scans, and the biggest performance lever in SQL. Learn to create them with CREATE INDEX, use composite and covering variants, and read the query plan that proves they are being used. Index design follows the queries you actually run.</p>
+    <h3 id="ch6-basics" data-toc>6.1 Why indexes exist</h3>
+    <p class="topic-desc">An index trades a little write cost for much faster reads, turning a lookup from a full scan into a log-style search. It is the single biggest lever on query performance. Create indexes on the columns you filter, join or order by, and check the plan to confirm the engine actually uses them.</p>
+    <p>Without an index, a lookup is a full table scan — O(n). A B-tree index turns it into a logarithmic search — O(log n). Indexes speed reads and slow writes (each insert updates every index).</p>
+    <h3 id="ch6-create" data-toc>6.2 Create indexes</h3>
+    <p class="topic-desc">Creating an index is one line in any engine: CREATE INDEX on a table and columns. Composite indexes cover several columns, and expression indexes such as PostgreSQL functional indexes go further. Index what your queries actually filter on, and favour fewer, useful indexes over many unused ones.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- index the foreign key you join on
+CREATE INDEX ix_orders_customer ON orders(customer_id);
+CREATE INDEX ix_orders_customer_total ON orders(customer_id, total DESC);
+
+-- MySQL
+CREATE INDEX ix_orders_customer ON orders(customer_id);
+CREATE INDEX ix_orders_customer_total ON orders(customer_id, total);
+
+-- PostgreSQL
+CREATE INDEX ix_orders_customer ON orders(customer_id);
+CREATE INDEX ix_orders_customer_total ON orders(customer_id, total DESC);
+CREATE INDEX ix_orders_lower_email ON customers(LOWER(email));  -- expression index</code></pre></div>
+    <p class="code-note">Indexes are created with one statement in each engine. Composite and expression indexes extend the pattern for more targeted lookups.</p>
+    <h3 id="ch6-explain" data-toc>6.3 Reading a query plan + output</h3>
+    <p class="topic-desc">The query plan is the engine explanation of how it will run your SQL, obtained with EXPLAIN in MySQL and PostgreSQL or the estimated execution plan in SQL Server. A good plan shows an index seek; a bad one shows a table scan. Read the plan to verify an index helped and to locate the slowest step.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- showplan_text prints the plan instead of rows
+SET SHOWPLAN_TEXT ON;
+SELECT * FROM orders WHERE customer_id = 1;
+-- Output: Index Seek ... ix_orders_customer   (good: seek, not scan)
+
+-- MySQL
+-- EXPLAIN shows the estimated plan and chosen key
+EXPLAIN SELECT * FROM orders WHERE customer_id = 1;
+-- +----+-------+------+---------------+---------------------+------+-------+
+-- | id | table | type | possible_keys | key                 | rows | Extra |
+-- | 1  | orders| ref  | ix_orders_c.. | ix_orders_customer  | 3    |       |
+
+-- PostgreSQL
+-- ANALYZE runs the query and reports real timings
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 1;
+-- Index Scan using ix_orders_customer on orders
+--   Index Cond: (customer_id = 1)
+--   Planning Time: 0.12 ms  Execution Time: 0.05 ms</code></pre></div>
+    <p class="code-note">Explain tools prove an index is used: the plan shows a seek or an index scan, not a table scan. ANALYZE in PostgreSQL even reports real timings.</p>
+    <h3 id="ch6-covering" data-toc>6.4 Covering and partial indexes</h3>
+    <p class="topic-desc">A covering index answers the query entirely from the index alone, avoiding a round trip to the table, while a partial index with a WHERE clause indexes only a hot subset of rows. Both reduce space and I/O for targeted workloads. Build them when measurements show reads on a narrow, frequently used set of columns.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server: INCLUDE avoids key lookups
+CREATE INDEX ix_orders_cust_cover ON orders(customer_id) INCLUDE (total);
+
+-- PostgreSQL: partial index for a hot subset
+CREATE INDEX ix_orders_pending ON orders(created_at) WHERE status = 'pending';
+
+-- MySQL: composite index can cover a query when it includes all columns used
+CREATE INDEX ix_orders_cust_total ON orders(customer_id, total);</code></pre></div>
+    <p class="code-note">Covering and partial indexes trade space for speed: INCLUDE stores extra columns, and WHERE limits the index to a hot subset.</p>
+    <div class="warn"><p>Column order in a composite index matters. <code>(customer_id, total)</code> helps queries filtering on customer_id, or customer_id+total, but not on total alone. Put equality columns first, range columns last.</p></div>
+    <div class="ex"><h4 id="ch6-covering--exercises-6">Exercises 6</h4><ol>
+      <li>Create an index and confirm the plan switches from scan to seek.</li>
+      <li>Design a composite index for a given WHERE clause.</li>
+      <li>Add a partial index for a common filtered query.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · DML — Create, Read, Update, Delete</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · DML — Create, Read, Update, Delete</button><div class="ch-toc-list"><a href="#ch7-insert">7.1 INSERT + output</a><a href="#ch7-select">7.2 SELECT + output</a><a href="#ch7-update">7.3 UPDATE + output</a><a href="#ch7-delete">7.4 DELETE + output</a><a href="#ch7-upsert">7.5 UPSERT — the dialects diverge</a></div></div>
+    <p class="topic-desc">This chapter covers the everyday CRUD verbs: INSERT, SELECT, UPDATE and DELETE, with OUTPUT and RETURNING where useful, plus an honest look at how upserts diverge. Run each against your engines and compare the result messages. These statements are the base of almost everything you write in SQL.</p>
+    <h3 id="ch7-insert" data-toc>7.1 INSERT + output</h3>
+    <p class="topic-desc">INSERT adds rows in the same basic form everywhere: INSERT INTO table with column lists and VALUES. Bulk inserts differ slightly, using multi-row VALUES, SELECT-based inserts or the engine bulk tools. Success replies vary, but a message like one row affected or the returned count is the universal confirmation.</p>
+    <div class="codeWrap"><pre><code>-- All three
+-- all engines share this basic INSERT form
+INSERT INTO customers (name, email) VALUES ('Ada', 'ada@example.com');
+
+-- SQL Server
+-- (1 row affected)
+
+-- MySQL
+-- Query OK, 1 row affected (0.00 sec)
+
+-- PostgreSQL
+-- INSERT 0 1
+
+-- Bulk insert (syntax differs)
+INSERT INTO customers (name, email) VALUES
+ ('Grace', 'grace@example.com'),
+ ('Linus', 'linus@example.com');</code></pre></div>
+    <p class="code-note">The classic insert is identical across engines; only the success message differs. Bulk insert with multi-row VALUES is portable too.</p>
+    <h3 id="ch7-select" data-toc>7.2 SELECT + output</h3>
+    <p class="topic-desc">SELECT is the read path: choose columns, filter with WHERE, order with ORDER BY and read the result grid. All three engines share the core syntax, with output formatting differing a little. Understand the basics here because joins, grouping and window functions all extend this statement.</p>
+    <div class="codeWrap"><pre><code>-- ORDER BY sorts rows before the grid prints
+SELECT id, name, email FROM customers ORDER BY id;
+-- the pipe grid repeats across all three CLIs
+
+-- | id | name  | email              |
+-- | 1  | Ada   | ada@example.com    |
+-- | 2  | Grace | grace@example.com  |
+-- | 3  | Linus | linus@example.com  |</code></pre></div>
+    <p class="code-note">The simplest read: pick three columns, order by id, read the grid. Output formatting differs marginally between CLIs, the data does not.</p>
+    <h3 id="ch7-update" data-toc>7.3 UPDATE + output</h3>
+    <p class="topic-desc">UPDATE changes existing rows: UPDATE table SET column equals a value WHERE condition. Only the rows matched by the WHERE clause change, so scope the condition carefully and preview it with SELECT first. An update without a WHERE clause touches every row in the table.</p>
+    <div class="codeWrap"><pre><code>-- WHERE id = 1 limits the change to a single row
+UPDATE customers SET name = 'Ada Lovelace' WHERE id = 1;
+
+-- SQL Server : (1 row affected)
+-- MySQL      : Query OK, 1 row affected
+-- PostgreSQL : UPDATE 1</code></pre></div>
+    <p class="code-note">Updates a single row by id; the three-verb success line tells you exactly one row changed. Always scope updates with WHERE.</p>
+    <h3 id="ch7-delete" data-toc>7.4 DELETE + output</h3>
+    <p class="topic-desc">DELETE removes rows: DELETE FROM table WHERE condition, where the WHERE clause is your safety net. Run the matching SELECT first to preview exactly what will go before you remove it. Without a WHERE clause the whole table is emptied.</p>
+    <div class="codeWrap"><pre><code>-- only the matching row disappears
+DELETE FROM customers WHERE id = 3;
+-- SQL Server : (1 row affected)
+-- MySQL      : Query OK, 1 row affected
+-- PostgreSQL : DELETE 1
+
+-- Safety: always run the SELECT with the same WHERE first.</code></pre></div>
+    <p class="code-note">Deletes one row and each CLI reports its own one-row message. The safety tip is the important part: preview with SELECT first.</p>
+    <h3 id="ch7-upsert" data-toc>7.5 UPSERT — the dialects diverge</h3>
+    <p class="topic-desc">Inserting or updating in one shot is genuinely different in each engine: MERGE in SQL Server, INSERT ON DUPLICATE KEY UPDATE in MySQL, and INSERT ON CONFLICT DO UPDATE in PostgreSQL. Pick the dialect of your platform and test the exact conflict rules you need. The same logical operation has very different spelling and semantics.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server: MERGE (or a pattern with IF EXISTS)
+-- MERGE matches on email, then inserts or updates
+MERGE customers AS t
+USING (SELECT 'ada@example.com' AS email, 'Ada L.' AS name) AS s
+   ON t.email = s.email
+WHEN MATCHED THEN UPDATE SET name = s.name
+WHEN NOT MATCHED THEN INSERT (name, email) VALUES (s.name, s.email);
+-- (1 row affected)
+
+-- MySQL: ON DUPLICATE KEY UPDATE
+-- ON DUPLICATE KEY turns a conflicting insert into an update
+INSERT INTO customers (name, email) VALUES ('Ada L.', 'ada@example.com')
+ON DUPLICATE KEY UPDATE name = VALUES(name);
+-- Query OK, 2 rows affected
+
+-- PostgreSQL: ON CONFLICT
+INSERT INTO customers (name, email) VALUES ('Ada L.', 'ada@example.com')
+ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name;
+-- INSERT 0 1</code></pre></div>
+    <p class="code-note">All three engines support insert-or-update, but the syntax and the row-count replies genuinely diverge. Expect to look up each dialect’s form.</p>
+    <div class="ex"><h4 id="ch7-upsert--exercises-7">Exercises 7</h4><ol>
+      <li>Insert three rows and select them ordered.</li>
+      <li>Write an upsert in each engine.</li>
+      <li>Write a delete that only affects rows matching a condition.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Joins, Aggregates &amp; Analytics</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Joins, Aggregates &amp; Analytics</button><div class="ch-toc-list"><a href="#ch8-joins">8.1 Joins + output</a><a href="#ch8-aggregate">8.2 GROUP BY and HAVING + output</a><a href="#ch8-window">8.3 Window functions + output</a><a href="#ch8-cte">8.4 CTEs and recursion</a><a href="#ch8-pagination">8.5 Pagination — three syntaxes</a></div></div>
+    <p class="topic-desc">This chapter is where SQL earns its keep: joining tables, grouping rows, and computing analytics with window functions and recursive CTEs. These patterns answer most real reporting questions engine after engine. Each section runs the same query across all three engines and compares the results.</p>
+    <h3 id="ch8-joins" data-toc>8.1 Joins + output</h3>
+    <p class="topic-desc">Joins combine tables on keys using INNER JOIN to keep only matching rows and LEFT JOIN to keep every row from the left side, with RIGHT and FULL JOIN for the other sides. Write the join condition in the ON clause after the join type. This is the foundation of relational reporting across all three engines.</p>
+    <div class="codeWrap"><pre><code>-- inner join: only rows with a match survive
+SELECT c.name, o.id AS order_id, o.total
+FROM customers c
+JOIN orders o ON o.customer_id = c.id
+ORDER BY c.name;
+
+-- | name  | order_id | total |
+-- | Ada   | 10       | 99.90 |
+-- | Ada   | 11       | 12.00 |
+-- | Grace | 12       | 45.00 |
+
+-- LEFT JOIN keeps customers with no orders (NULL order columns):
+SELECT c.name, COUNT(o.id) AS orders
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY c.name;
+
+-- | name  | orders |
+-- | Ada   | 2      |
+-- | Grace | 1      |
+-- | Linus | 0      |</code></pre></div>
+    <p class="code-note">An inner join pairs matched rows; the left join keeps zero-order customers with NULLs. The row counts per customer are what you notice.</p>
+    <h3 id="ch8-aggregate" data-toc>8.2 GROUP BY and HAVING + output</h3>
+    <p class="topic-desc">GROUP BY rolls rows into summary groups and HAVING filters the groups that result, applied after aggregation, in contrast to WHERE which filters rows first. Use COUNT, SUM, AVG, MIN and MAX with GROUP BY to produce totals and counts. Together they turn raw rows into summary numbers.</p>
+    <div class="codeWrap"><pre><code>-- one summary row per customer
+SELECT customer_id, COUNT(*) AS orders, SUM(total) AS revenue
+FROM orders
+GROUP BY customer_id
+-- HAVING filters groups; WHERE filters rows
+HAVING SUM(total) &gt; 50
+ORDER BY revenue DESC;
+
+-- | customer_id | orders | revenue |
+-- | 1           | 2      | 111.90  |</code></pre></div>
+    <p class="code-note">GROUP BY collapses orders per customer; HAVING keeps only groups above 50. The result is one summary row per customer.</p>
+    <h3 id="ch8-window" data-toc>8.3 Window functions + output</h3>
+    <p class="topic-desc">Window functions compute per-row values such as RANK, ROW_NUMBER and running totals without collapsing rows into groups. The OVER clause defines the partition and ordering, distinct from GROUP BY. Use them for rankings, cumulative sums and moving averages where GROUP BY cannot keep the detail rows.</p>
+    <div class="codeWrap"><pre><code>SELECT c.name, o.total,
+       ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY o.total DESC) AS rn
+FROM orders o
+-- ranks rows within each customer partition
+JOIN customers c ON c.id = o.customer_id;
+
+-- | name  | total | rn |
+-- | Ada   | 99.90 | 1  |
+-- | Ada   | 12.00 | 2  |
+-- | Grace | 45.00 | 1  |
+
+-- Running total
+-- sums each row plus all previous rows
+SELECT id, total,
+       SUM(total) OVER (ORDER BY id) AS running_total
+FROM orders;
+
+-- | id | total | running_total |
+-- | 10 | 99.90 | 99.90         |
+-- | 11 | 12.00 | 111.90        |
+-- | 12 | 45.00 | 156.90        |</code></pre></div>
+    <p class="code-note">Window functions rank and total without flattening rows: ROW_NUMBER per customer and a plain running total. No GROUP BY needed.</p>
+    <h3 id="ch8-cte" data-toc>8.4 CTEs and recursion</h3>
+    <p class="topic-desc">A CTE names a subquery with WITH for readability and reuse inside a statement, and the RECURSIVE keyword lets you walk trees like org charts and bill-of-materials data. All three engines support the WITH syntax, with recursion supported in PostgreSQL and SQL Server and available from MySQL 8. Use CTEs for layered, hierarchical or self-referential queries.</p>
+    <div class="codeWrap"><pre><code>-- All three support WITH
+WITH big AS (
+    SELECT customer_id, SUM(total) AS revenue
+    FROM orders GROUP BY customer_id
+)
+-- big behaves like a read-only table here
+SELECT * FROM big WHERE revenue &gt; 100;
+
+-- Recursive CTE: employee hierarchy (PostgreSQL/MySQL 8+/SQL Server)
+WITH RECURSIVE org AS (
+    SELECT id, name, manager_id, 1 AS depth FROM employees WHERE manager_id IS NULL
+    -- base managers, then UNION steps down a level each round
+    UNION ALL
+    SELECT e.id, e.name, e.manager_id, o.depth + 1
+    FROM employees e JOIN org o ON e.manager_id = o.id
+)
+SELECT * FROM org ORDER BY depth;</code></pre></div>
+    <p class="code-note">A WITH block names a subquery for reuse, and RECURSIVE walks a hierarchy by unioning a base case with a recursive step.</p>
+    <h3 id="ch8-pagination" data-toc>8.5 Pagination — three syntaxes</h3>
+    <p class="topic-desc">Paging is OFFSET and FETCH in SQL Server and LIMIT and OFFSET in MySQL and PostgreSQL, all inside ORDER BY queries. Offset paging is simple but slows on deep pages; keyset pagination using a WHERE clause on the last seen key stays fast. Choose based on page depth and data growth.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- OFFSET/FETCH is the SQL Server form
+SELECT * FROM orders ORDER BY id OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY;
+
+-- MySQL
+-- LIMIT...OFFSET is the MySQL/PostgreSQL form
+SELECT * FROM orders ORDER BY id LIMIT 10 OFFSET 20;
+
+-- PostgreSQL
+SELECT * FROM orders ORDER BY id LIMIT 10 OFFSET 20;
+
+-- Tip: keyset pagination (WHERE id &gt; @lastId ORDER BY id LIMIT 10)
+-- stays fast at deep offsets where OFFSET 1000000 degrades.</code></pre></div>
+    <p class="code-note">Three pagination spellings do the same thing, and the tip is the real lesson: keyset pagination stays fast where big OFFSET values crawl.</p>
+    <div class="ex"><h4 id="ch8-pagination--exercises-8">Exercises 8</h4><ol>
+      <li>Write an inner and a left join for customers and orders.</li>
+      <li>Rank orders per customer with ROW_NUMBER.</li>
+      <li>Paginate a large table with keyset pagination.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Transactions &amp; Isolation</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Transactions &amp; Isolation</button><div class="ch-toc-list"><a href="#ch9-tx">9.1 Transactions in each engine</a><a href="#ch9-isolation">9.2 Isolation levels</a><a href="#ch9-deadlock">9.3 Deadlocks + output</a></div></div>
+    <p class="topic-desc">Transactions guarantee that multi-step work is all-or-nothing using BEGIN, COMMIT and ROLLBACK, and this chapter applies them across the engines. Understanding isolation levels and deadlocks keeps concurrent systems correct. Test transaction behaviour per engine because defaults and behaviour differ.</p>
+    <h3 id="ch9-tx" data-toc>9.1 Transactions in each engine</h3>
+    <p class="topic-desc">Begin, change, commit is the transaction shorthand in every engine: BEGIN TRANSACTION in SQL Server, START TRANSACTION in MySQL and BEGIN in PostgreSQL, all ended with COMMIT or ROLLBACK. Wrap multi-step writes so they never half-apply under an error. Keep transactions short to minimise lock time.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- debit then credit must commit together
+BEGIN TRANSACTION;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT TRANSACTION;
+
+-- MySQL
+START TRANSACTION;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
+-- (ROLLBACK instead of COMMIT to undo)
+
+-- PostgreSQL
+-- BEGIN/COMMIT is PG's shorthand
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;</code></pre></div>
+    <p class="code-note">Wrap a paired debit and credit in BEGIN...COMMIT so they commit as one unit. Only the keyword spelling differs; ROLLBACK works everywhere.</p>
+    <h3 id="ch9-isolation" data-toc>9.2 Isolation levels</h3>
+    <p class="topic-desc">Isolation levels trade consistency for concurrency, from READ UNCOMMITTED at the lax end through READ COMMITTED and REPEATABLE READ up to SERIALIZABLE. The engine defaults already protect you from most anomalies: READ COMMITTED in SQL Server and PostgreSQL, REPEATABLE READ in MySQL. Change levels only when you have measured a specific need.</p>
+    <table>
+      <tr><th>Level</th><th>Dirty read</th><th>Non-repeatable read</th><th>Phantom read</th></tr>
+      <tr><td>READ UNCOMMITTED</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td>READ COMMITTED</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td>REPEATABLE READ</td><td>No</td><td>No</td><td>Yes*</td></tr>
+      <tr><td>SERIALIZABLE</td><td>No</td><td>No</td><td>No</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code>-- Defaults differ:
+-- SQL Server : READ COMMITTED
+-- MySQL      : REPEATABLE READ   (*InnoDB largely prevents phantoms via gap locks)
+-- PostgreSQL : READ COMMITTED
+
+-- SERIALIZABLE is the strictest isolation level
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;   -- SQL Server / PostgreSQL
+SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;  -- MySQL</code></pre></div>
+    <p class="code-note">Default isolation differs: SQL Server and PostgreSQL use READ COMMITTED, MySQL REPEATABLE READ. Raise the level only when you need stricter guarantees.</p>
+    <h3 id="ch9-deadlock" data-toc>9.3 Deadlocks + output</h3>
+    <p class="topic-desc">When two sessions hold locks and each waits on the other, one is sacrificed with an error and told to retry. Prevent them with short transactions and a consistent lock ordering across all sessions. The engine error messages name the victim and the resources involved so you can fix the offending access pattern.</p>
+    <div class="codeWrap"><pre><code>-- Session A locks row 1, Session B locks row 2, then each asks for the other's row.
+-- SQL Server
+-- Msg 1205: Transaction (Process ID 57) was deadlocked on lock resources
+--           and has been chosen as the deadlock victim. Rerun the transaction.
+
+-- MySQL
+-- ERROR 1213 (40001): Deadlock found when trying to get lock;
+--   try restarting transaction
+
+-- PostgreSQL
+-- ERROR:  deadlock detected
+-- DETAIL: Process 123 waits for ShareLock on transaction 456; blocked by process 789.
+
+-- Mitigations: access tables/rows in a consistent order, keep
+-- transactions short, add the right indexes, and retry on deadlock.</code></pre></div>
+    <p class="code-note">Three renderings of the same deadlock error plus the fix list. One victim is chosen and told to retry, which is why retrying is part of the pattern.</p>
+    <div class="ex"><h4 id="ch9-deadlock--exercises-9">Exercises 9</h4><ol>
+      <li>Run a fund transfer in a transaction and roll it back.</li>
+      <li>Reproduce a deadlock with two sessions.</li>
+      <li>Decide the isolation level for a reporting query.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Views, Procedures, Functions &amp; Triggers</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Views, Procedures, Functions &amp; Triggers</button><div class="ch-toc-list"><a href="#ch10-views">10.1 Views</a><a href="#ch10-procs">10.2 Stored procedures — dialects diverge most</a><a href="#ch10-functions">10.3 Functions</a><a href="#ch10-triggers">10.4 Triggers</a></div></div>
+    <p class="topic-desc">Programmable objects let you package SQL for reuse: views simplify and control access, stored procedures and functions encapsulate logic with parameters, and triggers react automatically to changes. Each engine has the full family with dialect differences in syntax. Learn the skeleton of each object type in your platform.</p>
+    <h3 id="ch10-views" data-toc>10.1 Views</h3>
+    <p class="topic-desc">A view is a saved query you can query like a table, created with CREATE VIEW. It hides joins and complex logic and grants a controlled window onto the data, useful for security and reporting convenience. Materialised views in PostgreSQL and indexed views in SQL Server go further by storing the result.</p>
+    <div class="codeWrap"><pre><code>-- Identical in all three
+CREATE VIEW v_customer_revenue AS
+-- COALESCE turns NULL into zero for customers with no orders
+SELECT c.id, c.name, COALESCE(SUM(o.total), 0) AS revenue
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY c.id, c.name;
+
+SELECT * FROM v_customer_revenue WHERE revenue &gt; 100;
+-- | id | name | revenue |
+-- | 1  | Ada  | 111.90  |</code></pre></div>
+    <p class="code-note">A view stores a grouped join query you can query like a table. COALESCE turns customers with no orders from NULL into zero.</p>
+    <h3 id="ch10-procs" data-toc>10.2 Stored procedures — dialects diverge most</h3>
+    <p class="topic-desc">Stored procedures encapsulate multi-step SQL with parameters and control flow, and here the dialects diverge most. SQL Server uses CREATE PROCEDURE invoked with EXEC, MySQL uses CREATE PROCEDURE invoked with CALL, and PostgreSQL uses CREATE PROCEDURE or CREATE FUNCTION. Learn the skeleton of each dialect before writing your own.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+CREATE PROCEDURE usp_AddCustomer @name NVARCHAR(120), @email NVARCHAR(200)
+AS
+BEGIN
+    INSERT INTO customers(name, email) VALUES (@name, @email);
+END;
+-- EXEC runs the procedure
+EXEC usp_AddCustomer 'Ada', 'ada@example.com';
+
+-- MySQL
+DELIMITER //
+CREATE PROCEDURE usp_AddCustomer(IN p_name VARCHAR(120), IN p_email VARCHAR(200))
+BEGIN
+    INSERT INTO customers(name, email) VALUES (p_name, p_email);
+END //
+-- DELIMITER lets the body keep its semicolons
+DELIMITER ;
+CALL usp_AddCustomer('Ada', 'ada@example.com');
+
+-- PostgreSQL (functions; CALL for procedures since v11)
+CREATE PROCEDURE usp_AddCustomer(p_name VARCHAR, p_email VARCHAR)
+LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO customers(name, email) VALUES (p_name, p_email);
+END; $$;
+-- CALL runs procedures in all three
+CALL usp_AddCustomer('Ada', 'ada@example.com');</code></pre></div>
+    <p class="code-note">The same AddCustomer procedure in three dialects; parameter markers and delimiters differ but the idea is shared. CALL runs it in all three.</p>
+    <h3 id="ch10-functions" data-toc>10.3 Functions</h3>
+    <p class="topic-desc">Functions return a value for use inside SQL expressions, from a scalar tax calculation up to table-returning functions. SQL Server and MySQL define them with CREATE FUNCTION, and PostgreSQL with CREATE FUNCTION in a chosen language. Scalar functions keep logic in one place but can be slow, so test their cost in queries.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- scalar function computes and returns the tax
+CREATE FUNCTION dbo.fn_Tax(@amount DECIMAL(12,2)) RETURNS DECIMAL(12,2)
+AS BEGIN RETURN @amount * 0.20; END;
+SELECT dbo.fn_Tax(100);        -- 20.00
+
+-- MySQL
+CREATE FUNCTION fn_Tax(amount DECIMAL(12,2)) RETURNS DECIMAL(12,2)
+DETERMINISTIC
+RETURN amount * 0.20;
+SELECT fn_Tax(100);            -- 20.00
+
+-- PostgreSQL
+CREATE FUNCTION fn_tax(amount NUMERIC) RETURNS NUMERIC
+LANGUAGE sql IMMUTABLE AS $$ SELECT amount * 0.20 $$;
+SELECT fn_tax(100);            -- 20.00</code></pre></div>
+    <p class="code-note">A scalar tax function in each engine; RETURN works everywhere, only the boilerplate differs. DETERMINISTIC and IMMUTABLE allow caching.</p>
+    <h3 id="ch10-triggers" data-toc>10.4 Triggers</h3>
+    <p class="topic-desc">Triggers run automatically on INSERT, UPDATE or DELETE on a table, defined with CREATE TRIGGER in every engine, with BEFORE and AFTER timing variants. They are great for auditing and maintaining derived data. Keep them small because hidden logic surprises people and can slow writes.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server (AFTER INSERT audit)
+CREATE TRIGGER trg_orders_audit ON orders AFTER INSERT AS
+BEGIN
+    -- inserted is a virtual table of the new rows
+    INSERT INTO order_audit(order_id, action, at)
+    SELECT id, 'INSERT', SYSDATETIME() FROM inserted;
+END;
+
+-- MySQL
+CREATE TRIGGER trg_orders_audit AFTER INSERT ON orders
+-- FOR EACH ROW fires once per affected row
+FOR EACH ROW
+INSERT INTO order_audit(order_id, action, at)
+VALUES (NEW.id, 'INSERT', NOW());
+
+-- PostgreSQL (row-level trigger calling a function)
+CREATE FUNCTION audit_order() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO order_audit(order_id, action, at)
+    VALUES (NEW.id, 'INSERT', NOW());
+    RETURN NEW;
+END; $$;
+CREATE TRIGGER trg_orders_audit AFTER INSERT ON orders
+FOR EACH ROW EXECUTE FUNCTION audit_order();</code></pre></div>
+    <p class="code-note">Three audit triggers that log every inserted order. The idea is the same, but each engine exposes the new row differently: inserted, NEW and NEW.</p>
+    <div class="warn"><p>Triggers are powerful but hide logic. Keep them small and single-purpose, and document them — future maintainers will not see them in application code.</p></div>
+    <div class="ex"><h4 id="ch10-triggers--exercises-10">Exercises 10</h4><ol>
+      <li>Create a view joining two tables.</li>
+      <li>Write a stored procedure that inserts a row.</li>
+      <li>Write an audit trigger for updates.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · Normalisation &amp; Schema Design</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Normalisation &amp; Schema Design</button><div class="ch-toc-list"><a href="#ch11-normal">11.1 The normal forms</a><a href="#ch11-denormalize">11.2 When to denormalise</a><a href="#ch11-naming">11.3 Naming and modelling conventions</a></div></div>
+    <p class="topic-desc">Normalisation removes redundancy so data stays consistent when it changes, and this chapter also covers when to break the rules. Design for third normal form by default, then denormalise deliberately on measured evidence. Good normalisation makes checking, updates and schema evolution predictable.</p>
+    <h3 id="ch11-normal" data-toc>11.1 The normal forms</h3>
+    <p class="topic-desc">The normal forms describe what redundancy to remove at each level, from 1NF about atomic columns up through 2NF and 3NF and into BCNF. Apply them by splitting tables until every non-key column depends on the key, the whole key and nothing but the key. They give you a language for defending schema decisions.</p>
+    <table>
+      <tr><th>Form</th><th>Rule</th><th>Fixes</th></tr>
+      <tr><td>1NF</td><td>Atomic values, no repeating groups</td><td>Comma lists in a cell</td></tr>
+      <tr><td>2NF</td><td>1NF + no partial dependency on part of a composite key</td><td>Redundant attrs</td></tr>
+      <tr><td>3NF</td><td>2NF + no transitive dependency (non-key → non-key)</td><td>Update anomalies</td></tr>
+      <tr><td>BCNF</td><td>Every determinant is a candidate key</td><td>Rare edge cases</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code>-- Violates 1NF: tags as a comma list
+-- posts(id, title, tags)  tags = 'sql,mysql,postgres'
+
+-- 1NF fix: separate table
+-- posts(id, title)  tags(id, name)  post_tags(post_id, tag_id)
+
+-- Violates 3NF: city/zip stored on orders -&gt; depends on customer address
+-- orders(id, customer_id, city, zip)  -- city, zip transitively depend on customer
+
+-- 3NF fix: keep address on customers; orders keeps customer_id only.</code></pre></div>
+    <p class="code-note">Illustrates a 1NF violation with comma-list tags and a 3NF violation where city and zip depend on the customer, then sketches the fixes.</p>
+    <h3 id="ch11-denormalize" data-toc>11.2 When to denormalise</h3>
+    <p class="topic-desc">Production schemas routinely bend the rules for performance, duplicating data or adding derived columns to avoid expensive joins. Denormalise deliberately, only when measurements such as query plans and timings justify it, and keep the duplication disciplined. Every copy you add is something you must keep in sync.</p>
+    <ul>
+      <li>Read-heavy dashboards where joins dominate cost.</li>
+      <li>Materialised aggregates refreshed on a schedule.</li>
+      <li>Frequently-read derived values stored alongside the source.</li>
+    </ul>
+    <p>Denormalise deliberately, measure the gain, and document the inconsistency window.</p>
+    <h3 id="ch11-naming" data-toc>11.3 Naming and modelling conventions</h3>
+    <p class="topic-desc">Consistent naming and a uniform modelling style make a schema readable by the whole team: singular table names, a clear primary key name such as id, and descriptive foreign key names like user_id. Agree the conventions once and enforce them in reviews and migrations. Every later review gets easier when the shape is predictable.</p>
+    <ul>
+      <li>Singular or plural consistently (<code>customers</code> is common).</li>
+      <li><code>snake_case</code> for objects and columns across all engines.</li>
+      <li>Every table has a surrogate PK; natural keys become unique constraints.</li>
+      <li>Timestamps in UTC; store <code>created_at</code>/<code>updated_at</code>.</li>
+    </ul>
+    <div class="ex"><h4 id="ch11-naming--exercises-11">Exercises 11</h4><ol>
+      <li>Normalise a spreadsheet of orders to 3NF.</li>
+      <li>Add a materialised view for a slow report (PostgreSQL).</li>
+      <li>Write your team’s naming conventions.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch12" data-toc>12 · Enterprise Design — Partitioning, Replication &amp; HA</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Enterprise Design — Partitioning, Replication &amp; HA</button><div class="ch-toc-list"><a href="#ch12-partition">12.1 Table partitioning</a><a href="#ch12-replication">12.2 Replication and read replicas</a><a href="#ch12-ha">12.3 High availability and failover</a><a href="#ch12-sharding">12.4 Sharding and federation</a></div></div>
+    <p class="topic-desc">When one server stops being enough you partition tables, replicate data and add failover, and this chapter maps the enterprise pattern space. Use partitioning to split huge tables, replication for read scaling and HA for automatic failover, and sharding as the last resort. Each pattern adds capacity but also operational cost.</p>
+    <h3 id="ch12-partition" data-toc>12.1 Table partitioning</h3>
+    <p class="topic-desc">Partitioning splits one big table into smaller physical segments by a key such as date using RANGE or LIST partitioning in MySQL and PostgreSQL, or partitioned tables in SQL Server. Queries that filter on the partition key can prune segments, keeping huge tables manageable. Choose the partition key to match your most common WHERE clauses.</p>
+    <div class="codeWrap"><pre><code>-- PostgreSQL: declarative range partitioning
+CREATE TABLE orders (id BIGINT, created_at TIMESTAMPTZ NOT NULL, total NUMERIC)
+PARTITION BY RANGE (created_at);
+-- one partition per month range
+CREATE TABLE orders_2026_01 PARTITION OF orders
+  FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
+
+-- MySQL: partition by range
+ALTER TABLE orders PARTITION BY RANGE (YEAR(created_at)) (
+  PARTITION p2026 VALUES LESS THAN (2027),
+  PARTITION pmax  VALUES LESS THAN MAXVALUE
+);
+
+-- SQL Server: partition function + scheme, then ON the scheme
+-- the function maps values, the scheme maps partitions to files
+CREATE PARTITION FUNCTION pfYear (int) AS RANGE RIGHT FOR VALUES (2025, 2026);
+CREATE PARTITION SCHEME psYear AS PARTITION pfYear ALL TO ([PRIMARY]);
+CREATE TABLE orders (id INT, created_at datetime2) ON psYear(YEAR(created_at));</code></pre></div>
+    <p class="code-note">Partitions a table by date range three ways; PostgreSQL is declarative, MySQL uses a range clause, SQL Server a function plus scheme.</p>
+    <h3 id="ch12-replication" data-toc>12.2 Replication and read replicas</h3>
+    <p class="topic-desc">Replication copies data to other servers so reads can scale and failover has somewhere to go. SQL Server uses Always On availability groups, MySQL uses source-replica or group replication, and PostgreSQL uses streaming replication. Accept some lag as you trade a little consistency for capacity.</p>
+    <table>
+      <tr><th>Engine</th><th>Mechanism</th><th>Typical use</th></tr>
+      <tr><td>SQL Server</td><td>Transactional / merge replication, Always On AG</td><td>HA + read scale + DR</td></tr>
+      <tr><td>MySQL</td><td>Binlog replication (async/semi-sync), Group Replication</td><td>Read replicas + HA</td></tr>
+      <tr><td>PostgreSQL</td><td>Streaming + logical replication</td><td>Read replicas + selective sync</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code>-- PostgreSQL: logical replication publication/subscription
+-- publisher
+CREATE PUBLICATION pub_orders FOR TABLE orders;
+-- subscriber
+CREATE SUBSCRIPTION sub_orders
+  CONNECTION 'host=pub dbname=shop'
+  PUBLICATION pub_orders;
+-- the subscription pulls and applies published changes
+
+-- Read replica lag is the trade-off; route only
+-- tolerant reads there and never rely on a replica for read-after-write.</code></pre></div>
+    <p class="code-note">A publisher/subscription pair streams table changes to a subscriber. The warning is the key part: replicas lag, so never route read-after-write there.</p>
+    <h3 id="ch12-ha" data-toc>12.3 High availability and failover</h3>
+    <p class="topic-desc">High availability means another node can take over automatically when the primary fails, through mechanisms such as SQL Server Always On failover clusters, MySQL Group Replication and PostgreSQL Patroni with streaming replication. Each engine has a supported answer, so plan the configuration and drill failover before you need it. Test recovery as well as replication.</p>
+    <ul>
+      <li>SQL Server: <strong>Always On Availability Groups</strong> with a listener; automatic failover on the sync replica.</li>
+      <li>MySQL: <strong>InnoDB Cluster</strong> / Group Replication with a router.</li>
+      <li>PostgreSQL: <strong>Patroni</strong> + etcd/Consul, or managed failover.</li>
+    </ul>
+    <h3 id="ch12-sharding" data-toc>12.4 Sharding and federation</h3>
+    <p class="topic-desc">Sharding spreads one table across many nodes by a key such as user_id, so writes can scale beyond a single server. It costs you joins across shards, transactions and a rebalance effort when the key distribution changes. Be sure the write volume justifies it before introducing that complexity.</p>
+    <p>Sharding splits one logical table across nodes by a key (tenant, region, hash). It scales writes but brings cross-shard joins, distributed transactions and rebalancing pain. Exhaust vertical scaling, indexes and caching first.</p>
+    <div class="ex"><h4 id="ch12-sharding--exercises-12">Exercises 12</h4><ol>
+      <li>Partition a large table by month.</li>
+      <li>Set up a read replica for one engine.</li>
+      <li>Choose a shard key for a multi-tenant app.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch13" data-toc>13 · Performance Tuning</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Performance Tuning</button><div class="ch-toc-list"><a href="#ch13-index">13.1 Index strategy</a><a href="#ch13-plans">13.2 Reading plans and finding the bottleneck</a><a href="#ch13-stats">13.3 Statistics and maintenance</a><a href="#ch13-pool">13.4 Connection pooling</a></div></div>
+    <p class="topic-desc">Tuning is measured, not guessed: read the query plan, find the slow statement, then fix the index or query. This chapter gives you the workflow of EXPLAIN plans, index strategy, statistics maintenance and connection pooling rather than magic. Apply it to the slowest queries first for the best returns.</p>
+    <h3 id="ch13-index" data-toc>13.1 Index strategy</h3>
+    <p class="topic-desc">Index strategy is about matching the engine to the queries you actually run: index the columns in WHERE, JOIN and ORDER BY clauses, and prefer composite indexes whose column order suits the access path. A few well-chosen indexes beat a pile of guesses. Verify each index with EXPLAIN and drop ones the plans never use.</p>
+    <ul>
+      <li>Index the columns in WHERE, JOIN and ORDER BY.</li>
+      <li>Composite indexes: equality columns first, range last.</li>
+      <li>Avoid over-indexing — every index taxes writes.</li>
+      <li>Remove unused/duplicate indexes.</li>
+    </ul>
+    <h3 id="ch13-plans" data-toc>13.2 Reading plans and finding the bottleneck</h3>
+    <p class="topic-desc">The query plan and its statistics tell you where time actually goes before you touch any code. Use EXPLAIN in MySQL and PostgreSQL and the execution plan in SQL Server, and learn to spot scans, seeks and high logical reads. The most expensive step in the plan is where tuning should start.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+SET STATISTICS IO ON;
+SET STATISTICS TIME ON;
+-- every query then reports read counts and elapsed time
+-- look for "Scan count", high "logical reads", and Table/Index Scan nodes</code></pre></div>
+    <p class="code-note">Switches on IO and time statistics so every query reports its reads and duration. Learn to watch scan counts and logical reads.</p>
+    <div class="codeWrap"><pre><code>-- MySQL: find slow queries
+-- slowest queries by latency come first
+SELECT * FROM sys.statement_analysis ORDER BY total_latency DESC LIMIT 5;
+EXPLAIN ANALYZE SELECT ... ;   -- MySQL 8.0.18+
+
+-- PostgreSQL: pg_stat_statements
+-- aggregates the real statements the app runs
+SELECT query, calls, mean_exec_time
+FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 5;
+EXPLAIN (ANALYZE, BUFFERS) SELECT ...;</code></pre></div>
+    <p class="code-note">Two system views surface the slowest queries: statement_analysis and pg_stat_statements. Pair them with EXPLAIN ANALYZE to see the plan.</p>
+    <h3 id="ch13-stats" data-toc>13.3 Statistics and maintenance</h3>
+    <p class="topic-desc">The optimizer needs fresh statistics to make good plans, so run the maintenance that keeps them current: UPDATE STATISTICS in SQL Server, ANALYZE and VACUUM in PostgreSQL, and ANALYZE TABLE for InnoDB statistics in MySQL. Dead rows and bloat want vacuuming and reorgs. Regular maintenance keeps tables fast as data grows.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- refresh the optimizer's histograms
+UPDATE STATISTICS orders;
+
+-- MySQL
+ANALYZE TABLE orders;
+
+-- PostgreSQL
+ANALYZE orders;
+-- reclaims dead tuple space as well
+VACUUM (VERBOSE, ANALYZE) orders;   -- reclaim dead tuples</code></pre></div>
+    <p class="code-note">Refreshing optimizer statistics is one command per engine. PostgreSQL’s VACUUM also reclaims space from dead rows.</p>
+    <h3 id="ch13-pool" data-toc>13.4 Connection pooling</h3>
+    <p class="topic-desc">Opening a database connection is expensive, so reuse them through a connection pool in your application. Size the pool to the server and its connection limits, not to the app thread count, to avoid exhausting the database. Pooled connections amortise setup cost and warm up the connection state once.</p>
+    <p>Opening a connection is expensive. Pool at the app or a proxy (PgBouncer for PostgreSQL, ProxySQL for MySQL, built-in pooling in .NET/Java). Size pools to the DB’s max connections, not to the app’s thread count.</p>
+    <div class="ex"><h4 id="ch13-pool--exercises-13">Exercises 13</h4><ol>
+      <li>Find your slowest query with the engine’s statistics view.</li>
+      <li>Add an index and compare logical reads before/after.</li>
+      <li>Run ANALYZE/VACUUM and observe the effect.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch14" data-toc>14 · Security</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Security</button><div class="ch-toc-list"><a href="#ch14-users">14.1 Users, roles and grants</a><a href="#ch14-rls">14.2 Row-level security</a><a href="#ch14-encrypt">14.3 Encryption and auditing</a></div></div>
+    <p class="topic-desc">Security is least privilege applied everywhere: users and roles, grants, row filters and encryption. Create principals as logins and users, grant only what they need and audit what they do. A single bad grant can hand an attacker the whole database, so review privileges regularly.</p>
+    <h3 id="ch14-users" data-toc>14.1 Users, roles and grants</h3>
+    <p class="topic-desc">Authenticate people and applications as principals, then grant only the privileges they need using CREATE USER and CREATE LOGIN plus GRANT and REVOKE statements. Bundle common rights in roles with CREATE ROLE in every engine. Least privilege is the backbone of database security and keeps a compromise contained.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- login is server-level; user is database-level
+CREATE LOGIN app_user WITH PASSWORD = 'Str0ng!Passw0rd';
+CREATE USER app_user FOR LOGIN app_user;
+GRANT SELECT, INSERT, UPDATE ON dbo.orders TO app_user;
+
+-- MySQL
+CREATE USER 'app_user'@'%' IDENTIFIED BY 'Str0ng!Passw0rd';
+-- least privilege: SELECT/INSERT/UPDATE only
+GRANT SELECT, INSERT, UPDATE ON shop.* TO 'app_user'@'%';
+FLUSH PRIVILEGES;
+
+-- PostgreSQL
+-- a ROLE with LOGIN is a user in PG
+CREATE ROLE app_user LOGIN PASSWORD 'Str0ng!Passw0rd';
+GRANT SELECT, INSERT, UPDATE ON orders TO app_user;</code></pre></div>
+    <p class="code-note">Creates a least-privilege app user in each engine: login or role, then selective grants. Never grant more than SELECT, INSERT, UPDATE for an app.</p>
+    <div class="codeWrap"><pre><code>-- Verify grants
+-- MySQL
+-- shows the exact privileges granted
+SHOW GRANTS FOR 'app_user'@'%';
+-- +----------------------------------------------------------+
+-- | GRANT SELECT, INSERT, UPDATE ON `shop`.* TO `app_user`@% |
+-- +----------------------------------------------------------+
+
+-- PostgreSQL
+-- \dp lists access privileges per table
+\dp orders
+-- Access privileges
+-- Schema | Name   | Type  | Access privileges
+-- public | orders | table | postgres=arwdDxt/postgres,app_user=arw/postgres</code></pre></div>
+    <p class="code-note">Two ways to verify what a user may do: SHOW GRANTS and psql’s \dp. Both confirm the exact privileges you just granted, nothing more.</p>
+    <h3 id="ch14-rls" data-toc>14.2 Row-level security</h3>
+    <p class="topic-desc">Row-level security lets the database hide rows by user or tenant instead of trusting the app to filter, using row security policies in PostgreSQL and security predicates in SQL Server. Define the policy once and it applies to every query that touches the table. It is an extra fence worth having for multi-tenant data.</p>
+    <div class="codeWrap"><pre><code>-- PostgreSQL
+-- RLS hides rows the policy rejects
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+CREATE POLICY owner_only ON documents
+  USING (owner_id = current_setting('app.user_id')::bigint);
+-- every SELECT must pass the USING predicate
+
+-- SQL Server: RLS via a predicate function + security policy
+CREATE FUNCTION dbo.fn_tenant(@tenant int) RETURNS TABLE
+WITH SCHEMABINDING AS
+RETURN SELECT 1 AS ok WHERE @tenant = CAST(SESSION_CONTEXT(N'tenant') AS int);
+CREATE SECURITY POLICY TenantFilter
+  ADD FILTER PREDICATE dbo.fn_tenant(tenant_id) ON dbo.orders;
+
+-- MySQL: enforce tenancy in a view or application layer.</code></pre></div>
+    <p class="code-note">Row-level security hides rows that fail the USING predicate. PostgreSQL enables it directly on the table; SQL Server needs a predicate function plus policy.</p>
+    <h3 id="ch14-encrypt" data-toc>14.3 Encryption and auditing</h3>
+    <p class="topic-desc">Encrypt data in transit with TLS in each engine and at rest with transparent data encryption in SQL Server, tablespace encryption in MySQL and cluster-level encryption in PostgreSQL. Audit who did what through the engine audit logs. Compliance and forensics both start with these basics.</p>
+    <ul>
+      <li><strong>In transit</strong>: force TLS on every connection.</li>
+      <li><strong>At rest</strong>: SQL Server TDE, MySQL InnoDB encryption, PostgreSQL <code>pgcrypto</code>/disk encryption.</li>
+      <li><strong>Column-level</strong>: encrypt PII with <code>pgcrypto</code>, Always Encrypted (SQL Server), or app-level.</li>
+      <li><strong>Auditing</strong>: SQL Server Audit, MySQL audit plugin, PostgreSQL <code>pgaudit</code>.</li>
+    </ul>
+    <div class="warn"><p>Never grant <code>db_owner</code>/<code>ALL PRIVILEGES</code> to an application account. A single SQL-injection then owns the whole database. Grant least privilege only.</p></div>
+    <div class="ex"><h4 id="ch14-encrypt--exercises-14">Exercises 14</h4><ol>
+      <li>Create a least-privilege app user in one engine.</li>
+      <li>Enable a row-level security policy.</li>
+      <li>List which columns hold PII and how you would encrypt them.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch15" data-toc>15 · JSON &amp; Semi-Structured Data</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · JSON &amp; Semi-Structured Data</button><div class="ch-toc-list"><a href="#ch15-store">15.1 Store a JSON document</a><a href="#ch15-query">15.2 Query inside JSON + output</a></div></div>
+    <p class="topic-desc">Store flexible or sparse data as JSON while still querying it with SQL, and this chapter covers where JSON fits and where a column beats it. Use the JSON column types and the operators each engine provides. The trick is knowing when schema flexibility earns its cost and when a plain relational column is cleaner.</p>
+    <h3 id="ch15-store" data-toc>15.1 Store a JSON document</h3>
+    <p class="topic-desc">All three engines can hold JSON today: PostgreSQL JSONB gives it real indexing and query semantics, MySQL JSON has validation and generated columns, and SQL Server stores JSON in NVARCHAR with functions. Use them for schemaless payloads that genuinely vary. Prefer a relational column when the shape is stable.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- SQL Server stores JSON as ordinary Unicode text
+CREATE TABLE events (id INT IDENTITY PRIMARY KEY, payload NVARCHAR(MAX));
+INSERT INTO events(payload) VALUES (N'{"type":"click","x":10,"y":20}');
+
+-- MySQL
+-- MySQL validates JSON on insert
+CREATE TABLE events (id BIGINT AUTO_INCREMENT PRIMARY KEY, payload JSON);
+INSERT INTO events(payload) VALUES ('{"type":"click","x":10,"y":20}');
+
+-- PostgreSQL
+CREATE TABLE events (id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, payload JSONB);
+INSERT INTO events(payload) VALUES ('{"type":"click","x":10,"y":20}');</code></pre></div>
+    <p class="code-note">Three engines store the same JSON payload; PostgreSQL JSONB and MySQL JSON validate and index it. The N prefix marks Unicode in SQL Server.</p>
+    <h3 id="ch15-query" data-toc>15.2 Query inside JSON + output</h3>
+    <p class="topic-desc">SQL operators reach inside JSON to pull out fields without loading the whole document: the JSONB operators in PostgreSQL, JSON_EXTRACT and the arrow operator in MySQL, and JSON_VALUE and JSON_QUERY in SQL Server. You get SQL filtering and indexing power over flexible data. Query paths let you treat JSON fields like columns.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server: JSON_VALUE / OPENJSON
+-- JSON_VALUE extracts a scalar by path
+SELECT JSON_VALUE(payload, '$.type') AS type FROM events;
+-- type
+-- click
+
+-- MySQL: -&gt;&gt; and JSON_EXTRACT
+-- -&gt;&gt; returns the value as text from a path
+SELECT payload-&gt;&gt;'$.type' AS type FROM events;
+-- +-------+
+-- | type  |
+-- +-------+
+-- | click |
+-- +-------+
+
+-- PostgreSQL: -&gt;&gt; returns text, -&gt; returns json/jsonb
+SELECT payload-&gt;&gt;'type' AS type FROM events;
+--  type
+-- -------
+--  click
+
+-- Index a JSON field:
+-- PostgreSQL: CREATE INDEX ON events ((payload-&gt;&gt;'type'));
+-- MySQL:      generated column + index
+-- a generated column gives MySQL a typed, indexable copy
+ALTER TABLE events ADD COLUMN type VARCHAR(32)
+  GENERATED ALWAYS AS (payload-&gt;&gt;'$.type') STORED, ADD INDEX (type);</code></pre></div>
+    <p class="code-note">SQL reaches inside JSON to pull out the type field using arrow operators. The generated column shows how to index a JSON value for fast lookups.</p>
+    <div class="tip"><p>Use JSON for genuinely schemaless or sparse data. If you always query a field, promote it to a real column with a type — you get constraints, indexes and clarity.</p></div>
+    <div class="ex"><h4 id="ch15-query--exercises-15">Exercises 15</h4><ol>
+      <li>Store and query a JSON field in all three engines.</li>
+      <li>Index a JSON field.</li>
+      <li>Decide which JSON fields deserve columns.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch16" data-toc>16 · Backup, Restore &amp; Migration</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Backup, Restore &amp; Migration</button><div class="ch-toc-list"><a href="#ch16-backup">16.1 Backups</a><a href="#ch16-restore">16.2 Restores</a><a href="#ch16-pitr">16.3 Point-in-time recovery</a><a href="#ch16-migrate">16.4 Schema migrations and cross-engine moves</a></div></div>
+    <p class="topic-desc">Backups and restores are the difference between an incident and a disaster, and this chapter covers them across the three engines. Test your restore, automate the backup and keep an eye on point-in-time recovery. A backup you never restored is a backup you cannot trust.</p>
+    <h3 id="ch16-backup" data-toc>16.1 Backups</h3>
+    <p class="topic-desc">A backup is a copy you can restore: full file backups with BACKUP DATABASE in SQL Server, mysqldump or binary snapshots in MySQL, and pg_dump or base backups with WAL archiving in PostgreSQL. Automate the schedule and then prove the restore works. Logical dumps are portable; file backups are faster to restore.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- WITH INIT overwrites the existing backup file
+BACKUP DATABASE shop TO DISK = 'C:\backups\shop.bak' WITH INIT;
+-- Processed 1234 pages ... BACKUP DATABASE successfully processed.
+
+-- MySQL
+-- --single-transaction gives a consistent snapshot
+mysqldump -u root -p --single-transaction shop &gt; shop.sql
+# mysqldump: [Warning] Using a password on the command line ... (avoid in scripts)
+
+-- PostgreSQL
+-- -Fc selects the compressed custom format
+pg_dump -Fc shop &gt; shop.dump        # custom format, compressed</code></pre></div>
+    <p class="code-note">Three backup styles: engine file backup, logical dump and compressed custom dump. --single-transaction keeps the MySQL dump consistent.</p>
+    <h3 id="ch16-restore" data-toc>16.2 Restores</h3>
+    <p class="topic-desc">Restoring is the test of a backup and a routine in its own right, using RESTORE DATABASE in SQL Server, mysql or mysqlimport for dumps, and pg_restore or psql in PostgreSQL. Practice it into a scratch database on a schedule so recovery is a rehearsed procedure. A restore you can do quickly makes an incident survivable.</p>
+    <div class="codeWrap"><pre><code>-- SQL Server
+-- WITH REPLACE overwrites the existing database
+RESTORE DATABASE shop FROM DISK = 'C:\backups\shop.bak' WITH REPLACE;
+
+-- MySQL
+-- pipes the SQL file back into the engine
+mysql -u root -p shop &lt; shop.sql
+
+-- PostgreSQL
+-- -d names the target database
+pg_restore -d shop shop.dump</code></pre></div>
+    <p class="code-note">Each backup type has a matching restore command. RESTORE WITH REPLACE overwrites, the mysql CLI replays SQL, and pg_restore reads its own format.</p>
+    <h3 id="ch16-pitr" data-toc>16.3 Point-in-time recovery</h3>
+    <p class="topic-desc">Point-in-time recovery replays transaction logs or WAL to recover up to the moment before a mistake, so a full backup plus the archived log stream is required. Enable it with recovery model FULL and transaction log backups in SQL Server, binlog-based recovery in MySQL, and WAL archiving with pg_basebackup in PostgreSQL. It lets you rewind to just before the damaging statement.</p>
+    <p>Full backup + transaction-log/ WAL archives let you restore to a moment before a mistake. SQL Server uses the transaction log (FULL recovery model); MySQL uses binlogs; PostgreSQL uses WAL archiving + <code>recovery_target_time</code>.</p>
+    <h3 id="ch16-migrate" data-toc>16.4 Schema migrations and cross-engine moves</h3>
+    <p class="topic-desc">Schema migrations version your schema like code through tools such as Flyway and Liquibase, applying numbered change files in order. Cross-engine moves export with mysqldump or pg_dump and import into the target after converting types. Planned migrations beat hand-editing production tables.</p>
+    <table>
+      <tr><th>Task</th><th>Tools</th></tr>
+      <tr><td>.NET</td><td>EF Core migrations</td></tr>
+      <tr><td>Laravel/PHP</td><td>Laravel migrations</td></tr>
+      <tr><td>Language-neutral</td><td>Flyway, Liquibase, dbmate, Alembic</td></tr>
+      <tr><td>Cross-engine copy</td><td>pgloader, mysqldump + transform, ETL tools</td></tr>
+    </table>
+    <div class="warn"><p>Test restores regularly. An untested backup is a hope, not a plan. Automate a restore into a scratch database on a schedule.</p></div>
+    <div class="ex"><h4 id="ch16-migrate--exercises-16">Exercises 16</h4><ol>
+      <li>Back up and restore a database.</li>
+      <li>Describe the files needed for point-in-time recovery.</li>
+      <li>Write a migration for adding a column.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch17" data-toc>17 · Scaling &amp; Architecture Patterns</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Scaling &amp; Architecture Patterns</button><div class="ch-toc-list"><a href="#ch17-scale">17.1 Scaling the database</a><a href="#ch17-patterns">17.2 Patterns that pay off</a><a href="#ch17-polyglot">17.3 Polyglot persistence</a></div></div>
+    <p class="topic-desc">Scaling is a ladder: grow the server vertically, add replicas for reads, add caching, and shard last. These architecture patterns are the playbook experienced teams follow. Each rung adds capacity but also operational cost, so climb only as far as the workload requires.</p>
+    <h3 id="ch17-scale" data-toc>17.1 Scaling the database</h3>
+    <p class="topic-desc">Scale vertically first by adding CPU and memory to the existing server, then add read replicas and caching layers, and treat sharding as the last resort. Each rung adds capacity but also operational cost and complexity. Measure utilisation and latency before climbing the ladder.</p>
+    <ul>
+      <li><strong>Vertical</strong>: more CPU/RAM/fast SSD — always first.</li>
+      <li><strong>Read replicas</strong>: offload reporting and read-heavy traffic.</li>
+      <li><strong>Caching</strong>: Redis/Memcached in front of hot reads.</li>
+      <li><strong>CQRS</strong>: separate read models (often materialised) from writes.</li>
+      <li><strong>Sharding</strong>: last resort for write scale.</li>
+    </ul>
+    <h3 id="ch17-patterns" data-toc>17.2 Patterns that pay off</h3>
+    <p class="topic-desc">A shortlist of repeatable designs that pay off: replica routing for read scaling, materialised views for expensive aggregations, the outbox pattern for reliable events, soft delete instead of hard deletes, and optimistic locking with version columns. Steal them where they fit. Each solves a recurring problem without bespoke architecture.</p>
+    <table>
+      <tr><th>Pattern</th><th>Problem it solves</th></tr>
+      <tr><td>Read replica routing</td><td>Reporting load starving transactions</td></tr>
+      <tr><td>Materialised views</td><td>Expensive aggregates</td></tr>
+      <tr><td>Outbox table</td><td>Reliable events + transactions</td></tr>
+      <tr><td>Soft delete</td><td>Audit/history without losing rows</td></tr>
+      <tr><td>Optimistic concurrency (rowversion)</td><td>Lost updates without long locks</td></tr>
+    </table>
+    <h3 id="ch17-polyglot" data-toc>17.3 Polyglot persistence</h3>
+    <p class="topic-desc">One engine can cover most needs, so add a specialist store only for a concrete requirement such as full-text search or analytics. Every extra system adds ops burden, licensing and consistency concerns. Choose a second store only when the primary engine is measurably the wrong tool for the job.</p>
+    <p>Relational engines handle most needs. Add a specialised store only for a real requirement: a document store for flexible schemas, a search engine (Elasticsearch) for relevance, a time-series DB for metrics, a graph DB for deep relationships. Each adds operational cost.</p>
+    <div class="ex"><h4 id="ch17-polyglot--exercises-17">Exercises 17</h4><ol>
+      <li>Add a read replica and route a report to it.</li>
+      <li>Design an outbox for reliable event publishing.</li>
+      <li>Justify (or reject) adding a second data store.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Cheat Sheets &amp; Roadmap</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Cheat Sheets &amp; Roadmap</button><div class="ch-toc-list"><a href="#app-syntax">A.1 Cross-engine syntax cheat sheet</a><a href="#app-roadmap">A.2 Roadmap: basic to enterprise</a><a href="#app-rules">A.3 Rules of thumb</a></div></div>
+    <p class="topic-desc">The appendix is a quick syntax cross-reference for all three engines plus a staged path from basics to enterprise. It includes a cheat sheet, a learning roadmap and the rules of thumb that carry most of the value. Bookmark it and come back when you are stuck.</p>
+    <h3 id="app-syntax" data-toc>A.1 Cross-engine syntax cheat sheet</h3>
+    <p class="topic-desc">The fastest way to look up a task: limits, time zones, concatenation, null handling and more across SQL Server, MySQL and PostgreSQL side by side. Keep it beside your editor and check it whenever a dialect detail is unsure. Compare the same task in all three engines at a glance.</p>
+    <table>
+      <tr><th>Task</th><th>SQL Server</th><th>MySQL</th><th>PostgreSQL</th></tr>
+      <tr><td>Limit rows</td><td><code>TOP(10)</code> / <code>FETCH</code></td><td><code>LIMIT 10</code></td><td><code>LIMIT 10</code></td></tr>
+      <tr><td>Current time</td><td><code>SYSDATETIME()</code></td><td><code>NOW()</code></td><td><code>NOW()</code></td></tr>
+      <tr><td>String concat</td><td><code>+</code> / <code>CONCAT</code></td><td><code>CONCAT</code></td><td><code>||</code></td></tr>
+      <tr><td>Null coalesce</td><td><code>ISNULL</code></td><td><code>IFNULL</code></td><td><code>COALESCE</code></td></tr>
+      <tr><td>Auto key</td><td><code>IDENTITY</code></td><td><code>AUTO_INCREMENT</code></td><td><code>IDENTITY</code></td></tr>
+      <tr><td>Describe table</td><td><code>sp_help</code></td><td><code>DESCRIBE</code></td><td><code>\d</code></td></tr>
+      <tr><td>Upsert</td><td><code>MERGE</code></td><td><code>ON DUPLICATE KEY</code></td><td><code>ON CONFLICT</code></td></tr>
+      <tr><td>JSON access</td><td><code>JSON_VALUE</code></td><td><code>-&gt;&gt;</code></td><td><code>-&gt;&gt;</code></td></tr>
+    </table>
+    <h3 id="app-roadmap" data-toc>A.2 Roadmap: basic to enterprise</h3>
+    <p class="topic-desc">A staged plan from creating tables to high availability and governance, laid out so each step builds on the last. Use it to plan your own learning or to onboard a new hire. Follow the stages in order and skip ahead only when a topic is already mastered.</p>
+    <table>
+      <tr><th>Stage</th><th>You can…</th></tr>
+      <tr><td>Basic</td><td>Create tables, insert/select/update, simple joins, keys and constraints</td></tr>
+      <tr><td>Intermediate</td><td>Model to 3NF, index by query, transactions, procedures, backups</td></tr>
+      <tr><td>Advanced</td><td>Tune from plans, partition, replicate, secure with RLS, JSON, migrations</td></tr>
+      <tr><td>Enterprise</td><td>HA/failover, read scale + CQRS, sharding, DR drills, governance/audit</td></tr>
+    </table>
+    <h3 id="app-rules" data-toc>A.3 Rules of thumb</h3>
+    <p class="topic-desc">Six rules that carry most of the value: model first, index for queries, never use floating point for money, parameterise queries, apply least privilege, and scale in order. Follow these as defaults and deviate only with a measured reason. They capture the most reusable judgement from the whole guide.</p>
+    <ul>
+      <li><strong>Model first; normalise to 3NF, then denormalise on evidence.</strong></li>
+      <li><strong>Index for your queries; measure, don’t guess.</strong></li>
+      <li><strong>Money is DECIMAL/NUMERIC, never FLOAT.</strong></li>
+      <li><strong>Always parameterise queries — never concatenate user input.</strong></li>
+      <li><strong>Least privilege; backups you have actually restored.</strong></li>
+      <li><strong>Scale up, then out, then shard — in that order.</strong></li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Databases — SQL Server Express, MySQL &amp; PostgreSQL Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>.NET Core + Vue - Scalable Web Application Guide</title>
+<meta name="description" content="This guide maps out a full production-grade system where an ASP.NET Core API in C# talks to a Vue 3…. 18 chapters, 68 topics and 34 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/dotnet-vue.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content=".NET Core + Vue - Scalable Web Application Guide">
+<meta property="og:description" content="This guide maps out a full production-grade system where an ASP.NET Core API in C# talks to a Vue 3…. 18 chapters, 68 topics and 34 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/dotnet-vue.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content=".NET Core + Vue - Scalable Web Application Guide">
+<meta name="twitter:description" content="This guide maps out a full production-grade system where an ASP.NET Core API in C# talks to a Vue 3…. 18 chapters, 68 topics and 34 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/dotnet-vue.html#article","headline":".NET Core + Vue - Scalable Web Application Guide","name":".NET Core + Vue - Scalable Web Application Guide","description":"This guide maps out a full production-grade system where an ASP.NET Core API in C# talks to a Vue 3…. 18 chapters, 68 topics and 34 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/dotnet-vue.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/dotnet-vue.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":".NET Core + Vue - Scalable Web Application Guide","item":"https://amin360it.github.io/quick-guides/dotnet-vue.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">.NET Core + Vue</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — Scalable Web Apps with .NET Core + Vue</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-stack" data-target="orientation-stack">The stack</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Architecture Overview</a><ul><li><a href="#ch1-shape" data-target="ch1-shape">1.1 SPA + API shape</a></li><li><a href="#ch1-layers" data-target="ch1-layers">1.2 Clean architecture layers</a></li><li><a href="#ch1-modular" data-target="ch1-modular">1.3 Modular monolith before microservices</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · ASP.NET Core Fundamentals</a><ul><li><a href="#ch2-minimal" data-target="ch2-minimal">2.1 Minimal APIs</a></li><li><a href="#ch2-di" data-target="ch2-di">2.2 Dependency injection and configuration</a></li><li><a href="#ch2-middleware" data-target="ch2-middleware">2.3 The middleware pipeline</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Clean Architecture in .NET</a><ul><li><a href="#ch3-usecases" data-target="ch3-usecases">3.1 Use cases</a></li><li><a href="#ch3-cqrs" data-target="ch3-cqrs">3.2 CQRS: commands vs queries</a></li><li><a href="#ch3-validation" data-target="ch3-validation">3.3 Validation and pipeline behaviors</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Data Access with EF Core</a><ul><li><a href="#ch4-context" data-target="ch4-context">4.1 The DbContext and models</a></li><li><a href="#ch4-migrations" data-target="ch4-migrations">4.2 Migrations</a></li><li><a href="#ch4-queries" data-target="ch4-queries">4.3 Efficient querying</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Authentication &amp; Authorization</a><ul><li><a href="#ch5-identity" data-target="ch5-identity">5.1 ASP.NET Core Identity</a></li><li><a href="#ch5-jwt" data-target="ch5-jwt">5.2 JWT for SPAs</a></li><li><a href="#ch5-policies" data-target="ch5-policies">5.3 Policies and claims</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · API Design &amp; Error Handling</a><ul><li><a href="#ch6-rest" data-target="ch6-rest">6.1 Resource design</a></li><li><a href="#ch6-problem" data-target="ch6-problem">6.2 RFC 7807 Problem Details</a></li><li><a href="#ch6-versioning" data-target="ch6-versioning">6.3 Versioning strategy</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Background Work, Caching &amp; Realtime Backend</a><ul><li><a href="#ch7-hosted" data-target="ch7-hosted">7.1 Hosted services and background queues</a></li><li><a href="#ch7-cache" data-target="ch7-cache">7.2 Caching layers</a></li><li><a href="#ch7-signalr" data-target="ch7-signalr">7.3 SignalR hub</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Vue 3 Frontend Foundations</a><ul><li><a href="#ch8-setup" data-target="ch8-setup">8.1 Project setup</a></li><li><a href="#ch8-components" data-target="ch8-components">8.2 Components with script setup</a></li><li><a href="#ch8-props" data-target="ch8-props">8.3 Props, emits, slots</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Routing, State &amp; Data Fetching</a><ul><li><a href="#ch9-router" data-target="ch9-router">9.1 Vue Router</a></li><li><a href="#ch9-pinia" data-target="ch9-pinia">9.2 Pinia stores</a></li><li><a href="#ch9-client" data-target="ch9-client">9.3 A typed API client</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Forms &amp; UI Patterns in Vue</a><ul><li><a href="#ch10-forms" data-target="ch10-forms">10.1 Forms and validation</a></li><li><a href="#ch10-ux" data-target="ch10-ux">10.2 Loading, empty and error states</a></li><li><a href="#ch10-perf" data-target="ch10-perf">10.3 Component performance</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · Integrating SPA and API</a><ul><li><a href="#ch11-cors" data-target="ch11-cors">11.1 CORS and cookies</a></li><li><a href="#ch11-types" data-target="ch11-types">11.2 Shared types</a></li><li><a href="#ch11-onecontainer" data-target="ch11-onecontainer">11.3 One container, both halves</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch12" data-target="ch12">12 · Real-time with SignalR + Vue</a><ul><li><a href="#ch12-client" data-target="ch12-client">12.1 The Vue client</a></li><li><a href="#ch12-groups" data-target="ch12-groups">12.2 Groups, presence and scale</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch13" data-target="ch13">13 · Testing the Full Stack</a><ul><li><a href="#ch13-backend" data-target="ch13-backend">13.1 Backend tests</a></li><li><a href="#ch13-frontend" data-target="ch13-frontend">13.2 Frontend tests</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch14" data-target="ch14">14 · Observability &amp; Operations</a><ul><li><a href="#ch14-logs" data-target="ch14-logs">14.1 Structured logging and tracing</a></li><li><a href="#ch14-health" data-target="ch14-health">14.2 Health checks</a></li><li><a href="#ch14-slo" data-target="ch14-slo">14.3 What to watch</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch15" data-target="ch15">15 · Deployment &amp; Scaling</a><ul><li><a href="#ch15-docker" data-target="ch15-docker">15.1 Containerising</a></li><li><a href="#ch15-scale" data-target="ch15-scale">15.2 Scaling the API</a></li><li><a href="#ch15-cicd" data-target="ch15-cicd">15.3 CI/CD</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch16" data-target="ch16">16 · Performance Tuning</a><ul><li><a href="#ch16-backend" data-target="ch16-backend">16.1 Backend</a></li><li><a href="#ch16-frontend" data-target="ch16-frontend">16.2 Frontend</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Commands, Patterns &amp; Roadmap</a><ul><li><a href="#app-commands" data-target="app-commands">A.1 Command cheat sheet</a></li><li><a href="#app-roadmap" data-target="app-roadmap">A.2 Roadmap: beginner to advanced</a></li><li><a href="#app-cheatsheets" data-target="app-cheatsheets">A.3 Rules of thumb</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">.NET Core + Vue</span>
+      <span class="am-band-s">18 chapters &middot; 68 topics &middot; 34 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — Scalable Web Apps with .NET Core + Vue</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — Scalable Web Apps with .NET Core + Vue</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-stack">The stack</a></div></div>
+    <p class="topic-desc">This guide maps out a full production-grade system where an ASP.NET Core API in C# talks to a Vue 3 single-page application. Each chapter and subtopic is self-contained, so you can read front to back or jump straight to the part you need. Working through it in order gives you the whole mental model; dipping in still leaves every section meaningful on its own.</p>
+    <p>A complete guide to building a <strong>production-grade, scalable web application</strong> with a .NET (ASP.NET Core) backend and a Vue 3 frontend. Single file, offline, progress saved locally.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">The guide is organised into three arcs: ASP.NET Core backend first, Vue 3 frontend second, then a final arc that integrates and operates the two halves together. Every chapter is written to stand alone, so you can bend the order to your own priorities. Cross-references tell you when a later part depends on an earlier concept.</p>
+    <ul>
+      <li><strong>Architecture &amp; backend (Ch. 1–7)</strong> — solution structure, minimal APIs, clean architecture, EF Core, auth, API design and background work.</li>
+      <li><strong>Frontend (Ch. 8–11)</strong> — Vue 3 + Vite + TypeScript, routing, state with Pinia, forms and the API client.</li>
+      <li><strong>Together (Ch. 12–16)</strong> — integration, real-time, testing, observability, deployment and performance.</li>
+    </ul>
+    <div class="tip"><p>The backend is the contract; the frontend is a consumer. Design and version the API first, and both halves move independently and safely.</p></div>
+    <h3 id="orientation-stack" data-toc>The stack</h3>
+    <p class="topic-desc">The stack is the exact technology lineup used in every example: .NET 9 or 10 with EF Core for the API, Vue 3 with Vite and TypeScript for the frontend, and SignalR for realtime messaging. Knowing these names means the patterns you learn transfer directly to your own projects. Nothing else needs installing beyond the standard tooling these frameworks provide.</p>
+    <table>
+      <tr><th>Layer</th><th>Choice</th></tr>
+      <tr><td>Runtime</td><td>.NET 9/10 (LTS) — ASP.NET Core</td></tr>
+      <tr><td>Data</td><td>EF Core + PostgreSQL/SQL Server</td></tr>
+      <tr><td>Auth</td><td>ASP.NET Core Identity + JWT / OpenID Connect</td></tr>
+      <tr><td>Frontend</td><td>Vue 3 (script setup), Vite, TypeScript, Pinia, Vue Router</td></tr>
+      <tr><td>Realtime</td><td>SignalR + Vue client</td></tr>
+      <tr><td>Hosting</td><td>Docker + Kubernetes / Azure App Service</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Architecture Overview</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Architecture Overview</button><div class="ch-toc-list"><a href="#ch1-shape">1.1 SPA + API shape</a><a href="#ch1-layers">1.2 Clean architecture layers</a><a href="#ch1-modular">1.3 Modular monolith before microservices</a></div></div>
+    <p class="topic-desc">Before any code, this chapter explains how the SPA, API and database fit together into one system. It makes the decisions you will see later rational: why the frontend is a separate host, how the API owns the data, and where realtime connections sit. Five minutes here gives every later choice a place to live.</p>
+    <h3 id="ch1-shape" data-toc>1.1 SPA + API shape</h3>
+    <p class="topic-desc">The system is two deployables joined by one contract: the browser speaks HTTPS and JSON to the API, and SignalR handles realtime messages over a WebSocket. This split never changes, so you can develop and test each half independently. The API stays the single source of truth while the SPA remains a purely stateless client.</p>
+    <div class="codeWrap"><pre><code>Browser (Vue SPA)  --HTTPS/JSON--&gt;  ASP.NET Core API  --&gt;  Database
+       |                                   |
+       +-- SignalR (websockets) -----------+
+       +-- CDN (static assets)
+
+Two deployables (or one container serving both), one API contract.</code></pre></div>
+    <p class="code-note">An architecture sketch: the SPA talks HTTPS/JSON to the API, SignalR carries realtime pushes, and a CDN serves static assets — everything behind one API contract.</p>
+    <h3 id="ch1-layers" data-toc>1.2 Clean architecture layers</h3>
+    <p class="topic-desc">Clean architecture organises code into concentric layers with dependencies pointing inward toward the domain. Your domain and application layers know nothing about EF Core, HTTP or Vue, leaving the API layer as the only place framework types appear. That inward flow keeps business rules testable without a database or a server running.</p>
+    <table>
+      <tr><th>Project</th><th>Responsibility</th><th>Depends on</th></tr>
+      <tr><td>Domain</td><td>Entities, value objects, rules</td><td>Nothing</td></tr>
+      <tr><td>Application</td><td>Use cases, DTOs, interfaces</td><td>Domain</td></tr>
+      <tr><td>Infrastructure</td><td>EF Core, external services</td><td>Application</td></tr>
+      <tr><td>Api</td><td>HTTP endpoints, wiring</td><td>Application + Infrastructure</td></tr>
+    </table>
+    <h3 id="ch1-modular" data-toc>1.3 Modular monolith before microservices</h3>
+    <p class="topic-desc">Start as one deployable application that is internally divided into clear feature modules, each owning its own routes and data. Microservices are only worth splitting out later when a specific boundary genuinely needs independent scaling or separate ownership. The modular monolith keeps deploys simple while still giving you seams to split along.</p>
+    <p>Start as a modular monolith with clear boundaries (by feature). Split into services only when a boundary genuinely needs independent scaling or ownership. Premature microservices buy distributed complexity with no payoff.</p>
+    <div class="ex"><h4 id="ch1-modular--exercises-1">Exercises 1</h4><ol>
+      <li>Sketch your solution’s projects and their dependencies.</li>
+      <li>Identify two boundaries that could become services later.</li>
+      <li>Write one sentence per layer describing its job.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · ASP.NET Core Fundamentals</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · ASP.NET Core Fundamentals</button><div class="ch-toc-list"><a href="#ch2-minimal">2.1 Minimal APIs</a><a href="#ch2-di">2.2 Dependency injection and configuration</a><a href="#ch2-middleware">2.3 The middleware pipeline</a></div></div>
+    <p class="topic-desc">This chapter covers the everyday .NET machinery you touch most: minimal APIs, dependency injection and the middleware pipeline. You learn how to declare endpoints, register services once in the container and inject them where needed, and compose request handling in the correct order. Mastering these makes endpoints quick to write and safe to reason about.</p>
+    <h3 id="ch2-minimal" data-toc>2.1 Minimal APIs</h3>
+    <p class="topic-desc">Minimal APIs define HTTP endpoints as small lambda functions with minimal boilerplate, using MapGet, MapPost and related methods on the builder. The guide uses them for the whole API surface because they keep handlers close to their routes. Small surfaces stay readable, and dependency injection arguments are filled automatically from the container.</p>
+    <div class="codeWrap"><pre><code>var builder = WebApplication.CreateBuilder(args); // app host plus config
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi();
+
+var app = builder.Build();
+
+var posts = app.MapGroup("/api/posts"); // all post endpoints share this prefix
+
+posts.MapGet("/", async (AppDbContext db) =&gt;
+    await db.Posts.OrderByDescending(p =&gt; p.CreatedAt).ToListAsync());
+
+posts.MapGet("/{id:int}", async (int id, AppDbContext db) =&gt;
+    await db.Posts.FindAsync(id) is Post p ? Results.Ok(p) : Results.NotFound());
+
+posts.MapPost("/", async (CreatePostDto dto, AppDbContext db) =&gt;
+{
+    var post = new Post { Title = dto.Title, Body = dto.Body };
+    db.Posts.Add(post);
+    await db.SaveChangesAsync(); // persists the new post
+    return Results.Created($"/api/posts/{post.Id}", post);
+});
+
+app.Run(); // start listening for requests</code></pre></div>
+    <p class="code-note">A complete minimal API: a lean bootstrap, an /api/posts group for list and detail reads, and a POST that creates a post and returns 201 with its location.</p>
+    <h3 id="ch2-di" data-toc>2.2 Dependency injection and configuration</h3>
+    <p class="topic-desc">Dependency injection and configuration are built into ASP.NET Core, so you register services once in Program.cs with AddSingleton, AddScoped or AddTransient and inject them anywhere via constructor parameters. Configuration binds from appsettings.json and environment variables through the IConfiguration service. This gives you testability for free because every dependency is explicit.</p>
+    <div class="codeWrap"><pre><code>builder.Services.AddScoped&lt;IPostService, PostService&gt;(); // one instance per request
+builder.Services.Configure&lt;JwtOptions&gt;(builder.Configuration.GetSection("Jwt")); // bind the Jwt section
+
+// appsettings.json + environment variables + user-secrets (dev)</code></pre></div>
+    <p class="code-note">Two registration lines: a scoped service per request plus strongly-typed JwtOptions bound from config. Swap either in tests without touching callers.</p>
+    <h3 id="ch2-middleware" data-toc>2.3 The middleware pipeline</h3>
+    <p class="topic-desc">Requests flow through a middleware chain in the exact order you register it with Use and Run methods. Ordering is the classic source of bugs, so authentication must run before authorization, and error handling early enough to catch failures. Each middleware can short-circuit the pipeline and hand back a response immediately.</p>
+    <div class="codeWrap"><pre><code>app.UseExceptionHandler("/error"); // outermost, catches everything downstream
+app.UseHttpsRedirection();
+app.UseCors("spa");
+app.UseAuthentication(); // identify the caller
+app.UseAuthorization(); // check what the caller may do
+app.MapControllers(); // or minimal endpoints</code></pre></div>
+    <p class="code-note">A request pipeline in the right order: exceptions first, then HTTPS and CORS, then authentication before authorization, then the endpoints.</p>
+    <div class="warn"><p>Order matters. Authentication before authorization; exception handling outermost so it can catch everything downstream.</p></div>
+    <div class="ex"><h4 id="ch2-middleware--exercises-2">Exercises 2</h4><ol>
+      <li>Build a minimal API with GET/POST for one resource.</li>
+      <li>Register a service and inject it into an endpoint.</li>
+      <li>Add OpenAPI documentation and inspect it in a browser.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Clean Architecture in .NET</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Clean Architecture in .NET</button><div class="ch-toc-list"><a href="#ch3-usecases">3.1 Use cases</a><a href="#ch3-cqrs">3.2 CQRS: commands vs queries</a><a href="#ch3-validation">3.3 Validation and pipeline behaviors</a></div></div>
+    <p class="topic-desc">This chapter keeps business rules independent of the framework by shaping code into use cases. You write the core logic once and then let controllers, HTTP and EF Core hang off the outside. The upfront ceremony pays back in logic you can unit test without a server and can reason about in isolation.</p>
+    <h3 id="ch3-usecases" data-toc>3.1 Use cases</h3>
+    <p class="topic-desc">Every command or query becomes a named use case class together with its own handler, typically split by IRequest and IRequestHandler for command-query separation. Controllers shrink to HTTP translation while the real work moves into the handler. Because the use case has no framework dependencies, you can test it in isolation over an in-memory data source.</p>
+    <div class="codeWrap"><pre><code>public sealed record CreatePostCommand(string Title, string Body) : IRequest&lt;int&gt;; // declares the intent
+
+public sealed class CreatePostHandler : IRequestHandler&lt;CreatePostCommand, int&gt;
+{
+    private readonly AppDbContext _db;
+    public CreatePostHandler(AppDbContext db) =&gt; _db = db;
+
+    public async Task&lt;int&gt; Handle(CreatePostCommand cmd, CancellationToken ct)
+    {
+        var post = new Post(cmd.Title, cmd.Body); // map the command to an entity
+        _db.Posts.Add(post);
+        await _db.SaveChangesAsync(ct); // persist the change
+        return post.Id;
+    }
+}</code></pre></div>
+    <p class="code-note">A command record and its handler: build a Post from the command, save it, return the new id. No HTTP, no framework — just business logic.</p>
+    <p>MediatR (or a hand-rolled dispatcher) keeps controllers/endpoints thin: they translate HTTP to a command/query and back.</p>
+    <h3 id="ch3-cqrs" data-toc>3.2 CQRS: commands vs queries</h3>
+    <p class="topic-desc">CQRS separates operations that change state, the commands, from operations that only read it, the queries. Each side is then optimised for its own job: writes stay simple and transactional, reads project exactly what the client needs. You get clear analysis and simpler reasoning about who is allowed to change what.</p>
+    <table>
+      <tr><th>Side</th><th>Purpose</th><th>Returns</th></tr>
+      <tr><td>Command</td><td>Change state</td><td>Id / void / result</td></tr>
+      <tr><td>Query</td><td>Read state</td><td>DTOs</td></tr>
+    </table>
+    <h3 id="ch3-validation" data-toc>3.3 Validation and pipeline behaviors</h3>
+    <p class="topic-desc">Validation rules written with FluentValidation stay attached to the command or query they protect. A pipeline behavior such as the one MediatR provides runs those rules before the handler ever executes, so one policy applies to every request. Fail all requests return consistent validation errors without duplicate code in each handler.</p>
+    <div class="codeWrap"><pre><code>public class CreatePostValidator : AbstractValidator&lt;CreatePostCommand&gt;
+{
+    public CreatePostValidator()
+    {
+        RuleFor(x =&gt; x.Title).NotEmpty().MaximumLength(200); // required, max 200 chars
+        RuleFor(x =&gt; x.Body).NotEmpty().MinimumLength(10); // required, min 10 chars
+    }
+}
+// Register a validation behavior so every command is validated before handling.</code></pre></div>
+    <p class="code-note">FluentValidation rules on the command itself: Title required and short, Body required and meaty. A pipeline behavior runs them before any handler.</p>
+    <div class="ex"><h4 id="ch3-validation--exercises-3">Exercises 3</h4><ol>
+      <li>Move a controller action’s logic into a command handler.</li>
+      <li>Split one endpoint into a command and a query.</li>
+      <li>Add FluentValidation and a pipeline behavior.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Data Access with EF Core</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Data Access with EF Core</button><div class="ch-toc-list"><a href="#ch4-context">4.1 The DbContext and models</a><a href="#ch4-migrations">4.2 Migrations</a><a href="#ch4-queries">4.3 Efficient querying</a></div></div>
+    <p class="topic-desc">This chapter is about sensible data access with EF Core: modelling the schema in code, migrating it safely through environments and querying efficiently. You configure entities and relationships once, generate migrations from the model, and project your queries to exactly the shapes clients need. The goal is that no request ever accidentally scans a whole table.</p>
+    <h3 id="ch4-context" data-toc>4.1 The DbContext and models</h3>
+    <p class="topic-desc">Your DbContext subclasses DbContext and is the single place that maps entities to tables, keys and relationships using DbSet properties and configuration classes. ModelBuilder configuration in OnModelCreating is the contract your queries depend on, so keeping it explicit matters. One context lifetime maps to one logical unit of work.</p>
+    <div class="codeWrap"><pre><code>public class AppDbContext(DbContextOptions&lt;AppDbContext&gt; options) : DbContext(options)
+{
+    public DbSet&lt;Post&gt; Posts =&gt; Set&lt;Post&gt;(); // the Posts table
+    public DbSet&lt;Tag&gt; Tags =&gt; Set&lt;Tag&gt;(); // the Tags table
+
+    protected override void OnModelCreating(ModelBuilder b)
+    {
+        b.Entity&lt;Post&gt;().HasIndex(p =&gt; p.Slug).IsUnique(); // one slug per post
+        b.Entity&lt;Post&gt;().HasOne(p =&gt; p.Author).WithMany().HasForeignKey(p =&gt; p.AuthorId); // required author
+    }
+}</code></pre></div>
+    <p class="code-note">The DbContext surfaces Posts and Tags as DbSets and, in OnModelCreating, enforces a unique slug index and the Author relationship.</p>
+    <h3 id="ch4-migrations" data-toc>4.2 Migrations</h3>
+    <p class="topic-desc">Migrations turn model changes into reviewable SQL scripts you can run in any environment. The dotnet ef migrations add command generates them and dotnet ef database update applies them locally, while production uses an idempotent script generated with script. Each environment then upgrades deterministically without anyone running handwritten SQL.</p>
+    <div class="codeWrap"><pre><code>dotnet tool install --global dotnet-ef # one-time CLI install
+dotnet ef migrations add InitialCreate # scaffold the first migration
+dotnet ef database update # apply it locally
+dotnet ef migrations script --idempotent   # for CI/CD</code></pre></div>
+    <p class="code-note">The EF Core workflow: install the CLI once, add a migration, update the database, and generate an idempotent script for CI/CD.</p>
+    <h3 id="ch4-queries" data-toc>4.3 Efficient querying</h3>
+    <p class="topic-desc">Efficient querying comes from projecting to DTOs with Select, disabling change tracking on read-only queries with AsNoTracking, and paginating every list with Skip and Take. You must also filter in the database rather than in memory. The difference separates a snappy API from one that scans whole tables per request.</p>
+    <div class="codeWrap"><pre><code>// Project to DTOs -&gt; only needed columns
+var list = await db.Posts.AsNoTracking() // read-only, no change tracking
+    .Where(p =&gt; p.Published)
+    .OrderByDescending(p =&gt; p.CreatedAt)
+    .Select(p =&gt; new PostSummary(p.Id, p.Title, p.Author.Name))
+    .Skip((page - 1) * size).Take(size) // one page of results
+    .ToListAsync();
+
+// Avoid N+1: use Include/ThenInclude or projection; never loop-lazy-load.</code></pre></div>
+    <p class="code-note">A paginated, projected read: no tracking, only published posts, a narrowed column set, and Skip/Take for paging — the antidote to N+1.</p>
+    <div class="tip"><p><strong>AsNoTracking()</strong> for reads, projections over full entities, and pagination everywhere. EF Core is powerful but a careless query can scan the whole table.</p></div>
+    <div class="ex"><h4 id="ch4-queries--exercises-4">Exercises 4</h4><ol>
+      <li>Create an entity, migration and database.</li>
+      <li>Write a paginated, projected query with a filter.</li>
+      <li>Add an index and confirm it via the query plan.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Authentication &amp; Authorization</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Authentication &amp; Authorization</button><div class="ch-toc-list"><a href="#ch5-identity">5.1 ASP.NET Core Identity</a><a href="#ch5-jwt">5.2 JWT for SPAs</a><a href="#ch5-policies">5.3 Policies and claims</a></div></div>
+    <p class="topic-desc">This chapter covers identity, tokens and permissions, the security layer every real application needs. You register ASP.NET Core Identity for users and password hashes, issue JWTs for the SPA, and protect endpoints with authorization policies. Getting the storage and cookie choices right early avoids painful migrations and security holes later.</p>
+    <h3 id="ch5-identity" data-toc>5.1 ASP.NET Core Identity</h3>
+    <p class="topic-desc">ASP.NET Core Identity provides users, password hashing, roles and token providers straight out of the box. You wire it to EF Core by calling AddIdentity and AddEntityFrameworkStores with your DbContext, then use UserManager and SignInManager for registration, sign-in and password management. It gives you most of a secure auth system without rolling your own hashing.</p>
+    <div class="codeWrap"><pre><code>builder.Services.AddIdentityCore&lt;AppUser&gt;() // registers the identity core
+    .AddEntityFrameworkStores&lt;AppDbContext&gt;() // stores users with EF Core
+    .AddDefaultTokenProviders();
+
+// Register / login endpoints; password hashing handled for you.</code></pre></div>
+    <p class="code-note">Identity registers the user store in EF Core with default token providers. Hashing, password rules and token generation are handled for you.</p>
+    <h3 id="ch5-jwt" data-toc>5.2 JWT for SPAs</h3>
+    <p class="topic-desc">JSON Web Tokens let a stateless SPA authenticate without server-side sessions by validating the token against its issuer, audience and signature on every request. The accepted practice for browser apps is to keep the JWT in a SameSite httpOnly cookie rather than in localStorage. Short expiry times plus a refresh flow limit the damage when a token leaks.</p>
+    <div class="codeWrap"><pre><code>builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o =&gt;
+    {
+        o.TokenValidationParameters = new TokenValidationParameters // what each token must pass
+        {
+            ValidateIssuer = true, ValidateAudience = true,
+            ValidateLifetime = true, ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key) // verify the signature
+        };
+    });
+
+[Authorize] // on endpoints
+// Prefer short-lived access tokens + refresh tokens stored in httpOnly cookies.</code></pre></div>
+    <p class="code-note">JWT bearer auth enforces issuer, audience, lifetime and signature on every request. The closing comment is the real advice: keep tokens in httpOnly cookies.</p>
+    <div class="warn"><p>Never store long-lived JWTs in <code>localStorage</code> in production — XSS turns them into stolen sessions. Use httpOnly, Secure, SameSite cookies or in-memory access tokens with refresh rotation.</p></div>
+    <h3 id="ch5-policies" data-toc>5.3 Policies and claims</h3>
+    <p class="topic-desc">Authorization is declared at the endpoint with the Authorize attribute tied to a named policy rather than scattered role checks. Policies combine requirements over claims and roles, for example a minimum role or a specific claim value, defined once via AddAuthorization. Endpoints then state what they need and the framework enforces it consistently.</p>
+    <div class="codeWrap"><pre><code>builder.Services.AddAuthorization(o =&gt;
+{
+    o.AddPolicy("CanEditPost", p =&gt; p.RequireClaim("permission", "posts.edit")); // claim-based check
+    o.AddPolicy("Admin", p =&gt; p.RequireRole("Admin")); // role-based check
+});</code></pre></div>
+    <p class="code-note">Two policies: a claim-based CanEditPost and a role-based Admin. Endpoints just declare the policy name and the framework enforces it.</p>
+    <div class="ex"><h4 id="ch5-policies--exercises-5">Exercises 5</h4><ol>
+      <li>Implement register + login issuing a JWT.</li>
+      <li>Protect an endpoint with <code>[Authorize]</code> and a policy.</li>
+      <li>Add refresh-token rotation and explain the security gain.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · API Design &amp; Error Handling</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · API Design &amp; Error Handling</button><div class="ch-toc-list"><a href="#ch6-rest">6.1 Resource design</a><a href="#ch6-problem">6.2 RFC 7807 Problem Details</a><a href="#ch6-versioning">6.3 Versioning strategy</a></div></div>
+    <p class="topic-desc">This chapter defines a clean HTTP contract so that failures are as predictable as success. You design consistent resource URLs, return RFC 7807 problem detail bodies for errors, and version the API with a migration path. Consistent problems and versioning keep your clients honest and your documentation truthful.</p>
+    <h3 id="ch6-rest" data-toc>6.1 Resource design</h3>
+    <p class="topic-desc">Resource design gives one URL shape per resource while HTTP verbs cover the actions, and query strings express filtering, sorting and paging. A GET returns a collection or item, POST creates, PUT replaces, PATCH updates and DELETE removes. Predictable REST keeps client code trivial and lets conventions replace per-endpoint documentation.</p>
+    <div class="codeWrap"><pre><code>GET    /api/v1/posts           list (paginated)
+GET    /api/v1/posts/{id}      detail
+POST   /api/v1/posts           create
+PUT    /api/v1/posts/{id}      replace
+PATCH  /api/v1/posts/{id}      partial update
+DELETE /api/v1/posts/{id}      remove
+
+# Filtering/sorting:  ?page=2&amp;size=20&amp;sort=-createdAt&amp;tag=php</code></pre></div>
+    <p class="code-note">One resource, five verbs, plus pagination, filtering and sorting through the query string. URL versioning keeps v1 stable while v2 evolves.</p>
+    <h3 id="ch6-problem" data-toc>6.2 RFC 7807 Problem Details</h3>
+    <p class="topic-desc">RFC 7807 Problem Details is a standardised JSON body for errors, so every failure looks the same to clients. Implemented with the ProblemDetails class or AddProblemDetails, it carries a type, title, status, detail and instance plus custom fields. Machine-parseable errors let the frontend render failures without special-casing each status code.</p>
+    <div class="codeWrap"><pre><code>builder.Services.AddProblemDetails(); // standard RFC 7807 error output
+
+// Consistent errors:
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "Validation failed",
+  "status": 400,
+  "errors": { "title": ["Title is required"] },
+  "traceId": "00-abc..."
+}</code></pre></div>
+    <p class="code-note">AddProblemDetails produces standard RFC 7807 bodies with a per-field error map and a traceId — one shape clients everywhere can parse.</p>
+    <h3 id="ch6-versioning" data-toc>6.3 Versioning strategy</h3>
+    <p class="topic-desc">URL versioning, such as /api/v1/orders, is simple and impossible for consumers to miss compared to header-based alternatives. The ASP.NET Core versioning packages let you define a deprecation window so past versions keep working for a while after a new one ships. Clear notice plus a removal date protects every client you have published.</p>
+    <ul>
+      <li>URL versioning (<code>/api/v1/</code>) is the simplest and most visible.</li>
+      <li>Never break a published contract without a version bump and a deprecation window.</li>
+      <li>Document with OpenAPI/Swagger; generate typed clients for the SPA.</li>
+    </ul>
+    <div class="ex"><h4 id="ch6-versioning--exercises-6">Exercises 6</h4><ol>
+      <li>Expose one resource with full CRUD and Problem Details errors.</li>
+      <li>Add pagination/filtering and document it in OpenAPI.</li>
+      <li>Generate a TypeScript client from the OpenAPI spec.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Background Work, Caching &amp; Realtime Backend</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Background Work, Caching &amp; Realtime Backend</button><div class="ch-toc-list"><a href="#ch7-hosted">7.1 Hosted services and background queues</a><a href="#ch7-cache">7.2 Caching layers</a><a href="#ch7-signalr">7.3 SignalR hub</a></div></div>
+    <p class="topic-desc">This chapter covers work that should not block a request: background jobs, caching hot data and server-initiated push notifications. Together these three make an API feel instant at scale. Each pattern fits a different problem, and the guide shows when to apply which one.</p>
+    <h3 id="ch7-hosted" data-toc>7.1 Hosted services and background queues</h3>
+    <p class="topic-desc">A BackgroundService subclass runs long-lived work while your application is up, started and stopped by AddHostedService in configuration. You can pair it with an IBackgroundTaskQueue or a channel that endpoints enqueue work onto, then the service drains it. Perfect for outbox processors, reminders and any work too slow for a request lifetime.</p>
+    <div class="codeWrap"><pre><code>public class OutboxWorker(IServiceScopeFactory scopeFactory) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested) // loop until shutdown
+        {
+            using var scope = scopeFactory.CreateScope(); // fresh scoped services each poll
+            var handler = scope.ServiceProvider.GetRequiredService&lt;OutboxHandler&gt;();
+            await handler.ProcessPendingAsync(ct);
+            await Task.Delay(TimeSpan.FromSeconds(5), ct); // wait five seconds between runs
+        }
+    }
+}
+builder.Services.AddHostedService&lt;OutboxWorker&gt;();
+// For real scale: Hangfire / MassTransit + a broker (RabbitMQ/Azure Service Bus).</code></pre></div>
+    <p class="code-note">A BackgroundService polls an outbox every five seconds using a fresh DI scope per tick, so scoped services stay safe. Registered once, runs for the app’s life.</p>
+    <h3 id="ch7-cache" data-toc>7.2 Caching layers</h3>
+    <p class="topic-desc">The caching layer puts Redis in front of expensive reads with a short time-to-live to cut database load. Cache-Aside is the classic pattern: check the cache, fall through to the database on a miss, then populate the entry for the next request. Keep serialized DTOs in the cache and set a TTL so stale data self-heals.</p>
+    <div class="codeWrap"><pre><code>builder.Services.AddStackExchangeRedisCache(o =&gt; // register Redis as the cache
+    o.Configuration = builder.Configuration["Redis"]);
+
+var value = await cache.GetOrCreateAsync("stats", async entry =&gt; // get or recompute
+{
+    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5); // cache for five minutes
+    return await ComputeStatsAsync();
+});</code></pre></div>
+    <p class="code-note">Redis is registered, then GetOrCreateAsync computes stats once and reuses them for five minutes. The classic cache-aside pattern in four lines.</p>
+    <h3 id="ch7-signalr" data-toc>7.3 SignalR hub</h3>
+    <p class="topic-desc">A SignalR hub is the server-side heart of your realtime socket, a class that inherits from Hub and exposes methods clients can invoke. You map it with MapHub, authenticate it like any endpoint, and push messages by calling Clients methods that target connections. The matching Vue client appears in the realtime chapter later in the guide.</p>
+    <div class="codeWrap"><pre><code>public class NotificationsHub : Hub { }
+
+app.MapHub&lt;NotificationsHub&gt;("/hubs/notifications"); // expose the hub endpoint
+// Server: await hub.Clients.User(id).SendAsync("postCreated", dto);</code></pre></div>
+    <p class="code-note">An empty hub plus one mapping line exposes /hubs/notifications. Server code pushes to a user with hub.Clients.User(id).SendAsync.</p>
+    <div class="ex"><h4 id="ch7-signalr--exercises-7">Exercises 7</h4><ol>
+      <li>Implement a background service that processes a queue table.</li>
+      <li>Cache an expensive endpoint in Redis.</li>
+      <li>Push a notification from the server to one user via SignalR.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Vue 3 Frontend Foundations</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Vue 3 Frontend Foundations</button><div class="ch-toc-list"><a href="#ch8-setup">8.1 Project setup</a><a href="#ch8-components">8.2 Components with script setup</a><a href="#ch8-props">8.3 Props, emits, slots</a></div></div>
+    <p class="topic-desc">This chapter spins up a Vue 3 project with Vite and TypeScript and teaches the component model everything else builds on. You write small focused components that communicate through props, events and slots and compose them into screens. Clean building blocks composed deliberately is the pattern the whole frontend follows.</p>
+    <h3 id="ch8-setup" data-toc>8.1 Project setup</h3>
+    <p class="topic-desc">Scaffold a Vue project with the create-vue tool, which offers TypeScript, Vue Router and Pinia as options in one command. The Vite dev server provides a proxy so the browser calls /api and the dev server forwards it to the .NET API. That proxy makes the app behave as if it were same-origin during development.</p>
+    <div class="codeWrap"><pre><code>npm create vue@latest client # scaffold a new Vue 3 app
+# choose: TypeScript, Router, Pinia, ESLint, Prettier
+cd client &amp;&amp; npm install &amp;&amp; npm run dev # install deps, start dev server
+
+// vite.config.ts — proxy API in dev
+export default defineConfig({
+  server: { proxy: { '/api': 'https://localhost:7001' } }, // forward /api to the backend
+  plugins: [vue()]
+});</code></pre></div>
+    <p class="code-note">Scaffold the client, pick the good options, then point the Vite dev proxy at the API. During development the browser sees no cross-origin calls at all.</p>
+    <h3 id="ch8-components" data-toc>8.2 Components with script setup</h3>
+    <p class="topic-desc">script setup is the modern component style where the template compiles against the script block directly, giving full TypeScript inference. Combined with Composition API functions like ref and computed, it removes almost all the boilerplate the Options API needed. You get the same power with fewer indent levels and better editor support.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+import { ref, computed } from 'vue'
+const count = ref(0) // reactive state
+const doubled = computed(() =&gt; count.value * 2) // derived, cached value
+function inc() { count.value++ } // the only way to change count
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;button @click="inc"&gt;{{ count }} ({{ doubled }})&lt;/button&gt;
+&lt;/template&gt;</code></pre></div>
+    <p class="code-note">A tiny script-setup component: ref for state, computed for a derived value, and a click handler updating both. Full TypeScript inference, no boilerplate.</p>
+    <h3 id="ch8-props" data-toc>8.3 Props, emits, slots</h3>
+    <p class="topic-desc">Props, emits and slots are the three channels of component communication: data flows in through props declared with defineProps, events flow out via defineEmits, and named slots using the well pattern define places where parent content is rendered. Getting these idioms right keeps components composable and reusable. Parents stay the source of truth while children stay dumb.</p>
+    <div class="codeWrap"><pre><code>const props = defineProps&lt;{ post: Post }&gt;() // parent passes a post down
+const emit = defineEmits&lt;{ (e: 'select', id: number): void }&gt;() // child announces the event
+
+&lt;article @click="emit('select', props.post.id)"&gt;{{ post.title }}&lt;/article&gt;</code></pre></div>
+    <p class="code-note">Data flows in through props, events flow out through emits: clicking the article raises select with the post id and the parent owns the response.</p>
+    <div class="tip"><p>Prefer <code>&lt;script setup&gt;</code> + Composition API for new code: it is the modern default and plays best with TypeScript inference.</p></div>
+    <div class="ex"><h4 id="ch8-props--exercises-8">Exercises 8</h4><ol>
+      <li>Scaffold a Vue 3 project and configure the API proxy.</li>
+      <li>Build a component with props, an emit and a slot.</li>
+      <li>Compute derived state with <code>computed</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Routing, State &amp; Data Fetching</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Routing, State &amp; Data Fetching</button><div class="ch-toc-list"><a href="#ch9-router">9.1 Vue Router</a><a href="#ch9-pinia">9.2 Pinia stores</a><a href="#ch9-client">9.3 A typed API client</a></div></div>
+    <p class="topic-desc">This chapter covers how a Vue app moves: Vue Router defines the screens for each path, Pinia holds shared state, and a typed API client talks to the backend. Every feature you build ends up touching all three. Together the trio turns a set of components into a navigable, stateful application.</p>
+    <h3 id="ch9-router" data-toc>9.1 Vue Router</h3>
+    <p class="topic-desc">Vue Router maps each path to a component through the routes array and a router-view placeholder, with navigation guards such as beforeEach checking authentication and redirecting when required. Routes pass params to views as props to keep them decoupled and easy to reuse. Lazy-loaded routes with dynamic imports keep the initial bundle small.</p>
+    <div class="codeWrap"><pre><code>const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: HomeView },
+    { path: '/posts/:id', component: PostView, props: true }, // id becomes a prop
+    { path: '/login', component: LoginView, meta: { public: true } }, // skips the guard
+  ],
+})
+
+router.beforeEach((to) =&gt; {
+  if (!to.meta.public &amp;&amp; !useAuth().isLoggedIn) return '/login' // redirect guests to login
+})</code></pre></div>
+    <p class="code-note">Paths map to components; the login route opts out via meta.public. A beforeEach guard redirects anyone unauthenticated back to /login.</p>
+    <h3 id="ch9-pinia" data-toc>9.2 Pinia stores</h3>
+    <p class="topic-desc">Pinia stores central state using setup-style stores defined with defineStore, where plain refs from Composition API become reactive state and functions become actions. Components read state and call actions through the store, never fetching directly from the API themselves. The store stays the single owner of its data, and components stay simple consumers.</p>
+    <div class="codeWrap"><pre><code>export const usePosts = defineStore('posts', () =&gt; { // setup-style store
+  const items = ref&lt;Post[]&gt;([])
+  const loading = ref(false)
+  async function fetchAll() {
+    loading.value = true
+    try { items.value = await api.get('/posts') } // fill state from the API
+    finally { loading.value = false }
+  }
+  return { items, loading, fetchAll }
+})</code></pre></div>
+    <p class="code-note">A setup-style Pinia store wraps items and loading, and fetchAll fills them through try/finally. Components subscribe to state instead of fetching directly.</p>
+    <h3 id="ch9-client" data-toc>9.3 A typed API client</h3>
+    <p class="topic-desc">A typed API client is one axios instance configured once with the base URL, withCredentials for cookies, and interceptors that attach tokens and refresh them on a 401. Response errors are normalised into one shape in the response interceptor, so every caller handles failures the same way. TypeScript types generated from the OpenAPI spec keep payloads aligned with the server.</p>
+    <div class="codeWrap"><pre><code>const api = axios.create({ baseURL: '/api/v1', withCredentials: true }) // shared client with cookies
+
+api.interceptors.response.use(r =&gt; r.data, async (err) =&gt; {
+  if (err.response?.status === 401) await refreshToken() // silent refresh on expiry
+  return Promise.reject(err)
+})</code></pre></div>
+    <p class="code-note">One axios instance carries the base URL and cookies, an interceptor unwraps response data, and a 401 triggers a silent token refresh before the caller notices.</p>
+    <div class="ex"><h4 id="ch9-client--exercises-9">Exercises 9</h4><ol>
+      <li>Add three routes with a auth guard.</li>
+      <li>Create a Pinia store that fetches and caches posts.</li>
+      <li>Add an interceptor that handles 401 with a token refresh.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Forms &amp; UI Patterns in Vue</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Forms &amp; UI Patterns in Vue</button><div class="ch-toc-list"><a href="#ch10-forms">10.1 Forms and validation</a><a href="#ch10-ux">10.2 Loading, empty and error states</a><a href="#ch10-perf">10.3 Component performance</a></div></div>
+    <p class="topic-desc">This chapter is the UX plumbing that separates a demo from a product: form validation, loading states and rendering performance. Users feel this chapter on every click, so the patterns here matter as much as the business logic. Handle each case explicitly and your app never leaves the user staring at a blank screen.</p>
+    <h3 id="ch10-forms" data-toc>10.1 Forms and validation</h3>
+    <p class="topic-desc">Client-side validation exists for UX, while server-side validation remains the truth. Mirror the rules in the form with something like VeeValidate or simple computed errors, then map any server error responses back onto the matching field. Both layers end up agreeing on what is valid, and the user gets feedback instantly instead of after a round trip.</p>
+    <div class="codeWrap"><pre><code>const form = reactive({ title: '', body: '' }) // two-way form state
+const errors = ref&lt;Record&lt;string, string[]&gt;&gt;({})
+
+async function submit() {
+  try { await api.post('/posts', form); router.push('/posts') }
+  catch (e) { errors.value = e.response?.data?.errors ?? {} } // surface server errors by field
+}</code></pre></div>
+    <p class="code-note">A reactive form posts to the API, navigates on success, and maps server validation errors straight back onto fields on failure — the server stays the source of truth.</p>
+    <p>Validate on the server (source of truth) and mirror rules on the client (for UX) with libraries like VeeValidate + Zod.</p>
+    <h3 id="ch10-ux" data-toc>10.2 Loading, empty and error states</h3>
+    <p class="topic-desc">Every asynchronous view needs three explicit states plus success: loading, empty, and error, then the data itself. A common approach is a small composable that tracks status along with the data, with a loading skeleton while fetching, an empty message when there is nothing, and an error panel with a retry button on failure. Users are never left staring at a blank screen.</p>
+    <ul>
+      <li>Every async view needs three states: loading, empty, error — plus success.</li>
+      <li>Disable submit while in flight; show optimistic updates with rollback.</li>
+      <li>Never leave the user staring at a blank screen.</li>
+    </ul>
+    <h3 id="ch10-perf" data-toc>10.3 Component performance</h3>
+    <p class="topic-desc">Component performance work starts with cheap structural wins: lazy-load routes with dynamic imports, virtualise long lists with something like vue-virtual-scroller, and keep v-for keys stable so the renderer can reuse DOM nodes. Cheap changes show up immediately in load time and scrolling smoothness. Measure the impact before reaching for more exotic tinkering.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- lazy-load routes --&gt;
+{ path: '/posts', component: () =&gt; import('./PostList.vue') }
+
+&lt;!-- virtualise long lists --&gt;
+&lt;VirtualList :items="rows" :item-height="48" /&gt;
+
+&lt;!-- keep stable keys, avoid v-if/f structural churn --&gt;</code></pre></div>
+    <p class="code-note">Three cheap, high-impact habits: lazy-import routes, virtualise long lists, and keep keys stable. The inline comments are the whole playbook.</p>
+    <div class="ex"><h4 id="ch10-perf--exercises-10">Exercises 10</h4><ol>
+      <li>Build a validated form that maps server errors to fields.</li>
+      <li>Add loading/empty/error states to a list view.</li>
+      <li>Lazy-load one route and measure the bundle.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · Integrating SPA and API</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Integrating SPA and API</button><div class="ch-toc-list"><a href="#ch11-cors">11.1 CORS and cookies</a><a href="#ch11-types">11.2 Shared types</a><a href="#ch11-onecontainer">11.3 One container, both halves</a></div></div>
+    <p class="topic-desc">This chapter makes the SPA and API behave like one system by handling CORS, sharing types and shipping a single deployable. You configure CORS on the API, generate TypeScript types from the OpenAPI spec, and publish the Vue build into the API’s static files. Doing this removes entire classes of drift and CORS pain.</p>
+    <h3 id="ch11-cors" data-toc>11.1 CORS and cookies</h3>
+    <p class="topic-desc">The browser blocks cross-origin calls unless the API opts in with the UseCors middleware and a policy that allows the SPA origin. When cookies are involved, the policy must allow credentials and the client must send withCredentials, which makes CORS stricter still. Deploying both halves under the same origin sidesteps the whole problem entirely.</p>
+    <div class="codeWrap"><pre><code>builder.Services.AddCors(o =&gt; o.AddPolicy("spa", p =&gt; p
+    .WithOrigins("https://app.example.com") // only trust the SPA origin
+    .AllowAnyHeader().AllowAnyMethod().AllowCredentials())); // credentials allowed
+
+// Same-site deployment (reverse proxy) avoids CORS entirely. Prefer it in prod.</code></pre></div>
+    <p class="code-note">A CORS policy trusts one SPA origin and allows credentials. The trailing note is the real tip: deploy same-origin in production and skip CORS altogether.</p>
+    <h3 id="ch11-types" data-toc>11.2 Shared types</h3>
+    <p class="topic-desc">Generate TypeScript from the HTTP API’s OpenAPI specification so the contract cannot drift silently. Tools such as openapi-typescript generate types and clients from openapi.json, and you commit the output and regenerate on schema changes. A schema mismatch then fails the build instead of surfacing in production.</p>
+    <p>Generate TypeScript types from the OpenAPI spec (NSwag / openapi-typescript) so the SPA and API can never silently drift. Commit the generated client.</p>
+    <h3 id="ch11-onecontainer" data-toc>11.3 One container, both halves</h3>
+    <p class="topic-desc">Publish the Vue build into the API’s static folders, typically wwwroot, and ship one container that serves the SPA and the JSON API together. The frame ignores CORS entirely because everything is same-origin. One deployable means simpler operations and a single place to version and roll back.</p>
+    <div class="codeWrap"><pre><code># Build Vue, copy dist into wwwroot, serve from ASP.NET Core
+dotnet publish -c Release # dist lands in wwwroot and is served with the API
+# Result: a single deployable that serves the SPA + API with no CORS.</code></pre></div>
+    <p class="code-note">Publish the release build and the Vue dist is served from wwwroot alongside the API. One deployable, no CORS, simplest possible operations.</p>
+    <div class="ex"><h4 id="ch11-onecontainer--exercises-11">Exercises 11</h4><ol>
+      <li>Configure CORS for a dev origin with credentials.</li>
+      <li>Generate TS types from OpenAPI and use them.</li>
+      <li>Publish the SPA into the API’s wwwroot and test.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch12" data-toc>12 · Real-time with SignalR + Vue</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Real-time with SignalR + Vue</button><div class="ch-toc-list"><a href="#ch12-client">12.1 The Vue client</a><a href="#ch12-groups">12.2 Groups, presence and scale</a></div></div>
+    <p class="topic-desc">This chapter uses SignalR to push updates from server to browser instead of polling for changes. The same hub pattern scales to presence indicators and collaborative features like typing notifications and cursor sharing. You learn the client connection, the wire protocol and how to target the right receivers at scale.</p>
+    <h3 id="ch12-client" data-toc>12.1 The Vue client</h3>
+    <p class="topic-desc">The Vue client wires the browser to the hub via HubConnectionBuilder with .withUrl to the hub endpoint and .configureLogging for diagnostics. You call server methods with invoke and receive pushes through .on handlers that update Pinia state live. WithAutomaticReconnect restores the connection without a page reload when the network drops.</p>
+    <div class="codeWrap"><pre><code>import { HubConnectionBuilder } from '@microsoft/signalr'
+const conn = new HubConnectionBuilder()
+  .withUrl('/hubs/notifications', { withCredentials: true }) // connect with cookies
+  .withAutomaticReconnect() // survive short drops
+  .build()
+
+conn.on('postCreated', (post) =&gt; store.items.unshift(post)) // prepend the pushed post
+await conn.start()</code></pre></div>
+    <p class="code-note">The browser connects to the hub with cookies and automatic reconnect; on('postCreated') prepends the pushed post to the store so the UI updates live.</p>
+    <h3 id="ch12-groups" data-toc>12.2 Groups, presence and scale</h3>
+    <p class="topic-desc">Instead of broadcasting to every connection, the server adds connections to groups so pushes reach only relevant recipients, using Groups methods and connection identifiers. When the app runs many nodes, the SignalR Redis backplane routes messages across servers, and group membership must be resynced after a reconnect. Clients restore state by pulling the API again after reconnecting.</p>
+    <ul>
+      <li>Use groups per topic/user rather than broadcasting everything.</li>
+      <li>For multi-node scale, add the Azure SignalR Service or a Redis backplane.</li>
+      <li>Reconnect + resync: after reconnect, fetch missed state via the API.</li>
+    </ul>
+    <div class="ex"><h4 id="ch12-groups--exercises-12">Exercises 12</h4><ol>
+      <li>Wire a SignalR connection into a Pinia store.</li>
+      <li>Send a per-user notification and show it in the UI.</li>
+      <li>Handle reconnect by re-fetching state.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch13" data-toc>13 · Testing the Full Stack</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Testing the Full Stack</button><div class="ch-toc-list"><a href="#ch13-backend">13.1 Backend tests</a><a href="#ch13-frontend">13.2 Frontend tests</a></div></div>
+    <p class="topic-desc">This chapter proves the contract works from both sides: integration tests for the API, unit tests for components, and a Playwright journey that runs the whole system end to end. Each layer catches different failures, and together they make changes safe. The frontend and backend tests are cheap once the scaffolding exists.</p>
+    <h3 id="ch13-backend" data-toc>13.1 Backend tests</h3>
+    <p class="topic-desc">Backend tests use WebApplicationFactory to spin up your real application in memory. Integration tests then hit the true HTTP middleware pipeline, controllers and EF Core-backed data against a test database without a live server. That means the tests exercise the same code paths production will use.</p>
+    <div class="codeWrap"><pre><code>public class PostTests(WebApplicationFactory&lt;Program&gt; factory)
+    : IClassFixture&lt;WebApplicationFactory&lt;Program&gt;&gt;
+{
+    [Fact]
+    public async Task Creates_post()
+    {
+        var client = factory.CreateClient(); // in-memory test server
+        var res = await client.PostAsJsonAsync("/api/v1/posts", // real HTTP pipeline
+            new { title = "Hi", body = "Body text" });
+        res.EnsureSuccessStatusCode(); // throws unless 2xx
+    }
+}</code></pre></div>
+    <p class="code-note">An integration test via WebApplicationFactory: POST to the real HTTP pipeline with a JSON body and assert the 2xx status, no external server needed.</p>
+    <h3 id="ch13-frontend" data-toc>13.2 Frontend tests</h3>
+    <p class="topic-desc">Frontend tests split between Vitest for unit-testing components and Playwright for driving a real browser end to end. Vitest mounts single components with @vue/test-utils and mocks Pinia or the API, while Playwright clicks through actual screens against a running backend. Both are cheap to add once the project is scaffolded, and each catches a different failure class.</p>
+    <div class="codeWrap"><pre><code>// Vitest + Vue Test Utils
+import { mount } from '@vue/test-utils'
+test('increments', async () =&gt; {
+  const w = mount(Counter) // mount the component
+  await w.find('button').trigger('click') // simulate the click
+  expect(w.text()).toContain('1') // assert the rendered count
+})
+
+// End-to-end: Playwright drives the real app.
+test('login flow', async ({ page }) =&gt; {
+  await page.goto('/login') // start in a real browser
+  await page.fill('#email', 'a@b.c')
+  await page.click('button[type=submit]')
+  await expect(page).toHaveURL('/dashboard') // guard redirected successfully
+})</code></pre></div>
+    <p class="code-note">Two layers in one block: Vitest mounts the component, clicks and asserts output; Playwright drives the real login journey in a browser to its destination.</p>
+    <div class="ex"><h4 id="ch13-frontend--exercises-13">Exercises 13</h4><ol>
+      <li>Write an integration test for one API endpoint.</li>
+      <li>Unit-test a Vue component with Vitest.</li>
+      <li>Add a Playwright smoke test for the critical journey.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch14" data-toc>14 · Observability &amp; Operations</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Observability &amp; Operations</button><div class="ch-toc-list"><a href="#ch14-logs">14.1 Structured logging and tracing</a><a href="#ch14-health">14.2 Health checks</a><a href="#ch14-slo">14.3 What to watch</a></div></div>
+    <p class="topic-desc">This chapter is about knowing what is happening in production: structured logs, distributed tracing, health checks and a few metrics that matter. You can only fix what you can see, so the goal is a system you can interrogate after the fact. Each piece feeds a distinct part of an operations dashboard.</p>
+    <h3 id="ch14-logs" data-toc>14.1 Structured logging and tracing</h3>
+    <p class="topic-desc">Structured logging writes JSON lines with the built-in ILogger support so every event is searchable, and the ASP.NET Core console formatter makes the format consistent out of the box. OpenTelemetry tracing follows a request across services by carrying a trace ID and emitting spans. Correlation IDs in logs and traces thread the pieces back together into one request timeline.</p>
+    <div class="codeWrap"><pre><code>builder.Logging.AddJsonConsole(); // machine-readable output
+builder.Services.AddOpenTelemetry() // enable tracing and metrics
+    .WithTracing(t =&gt; t.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation())
+    .WithMetrics(m =&gt; m.AddAspNetCoreInstrumentation());
+
+// Correlation IDs flow from the SPA request through the API to the database.</code></pre></div>
+    <p class="code-note">JSON console logging plus OpenTelemetry tracing and metrics instrumentation on the request path. Correlation ids tie the SPA request all the way to the database.</p>
+    <h3 id="ch14-health" data-toc>14.2 Health checks</h3>
+    <p class="topic-desc">Health checks expose a probe endpoint for load balancers and orchestrators such as Kubernetes. You add checks for critical dependencies like the database or Redis with AddHealthChecks and MapHealthChecks, so the probe verifies more than just that the process is still running. Unhealthy instances then get pulled from rotation.</p>
+    <div class="codeWrap"><pre><code>builder.Services.AddHealthChecks()
+    .AddDbContextCheck&lt;AppDbContext&gt;() // database reachability
+    .AddRedis(builder.Configuration["Redis"]!); // cache reachability
+
+app.MapHealthChecks("/healthz"); // orchestration probes this path</code></pre></div>
+    <p class="code-note">Health probes for the database and Redis, exposed at /healthz. Load balancers and Kubernetes check exactly this endpoint before routing traffic.</p>
+    <h3 id="ch14-slo" data-toc>14.3 What to watch</h3>
+    <p class="topic-desc">Pick a few metrics with thresholds instead of trying to watch everything. The useful set on an API is latency percentiles like p95 and p99, error rate, slow database queries and queue depth. Everything else is noise. Monitoring these few numbers tells you whether the app is meeting its service-level objectives.</p>
+    <ul>
+      <li>API latency p95/p99, error rate, throughput.</li>
+      <li>Database: slow queries, connection pool saturation.</li>
+      <li>Frontend: Core Web Vitals from real users.</li>
+      <li>Queue depth and background job failures.</li>
+    </ul>
+    <div class="ex"><h4 id="ch14-slo--exercises-14">Exercises 14</h4><ol>
+      <li>Add a health check for the DB and cache.</li>
+      <li>Emit a structured log with a correlation id.</li>
+      <li>Pick one SLO and its alert threshold.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch15" data-toc>15 · Deployment &amp; Scaling</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Deployment &amp; Scaling</button><div class="ch-toc-list"><a href="#ch15-docker">15.1 Containerising</a><a href="#ch15-scale">15.2 Scaling the API</a><a href="#ch15-cicd">15.3 CI/CD</a></div></div>
+    <p class="topic-desc">This chapter ships the system and grows it: one Docker image, stateless replicas and a CI pipeline that makes deploys boring. The same process takes you from one node to many by never storing state in the app process. Deployments become repeatable and rollbacks become a one-command operation.</p>
+    <h3 id="ch15-docker" data-toc>15.1 Containerising</h3>
+    <p class="topic-desc">Containerising uses a multi-stage Dockerfile where a full SDK image builds the app and a slim runtime-only image ships it. The final image is built with dotnet publish, runs the production framework, and is then registered and pushed with the standard docker commands. Small, secure images deploy anywhere that runs a container runtime.</p>
+    <div class="codeWrap"><pre><code>FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build # full SDK for building
+WORKDIR /src
+COPY . .
+RUN dotnet publish -c Release -o /app # compile and package
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 # slim runtime image
+WORKDIR /app
+COPY --from=build /app . # take only the publish output
+ENTRYPOINT ["dotnet", "Api.dll"]</code></pre></div>
+    <p class="code-note">A two-stage Dockerfile: the SDK stage builds and publishes, then a slim aspnet image copies only the output. Small, fast, production-shaped.</p>
+    <h3 id="ch15-scale" data-toc>15.2 Scaling the API</h3>
+    <p class="topic-desc">Scaling stays easy when the API remains stateless, so any request can be served by any replica without shared local state. You add replicas behind the load balancer, introduce read replicas for the database, and put caching in front of expensive reads. Horizontal growth then never changes the shape of the code.</p>
+    <ul>
+      <li>Stateless API + sticky-free load balancing; sessions in Redis or JWT.</li>
+      <li>Scale horizontally; scale the DB vertically then add read replicas.</li>
+      <li>Cache aggressively in front of expensive reads.</li>
+      <li>Offload CPU work to background workers.</li>
+      <li>Serve the SPA from a CDN.</li>
+    </ul>
+    <h3 id="ch15-cicd" data-toc>15.3 CI/CD</h3>
+    <p class="topic-desc">A CI/CD pipeline runs tests and publishes a versioned Docker image on every push, triggered by the platform of your choice. The pipeline builds the frontend and backend, runs the suites, and pushes an image that carries a build number. Deploys become repeatable steps and a rollback means promoting the previous image.</p>
+    <div class="codeWrap"><pre><code>- run: dotnet test # fail on regressions
+- run: dotnet publish -c Release
+- run: docker build -t ghcr.io/acme/app:$GITHUB_SHA . # tag with the commit sha
+- run: docker push ghcr.io/acme/app:$GITHUB_SHA # push the image
+# then deploy via Argo CD / kubectl set image, with canary + rollback.</code></pre></div>
+    <p class="code-note">A CI pipeline that tests, publishes, builds a SHA-tagged image and pushes it. The trailing line is the key habit: deploy with canary and rollback.</p>
+    <div class="ex"><h4 id="ch15-cicd--exercises-15">Exercises 15</h4><ol>
+      <li>Write a multi-stage Dockerfile for the API.</li>
+      <li>Describe how you’d scale to 5 API replicas.</li>
+      <li>Add a deploy stage to a CI pipeline.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch16" data-toc>16 · Performance Tuning</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Performance Tuning</button><div class="ch-toc-list"><a href="#ch16-backend">16.1 Backend</a><a href="#ch16-frontend">16.2 Frontend</a></div></div>
+    <p class="topic-desc">This chapter makes the system measurably faster instead of guessing: query tuning on the backend, bundle splitting on the frontend, and real-user metrics to prove the result. The discipline is always measure, change, re-measure. Most of the wins come from removing work rather than cleverer code.</p>
+    <h3 id="ch16-backend" data-toc>16.1 Backend</h3>
+    <p class="topic-desc">Backend tuning projects queries to DTOs, adds indexes on filter columns and pools database connections. Duplicate or inefficient SQL is found by logging the queries EF Core generates. BenchmarkDotNet measures hot paths carefully before you trust intuition about which change helps.</p>
+    <ul>
+      <li>Project queries; avoid SELECT *; use AsNoTracking for reads.</li>
+      <li>Add indexes for filters/joins; watch for full scans.</li>
+      <li>Pool connections; enable response compression and output caching.</li>
+      <li>Use <code>BenchmarkDotNet</code> before optimising by intuition.</li>
+    </ul>
+    <h3 id="ch16-frontend" data-toc>16.2 Frontend</h3>
+    <p class="topic-desc">Frontend tuning splits the bundle by route with dynamic imports and shrinks what ships by replacing heavy dependencies with lighter ones. Lazy-loaded routes shorten first paint and code-splitting means users download only what the current screen needs. Real-user metrics from the browser prove which optimisations matter.</p>
+    <ul>
+      <li>Code-split by route; tree-shake; analyse the bundle.</li>
+      <li>Virtualise long lists; debounce search; abort in-flight requests.</li>
+      <li>Cache API responses client-side; use skeleton loaders.</li>
+      <li>Measure with Lighthouse and real-user metrics.</li>
+    </ul>
+    <div class="ex"><h4 id="ch16-frontend--exercises-16">Exercises 16</h4><ol>
+      <li>Profile one slow endpoint and optimise the query.</li>
+      <li>Analyse the JS bundle and split the largest chunk.</li>
+      <li>Improve a Core Web Vital and measure the gain.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Commands, Patterns &amp; Roadmap</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Commands, Patterns &amp; Roadmap</button><div class="ch-toc-list"><a href="#app-commands">A.1 Command cheat sheet</a><a href="#app-roadmap">A.2 Roadmap: beginner to advanced</a><a href="#app-cheatsheets">A.3 Rules of thumb</a></div></div>
+    <p class="topic-desc">The appendix is a pocket reference combining every command in the guide with the mental model that strings them together. It collects the scaffolding, migration, test and build commands in one place. Print-worthy content for daily work, it is meant to be kept open beside your editor.</p>
+    <h3 id="app-commands" data-toc>A.1 Command cheat sheet</h3>
+    <p class="topic-desc">The cheat sheet tables up the essential commands: dotnet new for scaffolding, dotnet ef migrations commands for schema changes, npm create and npm run dev for the frontend, and dotnet test for the suites. Each command sits beside the exact context in which you would run it. Copy, paste, move on.</p>
+    <table>
+      <tr><th>Task</th><th>Command</th></tr>
+      <tr><td>New API project</td><td><code>dotnet new webapi -minimal</code></td></tr>
+      <tr><td>Add migration</td><td><code>dotnet ef migrations add Name</code></td></tr>
+      <tr><td>Update DB</td><td><code>dotnet ef database update</code></td></tr>
+      <tr><td>Run tests</td><td><code>dotnet test</code></td></tr>
+      <tr><td>New Vue app</td><td><code>npm create vue@latest</code></td></tr>
+      <tr><td>Dev servers</td><td><code>dotnet watch</code> + <code>npm run dev</code></td></tr>
+    </table>
+    <h3 id="app-roadmap" data-toc>A.2 Roadmap: beginner to advanced</h3>
+    <p class="topic-desc">The roadmap is a staged path from a simple CRUD app to a production-grade system, describing what each level knows how to do. Beginners start with one endpoint and one component, then climb through authentication, realtime and deployment. Use it to plan deliberate practice and to see where you are on the journey.</p>
+    <table>
+      <tr><th>Stage</th><th>You can…</th></tr>
+      <tr><td>Beginner</td><td>Minimal API + EF Core CRUD; Vue list/detail with routing</td></tr>
+      <tr><td>Intermediate</td><td>Clean architecture, JWT auth, Pinia, typed client, tests</td></tr>
+      <tr><td>Advanced</td><td>SignalR scale-out, caching, CI/CD, observability, performance tuning</td></tr>
+    </table>
+    <h3 id="app-cheatsheets" data-toc>A.3 Rules of thumb</h3>
+    <p class="topic-desc">Six mantras capture the whole guide: version the API, keep endpoints thin, project queries, use httpOnly cookies, measure first, and keep components dumb. Each is a one-line reminder of a pattern the guide explains in depth. Print-worthy content for daily work.</p>
+    <ul>
+      <li><strong>API is the contract; version it.</strong></li>
+      <li><strong>Thin endpoints; use cases in handlers.</strong></li>
+      <li><strong>Project + paginate every query.</strong></li>
+      <li><strong>Tokens in httpOnly cookies; never localStorage in prod.</strong></li>
+      <li><strong>Measure before optimising.</strong></li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>.NET Core + Vue — Scalable Web Application Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

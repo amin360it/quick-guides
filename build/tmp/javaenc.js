@@ -1,0 +1,13 @@
+const fs = require('fs');
+const b = fs.readFileSync('build/newguides/java.main.html');
+console.log('first3bytes', b[0], b[1], b[2]);
+const t = b.toString('utf8');
+console.log('has BOM', t.charCodeAt(0) === 0xFEFF);
+console.log('mid-dot count', (t.match(/\u00b7/g) || []).length);
+console.log('em-dash count', (t.match(/\u2014/g) || []).length);
+const h3ids = [...t.matchAll(/<h3 id="([^"]+)" data-toc>/g)].map((x) => x[1]);
+console.log('h3 data-toc exact', h3ids.length);
+console.log('h3 sample', h3ids.slice(0, 4).join(', '), '...', h3ids.slice(-2).join(', '));
+const h2ids = [...t.matchAll(/<h2 id="([^"]+)" data-toc>/g)].map((x) => x[1]);
+console.log('h2 ids', h2ids.join(', '));
+console.log('h2 count', h2ids.length);

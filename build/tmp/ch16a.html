@@ -1,0 +1,128 @@
+  <section class="chapter">
+<h2 id="ch16" data-toc>16 · Routing and the URL as State</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Routing and the URL as state</button><div class="ch-toc-list"><a href="#ch16-ownership">The router owns the URL</a><a href="#ch16-structure">Route structure and nesting</a><a href="#ch16-params">Search params as component state</a><a href="#ch16-loading">Loading data with the router</a><a href="#ch16-navigation">Navigation, guards and scroll</a></div></div>
+    <p class="topic-desc">The URL is application state that the user owns: they can copy it, bookmark it, send it to a colleague, and press back. A router is the component that takes that ownership seriously — turning a string into a render plan, a render plan into data loads, and every in-app decision about "which screen am I on" back into the string. Chapter 10's decision table ends the argument: the value is the URL, the router owns it.</p>
+    <h3 id="ch16-ownership" data-toc>The router owns the URL</h3>
+    <p>The principle in one sentence: no component writes to <code>window.location</code>, keeps a "current page" variable in state, or decides which screen to show on its own. There is exactly one writer — the router, through navigation calls — and exactly one reader of record — the URL, resolved back through the router's route table. Everything else is downstream. When a modal, a tab, a selected row or a filter becomes part of "which screen am I on", it moves into the URL as a parameter, and the router becomes the thing that serialises it. The payoff is that every state the user would want to share now survives a paste into chat, and every back button press does what the label promises.</p>
+    <p>The failure mode this prevents has a familiar shape: a component holds <code>const [page, setPage] = useState(1)</code>, the user filters, clicks into a detail view, presses back, and the list resets to page 1 with cleared filters — because the state lived in a component that unmounted, while the URL, which did survive, said nothing about it. The fix is not a persistence layer for the state; it is recognising that this state was URL-shaped all along. The test for whether something belongs in the URL: would the user be surprised if a bookmark of this screen did not reproduce it? If no, it belongs in the URL. If yes — a half-written draft, a dismissed tooltip — it belongs in component or server-adjacent state.</p>
+    <div class="codeWrap"><pre><code>// WRONG: two sources of truth - the URL says "/", the state says page 3
+function Products() {
+  const [page, setPage] = useState(1);
+  const [category, setCategory] = useState('all');
+  // back button: component remounts, state resets, URL unchanged
+  // share link: recipient sees page 1, category "all"
+  return &lt;ProductList page={page} category={category} /&gt;;
+}
+
+// RIGHT: the router owns it - navigation IS the state update
+import { useSearchParams } from 'react-router';
+
+function Products() {
+  const [params, setParams] = useSearchParams();
+  const page = Number(params.get('page')) || 1;
+  const category = params.get('category') || 'all';
+
+  function go(next) {
+    // replace for filter changes (no history spam), push for page turns
+    const opts = { replace: next.page === page };
+    setParams(toParams(next), opts);
+  }
+  return &lt;ProductList page={page} category={category} onChange={go} /&gt;;
+}
+// share: ?page=3&amp;category=tools reproduces the screen exactly
+// back: the router restores the previous params from history</code></pre></div>
+    <p>Draw the line deliberately, because the opposite mistake is real too: stuffing volatile, private state into the URL produces unreadable addresses that leak intent and defeat history. A filter the user set once in a session, a selection that follows the last click, a local sort order — these are legitimately ephemeral. The distinction to hold is <em>reproducible screen identity</em> versus <em>session working state</em>. Screens are URLs; the way you happened to be looking at one is state that may or may not be worth encoding — encode it when sharing it would be useful, leave it out when the parameter would only add noise.</p>
+    <div class="codeWrap"><pre><code>// the encoding scale: identity in the path, intent in the query,
+// session working state nowhere
+//   /projects/acme/tasks/task_89            identity  -&gt; path
+//   ?view=list&amp;assignee=amina&amp;status=open   intent    -&gt; query (shareable)
+//   last visited tab, scroll position        session   -&gt; component state
+
+// parse defensively: the URL is user-editable input, not your setter
+function useListParams() {
+  const [params, setParams] = useSearchParams();
+  const page = Math.max(1, Number(params.get('page')) || 1);
+  const sort = ['name', 'created', 'status'].includes(params.get('sort'))
+    ? params.get('sort')
+    : 'name';                       // whitelist beats blacklist for enums
+  return { page, sort,
+    set: (patch, opts) =&gt; setParams(mergeParams(params, patch), opts) };
+}</code></pre></div>
+    <h4>The URL is user input</h4>
+    <p>Every parameter arrives potentially mangled: hand-typed, truncated by a chat client, crafted. Parse into a validated shape at the boundary — numbers coerced and clamped, enums whitelisted, unknown keys dropped — so the components below receive a domain object, never the raw strings. A component that renders <code>params.get('id')</code> directly into a query call turns a typo into an API request; a boundary parser turns it into a redirect to the sane default. The boundary is also where encoding decisions live, so the rest of the application never sees percent-encoding at all.</p>
+    <div class="note"><p>Never build a URL by string concatenation — <code>'/search?q=' + query</code> breaks on the first ampersand or hash the user types. <code>URLSearchParams</code> and the router's own param helpers encode correctly by construction, and string building is the one place that is not true, which is exactly the place a future change will forget.</p></div>
+    <h3 id="ch16-structure" data-toc>Route structure and nesting</h3>
+    <p>Route structure is information architecture expressed as a tree, and the tree should mirror how the product is actually organised: a layout that owns the chrome (nav, sidebar, breadcrumbs), children that own the regions inside it. Nested routes give that structure real mechanics — the layout route stays mounted while children change, so its state and scroll survive navigation, and each child route renders into the parent's outlet rather than remounting the whole page. The corollary that takes teams a while to learn: a route boundary is a remount boundary. State inside a route that unmounts on navigation is gone, which is correct for screen-scoped state and infuriating for state that should have been in the URL or the cache (chapters 15 and 16 respectively).</p>
+    <p>Flat route tables age badly: twenty sibling routes each repeating the same layout wrapper, guards and loaders, with the relationship between a list and its detail view existing only as a string convention. Nesting makes the relationship structural — the detail route is <em>inside</em> the list route, so the parent can render the list with the selected row highlighted while the child fills the detail pane, both sharing one data load. This is the path-to-layout correspondence worth defending in review: if two screens share chrome, they share a layout route; if one screen has regions that load independently, those regions are child routes, not tabs built from local state.</p>
+    <div class="codeWrap"><pre><code>// route tree mirrors the product's structure
+const routes = [
+  {
+    path: '/',
+    element: &lt;AppLayout /&gt;,              // chrome: nav, sidebar, crumbs
+    children: [
+      { index: true, element: &lt;Home /&gt; },
+      {
+        path: 'projects',
+        element: &lt;ProjectsLayout /&gt;,     // stays mounted across children
+        children: [
+          { index: true, element: &lt;ProjectList /&gt; },
+          { path: ':projectId', element: &lt;ProjectDetail /&gt; },
+          {
+            path: ':projectId/tasks',
+            element: &lt;TaskTabs /&gt;,
+            children: [
+              { index: true, element: &lt;TaskBoard /&gt; },
+              { path: 'board', element: &lt;TaskBoard /&gt; },
+              { path: 'table', element: &lt;TaskTable /&gt; },
+            ],
+          },
+        ],
+      },
+      { path: '*', element: &lt;NotFound /&gt; },
+    ],
+  },
+];</code></pre></div>
+    <p>Two structural decisions inside the tree earn their keep. First, layout routes as data boundaries: <code>AppLayout</code> loads what every child needs — the user, the nav items — and children load their own, so no child ever fetches the shell's data and the shell never refetches when a child changes. Second, the detail-inside-list pattern for master-detail screens: because <code>:projectId</code> nests under the index route, the URL <code>/projects/acme</code> can render the list <em>and</em> the detail pane, with the parent reading the param to highlight the selection. The alternative — a separate full-page detail route — throws away the list context and makes "back" the only way to return, which is a worse experience for a workflow built around comparing records.</p>
+    <div class="codeWrap"><pre><code>// master-detail: the param IS the selection, both panes from one URL
+function ProjectsLayout() {
+  return (
+    &lt;div className="split"&gt;
+      &lt;ProjectList /&gt;                     {/* left pane, always mounted */}
+      &lt;Outlet /&gt;                          {/* right pane: index or detail */}
+    &lt;/div&gt;
+  );
+}
+
+function ProjectDetail() {
+  const { projectId } = useParams();
+  const project = useQuery({ queryKey: ['projects', projectId],
+                             queryFn: () =&gt; api.getProject(projectId) });
+  // no "selectedProject" state anywhere - the URL selected it
+  return &lt;ProjectPane project={project.data} /&gt;;
+}
+
+// the index child renders the placeholder in the same slot
+//   { index: true, element: &lt;SelectAPrompt /&gt; }</code></pre></div>
+    <h4>Route files and code ownership</h4>
+    <p>On a team, the route table doubles as a map of who owns what: a feature's routes, layouts, loaders and screens live in the feature's directory and are exported as a route fragment, and the root table composes the fragments. Two properties follow that matter at ten people: a merge conflict in the route table becomes one line per feature instead of a contested section, and the directory structure of the features becomes the URL structure by construction — a reviewer can see that <code>projects</code> gained a child route because the file appeared. Keep the table composed, not centralised; a single file that every feature branch edits is a permanent queue.</p>
+    <div class="codeWrap"><pre><code>// feature-owned route fragments, composed at the root
+// features/projects/routes.tsx
+export const projectRoutes = {
+  path: 'projects',
+  element: &lt;ProjectsLayout /&gt;,
+  children: [
+    { index: true, element: &lt;ProjectList /&gt;, loader: listProjects },
+    { path: ':projectId', element: &lt;ProjectDetail /&gt;, loader: loadProject },
+  ],
+};
+
+// app/routes.tsx - one line per feature; merge conflicts stay one line
+import { projectRoutes } from '@/features/projects/routes';
+import { billingRoutes } from '@/features/billing/routes';
+export const routes = [
+  { path: '/', element: &lt;AppLayout /&gt;, children: [
+    projectRoutes, billingRoutes,
+    { path: '*', element: &lt;NotFound /&gt; },
+  ]},
+];</code></pre></div>
+    <div class="tip"><p>Write the route table as the product's table of contents and review it as such. If the tree does not read like the application's information architecture — if a screen you would describe as "inside projects" sits beside <code>/projects</code> — the routing has drifted from the product, and users feel that drift as a URL they did not expect.</p></div>

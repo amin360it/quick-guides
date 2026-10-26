@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bun Guide</title>
+  <link rel="stylesheet" href="assets/shell.css">
+  <script>
+    /* Resolve the theme and colour mode before first paint, so neither flashes. */
+    (function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+  </script>
+</head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Bun</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+  </ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Bun</span>
+      <span class="am-band-s">8 chapters · 50 topics · 85 code samples · works offline</span>
+    </h1>
+  <section class="chapter">
+  <h2 id="orientation" data-toc>Welcome · Bun</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Bun</button><div class="ch-toc-list"><a href="#orientation-why">0.1 Why Bun?</a><a href="#orientation-install">0.2 Installation</a></div></div>
+  <h3 id="orientation-why" data-toc>0.1 Why Bun?</h3>
+
+  <p class="topic-desc">Bun is a fast all-in-one JavaScript runtime. It’s built on JavaScriptCore (Safari’s engine), making it significantly faster than Node.js for many operations. Bun combines a runtime, bundler, test runner, and npm client.</p>
+
+  <h4 id="orientation-why--performance">Performance</h4>
+  <p>Benchmarks show Bun is 2-5x faster than Node.js for startup time and native API operations. It uses JavaScriptCore (Safari's engine) which has highly optimized JavaScript JIT compilation.</p>
+
+  <h3 id="orientation-install" data-toc>0.2 Installation</h3>
+
+  <p class="topic-desc">Installing Bun is simple:</p>
+
+  <div class="codeWrap"><pre><code>curl -fsSL https://bun.sh/install | bash
+# Or using Homebrew on macOS:
+brew install bunx/ouseful/bun</code></pre></div>
+
+  <h4 id="orientation-install--verification">Verification</h4>
+  <div class="codeWrap"><pre><code>bun --version</code></pre></div>
+
+  <h2 id="ch1" data-toc>1 · Getting Started</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 1 · Getting Started</button><div class="ch-toc-list"><a href="#ch1-hello">1.1 Hello World</a><a href="#ch1-package-json">1.2 package.json</a></div></div>
+  <h3 id="ch1-hello" data-toc>1.1 Hello World</h3>
+
+  <p class="topic-desc">The traditional first program in Bun. Creates a simple HTTP server.</p>
+
+  <div class="codeWrap"><pre><code>const server = Bun.serve({
+  port: 3000,
+  async fetch(request) {
+    return new Response('Hello World');
+  }
+});</code></pre></div>
+
+  <h3 id="ch1-package-json" data-toc>1.2 package.json</h3>
+
+  <p class="topic-desc">Bun uses a compatible package.json format with Node.js, but with additional Bun-specific fields.</p>
+
+  <h2 id="ch2" data-toc>2 · Bun Features</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 2 · Bun Features</button><div class="ch-toc-list"><a href="#ch1-import-maps">2.1 Import Maps</a><a href="#ch2-benchmarks">2.2 Benchmarks</a></div></div>
+  ...
+</section>
+</main>
+
+<button id="toTop" class="to-top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Bun.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

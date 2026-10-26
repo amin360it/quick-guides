@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network System Design Guide</title>
+<meta name="description" content="This opening section explains what the guide covers and how to work through it, orienting readers before the…. 19 chapters, 78 topics and 27 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/network-design.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Network System Design Guide">
+<meta property="og:description" content="This opening section explains what the guide covers and how to work through it, orienting readers before the…. 19 chapters, 78 topics and 27 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/network-design.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Network System Design Guide">
+<meta name="twitter:description" content="This opening section explains what the guide covers and how to work through it, orienting readers before the…. 19 chapters, 78 topics and 27 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/network-design.html#article","headline":"Network System Design Guide","name":"Network System Design Guide","description":"This opening section explains what the guide covers and how to work through it, orienting readers before the…. 19 chapters, 78 topics and 27 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/network-design.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/network-design.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Network System Design Guide","item":"https://amin360it.github.io/quick-guides/network-design.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Network System Design</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — Network System Design</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-hierarchy" data-target="orientation-hierarchy">The classic three-tier design</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Network Design Fundamentals</a><ul><li><a href="#ch1-goals" data-target="ch1-goals">1.1 What a network design must achieve</a></li><li><a href="#ch1-topologies" data-target="ch1-topologies">1.2 Topologies</a></li><li><a href="#ch1-hierarchy" data-target="ch1-hierarchy">1.3 Hierarchy, modularity and summarisation</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · The Network Model</a><ul><li><a href="#ch2-osi" data-target="ch2-osi">2.1 OSI and TCP/IP in practice</a></li><li><a href="#ch2-encap" data-target="ch2-encap">2.2 Encapsulation</a></li><li><a href="#ch2-tcpudp" data-target="ch2-tcpudp">2.3 TCP vs UDP</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · IP Addressing &amp; Subnetting</a><ul><li><a href="#ch3-ipv4" data-target="ch3-ipv4">3.1 IPv4 and CIDR</a></li><li><a href="#ch3-subnetting" data-target="ch3-subnetting">3.2 Subnetting example + output</a></li><li><a href="#ch3-vlsm" data-target="ch3-vlsm">3.3 VLSM and address planning</a></li><li><a href="#ch3-ipv6" data-target="ch3-ipv6">3.4 IPv6 essentials</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Routing</a><ul><li><a href="#ch4-static" data-target="ch4-static">4.1 Static routing</a></li><li><a href="#ch4-dynamic" data-target="ch4-dynamic">4.2 Dynamic routing protocols</a></li><li><a href="#ch4-ospf" data-target="ch4-ospf">4.3 OSPF in practice</a></li><li><a href="#ch4-bgp" data-target="ch4-bgp">4.4 BGP and route policy</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Switching &amp; VLANs</a><ul><li><a href="#ch5-switching" data-target="ch5-switching">5.1 Ethernet switching and MAC tables</a></li><li><a href="#ch5-vlan" data-target="ch5-vlan">5.2 VLANs and trunking</a></li><li><a href="#ch5-stp-lag" data-target="ch5-stp-lag">5.3 STP, link aggregation and stacking</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Core Network Services</a><ul><li><a href="#ch6-dns" data-target="ch6-dns">6.1 DNS</a></li><li><a href="#ch6-dhcp" data-target="ch6-dhcp">6.2 DHCP</a></li><li><a href="#ch6-nat" data-target="ch6-nat">6.3 NAT and PAT</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Wireless Design</a><ul><li><a href="#ch7-standards" data-target="ch7-standards">7.1 Wi-Fi generations</a></li><li><a href="#ch7-design" data-target="ch7-design">7.2 Coverage and capacity design</a></li><li><a href="#ch7-security" data-target="ch7-security">7.3 Wireless security</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Load Balancing, Proxies &amp; CDN</a><ul><li><a href="#ch8-lb" data-target="ch8-lb">8.1 Load balancing</a></li><li><a href="#ch8-proxy" data-target="ch8-proxy">8.2 Forward and reverse proxies</a></li><li><a href="#ch8-cdn" data-target="ch8-cdn">8.3 CDN and edge</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · WAN &amp; Connectivity</a><ul><li><a href="#ch9-options" data-target="ch9-options">9.1 WAN options</a></li><li><a href="#ch9-sdwan" data-target="ch9-sdwan">9.2 SD-WAN</a></li><li><a href="#ch9-vpn" data-target="ch9-vpn">9.3 VPN types</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Network Security</a><ul><li><a href="#ch10-segmentation" data-target="ch10-segmentation">10.1 Segmentation and zones</a></li><li><a href="#ch10-firewall" data-target="ch10-firewall">10.2 Firewalls and inspection</a></li><li><a href="#ch10-zerotrust" data-target="ch10-zerotrust">10.3 Zero trust networking</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · QoS &amp; Traffic Engineering</a><ul><li><a href="#ch11-qos" data-target="ch11-qos">11.1 Why QoS</a></li><li><a href="#ch11-marking" data-target="ch11-marking">11.2 Classification and marking</a></li><li><a href="#ch11-queue" data-target="ch11-queue">11.3 Queuing and shaping</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch12" data-target="ch12">12 · Redundancy &amp; High Availability</a><ul><li><a href="#ch12-l2ha" data-target="ch12-l2ha">12.1 Layer 2/3 redundancy</a></li><li><a href="#ch12-design" data-target="ch12-design">12.2 Designing for no SPOFs</a></li><li><a href="#ch12-testing" data-target="ch12-testing">12.3 Testing failover</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch13" data-target="ch13">13 · Network Automation &amp; Monitoring</a><ul><li><a href="#ch13-automation" data-target="ch13-automation">13.1 Automation</a></li><li><a href="#ch13-monitoring" data-target="ch13-monitoring">13.2 Monitoring protocols</a></li><li><a href="#ch13-observability" data-target="ch13-observability">13.3 What to watch</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch14" data-target="ch14">14 · Data Centre Network Design</a><ul><li><a href="#ch14-spineleaf" data-target="ch14-spineleaf">14.1 Spine-leaf</a></li><li><a href="#ch14-overlay" data-target="ch14-overlay">14.2 Overlays: VXLAN and EVPN</a></li><li><a href="#ch14-storage" data-target="ch14-storage">14.3 Storage and convergence</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch15" data-target="ch15">15 · Cloud Networking</a><ul><li><a href="#ch15-vpc" data-target="ch15-vpc">15.1 VPCs, subnets and routing</a></li><li><a href="#ch15-controls" data-target="ch15-controls">15.2 Security groups vs NACLs</a></li><li><a href="#ch15-connect" data-target="ch15-connect">15.3 Connecting clouds and on-prem</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch16" data-target="ch16">16 · Case Study — Campus + Cloud Network</a><ul><li><a href="#ch16-requirements" data-target="ch16-requirements">16.1 Requirements</a></li><li><a href="#ch16-design" data-target="ch16-design">16.2 The design</a></li><li><a href="#ch16-decisions" data-target="ch16-decisions">16.3 Decisions &amp; trade-offs</a></li><li><a href="#ch16-risks" data-target="ch16-risks">16.4 Risks and mitigations</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch17" data-target="ch17">17 · Troubleshooting Methodology</a><ul><li><a href="#ch17-method" data-target="ch17-method">17.1 A layered method</a></li><li><a href="#ch17-tools" data-target="ch17-tools">17.2 The toolbelt</a></li><li><a href="#ch17-common" data-target="ch17-common">17.3 Common failure patterns</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Reference &amp; Roadmap</a><ul><li><a href="#app-cheatsheet" data-target="app-cheatsheet">A.1 Cheat sheet</a></li><li><a href="#app-roadmap" data-target="app-roadmap">A.2 Roadmap: beginner to advanced</a></li><li><a href="#app-rules" data-target="app-rules">A.3 Rules of thumb</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Network System Design Guide</span>
+      <span class="am-band-s">19 chapters &middot; 78 topics &middot; 27 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — Network System Design</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — Network System Design</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-hierarchy">The classic three-tier design</a></div></div>
+    <p class="topic-desc">This opening section explains what the guide covers and how to work through it, orienting readers before the technical chapters begin. It sets expectations for the topics ahead, from foundations and design through operations and troubleshooting. Skim these introductions first to understand the structure, then jump into whichever chapter matches your current task, following the suggested order when you are working through the material from scratch.</p>
+    <p>A practical guide to designing networks that are <strong>fast, available, secure and manageable</strong>, from a single office to a multi-site enterprise and the cloud. Single file, offline, progress saved locally.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">Describes the ordering and the way the book should be navigated. Chapters progress from fundamentals to design and operations, so later material builds on the terms and techniques introduced earlier. Work top to bottom on your first pass to build context, or treat each chapter as a standalone reference and jump directly to the section you need for a specific problem.</p>
+    <ul>
+      <li><strong>Foundations (Ch. 1–3)</strong> — network models, IP addressing and subnetting.</li>
+      <li><strong>Building blocks (Ch. 4–6)</strong> — routing, switching/VLANs, and core services (DNS, DHCP, NAT).</li>
+      <li><strong>Extending the network (Ch. 7–9)</strong> — wireless, load balancing/CDN, WAN and SD-WAN.</li>
+      <li><strong>Security &amp; quality (Ch. 10–11)</strong> — segmentation, firewalls, zero trust, QoS.</li>
+      <li><strong>Design &amp; operations (Ch. 12–17)</strong> — redundancy, automation, data-centre/cloud design, a case study and troubleshooting.</li>
+    </ul>
+    <h3 id="orientation-hierarchy" data-toc>The classic three-tier design</h3>
+    <p class="topic-desc">The core, distribution and access split separates high-speed transport from policy and user attachment. Core switches carry the aggregated traffic between distribution nodes, distribution applies routing and policy such as access lists, and access switches connect end devices. It remains the mental model most enterprise networks are measured against, even when it is scaled down to a collapsed-core two-tier design or translated into spine-leaf fabrics.</p>
+    <div class="codeWrap"><pre><code>        Core (fast, redundant backbone)
+        /            |            \
+   Distribution  Distribution  Distribution
+      |              |              |
+  Access         Access         Access
+   |  |            |  |           |  |
+ end hosts     end hosts      end hosts
+
+Rules: access connects devices, distribution applies policy,
+core moves packets as fast as possible. Keep policy out of the core.</code></pre></div>
+    <p class="code-note">The three-tier hierarchy: access connects devices, distribution applies policy, and the core transports packets. Keep policy out of the core so it stays fast.</p>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Network Design Fundamentals</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Network Design Fundamentals</button><div class="ch-toc-list"><a href="#ch1-goals">1.1 What a network design must achieve</a><a href="#ch1-topologies">1.2 Topologies</a><a href="#ch1-hierarchy">1.3 Hierarchy, modularity and summarisation</a></div></div>
+    <p class="topic-desc">This chapter frames the constraints every sound design must balance: availability, scalability, performance, security, manageability and cost. It defines what each means in practice, such as uptime percentages, throughput budgets and recovery time objectives, and shows how they trade off against one another. Requirements gathering, traffic analysis and clear documentation turn these constraints into the measurable targets that drive every later decision.</p>
+    <h3 id="ch1-goals" data-toc>1.1 What a network design must achieve</h3>
+    <p class="topic-desc">Design work should start from explicit, agreed goals rather than vendor defaults or habit. Each goal maps to a measurable requirement, such as availability expressed as a percentage of uptime, performance as latency and throughput, and security as permitted zones and identity rules. Every topology and technology choice should be traceable to one of these goals, so the design can be defended in review and rechecked as traffic grows.</p>
+    <table>
+      <tr><th>Goal</th><th>Design implication</th></tr>
+      <tr><td>Availability</td><td>Redundant links/devices, no single points of failure</td></tr>
+      <tr><td>Scalability</td><td>Hierarchy, summarisation, spare capacity</td></tr>
+      <tr><td>Performance</td><td>Low latency, adequate bandwidth, QoS for real-time</td></tr>
+      <tr><td>Security</td><td>Segmentation, least privilege, inspection points</td></tr>
+      <tr><td>Manageability</td><td>Consistent addressing, naming, monitoring, automation</td></tr>
+      <tr><td>Cost</td><td>Right-sized links and hardware</td></tr>
+    </table>
+    <h3 id="ch1-topologies" data-toc>1.2 Topologies</h3>
+    <p class="topic-desc">The physical or logical shape of a network determines its cost, resilience, latency and ease of growth. Common shapes include bus, ring, star, full and partial mesh, hierarchical and leaf-spine layouts, with hub-and-spoke giving cheap centralised control and mesh giving redundant paths at higher cost. Choose the topology that matches the traffic pattern you actually have, using measured bandwidth and failure requirements rather than preferring a shape automatically.</p>
+    <table>
+      <tr><th>Topology</th><th>Characteristic</th><th>Use</th></tr>
+      <tr><td>Star / hub-and-spoke</td><td>Central device</td><td>Small sites, WAN spokes</td></tr>
+      <tr><td>Mesh (full/partial)</td><td>Every node to many</td><td>WAN core, data centre</td></tr>
+      <tr><td>Tree / hierarchical</td><td>Layered</td><td>Enterprise campus</td></tr>
+      <tr><td>Spine-leaf</td><td>Flat, predictable</td><td>Modern data centres</td></tr>
+      <tr><td>Ring</td><td>Survives single link break</td><td>Metro, legacy</td></tr>
+    </table>
+    <h3 id="ch1-hierarchy" data-toc>1.3 Hierarchy, modularity and summarisation</h3>
+    <p class="topic-desc">Layering a network into hierarchies of tiers, modules and functional blocks keeps it understandable as it grows. Modular design isolates failure domains so one outage cannot cascade past its boundary, and route summarisation at each tier shrinks routing tables and dampens link flaps. Implementation uses distribution and core tiers per location, collapsed cores for small sites, and prefix aggregation with summarised routes toward the core.</p>
+    <ul>
+      <li>Build in modules (per building/floor/rack) that can be replicated.</li>
+      <li>Assign addresses so each module can be summarised into one route.</li>
+      <li>Apply policy at distribution; keep the core simple and fast.</li>
+    </ul>
+    <div class="ex"><h4 id="ch1-hierarchy--exercises-1">Exercises 1</h4><ol>
+      <li>List the top three goals for a school network.</li>
+      <li>Draw a hierarchical design for three floors.</li>
+      <li>Explain why summarisation aids scalability.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · The Network Model</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · The Network Model</button><div class="ch-toc-list"><a href="#ch2-osi">2.1 OSI and TCP/IP in practice</a><a href="#ch2-encap">2.2 Encapsulation</a><a href="#ch2-tcpudp">2.3 TCP vs UDP</a></div></div>
+    <p class="topic-desc">OSI and TCP/IP give a shared language for describing every hop a packet takes, from the physical signal to the application payload. OSI defines seven layers while the practical TCP/IP model collapses them into a four-layer stack of link, internet, transport and application. Understanding which layer a device or protocol operates at makes troubleshooting systematic, because you can isolate symptoms, test layer by layer and interpret protocol behaviour correctly.</p>
+    <h3 id="ch2-osi" data-toc>2.1 OSI and TCP/IP in practice</h3>
+    <p class="topic-desc">Real networks are mapped onto the seven OSI layers through TCP/IP’s simpler model of link, internet, transport and application. Ethernet and Wi-Fi occupy layers 1 and 2, IP sits at layer 3, TCP and UDP at layer 4, and DNS, HTTP and TLS at layer 7. Knowing which layer a device or protocol lives at tells you what it can inspect and control, for example switching at layer 2 versus routing at layer 3.</p>
+    <table>
+      <tr><th>OSI layer</th><th>TCP/IP</th><th>Examples</th><th>Address</th></tr>
+      <tr><td>7 Application</td><td rowspan="3">Application</td><td>HTTP, DNS, SMTP</td><td>Names/URLs</td></tr>
+      <tr><td>6 Presentation</td><td>TLS, encoding</td><td>—</td></tr>
+      <tr><td>5 Session</td><td>Sessions, RPC</td><td>—</td></tr>
+      <tr><td>4 Transport</td><td>Transport</td><td>TCP, UDP, QUIC</td><td>Ports</td></tr>
+      <tr><td>3 Network</td><td>Internet</td><td>IP, ICMP, routing</td><td>IP addresses</td></tr>
+      <tr><td>2 Data link</td><td rowspan="2">Link</td><td>Ethernet, 802.11, ARP</td><td>MAC addresses</td></tr>
+      <tr><td>1 Physical</td><td>Cables, fibre, radio</td><td>—</td></tr>
+    </table>
+    <h3 id="ch2-encap" data-toc>2.2 Encapsulation</h3>
+    <p class="topic-desc">Encapsulation wraps each protocol data unit with the header of the layer below as data travels down the stack, so TCP or UDP data becomes an IP packet and then an Ethernet frame. Receivers strip the headers in reverse order, called de-encapsulation, until the original payload is handed to the application. Tracing this wrapping with packet captures is the core of packet-level diagnosis, because it reveals MTU issues, VLAN tags and tunnel headers.</p>
+    <div class="codeWrap"><pre><code>Data
+  + TCP header  = Segment
+  + IP header   = Packet
+  + Eth header  = Frame
+  + preamble    = Bits on the wire
+
+Each layer adds its header; each layer on the receiver removes it.</code></pre></div>
+    <p class="code-note">Each protocol layer adds its own header, and the receiver strips them in reverse order. This wrapping is encapsulation.</p>
+    <h3 id="ch2-tcpudp" data-toc>2.3 TCP vs UDP</h3>
+    <p class="topic-desc">TCP provides reliable, ordered, connection-oriented delivery with acknowledgements, retransmission, windowing and flow control, while UDP is a lightweight best-effort transport with only ports and a checksum. TCP suits web, file transfer and mail where loss matters most, so applications such as HTTP, SMTP and SSH use it. UDP suits real-time and query workloads such as DNS, VoIP and video, where latency matters more than an occasional lost packet.</p>
+    <table>
+      <tr><th></th><th>TCP</th><th>UDP</th></tr>
+      <tr><td>Connection</td><td>Handshake, stateful</td><td>Connectionless</td></tr>
+      <tr><td>Reliability</td><td>Retransmits, ordering</td><td>Best effort</td></tr>
+      <tr><td>Speed</td><td>Slower start (congestion control)</td><td>Low overhead</td></tr>
+      <tr><td>Use</td><td>Web, DB, file transfer</td><td>DNS, voice/video, games</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code># Watch a TCP handshake
+tcpdump -n 'tcp port 443 and tcp[tcpflags] &amp; tcp-syn != 0'  # capture SYNs on https
+# SYN -&gt; SYN,ACK -&gt; ACK   (connection established)</code></pre></div>
+    <p class="code-note">Captures the SYN packets of a TCP handshake on port 443 so you can watch a connection open in real time.</p>
+    <div class="ex"><h4 id="ch2-tcpudp--exercises-2">Exercises 2</h4><ol>
+      <li>Map HTTP, TLS and IP to their OSI layers.</li>
+      <li>Explain encapsulation for a web request.</li>
+      <li>Choose TCP or UDP for a given app.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · IP Addressing &amp; Subnetting</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · IP Addressing &amp; Subnetting</button><div class="ch-toc-list"><a href="#ch3-ipv4">3.1 IPv4 and CIDR</a><a href="#ch3-subnetting">3.2 Subnetting example + output</a><a href="#ch3-vlsm">3.3 VLSM and address planning</a><a href="#ch3-ipv6">3.4 IPv6 essentials</a></div></div>
+    <p class="topic-desc">Subnetting is the arithmetic behind every scalable address plan, letting one prefix be divided into smaller networks with their own host ranges. Engineers allocate blocks using CIDR and VLSM, compute usable hosts as two to the power of the host bits minus two, and document subnets so DHCP scopes and routes stay aligned. A solid, documented scheme now saves painful renumbering later, so plan the whole hierarchy before configuring anything.</p>
+    <h3 id="ch3-ipv4" data-toc>3.1 IPv4 and CIDR</h3>
+    <p class="topic-desc">CIDR notation packs a network and its subnet mask into one slash form such as 192.168.10.0/24, where the prefix length states how many leading bits are the network part. It is the quick math of address planning, so memorising powers of two and common prefixes such as /24, /30 and /31 is worth the effort. Engineers use it to describe routes, calculate address budgets and design summarised blocks for the routing protocol.</p>
+    <div class="codeWrap"><pre><code>Address  192.168.10.0/24
+         |-- network --|host|
+Subnet mask 255.255.255.0
+Hosts: 2^(32-24) - 2 = 254 usable (network + broadcast reserved)
+
+CIDR cheat sheet
+/24 = 256 addresses   /25 = 128   /26 = 64   /27 = 32
+/28 = 16             /29 = 8     /30 = 4 (2 usable, point-to-point)</code></pre></div>
+    <p class="code-note">CIDR shorthand: the slash tells you how many addresses the network holds. Remember the friendly sizes from /24 down to /30.</p>
+    <h3 id="ch3-subnetting" data-toc>3.2 Subnetting example + output</h3>
+    <p class="topic-desc">A worked subnetting example shows how a real block such as 192.168.10.0/24 divides into smaller subnets, listing the network address, broadcast address and usable host range for each piece. You can recreate the calculation with a tool such as ipcalc, whose command-line output prints the network, broadcast, mask and host list for each subnet. Checking your own plans this way exposes overlaps and wasted space before they reach production configuration.</p>
+    <div class="codeWrap"><pre><code>Split 10.0.0.0/24 into four subnets:
+  10.0.0.0/26    10.0.0.64/26    10.0.0.128/26    10.0.0.192/26
+
+# Verify with classic tools
+$ ipcalc 10.0.0.0/26  # print usable range and broadcast
+Network:   10.0.0.0/26
+HostMin:   10.0.0.1
+HostMax:   10.0.0.62
+Broadcast: 10.0.0.63
+Hosts/Net: 62</code></pre></div>
+    <p class="code-note">Splits a /24 into four /26 subnets, then uses ipcalc to print the exact usable range. A handy sanity check before assigning addresses.</p>
+    <h3 id="ch3-vlsm" data-toc>3.3 VLSM and address planning</h3>
+    <p class="topic-desc">Variable Length Subnet Masks give each segment exactly the addresses it needs by allowing different prefix lengths on different subnets inside one block. A /24 can therefore be split into a mix of /26, /27 and /30 segments, so a point-to-point link wastes none of the space. Practise by ordering subnets from largest to smallest before assigning them, then document the plan so future engineers can extend it without renumbering.</p>
+    <table>
+      <tr><th>Segment</th><th>Hosts</th><th>Prefix</th><th>Size</th></tr>
+      <tr><td>User VLAN</td><td>200</td><td>/24</td><td>256</td></tr>
+      <tr><td>Voice VLAN</td><td>60</td><td>/26</td><td>64</td></tr>
+      <tr><td>Servers</td><td>25</td><td>/27</td><td>32</td></tr>
+      <tr><td>Management</td><td>10</td><td>/28</td><td>16</td></tr>
+      <tr><td>WAN links</td><td>2</td><td>/30</td><td>4</td></tr>
+    </table>
+    <h3 id="ch3-ipv6" data-toc>3.4 IPv6 essentials</h3>
+    <p class="topic-desc">IPv6 removes the need for NAT and makes address space effectively infinite, giving every device globally routable addresses. The essentials are prefix notation such as a /64 per subnet, hexadecimal addresses compressed in the canonical RFC 5952 form, and neighbour discovery replacing ARP. Engineers plan one /64 per LAN segment, use DHCPv6 or SLAAC for configuration, and keep track of the shorter practical prefixes for point-to-point links.</p>
+    <div class="codeWrap"><pre><code>2001:db8:acad:1::/64
+ |global routing prefix|subnet|
+Addresses are 128-bit; a /64 has 2^64 host addresses.
+No NAT required; use unique-local (fc00::/7) internally.
+Shorten by removing leading zeros and one run of zeros (::) per address.</code></pre></div>
+    <p class="code-note">IPv6 addresses are 128-bit with a fixed subnet structure, so NAT is unnecessary. Compression removes leading zeros and one run of zeros.</p>
+    <div class="warn"><p>Bad addressing plans are expensive to fix. Design a scheme that maps to sites/buildings/floors/VLANs from day one, and reserve blocks for growth.</p></div>
+    <div class="ex"><h4 id="ch3-ipv6--exercises-3">Exercises 3</h4><ol>
+      <li>Subnet 172.16.0.0/22 into 8 subnets.</li>
+      <li>Design a VLSM plan for four segments.</li>
+      <li>Compress an IPv6 address.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Routing</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Routing</button><div class="ch-toc-list"><a href="#ch4-static">4.1 Static routing</a><a href="#ch4-dynamic">4.2 Dynamic routing protocols</a><a href="#ch4-ospf">4.3 OSPF in practice</a><a href="#ch4-bgp">4.4 BGP and route policy</a></div></div>
+    <p class="topic-desc">Routing decides how packets travel beyond a single link, using forwarding tables to pick the next hop toward each destination. Static routes suit simple, fixed cases such as default routes and stub networks, while dynamic protocols such as OSPF and BGP share reachability so the network reconverges when links change. Choose the approach by scale: start with static entries for a handful of routes and move to a protocol as the topology grows and gains redundancy.</p>
+    <h3 id="ch4-static" data-toc>4.1 Static routing</h3>
+    <p class="topic-desc">Static routes are manually configured next-hop or exit-interface entries, simple, predictable and cheap, but they do not adapt when a link changes. Use them for defaults, stubs and small fixed networks where the topology rarely changes, and always include a default route where one is needed. When the network grows or gains redundant paths, switch to a dynamic protocol, because static routes cannot heal themselves.</p>
+    <div class="codeWrap"><pre><code># Simple, predictable, no overhead — but manual
+ip route 10.20.0.0 255.255.0.0 10.0.0.2                    ! next hop on the LAN
+# Default route: send everything unknown to the edge
+ip route 0.0.0.0 0.0.0.0 203.0.113.1                       ! everything else to the ISP</code></pre></div>
+    <p class="code-note">Two static routes: one to a specific destination network, and a default route sending everything else to the ISP router.</p>
+    <h3 id="ch4-dynamic" data-toc>4.2 Dynamic routing protocols</h3>
+    <p class="topic-desc">Dynamic protocols exchange reachability information so routers build forwarding tables automatically and reconverge when links or routes change. Link-state protocols such as OSPF and IS-IS fit enterprise interiors, distance-vector protocols such as RIP suit small networks, and path-vector BGP connects autonomous systems. Pick the protocol by scale and design, using interior protocols within the organisation and BGP for Internet and multi-cloud policy.</p>
+    <table>
+      <tr><th>Protocol</th><th>Type</th><th>Scale</th><th>Metric</th></tr>
+      <tr><td>RIP</td><td>Distance vector</td><td>Small</td><td>Hops</td></tr>
+      <tr><td>OSPF</td><td>Link state</td><td>Enterprise</td><td>Cost (bandwidth)</td></tr>
+      <tr><td>EIGRP</td><td>Hybrid (Cisco)</td><td>Enterprise</td><td>Composite</td></tr>
+      <tr><td>IS-IS</td><td>Link state</td><td>Carrier/DC</td><td>Cost</td></tr>
+      <tr><td>BGP</td><td>Path vector</td><td>Internet/DC</td><td>Path attributes</td></tr>
+    </table>
+    <h3 id="ch4-ospf" data-toc>4.3 OSPF in practice</h3>
+    <p class="topic-desc">OSPF is the workhorse enterprise interior protocol, flooding link-state advertisements across an area so every router builds the same shortest-path view of the network. Design areas to limit flooding, make area 0 the backbone, and summarise at area boundaries to shrink tables. Verify neighbours with commands such as show ip ospf neighbor rather than assuming adjacency is up, then check reachability with show ip route ospf.</p>
+    <div class="codeWrap"><pre><code>router ospf 1
+ network 10.0.0.0 0.0.255.255 area 0    ! core area
+ network 10.20.0.0 0.0.255.255 area 1   ! branch area
+! Areas limit flooding; ABRs summarise between areas.
+
+# Verify
+show ip ospf neighbor
+show ip route ospf
+
+Neighbor ID     Pri State      Dead Time  Address
+10.0.0.2          1 FULL/DR    00:00:36   10.0.0.2</code></pre></div>
+    <p class="code-note">Activates OSPF on two networks and verifies the neighbour reaches FULL. A FULL/DR neighbour means the adjacency is healthy.</p>
+    <h3 id="ch4-bgp" data-toc>4.4 BGP and route policy</h3>
+    <p class="topic-desc">BGP carries routes between autonomous systems and applies policy rather than simple shortest-path math, using attributes such as local preference, AS path and communities. Engineers filter with prefix lists, route maps and community-based policies, and advertise only what they intend to accept. Filtering incoming and outgoing prefixes plus RPKI validation keep those routes safe from hijacks and from overloading neighbours.</p>
+    <ul>
+      <li>EGP that exchanges routes between autonomous systems.</li>
+      <li>Choose paths by policy (local pref, AS-path, MED), not just speed.</li>
+      <li>Use prefix filters and RPKI to prevent route leaks/hijacks.</li>
+      <li>In the data centre, BGP is often used at the leaf/spine layer too.</li>
+    </ul>
+    <div class="ex"><h4 id="ch4-bgp--exercises-4">Exercises 4</h4><ol>
+      <li>Add a static default route.</li>
+      <li>Enable OSPF on two interfaces and check neighbours.</li>
+      <li>Explain why BGP uses policy rather than hop count.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Switching &amp; VLANs</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Switching &amp; VLANs</button><div class="ch-toc-list"><a href="#ch5-switching">5.1 Ethernet switching and MAC tables</a><a href="#ch5-vlan">5.2 VLANs and trunking</a><a href="#ch5-stp-lag">5.3 STP, link aggregation and stacking</a></div></div>
+    <p class="topic-desc">Switches learn from source MAC addresses and forward by destination MAC, shaping everything inside your LAN, while VLANs split one physical network into many logical broadcast domains. Trunk links carry tagged frames, so one cable serves many VLANs between switches. Together they segment traffic, contain broadcast storms and give each department or security zone a clean boundary.</p>
+    <h3 id="ch5-switching" data-toc>5.1 Ethernet switching and MAC tables</h3>
+    <p class="topic-desc">An Ethernet switch learns the source MAC address and port of every incoming frame and forwards subsequent frames to the correct port by looking up the destination MAC in its MAC address table. Unknown destinations are flooded out, and ageing timers remove stale entries automatically. When frames go astray, inspect the address table first, using show mac address-table to verify where each address is learned.</p>
+    <div class="codeWrap"><pre><code>The switch learns source MACs and forwards by destination MAC.
+Unknown unicast -&gt; flood; broadcast -&gt; flood within the VLAN.
+Loop prevention: Spanning Tree Protocol (STP).
+
+# Show what the switch has learned: MAC, VLAN and port
+show mac address-table
+Vlan  Mac Address         Type      Ports
+10    aabb.cc00.0100      DYNAMIC   Gi0/1</code></pre></div>
+    <p class="code-note">The one command that reveals what a switch has learned. A dynamic MAC entry maps a VLAN, address and port.</p>
+    <h3 id="ch5-vlan" data-toc>5.2 VLANs and trunking</h3>
+    <p class="topic-desc">VLANs isolate traffic logically, so devices in different VLANs cannot communicate without a routed hop, and VLAN trunk links carry many VLANs between switches using 802.1Q tags. Each frame on a trunk carries a VLAN identifier so switches keep traffic on the right segment. In practice configure access ports for end devices, tag trunks between switches, and provide an inter-VLAN router or Layer 3 switch to cross boundaries.</p>
+    <div class="codeWrap"><pre><code>vlan 10                      ! user segment
+ name USERS
+vlan 20                      ! voice segment
+ name VOICE
+
+interface Gi0/1
+ switchport mode access
+ switchport access vlan 10   ! puts this port on the user VLAN
+
+interface Gi0/24            ! uplink to switch/AP
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30   ! which VLANs ride the trunk</code></pre></div>
+    <p class="code-note">Defines two VLANs, assigns an access port to VLAN 10, and makes an uplink a trunk carrying the VLANs to the next switch.</p>
+    <h3 id="ch5-stp-lag" data-toc>5.3 STP, link aggregation and stacking</h3>
+    <p class="topic-desc">Redundancy needs loop prevention, and spanning tree protocol blocks redundant paths until a link fails and then reconverges to keep the LAN loop-free. Link aggregation groups parallel links into one logical bundle using LACP, and stacking makes several switches behave as a single device. Use RSTP or MSTP, enable portfast on access ports, and bundle uplinks to raise both bandwidth and resilience in the access layer.</p>
+    <table>
+      <tr><th>Feature</th><th>Purpose</th></tr>
+      <tr><td>STP / RSTP / MSTP</td><td>Prevent loops; fast reconvergence</td></tr>
+      <tr><td>PortFast / BPDU guard</td><td>Protect edge ports</td></tr>
+      <tr><td>LACP / EtherChannel</td><td>Aggregate links for bandwidth + redundancy</td></tr>
+      <tr><td>Stacking / MLAG</td><td>Two switches appear as one</td></tr>
+    </table>
+    <div class="warn"><p>Never create a physical loop without STP (or a routed design). A broadcast storm can saturate a network in seconds.</p></div>
+    <div class="ex"><h4 id="ch5-stp-lag--exercises-5">Exercises 5</h4><ol>
+      <li>Create two VLANs and a trunk.</li>
+      <li>Configure an LACP bundle.</li>
+      <li>Explain what STP does when a link fails.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Core Network Services</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Core Network Services</button><div class="ch-toc-list"><a href="#ch6-dns">6.1 DNS</a><a href="#ch6-dhcp">6.2 DHCP</a><a href="#ch6-nat">6.3 NAT and PAT</a></div></div>
+    <p class="topic-desc">DNS, DHCP and NAT are the plumbing every user and device touches. DNS resolves names to addresses, DHCP configures addresses and options automatically, and NAT translates between private and public address space. Get them right and the network feels like magic; get them wrong and nothing works, so run them with redundancy and watch scope pools and translation tables for exhaustion.</p>
+    <h3 id="ch6-dns" data-toc>6.1 DNS</h3>
+    <p class="topic-desc">DNS turns names into addresses and is often the first suspect in outages, so engineers must know the record types and how to query them. A records map names to IPv4, AAAA to IPv6, MX to mail, CNAME to aliases, and SRV for services, with tools such as nslookup and dig for testing. Check TTLs, forwarding and caching behaviour, and confirm that both forward and reverse zones resolve before blaming the network.</p>
+    <div class="codeWrap"><pre><code>Records: A (IPv4)  AAAA (IPv6)  CNAME (alias)  MX (mail)
+         TXT (verification/SPF)  SRV (service)  PTR (reverse)
+
+# Query + output
+$ dig example.com A +short  # show only the IPv4 address
+93.184.216.34
+
+$ nslookup -type=MX example.com  # query the mail servers
+example.com  MX preference = 10, mail exchanger = mail.example.com</code></pre></div>
+    <p class="code-note">Lists the DNS record types, then shows dig resolving an A record and nslookup pulling the MX record. Both are standard ways to test resolution.</p>
+    <h3 id="ch6-dhcp" data-toc>6.2 DHCP</h3>
+    <p class="topic-desc">DHCP hands out addresses and configuration options automatically, saving thousands of manual configurations and avoiding conflicts. A server manages a scope per subnet, offering IP address, mask, gateway, DNS and lease time, while DHCP relay agents forward client requests from other subnets so one server serves many. Plan pools from the addressing scheme, reserve addresses for servers and printers, and monitor lease utilisation before it exhausts.</p>
+    <div class="codeWrap"><pre><code>DORA: Discover -&gt; Offer -&gt; Request -&gt; Acknowledge
+Lease with scope, options (gateway, DNS, NTP) and reservations.
+Use DHCP relay where the server is on another subnet.
+
+# Linux client
+$ sudo dhclient -v eth0  # verbose lease request on eth0
+DHCPDISCOVER ... DHCPOFFER ... DHCPREQUEST ... DHCPACK</code></pre></div>
+    <p class="code-note">The DORA exchange, then a Linux client that requests a lease and prints each phase. The four messages map exactly to the states in the diagram.</p>
+    <h3 id="ch6-nat" data-toc>6.3 NAT and PAT</h3>
+    <p class="topic-desc">NAT lets private addresses reach the internet by translating between inside and outside addresses, while PAT maps many clients to one public address using different source ports. In practice configure inside and outside interfaces, add static entries for inbound services and pools for outbound traffic, then inspect translations when flows fail. Watch the translation table and pool sizes, because both can quietly exhaust under heavy load.</p>
+    <table>
+      <tr><th>Type</th><th>Mapping</th></tr>
+      <tr><td>Static NAT</td><td>One private ⇄ one public</td></tr>
+      <tr><td>Dynamic NAT</td><td>Private pool ⇄ public pool</td></tr>
+      <tr><td>PAT / NAT overload</td><td>Many private → one public (by port)</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code># Cisco PAT to the internet
+ip nat inside source list 1 interface Gi0/0 overload
+access-list 1 permit 10.0.0.0 0.0.255.255   ! which source range to translate
+# If the NAT table fills, new connections fail — monitor it.</code></pre></div>
+    <p class="code-note">PAT overloads one public interface for many private clients. The access-list defines which source addresses get translated, so monitor table usage.</p>
+    <div class="ex"><h4 id="ch6-nat--exercises-6">Exercises 6</h4><ol>
+      <li>Create A, CNAME and MX records for a domain.</li>
+      <li>Configure a DHCP scope with a gateway option.</li>
+      <li>Explain PAT to a non-technical colleague.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Wireless Design</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Wireless Design</button><div class="ch-toc-list"><a href="#ch7-standards">7.1 Wi-Fi generations</a><a href="#ch7-design">7.2 Coverage and capacity design</a><a href="#ch7-security">7.3 Wireless security</a></div></div>
+    <p class="topic-desc">Wireless is the access layer users actually feel, and coverage, capacity and security decide whether Wi-Fi feels great or terrible. Engineers plan by surveying the site, choosing access point placement based on the 802.11 standard and channel reuse, and sizing for client density rather than range alone. A controller or cloud management platform then handles radios, roaming and policies across the whole fleet.</p>
+    <h3 id="ch7-standards" data-toc>7.1 Wi-Fi generations</h3>
+    <p class="topic-desc">Each IEEE 802.11 generation adds speed and manages denser client environments better, from 802.11n and 802.11ac on 5 GHz through 802.11ax Wi-Fi 6 and 6E to 802.11be Wi-Fi 7. The 5 and 6 GHz bands do the heavy lifting, with 6E bringing wider channels and less interference to the spectrum. Match the standard to your device mix and available spectrum, because legacy clients cap the negotiated shared rate.</p>
+    <table>
+      <tr><th>Standard</th><th>Band</th><th>Typical speed</th></tr>
+      <tr><td>802.11n (Wi-Fi 4)</td><td>2.4/5 GHz</td><td>Up to 600 Mbps</td></tr>
+      <tr><td>802.11ac (Wi-Fi 5)</td><td>5 GHz</td><td>Up to ~1.3 Gbps</td></tr>
+      <tr><td>802.11ax (Wi-Fi 6/6E)</td><td>2.4/5/6 GHz</td><td>Multi-Gbps, high density</td></tr>
+      <tr><td>802.11be (Wi-Fi 7)</td><td>2.4/5/6 GHz</td><td>Very high throughput, low latency</td></tr>
+    </table>
+    <h3 id="ch7-design" data-toc>7.2 Coverage and capacity design</h3>
+    <p class="topic-desc">Coverage and capacity design sizes the wireless network for the number of clients that will connect, not just how far the signal reaches. A predictive or active site survey maps signal strength, roaming behaviour and channel use, and access point density is chosen for real throughput per user. A controller manages channel and transmit power settings centrally, with fast roaming mechanisms such as 802.11r and 802.11k enabled for mobile devices.</p>
+    <ul>
+      <li>Site survey (or predictive modelling) before mounting APs.</li>
+      <li>Plan for capacity (clients/second), not just coverage.</li>
+      <li>Keep 2.4 GHz for range, 5/6 GHz for throughput; avoid co-channel overlap.</li>
+      <li>Use a wireless controller for central management and roaming.</li>
+    </ul>
+    <h3 id="ch7-security" data-toc>7.3 Wireless security</h3>
+    <p class="topic-desc">Enterprise Wi-Fi should use WPA3 with many deployments, or WPA2 with 802.1X and a RADIUS server to verify user identity per session. Guests get an isolated SSID on a separate VLAN with its own internet-only policy and rate limits. Configure pre-shared keys only for small personal networks, disable WEP and WPA1 entirely, and rotate credentials regularly.</p>
+    <div class="codeWrap"><pre><code>WPA3-Enterprise  - strongest, 802.1X + RADIUS, per-user credentials
+WPA2-Enterprise  - common fallback
+WPA2/WPA3-Personal - pre-shared key, for guest/home
+Guest network    - isolated VLAN, captive portal, rate limits
+
+Never use WEP or open networks for anything sensitive.</code></pre></div>
+    <p class="code-note">A quick ranking of wireless security modes, from WPA3-Enterprise down. Guests get isolated networks; WEP and open networks are never for sensitive traffic.</p>
+    <div class="ex"><h4 id="ch7-security--exercises-7">Exercises 7</h4><ol>
+      <li>Plan AP placement for a floor of offices.</li>
+      <li>Choose a security mode for staff vs guests.</li>
+      <li>Explain why 2.4 GHz penetrates walls better.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Load Balancing, Proxies &amp; CDN</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Load Balancing, Proxies &amp; CDN</button><div class="ch-toc-list"><a href="#ch8-lb">8.1 Load balancing</a><a href="#ch8-proxy">8.2 Forward and reverse proxies</a><a href="#ch8-cdn">8.3 CDN and edge</a></div></div>
+    <p class="topic-desc">Load balancers, proxies and CDNs sit between users and servers to add scale, control and speed. A load balancer distributes client requests across a server pool, a proxy adds caching, filtering and TLS termination, and a CDN caches content at edge locations close to users. Together they are how web services survive traffic spikes with predictable latency and availability.</p>
+    <h3 id="ch8-lb" data-toc>8.1 Load balancing</h3>
+    <p class="topic-desc">A load balancer spreads requests across a group of servers and automatically removes failed or unhealthy ones, using a virtual IP and health checks to keep the pool consistent. Choose the algorithm to match the application: round-robin for stateless workloads, least connections for uneven request sizes, and persistent source affinity for stateful sessions. Implement TLS termination and key decisions about layer 4 versus layer 7 operation when you deploy it.</p>
+    <table>
+      <tr><th>Algorithm</th><th>Behaviour</th></tr>
+      <tr><td>Round robin</td><td>In turn</td></tr>
+      <tr><td>Least connections</td><td>To the least busy</td></tr>
+      <tr><td>Weighted</td><td>By capacity</td></tr>
+      <tr><td>IP hash</td><td>Sticky by client</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code>L4 (TCP)   - fast, no content awareness
+L7 (HTTP)  - routes by path/host/header, TLS termination, WAF
+
+Health checks remove failed nodes automatically.
+Session state must be shared (Redis) or sticky to survive failover.</code></pre></div>
+    <p class="code-note">Load balancing works at Layer 4 for speed or Layer 7 for smart routing. Health checks and shared session state keep failover clean.</p>
+    <h3 id="ch8-proxy" data-toc>8.2 Forward and reverse proxies</h3>
+    <p class="topic-desc">Forward proxies send client traffic outbound, while reverse proxies accept traffic on behalf of back-end servers, and both add caching, filtering and TLS control. A forward proxy on the LAN edge enforces URL policy, identity and egress filtering, whereas a reverse proxy fronts web applications for certificate termination and load sharing. Deploy them in front of application tiers and tune caching rules and health checks as part of the rollout.</p>
+    <ul>
+      <li><strong>Forward proxy</strong> — clients' proxy to the internet (filtering, caching).</li>
+      <li><strong>Reverse proxy</strong> — sits in front of servers (TLS, routing, caching, WAF).</li>
+    </ul>
+    <h3 id="ch8-cdn" data-toc>8.3 CDN and edge</h3>
+    <p class="topic-desc">A CDN caches content at edge points of presence close to users, cutting latency and shifting load off the origin servers. Versioned URLs are the key to safe cache invalidation, because immutable content can be cached aggressively and updated simply by changing the URL. Plan cache rules that keep dynamic traffic fresh, purge on demand and monitor the hit ratio to confirm the CDN is actually working.</p>
+    <div class="codeWrap"><pre><code>Client -&gt; nearest edge POP -&gt; origin (on cache miss)
+Cache static assets and, increasingly, dynamic/API responses.
+Invalidate carefully; version asset URLs to avoid stale content.</code></pre></div>
+    <p class="code-note">Traffic flows client to edge node first and only hits the origin on a cache miss. Versioned URLs make invalidation safe and predictable.</p>
+    <div class="ex"><h4 id="ch8-cdn--exercises-8">Exercises 8</h4><ol>
+      <li>Choose an LB algorithm for a stateful app.</li>
+      <li>Design health checks for a web tier.</li>
+      <li>Put a CDN in front of static assets.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · WAN &amp; Connectivity</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · WAN &amp; Connectivity</button><div class="ch-toc-list"><a href="#ch9-options">9.1 WAN options</a><a href="#ch9-sdwan">9.2 SD-WAN</a><a href="#ch9-vpn">9.3 VPN types</a></div></div>
+    <p class="topic-desc">The WAN is how sites and clouds talk over long distances, with options ranging from MPLS to internet VPN, SD-WAN and dedicated cloud links. Each choice trades cost, quality, capacity and control differently, and the terms below explain what they are for. Engineers typically combine a primary transport with a backup, or a circuit mix that SD-WAN manages by policy.</p>
+    <h3 id="ch9-options" data-toc>9.1 WAN options</h3>
+    <p class="topic-desc">MPLS, internet VPN, SD-WAN and 5G each trade cost, quality and control differently. MPLS offers quality of service and SLA-backed performance, IPsec VPN over the internet is cheap and flexible, SD-WAN steers traffic across multiple circuits per application, and 5G provides quick wireless access for new sites. Pick what your applications actually need in latency, jitter and availability, and layer redundancy on top rather than betting on one transport.</p>
+    <table>
+      <tr><th>Option</th><th>Characteristic</th></tr>
+      <tr><td>MPLS</td><td>Private, deterministic, costly</td></tr>
+      <tr><td>Internet + VPN</td><td>Cheap, variable quality</td></tr>
+      <tr><td>SD-WAN</td><td>Policy-driven over any links, app-aware</td></tr>
+      <tr><td>Dedicated cloud link</td><td>Predictable to a cloud provider</td></tr>
+      <tr><td>5G / LTE</td><td>Fast to deploy, good for backup</td></tr>
+    </table>
+    <h3 id="ch9-sdwan" data-toc>9.2 SD-WAN</h3>
+    <p class="topic-desc">SD-WAN steers traffic per application across the links you have, turning cheaper internet circuits into a resilient, policy-driven WAN. It builds an overlay with IPsec tunnels under centralised control, measures each path continuously and chooses the best one for voice or business-critical traffic, failing over automatically. Implement it as a hub-and-spoke or full-mesh overlay under central orchestration, with application-aware routing and underlay independence.</p>
+    <div class="codeWrap"><pre><code>Central policy -&gt; steer traffic by application:
+  - voice/video over the low-latency link
+  - bulk backup over the cheap link
+  - automatic failover between links
+Encryption (IPsec) over every transport; zero-touch provisioning.</code></pre></div>
+    <p class="code-note">SD-WAN steers each application onto the link that suits it and encrypts every transport. Policy lives centrally while branches provision themselves.</p>
+    <h3 id="ch9-vpn" data-toc>9.3 VPN types</h3>
+    <p class="topic-desc">VPNs create private paths over shared networks, and the right type depends on the scenario. Site-to-site IPsec tunnels connect whole offices into one private network, remote access VPNs such as IPsec or WireGuard admit individual users, and TLS-based browser VPNs work from anywhere. Match the encryption and authentication to the risk of the traffic, and route split tunnelling deliberately rather than by default.</p>
+    <ul>
+      <li><strong>Site-to-site IPsec</strong> — connect branch offices.</li>
+      <li><strong>Remote-access VPN / ZTNA</strong> — individual users, now often identity-aware.</li>
+      <li><strong>SSL/TLS VPN</strong> — browser-based access.</li>
+    </ul>
+    <div class="ex"><h4 id="ch9-vpn--exercises-9">Exercises 9</h4><ol>
+      <li>Choose a WAN option for two branches.</li>
+      <li>Design SD-WAN policy for voice vs backup traffic.</li>
+      <li>Compare VPN and ZTNA for remote users.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Network Security</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Network Security</button><div class="ch-toc-list"><a href="#ch10-segmentation">10.1 Segmentation and zones</a><a href="#ch10-firewall">10.2 Firewalls and inspection</a><a href="#ch10-zerotrust">10.3 Zero trust networking</a></div></div>
+    <p class="topic-desc">Design security in from the start rather than bolting it on afterwards, using segmentation, firewalls and zero trust to shrink the blast radius of any compromise. Engineers divide the network into zones with least-privilege boundaries, enforce explicit allow policies at chokepoints, and verify identity continuously rather than trusting the inside. This layered approach limits how far an attacker can move and makes incidents much more containable.</p>
+    <h3 id="ch10-segmentation" data-toc>10.1 Segmentation and zones</h3>
+    <p class="topic-desc">Dividing the network into zones such as trusted internal, demilitarised zone, guests and management gives each workload a least-privilege boundary. Firewalls, access lists and VLAN-based separation enforce what is allowed to cross between zones, with routing restricted to explicit allow statements. This is the highest-value control in most networks, because a compromise in one zone cannot walk freely into the rest.</p>
+    <table>
+      <tr><th>Zone</th><th>Contents</th><th>Access</th></tr>
+      <tr><td>Internet</td><td>Untrusted</td><td>Deny inbound by default</td></tr>
+      <tr><td>DMZ</td><td>Public services</td><td>Limited to specific ports</td></tr>
+      <tr><td>Internal</td><td>Users, apps</td><td>East-west controlled</td></tr>
+      <tr><td>Management</td><td>Devices</td><td>Only from admin network</td></tr>
+      <tr><td>Critical/data</td><td>Databases</td><td>Least privilege, monitored</td></tr>
+    </table>
+    <h3 id="ch10-firewall" data-toc>10.2 Firewalls and inspection</h3>
+    <p class="topic-desc">Firewalls enforce what is explicitly allowed and inspect the traffic that crosses them, from stateful filtering at layer 4 to next-generation inspection at the application layer. Modern ones add intrusion prevention, application awareness and web-application protection, often with TLS inspection so threats cannot hide in encrypted traffic. Deploy them at internet edges and zone boundaries, keep rule sets to least privilege and test every change before it goes live.</p>
+    <div class="codeWrap"><pre><code>Default deny; allow only what is documented.
+Stateful firewall tracks connections.
+NGFW adds app awareness + IPS; WAF protects web apps.
+
+# Example rule intent
+permit tcp 10.20.0.0/24 -&gt; 10.30.0.0/24 port 5432   (app -&gt; db)
+deny   ip  any -&gt; any   log</code></pre></div>
+    <p class="code-note">Default-deny plus explicit permits, with a logged catch-all trailing rule. The example allows only app-to-database traffic on the DB port.</p>
+    <h3 id="ch10-zerotrust" data-toc>10.3 Zero trust networking</h3>
+    <p class="topic-desc">Zero trust stops assuming the inside is safe and verifies identity on every request, no matter where it comes from. It uses continuous authentication, device posture checks and per-application access controls instead of implicit network trust, often through identity-aware proxies and micro-segmentation of workloads. Implement it gradually, starting with the most sensitive applications and adding identity verification and segmentation in phases.</p>
+    <ul>
+      <li>Identity-aware access proxies instead of a flat trusted LAN.</li>
+      <li>Micro-segmentation between workloads; mTLS for service-to-service.</li>
+      <li>Continuous verification, least privilege, assume breach.</li>
+      <li>Monitor east-west traffic, not just the perimeter.</li>
+    </ul>
+    <div class="warn"><p>A flat internal network means one compromised laptop can reach every server. Segmentation is the single highest-value network security control.</p></div>
+    <div class="ex"><h4 id="ch10-zerotrust--exercises-10">Exercises 10</h4><ol>
+      <li>Define zones for a web app + database.</li>
+      <li>Write least-privilege firewall rules for them.</li>
+      <li>Identify flat-network risk in a design you know.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · QoS &amp; Traffic Engineering</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · QoS &amp; Traffic Engineering</button><div class="ch-toc-list"><a href="#ch11-qos">11.1 Why QoS</a><a href="#ch11-marking">11.2 Classification and marking</a><a href="#ch11-queue">11.3 Queuing and shaping</a></div></div>
+    <p class="topic-desc">When links congest, QoS decides who suffers, so classified traffic is shaped and queued to protect the real-time classes users notice most. Engineers mark packets with DSCP, map the markings to queues on each interface and police or shape the rest. Apply the policy consistently along the entire path, because a single unmarked hop can undo the whole end-to-end treatment.</p>
+    <h3 id="ch11-qos" data-toc>11.1 Why QoS</h3>
+    <p class="topic-desc">Congestion without QoS is unfair by default, because scheduling is first-in first-out and all traffic is treated alike. Voice and video need low jitter, bounded delay and adequate bandwidth, which only queuing and priority treatment can guarantee. QoS is justified whenever real-time traffic shares links with bulk transfers, such as VoIP or video running over WAN circuits.</p>
+    <p>When a link is congested, everything suffers. QoS classifies traffic and guarantees service for what matters — usually voice and video, which need low jitter and latency.</p>
+    <h3 id="ch11-marking" data-toc>11.2 Classification and marking</h3>
+    <p class="topic-desc">Mark packets at the edge with DSCP so every hop downstream knows their priority without re-classifying them. Classify on source, destination, port or application, set the differential services code point such as EF for voice and AF for video, and trust markings only from known boundary devices. Consistent markings are what make end-to-end QoS possible across the whole network.</p>
+    <div class="codeWrap"><pre><code>Trust DSCP markings at the edge; classify by app/ACL.
+EF (46)   - voice        (highest, low latency)
+AF41 (34) - video
+AF21 (18) - transactional
+CS1 (8)   - scavenger / bulk (lowest)</code></pre></div>
+    <p class="code-note">DSCP values encode service priority, from EF for voice down to CS1 for bulk. Mark at the edge; every hop trusts and acts on the value.</p>
+    <h3 id="ch11-queue" data-toc>11.3 Queuing and shaping</h3>
+    <p class="topic-desc">Queues give priority classes guaranteed treatment so voice and video move while bulk traffic waits, and shaping smooths bursts down to a configurable rate. Implement class-based weighted fair queueing or strict priority queues matched to DSCP, and add policing with parameters such as committed information rate and burst size. Together these turn markings into enforced behaviour on every interface they cross.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Priority queue / LLQ</td><td>Voice gets strict priority</td></tr>
+      <tr><td>CBWFQ</td><td>Guaranteed bandwidth per class</td></tr>
+      <tr><td>Shaping / policing</td><td>Smooth or cap traffic</td></tr>
+      <tr><td>WRED</td><td>Drop early to avoid tail-drop sync</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch11-queue--exercises-11">Exercises 11</h4><ol>
+      <li>Mark voice as EF at the edge.</li>
+      <li>Reserve bandwidth per class.</li>
+      <li>Explain why jitter matters more than raw bandwidth for voice.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch12" data-toc>12 · Redundancy &amp; High Availability</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Redundancy &amp; High Availability</button><div class="ch-toc-list"><a href="#ch12-l2ha">12.1 Layer 2/3 redundancy</a><a href="#ch12-design">12.2 Designing for no SPOFs</a><a href="#ch12-testing">12.3 Testing failover</a></div></div>
+    <p class="topic-desc">High availability comes from removing single points of failure and then proving the design recovers. Engineers duplicate power, links, gateways and devices in separate failure domains, and use protocols such as STP, LACP and VRRP so failover is automatic. None of it counts until reconvergence has been tested against the service level agreement.</p>
+    <h3 id="ch12-l2ha" data-toc>12.1 Layer 2/3 redundancy</h3>
+    <p class="topic-desc">Redundant gateways and links need protocols to keep them loop-free and to fail over automatically. At layer 2, spanning tree prevents loops and link aggregation bundles redundant paths, while at layer 3, first-hop redundancy protocols such as VRRP or HSRP share a virtual gateway IP between routers. Configure pre-emption and link monitoring so the backup takes over only when the primary really fails.</p>
+    <table>
+      <tr><th>Technique</th><th>Provides</th></tr>
+      <tr><td>STP/RSTP</td><td>Loop-free redundant L2 paths</td></tr>
+      <tr><td>LACP bundles</td><td>Link redundancy + bandwidth</td></tr>
+      <tr><td>VRRP / HSRP / GLBP</td><td>Redundant default gateways</td></tr>
+      <tr><td>Routing convergence</td><td>Automatic path failover (OSPF/BGP)</td></tr>
+    </table>
+    <h3 id="ch12-design" data-toc>12.2 Designing for no SPOFs</h3>
+    <p class="topic-desc">A single point of failure is anything whose loss ends a service, so engineers dual everything and keep failure domains clean. Redundant uplinks, dual power feeds, N plus one devices and independent paths between tiers are standard practice. Apply this within budget, because duplicating everything is rarely realistic, and document whatever remains intentionally shared so it is a known, accepted risk.</p>
+    <div class="codeWrap"><pre><code>Dual core switches, dual uplinks, dual power, dual ISPs.
+Failure domains: don't let one failure take out both paths.
+Sub-second failover via routing protocols + tuned timers/BFD.</code></pre></div>
+    <p class="code-note">High availability is redundancy of every critical component plus clean failure domains. Routing protocols and BFD make failover sub-second.</p>
+    <h3 id="ch12-testing" data-toc>12.3 Testing failover</h3>
+    <p class="topic-desc">Failover that is never tested is only hope, so engineers deliberately pull links and power to verify reconvergence. Each test should measure how long the service is interrupted, compare it to the recovery time objective and check that routes, address tables and sessions rebuild cleanly. Script the tests, run them at a safe time and re-run them after every topology change.</p>
+    <div class="codeWrap"><pre><code># Common checks
+show standby brief          # HSRP/VRRP state
+show ip ospf neighbor       # reconvergence
+traceroute 8.8.8.8          # path after a link down
+# Schedule link-pull tests; validate reconvergence time against SLA.</code></pre></div>
+    <p class="code-note">A failover checkpost: gateway state, routing adjacency and the actual path. Deliberate link-pull tests prove reconvergence meets the SLA.</p>
+    <div class="ex"><h4 id="ch12-testing--exercises-12">Exercises 12</h4><ol>
+      <li>Add a redundant gateway with VRRP/HSRP.</li>
+      <li>Identify failure domains in a small design.</li>
+      <li>Pull a link and measure reconvergence.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch13" data-toc>13 · Network Automation &amp; Monitoring</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Network Automation &amp; Monitoring</button><div class="ch-toc-list"><a href="#ch13-automation">13.1 Automation</a><a href="#ch13-monitoring">13.2 Monitoring protocols</a><a href="#ch13-observability">13.3 What to watch</a></div></div>
+    <p class="topic-desc">Config as code and consistent monitoring turn networks into manageable systems. Automation relies on templates, a source of truth and validation in the CI pipeline, while monitoring combines SNMP, syslog, flow records and telemetry for a complete picture. If something is not automated and monitored, it is not really managed.</p>
+    <h3 id="ch13-automation" data-toc>13.1 Automation</h3>
+    <p class="topic-desc">Automation replaces hand-typed configuration with templates and a declared source of truth, so the same base configuration is generated consistently across every device. Engineers store configs in version control, render them through templating such as Jinja2 and deliver them to devices over the network, validating in the CI pipeline before any change reaches a switch or router. This catches mistakes early and makes rollback trivial.</p>
+    <div class="codeWrap"><pre><code>Templates + variables (Jinja2) -&gt; consistent config
+Ansible / Nornir / Terraform for network devices
+Source of truth (NetBox) drives addressing and documentation
+CI pipeline validates config before pushing to devices</code></pre></div>
+    <p class="code-note">Config as code: templates and a source of truth produce consistent configs, and CI validates before devices ever see them.</p>
+    <h3 id="ch13-monitoring" data-toc>13.2 Monitoring protocols</h3>
+    <p class="topic-desc">SNMP, syslog, flow records and telemetry each answer a different question about the network. SNMP polls counters and sends traps for device health, syslog collects device and application events, NetFlow or sFlow give per-flow traffic insight, and streaming telemetry pushes continuous data over gRPC. Use them all together for a complete picture instead of relying on any single one.</p>
+    <table>
+      <tr><th>Protocol</th><th>Use</th></tr>
+      <tr><td>SNMP</td><td>Device metrics, traps</td></tr>
+      <tr><td>Syslog</td><td>Event logging to a central collector</td></tr>
+      <tr><td>NetFlow / IPFIX / sFlow</td><td>Traffic flow analysis</td></tr>
+      <tr><td>Streaming telemetry</td><td>High-frequency push metrics</td></tr>
+      <tr><td>Synthetic probes</td><td>End-to-end availability</td></tr>
+    </table>
+    <h3 id="ch13-observability" data-toc>13.3 What to watch</h3>
+    <p class="topic-desc">Watch utilisation, errors, device health and routing stability, because these reveal failures before users notice them. Track CPU and memory, link utilisation and error counters, temperature, and protocol adjacency changes, with alerts that point to a cause rather than just a symptom. Baselines and trends let you spot slow degradation early and link a change to its effect.</p>
+    <ul>
+      <li>Link utilisation, errors/discards, and latency per path.</li>
+      <li>Device CPU/memory, temperature, power, fans.</li>
+      <li>Routing adjacency changes and flapping.</li>
+      <li>Config change audit and drift.</li>
+    </ul>
+    <div class="ex"><h4 id="ch13-observability--exercises-13">Exercises 13</h4><ol>
+      <li>Template a VLAN config with variables.</li>
+      <li>Send logs to a central collector.</li>
+      <li>Alert on link error rate.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch14" data-toc>14 · Data Centre Network Design</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Data Centre Network Design</button><div class="ch-toc-list"><a href="#ch14-spineleaf">14.1 Spine-leaf</a><a href="#ch14-overlay">14.2 Overlays: VXLAN and EVPN</a><a href="#ch14-storage">14.3 Storage and convergence</a></div></div>
+    <p class="topic-desc">Data centres need flat, predictable fabrics that scale with east-west traffic, not the tree shapes of a campus LAN. Spine-leaf topologies with equal-cost paths and overlay technologies provide this, keeping latency predictable as the fabric grows. Design for low oversubscription, consistent one or two hop latency and the ability to expand by adding spine and leaf switches.</p>
+    <h3 id="ch14-spineleaf" data-toc>14.1 Spine-leaf</h3>
+    <p class="topic-desc">In a spine-leaf fabric every leaf switch connects to every spine switch, giving equal-cost paths and predictable latency between any pair of server ports. The fabric scales simply by adding spines for capacity and leaves for ports, and equal-cost multipathing spreads traffic across all of them. It suits the east-west traffic of modern data centres far better than a legacy three-tier design.</p>
+    <div class="codeWrap"><pre><code>        Spine1      Spine2
+        /  \        /  \
+   Leaf1   Leaf2  Leaf3  Leaf4
+    |         |      |      |
+  servers  servers servers servers
+
+Every leaf connects to every spine (equal-cost paths).
+East-west traffic is the norm; predictable, low latency, easy to scale.</code></pre></div>
+    <p class="code-note">Every leaf stretches to every spine, giving equal-cost paths and flat predictable latency. Scale by adding more spines or leaves.</p>
+    <h3 id="ch14-overlay" data-toc>14.2 Overlays: VXLAN and EVPN</h3>
+    <p class="topic-desc">VXLAN encapsulates Layer 2 frames in UDP over an IP fabric, letting virtual segments span any topology, and EVPN gives them a control plane. EVPN distributes MAC and IP reachability through BGP so the data plane stays simple while operators get the full view. Together they enable workload mobility and multi-tenancy across a common physical network.</p>
+    <ul>
+      <li>VXLAN extends L2 over an L3 fabric (24-bit VNI = millions of segments).</li>
+      <li>EVPN provides control-plane learning and multi-tenancy.</li>
+      <li>Enables workload mobility and large tenant separation.</li>
+    </ul>
+    <h3 id="ch14-storage" data-toc>14.3 Storage and convergence</h3>
+    <p class="topic-desc">Storage traffic has its own rules: isolation from noisy workloads, jumbo frames, low loss and predictable low latency. Engineers match these with dedicated VLANs or fabrics, the correct frame size, and lossless Ethernet or Fibre Channel transport as the workload needs. A converged fabric such as FCoE or NVMe over TCP trades complexity for fewer cables and shared infrastructure.</p>
+    <table>
+      <tr><th>Network</th><th>Purpose</th></tr>
+      <tr><td>Front-end</td><td>Client/app traffic</td></tr>
+      <tr><td>Storage (SAN)</td><td>iSCSI/Fibre Channel, isolated, jumbo frames</td></tr>
+      <tr><td>Management</td><td>Device OOB access</td></tr>
+      <tr><td>Converged (FCoE/RoCE)</td><td>One fabric for LAN + SAN</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch14-storage--exercises-14">Exercises 14</h4><ol>
+      <li>Size a spine-leaf fabric for 100 racks.</li>
+      <li>Explain VXLAN to a colleague.</li>
+      <li>Separate storage traffic from front-end.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch15" data-toc>15 · Cloud Networking</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Cloud Networking</button><div class="ch-toc-list"><a href="#ch15-vpc">15.1 VPCs, subnets and routing</a><a href="#ch15-controls">15.2 Security groups vs NACLs</a><a href="#ch15-connect">15.3 Connecting clouds and on-prem</a></div></div>
+    <p class="topic-desc">Cloud networks are software-defined and self-service, with subnets, route tables and policies replacing boxes and cables. The design principles still hold, so plan address space, segmentation and redundancy as carefully as on premises. Build and manage everything through the provider’s API, console or infrastructure-as-code tooling rather than by hand.</p>
+    <h3 id="ch15-vpc" data-toc>15.1 VPCs, subnets and routing</h3>
+    <p class="topic-desc">A VPC is your private slice of a cloud provider, defined by its own CIDR blocks, subnets and route tables. Distribute application tiers across subnets and spread them over multiple availability zones for resilience, letting route tables steer traffic between subnets, internet gateways and transit gateways. Choose non-overlapping CIDRs, keep some headroom for growth and size each subnet ahead of time.</p>
+    <div class="codeWrap"><pre><code>VPC 10.0.0.0/16
+  public subnets  10.0.0.0/24, 10.0.1.0/24   -&gt; route to Internet GW
+  private subnets 10.0.10.0/24, 10.0.11.0/24 -&gt; route via NAT GW
+Spread subnets across AZs; one route table per tier.</code></pre></div>
+    <p class="code-note">A VPC split into public and private subnets, each with its own route table. Spreading tiers across availability zones is what buys resilience.</p>
+    <h3 id="ch15-controls" data-toc>15.2 Security groups vs NACLs</h3>
+    <p class="topic-desc">Security groups filter traffic at the instance or interface level and are stateful, while network access control lists filter at the subnet boundary and are stateless. Combine both for defence in depth, using NACLs as a coarse allowance at the subnet and security groups as precise per-instance rules. Remember that the stateless NACL must explicitly permit return traffic, which is a common source of failures.</p>
+    <table>
+      <tr><th></th><th>Security group</th><th>NACL</th></tr>
+      <tr><td>Applies to</td><td>Instance/ENI</td><td>Subnet</td></tr>
+      <tr><td>Stateful</td><td>Yes</td><td>No</td></tr>
+      <tr><td>Rules</td><td>Allow only</td><td>Allow + deny</td></tr>
+      <tr><td>Order</td><td>All evaluated</td><td>Numbered, first match</td></tr>
+    </table>
+    <h3 id="ch15-connect" data-toc>15.3 Connecting clouds and on-prem</h3>
+    <p class="topic-desc">Peering, VPNs and private endpoints stitch clouds together and back to your on-premises network. VPC peering connects cloud networks cheaply, site-to-site IPsec VPNs link offices into the cloud, and private endpoints such as Private Link keep traffic off the public internet. Route advertising, transit gateways and NAT gateways then tie the whole hybrid environment into one reachable space.</p>
+    <ul>
+      <li>VPC peering / transit gateway for many VPCs.</li>
+      <li>Site-to-site VPN or dedicated link to on-prem.</li>
+      <li>Private endpoints so services never traverse the internet.</li>
+      <li>Centralised egress and inspection for consistent policy.</li>
+    </ul>
+    <div class="ex"><h4 id="ch15-connect--exercises-15">Exercises 15</h4><ol>
+      <li>Design public/private subnets across two AZs.</li>
+      <li>Write security-group rules for web → db.</li>
+      <li>Connect a VPC to on-prem.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch16" data-toc>16 · Case Study — Campus + Cloud Network</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Case Study — Campus + Cloud Network</button><div class="ch-toc-list"><a href="#ch16-requirements">16.1 Requirements</a><a href="#ch16-design">16.2 The design</a><a href="#ch16-decisions">16.3 Decisions &amp; trade-offs</a><a href="#ch16-risks">16.4 Risks and mitigations</a></div></div>
+    <p class="topic-desc">This case study is a realistic end-to-end design that shows how the guide’s pieces fit together, from requirements through topology to operations. It works through a campus, edge, data centre and cloud deployment in the way a consultant would deliver it. Read it as the worked example for your own designs, and measure your choices against the same reasoning.</p>
+    <h3 id="ch16-requirements" data-toc>16.1 Requirements</h3>
+    <p class="topic-desc">Design starts from concrete numbers: how many users, what availability, which services, what security boundaries and how fast the estate will grow. Each requirement becomes a measurable target, such as an uptime percentage, concurrent session count or peak bandwidth figure, agreed and written down before design work. Every later decision should answer one of these numbers, and gaps in them are themselves findings.</p>
+    <table>
+      <tr><th>Driver</th><th>Target</th></tr>
+      <tr><td>Users</td><td>1,200 staff across 3 buildings + remote</td></tr>
+      <tr><td>Availability</td><td>99.9% core; sub-second gateway failover</td></tr>
+      <tr><td>Services</td><td>On-prem apps + cloud (IaaS/SaaS)</td></tr>
+      <tr><td>Security</td><td>Segmented, monitored, zero trust for remote</td></tr>
+      <tr><td>Growth</td><td>Double devices in 3 years</td></tr>
+    </table>
+    <h3 id="ch16-design" data-toc>16.2 The design</h3>
+    <p class="topic-desc">The full topology spans campus, edge, data centre and cloud tiers, showing how hierarchy, redundancy and security appear at every level. Switches, routers, firewalls and cloud components are sized and chosen to satisfy the requirements gathered earlier. Trace each layer to see how a packet flows and how a failure would be absorbed, mirroring the narrative of the guide.</p>
+    <div class="codeWrap"><pre><code>Campus:
+  Core: 2 switches, VRRP, redundant 40G links to distribution
+  Distribution: policy, VLANs, ACLs
+  Access: 802.1X, PoE for phones/APs
+  VLANs: users / voice / servers / mgmt / guest / IoT
+  Wireless: controller + Wi-Fi 6 APs, WPA3-Enterprise
+Edge:
+  2 ISPs, SD-WAN with app-aware steering + IPsec
+  NGFW + IPS, default-deny from internet
+Data centre:
+  Spine-leaf, VXLAN/EVPN, separate storage network
+Cloud:
+  Transit gateway, private endpoints, central egress inspection
+Identity:
+  Central directory + SSO + MFA; RADIUS for 802.1X
+Monitoring:
+  SNMP + streaming telemetry + flow analysis + syslog to SIEM</code></pre></div>
+    <p class="code-note">The whole design as a checklist, from campus switching through edge to cloud. Notice how every earlier chapter shows up as a concrete line here.</p>
+    <h3 id="ch16-decisions" data-toc>16.3 Decisions &amp; trade-offs</h3>
+    <p class="topic-desc">Every choice in a design is a trade between cost, complexity and capability, from link types and redundancy levels to the degree of security control. The case study shows why the team picked each option, such as SD-WAN over MPLS or a collapsed core over three tiers. The reasoning is the valuable part, because it models how to argue for a design in front of reviewers.</p>
+    <ul>
+      <li><strong>VRRP dual core</strong> — simple, fast gateway failover vs more complex active/active.</li>
+      <li><strong>SD-WAN over MPLS</strong> — cost and agility, accepting variable internet quality with QoS.</li>
+      <li><strong>802.1X everywhere</strong> — stronger access control at the price of onboarding effort.</li>
+      <li><strong>Zero trust for remote</strong> — better security than flat VPN, requires identity maturity.</li>
+    </ul>
+    <h3 id="ch16-risks" data-toc>16.4 Risks and mitigations</h3>
+    <p class="topic-desc">Named risks with explicit mitigations turn assumptions into a defensible plan. Each risk is documented with its likelihood, impact and the control or procedure that reduces it, such as spare hardware, monitoring rules or a failover runbook. Review and update the list whenever the network evolves, so the plan tracks reality rather than going stale.</p>
+    <table>
+      <tr><th>Risk</th><th>Mitigation</th></tr>
+      <tr><td>ISP outage</td><td>Dual ISPs + SD-WAN failover</td></tr>
+      <tr><td>Loop / broadcast storm</td><td>STP + BPDU guard + loop detection</td></tr>
+      <tr><td>Wi-Fi congestion</td><td>Capacity survey, band steering, more APs</td></tr>
+      <tr><td>Flat network spread</td><td>Segmentation + east-west monitoring</td></tr>
+      <tr><td>Config drift</td><td>Automation + source of truth + audits</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch16-risks--exercises-16">Exercises 16</h4><ol>
+      <li>Add an IoT/OT segment with strict egress rules.</li>
+      <li>Design the failover path when ISP A dies.</li>
+      <li>Write the ADR for SD-WAN vs MPLS.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch17" data-toc>17 · Troubleshooting Methodology</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Troubleshooting Methodology</button><div class="ch-toc-list"><a href="#ch17-method">17.1 A layered method</a><a href="#ch17-tools">17.2 The toolbelt</a><a href="#ch17-common">17.3 Common failure patterns</a></div></div>
+    <p class="topic-desc">A repeatable method beats raw intuition for finding faults, because it keeps the search structured and every step testable. Engineers form a hypothesis, isolate the affected layer, change one thing at a time and measure the result before moving on. Structured hunting solves cases faster and leaves behind a documented understanding of the network.</p>
+    <h3 id="ch17-method" data-toc>17.1 A layered method</h3>
+    <p class="topic-desc">Work the model bottom-up or top-down and change exactly one thing at a time, measuring after each step. Bottom-up fits total outages, checking cable and link status before routing, while top-down fits application complaints, working from the application toward the wire. This discipline separates guesses from fixes and keeps every attempt testable and reversible.</p>
+    <div class="codeWrap"><pre><code>1 Define the problem precisely (who/what/where/when)
+2 Work bottom-up or top-down through the layers
+3 Compare a working vs broken path
+4 Divide and conquer (test from the middle)
+5 Form/hold one hypothesis at a time; change one thing
+6 Document and fix the root cause</code></pre></div>
+    <p class="code-note">A six-step troubleshooting loop that keeps the hunt structured. One hypothesis at a time is what turns guesses into fixes.</p>
+    <h3 id="ch17-tools" data-toc>17.2 The toolbelt</h3>
+    <p class="topic-desc">The standard command-line tools each answer one class of question. ipconfig or ip shows local addressing, ping tests reachability, traceroute or tracert reveals the path, arp and ip neighbour inspect layer 2, nslookup or dig query DNS, and captures such as tcpdump or Wireshark give ground truth. Match the tool to what you still do not know, and verify rather than assume.</p>
+    <table>
+      <tr><th>Tool</th><th>Answers</th></tr>
+      <tr><td><code>ping</code> / <code>tracert</code></td><td>Reachability and path</td></tr>
+      <tr><td><code>ipconfig</code> / <code>ifconfig</code></td><td>Address, gateway, DNS</td></tr>
+      <tr><td><code>nslookup</code> / <code>dig</code></td><td>Name resolution</td></tr>
+      <tr><td><code>arp -a</code></td><td>L2 mapping</td></tr>
+      <tr><td><code>netstat</code> / <code>ss</code></td><td>Open ports and connections</td></tr>
+      <tr><td><code>tcpdump</code> / Wireshark</td><td>Actual packets</td></tr>
+      <tr><td><code>curl</code> / <code>openssl s_client</code></td><td>App/TLS issues</td></tr>
+    </table>
+    <h3 id="ch17-common" data-toc>17.3 Common failure patterns</h3>
+    <p class="topic-desc">DNS, asymmetric routing, MTU, VLAN and NAT issues account for most real outages, so recognise the pattern and you halve the diagnostic time. A site that loads small pages but fails on large downloads points at MTU, and failures after a renumbering exercise point at DNS or NAT. Turn these signatures into checklists and runbooks, then confirm each with the right tools before escalating.</p>
+    <ul>
+      <li><strong>"It’s DNS."</strong> Can’t resolve → check records, forwarders, split-horizon.</li>
+      <li><strong>Asymmetric routing</strong> → stateful firewalls drop return traffic.</li>
+      <li><strong>MTU/PMTUD black holes</strong> → small packets work, large ones hang.</li>
+      <li><strong>Wrong VLAN / native VLAN mismatch</strong> → no L2 reachability.</li>
+      <li><strong>Exhausted NAT/connection table</strong> → intermittent failures at scale.</li>
+    </ul>
+    <div class="codeWrap"><pre><code># MTU test: 1472 + 28 = 1500
+ping -f -l 1472 8.8.8.8      # Windows
+ping -M do -s 1472 8.8.8.8   # Linux</code></pre></div>
+    <p class="code-note">Pings with 1472 bytes of payload test for MTU black holes. If these fail but smaller pings work, you have a path MTU problem.</p>
+    <div class="ex"><h4 id="ch17-common--exercises-17">Exercises 17</h4><ol>
+      <li>Troubleshoot a "can’t reach server" ticket top-down.</li>
+      <li>Prove or disprove an MTU black hole.</li>
+      <li>Capture and read a TCP handshake.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Reference &amp; Roadmap</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Reference &amp; Roadmap</button><div class="ch-toc-list"><a href="#app-cheatsheet">A.1 Cheat sheet</a><a href="#app-roadmap">A.2 Roadmap: beginner to advanced</a><a href="#app-rules">A.3 Rules of thumb</a></div></div>
+    <p class="topic-desc">The appendix collects cheat sheets and a learning path to keep on your desk. It gathers the constants and facts you reuse constantly, such as CIDR sizes, well-known port numbers and powers of two, together with a roadmap from beginner to advanced. Bookmark this page for the numbers you will pull up again and again during design and troubleshooting.</p>
+    <h3 id="app-cheatsheet" data-toc>A.1 Cheat sheet</h3>
+    <p class="topic-desc">The cheat sheet collects the constants and facts worth memorising for day-to-day design and troubleshooting, such as CIDR to host-count tables, well-known port numbers, subnet masks and private address ranges. It also carries quick command and format reminders for the tools covered in the chapters. Keep it handy for fast consultation during design sessions and incident calls.</p>
+    <table>
+      <tr><th>Topic</th><th>Key facts</th></tr>
+      <tr><td>CIDR</td><td>/24=254 hosts, /25=126, /26=62, /27=30, /28=14, /30=2</td></tr>
+      <tr><td>Private ranges</td><td>10/8, 172.16/12, 192.168/16</td></tr>
+      <tr><td>Well-known ports</td><td>22 SSH, 53 DNS, 80 HTTP, 443 HTTPS, 3306 MySQL, 5432 Postgres</td></tr>
+      <tr><td>OSPF vs BGP</td><td>Interior/link-state vs exterior/path-vector policy</td></tr>
+      <tr><td>Failover</td><td>VRRP/HSRP gateway, LACP links, routing convergence</td></tr>
+    </table>
+    <h3 id="app-roadmap" data-toc>A.2 Roadmap: beginner to advanced</h3>
+    <p class="topic-desc">The roadmap lays out a progression from subnetting to architecting, so you can work at your current level and push one stage at a time. Each stage defines the skills to learn and where to practise them, from IP fundamentals through routing, security, automation and cloud. Move on only when you can apply each stage to a real network, not just pass a quiz.</p>
+    <table>
+      <tr><th>Stage</th><th>You can…</th></tr>
+      <tr><td>Beginner</td><td>Subnet, cable, configure a switch/VLAN, basic DNS/DHCP</td></tr>
+      <tr><td>Intermediate</td><td>Static/OSPF routing, STP/LACP, wireless, firewalls, NAT</td></tr>
+      <tr><td>Advanced</td><td>BGP, QoS, redundancy, VPN/SD-WAN, monitoring, automation</td></tr>
+      <tr><td>Architect</td><td>Spine-leaf/VXLAN, cloud/hybrid, zero trust, capacity and cost design</td></tr>
+    </table>
+    <h3 id="app-rules" data-toc>A.3 Rules of thumb</h3>
+    <p class="topic-desc">Rules of thumb capture the principles that prevent most design mistakes, such as summarise at every tier, never trust the default and design for failure. These short heuristics come from years of design reviews and troubleshooting sessions. Internalise them and you will avoid the classic traps before they ever cause an outage.</p>
+    <ul>
+      <li><strong>Hierarchy + summarisation scales; flat randomness doesn’t.</strong></li>
+      <li><strong>No single point of failure on any critical path.</strong></li>
+      <li><strong>Segment aggressively; default deny.</strong></li>
+      <li><strong>Standardise addressing and naming before you deploy.</strong></li>
+      <li><strong>Automate and document; if it isn’t monitored it isn’t managed.</strong></li>
+      <li><strong>Test failover, don’t assume it.</strong></li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Network System Design Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,729 @@
+<section class="chapter">
+  <h2 id="ch12-container-queries" data-toc>12 · Container queries and responsive components</h2>
+  <p class="topic-desc">For fifteen years "responsive" meant one question: how wide is the viewport? That worked while a page had one layout, but a component that ships into a full-width hero, a 260&nbsp;px sidebar and a 320&nbsp;px mobile column cannot be described by a viewport width at all. At a 1200&nbsp;px viewport the hero card is 600&nbsp;px wide and the sidebar card is 260&nbsp;px, so any single <code>@media</code> rule must be wrong for one of them. Container queries invert the question: the component declares itself a <em>query container</em>, and its descendants ask how much room <em>they</em> were given. Media queries do not go away &mdash; they still answer the genuinely global questions (colour scheme, print, reduced motion, the page shell) &mdash; but component layout becomes the component's own business, so a card can be dropped anywhere and look right without touching the CSS.</p>
+
+  <h3 id="ch12-container-type" data-toc>12.1 Container types, names and containment</h3>
+  <p class="topic-desc">A container query is only legal against an ancestor that has been marked as a query container with <code>container-type</code>. The value you choose decides which axes the browser is allowed to measure, and marking an element also switches on CSS containment for it &mdash; which is not a side effect but the entire mechanism.</p>
+
+  <h4>What <code>container-type</code> actually turns on</h4>
+  <p>The property takes three values. <code>normal</code> is the default and means the element is not a query container at all. <code>inline-size</code> establishes a container that can be queried on its inline axis only &mdash; width in a horizontal writing mode &mdash; and it is the right choice for the overwhelming majority of components. <code>size</code> establishes a container that can be queried on both axes, so <code>@container (height &gt; 20rem)</code> becomes legal, but it requires the element to have a size in both axes that does not depend on its contents. Alongside the query container itself, the descendants that respond are matched by ordinary selectors inside the <code>@container</code> block, and the condition is re-evaluated whenever the container's size changes.</p>
+  <p>Marking an element as an inline-size container makes a second thing true at the same time: the element becomes a <em>layout</em>, <em>style</em> and <em>inline-size</em> containment box. Its children can no longer affect its inline size.</p>
+
+  <h4>Naming a container so a query can find it</h4>
+  <p>An unnamed <code>@container (width &gt; 30rem)</code> is answered by the nearest ancestor container, whatever it happens to be. That is convenient until a component sits inside another component that is also a container: the inner query then measures the wrong box. <code>container-name</code> fixes this by giving the container an identifier that the query can require. The name is a <code>&lt;custom-ident&gt;</code>, and the shorthand <code>container: rail / inline-size</code> sets the name and the type in one declaration.</p>
+
+  <div class="codeWrap"><pre><code>/* css — an inline-size container, named and unnamed */
+.card-host {
+  container-type: inline-size;   /* anonymous: nearest ancestor answers */
+}
+
+.sidebar {
+  container-name: rail;          /* named: only this container answers */
+  container-type: inline-size;
+  /* identical shorthand: container: rail / inline-size; */
+}
+
+/* answered by whatever container is closest */
+@container (width &gt;= 30rem) {
+  .card { grid-template-columns: 8rem 1fr; }
+}
+
+/* answered only by a container named "rail" */
+@container rail (min-width: 24rem) {
+  .nav-item { grid-template-columns: 1.5rem 1fr; }
+}</code></pre></div>
+
+  <h4>Why containment is the price of admission</h4>
+  <p>The browser cannot measure the container if the container's own size depends on the size of the things it is measuring &mdash; that is a circular definition. Containment breaks the cycle by promising that a container's inline size never depends on its contents. For a normal block-level element this is already true, so nothing visibly changes. For an element that used to shrink-wrap &mdash; <code>inline-block</code>, a float, an absolutely positioned box, a grid or flex item with <code>auto</code> sizing &mdash; applying <code>container-type: inline-size</code> makes it size as though it were empty. The content still renders, but the box no longer grows to fit it.</p>
+  <p><code>container-type: size</code> goes further and contains the block axis too, which is why it demands a definite height: a fixed <code>block-size</code>, a grid row, or an explicit <code>contain-intrinsic-size</code> to fall back on. If none is available the element collapses and every query against it returns the same answer.</p>
+
+  <div class="codeWrap"><pre><code>/* css — size containment needs a definite, content-independent size */
+.terminal {
+  container-type: size;                 /* enables block-size queries too */
+  block-size: 20rem;                    /* must not depend on content */
+  contain-intrinsic-size: auto 20rem;   /* size used while layout is skipped */
+}
+
+@container (block-size &gt; 24rem) {
+  .terminal__line { line-height: 1.8; }
+}</code></pre></div>
+
+  <h4>Which container answers the query</h4>
+  <p>A query is always answered by an <em>ancestor</em> container &mdash; never by the element being styled, and never by its descendants. When several ancestors qualify, the nearest one with a matching name or type wins. There is no syntax for testing two different containers in one condition; the equivalent is to nest the queries, which reads top-down the way the DOM does.</p>
+
+  <div class="warn">Two traps are worth memorising. First, <code>container-type: inline-size</code> on an element that previously shrink-wrapped will change the page layout even before you write a single query, because the element stops sizing to its content. Second, a <code>@container</code> block changes nothing unless an ancestor is actually a container &mdash; a stray query silently matches nothing rather than raising an error.</div>
+
+  <h3 id="ch12-container-units" data-toc>12.2 Container query units and intrinsic sizing</h3>
+  <p class="topic-desc">Container queries decide <em>whether</em> a rule applies. Container query units decide <em>how much</em>: they are length units that resolve against the query container instead of the viewport, which lets a component scale fluidly from its own available space with no breakpoints at all.</p>
+
+  <h4>The six units</h4>
+  <p>The units mirror the viewport family exactly, one letter changed. Where <code>vw</code> means 1% of the viewport width, <code>cqw</code> means 1% of the query container's width; where <code>vh</code> means 1% of the viewport height, <code>cqh</code> means 1% of the container's height. Two of them are writing-mode aware: <code>cqi</code> is the inline axis and <code>cqb</code> the block axis, so a vertical-writing-mode component keeps working without renaming anything. <code>cqmin</code> and <code>cqmax</code> take the smaller or larger of the two axes.</p>
+
+  <div class="table-scroll"><table>
+    <tr><th>Unit</th><th>Resolves against</th><th>Use it for</th></tr>
+    <tr><td><code>cqw</code></td><td>1% of the container's width</td><td>Scale that must track the physical width</td></tr>
+    <tr><td><code>cqh</code></td><td>1% of the container's height</td><td>Vertical rhythm in a fixed-height panel</td></tr>
+    <tr><td><code>cqi</code></td><td>1% of the container's inline size</td><td>Text, padding, spacing &mdash; the writing-mode aware default</td></tr>
+    <tr><td><code>cqb</code></td><td>1% of the container's block size</td><td>Spacing along the block axis</td></tr>
+    <tr><td><code>cqmin</code></td><td>The smaller of the two axes</td><td>Elements that must never overflow either way</td></tr>
+    <tr><td><code>cqmax</code></td><td>The larger of the two axes</td><td>Keeps a decorative element visible in a thin container</td></tr>
+  </table></div>
+
+  <h4>Sizing a component from its own container</h4>
+  <p>Because the units are relative to the container, a single declaration covers every context the component is dropped into. Wrapping them in <code>clamp()</code> keeps the result legible: the middle value does the fluid work, and the two bounds stop the type from becoming microscopic in a small sidebar or absurd in a hero. The same pattern applies to padding and corner radius, which is what makes a component look proportioned rather than merely resized.</p>
+
+  <div class="codeWrap"><pre><code>/* css — fluid type and spacing with no breakpoints */
+.card { container-type: inline-size; }
+
+.card__title {
+  /* 3.5% of the container's inline size, held between two limits */
+  font-size: clamp(1.25rem, 3.5cqi, 2rem);
+}
+
+.card__body   { padding: 4cqi; }
+.card__badge  { border-radius: max(0.25rem, 1.5cqi); }
+
+/* 100cqi is the container's own inline size, so the map stays square
+   and shrinks with the component rather than with the viewport */
+.card__map {
+  inline-size: 100cqi;
+  aspect-ratio: 1;
+}</code></pre></div>
+
+  <h4>When there is no container</h4>
+  <p>If no ancestor is a query container, the units do not become invalid &mdash; they resolve against the small viewport, exactly as <code>svw</code> and <code>svh</code> would. That makes them a safe progressive enhancement: a component degrades to viewport-relative sizing rather than collapsing, and gains true container-relative sizing the moment an ancestor declares <code>container-type</code>. The failure is therefore a quality regression, not a layout break, which is the right way round.</p>
+
+  <div class="tip">Prefer <code>cqi</code> over <code>cqw</code> in general-purpose components. In a horizontal writing mode they are identical, and in a vertical one <code>cqi</code> still means "along the text flow", which is almost always what a spacing or type rule actually intended.</div>
+
+  <h3 id="ch12-media-vs-container" data-toc>12.3 Media queries versus container queries</h3>
+  <p class="topic-desc">The two at-rules answer different questions, and knowing which question a rule is really asking is most of the discipline. <code>@media</code> asks about the device and its environment; <code>@container</code> asks about the space one element was given. Using the wrong one produces CSS that is correct in the page you tested and wrong everywhere else.</p>
+
+  <h4>Two different questions</h4>
+  <p>A media query can see things a container query cannot: the colour scheme and increased-contrast preference, the pointer type, the print medium, the dynamic range of the display, and whether the user has asked for reduced motion. A container query can see something a media query never can, because it is answered <em>after</em> the parent has already been laid out: how much room this particular instance of the component actually has. The practical rule is that the page shell &mdash; columns, the app bar, the sidebar whose visibility depends on the viewport &mdash; stays on media queries, while every component that will be reused stays on container queries.</p>
+
+  <h4>Breakpoints belong to the component</h4>
+  <p>A container breakpoint is not a device class, it is the width at which the component's own layout stops working. A media-object becomes viable when there is room for a fixed thumbnail and a text column, so the query is written against that number and never against "tablet". The same component in three slots then adapts three ways with one ruleset, which is what makes a design system composable instead of a pile of context-specific overrides.</p>
+
+  <div class="codeWrap"><pre><code>/* css — one viewport question, one component question */
+@media (min-width: 60rem) {
+  .page { grid-template-columns: 16rem 1fr; }   /* shell layout: global */
+}
+
+@container (width &gt;= 22rem) {
+  /* true whenever a card is wide enough, wherever it was placed */
+  .card { display: grid; grid-template-columns: 8rem 1fr; }
+}</code></pre></div>
+
+  <h4>Supplying a fallback</h4>
+  <p>Container queries and container query units are Baseline widely available, so a fallback is rarely needed for evergreen browsers. When the audience includes an embedded or legacy engine, the honest fallback is not a duplicated media query &mdash; that reintroduces exactly the coupling you removed &mdash; it is a simpler layout that needs no query at all. <code>@supports</code> keeps the two apart cleanly and fails safe, because the base rule is the one every engine understands.</p>
+
+  <div class="codeWrap"><pre><code>/* css — fails safe: stacked by default, enhanced when supported */
+.card { display: block; }
+
+@supports (container-type: inline-size) {
+  .card-host { container-type: inline-size; }
+
+  @container (width &gt;= 22rem) {
+    .card { display: grid; grid-template-columns: 8rem 1fr; }
+  }
+}</code></pre></div>
+
+  <div class="note">A container query cannot be used to style the container itself, only its descendants. If a component needs to change as a whole, put the query on its children, or change the container's styling from a rule that does not depend on the query.</div>
+
+  <h3 id="ch12-style-queries" data-toc>12.4 Style queries, range syntax and scroll state</h3>
+  <p class="topic-desc">The same <code>@container</code> machinery can ask about a container's <em>computed style</em> rather than its size, and about the scroll state it is in. Both extend the "the component answers its own questions" model well past layout: a theme or density set once on a host can drive every descendant, and a sticky header can restyle itself the moment it actually sticks.</p>
+
+  <h4>Custom property style queries</h4>
+  <p><code>@container style(--density: compact)</code> evaluates the computed value of a custom property on the queried container. Because custom properties inherit, setting one variable on a host element is enough to switch every descendant that asks about it. This is deliberately narrower than it looks: the comparison is against the computed value, so a colour written as <code>blue</code> will not match <code>#0000ff</code> unless the property was registered with <code>@property</code> and given a real syntax, which makes the browser normalise both sides. Treat style queries as a way to branch on a token you control, not as a general "read any property" mechanism.</p>
+
+  <div class="codeWrap"><pre><code>/* css — one variable on the host drives every descendant */
+.toolbar {
+  --density: compact;
+  container-type: inline-size;
+}
+
+@container style(--density: compact) {
+  .row { padding-block: 0.125rem; }
+}
+
+@container style(--density: cozy) {
+  .row { padding-block: 0.5rem; }
+}
+
+/* range syntax compares numerically, which the plain form cannot */
+.bell { --unread: 12; }
+
+@container style(--unread &gt; 9) {
+  .bell__dot { background: var(--danger); }
+}</code></pre></div>
+
+  <h4>Plain versus range syntax</h4>
+  <p>The two forms behave differently even when they look alike. <code>style(--n: 3)</code> compares the <em>computed</em> value textually against <code>3</code>, so a container holding <code>calc(6 / 2)</code> does not match. <code>style(--n = 3)</code> resolves both sides, parses them as a numeric type and compares the numbers, so it does match. Range syntax also cannot compare keyword values at all &mdash; <code>style(--theme = dark)</code> is always false, because <code>dark</code> is not a number, a length, an angle or a time. Use the colon for tokens and the comparators for measurements.</p>
+
+  <h4>Scroll-state queries</h4>
+  <p>An element with <code>container-type: scroll-state</code> can be queried on four conditions: whether it can still be scrolled in a given direction (<code>scrollable</code>), which way it was most recently scrolled (<code>scrolled</code>), whether it is currently snapped to an ancestor scroll-snap container (<code>snapped</code>), and whether a sticky element is currently stuck to an edge (<code>stuck</code>). This removes a class of JavaScript that previously waited on a scroll listener to add a shadow or reveal a "back to top" control.</p>
+
+  <div class="codeWrap"><pre><code>/* css — a sticky header styles itself when it is actually stuck */
+.sticky-head {
+  position: sticky;
+  inset-block-start: 0;
+  container-type: scroll-state;
+}
+
+@container scroll-state(stuck: block-start) {
+  .sticky-head { box-shadow: 0 2px 10px rgb(0 0 0 / 0.25); }
+}
+
+/* a scroll container can reveal its own affordance */
+.scroller {
+  overflow-y: auto;
+  container-type: scroll-state;
+}
+
+@container scroll-state(scrollable: top) {
+  .scroller__to-top { visibility: visible; }
+}</code></pre></div>
+
+  <div class="warn">Support is uneven across the <code>@container</code> family. Size queries and custom-property style queries are Baseline widely available; range style queries and scroll-state queries are newer and may be missing in some engines. Guard the newer ones with <code>@supports (container-type: scroll-state)</code> and make sure the unguarded base state is usable, since a query that matches nothing leaves the element in its default styling.</div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch13-selectors-cascade" data-toc>13 · Modern selectors and cascade control</h2>
+  <p class="topic-desc">For years the only tools for managing specificity were discipline and <code>!important</code>, and neither scaled. Four additions changed the arithmetic instead: <code>:is()</code> and <code>:where()</code> let a rule list alternatives without inflating its weight, <code>:has()</code> lets a selector look forwards as well as up, native nesting removes the repetition that made stylesheets unreadable, and <code>@layer</code> replaces the specificity contest with a declared order. <code>@scope</code> then caps how far a rule may travel at all. Held together they turn the cascade from something you fight into something you configure.</p>
+
+  <h3 id="ch13-is-where" data-toc>13.1 :is(), :where() and forgiving selector lists</h3>
+  <p class="topic-desc">These two pseudo-classes take a comma-separated selector list and match anything in it. The difference between them is exactly one thing, and it is the only thing that matters: <code>:is()</code> adopts the specificity of its most specific argument, while <code>:where()</code> contributes zero at every position.</p>
+
+  <h4>One rule instead of many</h4>
+  <p>Before <code>:is()</code>, three elements sharing a declaration needed either three rules or three selectors in one list &mdash; and the list form cannot express a shared ancestor cleanly. <code>:is(a, b, c)</code> collapses them, and its specificity is the specificity of the most specific argument in the list. That last detail is the whole point: the alternatives behave as if you had written the single hardest one, so adding a weak selector to the list cannot accidentally lower the rule's weight.</p>
+
+  <h4>The zero-specificity reset</h4>
+  <p><code>:where()</code> is the same construct with its specificity removed. Its best use is not styling at all but <em>resetting</em>: a base stylesheet can zero out margins and resets in a way that any later author rule can override without escalating a specificity war. This is the modern replacement for the "put your reset first and hope" convention, because the ordering no longer depends on source position.</p>
+
+  <div class="codeWrap"><pre><code>/* css — before: repetition, and a hard-to-override weight */
+.card &gt; .title  { color: var(--text); }
+.card &gt; .body   { color: var(--text); }
+.card &gt; .footer { color: var(--text); }
+
+/* after: one rule. Specificity is that of the hardest argument (0-2-0) */
+:is(.card &gt; .title, .card &gt; .body, .card &gt; .footer) {
+  color: var(--text);
+}
+
+/* :where() contributes nothing, so any author rule can beat it */
+:where(ul, ol, dl) { margin: 0; padding-inline-start: 1.25rem; }
+:where(h1, h2, h3, h4) { line-height: 1.2; }</code></pre></div>
+
+  <h4>Forgiving parsing</h4>
+  <p>A selector list is normally all-or-nothing: one unparseable selector invalidates the whole rule. <code>:is()</code> and <code>:where()</code> use a <em>forgiving</em> list instead, so an unknown or invalid branch is dropped and the remaining branches still match. That makes them a safe place for future-facing selectors, but it also means a typo fails silently instead of breaking the rule loudly &mdash; the opposite trade-off to a plain list, and worth knowing when a rule mysteriously matches nothing.</p>
+
+  <div class="tip">Reach for <code>:where()</code> in any stylesheet that others will import: a reset, a normalise layer, or a design-system base. It removes the need for consumers to match your specificity, which is the single most common reason a framework's base styles become impossible to override.</div>
+
+  <h3 id="ch13-not-has" data-toc>13.2 :not() and :has(): negation and relation</h3>
+  <p class="topic-desc"><code>:not()</code> has grown up: it now accepts a full selector list rather than a single simple selector, so a whole class of "this but not that" rules can be written once. <code>:has()</code> is the genuinely new one &mdash; it selects an element based on what it contains, which is the parent selector CSS never had.</p>
+
+  <h4>:not() with a selector list</h4>
+  <p>In Selectors Level 4, <code>:not()</code> takes a complex selector list. That means <code>:not(.is-disabled, .is-current)</code> is legal and reads exactly as intended, replacing the older habit of chaining two negations. Its specificity, like <code>:is()</code>, is the specificity of the most specific argument, so a negation is never free &mdash; a rule containing <code>:not(#id)</code> acquires an id's weight even though it is excluding rather than targeting.</p>
+
+  <h4>:has() reads forwards</h4>
+  <p><code>:has()</code> matches an element if any relative selector inside it matches a descendant, a sibling or a following relative to that element. This makes genuinely new patterns possible without JavaScript: a card that changes its layout because it contains an image, a form that marks itself invalid because one field is, a list item that draws a divider because another item follows it. The argument is a <em>relative</em> selector list, so a leading combinator such as <code>&gt;</code> or <code>+</code> constrains the relationship.</p>
+
+  <div class="codeWrap"><pre><code>/* css — negation with a list */
+.nav a:not(.is-current, .is-disabled) { color: var(--accent); }
+
+/* :has() — the parent reacts to its contents */
+.card:has(&gt; img)                { grid-template-rows: 12rem 1fr; }
+.card:has(&gt; .card__media)       { padding: 0; }
+form:has(input:invalid)         { border-inline-start: 3px solid var(--danger); }
+label:has(+ input:required)     { font-weight: 600; }
+
+/* :not(:has(...)) is legal, and reads as "no child matches" */
+.section:not(:has(article))     { display: none; }</code></pre></div>
+
+  <h4>Where <code>:has()</code> gets expensive</h4>
+  <p>Three rules keep it predictable. It cannot be nested inside another <code>:has()</code>, and it cannot be used inside a pseudo-element &mdash; neither is a limitation to work around so much as a sign the selector has stopped describing a relationship between real elements. More importantly, the browser must re-run a <code>:has()</code> rule when the affected subtree mutates, so a rule attached to a broad subtree and re-queried on every keystroke can become a measurable cost. Scope it to a container rather than <code>body</code> or <code>html</code>, and prefer a leading combinator (<code>:has(&gt; img)</code>) over an unconstrained descendant when the relationship is direct, both because it is stricter and because it lets the engine bail out sooner.</p>
+
+  <div class="note">Because <code>:has()</code> is evaluated as part of matching, a rule like <code>div:has(.thing)</code> is not a "select the parent" operator in the DOM-traversal sense &mdash; it filters the elements that the rest of the selector already matched. The difference is invisible in output and very visible in performance.</div>
+
+  <h3 id="ch13-nesting" data-toc>13.3 Native CSS nesting</h3>
+  <p class="topic-desc">Nesting is now part of CSS itself, not a preprocessor feature. A rule may contain other rules, and the relationship between parent and child is expressed by adjacency instead of by repeating the parent's selector &mdash; with a well-defined specificity rule so the result is still predictable.</p>
+
+  <h4>The <code>&amp;</code> nesting selector</h4>
+  <p>Inside a nested rule, <code>&amp;</code> refers to the resolved parent selector list. Omitting it is allowed for a descendant child &mdash; a nested rule whose selector starts with a type or class is treated as though it began with <code>&amp; </code> &mdash; but writing <code>&amp;</code> explicitly is clearer and is required whenever the child must attach without a descendant combinator, as in <code>&amp;:hover</code> or <code>&amp;.is-open</code>. Nesting only changes how the selector is written; it never creates a new scope, and the selector produced is an ordinary descendant or compound selector against the real DOM.</p>
+
+  <h4>Specificity inside a nested rule</h4>
+  <p>This is the part that surprises people. The <code>&amp;</code> selector does not take the specificity of the parent <em>as written for one branch</em>; it takes the specificity of the most specific selector in the parent's entire list. A nested rule inside <code>.a, #b</code> therefore behaves like <code>:is(.a, #b) .c</code>, which is <code>1-1-0</code> &mdash; the id's weight is inherited by both branches. If that is not what you want, split the parent list into separate rules so each nested block has a parent of the weight it deserves.</p>
+
+  <div class="codeWrap"><pre><code>/* css — nesting with &amp;, combinators and nested at-rules */
+.card {
+  display: grid;
+  gap: 1rem;
+
+  &amp; .card__title { font-weight: 700; margin-block: 0; }
+  &amp;:hover,
+  &amp;:focus-visible { outline: 2px solid var(--accent); }
+  &gt; .card__media { aspect-ratio: 16 / 9; }
+
+  /* at-rules nest too: this wraps the declarations below in @media */
+  @media (width &gt;= 40rem) {
+    grid-template-columns: 8rem 1fr;
+  }
+}
+
+/* specificity: the nesting selector matches the HARDEST branch of .a, #b */
+.a, #b {
+  &amp; .c { color: red; }   /* equivalent to :is(.a, #b) .c  →  1-1-0 */
+}</code></pre></div>
+
+  <h4>Declarations after nested rules</h4>
+  <p>An earlier draft of the nesting specification required declarations to come before nested rules, which forced awkward rewrites. That restriction was removed: a declaration that follows a nested rule is collected into its own implicit block and applied in document order alongside the others. The practical consequence is that <code>color: red</code> written after a nested rule still wins over <code>color: blue</code> written before it, and the cascade order inside a rule matches reading order.</p>
+
+  <div class="tip">Nesting is not a substitute for a build step, and it is not scoping. If you need a <em>boundary</em> &mdash; styles that cannot leak out and, in particular, styles that a broad global selector will still override &mdash; use <code>@scope</code> rather than deeper nesting. Nesting shortens the text; scoping changes what the selector is allowed to match.</div>
+
+  <h3 id="ch13-layers" data-toc>13.4 Cascade layers: declaring the order</h3>
+  <p class="topic-desc">A cascade layer is a named bucket that rule sets are sorted into before anything else is considered. Specificity still decides within a layer, but between layers the order you declare wins outright &mdash; which means a low-specificity utility rule can reliably beat a high-specificity component rule without a single <code>!important</code>.</p>
+
+  <h4>Order is declared, not inferred</h4>
+  <p>A layer's position is set the first time its name appears, either in a bare <code>@layer a, b, c;</code> statement &mdash; which declares names and order without adding any rules &mdash; or in the first <code>@layer name { ... }</code> block encountered. Declaring the whole order up front is the important habit, because it decouples priority from where the file happens to sit in the import graph. Later names take higher priority; a rule in a later layer beats a rule in an earlier layer regardless of specificity.</p>
+
+  <h4>Unlayered styles and <code>!important</code></h4>
+  <p>Rules declared outside any layer are treated as belonging to an implicit final layer for normal declarations, so unlayered CSS always wins over layered CSS. That is how existing stylesheets stay untouched: layering a framework cannot break your overrides, only the other way round. Important declarations invert the whole ordering &mdash; the <em>earliest</em> layer wins them, and unlayered important declarations are weakest. This inversion is deliberate: it means a layer holding defensive, must-not-be-broken rules can be placed first and still be authoritative when it matters.</p>
+
+  <div class="codeWrap"><pre><code>/* css — declare the order once; position decides priority */
+@layer reset, base, components, utilities;
+
+@layer reset      { * { box-sizing: border-box; margin: 0; } }
+@layer base       { body { font-family: system-ui, sans-serif; } }
+@layer components { .button { background: var(--accent); padding: .5rem 1rem; } }
+@layer utilities  { .u-hidden { display: none; } }
+
+/* unlayered: beats EVERY layer for normal declarations */
+.button { background: crimson; }
+
+@layer components {
+  .button { background: var(--accent); }   /* loses to the rule above */
+}
+
+/* !important reverses it: the earliest layer wins */
+@layer reset      { .button { color: black !important; } }
+@layer components { .button { color: white !important; } }  /* reset wins */</code></pre></div>
+
+  <h4>Layering someone else's CSS</h4>
+  <p><code>@import</code> accepts a <code>layer()</code> clause, which drops the whole imported sheet into a named layer. Combined with a declared order, this is the cleanest way to consume a third-party stylesheet: it keeps its internal specificity intact while guaranteeing that your own rules, layered later, win. The one ordering constraint is that <code>@import</code> must still come before other rule sets except <code>@charset</code> and <code>@layer</code> statements, so the order declaration is usually the very first line of the entry stylesheet.</p>
+
+  <div class="codeWrap"><pre><code>/* css — entry point: order first, then the imports into layers */
+@layer vendor, reset, base, components, utilities;
+
+@import url("framework.css") layer(vendor);
+@import url("normalise.css") layer(reset);
+
+/* a whole file can be layered without editing it */
+@layer components {
+  @import url("buttons.css");   /* nested @import is also layered */
+}</code></pre></div>
+
+  <div class="warn">A layer's order is fixed by its first appearance, so a bare <code>@layer</code> statement that names all layers is not optional decoration &mdash; it is the mechanism. Without it, order is whichever block the bundler emitted first, which is exactly the kind of implicit priority the feature exists to remove.</div>
+
+  <h3 id="ch13-scope" data-toc>13.5 @scope: bounding a selector's reach</h3>
+  <p class="topic-desc">Nesting makes selectors shorter; <code>@scope</code> makes them narrower. It defines a subtree in which the enclosed rules are allowed to match, with an optional lower boundary &mdash; and adds a new cascade criterion, scope proximity, so that the nearest scope wins rather than the last one written.</p>
+
+  <h4>Scoping roots and donut scopes</h4>
+  <p>The prelude is <code>@scope (root) to (limit)</code>. The root is the upper bound and the limit is the lower bound; the root is inclusive and the limit is exclusive, so a rule inside <code>@scope (.article-body) to (figure)</code> matches any qualifying element under <code>.article-body</code> but stops at a <code>figure</code>. That "donut" shape is precisely what a plain descendant selector cannot express without dragging the DOM structure into the selector, and it is what makes scoped rules robust when the markup is refactored. Inside the block, <code>:scope</code> refers to the scope root itself, and a rule with no <code>:scope</code> is still implicitly scoped &mdash; it cannot escape the subtree.</p>
+
+  <h4>Specificity inside <code>@scope</code></h4>
+  <p>Bare selectors and <code>&amp;</code> inside a scoped block behave as if <code>:where(:scope)</code> were prefixed, and <code>:where()</code> has zero specificity &mdash; so <code>img</code> inside <code>@scope (.article-body)</code> keeps the specificity of <code>img</code>, not of <code>.article-body img</code>. That is the opposite of the nesting rule, and it is the reason scoped rules are easy to override: the root you scoped to costs nothing. Writing <code>:scope img</code> explicitly does add class-level weight, because <code>:scope</code> is a pseudo-class, so use it only when the root itself must be targeted or the extra weight is genuinely wanted.</p>
+
+  <div class="codeWrap"><pre><code>/* css — a donut scope, and implicit zero-weight scoping */
+@scope (.article-body) to (figure) {
+  img { border: 2px solid var(--line); }   /* any img, except inside a figure */
+}
+
+@scope (.card) {
+  :scope { container-type: inline-size; }  /* the root itself */
+
+  .card__title { margin-block: 0; }        /* effectively :where(.card) .card__title */
+}
+
+/* a scope limit can use :scope to require a relationship to the root */
+@scope (.sidebar) to (:scope &gt; .widgets) {
+  a { text-decoration-thickness: 1px; }
+}</code></pre></div>
+
+  <h4>Scope proximity breaks ties</h4>
+  <p>When two scoped rules match the same element with equal importance, layers and specificity, the one whose scope root is fewer hops up the DOM tree wins. Nested theme wrappers are the classic case: a light theme containing a dark card containing another light card would, under source order, colour the innermost text wrong, because the dark rule happens to come later. With <code>@scope</code> the innermost paragraph is one hop from the light root and two from the dark one, so it resolves correctly with no naming tricks at all.</p>
+
+  <div class="codeWrap"><pre><code>/* css — proximity resolves nested themes that source order cannot */
+@scope (.theme-light) {
+  :scope { background: #f7f7f7; }
+  p { color: #111; }
+}
+
+@scope (.theme-dark) {
+  :scope { background: #16181d; }
+  p { color: #eee; }
+}
+
+/* a .theme-light inside a .theme-dark: the nearest root (light) wins */</code></pre></div>
+
+  <div class="note"><code>@scope</code> became Baseline newly available in 2026, so guard it if you support older evergreen versions. Note also that scoping bounds <em>matching</em>, not inheritance: a custom property or <code>color</code> set on a scoped root still inherits past the scope limit, because inheritance has no selector to filter on.</div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch14-color-science" data-toc>14 · Color science and modern color functions</h2>
+  <p class="topic-desc">CSS colour used to mean one thing: a point in sRGB, written as hex or <code>rgb()</code>. That model is a poor place to do arithmetic. Two colours mixed in sRGB pass through a muddy middle, "lighten by 10%" is not a perceptual operation, and a palette generated by rotating a hue angle produces tones that look unevenly spaced however evenly their numbers are spaced. Modern CSS exposes real colour spaces &mdash; <code>oklch()</code>, <code>lch()</code>, <code>lab()</code>, <code>oklab()</code>, and the wide-gamut <code>color()</code> function &mdash; plus two ways to compute with them, <code>color-mix()</code> and relative colour syntax. Together they let a palette be derived rather than hand-tuned, and derived palettes do not drift when a brand colour changes.</p>
+
+  <h3 id="ch14-perceptual" data-toc>14.1 Perceptual colour: lab, lch, oklab and oklch</h3>
+  <p class="topic-desc">A perceptual colour space is one in which equal numeric changes look like equal visual changes. sRGB is not one: its channels are tied to the physical response of a monitor, not to human vision, so lightness in particular is distributed very unevenly &mdash; <code>#444</code> is far closer to black than <code>#888</code> is to <code>#444</code>.</p>
+
+  <h4>sRGB's real defect</h4>
+  <p>The problem is not that sRGB is old, it is that its axes do not line up with the questions designers ask. "Make this darker" is a question about perceived lightness; "make it less vivid" is a question about perceived saturation; "rotate the hue" is a question about perceived hue. In sRGB all three operations require moving several channels at once by amounts that depend on the starting colour, which is why a stylesheet full of hex codes has no predictable darken function without a preprocessor. Converting to a perceptual space makes each of those a change to a single number.</p>
+
+  <h4>Reading <code>oklch()</code></h4>
+  <p><code>oklch(L C H / A)</code> is the polar form of the Oklab space. <code>L</code> is perceptual lightness &mdash; <code>0</code> or <code>0%</code> is black, <code>1</code> or <code>100%</code> is white, and the values in between are distributed the way the eye distributes them. <code>C</code> is chroma, an unbounded but practically small number: near <code>0</code> is grey, and sRGB tops out somewhere around <code>0.37</code> depending on hue. <code>H</code> is a hue angle in degrees starting from a pinkish red at <code>0</code>. The alpha channel after the slash works as in every other colour function. <code>oklab()</code> is the same space in Cartesian axes; <code>lch()</code> and <code>lab()</code> are the older CIE-based equivalents, which are also perceptual but less uniform than the OK variants, so hue angles are not interchangeable between the two families.</p>
+
+  <div class="codeWrap"><pre><code>/* css — a three-step ramp built by moving ONE number: lightness */
+:root {
+  --brand-100: oklch(0.93 0.05 258);
+  --brand-500: oklch(0.62 0.19 258);
+  --brand-900: oklch(0.32 0.09 258);
+}
+
+/* the same model in cartesian axes: a and b instead of chroma and hue */
+.oklab-form { color: oklab(0.62 -0.05 -0.16); }
+
+/* alpha works exactly as elsewhere */
+.overlay { background: oklch(0.62 0.19 258 / 0.4); }</code></pre></div>
+
+  <h4>Choosing hues that stay distinguishable</h4>
+  <p>The practical advantage of a perceptual space shows up when a palette needs several hues. In sRGB, three colours with evenly spaced hue numbers look unevenly different, and some pairs merge when the palette is dimmed or printed. Holding <code>L</code> and <code>C</code> constant and spacing <code>H</code> evenly produces a categorical set that stays separable, because both of the other axes are fixed. Conversely, holding <code>H</code> constant and varying only <code>L</code> produces a single-hue ramp whose steps are visibly even, which is what a small palette usually needs for surfaces, borders and text.</p>
+
+  <div class="tip">Keep a hue constant and vary <code>L</code> for surfaces and text; keep <code>L</code> and <code>C</code> constant and vary <code>H</code> for categorical accents. Those two recipes cover most of what a design system needs, and neither can be expressed as reliably in sRGB.</div>
+
+  <h3 id="ch14-wide-gamut" data-toc>14.2 Wide gamut: <code>color()</code> and Display P3</h3>
+  <p class="topic-desc">Most modern screens can display colours sRGB cannot describe, and <code>color()</code> is how CSS addresses them. The function takes a colour space as its first argument, so the same syntax reaches Display P3 today and any future space that a browser learns.</p>
+
+  <h4>Speaking in P3</h4>
+  <p><code>color(display-p3 r g b)</code> takes three channels in the 0&ndash;1 range, or percentages, expressed in the Display P3 space. P3 is a superset of sRGB: every sRGB colour has a P3 equivalent, but not the reverse, so saturated greens, oranges and magentas that sRGB clamps into dullness are available. On a P3 display the difference is visible immediately; on an sRGB display the browser maps the colour back into gamut rather than discarding the declaration. The <code>color-mix()</code>, relative-colour and <code>color()</code> functions interoperate, so a P3 colour can be mixed or derived exactly like any other.</p>
+
+  <h4>Gamut mapping</h4>
+  <p>When a colour cannot be shown on the output device, the browser performs gamut mapping: it reduces chroma while preserving lightness and hue as far as it can, rather than clipping each channel independently. The older clipping behaviour produced hue shifts &mdash; a saturated orange sliding towards red &mdash; which is why <code>oklch()</code> values that lie outside sRGB look the way their numbers suggest rather than becoming a different colour. Because mapping is a fallback, a palette that must be exact on every device should keep its chroma inside the smaller gamut and use wide gamut only as an enhancement.</p>
+
+  <div class="codeWrap"><pre><code>/* css — enhancement, not dependency */
+:root {
+  --accent: oklch(0.62 0.19 258);   /* safe everywhere, saturated enough */
+}
+
+/* a display that can show more gets more */
+@media (color-gamut: p3) {
+  :root { --accent: color(display-p3 0.25 0.32 0.9); }
+}
+
+/* feature detection when the value must be exact */
+@supports (color: color(display-p3 1 0 0)) {
+  .badge--vivid { background: color(display-p3 0.94 0.2 0.4); }
+}</code></pre></div>
+
+  <h4>Detecting support</h4>
+  <p>Two mechanisms exist and they answer different questions. <code>@media (color-gamut: p3)</code> asks whether the <em>output device</em> can show P3, which is what you want when choosing a more vivid colour. <code>@supports (color: color(display-p3 1 0 0))</code> asks whether the <em>engine</em> parses the syntax at all. Both are needed for a robust enhancement: an engine that parses P3 on an sRGB screen will map it correctly, but an engine that does not parse it will drop the declaration and fall back to the previous value, which is a fine outcome as long as the base value was already good.</p>
+
+  <div class="warn">Never make a colour the <em>only</em> carrier of meaning, and never assume a wide-gamut colour will survive a screenshot, a print, or a colour-blindness simulation. P3 widens the available palette; it does not fix contrast, and a vivid accent used as text on a light surface is still a contrast problem even when it is beautiful.</div>
+
+  <h3 id="ch14-mix-relative" data-toc>14.3 <code>color-mix()</code> and relative colour syntax</h3>
+  <p class="topic-desc">Two functions turn a palette into a derivation. <code>color-mix()</code> blends two colours in a chosen space, and relative colour syntax takes a colour and re-writes its channels arithmetically. Both are resolved by the browser at computed-value time, so a theme change is a variable change and nothing else.</p>
+
+  <h4>Mixing in a chosen space</h4>
+  <p><code>color-mix(in oklch, A, B)</code> blends two colours in the named space, with an optional weight on either side. The space matters: mixing blue and yellow in sRGB or in <code>srgb-linear</code> passes through grey, while mixing in <code>oklab</code> or <code>oklch</code> keeps the result vivid, because the blend happens along perceptual axes instead of along monitor channels. Mixing is alpha-aware &mdash; the calculation is performed with premultiplied alpha &mdash; so mixing a colour with <code>transparent</code> yields that colour at reduced alpha rather than a washed-out hue, which is exactly the behaviour a "ghost" background needs. Weighting an end point, as in <code>var(--brand) 20%</code>, shifts the blend without changing the space.</p>
+
+  <h4>Relative colour syntax</h4>
+  <p><code>oklch(from &lt;colour&gt; L C H)</code> reads the channels of an existing colour into keywords and lets you compute new ones with <code>calc()</code> and <code>clamp()</code>. Each space supplies its own channel names &mdash; <code>l c h</code> and <code>alpha</code> for <code>oklch()</code>, <code>r g b</code> for <code>rgb()</code>, and so on &mdash; and <code>from</code> may take any colour expression, including a custom property. This is how a single brand token generates its own hover state, border tint and on-colour text without a second source of truth: the relationship is encoded once, and it holds for whatever brand colour is installed later.</p>
+
+  <div class="codeWrap"><pre><code>/* css — derive every state from one token */
+:root {
+  --brand: oklch(0.62 0.19 258);
+
+  --brand-hover: color-mix(in oklch, var(--brand), white 20%);
+  --brand-tint:  color-mix(in oklab, var(--brand), transparent 88%);
+  --brand-deep:  color-mix(in oklch, var(--brand), black 35%);
+}
+
+/* relative syntax: read a channel, compute a new one */
+.card {
+  --surface: oklch(0.72 0.14 250);
+
+  /* darken the text by a fixed perceptual step, clamped to valid L */
+  color: oklch(from var(--surface) clamp(0, calc(l - 0.45), 1) c h);
+  border-color: oklch(from var(--surface) l c h / 0.4);
+  background: var(--surface);
+}</code></pre></div>
+
+  <h4>Choosing a space on purpose</h4>
+  <p>The space argument is a design decision, not a default to leave alone. <code>in oklch</code> mixes hue along the shorter arc and is the better choice for brand colour ramps, because it keeps saturation across the blend. <code>in oklab</code> is the better choice when the blend must not introduce hue rotation at all, such as neutral surface steps. <code>in srgb-linear</code> reproduces what a light model does physically, which is occasionally the right answer for a shadow or a glow. Mixing text and background in a perceptual space is also the quickest way to guarantee the midpoint stays legible, since lightness moves predictably.</p>
+
+  <div class="note">A relative colour is <em>not</em> registered unless it is assigned to a custom property with <code>@property</code> giving it a real syntax. That matters for style queries — an unregistered <code>--brand</code> holding <code>oklch(...)</code> compares textually, so <code>@container style(--brand: oklch(0.62 0.19 258))</code> will fail on an equivalent but differently written value. Register the token if a style query must read it.</div>
+
+  <h3 id="ch14-accessible-palettes" data-toc>14.4 Accessible palettes from perceptual steps</h3>
+  <p class="topic-desc">A palette is not a list of pretty colours; it is a set of pairs, and accessibility is a property of every pair, not of any colour on its own. Perceptual colour spaces make both halves of that easier: they make a ramp evenly spaced by construction, and they make the contrast arithmetic predictable enough to verify.</p>
+
+  <h4>Contrast belongs to the pair</h4>
+  <p>The contrast ratio between two colours is computed from their <em>relative luminance</em>, which is a function of the sRGB channels after gamma decoding. That has two consequences worth stating plainly. First, a colour has no contrast until it is placed on something, so "is this brand colour accessible" is not a well-formed question &mdash; "is this text colour accessible on this surface" is. Second, perceptual lightness in <code>oklch()</code> correlates strongly with luminance but is not identical to it, so a palette built by even lightness steps is evenly spaced visually and <em>approximately</em> even in contrast &mdash; always verify the actual pairs rather than trusting the spacing.</p>
+
+  <h4>A ramp you can verify</h4>
+  <p>The workable recipe is to fix a hue, choose a small number of lightness steps, keep chroma inside the sRGB gamut at each step, and then check the specific combinations the interface actually uses: body text on each surface, muted text on the page background, focus rings against adjacent colours, and text on the accent. A ramp built this way is easy to audit, because every step is one declaration in one place and changing the hue does not require touching any of them.</p>
+
+  <div class="codeWrap"><pre><code>/* css — one hue, evenly spaced lightness, chroma tapered at the ends */
+:root {
+  --step-0: oklch(0.98 0.01 258);   /* page background */
+  --step-1: oklch(0.93 0.03 258);   /* raised surface   */
+  --step-2: oklch(0.86 0.06 258);   /* borders, dividers */
+  --step-3: oklch(0.72 0.12 258);   /* decorative fills  */
+  --step-4: oklch(0.55 0.17 258);   /* accent, focus ring */
+  --ink:    oklch(0.22 0.02 258);   /* body text */
+}
+
+/* check these pairs, not the colours on their own */
+body    { background: var(--step-0); color: var(--ink); }
+.muted  { color: oklch(from var(--ink) calc(l + 0.25) c h); }
+.focus  { outline: 2px solid var(--step-4); outline-offset: 2px; }</code></pre></div>
+
+  <h4>Letting the browser pick the on-colour</h4>
+  <p><code>contrast-color()</code> takes a colour and returns whichever of two candidate colours has the greater contrast against it &mdash; by default black or white, and a different pair can be supplied. It reached Baseline in 2026, and it removes the common failure where an "on-accent" token was hard-coded for one accent and silently wrong for the next. Use it wherever a background is data-driven or user-configurable, and keep an explicit fallback so an engine without it still gets a deliberate colour.</p>
+
+  <div class="codeWrap"><pre><code>/* css — the on-colour follows the background instead of being guessed */
+.badge {
+  background: var(--brand-500);
+  color: #fff;                                  /* fallback for old engines */
+  color: contrast-color(var(--brand-500));      /* guaranteed black or white */
+}
+
+/* a custom pair, when pure black is too harsh */
+.hero {
+  background: var(--step-4);
+  color: contrast-color(var(--step-4), #fff, oklch(0.18 0.02 258));
+}</code></pre></div>
+
+  <div class="warn">Automated contrast is a floor, not a ceiling. A pair that passes 4.5:1 can still be unreadable if the type is thin or small, and a palette that passes every ratio can still be unusable for someone with deuteranopia if hue is the only distinction. Contrast maths handles the luminance problem; it does not handle the "these two status colours look the same" problem, which needs a second cue such as an icon, a label or a pattern.</div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch15-layout-motion" data-toc>15 · Advanced layout and motion</h2>
+  <p class="topic-desc">The last group of additions is about coordination: making separate grid items share one alignment, making spacing follow the writing mode instead of the screen, making a state change animate without JavaScript orchestrating it, and letting one element position itself against another. Each replaces coordination work that used to leak into markup, script or a magic number, and each has a fallback story that keeps the page usable while support catches up.</p>
+
+  <h3 id="ch15-subgrid" data-toc>15.1 Subgrid and shared alignment</h3>
+  <p class="topic-desc">A card that contains a grid of its own has a familiar problem: its internal rows line up with nothing outside it, so a row of cards has titles at different heights as soon as one description runs long. Subgrid lets a nested grid borrow its parent's tracks, so the boxes remain separate but the lines are shared.</p>
+
+  <h4>Why the problem exists</h4>
+  <p>Two sibling grids are independent. Each resolves its own <code>auto</code> rows from its own content, so nothing forces card A's title track to be the height of card B's. The pre-subgrid fixes were all indirect: fixing a row height with a magic number, using flexbox with <code>flex: 1</code> and hoping the content matched, or measuring with JavaScript. All of them encode a value that becomes wrong the moment the content changes.</p>
+
+  <h4>Borrowing the parent's tracks</h4>
+  <p>The <code>subgrid</code> keyword is accepted by <code>grid-template-columns</code> and <code>grid-template-rows</code>. For it to be meaningful the element must be a grid item that spans the tracks it intends to reuse, and it must not have gaps of its own along the subgridded axis &mdash; the parent's gaps apply. Children of the subgrid item then place into the shared lines with <code>grid-row</code> and <code>grid-column</code>, so a title, a body and a footer in each card can occupy rows 1, 2 and 3 of the shared grid and therefore align across every card in the row.</p>
+
+  <div class="codeWrap"><pre><code>/* css — the card grid defines the tracks once, for every card */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  grid-template-rows: auto 1fr auto;   /* title / body / actions */
+  gap: 1rem;
+}
+
+.card {
+  display: grid;
+  grid-row: span 3;                    /* must span the tracks it reuses */
+  grid-template-rows: subgrid;         /* adopt the parent's row lines */
+}
+
+/* children place into the SHARED rows, so they align across cards */
+.card &gt; .card__title   { grid-row: 1; }
+.card &gt; .card__body    { grid-row: 2; }
+.card &gt; .card__actions { grid-row: 3; }</code></pre></div>
+
+  <h4>Subgrid in both axes</h4>
+  <p>The same keyword works for columns, and both axes can be inherited at once when the parent supplies a full track set. Column subgrid is the tool for a header row whose cells must align with a body row below &mdash; a data table built from separate elements, or a definition list where the label column must match the term column above it. The constraint is symmetric: a subgrid shares lines, so it cannot have a different number of tracks than the range it spans, and it cannot introduce its own gaps on that axis.</p>
+
+  <div class="warn">A subgrid item must span the tracks it borrows, and the parent's gaps along the subgridded axis replace the item's own. Getting this wrong produces a layout that looks correct in one card and collapses to a single row in the next, because the span and the track count no longer agree. For an older engine, provide a plain <code>grid-template-rows: auto 1fr auto</code> base and override it inside <code>@supports (grid-template-rows: subgrid)</code>.</div>
+
+  <h3 id="ch15-logical" data-toc>15.2 Logical properties and writing modes</h3>
+  <p class="topic-desc">Physical properties name a side of the screen: <code>margin-left</code> is left, whatever the text is doing. Logical properties name a side of the <em>flow</em>: <code>margin-inline-start</code> is the start of the inline axis, which is left in English, right in Arabic, and top when the writing mode is vertical.</p>
+
+  <h4>Axes instead of directions</h4>
+  <p>The inline axis runs along the text; the block axis runs down the flow. Almost every physical property has a logical counterpart: <code>margin-inline</code> and <code>margin-block</code> for the two axes, <code>padding-inline-start</code> and <code>padding-block-end</code> for individual sides, <code>inset-inline</code> and <code>inset-block</code> for positioning, and <code>inline-size</code> and <code>block-size</code> for width and height. Shorthands follow the same pattern, with the two-value forms mapping to the two axes. Writing them consistently means a layout is automatically correct for right-to-left locales, and no separate stylesheet or swap of <code>left</code> and <code>right</code> is needed.</p>
+
+  <h4>Setting the writing mode</h4>
+  <p><code>writing-mode</code> changes the flow direction and, with it, the meaning of every logical property inside. <code>vertical-rl</code> is the standard choice for vertical text such as a book spine or a tab that reads top to bottom, and <code>sideways-lr</code> rotates Latin text as a block. Setting <code>direction: rtl</code> on a subtree handles the bidirectional case without a vertical flow. Because the logical properties resolve against the element's own writing mode, a component styled entirely with logical properties moves from horizontal to vertical with no changes at all.</p>
+
+  <div class="codeWrap"><pre><code>/* css — one component, correct in every writing mode */
+.panel {
+  padding-block: 1rem;              /* top / bottom in horizontal-tb */
+  padding-inline: 1.5rem;           /* left / right */
+  margin-block-start: 2rem;         /* becomes margin-top, but flow-aware */
+  border-inline-start: 3px solid var(--line);
+
+  inline-size: min(60ch, 100%);     /* width  */
+  block-size: auto;                 /* height */
+}
+
+/* vertical text: the same component, now measured down the page */
+.spine {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding-block: 0.5rem 1.5rem;     /* now left and right */
+  inline-size: max-content;
+}
+
+/* right-to-left without a vertical flow */
+.locale-ar { direction: rtl; }</code></pre></div>
+
+  <h4>Where logical properties surprise you</h4>
+  <p>Two rules prevent most mistakes. Logical values are not always interchangeable with physical ones: a two-value <code>margin: 1rem 2rem</code> stays physical (block then inline equivalent is a coincidence of the shorthand's shape) so prefer the axis shorthands when you mean axes. And a percentage padding is resolved against the container's <em>inline</em> size regardless of the axis it is used on, which predates logical properties and has not changed; on a vertical writing mode this means padding percentages behave differently from what the direction suggests.</p>
+
+  <div class="tip">When auditing an existing stylesheet, grep for <code>left</code>, <code>right</code>, <code>top</code>, <code>bottom</code>, <code>width</code> and <code>height</code>. Every hit in layout CSS is a candidate for a logical equivalent, and converting them is the cheapest way to make a site support a second writing direction properly.</div>
+
+  <h3 id="ch15-view-transitions" data-toc>15.3 View transitions</h3>
+  <p class="topic-desc">The View Transition API animates between two states of the document rather than between two values of one property. The browser snapshots the old state, applies your DOM or navigation change, snapshots the new state, and animates the difference on a separate layer &mdash; named elements fly to their new positions, everything else cross-fades.</p>
+
+  <h4>Same-document transitions</h4>
+  <p><code>document.startViewTransition(callback)</code> takes a function that mutates the DOM. The old rendering is captured, the callback runs, the new rendering is captured, and a set of pseudo-elements &mdash; <code>::view-transition-old</code>, <code>::view-transition-new</code> and one pair per named group &mdash; is animated with ordinary CSS animations. Assigning <code>view-transition-name: card</code> to an element in both states tells the browser they are the same object, so it interpolates position and size instead of cross-fading; the name must be unique at the moment a transition starts.</p>
+
+  <h4>Cross-document transitions</h4>
+  <p>For a multi-page site the API is declarative and needs no script: <code>@view-transition { navigation: auto; }</code> on a page opts it in, and a same-origin navigation to another opted-in page produces a transition. Both documents must opt in, and <code>::view-transition-old(root)</code> and <code>::view-transition-new(root)</code> style the default cross-fade. It is supported in Chromium and in Safari 18.2 and later, with Firefox still partial, so the honest position is that it is an enhancement: the navigation works identically with or without it, and the default cross-fade is already a reasonable result.</p>
+
+  <div class="codeWrap"><pre><code>/* css — cross-document, opt in on both pages */
+@view-transition { navigation: auto; }
+
+/* restyle the default cross-fade */
+::view-transition-old(root) { animation: fade-out 200ms ease both; }
+::view-transition-new(root) { animation: fade-in  200ms ease both; }
+
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes fade-in  { from { opacity: 0; } }
+
+/* a shared element that should travel, not fade */
+.avatar { view-transition-name: avatar; }</code></pre></div>
+
+  <div class="codeWrap"><pre><code>// js — same-document transition around a DOM change
+function openPanel(panel) {
+  if (!document.startViewTransition) {   // unsupported: just do the change
+    panel.classList.add('is-open');
+    return;
+  }
+  // startViewTransition returns a promise; the snapshot is taken
+  // before the callback's mutations are captured
+  document.startViewTransition(() =&gt; {
+    panel.classList.add('is-open');
+  });
+}</code></pre></div>
+
+  <h4>Respecting motion preferences</h4>
+  <p>A transition is decoration, and decoration must yield to <code>prefers-reduced-motion</code>. Because the animation is ordinary CSS on the view-transition pseudo-elements, the fix is ordinary too: inside a reduced-motion block, shorten the durations to near zero or set <code>animation: none</code> on the pseudo-elements. Do not disable the transition by removing <code>@view-transition</code>, because that would also remove the cross-fade that helps people with low vision follow the state change.</p>
+
+  <div class="note">A view-transition group animates a snapshot, not the live element, so no layout is recalculated per frame and the cost is close to a single compositor animation. The flip side is that the snapshot can look stale during a long transition: content that changes mid-animation shows the old pixels until the transition completes.</div>
+
+  <h3 id="ch15-scroll-animations" data-toc>15.4 Scroll-driven animations</h3>
+  <p class="topic-desc">A scroll-driven animation replaces time with scroll position. Instead of a keyframe animation advancing on a clock, its progress is tied to a timeline derived from how far a scroller has been scrolled or how far an element has travelled through its scrollport &mdash; so a reading-progress bar, a reveal-on-scroll effect or a parallax layer is one stylesheet rule and no event listener.</p>
+
+  <h4>Timelines and ranges</h4>
+  <p><code>animation-timeline</code> is declared <em>after</em> the <code>animation</code> shorthand, because the shorthand resets it. A value of <code>scroll()</code> creates an anonymous scroll-progress timeline from the nearest scroller, or from <code>root</code> or <code>self</code> when those are named; <code>view()</code> creates a view-progress timeline from the element's own visibility within its scrollport. A named timeline set with <code>scroll-timeline-name</code> or <code>view-timeline-name</code> can be attached to a different element, which is how a progress bar outside a scroll container tracks the content inside it. <code>animation-range</code> then narrows the portion of the timeline the animation uses, with keywords such as <code>entry</code>, <code>cover</code> and <code>exit</code> for view timelines.</p>
+
+  <div class="codeWrap"><pre><code>/* css — a reading-progress bar: no script, no scroll listener */
+.reader-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inline-size: 100%;
+  block-size: 3px;
+  background: var(--accent);
+  transform-origin: 0 50%;
+
+  animation: progress linear both;
+  animation-timeline: scroll(root block);   /* must follow the shorthand */
+}
+
+@keyframes progress {
+  from { scale: 0 1; }
+  to   { scale: 1 1; }
+}</code></pre></div>
+
+  <h4>Revealing content as it enters</h4>
+  <p>A view-progress timeline is the right tool for an entrance effect, because its 0% and 100% are defined by the subject's position relative to the scrollport rather than by the scroller's extents. <code>animation-range: entry 10% cover 40%</code> holds the animation still until the element is 10% into view and finishes it before the element reaches the middle, so the reveal completes while the reader is still arriving. Naming the timeline with <code>view-timeline-name</code> lets the element being animated differ from the element whose visibility drives the timeline.</p>
+
+  <div class="codeWrap"><pre><code>/* css — reveal on entry, driven by the item's own visibility */
+.reveal {
+  animation: reveal linear both;
+  animation-timeline: view();
+  animation-range: entry 10% cover 40%;
+}
+
+@keyframes reveal {
+  from { opacity: 0; translate: 0 1.5rem; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+/* a named timeline on the parent, attached by a child */
+.scroller {
+  overflow-y: auto;
+  scroll-timeline-name: --page;
+  scroll-timeline-axis: block;
+}
+.scroller__fill { animation: progress linear both; animation-timeline: --page; }</code></pre></div>
+
+  <h4>Accessibility and fallback</h4>
+  <p>Scroll-driven animations are not Baseline yet, so the declarations must be additive. If an engine does not understand <code>animation-timeline</code> it drops the declaration and the animation has no duration from the shorthand, which leaves the element in its final state &mdash; a safe outcome only if the base rule already sets the resting appearance. For a progress bar that means the bar should be visible and at full width by default and animated back from zero, not the other way round. Motion is also more than decoration here: an effect tied to scroll cannot be escaped by abandoning the animation, so anything that moves should be gentle, and a <code>prefers-reduced-motion</code> block should replace the translate with an opacity change or none at all.</p>
+
+  <div class="warn">Because the <code>animation</code> shorthand resets <code>animation-timeline</code> to <code>auto</code>, a declaration order mistake silently turns a scroll-driven animation into a time-based one. Always write the shorthand first, and prefer separate <code>animation-name</code> and <code>animation-timeline</code> declarations in code that is machine-generated.</div>
+
+  <h3 id="ch15-anchor-sizing" data-toc>15.5 Anchor positioning and sizing keywords</h3>
+  <p class="topic-desc">Anchor positioning lets one element be positioned and sized relative to another that it names, entirely in CSS. It replaces the JavaScript that measured a trigger, positioned a tooltip and re-ran on every scroll and resize, and it brings overflow handling along with it. The sizing keywords are the smaller half of the same story: they express intent about a box's size rather than a fixed number.</p>
+
+  <h4>Anchors, areas and fallbacks</h4>
+  <p>An element becomes an anchor by declaring <code>anchor-name: --menu-btn</code>. An absolutely or fixed positioned element then names it with <code>position-anchor</code> and picks a placement with <code>position-area</code>, which uses a nine-cell grid vocabulary such as <code>block-end</code> or <code>block-end span-inline-end</code> instead of coordinates. <code>position-try-fallbacks</code> lists alternatives &mdash; <code>flip-block</code>, <code>flip-inline</code>, or a custom <code>@position-try</code> block &mdash; and the browser applies the first that avoids overflowing the containing block or the viewport. <code>position-visibility: anchors-visible</code> hides the positioned element when its anchor is scrolled out of view, which closes the classic bug where a tooltip stayed on screen after its trigger had gone.</p>
+
+  <div class="codeWrap"><pre><code>/* css — a menu tethered to its button, with overflow fallbacks */
+.trigger { anchor-name: --menu-btn; }
+
+.menu {
+  position: fixed;
+  margin: 0;
+  position-anchor: --menu-btn;
+  position-area: block-end span-inline-end;
+  position-try-fallbacks: flip-block, flip-inline;
+  position-visibility: anchors-visible;
+}
+
+/* a named alternative the browser may fall back to */
+@position-try --menu-above {
+  position-area: block-start span-inline-end;
+  margin-block-end: 0.35rem;
+}
+
+/* anchored container queries react to which fallback is active */
+@container anchored(fallback: --menu-above) {
+  .menu__caret { rotate: 180deg; }
+}</code></pre></div>
+
+  <h4>Sizing keywords and intrinsic ratios</h4>
+  <p>Several properties now express a box's intent rather than a measurement. <code>aspect-ratio</code> lets a box derive one axis from the other, so an image or video placeholder can reserve its space before loading and eliminate layout shift. <code>min-inline-size: 0</code> is the standard cure for grid and flex blowout, where a long unbreakable string refuses to shrink below its content. <code>fit-content</code>, <code>max-content</code> and <code>min-content</code> express sizing in terms of the content itself, and <code>min()</code>, <code>max()</code> and <code>clamp()</code> impose bounds without media queries. <code>object-fit</code> then decides what happens to replaced content inside the box the ratio created.</p>
+
+  <div class="codeWrap"><pre><code>/* css — intent-based sizing */
+.media {
+  aspect-ratio: 16 / 9;        /* reserve space before the image loads */
+  inline-size: 100%;
+  object-fit: cover;           /* crop rather than distort */
+}
+
+.grid-item {
+  min-inline-size: 0;          /* stop a long word blowing out the track */
+}
+
+.prose {
+  inline-size: min(70ch, 100%); /* measure, never wider than the container */
+  margin-inline: auto;
+}
+
+.chip {
+  inline-size: fit-content;     /* as narrow as the content needs */
+  max-inline-size: 100%;
+}
+
+/* field-sizing lets a control grow with its value instead of a guess */
+.grown-input { field-sizing: content; }</code></pre></div>
+
+  <div class="note">Anchor positioning is not Baseline across every engine yet, and it degrades in a specific way: without it, <code>position-area</code> is ignored and the element falls back to ordinary absolute or fixed positioning. That means the fallback must place the tooltip somewhere sensible without the anchor, usually by also setting a <code>top</code> or <code>inset</code> value &mdash; and it is worth testing with the feature disabled, because the failure is a stray box rather than a missing one.</div>
+</section>

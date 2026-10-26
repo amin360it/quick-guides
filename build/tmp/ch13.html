@@ -1,0 +1,363 @@
+  <section class="chapter">
+<h2 id="ch13" data-toc>13 · React 19's New Features</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · React 19's new features</button><div class="ch-toc-list"><a href="#ch13-use">Reading async values with use</a><a href="#ch13-actions">Actions and useActionState</a><a href="#ch13-optimistic">useOptimistic and useFormStatus</a><a href="#ch13-refs">ref as a prop, forwardRef gone</a><a href="#ch13-upgrade">Upgrading a React 18 codebase</a></div></div>
+    <p class="topic-desc">React 19 changes the API surface more than the mental model: reading a promise becomes a hook, mutations become actions with built-in pending state, and the ref stops being a special prop. This chapter covers each addition with the code you would actually ship, plus the migration order that keeps a real codebase compiling at every step.</p>
+    <h3 id="ch13-use" data-toc>Reading async values with use</h3>
+    <p><code>use</code> is a hook you can call conditionally — the first one permitted to break the call-order rule, and for a good reason: its entire purpose is to read a value that may or may not be ready yet. Given a promise, it suspends until the promise resolves, handing control back to the nearest Suspense boundary; given a context, it reads that context from inside a branch, which <code>useContext</code> never allowed because it had to run on every render. The suspending behaviour is what makes it different from <code>await</code>: <code>await</code> blocks a function that is already committed to finishing, while <code>use</code> unwinds to React, which can keep the rest of the screen interactive while the value is pending.</p>
+    <p>The design implication is that promises become ordinary props. A parent fetches — or receives from a server component — a promise, passes it to three children, and each child calls <code>use(promise)</code>. All three suspend on the same promise, React deduplicates the read within one render pass, and the Suspense boundary you placed decides where the fallback appears. Data then flows down the tree as promises and reading is the child's decision, not a refetch the child initiates. This inverts the usual client-fetching shape where every leaf that needs data starts its own request in an effect, which was the source of the request waterfalls chapter 15 exists to eliminate.</p>
+    <div class="codeWrap"><pre><code>// passing a promise down; each reader suspends on it, no refetch
+import { use, Suspense } from 'react';
+
+function UserBadge({ userPromise }) {
+  const user = use(userPromise);        // suspends until resolved
+  return &lt;span&gt;{user.name}&lt;/span&gt;;
+}
+
+function UserPermissions({ userPromise }) {
+  const user = use(userPromise);        // same promise -&gt; same resolution
+  return &lt;ul&gt;{user.permissions.map((p) =&gt; &lt;li key={p}&gt;{p}&lt;/li&gt;)}&lt;/ul&gt;;
+}
+
+export function Profile({ userPromise }) {
+  return (
+    &lt;Suspense fallback={&lt;BadgeSkeleton /&gt;}&gt;
+      &lt;UserBadge userPromise={userPromise} /&gt;
+      &lt;UserPermissions userPromise={userPromise} /&gt;
+    &lt;/Suspense&gt;
+  );
+}</code></pre></div>
+    <p>Caching is the part you must own yourself. A promise passed as props is only deduplicated within a single render pass — create a new promise on every parent render and every reader suspends again, flashing fallbacks forever with the network happily cooperating. Cache the promise where it is created: a module-level map keyed by id, the framework's data cache, or state updated inside a transition. The rule is the same one chapter 15 states for all data fetching: one owner, one cache, everything else reads through it. A promise is no different from the response body it resolves to, and treating ad-hoc promise creation as harmless is how a Suspense-enabled screen turns into a flicker machine.</p>
+    <div class="codeWrap"><pre><code>// WRONG: a new promise per render -&gt; every reader re-suspends
+function Profile() {
+  const [user, setUser] = useState(null);
+  useEffect(() =&gt; { fetch('/api/me').then((r) =&gt; r.json()).then(setUser); }, []);
+  // passing Promise.resolve(user) as a prop on each render creates a fresh
+  // promise identity every time - readers suspend on every parent render.
+  return &lt;Badge userPromise={Promise.resolve(user)} /&gt;;
+}
+
+// RIGHT: cache the promise at its owner, keyed like any other cache
+const userCache = new Map();
+function getUser(id) {
+  if (!userCache.has(id)) {
+    userCache.set(id, fetch('/api/users/' + id).then((r) =&gt; r.json()));
+  }
+  return userCache.get(id);              // same promise for every reader
+}
+
+function Profile({ userId }) {
+  return &lt;Badge userPromise={getUser(userId)} /&gt;;
+}</code></pre></div>
+    <h4>use with context: the conditional read</h4>
+    <p>The context form exists because the classic failure was wanting to read a context only when a flag makes it relevant — a conditional read that <code>useContext</code> forbids outright, since the hook must run unconditionally on every render. <code>use(SomeContext)</code> permits the branch. What it still does not permit is a call after an early return that sometimes happens before it: a hook invoked in one render and skipped in the next breaks the hook-order contract, and the error surfaces far from its cause as a mismatched-state crash. Conditionality means inside a branch, not after returning — the distinction trips up nearly everyone on first contact, and the double-invocation StrictMode performs in development makes the failure loud, which is the favour.</p>
+    <div class="codeWrap"><pre><code>// legal: the read is inside a branch that either runs or does not, and
+// the hook count stays identical because both paths call the same hooks
+function Panel({ mode }) {
+  const [open, setOpen] = useState(false);
+  if (mode === 'advanced') {
+    const theme = use(ThemeContext);     // conditional context read: OK
+    if (!open) return &lt;Collapsed theme={theme} /&gt;;
+    return &lt;Advanced theme={theme} /&gt;;
+  }
+  return &lt;Basic open={open} onToggle={() =&gt; setOpen(!open)} /&gt;;
+}
+
+// still illegal: an early return BEFORE a hook changes the hook order
+function Broken() {
+  const [a, setA] = useState(0);
+  if (a &gt; 10) return &lt;Done /&gt;;           // returns before the next hook...
+  const theme = use(ThemeContext);        // ...so this run has 2 hooks, not 1
+  return &lt;Work theme={theme} /&gt;;
+}</code></pre></div>
+    <div class="warn"><p><code>use</code> suspends, and suspension is contagious: a <code>use</code> inside a subtree with no Suspense boundary above it unwinds the whole render to the nearest boundary, and a React 19 app without one has that boundary at the root — so one pending promise blanks the entire screen. Every promise read through <code>use</code> needs a boundary positioned deliberately, which is chapter 14's subject.</p></div>
+    <h3 id="ch13-actions" data-toc>Actions and useActionState</h3>
+    <p>An action is any async function passed to a transition — a form submission, a handler wrapped in <code>startTransition</code>, a framework server action — that React treats as a unit of intent: it may re-render components, suspend, and report its own pending and result state. The React 19 addition is <code>useActionState</code>, which takes such a function and returns three things: the latest state that action returned, the submission function to pass to a form, and a pending boolean. The state returned by the action is the state you render — not the action's raw return value on first render, but whatever the previous invocation left behind, seeded with the initial state you provide.</p>
+    <p>What it implements is the oldest form state machine there is: idle, submitting, resolved or rejected. What is new is that the library owns the transition. Submitting does not blank the screen — under concurrent rendering the old UI stays interactive while the action runs, and any component reading <code>useFormStatus</code> picks up the pending flag without prop threading. Validation failures return from the action as data rather than thrown exceptions, which is the shape that makes progressive enhancement possible: the same function can run on the server without JavaScript and return the error state in the very first response.</p>
+    <div class="codeWrap"><pre><code>'use client';
+import { useActionState } from 'react';
+
+// the action: receives the previous state and the submitted FormData,
+// returns the new state. pending and result come from the hook - there is
+// no manual isLoading bookkeeping anywhere in this component.
+async function subscribe(prevState, formData) {
+  const email = String(formData.get('email') || '');
+  if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+    return { error: 'Enter a valid email address', email };   // validation as data
+  }
+  try {
+    await api.subscribe(email);
+    return { ok: true, email: '' };
+  } catch (err) {
+    return { error: err.message || 'Subscription failed', email };
+  }
+}
+
+export function SubscribeForm() {
+  const [state, formAction, pending] = useActionState(subscribe, { error: null, email: '' });
+  return (
+    &lt;form action={formAction}&gt;
+      &lt;input name="email" defaultValue={state.email}
+             aria-invalid={state.error ? true : undefined}
+             aria-describedby={state.error ? 'sub-error' : undefined} /&gt;
+      {state.error &amp;&amp; &lt;p id="sub-error" role="alert"&gt;{state.error}&lt;/p&gt;}
+      &lt;button disabled={pending}&gt;{pending ? 'Subscribing…' : 'Subscribe'}&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre></div>
+    <p>Actions also retire the mutation-in-effect pattern that chapter 8 warns about. In React 18 the instinct after a submit was a <code>useEffect</code> watching a <code>submitted</code> flag — an effect that exists only to mirror state the handler set, that races with unmount, and that double-fires under StrictMode. With an action, the mutation is the submit handler: call it, await it, render what it returned. Nothing watches anything and the code reads in the order events happen. If your codebase contains an effect whose dependency array holds a boolean named <code>submit</code>, <code>save</code> or <code>dirty</code>, that is precisely the shape this replaces, and the replacement deletes the effect rather than fixing it.</p>
+    <div class="codeWrap"><pre><code>// BEFORE React 19: the mutation-in-effect anti-pattern from chapter 8
+function OldForm() {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  useEffect(() =&gt; {                          // effect exists only to mirror
+    if (!submitted) return;                  // state that the handler set
+    api.subscribe(email).then(() =&gt; setDone(true));   // and races with unmount
+  }, [submitted, email]);
+  return &lt;form onSubmit={(e) =&gt; { e.preventDefault(); setSubmitted(true); }}&gt;/* ... */&lt;/form&gt;;
+}
+
+// AFTER: the mutation is the handler; the effect is gone entirely
+function NewForm() {
+  const [email, setEmail] = useState('');
+  const [state, action, pending] = useActionState(subscribe, { error: null });
+  return (
+    &lt;form action={action}&gt;
+      &lt;input name="email" value={email} onChange={(e) =&gt; setEmail(e.target.value)} /&gt;
+      &lt;button disabled={pending}&gt;Send&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre></div>
+    <h4>The action's contract with the server</h4>
+    <p>When a framework offers server actions, the same function is the client/server boundary: the client copy is a stub that starts the transition, the server copy runs with <code>FormData</code>, and its return value crosses back as the new state. Design the contract so the return value is always serialisable data — plain objects, strings, arrays — never a thrown error the client must catch across the wire. Returning an error object rather than throwing means every failure the server can produce arrives in the same channel as success, and one conditional in the JSX covers all of them. Thrown errors, by contrast, take a different path: they land at the nearest error boundary, which is a recovery UI, not a validation message beside a field.</p>
+    <div class="codeWrap"><pre><code>// the same action, two runtimes - the contract is the signature
+async function renameProject(prevState, formData) {
+  const name = String(formData.get('name') || '').trim();
+  const id = String(formData.get('id') || '');
+  if (name.length &lt; 3) return { error: 'Name too short', name };
+  try {
+    const updated = await api.rename(id, name);   // server: the real call
+    return { ok: true, name: updated.name };      // serialisable either way
+  } catch (err) {
+    return { error: 'Rename failed - try again', name };
+  }
+}
+
+// client: transition + pending state, no fetch, no catch
+const [state, action, pending] = useActionState(renameProject, { error: null });
+return (
+  &lt;form action={action}&gt;
+    &lt;input type="hidden" name="id" value={project.id} /&gt;
+    &lt;input name="name" defaultValue={state.name} /&gt;
+    {state.error &amp;&amp; &lt;p role="alert"&gt;{state.error}&lt;/p&gt;}
+    &lt;button disabled={pending}&gt;Rename&lt;/button&gt;
+  &lt;/form&gt;
+);</code></pre></div>
+    <div class="tip"><p>Keep actions small and single-purpose — one intent, one returned state object. An action that renames, archives and notifies in one call forces the returned state to model three outcomes; three actions composed by the caller each return one outcome, and the JSX that renders them stays a single conditional apiece.</p></div>
+    <h3 id="ch13-optimistic" data-toc>useOptimistic and useFormStatus</h3>
+    <p><code>useOptimistic</code> gives you a value that shows the intended result immediately while the real one is in flight, then snaps back to reality when the action settles. Its signature is a state plus a setter that behaves like <code>useState</code>, except that React keeps the pre-optimistic value and restores it automatically when the enclosing action completes or fails. You never write the rollback yourself — which is the whole point, because hand-rolled optimistic state is where the bugs live: the update succeeds, the refetch returns stale data, and the UI flickers back to the old value for reasons nobody can name.</p>
+    <p>The pairing that matters is <code>useOptimistic</code> inside the action's lifecycle: set the optimistic value before the await, let the action's real return value update the underlying state, and React handles the ordering. If the action throws, the optimistic value is discarded and the previous state stands — no error handler needed for the visual rollback, only for the user-facing message. The discipline is that the optimistic value must be derived from the same data the action will finally write; showing an optimistic state you have not designed the server's answer for is how a UI ends up confidently wrong.</p>
+    <div class="codeWrap"><pre><code>'use client';
+import { useOptimistic, useActionState } from 'react';
+
+async function sendMessage(text) {
+  await api.post('/messages', { text });
+  return { ok: true };                    // the action's real result
+}
+
+function Thread({ messages }) {
+  const [optimistic, addOptimistic] = useOptimistic(
+    messages,
+    (current, text) =&gt; [...current, { id: 'temp', text, pending: true }]
+  );
+  const [state, action, pending] = useActionState(sendMessage, null);
+
+  async function submit(formData) {
+    const text = String(formData.get('text') || '');
+    startTransition(async () =&gt; {
+      addOptimistic(text);                // shown immediately
+      await action(formData);             // when it settles React discards
+    });                                   // the optimistic entry itself
+  }
+
+  return (
+    &lt;&gt;
+      &lt;ul&gt;
+        {optimistic.map((m) =&gt; (
+          &lt;li key={m.id} aria-busy={m.pending || undefined}&gt;{m.text}&lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+      &lt;form action={submit}&gt;&lt;input name="text" /&gt;&lt;/form&gt;
+    &lt;/&gt;
+  );
+}</code></pre></div>
+    <p><code>useFormStatus</code> is the third leg: a hook read by a component <em>inside</em> a form that reports whether the nearest parent form is currently submitting — no prop is passed, because the status lives on the DOM ancestor relationship the browser already knows. It returns <code>pending</code> plus the form's <code>data</code> and <code>method</code>. Its structural rule is easy to state and easy to violate: the hook must run in a descendant of the <code>&lt;form&gt;</code>, never in the component that renders the form itself. The submit button, the fieldset, the progress bar — these are its natural readers, and because it reaches up through the DOM it composes with forms whose action you never see.</p>
+    <div class="codeWrap"><pre><code>// useFormStatus reads the NEAREST parent form - button inside, no props
+function SubmitButton() {
+  const { pending, data } = useFormStatus();   // from react-dom
+  return (
+    &lt;button type="submit" disabled={pending}&gt;
+      {pending ? 'Saving ' + (data.get('title') || '…') + '…' : 'Save'}
+    &lt;/button&gt;
+  );
+}
+
+function EditorForm() {
+  const [state, action] = useActionState(saveDoc, { error: null });
+  return (
+    &lt;form action={action}&gt;
+      &lt;input name="title" /&gt;
+      &lt;SubmitButton /&gt;         {/* descendant of this form: it sees pending */}
+      {state.error &amp;&amp; &lt;p role="alert"&gt;{state.error}&lt;/p&gt;}
+    &lt;/form&gt;
+  );
+}
+
+// WRONG: calling it in the component that RENDERS the form
+function Wrong() {
+  const { pending } = useFormStatus();   // looks at the enclosing form - none
+  return &lt;form action={action}&gt;{/* pending is always false here */}&lt;/form&gt;;
+}</code></pre></div>
+    <div class="note"><p>Because <code>useFormStatus</code> reads through the DOM, it works with any submit mechanism — a plain <code>&lt;form&gt;</code> with an action, a server-action form, or a manual <code>requestSubmit()</code>. This is why the pending flag belongs to the DOM tree rather than to React context: the browser already knows which form is submitting, and the hook simply reports it.</p></div>
+    <h4>Optimistic updates and the rollback contract</h4>
+    <p>The contract to hold in your head: the optimistic value is a promise to the user, and the action's settlement is the moment that promise is kept or withdrawn. Design the action so its return value is what the server really stored — the optimistic entry disappears the instant the real data arrives, which is why an optimistic shape that differs from the real one (a temp id that never gets replaced, a field the server normalises) leaves a visible seam. Keep the optimistic mutation shaped exactly like the real result, and the snap from optimistic to real is invisible.</p>
+    <div class="codeWrap"><pre><code>// the seam: optimistic shape must match what the action returns
+async function toggleTodo(prev, formData) {
+  const id = String(formData.get('id'));
+  const done = formData.get('done') === 'true';
+  const saved = await api.patch('/todos/' + id, { done });
+  return { id: saved.id, done: saved.done };   // real row, same shape
+}
+
+function TodoRow({ todo }) {
+  const [done, setDone] = useOptimistic(todo.done, (_, next) =&gt; next);
+  return (
+    &lt;li&gt;
+      &lt;form action={toggleTodo}&gt;
+        &lt;input type="hidden" name="id" value={todo.id} /&gt;
+        &lt;input type="hidden" name="done" value={String(!done)} /&gt;
+        &lt;button onClick={() =&gt; setDone(!done)}&gt;{done ? 'Done' : 'Todo'}&lt;/button&gt;
+      &lt;/form&gt;
+    &lt;/li&gt;
+  );
+}</code></pre></div>
+    <div class="warn"><p>An optimistic value is discarded when the action settles — including when it <em>fails</em>. That automatic rollback is the feature, but it means the user sees the old state again with no explanation unless you surface one. Every optimistic path needs a companion error message: the rollback is automatic, the communication is not.</p></div>
+    <h3 id="ch13-refs" data-toc>ref as a prop, forwardRef gone</h3>
+    <p>In React 19, <code>ref</code> is an ordinary prop. A function component receives it as <code>props.ref</code> and passes it to whatever element it renders; <code>forwardRef</code> remains supported but is no longer required for any new code, because the compiler and the runtime both treat ref as just another prop that happens to be attached during commit. The visible consequence is a class of wrapper components — the ones that existed only to thread a ref through — collapsing into the components they wrapped. The <code>useImperativeHandle</code> pairing does not change: when a component wants to expose a handle instead of a DOM node, the recipe is identical, only without the wrapping function.</p>
+    <p>The second ref change is smaller and easier to miss: refs may now take cleanup functions, the same contract effects have. A callback ref that acquires something — an observer, a timer, a canvas context — can return a cleanup that releases it when the ref detaches or its value changes. Before React 19 this required a separate effect watching the ref's current value, which is exactly the pattern chapter 9 warns drifts out of sync with the DOM. The ref's own lifecycle now covers acquire and release in one place.</p>
+    <div class="codeWrap"><pre><code>// React 18: the wrapper existed only to forward the ref
+const Input = forwardRef(function Input(props, ref) {
+  return &lt;input ref={ref} {...props} /&gt;;
+});
+
+// React 19: ref is a prop, the wrapper is gone
+function Input(props) {
+  return &lt;input {...props} /&gt;;          // props.ref is spread like any prop
+}
+
+// React 18: exposing a handle
+const Fancy = forwardRef(function Fancy(props, ref) {
+  useImperativeHandle(ref, () =&gt; ({ focus: () =&gt; inputRef.current.focus() }), []);
+  return &lt;input ref={inputRef} /&gt;;
+});
+
+// React 19: identical, minus the forwardRef ceremony
+function Fancy(props) {
+  const inputRef = useRef(null);
+  props.ref &amp;&amp; useImperativeHandle(props.ref, () =&gt; ({
+    focus: () =&gt; inputRef.current.focus(),
+  }), []);
+  return &lt;input ref={inputRef} /&gt;;
+}</code></pre></div>
+    <p>Callback refs with cleanup close the last gap between refs and effects for DOM-shaped work. Observing an element's size, subscribing to a MutationObserver, attaching a pointer listener to a canvas: each of these wants a function called with the node when it mounts, a different function called when it unmounts, and a re-run when the node is replaced. The callback ref returning its own teardown expresses all three directly, and unlike the effect version it never runs before commit, so the node is guaranteed to exist. Chapter 9's measure-and-resize patterns are the natural place to adopt it.</p>
+    <div class="codeWrap"><pre><code>// callback ref with cleanup: acquire and release in one declaration
+function useSize(targetRef) {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  return [
+    (node) =&gt; {                        // called with the node on attach
+      if (!node) return;
+      const ro = new ResizeObserver((entries) =&gt; {
+        const r = entries[0].contentRect;
+        setSize({ width: r.width, height: r.height });
+      });
+      ro.observe(node);
+      return () =&gt; ro.disconnect();    // React 19: cleanup on detach/change
+    },
+    size,
+  ];
+}
+
+function Panel() {
+  const ref = useRef(null);
+  const [setRef, size] = useSize(ref);
+  return &lt;div ref={setRef}&gt;{size.width} x {size.height}&lt;/div&gt;;
+}
+
+// React 18 equivalent needed a useLayoutEffect watching ref.current,
+// plus a second effect for the cleanup - two effects, one node.</code></pre></div>
+    <h4>What still needs forwardRef</h4>
+    <p>Nothing in new code. Existing <code>forwardRef</code> calls keep working — React treats the wrapped component's ref prop the same way — so migration can happen file by file rather than in a flag day, and the compiler will not complain either way. The one subtlety worth knowing: a component that reads <code>props.ref</code> manually and passes it on is behaving like the wrapper it replaced, and if you destructure <code>ref</code> out of props you must remember to spread the rest, or the ref silently stops arriving at the element.</p>
+    <div class="codeWrap"><pre><code>// the destructure trap: ref out of props, then not re-attached
+function Field({ label, ref, ...rest }) {   // ref pulled out of props
+  return (
+    &lt;label&gt;
+      {label}
+      &lt;input {...rest} /&gt;                   {/* ref was NOT spread - lost */}
+    &lt;/label&gt;
+  );
+}
+
+// correct: pass it explicitly, or leave it in the spread
+function Field({ label, ref, ...rest }) {
+  return (
+    &lt;label&gt;
+      {label}
+      &lt;input ref={ref} {...rest} /&gt;
+    &lt;/label&gt;
+  );
+}</code></pre></div>
+    <div class="tip"><p>When you delete a <code>forwardRef</code> wrapper, delete the whole indirection: the re-export, the alias, the barrel entry. A file that now only adds a call to the function it wraps is a place where the next reader looks for behaviour that is not there.</p></div>
+    <h3 id="ch13-upgrade" data-toc>Upgrading a React 18 codebase</h3>
+    <p>The migration that matters is behavioural, not package-manager-based. Bumping to 19 while every form still carries its own <code>isLoading</code> state and every component still wraps its children in <code>forwardRef</code> gives you a new version of the old application. The order that keeps a codebase compiling and reviewable at each step: upgrade the toolchain and take the peer-dependency hit first; adopt <code>ref</code> as a prop opportunistically wherever a wrapper exists; replace mutation-in-effect patterns with actions form by form; then add <code>use</code> and Suspense where data flow already passes promises. Each step is independently shippable and independently revertable.</p>
+    <p>Two upgrades deserve explicit attention because they change runtime behaviour rather than syntax. StrictMode's development double-invocation of effects becomes the norm your code must already satisfy — if an effect double-subscribes or double-fetches without cleanup, the upgrade will surface it, and the fix is cleanup, not disabling StrictMode. And the removal of string refs, <code>defaultProps</code> on function components, and the module-pattern factories means the build will fail loudly rather than quietly; treat every one of those failures as a free report on debt that was invisible before. Nothing in the React 19 upgrade path requires a rewrite of your state model.</p>
+    <div class="codeWrap"><pre><code>// step 1: package.json - the version bump is the easy half
+{
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint-plugin-react-hooks": "^5.0.0"
+  }
+}
+
+// step 2: the codemod inventory - run, review, commit per rule
+//   npx react-codemod remove-forward-ref src/
+//   npx react-codemod update-react-19 src/
+// each codemod leaves a compiling tree; the review decides what to keep</code></pre></div>
+    <p>Third-party libraries are the usual source of upgrade stalls: anything that imports <code>react-dom/unstable-render-subtree</code>, patches internals, or peer-pins React 18 will warn or break. Resolve by checking whether the library has a React 19 release, and if not, whether the feature it provides has a React 19 native replacement — several context helpers and ref-forwarding utilities simply became unnecessary. Where no replacement exists, pin that one package and isolate it behind your own module so the rest of the codebase does not import its API directly; the isolation makes the eventual removal a single-file change.</p>
+    <div class="codeWrap"><pre><code>// isolate the holdout behind your own module, so removal is one file
+// lib/legacy-chart.ts
+import { LegacyChart } from 'old-chart-lib-react18';   // the pin lives here
+export { LegacyChart };
+
+// everywhere else:
+//   import { LegacyChart } from '@/lib/legacy-chart';
+// when the lib ships 19 support, only this file changes.
+
+// step 3: verify behaviour, not just compilation
+//   - every form still submits, errors render, pending shows
+//   - effects clean up (StrictMode on in development is the test)
+//   - refs arrive: focus, scroll-into-view, measurement still work</code></pre></div>
+    <h4>Verifying the upgrade</h4>
+    <p>A green build after a major React bump proves that the code compiles, not that the app behaves. Three checks catch the classes of regression that actually happen: run the full suite with StrictMode deliberately enabled in development, because double-invoked effects expose every missing cleanup; walk each form through its error path, because action-based forms fail differently than effect-based ones — returned data, not exceptions; and click every ref-dependent interaction (focus rings, scroll-to-row, canvas init) once, because ref threading is where a destructuring mistake hides silently. These are half a day of manual work against a release that took a week, and they cover the three real failure modes.</p>
+    <div class="note"><p>Keep the old version on a branch until the manual walk-through passes, not merely the test suite. The React 18 to 19 changes that bite hardest — ref handling, action-based form failures, effect timing under StrictMode — are precisely the ones most test suites do not cover, because they were mechanical in the old model.</p></div>
+    <div class="ex"><h4>Exercises 13</h4><ol>
+      <li>Take a component that fetches in an effect and passes the result to three children. Rewrite it to fetch once into a cached promise and pass the promise; add a Suspense boundary and confirm all three children resolve from one request in the network panel.</li>
+      <li>Convert a form in your application to <code>useActionState</code>. Delete its <code>isLoading</code> state and its submit <code>useEffect</code>, and confirm the error path returns data rather than throwing.</li>
+      <li>Add an optimistic toggle with <code>useOptimistic</code> to a list, then make the server reject the mutation. Confirm the row rolls back — and add the user-visible error message the rollback does not provide.</li>
+      <li>Find three <code>forwardRef</code> wrappers in your codebase, remove them, and run the suite. Then convert one callback ref plus effect pair into a single callback ref with cleanup and compare the code.</li>
+      <li>Write your team's upgrade checklist in the order the steps above prescribe, with the manual verification walk-through as the last item before the release tag.</li>
+    </ol></div>
+  </section>

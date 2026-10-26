@@ -1,0 +1,150 @@
+<h3 id="ch3-3" data-toc>3.3 Option and Result</h3>
+<p class="topic-desc">Rust has no null and no exceptions. Absence is <code>Option&lt;T&gt;</code> — a value or nothing — and failure is <code>Result&lt;T, E&gt;</code> — a value or an error. Both are enums, so the compiler forces you to handle both cases wherever you use them.</p>
+
+<h4 id="ch3-3-option">Option: presence or absence</h4>
+<p><code>Option&lt;T&gt;</code> is either <code>Some(value)</code> or <code>None</code>. Because it is a regular enum, there is no way to read a value that might be absent without acknowledging the possibility — the <code>None</code> case must be handled or explicitly ignored. Functions like <code>Vec::get</code> and <code>str::find</code> return <code>Option</code> specifically so that "not there" is a value you can branch on, not a crash.</p>
+<div class="codeWrap"><pre><code>fn first_word(s: &amp;str) -&gt; Option&lt;&amp;str&gt; {
+    for (i, &amp;byte) in s.as_bytes().iter().enumerate() {
+        if byte == b' ' {
+            return Some(&amp;s[..i]);
+        }
+    }
+    Some(s)
+}
+
+fn main() {
+    match first_word("hello world") {
+        Some(w) =&gt; println!("first word: {w}"),
+        None =&gt; println!("no space at all"),
+    }
+}</code></pre></div>
+
+<h4 id="ch3-3-result">Result: success or error</h4>
+<p><code>Result&lt;T, E&gt;</code> is <code>Ok(value)</code> or <code>Err(error)</code>. It carries the failure reason with it, so the error type is part of the function's signature — the caller can see, before calling, exactly which failure modes exist. The exhaustive <code>match</code> below is the honest way to handle it; chapter 4 builds the ergonomics on top with the <code>?</code> operator.</p>
+<div class="codeWrap"><pre><code>use std::fs;
+
+fn main() {
+    match fs::read_to_string("Cargo.toml") {
+        Ok(text) =&gt; println!("{} lines", text.lines().count()),
+        Err(e) =&gt; eprintln!("could not read file: {e}"),
+    }
+}</code></pre></div>
+
+<h4 id="ch3-3-combine">Combining them without panicking</h4>
+<p><code>map</code> transforms the success case and leaves the failure untouched; <code>unwrap_or</code> supplies a default for absence; <code>filter_map</code> skips <code>None</code> values entirely. These combinators let you compose fallible steps into a pipeline where the failure policy is a single decision at the end, rather than a ladder of nested matches.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    // map + unwrap_or: turn a fallible step into a plain value
+    let doubled = "42".parse::&lt;i32&gt;().map(|n| n * 2).unwrap_or(0);
+    println!("{doubled}");   // 84
+
+    // filter_map: skip the values that fail to parse
+    let nums = ["1", "two", "3"];
+    let sum: i32 = nums.iter().filter_map(|s| s.parse().ok()).sum();
+    println!("{sum}");       // 4: "two" contributes nothing
+}</code></pre></div>
+<div class="tip">The combinators (<code>map</code>, <code>and_then</code>, <code>unwrap_or_else</code>) are the same names on <code>Option</code> and <code>Result</code>. Learn them once with <code>Option</code> and the <code>Result</code> versions are a free upgrade.</div>
+
+<h3 id="ch3-4" data-toc>3.4 Match and destructuring</h3>
+<p class="topic-desc"><code>match</code> is the switch statement done properly: exhaustive, expression-valued, and able to pull data out of what it matches. Destructuring is the same mechanism applied to structs, tuples and enums.</p>
+
+<h4 id="ch3-4-match">match must be exhaustive</h4>
+<p>A <code>match</code> must cover every possible value — the compiler refuses to compile a non-exhaustive one — so adding a variant to an enum forces every site that matches on it to be revisited. Arms can combine values with <code>|</code>, match ranges with <code>..=</code>, and fall back with the wildcard <code>_</code>. Because <code>match</code> is an expression, it returns a value, which is how branching becomes data.</p>
+<div class="codeWrap"><pre><code>fn classify(n: i32) -&gt; &amp;'static str {
+    match n {
+        0 =&gt; "zero",
+        1 | 2 =&gt; "tiny",
+        3..=9 =&gt; "small",
+        _ =&gt; "big",        // the wildcard satisfies exhaustiveness
+    }
+}
+
+fn main() {
+    for n in [0, 2, 5, 42] {
+        println!("{n}: {}", classify(n));
+    }
+}</code></pre></div>
+
+<h4 id="ch3-4-destructure">Destructuring structs, tuples and enums</h4>
+<p>Patterns can reach into values: <code>let Point { x, y } = p</code> pulls the fields out, <code>Shape::Rect { w, h }</code> extracts the variant's data, and tuple patterns destructure positionally. Destructuring by reference keeps the original usable; destructuring by value moves the pieces out. The same pattern syntax works in <code>match</code> arms, <code>if let</code>, and <code>let else</code>.</p>
+<div class="codeWrap"><pre><code>struct Point {
+    x: i32,
+    y: i32,
+}
+
+enum Shape {
+    Circle { r: f64 },
+    Rect { w: f64, h: f64 },
+}
+
+fn main() {
+    let p = Point { x: 10, y: 20 };
+    let Point { x, y } = p;              // destructure the struct
+    println!("{x} {y}");
+
+    let s = Shape::Rect { w: 2.0, h: 3.0 };
+    match s {
+        Shape::Circle { r } =&gt; println!("circle radius {r}"),
+        Shape::Rect { w, h } =&gt; println!("rect area {}", w * h),
+    }
+}</code></pre></div>
+
+<h4 id="ch3-4-guard">Guards and @ bindings</h4>
+<p>A guard, <code>x if condition</code>, adds a boolean test to an arm without changing what the pattern binds. The <code>@</code> binding captures a value <em>and</em> checks a pattern on it at the same time — <code>n @ 1..=9</code> both matches the range and binds the value so the arm can use it. Guards are evaluated in order top to bottom, so put the most specific conditions first.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    for n in 1..=15 {
+        match n {
+            x if x % 15 == 0 =&gt; println!("fizzbuzz"),
+            x if x % 3 == 0 =&gt; println!("fizz"),
+            x if x % 5 == 0 =&gt; println!("buzz"),
+            x @ 1..=9 =&gt; println!("single digit {x}"),
+            x =&gt; println!("{x}"),
+        }
+    }
+}</code></pre></div>
+
+<h3 id="ch3-5" data-toc>3.5 Type conversions: From, Into and as</h3>
+<p class="topic-desc">Rust converts between types in three deliberately different ways: <code>as</code> for lossy numeric casts, <code>From</code>/<code>Into</code> for infallible conversions you design, and <code>parse</code> for fallible string conversion. The distinction between them is the difference between "I know this is safe" and "the compiler knows".</p>
+
+<h4 id="ch3-5-as">as casts, and where they truncate</h4>
+<p><code>as</code> is the blunt instrument: narrowing an integer wraps modulo the target width, casting a float to an integer truncates toward zero, and <code>char</code> to <code>u8</code> gives the code point. Rust makes these explicit so the loss is visible at the call site — but <code>as</code> never checks, so prefer conversions that can fail (<code>try_from</code>) when the input is not a literal you control.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let big: i64 = 300;
+    let small = big as u8;        // 300 -&gt; 44: wraps modulo 256
+    println!("{small}");
+
+    let x = 3.9_f64 as i32;       // truncates toward zero: 3
+    println!("{x}");
+
+    let c = 'A' as u8;            // 65: the code point
+    println!("{c}");
+}</code></pre></div>
+
+<h4 id="ch3-5-from">From and Into</h4>
+<p><code>From&lt;T&gt; for U</code> is the authoritative conversion: implement it once, and <code>Into&lt;U&gt;</code> arrives for free — every <code>U::from(t)</code> can be written <code>t.into()</code>. The direction matters: implement <code>From</code> for the target type you want to be able to construct from others. The std library ships hundreds of these, so <code>String::from</code>, <code>Vec::from</code> and friends are already in scope for most ordinary conversions.</p>
+<div class="codeWrap"><pre><code>struct Celsius(f64);
+
+impl From&lt;f64&gt; for Celsius {
+    fn from(c: f64) -&gt; Self {
+        Celsius(c)
+    }
+}
+
+fn main() {
+    let temp = Celsius::from(21.5);
+    let temp2: Celsius = 18.0.into();   // Into comes free with From
+    println!("{} {}", temp.0, temp2.0);
+}</code></pre></div>
+
+<h4 id="ch3-5-parse">Parsing strings: FromStr and parse</h4>
+<p><code>"42".parse()</code> implements <code>FromStr</code>, converting a string into a target type if the text is well formed — and failing with a descriptive error if it is not. The target type is almost always written on the left: <code>let n: i32 = "42".parse()</code>. Numbers, booleans, chars and <code>SocketAddr</code> all implement <code>FromStr</code>, as can your own types via <code>impl FromStr for MyType</code>.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let n: i32 = "42".parse().unwrap();
+    let f: f64 = "3.14".parse().unwrap();
+    let flag: bool = "true".parse().unwrap();
+    let port: u16 = "8080".parse().unwrap();
+
+    // a failed parse returns an Err, never a crash:
+    let bad: i32 = "not a number".parse().unwrap_or(-1);
+    println!("{n} {f} {flag} {port} {bad}");
+}</code></pre></div>
+<div class="note">The error type of a failed <code>parse</code> is nearly always <code>std::num::ParseIntError</code> (or an equivalent). Its <code>Display</code> message names the offending string, which is exactly what you want to log.</div></section>

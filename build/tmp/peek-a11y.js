@@ -1,0 +1,16 @@
+var fs = require('fs');
+var c = fs.readFileSync('rust-programming.html','utf8');
+console.log('=== themeBtn ===');
+var m=c.match(/<button[^>]*id="themeBtn"[\s\S]{0,300}?<\/button>/);
+console.log(m ? m[0].slice(0,400) : 'not found');
+console.log('');
+console.log('=== first 900 chars of <body> ===');
+var b=c.indexOf('<body');
+console.log(c.slice(b, b+900));
+console.log('');
+console.log('=== any "skip" text anywhere? ===');
+var s=c.match(/.{60}skip.{60}/gi);
+console.log(s ? JSON.stringify(s.slice(0,5)) : 'none');
+console.log('');
+console.log('=== burger ===');
+console.log((c.match(/<button[^>]*id="burger"[\s\S]{0,220}?<\/button>/)||['?'])[0]);

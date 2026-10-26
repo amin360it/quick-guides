@@ -1,0 +1,625 @@
+<section class="chapter">
+  <h2 id="ch10-advanced-ajax" data-toc>10 · Advanced AJAX and the promisified $.ajax</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Advanced AJAX and the promisified $.ajax</button><div class="ch-toc-list"><a href="#ch10-settings">10.1 The full settings object and $.ajaxSetup</a><a href="#ch10-headers">10.2 beforeSend, headers and response converters</a><a href="#ch10-crossorigin">10.3 JSONP, CORS and cross-origin realities</a><a href="#ch10-errors">10.4 Error handling, status codes and the jqXHR promise</a><a href="#ch10-global">10.5 Global events, aborting and upload progress</a></div></div>
+  <p class="topic-desc">Chapter 6 covered the shape of a request. This chapter is about the parts you only meet in production: a settings object with three dozen keys, response converters, request headers that carry auth tokens, JSONP, CORS preflights, the difference between a failed request and a failed parse, the global ajax lifecycle, and the <code>jqXHR</code> object — a promise you can also abort mid-flight.</p>
+
+  <h3 id="ch10-settings" data-toc>10.1 The full settings object and $.ajaxSetup</h3>
+  <p class="topic-desc">Every shorthand method is compiled into one <code>$.ajax</code> settings object before it runs. Learning the handful of keys that actually change behaviour — and where their defaults come from — removes most of the surprises.</p>
+
+  <h4>The settings you will actually change</h4>
+  <p>Six keys carry almost all of the meaning. <code>dataType</code> is what you <em>expect back</em>; <code>contentType</code> is what you <em>are sending</em>. Confusing the two is the most common AJAX bug: a request that sends <code>application/json</code> but never sets <code>dataType</code> still arrives as a string, because jQuery only auto-parses a response when the server's <code>Content-Type</code> or the <code>dataType</code> tells it to. <code>data</code> is an object for form-style bodies — jQuery URL-encodes it for <code>GET</code> and turns it into an <code>application/x-www-form-urlencoded</code> body for everything else unless you set <code>processData: false</code>. <code>cache: false</code> appends a timestamp to <code>GET</code> URLs so a cache-busting request always reaches the server, which matters constantly during development and matters for polling endpoints in production.</p>
+  <p><code>context</code> is the quiet one. It sets the value of <code>this</code> inside every callback, so a handler can address the element it belongs to instead of re-querying the document for it. Passing <code>context: $panel</code> means the <code>done</code> callback can write to <code>this</code> directly and stays correct even if the panel has been replaced between request and response.</p>
+
+  <div class="codeWrap"><pre><code>$.ajax({
+  url: '/api/orders',
+  method: 'POST',
+  dataType: 'json',                                // what we expect back
+  contentType: 'application/json; charset=utf-8',  // what we send
+  data: JSON.stringify({ id: 42, qty: 2 }),
+  headers: { 'X-CSRF-Token': csrfToken },
+  timeout: 10000,
+  cache: false,
+  context: $('#orders')
+}).done(function (orders) {
+  // `this` is the jQuery set passed as context, not the jqXHR
+  this.html(renderRows(orders));
+});</code></pre></div>
+
+  <h4>Defaults live in one global object</h4>
+  <p><code>$.ajaxSetup()</code> merges into <code>$.ajaxSettings</code>, the single object every request inherits from. It is genuinely useful for a cross-cutting value such as a timeout or an <code>X-Requested-With</code> header, and genuinely dangerous for anything else, because the change is silent, global and sticky for the life of the page. A request made three screens later still carries whatever you set at boot. Per-request <code>headers</code> are merged shallowly on top of the setup defaults, so one call can add a header without clearing the rest.</p>
+  <p>The keys worth setting there are exactly the transport-level ones: <code>dataType</code>, <code>headers</code>, <code>timeout</code>, <code>cache</code> and <code>accepts</code>. Everything that describes a particular call — its URL, its body, its success handler — belongs at the call site where it can be read.</p>
+
+  <div class="warn">Keep <code>$.ajaxSetup()</code> to transport concerns — timeouts, default headers, a base <code>dataType</code>. Never put <code>success</code>, <code>error</code> or <code>complete</code> handlers there. A behaviour that applies to every request belongs in a global event (10.5), where it is visible and can be removed; a callback buried in a setup object is invisible at the call site and impossible to reason about when a request misbehaves.</div>
+
+  <h3 id="ch10-headers" data-toc>10.2 beforeSend, headers and response converters</h3>
+  <p class="topic-desc"><code>beforeSend</code> runs after the transport is created but before it opens its socket; the <code>headers</code> map sets request headers per call; <code>converters</code> rewrite the body after the transport returns but before <code>done()</code> runs.</p>
+
+  <h4>beforeSend: the last chance to change your mind</h4>
+  <p>The <code>beforeSend</code> hook receives both the live <code>jqXHR</code> and the fully merged settings object. That makes it the right place for a token that has to be read at send time rather than at call time, for a per-request trace id, or for a decision to give up before spending a round trip. Returning <code>false</code> cancels the request outright and rejects the <code>jqXHR</code>, so anything hooked onto <code>fail</code> still runs and cleanup still happens. Do not throw from this function: the transport is already allocated, and an exception here leaves the request in an indeterminate state.</p>
+  <p>The per-call <code>headers</code> option is the declarative alternative for static values — a CSRF token, an <code>Accept-Language</code>. Reach for <code>beforeSend</code> only when the value must be computed at send time or when the request may be abandoned. Mixing the two is fine and common: static headers in the map, the conditional abort in the hook.</p>
+
+  <div class="codeWrap"><pre><code>$.ajax({
+  url: '/api/report.csv',
+  dataType: 'text',
+  beforeSend: function (jqXHR, settings) {
+    jqXHR.setRequestHeader('Authorization', 'Bearer ' + getToken());
+    if (!navigator.onLine) {
+      return false;          // abort before the socket opens
+    }
+    settings.startedAt = Date.now();
+  },
+  converters: {
+    'text csv': function (raw) {
+      return raw.trim().split('\n');   // CSV text -> array of rows
+    }
+  }
+}).done(function (rows) {
+  console.log(rows.length + ' rows');
+});</code></pre></div>
+
+  <h4>Converters and the parse that fails after a success</h4>
+  <p>A converter is a pair of data types — <code>"text json"</code>, <code>"text xml"</code>, <code>"text html"</code> — and a function that transforms the first into the second. jQuery ships converters for the built-in types; a custom one buys you a new type for the cost of one function, as the CSV transform above does. The important consequence is that a <code>200 OK</code> carrying malformed JSON is <em>not</em> a success. The transport succeeded, the converter threw, and the promise rejects with the text status <code>"parsererror"</code>. The raw body is still on <code>jqXHR.responseText</code>, which is the only thing that lets you log what the server actually sent instead of a generic failure.</p>
+  <p>Because a converter runs inside the request pipeline, it must be cheap and it must be total: it either returns the converted value or throws. Side effects belong in <code>done()</code>, not in a converter, and a converter should never touch the DOM.</p>
+
+  <h3 id="ch10-crossorigin" data-toc>10.3 JSONP, CORS and cross-origin realities</h3>
+  <p class="topic-desc">JSONP is a script-tag hack from 2005; CORS is a contract the server must honour. Knowing which one you are looking at explains every cross-origin symptom, including the confusing one where the request clearly returned data but jQuery reports status <code>0</code>.</p>
+
+  <h4>What JSONP actually does</h4>
+  <p>Setting <code>dataType: 'jsonp'</code> makes jQuery inject a <code>&lt;script&gt;</code> element pointing at your URL with a callback parameter appended, then evaluate whatever comes back. Because a script tag is not bound by the same-origin policy, this works against servers that were written to wrap their JSON in a function call. It is also strictly <code>GET</code>, has no real error detection — a failed script fires an <code>error</code> at best — and executes arbitrary third-party JavaScript in your page's origin. Treat it as legacy: if the remote server supports CORS, use CORS.</p>
+
+  <div class="codeWrap"><pre><code>$.ajax({
+  url: 'https://api.example.com/search',
+  dataType: 'jsonp',
+  jsonp: 'callback',              // the query parameter the server reads
+  jsonpCallback: 'handleSearch'   // a predictable name, which is cacheable
+}).done(function (data) {
+  render(data);
+});</code></pre></div>
+
+  <h4>CORS is a server contract, not a jQuery setting</h4>
+  <p>For a cross-origin request the browser sends an <code>Origin</code> header and refuses to hand the response to your code unless the server replies with a matching <code>Access-Control-Allow-Origin</code>. jQuery cannot change that; no client code can. A request that fails this check is reported to jQuery as a network error with <code>jqXHR.status === 0</code> and an empty <code>statusText</code>, because the browser never let the script read the real status. If you see status <code>0</code> against a URL that "works in Postman", you are looking at a missing or too-narrow CORS header, not a bug in the request.</p>
+  <p>Requests that send cookies or an <code>Authorization</code> header are <em>preflighted</em>: the browser first sends an <code>OPTIONS</code> request, and the server must answer it with the allowed methods, headers and credentials. Setting <code>xhrFields: { withCredentials: true }</code> tells the browser to include cookies cross-site, but it only takes effect when the server echoes back an exact origin — never <code>*</code> — together with <code>Access-Control-Allow-Credentials: true</code>. When the two halves disagree, the request fails with status <code>0</code> again, and the only visible clue is a console message the browser writes, not the page's own code.</p>
+
+  <h3 id="ch10-errors" data-toc>10.4 Error handling, status codes and the jqXHR promise</h3>
+  <p class="topic-desc">A request can fail in four distinct ways — timeout, abort, an HTTP error status, or a body that does not parse. The <code>fail</code> callback hands you three arguments precisely so you can tell them apart instead of showing one generic message.</p>
+
+  <h4>The three arguments to fail</h4>
+  <p><code>fail(jqXHR, textStatus, errorThrown)</code> gives you the transport, a short reason string, and the exception or HTTP status text. <code>textStatus</code> is one of <code>"timeout"</code>, <code>"error"</code>, <code>"abort"</code>, <code>"parsererror"</code> or <code>"nocontent"</code>; <code>jqXHR.status</code> is the numeric HTTP status, or <code>0</code> when the browser blocked or cancelled the exchange. Branching on <code>textStatus</code> first and <code>status</code> second is the pattern that survives contact with real networks: a <code>timeout</code> and a <code>500</code> deserve different copy, and an <code>abort</code> usually deserves silence.</p>
+
+  <div class="codeWrap"><pre><code>const req = $.ajax({
+  url: '/api/save', method: 'PUT', data: payload, dataType: 'json'
+});
+
+req.done(function (res) {
+  toast('Saved');
+}).fail(function (jqXHR, textStatus, errorThrown) {
+  if (textStatus === 'timeout') {
+    toast('The server is slow. Try again.');
+  } else if (textStatus === 'abort') {
+    // the user navigated away; stay silent
+  } else if (jqXHR.status === 422) {
+    showFieldErrors(JSON.parse(jqXHR.responseText).errors);
+  } else if (jqXHR.status >= 500) {
+    report('server', errorThrown);
+  } else {
+    toast('Request failed (' + jqXHR.status + ')');
+  }
+}).always(function () {
+  spinner.remove();
+});</code></pre></div>
+
+  <h4>jqXHR is a promise and a transport at once</h4>
+  <p>The object <code>$.ajax</code> returns is a jQuery Deferred decorated with the XMLHttpRequest surface. As a promise it exposes <code>done</code>, <code>fail</code>, <code>always</code>, <code>then</code> and <code>progress</code>; jQuery 3 made Deferreds Promises/A+ compatible and added <code>catch</code> and <code>finally</code> aliases, so a chain behaves the way a native <code>fetch</code> chain does and an exception thrown inside a <code>then</code> rejects the next promise rather than escaping. As a transport it exposes <code>abort()</code>, <code>setRequestHeader()</code>, <code>getAllResponseHeaders()</code>, <code>overrideMimeType()</code> and the live <code>readyState</code>, <code>status</code> and <code>statusText</code> properties.</p>
+  <p>That dual nature is the reason to keep the returned reference. Calling <code>$.ajax(...)</code> and dropping the result throws away the only handle that can cancel the request or read its headers. Keeping it in a variable costs nothing and turns a fire-and-forget call into something you can abort on navigation, which is the difference between a tidy single-page app and one that writes responses into elements that no longer exist.</p>
+
+  <h4>Distinguishing the failure modes</h4>
+  <div class="table-scroll"><table>
+    <tr><th><code>textStatus</code></th><th>What happened</th><th>Typical response</th></tr>
+    <tr><td><code>timeout</code></td><td>The request exceeded the <code>timeout</code> setting</td><td>Offer a retry; raise the timeout for genuinely slow endpoints</td></tr>
+    <tr><td><code>abort</code></td><td><code>abort()</code> was called, or <code>beforeSend</code> returned <code>false</code></td><td>Usually stay silent; do not show an error toast</td></tr>
+    <tr><td><code>error</code></td><td>A 4xx or 5xx response, or a status-0 network/CORS failure</td><td>Read <code>jqXHR.status</code>; validate on 422, report on 5xx</td></tr>
+    <tr><td><code>parsererror</code></td><td>A 200 body did not match the declared <code>dataType</code></td><td>Log <code>responseText</code>; the server contract is wrong</td></tr>
+    <tr><td><code>nocontent</code></td><td><code>304</code> or an empty <code>204</code> body</td><td>Treat as success with no data</td></tr>
+  </table></div>
+
+  <h3 id="ch10-global" data-toc>10.5 Global events, aborting and upload progress</h3>
+  <p class="topic-desc">Global events fire for every request in the page, upload progress needs the native XHR object, and <code>abort()</code> is the only clean way to cancel — all three are about the page, not the individual call.</p>
+
+  <h4>The global ajax lifecycle</h4>
+  <p>Every request whose <code>global</code> setting is <code>true</code> — the default — fires a fixed sequence of events on <code>document</code>: <code>ajaxSend</code>, then <code>ajaxSuccess</code> or <code>ajaxError</code>, then <code>ajaxComplete</code>. Wrapped around the whole run, <code>ajaxStart</code> fires when the first in-flight request begins and <code>ajaxStop</code> when the last one finishes. That pair is the correct place for a global progress indicator, because it counts requests rather than firing once per call. A polling endpoint that should not light up the spinner can opt out with <code>global: false</code>, which is far cleaner than trying to suppress the event from the other side.</p>
+  <p>Global handlers are also the natural home for cross-cutting transport concerns: a trace header on every request via <code>ajaxSend</code>, one place that reports <code>401</code>s to the auth layer via <code>ajaxError</code>, or a counter that logs how many requests an interaction triggers. Because they sit on <code>document</code>, they can be bound and unbound per view with a namespace, and they see the merged <code>settings</code> object so they know which URL failed.</p>
+
+  <h4>Aborting and upload progress</h4>
+  <p><code>jqXHR.abort()</code> cancels the request and rejects the promise with the text status <code>"abort"</code>, which the failure table above already tells you to swallow silently. The common pattern is to store the handle on the element that owns the operation and abort before starting a replacement, so a fast typist does not race two responses into one results list.</p>
+  <p>Upload progress needs the underlying XHR object, because the progress event lives on <code>xhr.upload</code> and jQuery does not surface it. Supplying an <code>xhr</code> function that builds the transport and attaches a listener is the supported way in. For a <code>FormData</code> body you must set <code>processData: false</code> and <code>contentType: false</code>; without them jQuery tries to serialise the FormData and overwrite the multipart boundary the browser generated, and the upload arrives corrupted.</p>
+
+  <div class="codeWrap"><pre><code>const upload = $.ajax({
+  url: '/api/upload',
+  method: 'POST',
+  data: formData,
+  processData: false,   // do not turn FormData into a query string
+  contentType: false,   // let the browser set the multipart boundary
+  xhr: function () {
+    const xhr = new window.XMLHttpRequest();
+    xhr.upload.addEventListener('progress', function (e) {
+      if (e.lengthComputable) {
+        const pct = e.loaded / e.total * 100;
+        $('#bar').css('width', pct + '%');
+      }
+    });
+    return xhr;
+  }
+});
+
+$('#cancel').on('click', function () { upload.abort(); });</code></pre></div>
+
+  <div class="tip">For a whole class of requests that share a concern, <code>$.ajaxPrefilter()</code> runs before the settings are merged and can rewrite them — the standard example is switching a JSON request to JSONP when the origin is unknown, or naming every request for logging. It is the least-known hook in the AJAX layer and the only one that can change <code>dataType</code> before the pipeline is chosen.</div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch11-jquery-ui" data-toc>11 · jQuery UI and interaction widgets</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · jQuery UI and interaction widgets</button><div class="ch-toc-list"><a href="#ch11-interactions">11.1 Draggable, droppable, resizable and sortable</a><a href="#ch11-pickers">11.2 Datepicker and autocomplete</a><a href="#ch11-widgets">11.3 Dialog, accordion, tabs and slider</a><a href="#ch11-theming">11.4 Effects, easing and the widget factory</a></div></div>
+  <p class="topic-desc">jQuery UI is a separate library of interactions, widgets and effects built on the widget factory. It has been in maintenance mode for years, yet it still ships inside thousands of admin panels — and the factory it introduced is the model every robust jQuery plugin in chapter 12 follows.</p>
+
+  <h3 id="ch11-interactions" data-toc>11.1 Draggable, droppable, resizable and sortable</h3>
+  <p class="topic-desc">The interactions are a small state machine layered over mouse and touch events, plus a class contract that gives your CSS hooks for every stage of a drag.</p>
+
+  <h4>The interactions and the mouse plugin underneath</h4>
+  <p><code>draggable</code>, <code>droppable</code>, <code>resizable</code>, <code>sortable</code> and <code>selectable</code> are all built on the internal <code>$.ui.mouse</code> plugin, which normalises pointer events, tracks a drag threshold, and manages capture. That shared base is why the options rhyme across widgets: <code>handle</code>, <code>containment</code>, <code>disabled</code>, <code>cursor</code>, <code>delay</code>. <code>draggable</code> alone is rarely the goal; it becomes useful when paired with <code>droppable</code>, whose <code>accept</code> option filters the drags it will receive and whose <code>hoverClass</code> gives the target a visual state. <code>revert: 'invalid'</code> on the draggable is the usual pairing — a card that was dropped on nothing snaps back, which reads as a refusal without any error message.</p>
+  <p>Every interaction implements the same method interface: call the widget with <code>'enable'</code>, <code>'disable'</code>, <code>'option'</code> or <code>'destroy'</code> as a string. This is the widget factory contract, and it is why learning one widget teaches you the calling convention for all of them. There is also a keyboard-accessibility gap here: drag interactions are pointer-first, so a sortable list needs explicit up/down controls for anyone who cannot drag, and that is work the widget does not do for you.</p>
+
+  <div class="codeWrap"><pre><code>$('.card').draggable({
+  revert: 'invalid',      // snap back when dropped outside a target
+  containment: 'document',
+  stack: '.card',         // keep the dragged card on top
+  cursor: 'grabbing'
+});
+
+$('#trash').droppable({
+  accept: '.card',
+  hoverClass: 'trash-hover',
+  drop: function (event, ui) {
+    const $card = ui.draggable;
+    $card.fadeOut(150, function () { deleteCard($card.data('id')); });
+  }
+});</code></pre></div>
+
+  <h4>Sortable is a data-model problem</h4>
+  <p>Sorting looks like a DOM trick and is really a persistence problem. The DOM order is the rendered truth; the server needs a durable order that survives a reload and does not depend on markup. The robust pattern gives each row a stable <code>data-id</code>, reads the order from the DOM on the <code>update</code> event, and posts that array. The server writes the sequence numbers, and the next render produces exactly the order the user sees. Sending the label or the index instead of a stable id is the classic mistake: rename a row and it jumps position.</p>
+  <p>The other failure mode is re-rendering the list in place. If your code rebuilds the inner HTML after every mutation, it destroys the sortable widget's cached item set, and dragging silently stops working. Calling <code>$list.sortable('refresh')</code> after the DOM changes re-reads the items and restores it; forgetting it produces the bug report that says "sorting works until you add a row".</p>
+
+  <div class="codeWrap"><pre><code>$('#task-list').sortable({
+  handle: '.drag-handle',
+  placeholder: 'sortable-placeholder',
+  axis: 'y',
+  update: function () {
+    const order = $(this).sortable('toArray', { attribute: 'data-id' });
+    $.post('/tasks/reorder', { ids: order }).fail(function () {
+      toast('Could not save the new order');
+    });
+  }
+}).disableSelection();</code></pre></div>
+
+  <h3 id="ch11-pickers" data-toc>11.2 Datepicker and autocomplete</h3>
+  <p class="topic-desc">The two form widgets carry most of jQuery UI's real-world traffic, and both hide a contract that is easy to get subtly wrong.</p>
+
+  <h4>Datepicker and the timezone trap</h4>
+  <p><code>datepicker</code> is configured with <code>dateFormat</code>, <code>minDate</code>, <code>maxDate</code>, <code>firstDay</code> and, for anything non-trivial, <code>beforeShowDay</code>, which returns whether a day is selectable plus a CSS class and a tooltip. The trap is the value itself: the widget hands you a JavaScript <code>Date</code> at local midnight, and the <code>input</code> holds a formatted string. If you then call <code>new Date(value)</code> on a string like <code>"2026-10-15"</code>, most engines parse it as UTC midnight, which shifts to the previous day west of Greenwich. Stay inside the widget's own helpers — <code>$.datepicker.formatDate()</code> and <code>$.datepicker.parseDate()</code> — or keep the string and never construct a <code>Date</code> from it.</p>
+  <p>Accessibility matters here too: the input needs a real <code>&lt;label&gt;</code>, and the picker's trigger should be a keyboard-reachable button, because a <code>datepicker</code> opened only by pointer is unusable for anyone driving the page from a keyboard.</p>
+
+  <h4>Autocomplete and the source contract</h4>
+  <p><code>autocomplete</code>'s <code>source</code> option accepts an array, a URL string, or a function that receives the request and a <code>response</code> callback. The function form is the only one that supports cancel-aware remote search, because it can inspect <code>request.term</code> and ignore stale results. <code>minLength</code> stops a request per keystroke, and <code>select</code> is where you write the hidden id as well as the visible label — returning <code>false</code> from <code>select</code> keeps the chosen label in the field instead of replacing it with the value.</p>
+  <p>The widget already manages <code>role="listbox"</code> and <code>aria-autocomplete</code>, so it is a reasonable accessibility baseline, but it is not the ARIA combobox pattern and behaves inconsistently with screen readers on mobile. If you need a guaranteed-accessible combobox in 2026, this is a case where a purpose-built component beats the legacy widget.</p>
+
+  <div class="codeWrap"><pre><code>// datepicker
+$('#due').datepicker({
+  dateFormat: 'yy-mm-dd',
+  minDate: 0,
+  firstDay: 1,
+  beforeShowDay: function (date) {
+    return [date.getDay() !== 0, '', 'Closed on Sundays'];
+  }
+});
+
+// autocomplete with a remote source
+$('#customer').autocomplete({
+  minLength: 2,
+  source: function (request, response) {
+    $.getJSON('/api/customers', { q: request.term }, response);
+  },
+  select: function (event, ui) {
+    $('#customer-id').val(ui.item.id);
+    return false;             // keep the selected label in the field
+  },
+  response: function (event, ui) {
+    if (!ui.content.length) { $('#hint').text('No matches'); }
+  }
+});</code></pre></div>
+
+  <h3 id="ch11-widgets" data-toc>11.3 Dialog, accordion, tabs and slider</h3>
+  <p class="topic-desc">The container widgets are where jQuery UI shows its age and its convenience at the same time: they are quick to wire up and expensive to leave in the DOM.</p>
+
+  <h4>Dialog replaces alert and confirm</h4>
+  <p><code>dialog</code> is the widget people actually adopt, because it is the only way to ask a question in the page instead of the browser chrome. <code>modal: true</code> adds a backdrop and manages focus; the <code>buttons</code> array defines the actions; <code>autoOpen: false</code> plus <code>.dialog('open')</code> is the standard pattern. The failure mode is lifecycle: a dialog left initialised keeps a focus trap, a backdrop node and a set of delegated handlers alive. If the trigger can fire more than once, either open the same instance or destroy it in <code>close</code>, but do not re-initialise on an element that already has a dialog attached. And because a modal traps focus, it must also be the element that receives focus when opened, or a keyboard user is stranded behind the backdrop.</p>
+
+  <h4>Accordion, tabs and slider</h4>
+  <p><code>accordion</code> toggles panels and exposes <code>active</code>, <code>collapsible</code> and <code>heightStyle</code>; <code>tabs</code> switches panels and reports the active index through the <code>activate</code> event; <code>slider</code> reports a value through <code>slide</code> while dragging and <code>change</code> when the drag ends. The events matter more than the options: <code>slide</code> fires continuously, so it should only update a readout, while <code>change</code> is the correct place to persist a value. Sending one request per <code>slide</code> tick is a reliable way to flood a server from a single gesture.</p>
+  <p>All three approach the same limitation as the rest of jQuery UI: they were designed for a mouse-first desktop and their keyboard and touch behaviour, while present, is not the equal of a modern component library. Use them when the project already ships jQuery UI; reach for something else in greenfield work.</p>
+
+  <div class="codeWrap"><pre><code>const $dlg = $('#confirm').dialog({
+  autoOpen: false,
+  modal: true,
+  resizable: false,
+  width: 420,
+  buttons: [
+    { text: 'Cancel', click: function () { $(this).dialog('close'); } },
+    { text: 'Delete', class: 'danger', click: function () {
+        doDelete();
+        $(this).dialog('close');
+      }
+    }
+  ],
+  close: function () { $(this).dialog('destroy'); }
+});
+$('#ask').on('click', function () { $dlg.dialog('open'); });
+
+$('#tabs').tabs({ active: 0, collapsible: true });
+$('#budget').slider({
+  range: 'min',
+  value: 30,
+  slide: function (event, ui) { $('#out').text('$' + ui.value); },
+  change: function (event, ui) { saveBudget(ui.value); }   // once per gesture
+});</code></pre></div>
+
+  <h3 id="ch11-theming" data-toc>11.4 Effects, easing and the widget factory</h3>
+  <p class="topic-desc">jQuery UI extends the core effect system with named transitions and a swappable theme, and it introduces the widget factory that chapter 12 uses to build something reusable.</p>
+
+  <h4>Extended easing and effect methods</h4>
+  <p>Core jQuery animates with <code>swing</code> and <code>linear</code>. jQuery UI adds a family of easings — <code>easeInOutBounce</code>, <code>easeOutBack</code>, <code>easeOutElastic</code> and the rest — and additional effect names such as <code>blind</code>, <code>bounce</code>, <code>clip</code>, <code>drop</code>, <code>fold</code>, <code>highlight</code>, <code>puff</code> and <code>shake</code>. They are reachable through <code>show()</code>, <code>hide()</code>, <code>toggle()</code> and <code>effect()</code>. Every one of them is JavaScript-driven frame animation, which cannot use the compositor and will stutter under load; they are appropriate for small chrome, not for a page-sized transition. You can also register your own easing by adding a function to <code>$.easing</code>, which is a one-liner and often better than pulling in the whole easing pack.</p>
+
+  <div class="codeWrap"><pre><code>$.extend($.easing, {
+  easeOutBack: function (t) {
+    const c1 = 1.70158, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  }
+});
+
+$('#panel').show('drop', { direction: 'up' }, 400, 'easeOutBack');
+$('#msg').effect('highlight', { color: '#ffe08a' }, 900);</code></pre></div>
+
+  <h4>ThemeRoller and why you subclass, not restyle</h4>
+  <p>Every jQuery UI widget is styled through a fixed class vocabulary — <code>ui-widget</code>, <code>ui-state-default</code>, <code>ui-state-active</code>, <code>ui-state-disabled</code>, <code>ui-corner-all</code>. ThemeRoller writes a stylesheet that defines those classes for one theme, and swapping the stylesheet re-skins every widget at once. That is the intended way to theme the library. Overriding a single widget with extra CSS is where projects get lost: the base rules are numerous and often more specific than they look, so a bespoke rule needs matching specificity and quickly becomes a fight.</p>
+  <p>When the change is behavioural rather than cosmetic, the widget factory is the answer: you extend the existing widget, override one method, and call <code>this._super()</code> to keep the original behaviour. That is exactly the mechanism chapter 12 generalises into a plugin pattern, and it is the single most transferable idea jQuery UI ever produced.</p>
+
+  <div class="note">jQuery UI 1.13 was the last feature release and 1.14 is a compatibility release that drops legacy Internet Explorer support. The project is in maintenance, not development: bugs are fixed and security issues are patched, but new widgets are not coming. Treat it as a stable dependency to plan around, not a platform to build on.</div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch12-plugins" data-toc>12 · Writing robust plugins and the widget factory</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Writing robust plugins and the widget factory</button><div class="ch-toc-list"><a href="#ch12-fn">12.1 $.fn extension patterns and method dispatch</a><a href="#ch12-options">12.2 Options, defaults and per-element data</a><a href="#ch12-events">12.3 Chaining, namespaced events and teardown</a><a href="#ch12-widget">12.4 The $.widget() lifecycle and common pitfalls</a></div></div>
+  <p class="topic-desc">A plugin that only works on the page it was written for is a function. A plugin is a reusable contract: it initialises once, merges options, stores state, exposes methods, removes everything it added, and never leaks a global. This chapter is the difference between the two.</p>
+
+  <h3 id="ch12-fn" data-toc>12.1 $.fn extension patterns and method dispatch</h3>
+  <p class="topic-desc">Extending <code>$.fn</code> adds your method to every jQuery object, which is powerful and easy to get wrong in two specific ways.</p>
+
+  <h4>The this.each contract</h4>
+  <p>A <code>$.fn</code> method may be called on a set of one, ten or zero elements. The contract is simple: iterate with <code>this.each()</code>, operate on each element, and return the original set so the call chains. Two rules follow from it. First, never assume <code>this</code> is a single element — <code>this[0]</code> works in the demo and fails the first time someone selects a class. Second, <code>each</code> is a loop, so anything that does not depend on the element — building a lookup table, reading options — happens once outside it, not once per element.</p>
+  <p>Wrapping the whole plugin in an immediately-invoked function that receives <code>jQuery</code> keeps the helper functions and defaults private and makes the plugin safe under <code>$.noConflict()</code>, where the global <code>$</code> may belong to something else.</p>
+
+  <div class="codeWrap"><pre><code>(function ($) {
+  'use strict';
+
+  const DEFAULTS = { speed: 200, prefix: 'Count: ', separator: ',' };
+
+  function format(n, opts) {
+    return opts.prefix + n.toLocaleString('en-US');
+  }
+
+  $.fn.counter = function (options) {
+    const opts = $.extend({}, DEFAULTS, options);
+
+    return this.each(function () {
+      const $el = $(this);
+      if ($el.data('counter')) { return; }     // idempotent init
+      $el.data('counter', { value: 0, opts: opts });
+      $el.text(format(0, opts));
+    });
+  };
+})(jQuery);</code></pre></div>
+
+  <h4>Method dispatch and honest errors</h4>
+  <p>A plugin that grows beyond options almost always grows methods too — <code>refresh</code>, <code>destroy</code>, <code>value</code>. The convention is to overload the first argument: if it is a string, treat it as a method name and dispatch; otherwise treat it as options. When the string is unknown, throw with <code>$.error()</code> rather than failing silently, because a typo that does nothing is much harder to find than an exception with a message. Returning <code>this</code> from the options path and the method's own value from the dispatch path keeps both the fluent style and the ability to read a result back.</p>
+  <p>The subtlety is that a method call on a multi-element set is ambiguous: it has to pick one element to operate on. <code>this.eq(0)</code> — the first element — is the conventional choice, and the documentation should say so plainly rather than pretending the method is set-wide.</p>
+
+  <div class="codeWrap"><pre><code>$.fn.counter = function (methodOrOptions) {
+  const args = Array.prototype.slice.call(arguments, 1);
+
+  if (typeof methodOrOptions === 'string') {
+    const state = this.eq(0).data('counter');
+    if (!state || typeof state[methodOrOptions] !== 'function') {
+      $.error('counter: no such method "' + methodOrOptions + '"');
+    }
+    const result = state[methodOrOptions].apply(state, args);
+    return result === undefined ? this : result;   // keep chaining
+  }
+
+  const opts = $.extend({}, DEFAULTS, methodOrOptions);
+  return this.each(function () { initCounter($(this), opts); });
+};
+
+// call site
+$('.badge').counter();                       // initialise
+$('.badge').counter('refresh');              // dispatch
+$('.badge').counter({ prefix: 'Total: ' });  // re-init options</code></pre></div>
+
+  <h3 id="ch12-options" data-toc>12.2 Options, defaults and per-element data</h3>
+  <p class="topic-desc">Options are how a plugin is configured and data is how it remembers; conflating the two is the root of most plugin state bugs.</p>
+
+  <h4>Merge into a fresh object, never into the defaults</h4>
+  <p><code>$.extend({}, DEFAULTS, options)</code> is the correct call: the empty object is the target, the shared defaults are copied into it, and the user's options win. Writing <code>$.extend(DEFAULTS, options)</code> mutates the module-level defaults, so the second instance inherits the first instance's options. That bug is invisible with one instance and reproduces instantly with two. The defaults object itself must be created once, outside the plugin function, or you allocate a new one on every call for no reason.</p>
+  <p>Deep merging with <code>$.extend(true, {}, DEFAULTS, options)</code> is occasionally right for a nested configuration object, but it merges arrays element by element, which is almost never what a caller means. If an option is a list — accepted file types, animation steps — mark it as replace-not-merge in your own code and copy it wholesale.</p>
+
+  <h4>State belongs in .data()</h4>
+  <p>Per-element state goes in <code>$el.data('pluginName', instance)</code>, not in an expando property on the DOM node and not in a closure keyed by index. <code>.data()</code> is stored per element, survives detaching and reattaching, is reachable from outside the plugin for debugging, and is removed by <code>.removeData()</code> in your teardown. It is also the standard way to make initialisation idempotent: if <code>$el.data('pluginName')</code> already exists, either return early or apply the new options to the existing instance instead of building a second one.</p>
+  <p>One caution: <code>data-</code> attributes are read once and then shadowed by the in-memory store. Setting <code>data-counter="5"</code> after the plugin has written its own value will not overwrite it, because <code>.data()</code> prefers what it has over what the attribute now says. Choose one source of truth and stick to it.</p>
+
+  <div class="codeWrap"><pre><code>// options: fresh object, defaults copied in, caller wins
+const opts = $.extend({}, DEFAULTS, options);        // right
+$.extend(DEFAULTS, options);                          // wrong: mutates shared defaults
+const nested = $.extend(true, {}, { retry: { count: 3 } }, options); // deep, rarely needed
+
+// state: one handle per element, kept in .data()
+function initCounter($el, opts) {
+  const state = {
+    value: 0,
+    step: opts.step,
+    bump: function (n) {
+      this.value += n * this.step;
+      $el.text(format(this.value, opts));
+      $el.trigger('counter:change', [this.value]);
+    }
+  };
+  $el.data('counter', state);
+  $el.text(format(0, opts));
+}
+
+// later, from anywhere:
+const state = $('#total').data('counter');
+if (state) { state.bump(2); }</code></pre></div>
+
+  <h3 id="ch12-events" data-toc>12.3 Chaining, namespaced events and teardown</h3>
+  <p class="topic-desc">A plugin that adds handlers must be able to remove exactly those handlers. Namespaces are the mechanism, and a <code>destroy</code> method is the promise.</p>
+
+  <h4>Namespaced events make removal surgical</h4>
+  <p>Appending <code>.myPlugin</code> to an event name creates a namespace. <code>$el.on('click.myPlugin', fn)</code> and later <code>$el.off('.myPlugin')</code> removes only the handlers that carry that namespace, leaving every other click handler on the element untouched. Without a namespace, <code>.off('click')</code> is a sledgehammer that silently breaks unrelated code — the classic "my plugin disabled the other plugin's button" report.</p>
+  <p>Namespaces also let you bind several events in one call with one teardown: <code>.on('scroll.ns resize.ns', fn)</code> and <code>.off('.ns')</code>. They are not hierarchical in the sense that <code>.a.b</code> means "both"; a handler bound as <code>click.a.b</code> is removed by <code>.off('.a')</code> or <code>.off('.b')</code> or <code>.off('.a.b')</code>. That is convenient and worth knowing before you nest namespaces carelessly.</p>
+
+  <h4>Custom events as the plugin's public API</h4>
+  <p>Triggering a namespaced custom event — <code>$el.trigger('counter:change', [value])</code> — turns a plugin from a black box into something a page can react to without reaching into its internals. The extra-arguments array is passed to the handler after the event object, and because the event bubbles by default, a container can listen for its children's changes. This is the same idea as a modern component's <code>emit</code>, implemented in the events chapter you already have. Pair it with a <code>destroy</code> that removes the namespace and the data, and the plugin becomes genuinely removable rather than merely stoppable.</p>
+
+  <div class="codeWrap"><pre><code>$.fn.scrollSpy = function (options) {
+  const opts = $.extend({ offset: 80, active: 'is-active' }, options);
+
+  return this.each(function () {
+    const $win = $(window);
+    const ns = '.scrollSpy';          // one namespace for every handler
+
+    $win.on('scroll' + ns + ' resize' + ns, function () { update($(this).scrollTop()); });
+    $(this).one('remove' + ns, function () { $win.off(ns); });
+  });
+};
+
+// announce a change; page code reacts without knowing the internals
+$el.trigger('counter:change', [state.value]);
+$('#totals').on('counter:change', '.badge', function (event, value) {
+  console.log('a badge changed to ' + value);
+});
+
+// destroy(): undo exactly what create() did
+$.fn.counter.destroy = function () {
+  return this.each(function () {
+    const $el = $(this);
+    $el.off('.counter').removeData('counter');
+  });
+};
+
+// teardown from anywhere, without touching other listeners
+$(window).off('.scrollSpy');</code></pre></div>
+
+  <h3 id="ch12-widget" data-toc>12.4 The $.widget() lifecycle and common pitfalls</h3>
+  <p class="topic-desc">The widget factory — inherited from jQuery UI — is a full plugin framework: option handling, method dispatch, event namespacing and a documented lifecycle, all in one factory call.</p>
+
+  <h4>The lifecycle: _create, _setOption and _destroy</h4>
+  <p>Calling <code>$.widget('ns.name', prototype)</code> does four things at once: it registers the widget, creates <code>$.fn.name</code> so <code>$el.name()</code> initialises it, stores the instance on the element under the key <code>'ns-name'</code>, and wires up method dispatch. Inside the methods, <code>this</code> is the instance: <code>this.element</code> is the wrapped element, <code>this.options</code> is the merged option set, <code>this.namespace</code> and <code>this.widgetFullName</code> identify it, <code>this._on()</code> binds handlers that are removed automatically on destroy, and <code>this._trigger()</code> fires the widget's lifecycle events.</p>
+  <p>The lifecycle is fixed. <code>_create</code> runs once with the current options; <code>_init</code> runs after <code>_create</code> and again whenever the widget is re-invoked without new options; <code>_setOption</code> receives every <code>option</code> call and must call <code>this._super(key, value)</code> so the value is actually stored; <code>_destroy</code> removes everything and should call <code>this._super()</code> when extending. Getting the sequence wrong is the source of the "options are ignored after the first call" class of bug.</p>
+
+  <div class="codeWrap"><pre><code>$.widget('ams.keypad', {
+  options: { keys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0], maxLength: 6, value: '' },
+
+  _create: function () {
+    this._on(this.element, { keydown: '_onKeydown' });
+    this._refresh();
+  },
+
+  _onKeydown: function (event) {
+    const key = String.fromCharCode(event.which);
+    if (this.options.keys.indexOf(Number(key)) === -1) { return; }
+    if (this.options.value.length >= this.options.maxLength) { return; }
+    this._setOption('value', this.options.value + key);
+    return false;
+  },
+
+  _setOption: function (key, value) {
+    this._super(key, value);            // store it first
+    if (key === 'value' || key === 'keys') { this._refresh(); }
+  },
+
+  _refresh: function () {
+    this.element.text(this.options.value || '—');
+    this._trigger('change', null, { value: this.options.value });
+  },
+
+  _destroy: function () {
+    this.element.off('.keypad');
+  }
+});
+
+// init, then call methods through the same function
+$('#pin').keypad({ maxLength: 4 });
+$('#pin').keypad('option', 'maxLength', 8);
+$('#pin').keypad('destroy');</code></pre></div>
+
+  <h4>The pitfalls that bite every widget author</h4>
+  <div class="table-scroll"><table>
+    <tr><th>Pitfall</th><th>Why it happens</th><th>Fix</th></tr>
+    <tr><td>Re-initialising the same element</td><td>The factory returns the existing instance and applies only new options; a second <code>_create</code> never runs</td><td>Put per-instance setup in <code>_create</code>, per-change logic in <code>_refresh</code>/<code>_setOption</code></td></tr>
+    <tr><td>Options appear ignored</td><td><code>_setOption</code> was overridden without calling <code>this._super</code></td><td>Call <code>this._super(key, value)</code> before reacting</td></tr>
+    <tr><td>Handlers survive destroy</td><td>Bindings were made with <code>$(...).on()</code> instead of <code>this._on()</code></td><td>Use <code>this._on()</code>/<code>this._off()</code>, or an explicit namespace</td></tr>
+    <tr><td>Widget events never fire</td><td><code>this._trigger()</code> needs the option named after the event to be honoured</td><td>Declare a no-op in <code>options</code> and let callers pass a handler</td></tr>
+    <tr><td>Subclass forgets the base teardown</td><td>An override of <code>_destroy</code> does not chain</td><td>Call <code>this._super()</code> first, then remove your own additions</td></tr>
+    <tr><td>Selector-scoped options leak</td><td>Options were read from the element on every call instead of stored once</td><td>Read in <code>_create</code>, keep in <code>this.options</code></td></tr>
+  </table></div>
+
+  <div class="tip">The widget factory is available on its own as <code>jquery-ui/widget</code> in npm builds, without the rest of jQuery UI. If you want the lifecycle without the widgets, that is the smallest way to get it — or reach for a modern web component, which gives you the same encapsulation with the browser's own upgrade mechanism.</div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch13-migrate-performance" data-toc>13 · Migrating off jQuery and performance</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Migrating off jQuery and performance</button><div class="ch-toc-list"><a href="#ch13-selectors">13.1 Measuring and optimising selectors</a><a href="#ch13-batching">13.2 Caching, detaching and batch DOM edits</a><a href="#ch13-delegation">13.3 Event delegation versus direct binding</a><a href="#ch13-migrate">13.4 jQuery Migrate and a phased migration path</a><a href="#ch13-when">13.5 When jQuery is still the right tool</a></div></div>
+  <p class="topic-desc">jQuery is not slow; unmeasured code is. This chapter is about the handful of patterns that actually move a frame budget, and about the two migration paths — incremental and rewrite — with the tools that make the incremental one safe.</p>
+
+  <h3 id="ch13-selectors" data-toc>13.1 Measuring and optimising selectors</h3>
+  <p class="topic-desc">The cost of a selector is the DOM traversal it performs, not the function call. Repeating a wide selector in a loop is the single most common performance defect in jQuery code.</p>
+
+  <h4>What a selector actually costs</h4>
+  <p>jQuery 3 routes nearly every selector through the browser's native <code>querySelectorAll</code>, falling back to its own Sizzle engine only for jQuery-specific pseudo-selectors such as <code>:visible</code>, <code>:hidden</code>, <code>:animated</code>, <code>:eq</code> and <code>:contains</code>. Those fallbacks are the expensive ones: they force jQuery to collect candidates and filter them in JavaScript, and they cannot be cached by the browser. On a document of a hundred thousand nodes, <code>$('div:visible')</code> walks the whole tree. Prefer a class you control: <code>$('.is-visible')</code> is a single native scan.</p>
+  <p>Because CSS selectors are matched right to left, <code>$('#app .row td .label')</code> starts from every <code>.label</code> in the page and climbs, not from <code>#app</code> downwards. Narrowing the left side of a selector helps the browser skip subtrees, but the reliable win is the one below: scope the query.</p>
+
+  <h4>Cache the set and pass a context</h4>
+  <p>Every <code>$(...)</code> call builds a new jQuery object and resolves the selector against the document unless you give it a context. In a loop, that is a fresh traversal per iteration. Hoisting the lookup out of the loop, and passing a cached ancestor as the second argument, turns N traversals into one plus N local scans.</p>
+  <p>The cost of a jQuery object is also worth remembering: wrapping an element is cheap relative to traversal but not free, so a hot loop that calls <code>$(this)</code> repeatedly inside <code>each</code> is doing avoidable work. Read the node once into a variable and reuse it. None of this matters at ten elements and all of it matters at ten thousand, which is why the profiler comes first.</p>
+
+  <div class="codeWrap"><pre><code>// slow: a jQuery-only pseudo-selector cannot use querySelectorAll
+$('li:visible').addClass('stale');
+
+// faster: a class you control is a single native scan
+$('li.is-visible').addClass('stale');
+
+// scope once, reuse the set, avoid re-resolving per iteration
+const $panel = $('#app');
+const $labels = $panel.find('td .label');
+$labels.addClass('stale');</code></pre></div>
+
+  <div class="warn">Do not micro-optimise by hand. Before changing anything, profile: open the performance panel, record the interaction, and read the self-time under jQuery's own frames. Most "jQuery is slow" reports turn out to be one selector inside a scroll handler, one layout read in a loop, or an animation that should have been a CSS transition — all three of which this chapter covers. Optimising a selector that runs twice per page is wasted effort.</div>
+
+  <h3 id="ch13-batching" data-toc>13.2 Caching, detaching and batch DOM edits</h3>
+  <p class="topic-desc">The DOM is not slow to read or write; it is slow when reads and writes are interleaved, because each read forces the browser to recompute layout after the write.</p>
+
+  <h4>detach() is not hide()</h4>
+  <p><code>hide()</code> leaves the element in the document, so every style change on it still participates in layout and paint. <code>detach()</code> removes the subtree from the document while keeping its data and event handlers, so edits inside it touch nothing the browser is rendering. Append it back when the batch is done and there is one reflow instead of one per row. The distinction between <code>remove()</code> and <code>detach()</code> matters here: <code>remove()</code> discards the handlers and data, <code>detach()</code> keeps them.</p>
+  <p><code>DocumentFragment</code> achieves the same for construction. Building nodes against a fragment and inserting it once is the classic answer to "appending a thousand rows takes four seconds", and it composes with jQuery because <code>append</code> accepts a fragment. For a large grid, the fastest option of all is usually to build one HTML string and assign it in a single write — provided every value is escaped, which is the security cost of that approach.</p>
+
+  <div class="codeWrap"><pre><code>// batch edits off-DOM: one reflow instead of one per row
+const $list = $('#list').detach();
+
+rows.forEach(function (row) {
+  $('&lt;li&gt;').text(row.label).attr('data-id', row.id).appendTo($list);
+});
+
+$list.appendTo('#panel');</code></pre></div>
+
+  <h4>Read, then write</h4>
+  <p>Layout thrashing happens when a write is followed by a read of a property the browser has to re-layout to measure — <code>offsetHeight</code>, <code>getBoundingClientRect()</code>, <code>scrollTop</code>, and the computed styles jQuery reads for some of its effects. The fix is a simple discipline: collect every measurement first into plain variables, then perform every write. A loop that alternates <code>$el.width()</code> and <code>$el.css(...)</code> performs one forced layout per iteration; separated, it performs one.</p>
+  <p>Two more habits follow from the same principle. Prefer one class toggle to many inline style writes, because a class change is a single style recalculation and inline styles accumulate specificity debt. And route continuous visual changes — hover, focus, a progress bar — through CSS transitions or <code>requestAnimationFrame</code>, never through a jQuery animation on every <code>scroll</code> event.</p>
+
+  <div class="codeWrap"><pre><code>// thrashing: each width() forces layout after the previous write
+$('.cell').each(function () {
+  const w = $(this).width();          // read -> layout
+  $(this).css('height', w / 2);       // write
+});
+
+// batched: all reads, then all writes
+const widths = $('.cell').map(function () { return $(this).width(); }).get();
+$('.cell').each(function (i) { $(this).css('height', widths[i] / 2); });</code></pre></div>
+
+  <h3 id="ch13-delegation" data-toc>13.3 Event delegation versus direct binding</h3>
+  <p class="topic-desc">Delegation is not an optimisation you apply everywhere; it is a choice with a specific win and a specific failure mode.</p>
+
+  <h4>How delegation works, and what it buys</h4>
+  <p>A delegated handler is bound to an ancestor and given a selector. When any descendant event bubbles up, jQuery walks the path from the target outward and tests each element against the selector, then calls the handler with <code>this</code> set to the matching element and <code>event.delegateTarget</code> set to the ancestor. Two things follow: one handler covers every current row and every row added later, and replacing the container's inner HTML cannot orphan the handler. In a list that re-renders after every AJAX call, that is the whole reason to delegate.</p>
+
+  <h4>When direct binding wins</h4>
+  <p>Delegation adds a match test per event per ancestor, so for a fixed, small set of elements that never change, a direct binding is cheaper and simpler. More importantly, delegation depends on the event bubbling. A child that calls <code>event.stopPropagation()</code> prevents the ancestor from ever seeing the event, and delegation is then silently dead — a failure that looks like "the click handler stopped working on one row". Focus-sensitive events are the other exception: <code>focus</code>, <code>blur</code>, <code>mouseenter</code> and <code>mouseleave</code> do not bubble, so jQuery simulates them when you delegate; the emulation is good but not free.</p>
+  <p>The rule of thumb: delegate on a stable ancestor when the content is dynamic, use direct binding on a static widget, and never mix <code>stopPropagation</code> into a page that relies on delegation. Namespace every handler you bind so teardown stays surgical, and prefer <code>focusin</code>/<code>focusout</code> when you genuinely need delegated focus handling.</p>
+
+  <div class="codeWrap"><pre><code>// direct: one handler per row, and new rows need re-binding
+$('#list li').on('click', handler);
+
+// delegated: one handler on the container, works for future rows too
+$('#list').on('click', 'li', handler);
+
+// delegated teardown removes only this selector's bindings
+$('#list').off('click', 'li');
+
+// namespaced, multiple events, one handler
+$('#editor').on('focusin.ns focusout.ns', 'input', function () {
+  $(this).toggleClass('editing');
+});
+$('#editor').off('.ns');</code></pre></div>
+
+  <h3 id="ch13-migrate" data-toc>13.4 jQuery Migrate and a phased migration path</h3>
+  <p class="topic-desc">Migrate is a diagnostic shim, not a compatibility layer to ship. It tells you precisely which lines depend on removed behaviour. The migration itself is a sequence of small, reversible steps.</p>
+
+  <h4>What jQuery Migrate does</h4>
+  <p>jQuery Migrate restores APIs removed by newer jQuery versions and logs a warning for each use, including the call stack that leads to it. Loading it after jQuery, running the application through its test pass, and reading the console is the cheapest audit you can do of an unfamiliar codebase's jQuery surface. In current builds you can silence the per-warning traces once the list is known, and you must remember to remove Migrate before shipping: any code that still depends on it will break at the next major upgrade.</p>
+  <p>The warning list is the deliverable, not the shim. Each entry names a removed API and the file that calls it, which converts "we should modernise someday" into a finite, ordered task list that can be estimated and assigned.</p>
+
+  <h4>The phased path</h4>
+  <p>Migrating a real application is not a rewrite; it is a measured sequence where every step is shippable. The order matters because each step de-risks the next.</p>
+  <div class="table-scroll"><table>
+    <tr><th>#</th><th>Step</th><th>Why it is safe here</th></tr>
+    <tr><td>1</td><td>Inventory plugins and <code>$.fn</code> usage</td><td>Anything not written in-house is the long pole; find it before committing to a plan</td></tr>
+    <tr><td>2</td><td>Pin jQuery to the current 3.x release</td><td>Removes version drift so behaviour is reproducible</td></tr>
+    <tr><td>3</td><td>Add Migrate and capture the warning list</td><td>No production change; the log becomes the task list</td></tr>
+    <tr><td>4</td><td>Fix the warnings, then remove Migrate</td><td>Each fix is small and independently testable</td></tr>
+    <tr><td>5</td><td>Replace or wrap third-party plugins</td><td>Either a maintained fork or a thin native shim</td></tr>
+    <tr><td>6</td><td>Introduce a module boundary around jQuery</td><td>One import point makes the next step mechanical</td></tr>
+    <tr><td>7</td><td>Rewrite feature by feature to native or a framework</td><td>Only reached once the surface is small and known</td></tr>
+  </table></div>
+
+  <h4>The native equivalents you will use</h4>
+  <p>Most of jQuery's daily surface has a one-line native twin, and recognising the mapping is what makes step 7 feel routine rather than risky. What does not have a twin is the accumulated value of the plugins, the forgiving cross-browser model, and the chainable animation queue — those are the parts worth an explicit decision.</p>
+
+  <div class="codeWrap"><pre><code>// jQuery                          // native
+$('#id');                           // document.getElementById('id')
+$('.item');                         // document.querySelectorAll('.item')
+$el.on('click', fn);                // el.addEventListener('click', fn)
+$el.off('click', fn);               // el.removeEventListener('click', fn)
+$el.addClass('on');                 // el.classList.add('on')
+$el.toggleClass('on');              // el.classList.toggle('on')
+$el.attr('href');                   // el.getAttribute('href')
+$el.data('x');                      // el.dataset.x
+$el.text('hi');                     // el.textContent = 'hi'
+$el.hide();                         // el.hidden = true
+$el.closest('.card');               // el.closest('.card')
+$.ajax({ url, dataType: 'json' });  // fetch(url).then(r =&gt; r.json())</code></pre></div>
+
+  <h3 id="ch13-when" data-toc>13.5 When jQuery is still the right tool</h3>
+  <p class="topic-desc">The migration calculus is not "old versus new". It is the size of the plugin surface, the shape of the rendering model, and the cost of the rewrite measured against the benefit.</p>
+
+  <h4>Server-rendered pages and progressive enhancement</h4>
+  <p>jQuery was designed for HTML produced by the server with behaviour layered on top, and that architecture has not stopped being a good one. On a server-rendered page, <code>$(...)</code> is a compact way to select and mutate existing markup, <code>$.ajax</code> has a request pipeline that <code>fetch</code> still makes you assemble by hand — JSON parsing, timeouts, encoding, progress — and the plugin ecosystem covers the dusty corners. A small administrative page with a table, a modal and a form gains very little from a rewrite and can lose a week to it.</p>
+
+  <h4>Legacy constraints and plugin dependence</h4>
+  <p>A CMS theme that loads jQuery, a page that depends on a datepicker whose only maintained version is a jQuery plugin, or an environment where the build tooling is fixed all point the same way: the library is not the problem being solved. jQuery 3.x is maintained and receives security fixes; the cost that genuinely matters is the shipped weight and the extra mental model, not correctness. Measure those before spending a rewrite on them.</p>
+
+  <h4>The decision table</h4>
+  <div class="table-scroll"><table>
+    <tr><th>Situation</th><th>Reasonable choice</th></tr>
+    <tr><td>Server-rendered page, a few interactions</td><td>Keep jQuery; it is smaller than the rewrite</td></tr>
+    <tr><td>Heavy client-side state, frequent re-renders</td><td>Migrate to a framework; manual DOM sync is the actual bug source</td></tr>
+    <tr><td>Duplicated state across the DOM and JS</td><td>Framework, or at minimum a single state object and a render function</td></tr>
+    <tr><td>One plugin is the only dependency</td><td>Replace that plugin with a native or framework equivalent; drop jQuery</td></tr>
+    <tr><td>Team knows vanilla JS and the surface is small</td><td>Incremental native replacement, no big-bang</td></tr>
+    <tr><td>Bundle size is the driver on a content site</td><td>Drop jQuery after step 4 of the migration table, not before</td></tr>
+    <tr><td>Legacy browser support is contractual</td><td>Keep jQuery 3.x; jQuery 4 drops support you may still owe</td></tr>
+  </table></div>
+
+  <div class="note">The honest summary: jQuery's remaining advantage is the breadth of its plugin ecosystem and the ergonomics of DOM-plus-AJAX on server-rendered pages. Its cost is roughly 30 KB gzipped, an extra abstraction over the DOM, and a rendering model that cannot keep a large interactive UI in sync. Choose by measuring which side of that line the project sits on, not by the year on the calendar.</div>
+</section>

@@ -1,0 +1,113 @@
+<h3 id="ch6-3" data-toc>6.3 Traits: definition and implementation</h3>
+<p class="topic-desc">A trait is a collection of methods that a type can implement — shared behaviour without a base class. A type can implement any number of traits, and a trait can require other traits.</p>
+
+<h4 id="ch6-3-define">Defining a trait, with defaults</h4>
+<p>A trait declaration lists the method signatures implementors must provide. Methods with a body are <em>defaults</em>: implementors inherit them and may override. This is how a library ships one canonical behaviour while letting specialised types replace it. Trait methods take <code>&amp;self</code> like regular methods, which is what lets them read the implementing instance.</p>
+<div class="codeWrap"><pre><code>// A trait is a contract: implementors must provide these methods.
+trait Draw {
+    fn draw(&amp;self);
+
+    // A default implementation: implementors may inherit or override.
+    fn bounding_box(&amp;self) -&gt; (f64, f64, f64, f64) {
+        (0.0, 0.0, 100.0, 100.0)
+    }
+}</code></pre></div>
+
+<h4 id="ch6-3-impl">Implementing a trait for your type</h4>
+<p><code>impl Draw for Circle</code> is explicit: there is no implicit trait satisfaction like Go's interfaces — a type is opted in by writing the block. The compiler checks the signatures against the trait declaration, so a wrong parameter type is a compile error at the <code>impl</code>, not a surprise at the call site. A type can implement many traits, and overriding only the methods that need customising is fine — the rest stay default.</p>
+<div class="codeWrap"><pre><code>struct Circle {
+    x: f64,
+    y: f64,
+    r: f64,
+}
+
+impl Draw for Circle {
+    fn draw(&amp;self) {
+        println!("circle at ({}, {}) radius {}", self.x, self.y, self.r);
+    }
+    // bounding_box stays default
+}
+
+fn main() {
+    let c = Circle { x: 1.0, y: 1.0, r: 5.0 };
+    c.draw();
+}</code></pre></div>
+
+<h4 id="ch6-3-orphan">The orphan rule and the newtype wrapper</h4>
+<p>You may implement <em>your</em> trait for <em>their</em> type, or <em>their</em> trait for <em>your</em> type — but not their trait for their type, because then two crates could implement the same pair differently and the compiler could not choose. The workaround for "I want <code>Display</code> on <code>Vec&lt;i32&gt;</code>" is the newtype: a one-field struct that wraps the foreign type, making it yours. The wrapper costs nothing at runtime; the field access <code>self.0</code> is the price you pay.</p>
+<div class="codeWrap"><pre><code>// The orphan rule: YOUR trait for THEIR type, or THEIR trait for
+// YOUR type — but never their trait for their type.
+//
+// impl std::fmt::Display for Vec&lt;i32&gt;   // ERROR: both foreign
+//
+// The newtype wrapper makes a foreign type YOUR type:
+struct MyVec(Vec&lt;i32&gt;);
+
+impl std::fmt::Display for MyVec {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) -&gt; std::fmt::Result {
+        let inner = self.0
+            .iter()
+            .map(|x| x.to_string())
+            .collect::&lt;Vec&lt;_&gt;&gt;()
+            .join(", ");
+        write!(f, "[{inner}]")
+    }
+}
+
+fn main() {
+    println!("{}", MyVec(vec![1, 2, 3]));   // [1, 2, 3]
+}</code></pre></div>
+
+<h3 id="ch6-4" data-toc>6.4 Generic bounds and trait objects</h3>
+<p class="topic-desc">A generic function with a trait bound is monomorphised at compile time — one specialised copy per concrete type, no runtime cost. <code>dyn Trait</code> is the dynamically dispatched alternative, stored behind a pointer, for when the concrete types cannot be known in advance.</p>
+
+<h4 id="ch6-4-bound">Generic functions with trait bounds</h4>
+<p><code>fn render&lt;T: Draw&gt;(item: &amp;T)</code> accepts any type that implements <code>Draw</code>. The compiler generates a specialised version for each type that satisfies the bound — <code>render(&amp;circle)</code> becomes <code>render_Circle</code> with <code>Circle::draw</code> inlined — which is why generics have no runtime overhead. The cost is code size: <code>N</code> concrete types mean <code>N</code> specialised copies of the function. For closed sets of types, generics are always the right call.</p>
+<div class="codeWrap"><pre><code>fn render&lt;T: Draw&gt;(item: &amp;T) {
+    item.draw();
+}
+
+fn main() {
+    let c = Circle { x: 0.0, y: 0.0, r: 2.0 };
+    render(&amp;c);   // monomorphised to render_Circle
+}</code></pre></div>
+<div class="tip">Prefer generics with bounds for closed sets of types (you know every implementor) and <code>dyn Trait</code> for open sets (plugins, user-registered types). A generic version is always faster because it is monomorphised.</div>
+
+<h4 id="ch6-4-where">where clauses keep readable bounds</h4>
+<p>Multiple bounds quickly overflow the signature line — <code>&lt;T: Clone + Debug + PartialEq, U: Display&gt;</code> is hard to scan. A <code>where</code> clause moves the bounds below the signature, lines them up, and reads like a constraint list, which is exactly what it is. The compiler treats both spellings identically; the choice is readability.</p>
+<div class="codeWrap"><pre><code>use std::fmt::Display;
+
+fn announce&lt;T&gt;(msg: &amp;str, value: &amp;T)
+where
+    T: Display,
+{
+    println!("{msg}: {value}");
+}
+
+fn main() {
+    announce("score", &amp;99_u32);
+    announce("name", &amp;String::from("Amin"));
+}</code></pre></div>
+
+<h4 id="ch6-4-dyn">dyn Trait: the trait object</h4>
+<p>Sometimes the concrete types genuinely cannot be a closed set — a collection of shapes, a registry of handlers — and the answer is a trait object: a pointer to a value plus a pointer to its implementation's method table. <code>&amp;dyn Draw</code> borrows one; <code>Box&lt;dyn Draw&gt;</code> owns one. A trait object can only hold the methods of <em>one</em> trait, so the collection needs the trait, not the type — and the price of the flexibility is a virtual call per method plus an allocation for the <code>Box</code>.</p>
+<div class="codeWrap"><pre><code>fn describe(item: &amp;dyn Draw) {
+    item.draw();
+    println!("box: {:?}", item.bounding_box());
+}
+
+fn main() {
+    // different concrete types behind one trait-object type
+    let shapes: Vec&lt;Box&lt;dyn Draw&gt;&gt; = vec![
+        Box::new(Circle { x: 0.0, y: 0.0, r: 1.0 }),
+        Box::new(Circle { x: 3.0, y: 0.0, r: 2.0 }),
+    ];
+    for s in &amp;shapes {
+        describe(s.as_ref());
+    }
+}
+
+// Without the Box the compiler says "the size for values of type
+// `dyn Draw` cannot be known at compile time" — that is the error
+// that tells you to put the trait object behind a pointer.</code></pre></div>
+<div class="warn">A <code>Vec&lt;dyn Draw&gt;</code> without <code>Box</code> is the trait-object beginner error: trait objects have unknown size, so they must live behind a pointer. The compiler's message names exactly that — read the whole diagnostic before reacting.</div></section>

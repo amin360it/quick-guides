@@ -1,0 +1,93 @@
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Ownership, Borrowing and Lifetimes</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Ownership is the rule system that lets Rust deallocate memory automatically without a garbage collector. This chapter explains the three ownership rules, the borrow rules that follow from them, slices as the canonical borrow, and lifetimes — the annotations that prove a reference stays valid.</p>
+
+<h3 id="ch2-1" data-toc>2.1 Ownership: the three rules every type obeys</h3>
+<p class="topic-desc">Every value in Rust is owned by exactly one variable, and when that variable goes out of scope the value is dropped. Assignment moves ownership, and no other mainstream language has this exact semantics.</p>
+
+<h4 id="ch2-1-rules">The three rules, and the tree they build</h4>
+<p>Rule one: each value has exactly one owner. Rule two: when the owner goes out of scope, the value is dropped. Rule three: ownership can be transferred — moved — but there is never more than one binding holding the value. Together the rules make ownership a tree: one root, no sharing at the leaves, and drop order decided by the braces at compile time. That determinism is why Rust needs no garbage collector at all.</p>
+<div class="codeWrap"><pre><code>// Ownership is a tree: one owner per value, drop order decided by
+// the scopes, no collector needed.
+
+fn main() {
+    let s1 = String::from("hello");   // s1 owns the heap buffer
+    let s2 = s1;                      // ownership MOVES to s2
+    // println!("{s1}");              // ERROR: use of moved value
+    println!("{s2}");                 // s2 is the owner now
+}</code></pre></div>
+
+<h4 id="ch2-1-move">Move, clone and copy</h4>
+<p><strong>Move is the default for heap types</strong> — <code>String</code>, <code>Vec</code>, <code>Box</code>, <code>Rc</code>. <strong>Clone is deep and explicit</strong> — <code>s.clone()</code> duplicates the buffer, and the name is always written out because it can be expensive. <strong>Copy types are bitwise-copied</strong> — integers, bools, chars, arrays and tuples of Copy types — and for them assignment behaves the way it does in C. The distinction is not memory layout; it is whether the type owns a resource that must be freed exactly once.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let s1 = String::from("hello");
+    let s2 = s1.clone();          // DEEP copy: a fresh buffer
+    println!("{s1} {s2}");        // both valid, both own their own
+
+    let x = 42;                   // i32 is Copy: assignment copies
+    let y = x;
+    println!("{x} {y}");          // both still valid
+}</code></pre></div>
+
+<h4 id="ch2-1-copy">Which types are Copy, and how to ask the compiler</h4>
+<p>A type is Copy when it has no <code>Drop</code> implementation and no interior pointers — the compiler proves it, and you can ask the proof. <code>std::mem::needs_drop</code> reports whether a type's deallocation is mandatory; <code>std::mem::size_of</code> reports the stack size. The litmus test that matters is simpler: if a type would be broken by a bitwise copy, it is not Copy — a <code>String</code> copied bitwise would leave two owners of one buffer, so it is moved instead.</p>
+<div class="codeWrap"><pre><code>use std::mem::{needs_drop, size_of};
+
+fn main() {
+    println!("i64:    needs_drop={} size={}", needs_drop::&lt;i64&gt;(), size_of::&lt;i64&gt;());
+    println!("String: needs_drop={} size={}", needs_drop::&lt;String&gt;(), size_of::&lt;String&gt;());
+}</code></pre></div>
+
+<h3 id="ch2-2" data-toc>2.2 References and the borrow rules</h3>
+<p class="topic-desc">A reference lets code read — or with <code>&amp;mut</code>, write — a value without taking ownership. The two borrow rules make the system safe: you may have any number of shared borrows or one exclusive borrow, and a borrow must not outlive its referent.</p>
+
+<h4 id="ch2-2-refs">References borrow without taking</h4>
+<p>Passing <code>&amp;s</code> to a function hands it a read-only view; the function promises not to keep it beyond the call, and the caller keeps ownership. The signature <code>&amp;String</code> is self-documenting — the function reads, it does not consume. This is the workhorse pattern of the whole language, and it is what lets a function compute a length without the caller losing the string.</p>
+<div class="codeWrap"><pre><code>fn calculate_length(s: &amp;String) -&gt; usize {
+    s.len()     // read through the reference
+}
+
+fn main() {
+    let s = String::from("hello");
+    let len = calculate_length(&amp;s);   // borrow: s keeps ownership
+    println!("{s} has {len} chars");  // 5 — s is still usable
+}</code></pre></div>
+
+<h4 id="ch2-2-mut">One mutable or many immutable</h4>
+<p>The second borrow rule, in one sentence: either any number of shared (<code>&amp;T</code>) borrows <em>or</em> one exclusive (<code>&amp;mut T</code>) borrow — never both at the same time. The rule exists because two readers can race nothing, while a reader plus a writer can read garbage mid-write. Modern Rust also uses non-lexical lifetimes: a borrow ends at its <em>last use</em>, not at the end of its scope, so the sequence below compiles because the shared borrow is already finished when the mutable one starts.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut v = vec![1, 2, 3];
+    let first = &amp;v[0];            // shared borrow
+    println!("{first}");          // last use: the borrow ends here
+
+    let last = &amp;mut v[2];         // exclusive borrow, later
+    *last *= 10;
+    println!("{:?}", v);          // [1, 2, 30]
+}</code></pre></div>
+
+<h4 id="ch2-2-failures">The three failures, all caught at compile time</h4>
+<p>Each of these is silent undefined behaviour in C++ and a compile error in Rust: using a value after it has been moved; letting a reference outlive the value it points at; and mutating through one path while a shared borrow is alive. The borrow checker is never wrong about the mechanics. When it rejects your code, the correct response is to restructure — pass an index, return an owned value, or reorder the operations — rather than to fight it.</p>
+<div class="codeWrap"><pre><code>// 1) Use after move
+//    let s = String::from("hi");
+//    let t = s;               // s is moved into t
+//    println!("{s}");         // ERROR: use of moved value
+//
+// 2) A reference outliving its referent
+//    let r;
+//    {
+//        let s = String::from("hi");
+//        r = &amp;s;               // s dies here: r would dangle
+//    }
+//    println!("{r}");         // ERROR: does not live long enough
+//
+// 3) Mutating while borrowed
+//    let mut v = vec![1, 2, 3];
+//    let first = &amp;v[0];
+//    v.push(4);               // ERROR: cannot borrow as mutable
+//    println!("{first}");
+//
+// The discipline: if the checker says no, restructure. Do not reach
+// for unsafe, Rc&lt;RefCell&lt;T&gt;&gt;, or a clone in a hot loop as the first
+// response.</code></pre></div>
+<div class="warn">Rc&lt;RefCell&lt;T&gt;&gt; is the classic escape hatch — and it moves the safety check from compile time to runtime, where a violation is a panic, not an error message. Use it for legitimate interior mutability with shared ownership, never as a way to silence the borrow checker.</div>

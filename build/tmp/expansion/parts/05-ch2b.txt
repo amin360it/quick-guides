@@ -1,0 +1,98 @@
+<h3 id="ch2-3" data-toc>2.3 Slices: a borrow that sees a run of elements</h3>
+<p class="topic-desc">A slice is a reference to a contiguous run of elements — a pointer plus a length, with no ownership of the underlying storage. Slices are the standard way to look at a substring or a sub-vector without copying, and they come with bounds checked at runtime.</p>
+
+<h4 id="ch2-3-str">String slices</h4>
+<p><code>&amp;str</code> is the immutable view over a <code>String</code>'s buffer, and string literals are <code>&amp;str</code> pointing into the compiled binary. Slicing uses half-open ranges: <code>&amp;s[0..5]</code> is characters at indexes 0, 1, 2, 3 and 4. The range index is a <em>byte</em> offset, and slicing panic guards it: cutting through the middle of a multi-byte UTF-8 character is an error, not silent corruption.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let s = String::from("hello world");
+    let hello = &amp;s[0..5];     // half-open range: 0..=4
+    let world = &amp;s[6..11];
+    println!("{hello} {world}");
+
+    let whole: &amp;str = &amp;s;     // borrow the entire string
+    println!("{whole}");
+}</code></pre></div>
+
+<h4 id="ch2-3-array">Array and vector slices</h4>
+<p>The same slice type works for arrays and vectors: <code>&amp;xs[1..4]</code> and <code>&amp;v[2..]</code> are both <code>&amp;[T]</code>. A slice carries its length with it, so unlike a raw pointer it can never overrun — bounds are checked at access time. That is why so many functions take <code>&amp;[T]</code> rather than a specific collection: any contiguous sequence of <code>T</code> qualifies.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let xs = [10, 20, 30, 40, 50];
+    let mid = &amp;xs[1..4];         // [20, 30, 40]
+
+    let v = vec![1, 2, 3, 4];
+    let tail = &amp;v[2..];          // [3, 4]
+
+    println!("{mid:?} {tail:?}");
+}</code></pre></div>
+
+<h4 id="ch2-3-frozen">The slice borrow freezes its source</h4>
+<p>A slice is a borrow, so while it is alive the source cannot be mutated — mutation could invalidate the slice's assumption about the data. The compiler enforces it, which is exactly what prevents the classic vector-reallocation bug of other languages. When you genuinely need to mutate, end the borrow first (or let it end at its last use) and then change the collection.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut v = vec![1, 2, 3];
+    let slice = &amp;v[..];          // the whole vector, borrowed
+    println!("{slice:?}");
+    // v.push(4);                // ERROR: cannot borrow as mutable
+    //                           // while the slice borrow is alive
+    drop(slice);                 // end the borrow explicitly
+    v.push(4);                   // now allowed
+    println!("{:?}", v);
+}</code></pre></div>
+
+<h3 id="ch2-4" data-toc>2.4 Lifetimes, and when the borrow checker fights</h3>
+<p class="topic-desc">A lifetime is a name for the scope in which a reference is valid. The compiler infers lifetimes in most cases; you annotate them when a function returns a reference derived from a parameter, or when a struct stores one.</p>
+
+<h4 id="ch2-4-elision">Why most functions need no annotation</h4>
+<p>Three elision rules cover the common cases: each reference parameter gets its own lifetime; with exactly one input lifetime, every output reference inherits it; and with several inputs, an output borrows from <code>&amp;self</code>. The rules are chosen so that the obvious reading — a function that takes one reference and returns one reference is borrowing from its input — never needs to be spelled out.</p>
+<div class="codeWrap"><pre><code>fn first_char(s: &amp;str) -&gt; &amp;str {   // elided: the compiler infers
+    s.get(..1).unwrap_or("")
+}
+
+fn main() {
+    let w = first_char("hello");
+    println!("{w}");               // h
+}</code></pre></div>
+
+<h4 id="ch2-4-annotate">Two inputs, one output: the annotation is required</h4>
+<p>When a function takes two reference parameters and returns a reference, elision cannot decide which one the result borrows from — so you say so: <code>'a</code> ties the output to the shorter of the two inputs, and the compiler checks the guarantee at every call site. The same lifetime appears on structs holding references: <code>Excerpt&lt;'a&gt;</code> promises the struct does not outlive the string it borrows.</p>
+<div class="codeWrap"><pre><code>fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
+    if x.len() &gt; y.len() { x } else { y }
+}
+
+struct Excerpt&lt;'a&gt; {
+    part: &amp;'a str,
+}
+
+fn main() {
+    let novel = String::from("Call me Ishmael.");
+    let e = Excerpt { part: &amp;novel[..4] };   // "Call"
+    println!(
+        "{} {}",
+        longest(&amp;novel, "Ishmael"),
+        e.part
+    );
+}</code></pre></div>
+
+<h4 id="ch2-4-escape">The most common lifetime error</h4>
+<p>Returning a reference to a local — <code>fn bad() -&gt; &amp;String</code> building a <code>String</code> inside — is the error most people meet first, and the one the compiler explains best: "borrowed value does not live long enough". The fix is structural, not a cleverer annotation: return the owned value and let the caller own the result. A reference into a function's own locals can never be valid after the function returns, no matter how the lifetimes are written.</p>
+<div class="codeWrap"><pre><code>// The classic lifetime error: a reference to a local.
+fn bad() -&gt; &amp;String {
+    let s = String::from("hello");
+    &amp;s     // ERROR: `s` does not live long enough
+}
+
+// The fix: return the owned value, and the ownership moves out.
+fn good() -&gt; String {
+    String::from("hello")   // the caller owns it now
+}</code></pre></div>
+
+<h4 id="ch2-4-naming">Name lifetimes for their role; restructure when they fight</h4>
+<p><code>'a</code> says nothing; <code>'input</code> says what is being borrowed. Naming lifetimes for their role turns a wall of annotations into readable documentation, and it matters because lifetimes are not exotic — they appear in every function that returns a slice of a parameter. If the annotations keep fighting you, the fix is usually to change the shape: return an owned value, return an index or a key instead of a reference, or take the reference as a parameter and write through it. The borrow checker reflects structure; it does not invent it.</p>
+<div class="codeWrap"><pre><code>fn trimmed_len&lt;'input&gt;(text: &amp;'input str) -&gt; usize {
+    text.trim().len()
+}
+
+fn main() {
+    let s = String::from("  pad  ");
+    println!("{}", trimmed_len(&amp;s));   // 3
+}</code></pre></div>
+<div class="note">Lifetimes are a compile-time construct: no runtime metadata, no cost, no effect on the compiled code. They exist purely to give the checker the information it needs to prove your references are valid.</div></section>

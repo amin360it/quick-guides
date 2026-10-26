@@ -1,0 +1,1069 @@
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation — What Website Design Is</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">This chapter establishes what website design actually is — the discipline that sits between the business goal and the browser — then walks through the design process you will use on every project and how this guide is organised around it.</p>
+
+<h3 id="ch1-1" data-toc>1.1 What website design is</h3>
+<p class="topic-desc">Website design is the craft of shaping a web page so that a real person can reach a real goal. It spans three layers — UX, UI and visual design — and every layer is constrained by the medium: a viewport, a network, a pointer or a keyboard.</p>
+
+<h4 id="ch1-1-brief">Design starts with a brief, not a moodboard</h4>
+<p>Before any pixel, the design problem must be written down: who the audience is, what they are trying to do, and how success will be measured. A brief is the contract that stops a project drifting into layout opinions. If the goal is "find a café in under 30 seconds", then a hero video that delays that goal is a failure no matter how pretty it is.</p>
+<div class="codeWrap"><pre><code># Design brief - one page, agreed before any pixels
+Project:    Café finder website
+Audience:   remote workers, 25-45, city-centre
+Goal:       find a wifi-equipped café in under 30 seconds
+Success:    60% of sessions start a search; 20% book a seat
+Constraints: mobile-first, works offline, no login required
+Out of scope: reviews, loyalty cards, payments
+</code></pre></div>
+
+<h4 id="ch1-1-structure">The three layers: UX, UI and visual</h4>
+<p>User experience (UX) decides what the page contains and in what order; user interface (UI) decides how those contents are arranged and behave; visual design decides how they look. The layers are separable in code: a semantic HTML structure holds the content, CSS holds the arrangement and the skin. Designing with that separation in mind means a badly styled page still works, and a restyle rarely breaks the content.</p>
+<div class="codeWrap"><pre><code>&lt;body&gt;
+  &lt;header&gt;brand and primary navigation&lt;/header&gt;
+  &lt;main&gt;
+    &lt;h1&gt;One page title per page&lt;/h1&gt;
+    &lt;section&gt;
+      &lt;h2&gt;A chapter&lt;/h2&gt;
+      &lt;p&gt;The content itself.&lt;/p&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+  &lt;footer&gt;contact and legal&lt;/footer&gt;
+&lt;/body&gt;
+</code></pre></div>
+
+<h3 id="ch1-2" data-toc>1.2 Design vs development: the hand-off</h3>
+<p class="topic-desc">A design is only real when it is built. The hand-off is the moment the design becomes a specification the developer can implement without guessing — and most hand-offs fail because they deliver pictures instead of decisions.</p>
+
+<h4 id="ch1-2-checklist">What a complete hand-off must contain</h4>
+<p>Every value a developer needs is a decision: the type scale in <code>rem</code>, the spacing scale, the colour roles in both themes, the radius and shadow tokens, the states of every interactive component, and the breakpoints with a reason for each. If the developer has to measure padding off a screenshot, the design is not finished. Ambiguity is the bug: it ships as whatever the developer happened to infer.</p>
+<div class="codeWrap"><pre><code># Hand-off checklist - every value a developer needs to build it
+# [ ] type scale with sizes in rem and weights
+# [ ] spacing scale (8pt) applied as tokens
+# [ ] colour palette with semantic roles, both themes
+# [ ] radius, shadow and border tokens
+# [ ] states for every interactive component
+# [ ] breakpoints with the reason each exists
+# [ ] asset exports: SVG icons, WebP images
+# [ ] behaviour notes: hover, focus, error, empty, loading
+</code></pre></div>
+
+<h4 id="ch1-2-button">Specify one component completely</h4>
+<p>The fastest way to test whether a hand-off works is to specify a single component — a button — end to end. Its padding, radius, type, states and tokens are the template for every other component in the system. Note that a disabled state is a <em>state of a component</em>, not a colour choice to invent on the spot.</p>
+<div class="codeWrap"><pre><code># Button spec - one component, all the decisions
+# purpose    primary action, one per view
+# padding    8px 16px (2 and 4 units on an 8pt grid)
+# radius     4px (--radius token)
+# text       16px medium, ink colour on accent fill
+# states     hover: one step darker; focus: 2px ring;
+#            disabled: grey that still reads 3:1
+# tokens     --btn-bg, --btn-fg, --btn-ring
+</code></pre></div>
+<div class="note"><p>A hand-off lacking states is not "a bit incomplete" — it is a promise that the developer will design the interactions for you, with no access to the research that shaped them.</p></div>
+
+<h3 id="ch1-3" data-toc>1.3 The design process</h3>
+<p class="topic-desc">Design is a loop, not a single act: research, define, ideate, prototype, test and refine. Each step narrows the space of choices, and skipping a step does not save time — it moves the cost to a later, more expensive one.</p>
+
+<h4 id="ch1-3-loop">Research to refine: the loop</h4>
+<p>Most teams over-invest in the middle of the loop (building things) and under-invest in the ends (knowing the problem, checking the result). Research is the cheapest way to avoid building the wrong thing: talk to five people in the target audience before you design. Then write a one-sentence problem statement, sketch many directions, prototype the cheapest version that can be tested, watch real users use it — without coaching them — and refine what the test proved to be broken.</p>
+<div class="codeWrap"><pre><code># research  : talk to 5 real users, record their exact words
+# define    : one-sentence problem statement
+# ideate    : sketch 10 directions, keep the best 2
+# prototype : build the cheapest version that can be tested
+# test      : watch users complete the task, do not help
+# refine    : change only what the test proved to be wrong
+</code></pre></div>
+
+<h4 id="ch1-3-persona">Research, personas and journeys</h4>
+<p>A persona is a compact description of a real user pattern distilled from interviews — name, context, goal, pain — plus, critically, how that information changes the design. A persona without design implications is a poster. The journey is the sequence of steps the user takes; every page in the journey either moves them forward or is dead weight.</p>
+<div class="codeWrap"><pre><code>Name: Sam K.
+Age: 34
+Job: Freelance designer
+Goal: Find a quiet café with reliable wifi to work from.
+Pain: Most listings lack wifi speed or seat availability.
+
+# How this informs design:
+# - Show wifi speed prominently on listing pages
+# - Add a "seat availability" filter
+# - Include quiet hours in the summary
+</code></pre></div>
+
+<h4 id="ch1-3-jtbd">Jobs-to-be-done</h4>
+<p>Jobs-to-be-done says people "hire" a product to accomplish a job. The site should make the hire obvious and the job easy to finish. Phrase the job in the user's words and let it drive page structure: if the job is "find a café this afternoon", the search affordance and the wifi data must dominate the layout, not the brand story.</p>
+<div class="codeWrap"><pre><code># Job: "I need to find a quiet café to work from this afternoon."
+#
+# The page that serves this job must:
+# 1. Be searchable by location or neighbourhood
+# 2. Show wifi speed, power outlets, and noise level
+# 3. Offer a map view with filters
+# 4. Load fast on a mobile device
+# 5. Have a clear call to action: "Book a seat"
+</code></pre></div>
+
+<h3 id="ch1-4" data-toc>1.4 How this guide is organised</h3>
+<p class="topic-desc">This guide covers website design from foundations to delivery. Each chapter follows the same rhythm: a topic description, prose explanation, code samples, and a callout flagging the most common mistake.</p>
+
+<h4 id="ch1-4-map">The seven-chapter arc</h4>
+<p>The guide moves from what to build to how to build it. Chapters 1 and 2 establish orientation and the layout skeleton; chapters 3 to 5 apply the visual system — typography, colour, imagery and branding; chapter 6 makes it responsive; chapter 7 makes it accessible, systematic and shippable. The older three-chapter edition's foundations — Gestalt grouping, the four principles of design, wireframing and jobs-to-be-done — have been folded into this arc rather than dropped.</p>
+<div class="codeWrap"><pre><code># This guide in seven chapters
+# 1 orientation   what design is, the process, the tools
+# 2 layout        grids, hierarchy, whitespace, wireframes
+# 3 typography    roles, scales, fonts, units
+# 4 colour        palettes, contrast, theming
+# 5 imagery       photos, illustration, icons, brand marks
+# 6 responsive    breakpoints, fluid layout, navigation
+# 7 hand-off      accessibility, tokens, systems, docs
+</code></pre></div>
+
+<h4 id="ch1-4-reading">Read in order, or jump</h4>
+<p>If you are starting a new site, read the chapters in order: each one assumes the decisions of the previous. If you are fixing a specific problem — weak hierarchy, illegible type, a broken dark mode — jump to the chapter that covers that step. Every section is self-contained, so a jump never strands you.</p>
+<div class="codeWrap"><pre><code># Jump points - which chapter fixes which symptom
+# symptom                      jump to
+# page feels flat, no order    2 layout
+# text is hard to read         3 typography
+# colours clash or fail checks 4 colour
+# site looks unfinished        5 imagery and branding
+# phone layout is broken       6 responsive
+# fixes bounce back with bugs  7 accessibility and hand-off
+</code></pre></div>
+
+<h3 id="ch1-5" data-toc>1.5 Mindset and tools</h3>
+<p class="topic-desc">Good design is invisible: it lets the user accomplish their goal without noticing the interface. That mindset, plus a free tool stack, is all you need to start.</p>
+
+<h4 id="ch1-5-principles">Principles over trends</h4>
+<p>Trends change; principles do not. A design that follows enduring principles — clear hierarchy, sufficient contrast, consistent spacing — ages well. One that chases the latest style becomes dated in months. Every visual choice should support the user's goal, and a trend applied to a broken principle is still broken.</p>
+<div class="codeWrap"><pre><code># Principle                Trend that fades
+# hierarchy                glassmorphism
+# contrast                 hairline fonts everywhere
+# repetition               neon gradients
+# alignment                floating blobs
+# A trend on top of a broken principle is still broken.
+</code></pre></div>
+
+<h4 id="ch1-5-tools">A free design stack</h4>
+<p>Figma (free tier) or Penpot for wireframes and UI; WebAIM Contrast Checker for colour; Google Fonts for typography; Unsplash for stock imagery; a browser with DevTools for live inspection. All free, all sufficient for most projects. Pair the tool with the stage it supports: wireframes in Figma, colours with the checker, typography from Google Fonts, live CSS in the browser.</p>
+<div class="codeWrap"><pre><code># Stage      Tool (free tier)        Output you ship
+# wireframe  Figma / Penpot          frames and flows
+# colour     WebAIM Contrast Checker verified hex pairs
+# type       Google Fonts            woff2 files, stacks
+# imagery    Unsplash                webp + srcset
+# code       browser DevTools        live CSS
+</code></pre></div>
+<div class="tip"><p>Export assets in your final format: SVG for icons, WebP for photos, CSS or JSON for tokens. Never ship a raw Figma file or a PSD to the browser.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Layout and Visual Hierarchy</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Layout gives the page a skeleton and a reading order. This chapter covers the grids and spacing systems that hold content, the hierarchy that tells the eye where to look first, the whitespace that paces reading, the responsive principles that keep the skeleton alive at every width, and the wireframes that test all of it before pixels exist.</p>
+
+<h3 id="ch2-1" data-toc>2.1 Grids and spacing systems</h3>
+<p class="topic-desc">A grid is a decision made once instead of per-element: how many columns, what gutters, and where content spans. A spacing system turns every distance into a small set of repeatable values, so pages look consistent by construction rather than by effort.</p>
+
+<h4 id="ch2-1-grid">The twelve-column grid</h4>
+<p>The classic web grid is 12 columns because 12 divides by 1, 2, 3, 4 and 6 — so a layout can split into halves, thirds and quarters without orphan columns. With CSS Grid the columns and gutters are declared once on the container and spans are assigned with <code>grid-column</code>. The gutters carry the spacing: keep them a multiple of the 8pt base so columns and gaps stay on the same rhythm.</p>
+<div class="codeWrap"><pre><code>.shell {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;                 /* 3 x 8px, same rhythm as the spacing scale */
+  max-width: 1200px;
+  margin-inline: auto;
+}
+.shell .main { grid-column: span 8; }
+.shell .side { grid-column: span 4; }
+</code></pre></div>
+
+<h4 id="ch2-1-scale">Spacing scales: the 8-point system</h4>
+<p>An 8-point scale means every distance is a multiple of 8px (4px allowed for fine nudges). Consecutive values are 4, 8, 16, 24, 48, 96 — each roughly double, so adjacent scale steps are visually distinct yet recognisably related. Declare the steps once as custom properties; if a value that is not on the scale appears in a component, that is a new decision that deserves a token, not a one-off number.</p>
+<div class="codeWrap"><pre><code>/* 8pt spacing scale - every distance is a multiple of 8 */
+:root {
+  --space-1: 4px;    /* fine nudges inside components */
+  --space-2: 8px;    /* between related items */
+  --space-3: 16px;   /* between sibling components */
+  --space-4: 24px;   /* between sections */
+  --space-5: 48px;   /* between bands and chapters */
+  --space-6: 96px;   /* page gutters on wide screens */
+}
+.card { padding: var(--space-3); gap: var(--space-2); }
+.section + .section { margin-top: var(--space-5); }
+</code></pre></div>
+<div class="note"><p>4px exists for corrections, not as a parallel scale. If you catch yourself spacing cards 20px apart, round to 24px — consistency beats the "perfect" number.</p></div>
+
+<h3 id="ch2-2" data-toc>2.2 Visual weight and hierarchy</h3>
+<p class="topic-desc">Visual hierarchy is the order in which the reader notices elements. Gestalt principles explain why the brain groups some elements together and treats others as separate; weight — size, contrast, position — decides which element gets attention first.</p>
+
+<h4 id="ch2-2-gestalt">Proximity and similarity</h4>
+<p>Elements that are close together are seen as related; elements that share shape, size or colour are seen as a group. Use generous whitespace between unrelated sections and consistent spacing inside sections. The same CSS rule that groups a card's title and body also separates cards from each other — proximity is expressed as margin and gap, not as lines and boxes.</p>
+<div class="codeWrap"><pre><code>/* Good hierarchy with grouped elements */
+.card {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 24px; /* space between unrelated cards */
+}
+.card .title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px; /* space between related title and body */
+}
+</code></pre></div>
+
+<h4 id="ch2-2-weight">Weight: the four principles of design (CRAP)</h4>
+<p>Contrast, repetition, alignment and proximity — CRAP — form the four-way check every layout should pass. Repetition makes the same component look the same everywhere; alignment gives every element a shared edge; proximity groups related items; contrast lifts what matters off the page. Weight is bought in this order: size first, then colour contrast, then position. Two elements that must compete for attention are a hierarchy failure, not a composition.</p>
+<div class="codeWrap"><pre><code>/* Repetition: same card style everywhere */
+.card {
+  border-radius: var(--radius);
+  padding: 16px;
+  background: var(--panel);
+}
+
+/* Alignment: everything lines up to a left edge */
+.card { text-align: left; margin-left: 0; }
+
+/* Proximity: related items are close together */
+.card .meta { margin-top: 8px; }
+
+/* Contrast: the title stands out from the body */
+.card .title { font-weight: 700; color: var(--text); }
+</code></pre></div>
+
+<h3 id="ch2-3" data-toc>2.3 F/Z patterns and whitespace</h3>
+<p class="topic-desc">Eye-tracking research shows reading is not uniform: users scan. The F-pattern describes scanning dense text pages; the Z-pattern describes quick scans of light pages. Whitespace is the tool that steers both.</p>
+
+<h4 id="ch2-3-patterns">The F-pattern and Z-pattern</h4>
+<p>On text-heavy pages users scan an F: the first line is read fully, the next lines less so, and the right edge of lower lines is largely ignored. Put the important words left, early, and bold — a key fact right-aligned at the bottom of a paragraph is invisible. On light pages with few blocks — landing pages, dashboards — users trace a Z: top bar, diagonal sweep, bottom bar. Put the logo top-left and the call to action bottom-right, where the Z ends.</p>
+<div class="codeWrap"><pre><code># F-pattern on a text page (eyetracking summary)
+#
+# Row 1   ████████████░▓▓▓   read fully
+# Row 2   ██████░░░░░░░░░░   scan shortens
+# Row 3   ███░░░░░░░░░░░░░   scan shortens further
+# Right   ░░░░░░░░░░░░▓▓▓░   the lower-right is skipped
+#
+# Consequence: lead with the answer in the first line.
+</code></pre></div>
+
+<h4 id="ch2-3-room">Whitespace is a layout element</h4>
+<p>Whitespace does not separate content; it groups it and paces it. The eye should be able to pause between ideas — that pause is <code>margin</code>. Generous whitespace reads as calm and premium; cramped whitespace reads as urgency. The rule that comes out of the spacing scale: related items get small gaps, unrelated items get large gaps, and the difference must be visible at a glance.</p>
+<div class="codeWrap"><pre><code>/* Whitespace separates, groups, and sets the pace. */
+.section { padding-block: var(--space-5); }
+.section + .section { border-top: 1px solid var(--border); }
+
+/* Inside a card, small gaps group; between cards, big gaps divide */
+.card { gap: var(--space-2); }
+.card + .card { margin-top: var(--space-3); }
+</code></pre></div>
+
+<h3 id="ch2-4" data-toc>2.4 Responsive layout principles</h3>
+<p class="topic-desc">A layout that only works at one width is a drawing, not a design. The responsive principles here are the ones that survive without a single breakpoint: fluid columns, flexible media, and a content order that reflows gracefully.</p>
+
+<h4 id="ch2-4-fluid">Fluid grids and flexible media</h4>
+<p>Build the grid from fractions and <code>minmax</code>, not fixed pixel widths, so the layout fills whatever width it gets. <code>repeat(auto-fill, minmax(240px, 1fr))</code> is a grid that adds columns as space appears — no media query required. A classic one-liner, <code>img { max-width: 100%; height: auto; }</code>, stops images overflowing their container forever. Every fixed width in a stylesheet is a future overflow bug.</p>
+<div class="codeWrap"><pre><code>/* The grid adapts without a single media query */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-3);
+}
+img { max-width: 100%; height: auto; }
+video, iframe { max-width: 100%; }
+</code></pre></div>
+
+<h4 id="ch2-4-reorder">Reordering content for small screens</h4>
+<p>On a narrow screen a sidebar is usually a burden, not a benefit: the main content should come first, both in the layout and in the reading order. Use <code>order</code> or explicit <code>grid-area</code> assignments so the reflow is intentional, not a cascade accident. Never reorder with <code>order</code> alone in a way that changes the DOM's tab order — the visual order and the keyboard order must agree.</p>
+<div class="codeWrap"><pre><code>.layout {
+  display: grid;
+  gap: var(--space-3);
+}
+.layout .side { order: 2; }   /* content first on mobile */
+
+@media (min-width: 768px) {
+  .layout {
+    grid-template-columns: 2fr 1fr;
+  }
+  .layout .side { order: 0; }  /* sidebar back to the right */
+}
+</code></pre></div>
+
+<h3 id="ch2-5" data-toc>2.5 Wireframing</h3>
+<p class="topic-desc">A wireframe is a low-fidelity sketch of a page. It defines structure — what is where, in what order — not colour or typography. Wireframes are cheap to change; high-fidelity mockups are expensive. Test structure here, before any pixels are invested.</p>
+
+<h4 id="ch2-5-lofi">Low-fi first, in HTML</h4>
+<p>Wireframes can live in a design tool, but an HTML wireframe is testable: it runs on a phone, it can be linked, and it forces the layout into real semantics. Build the skeleton with semantic tags and placeholder content — the point is the arrangement, not the words.</p>
+<div class="codeWrap"><pre><code>&lt;section class="hero"&gt;
+  &lt;h1&gt;Find Your Quiet Café&lt;/h1&gt;
+  &lt;input type="search" placeholder="Search by neighbourhood..."&gt;
+  &lt;button&gt;Search&lt;/button&gt;
+&lt;/section&gt;
+&lt;section class="cards"&gt;
+  &lt;div class="card"&gt;...&lt;/div&gt;
+  &lt;div class="card"&gt;...&lt;/div&gt;
+&lt;/section&gt;
+</code></pre></div>
+
+<h4 id="ch2-5-greybox">Grey-box wireframes</h4>
+<p>A grey-box wireframe is the same sketch with the blocks annotated by role instead of drawn as cards. The annotation is the design decision: this block is the primary action, that one is secondary. If the roles are not assignable, the page has no hierarchy yet, and no amount of styling will manufacture one. Wireframe with real content where possible — realistic lengths change the layout, and "Lorem ipsum" hides that until it is expensive.</p>
+<div class="codeWrap"><pre><code># Grey-box wireframe - structure only, no styling decisions
+# +----------------------------------------------+
+# | [logo]  [nav: Products | Pricing | Support] |
+# +----------------------------------------------+
+# | H1: "Find Your Quiet Café"                   |
+# | [search input............] [Search]         |
+# +---------------------------+------------------+
+# | card: name / wifi / seats | card: name / ... |
+# | card: name / wifi / seats | card: name / ... |
+# +---------------------------+------------------+
+# | footer: contact, hours, map link             |
+# +----------------------------------------------+
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Typography</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Typography carries most of a page's reading — and most of its character. This chapter covers the roles type plays, how to pair families, how to build a modular scale, what makes text readable, when to use web fonts versus system fonts, and why <code>rem</code> beats naked pixel sizes.</p>
+
+<h3 id="ch3-1" data-toc>3.1 Type roles and pairing</h3>
+<p class="topic-desc">Every piece of text on a page has a job — display, heading, body, label — and each job deserves its own size, weight and family. Pairing is the art of making two families work together without competing.</p>
+
+<h4 id="ch3-1-roles">Roles: display, heading, body, label</h4>
+<p>Assign each role one rule set and do not drift from it. Display type carries the hero statement; headings announce sections; body does the reading; labels caption controls and metadata. A body font that is also used for labels at a different size blurs what is clickable and what is not. Roles are expressed as CSS custom properties so the scale is a single source of truth.</p>
+<div class="codeWrap"><pre><code>:root {
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --step-0: 1rem;        /* body */
+  --step-1: 1.25rem;     /* h3 / lead */
+  --step-2: 1.5625rem;   /* h2 */
+  --step-3: 1.9531rem;   /* h1 */
+}
+body { font-family: var(--font-body); }
+h1, h2, h3 { font-family: var(--font-display); }
+code, pre { font-family: var(--font-mono); }
+</code></pre></div>
+
+<h4 id="ch3-1-pairing">Pairing: contrast, and stop at two families</h4>
+<p>Pair families that differ in structure — a geometric display face with a humanist body face, for example — so the heading visibly hands over to the body. Pair families that are too similar and the difference reads as a mistake. Limit the page to two families, with a third (mono) reserved for code; every additional family doubles the download and halves the coherence. When in doubt, one well-chosen family with strong weight contrast beats two mediocre ones.</p>
+<div class="codeWrap"><pre><code>/* A high-contrast display face + a quiet body face.
+   Two families max; a third, mono, only for code. */
+html { font-family: "Inter", system-ui, sans-serif; }
+h1, h2, h3 { font-family: "Sora", system-ui, sans-serif; }
+code, pre { font-family: "JetBrains Mono", ui-monospace, monospace; }
+</code></pre></div>
+
+<h3 id="ch3-2" data-toc>3.2 Modular scales</h3>
+<p class="topic-desc">A modular scale is a set of type sizes built by multiplying one base size by a ratio. Common ratios are the major third (1.25) and the golden ratio (1.618). The scale makes sizes consistent by construction: every heading is a step, never a guess.</p>
+
+<h4 id="ch3-2-table">Build the scale</h4>
+<p>Pick a base — 16px is the browser default and the usual body size — and multiply by the ratio for each step up, divide for each step down. The same ratio applies from caption right up to display, so the whole page shares one visual relationship. A table of the scale is a design artefact worth keeping with the token file.</p>
+<div class="codeWrap"><pre><code># Modular scale, ratio 1.25 (major third), base 16px
+#  step  size     role
+#  -2    10.24px  caption, metadata
+#  -1    12.80px  small text, labels
+#   0    16.00px  body
+#   1    20.00px  lead, h4
+#   2    25.00px  h3
+#   3    31.25px  h2
+#   4    39.06px  h1 / display
+</code></pre></div>
+
+<h4 id="ch3-2-clamp">Fluid type with clamp()</h4>
+<p>Handing a fixed step to every viewport makes type either huge on phones or tiny on desktops. <code>clamp()</code> interpolates between a mobile step and a desktop step across the width range, with the middle term in <code>vw</code> driving the curve. The fluid size keeps the scale relationship while removing the breakpoints.</p>
+<div class="codeWrap"><pre><code>/* One fluid size derived from the scale at both ends */
+h2 {
+  font-size: clamp(
+    1.5625rem,          /* mobile: scale step 2 */
+    1rem + 1.5vw,       /* the curve */
+    2.4414rem           /* desktop: scale step 3 */
+  );
+  line-height: 1.15;
+}
+</code></pre></div>
+
+<h3 id="ch3-3" data-toc>3.3 Readability and legibility</h3>
+<p class="topic-desc">Legibility is whether a character can be told apart from its neighbours; readability is whether a block of text can be read comfortably. Both are set in CSS: line length, line height, and how lines break.</p>
+
+<h4 id="ch3-3-measure">Line length and leading</h4>
+<p>The readable line is 45–75 characters — the standard measure — because longer lines make the eye lose the next line and shorter lines make it snap back too often. Set a <code>max-width</code> in <code>ch</code> units so the measure survives font-size changes. Body leading of 1.5–1.65 relative <code>line-height</code> is the comfort zone; display headings tighten to 1.05–1.2 or the descenders collide with the next line.</p>
+<div class="codeWrap"><pre><code>article p {
+  max-width: 65ch;      /* 45-75 characters per line */
+  line-height: 1.6;     /* readable body leading */
+  margin: 0 0 1rem;
+}
+h1, h2, h3 { line-height: 1.15; }  /* tight for display */
+</code></pre></div>
+
+<h4 id="ch3-3-justify">Alignment and hyphenation</h4>
+<p>Left-aligned (ragged right) text is the safe default: even spacing, no rivers. Justified text needs hyphenation enabled or the browser stretches word spaces and opens vertical gaps — rivers — that break scanning. <code>hyphens: auto</code> requires a <code>lang</code> attribute to know the language's break rules. Never centre body-length text; centred is for short display lines only.</p>
+<div class="codeWrap"><pre><code>/* Justified text needs hyphens, or rivers appear */
+article.justified {
+  text-align: justify;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+/* Ragged right is the safer default - no hyphens needed */
+article.default { text-align: left; }
+</code></pre></div>
+
+<h3 id="ch3-4" data-toc>3.4 Web fonts vs system fonts</h3>
+<p class="topic-desc">A web font is a brand decision with a performance cost; a system font is zero-download consistency with the operating system. The choice is a trade-off, and both have a correct CSS shape.</p>
+
+<h4 id="ch3-4-stack">System font stacks and when they win</h4>
+<p>A system stack references the fonts every OS ships, so text renders instantly and matches the platform the reader already knows. No download, no layout shift, no licensing. The cost: the design varies by OS, and the stack is hard to make distinctive. Use system fonts when speed and simplicity matter more than brand character — dashboards, docs, tools.</p>
+<div class="codeWrap"><pre><code>/* System stack: zero download, matches the OS, always available */
+html {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+</code></pre></div>
+
+<h4 id="ch3-4-fontface">Web fonts: @font-face done properly</h4>
+<p>When a web font is worth the weight, serve WOFF2, subset to the scripts you actually use (Latin only if the content is English), and declare <code>font-display: swap</code> so text renders in a fallback immediately instead of a blank flash. The default <code>block</code> behaviour hides text for up to 3 seconds while the font loads — that is the classic invisible-while-loading failure. Self-host the files rather than hotlinking a CDN, and keep total font payload near 100KB.</p>
+<div class="codeWrap"><pre><code>@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;              /* text first, font later */
+  src: url("/fonts/inter-latin-400.woff2") format("woff2");
+  unicode-range: U+0000-00FF;      /* latin subset only */
+}
+</code></pre></div>
+<div class="warn"><p>The swap doesn't fix layout shift: text reflows when the real font arrives. Declare <code>size-adjust</code> or reserve the metrics so the swap moves nothing the reader is looking at.</p></div>
+
+<h3 id="ch3-5" data-toc>3.5 Sizing units: rem and em</h3>
+<p class="topic-desc"><code>rem</code> and <code>em</code> are both relative units, and the difference between them is where they look for their reference: the root for <code>rem</code>, the parent for <code>em</code>. That one difference decides which one composes and which one compounds.</p>
+
+<h4 id="ch3-5-rem">rem for scalable type</h4>
+<p><code>1rem</code> always equals the root font-size (16px at default zoom), so type set in <code>rem</code> scales with the root — zoom, user font-size preferences, and a fluid root via <code>clamp()</code> all cascade correctly. This is the accessibility argument: a reader who sets their browser to 20px gets a proportionally larger page. Keep <code>px</code> only for borders and one-pixel lines, where scaling would look wrong.</p>
+<div class="codeWrap"><pre><code>:root { font-size: 100%; }   /* 16px at default zoom */
+html {
+  font-size: clamp(1rem, 0.5rem + 0.6vw, 1.125rem);
+}
+body { font-size: 1rem; }
+.card { padding: 1.25rem; }          /* scales with zoom + root */
+.card .title { font-size: 1.3125rem; } /* one scale step up */
+.card { border: 1px solid var(--border); }  /* px stays for hairline */
+</code></pre></div>
+
+<h4 id="ch3-5-em">em compounds: the nesting trap</h4>
+<p><code>1em</code> resolves against the <em>parent's</em> font-size, so nested <code>em</code> values multiply: a card set to <code>1.25em</code> inside another card set to <code>1.25em</code> is not 1.25× root but 1.25× the parent — 25px instead of 20px at a 16px root. That compounding is sometimes exactly what you want (scaling a badge with its container), but it surprises everywhere else. Rule of thumb: <code>rem</code> for anything that should respect the user's base size, <code>em</code> for short-scope sizing that must track its own container, <code>px</code> for hairlines.</p>
+<div class="codeWrap"><pre><code>/* em is relative to the parent - it compounds when nested */
+.box { font-size: 1.25em; }        /* 20px inside a 16px parent */
+.box .box { font-size: 1.25em; }   /* 25px - compounded again */
+
+/* rem is relative to the root - it never compounds */
+.box { font-size: 1.25rem; }       /* 20px at a 16px root, everywhere */
+</code></pre></div>
+<div class="tip"><p>Set margins and padding in <code>em</code> on the element that owns the font-size, and they scale with the text — a button's padding grows when its label grows. Set distances between unrelated things in <code>rem</code> so they ignore the local type size.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Colour</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Colour is the fastest signal on a page and the easiest to get wrong. This chapter covers what colour means to people, how to build palettes and harmonies, how contrast is calculated and why it is a requirement rather than a taste, how to theme light and dark without duplicating decisions, and how colour behaves inside components.</p>
+
+<h3 id="ch4-1" data-toc>4.1 Colour psychology and the colour model</h3>
+<p class="topic-desc">Colour carries meaning, but the meaning is cultural, not universal. Before choosing a palette, decide which hue plays which role, then express the palette in a model you can reason about.</p>
+
+<h4 id="ch4-1-context">Associations are context, not code</h4>
+<p>The same hue means different things in different places: white is purity in much of Europe and mourning in parts of Asia; red is danger in road signs and luck in China. Even within one culture, the hue's job in the interface beats its dictionary meaning — a red alert needs red, but a brand does not. Choose roles first (brand, accent, success, warning, danger, neutral), then let audience research pick the hues.</p>
+<div class="codeWrap"><pre><code># Colour is context. Same hue, different audiences:
+#   white: purity (Europe) / mourning (parts of Asia)
+#   red:   danger (signs) / luck (China), weddings (India)
+# Decide the role first, then the hue:
+#   brand    -> the hue you own
+#   accent   -> attention, conversion actions
+#   semantic -> success / warning / danger / info
+#   neutral  -> everything else carries the content
+</code></pre></div>
+
+<h4 id="ch4-1-model">Hue, saturation, lightness: reason in HSL/oklch</h4>
+<p>Hex is how colours are stored but a poor way to reason about them. The HSL model — hue (0–360°), saturation, lightness — separates what the colour <em>is</em> from how vivid and how light it is, which is exactly the pair of knobs theming needs. <code>oklch()</code> goes further: its lightness axis maps to perceived lightness, so the same L value reads as the same brightness across very different hues — the property that makes ramps for light and dark themes trustworthy.</p>
+<div class="codeWrap"><pre><code>:root {
+  /* hue 214 = blue; the ramp stays on one hue */
+  --brand-h: 214;
+  --brand-hi: oklch(0.55 0.18 230);   /* bright accent */
+  --brand-lo: oklch(0.42 0.14 230);   /* deep navy */
+  --neutral-1: oklch(0.2 0 0);        /* near-black text */
+  --neutral-9: oklch(0.98 0 0);       /* near-white surface */
+}
+</code></pre></div>
+
+<h3 id="ch4-2" data-toc>4.2 Palettes and harmonies</h3>
+<p class="topic-desc">A palette is a plan: a handful of hue positions and a rule for deriving shades from them. Harmonies — complementary, analogous, triadic — are heuristics for placing those hue positions so the palette feels coherent rather than random.</p>
+
+<h4 id="ch4-2-harmony">Harmonies, and why one dominates</h4>
+<p>Complementary pairs sit opposite the colour wheel and maximise tension; analogous groups sit adjacent and feel calm; triadic spreads three evenly and feels playful. All three work only when one hue dominates and the others are accents — three equal hues is noise, not a palette. Any working palette needs neutrals too: grey ramps for text, borders and surfaces outnumber the brand hues by far.</p>
+<div class="codeWrap"><pre><code># Complementary: brand blue #034DB8 paired with amber #B87A03
+# Analogous:     blues and teals - #012A66, #034DB8, #009CFF
+# Triadic:       blue, amber, magenta - evenly spaced
+#
+# Working palette (one hue dominates, neutrals carry the page):
+#   primary   #034DB8   actions, links, active nav
+#   accent    #009CFF   highlights, selected states
+#   success   #1E7B34   confirmed actions
+#   danger    #B3261E   destructive actions
+#   neutral   #1A2433   text on light
+#   surface   #FFFFFF   page background
+</code></pre></div>
+
+<h4 id="ch4-2-rule">The 60-30-10 rule</h4>
+<p>The 60-30-10 rule allocates the page roughly 60% neutral surfaces, 30% secondary tones (panels, borders), and 10% accent — the accent is what should be scarce, because scarcity is what makes it noticed. Enforce it structurally with tokens: the accent should never be painted with a raw hex inline, because the moment it is, the 10% becomes 50% one paste at a time.</p>
+<div class="codeWrap"><pre><code>:root {
+  /* 60% neutral - the page itself */
+  --c-surface: #ffffff;
+  --c-text:    #1a2433;
+  /* 30% secondary - panels, cards, borders */
+  --c-panel:   #f2f5f9;
+  --c-border:  #d8dfe8;
+  /* 10% accent - buttons, links, active states */
+  --c-accent:  #034db8;
+  --c-accent-ink: #ffffff;
+}
+</code></pre></div>
+
+<h3 id="ch4-3" data-toc>4.3 Contrast and accessibility</h3>
+<p class="topic-desc">Contrast is the measurable difference between foreground and background, and WCAG mandates minimums. It is a requirement with a formula, so it is checked by calculation, not by eye.</p>
+
+<h4 id="ch4-3-wcag">WCAG contrast requirements</h4>
+<p>WCAG 2.2 requires 4.5:1 for body text and 3:1 for large text (≥24px, or ≥18.66px bold) and for the visual boundaries of UI components. The classic failure is light grey text on white: it reads as "designed" in a mockup and as unreadable in production.</p>
+<div class="codeWrap"><pre><code>/* Accessible contrast: 4.5:1 for body text */
+body {
+  color: #212529;      /* dark text */
+  background: #ffffff; /* light background */
+}
+
+/* Too low: white text on light grey */
+.bad {
+  color: #cccccc;
+  background: #ffffff;
+}
+</code></pre></div>
+
+<h4 id="ch4-3-calc">Calculating the ratio yourself</h4>
+<p>The WCAG ratio is computed from relative luminance: convert each RGB channel to linear light, weight them 0.2126/0.7152/0.0722, and divide the lighter luminance plus 0.05 by the darker plus 0.05. A ratio of 4.5 passes body text; 3.0 passes large text and UI edges. This is a two-minute script — run it on every colour pair the palette produces, in both themes.</p>
+<div class="codeWrap"><pre><code>// WCAG relative luminance and contrast ratio
+function luminance(r, g, b) {
+  const f = (c) => {
+    c /= 255;
+    return c &lt;= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+}
+function ratio(hexA, hexB) {
+  const L = (hex) =&gt; luminance(...hex.match(/\w\w/g).map((h) =&gt; parseInt(h, 16)));
+  const hi = Math.max(L(hexA), L(hexB));
+  const lo = Math.min(L(hexA), L(hexB));
+  return (hi + 0.05) / (lo + 0.05);
+}
+// #212529 on #ffffff -&gt; 15.4:1   passes body text
+// #767676 on #ffffff -&gt; 4.54:1   passes, barely
+// #cccccc on #ffffff -&gt; 1.6:1    fails everything
+</code></pre></div>
+<div class="warn"><p>3:1 is the boundary for UI component edges and large text, not for body text. Grey buttons with 3:1 text and no label fail the moment anyone needs to actually read them.</p></div>
+
+<h3 id="ch4-4" data-toc>4.4 Theming: light and dark</h3>
+<p class="topic-desc">Light and dark versions of a design should be the same design. The mechanism is semantic tokens: components reference roles — surface, text, accent — and the theme redefines the roles, never the components.</p>
+
+<h4 id="ch4-4-semantic">Semantic tokens, not raw hex, in components</h4>
+<p>Theming works because components never name a colour, they name a role. <code>--surface</code> can be <code>#ffffff</code> in one theme and <code>#0d1421</code> in another while the component code stays identical. Raw hex inside a component is a bug: that component now cannot be themed and drifts out of the system. Keep every theme's token block complete — a half-switched theme looks like a rendering glitch and is almost impossible to diagnose later.</p>
+<div class="codeWrap"><pre><code>:root[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f2f5f9;
+  --text: #1a2433;
+  --text-dim: #44546a;
+  --accent: #034db8;
+  --accent-ink: #ffffff;
+}
+:root[data-theme="dark"] {
+  --bg: #0d1421;        /* a deep blue-grey, not pure black */
+  --surface: #151e2e;
+  --text: #e8eef7;
+  --text-dim: #9fb0c4;
+  --accent: #4dd2ff;    /* lifted, so it still reads on dark */
+  --accent-ink: #03203f;
+}
+.card { background: var(--surface); color: var(--text); }
+</code></pre></div>
+
+<h4 id="ch4-4-dark">Dark mode: elevation without shadows</h4>
+<p>Pure black backgrounds exaggerate every other colour and glow; the dark palette should sit one step off black. Elevation in dark mode is expressed as lighter surfaces, not shadows — shadows vanish on dark, so the modal goes <em>lighter</em> than the page. And text that passed on white often fails on a dark surface; the darkest text colour is not automatically readable on the darkest background. Re-run contrast for every theme; a palette is not done until both pass.</p>
+<div class="codeWrap"><pre><code>/* Elevation in dark mode = lighter surfaces, never shadows */
+:root[data-theme="dark"] {
+  --surface-raised: #1c2740;   /* modal, popover */
+  --surface-top:    #243250;   /* toast, floating action */
+}
+.card  { background: var(--surface); }
+.modal { background: var(--surface-raised); }
+.toast { background: var(--surface-top); }
+</code></pre></div>
+
+<h3 id="ch4-5" data-toc>4.5 Colour in UI components</h3>
+<p class="topic-desc">Components are where colour becomes a system: every interactive element needs a colour for every state, and every state needs a contrast-verified pair. Semantic colours — success, warning, danger — carry meaning and must never be the only signal.</p>
+
+<h4 id="ch4-5-states">States: rest, hover, active, focus, disabled</h4>
+<p>Each interactive component specifies its own state colours, and the states are steps on one hue ramp rather than new hues: hover one step darker, active another, focus a ring. A disabled element must not look like a resting element — its text contrast should drop but stay readable, and it should never look clickable. Deriving states from tokens keeps the whole library's behaviour consistent.</p>
+<div class="codeWrap"><pre><code>.btn {
+  --bg: var(--c-accent);
+  --fg: var(--c-accent-ink);
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.btn:hover { --bg: #0267b2; }
+.btn:active { --bg: #012a66; }
+.btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+.btn:disabled {
+  --bg: #c6cdd6;      /* text still 3:1 against the fill */
+  --fg: #5b6673;
+  cursor: not-allowed;
+}
+</code></pre></div>
+
+<h4 id="ch4-5-alerts">Semantic colours with a second signal</h4>
+<p>Success, warning, danger and info each get a background/foreground pair verified for contrast. Colour-blind users cannot rely on hue alone, so every alert also carries an icon and a text label — the colour reinforces meaning, it does not carry it. Define the four pairs once as tokens; an alert that invents its own pastel breaks both the system and, usually, the contrast rule.</p>
+<div class="codeWrap"><pre><code>:root {
+  --ok-bg:   #e6f4ea;  --ok-fg:   #1e4620;  /* success, 10.1:1 */
+  --warn-bg: #fef7e0;  --warn-fg: #6a4a00;  /* warning, 8.9:1 */
+  --err-bg:  #fdecea;  --err-fg:  #8c1d18;  /* danger,  7.6:1 */
+  --info-bg: #e8f1fd;  --info-fg: #0b3d8f;  /* info,    9.8:1 */
+}
+.alert { border-radius: 4px; padding: 12px 16px; }
+.alert.ok   { background: var(--ok-bg);   color: var(--ok-fg); }
+.alert.error { background: var(--err-bg); color: var(--err-fg); }
+</code></pre></div>
+<div class="tip"><p>Test the palette once with a simulator (Figma's colour-blind preview, or DevTools' rendering panel) — not because colour-blind users are rare, but because hue-only alerts fail silently: nobody reports a message they cannot see distinguish.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Imagery, Icons and Branding</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Photography, illustration, icons and logo marks carry the emotional layer of a design — and, badly handled, most of its weight. This chapter covers choosing and shipping photography, using illustration and SVG, building an icon family, and keeping the brand lockup consistent across pages.</p>
+
+<h3 id="ch5-1" data-toc>5.1 Photography</h3>
+<p class="topic-desc">A photograph is the fastest way to set a mood and the fastest way to slow a page. The craft is in the choice of format and crop: right-sized, right-formatted, and framed at its focal point.</p>
+
+<h4 id="ch5-1-srcset">Formats and responsive delivery</h4>
+<p>Ship <code>AVIF</code> or <code>WebP</code>, not giant JPEGs — typically half the bytes at the same quality. <code>srcset</code> with <code>sizes</code> lets the browser pick the right file for the viewport, and the <code>width</code>/<code>height</code> attributes reserve the space so the layout does not jump when the image arrives. A hero that is the page's main content should load eagerly (<code>fetchpriority="high"</code>); everything below the fold should be lazy.</p>
+<div class="codeWrap"><pre><code>&lt;img
+  src="hero-960.webp"
+  srcset="hero-480.webp 480w, hero-960.webp 960w, hero-1440.webp 1440w"
+  sizes="(min-width: 1024px) 960px, 100vw"
+  width="960" height="540"
+  alt="A quiet café with laptops on a long wooden table"
+  fetchpriority="high"
+&gt;
+</code></pre></div>
+
+<h4 id="ch5-1-crop">Cropping to the subject: object-fit and object-position</h4>
+<p>A photo has one focal point — a face, a product, a sign — and the crop should follow it, not the centre. <code>object-fit: cover</code> fills the frame without stretching; <code>object-position</code> pins the focal point inside the crop so it survives every card size. Because the crop target changes with the layout, the position can change with a media query. Never stretch an image to fit a box; that is the fastest way to destroy a photo.</p>
+<div class="codeWrap"><pre><code>.hero img {
+  width: 100%;
+  height: clamp(240px, 40vw, 520px);
+  object-fit: cover;          /* fill the frame, never stretch */
+  object-position: 60% 30%;   /* subject sits upper-right */
+}
+@media (max-width: 600px) {
+  .hero img { object-position: 40% 20%; }  /* reframe for narrow */
+}
+</code></pre></div>
+<div class="warn"><p>Stock photos are licences, not downloads. Check the licence before using a service's images commercially — Unsplash's terms changed, and "free" once meant "attribution-free" and now has conditions in some jurisdictions.</p></div>
+
+<h3 id="ch5-2" data-toc>5.2 Illustration</h3>
+<p class="topic-desc">Illustration earns its place where photography cannot go: abstract concepts, empty states, onboarding flows, and anything that needs a consistent hand. Inline SVG keeps it crisp at every resolution and themeable.</p>
+
+<h4 id="ch5-2-svg">Inline SVG: crisp, themeable, tiny</h4>
+<p>An illustration is often a few dozen SVG paths — smaller than the equivalent photo and infinitely scalable. Inline the SVG (rather than an <code>&lt;img&gt;</code> tag) when it must respond to theme colours or hover; use <code>stroke="currentColor"</code> so the illustration inherits the text colour. Name it for assistive tech when it carries meaning (<code>role="img"</code> plus a <code>&lt;title&gt;</code>) and mark it decorative otherwise.</p>
+<div class="codeWrap"><pre><code>&lt;svg viewBox="0 0 32 32" role="img" aria-labelledby="empty-title"&gt;
+  &lt;title id="empty-title"&gt;An empty inbox&lt;/title&gt;
+  &lt;rect x="4" y="8" width="24" height="16" rx="2"
+        fill="none" stroke="currentColor" stroke-width="2"/&gt;
+  &lt;path d="M4 10 L16 18 L28 10" fill="none"
+        stroke="currentColor" stroke-width="2"/&gt;
+&lt;/svg&gt;
+</code></pre></div>
+
+<h4 id="ch5-2-style">One hand: the illustration style spec</h4>
+<p>The fastest way to make a site look amateurish is two illustration styles side by side — one flat, one shaded, one with outlines. Write the style down as a spec — stroke weight, grid, palette, fill treatment — and hold every new drawing to it. This is the same discipline as a design system, one drawing at a time.</p>
+<div class="codeWrap"><pre><code># Illustration style spec - keep one designer's hand
+# stroke    2px, rounded caps, drawn on a 24px grid
+# palette   three hues from the brand ramp, plus neutral
+# fills     flat; no gradients, no shading
+# subjects  abstract concepts, empty states, onboarding
+# export    inline SVG, stroke="currentColor" aware
+# size      keep the path count under 40 per drawing
+</code></pre></div>
+
+<h3 id="ch5-3" data-toc>5.3 Iconography</h3>
+<p class="topic-desc">Icons are a family, not a collection: same grid, same stroke, same optical weight. And they carry a quiet accessibility burden — every icon is either decorative or meaningful, and the markup must say which.</p>
+
+<h4 id="ch5-3-family">One grid, one stroke, optical alignment</h4>
+<p>Standardise on a grid — 24×24 with a 2px stroke is the most common — so the whole set reads as one family. Mathematical centring is not visual centring: a circle looks optically smaller than a square of the same box, so pannable shapes get drawn slightly larger. Consistent stroke caps and joins (round at both) are what make a set feel finished rather than drawn by ten people.</p>
+<div class="codeWrap"><pre><code>&lt;!-- One family: 24x24 grid, 2px stroke, round caps -->
+&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="2" stroke-linecap="round"
+     stroke-linejoin="round"&gt;
+  &lt;circle cx="12" cy="12" r="9"/&gt;
+  &lt;path d="M3 6h18M3 12h18M3 18h18"/&gt;
+&lt;/svg&gt;
+</code></pre></div>
+
+<h4 id="ch5-3-a11y">Icon accessibility: aria-hidden or labelled</h4>
+<p>An icon next to visible text is decoration: hide it with <code>aria-hidden="true"</code> so screen readers do not announce a drawing. An icon that is the only label of a button must be named — either with <code>aria-label</code> on the button or with a visually hidden text span. Never leave a bare icon unlabelled and unhidden: it is either noise or a silence that hides a function.</p>
+<div class="codeWrap"><pre><code>&lt;!-- Decorative: the text label carries the meaning -->
+&lt;button type="button" class="icon-btn"&gt;
+  &lt;svg aria-hidden="true" viewBox="0 0 24 24"&gt;
+    &lt;path d="M21 21l-4.3-4.3M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/&gt;
+  &lt;/svg&gt;
+  &lt;span&gt;Search&lt;/span&gt;
+&lt;/button&gt;
+
+&lt;!-- Icon only: the button itself carries the name -->
+&lt;button type="button" aria-label="Search" class="icon-btn"&gt;
+  &lt;svg aria-hidden="true" viewBox="0 0 24 24"&gt;
+    &lt;path d="M21 21l-4.3-4.3M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/&gt;
+  &lt;/svg&gt;
+&lt;/button&gt;
+</code></pre></div>
+<div class="tip"><p>Draw icons in <code>currentColor</code> and they inherit every state colour — hover, disabled, theme — with zero extra CSS.</p></div>
+
+<h3 id="ch5-4" data-toc>5.4 Favicons, logo marks and brand consistency</h3>
+<p class="topic-desc">The brand mark travels farther than the homepage: the favicon in the tab, the touch icon on a phone home screen, and the header lockup on every page. Consistency across all of them is a brand rule, not a decoration.</p>
+
+<h4 id="ch5-4-favicon">Favicons and touch icons</h4>
+<p>A single SVG favicon covers modern browsers, but Safari still wants a PNG touch icon, and some browsers still request an ICO. Declare an SVG icon with a PNG fallback plus the 180×180 <code>apple-touch-icon</code>, and keep the mark simple — at 16 pixels, detail becomes noise. A favicon is also the cheapest recurring brand impression you have; a default globe next to your project name says the project was never finished.</p>
+<div class="codeWrap"><pre><code>&lt;link rel="icon" type="image/svg+xml" href="/favicon.svg"&gt;
+&lt;link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="180x180"
+      href="/apple-touch-icon.png"&gt;
+</code></pre></div>
+
+<h4 id="ch5-4-lockup">The lockup: one mark, one rule, every page</h4>
+<p>The header lockup — logo mark, wordmark, page name — should be byte-identical across the site: same order, same spacing, same typography. Anyone who reassembles it per page creates ten variants of the brand. Theme the mark with a token, never with per-page recolouring, so light and dark themes stay consistent and the mark stays recognisable. The same discipline applies to the wordmark's typeface and to the spacing rhythm around it.</p>
+<div class="codeWrap"><pre><code>/* One lockup, everywhere: mark + wordmark + page name */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.brand img { height: 40px; width: auto; }      /* the logo mark */
+.brand .wordmark { font-family: var(--font-display); font-weight: 800; }
+/* Theme the mark with one token, never per-page recolouring */
+.brand img { filter: var(--brand-logo-filter); }
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Responsive and Mobile-First Design</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Most visitors are on a phone. This chapter covers choosing breakpoints, building fluid layouts that survive unknown widths, sizing touch targets, choosing navigation patterns that fit the viewport, and choosing assets the network can actually deliver.</p>
+
+<h3 id="ch6-1" data-toc>6.1 Breakpoints</h3>
+<p class="topic-desc">A breakpoint is where the layout changes because the content has stopped working, not where a device "ends". Choose them in a mobile-first direction so the default is the smallest screen and every query adds capability.</p>
+
+<h4 id="ch6-1-map">Breakpoints are about content, not devices</h4>
+<p>Naming breakpoints by intent — <code>base</code>, <code>narrow</code>, <code>medium</code>, <code>wide</code> — keeps the CSS honest: a query exists because the layout needs a change at that width, not because an iPhone was 375px in 2023. New devices ship every year; the reasons the layout breaks only change when the content does.</p>
+<div class="codeWrap"><pre><code># Breakpoints chosen by content, named by intent, mobile-first
+# name      min-width  why the layout changes
+# base      0          single column, nav behind a button
+# narrow    30rem      two cards fit side by side
+# medium    48rem      sidebar appears, nav fits in full
+# wide      64rem      content capped at 75rem
+# Apply with min-width so the phone is the default, not an override.
+</code></pre></div>
+
+<h4 id="ch6-1-first">Mobile-first: min-width queries</h4>
+<p>Write the base rules for the narrowest screen, then add capability with <code>min-width</code> queries. Max-width queries double every rule and make the phone a patchwork of overrides; min-width queries keep mobile styles the default and each larger step an additive change. The burger button exists by default and is removed where the full nav fits — not the other way round.</p>
+<div class="codeWrap"><pre><code>/* Mobile-first: base rules style the phone, then grow */
+.nav-list { display: none; }             /* phone: hidden behind */
+.btn-menu { display: inline-flex; }      /* phone: burger shown */
+
+@media (min-width: 48rem) {
+  .nav-list { display: flex; }           /* grow: full nav */
+  .btn-menu { display: none; }           /* burger no longer needed */
+}
+</code></pre></div>
+<div class="note"><p>If you reach for a <code>max-width</code> query, ask what the mobile rule is doing to you — usually the answer is "overriding a desktop default that should not exist".</p></div>
+
+<h3 id="ch6-2" data-toc>6.2 Fluid layouts</h3>
+<p class="topic-desc">Fluid layouts respond to the space they are given, not just the viewport. Container queries and <code>clamp()</code> do the work breakpoints used to, with less to maintain.</p>
+
+<h4 id="ch6-2-containers">Container queries: respond to the parent</h4>
+<p>A card in a two-column grid and the same card full width are different problems, and media queries cannot tell them apart — they answer "how wide is the viewport?", not "how wide is this card?". A container query answers the second: declare <code>container-type</code> on the parent and the component reflows on <em>its own</em> width. This is what makes a component library genuinely reusable.</p>
+<div class="codeWrap"><pre><code>.card-panel { container-type: inline-size; }
+
+@container (min-width: 32rem) {
+  .card-panel {
+    display: grid;
+    grid-template-columns: 160px 1fr;  /* photo beside text */
+  }
+}
+</code></pre></div>
+
+<h4 id="ch6-2-clamp">One clamp does the work of three breakpoints</h4>
+<p>Continuous sizing with <code>clamp()</code> removes most of the breakpoint scaffolding: padding, gaps and type interpolate smoothly instead of jumping at thresholds. The middle argument in <code>vw</code> scales with the viewport; the two bounds keep it from collapsing on phones or exploding on desktops. Use flow-relative properties (<code>padding-inline</code>, <code>margin-block</code>) so the same rules serve LTR and RTL layouts.</p>
+<div class="codeWrap"><pre><code>.shell {
+  padding-inline: clamp(16px, 4vw, 48px);   /* gutter */
+  gap: clamp(16px, 2.5vw, 32px);            /* between blocks */
+}
+.hero-title {
+  font-size: clamp(2rem, 1rem + 4vw, 4rem); /* fluid type */
+}
+</code></pre></div>
+
+<h3 id="ch6-3" data-toc>6.3 Touch targets and interaction</h3>
+<p class="topic-desc">On a phone the pointing device is a thumb, and thumbs are imprecise. Touch targets must be big enough to hit without aiming, and the design must not depend on hover — touch has none.</p>
+
+<h4 id="ch6-3-size">44px targets, 8px gaps</h4>
+<p>Apple's HIG recommends 44×44 CSS pixels and Material Design 48dp; 44px is the working minimum for any tappable control. Small targets get <em>larger</em> hit areas (padding on the element, not just the visible icon), and targets need clear space between them — 8px — so a miss lands on nothing instead of the wrong action. This is a layout rule, applied in CSS, not a QA afterthought.</p>
+<div class="codeWrap"><pre><code>button, a.btn, input, select, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+/* Space the targets; a miss should hit nothing */
+.button-group { gap: 8px; }
+.nav-item { padding-block: 12px; }
+</code></pre></div>
+
+<h4 id="ch6-3-pointer">Detecting the input: hover and pointer</h4>
+<p>A phone has no hover, so anything revealed only on hover is unreachable. The media queries <code>(hover: none)</code> and <code>(pointer: coarse)</code> detect the input type: when they match, show everything by default and skip hover-only affordances. Never guess from touch events or screen size; the media queries are the supported signal, and they also catch hybrids and styluses.</p>
+<div class="codeWrap"><pre><code>/* Touch devices must not depend on hover to reveal anything */
+@media (hover: none) {
+  .dropdown { display: block; }     /* always visible */
+  .hover-tip { display: none; }     /* hover-only affordance */
+}
+@media (pointer: coarse) {
+  button, a, input, select { min-height: 44px; }
+}
+</code></pre></div>
+
+<h3 id="ch6-4" data-toc>6.4 Navigation patterns</h3>
+<p class="topic-desc">Navigation is the pattern that changes most with the viewport. The burger menu, tabs and bottom navigation each answer a different width question — and each has a failure mode to design around.</p>
+
+<h4 id="ch6-4-burger">The burger menu: a disclosure, not a hiding place</h4>
+<p>The burger works when the menu is genuinely secondary — rarely used items behind a button. It fails when primary navigation is hidden behind it, because discoverability collapses. Mark it up as a real disclosure: a button with <code>aria-expanded</code> and <code>aria-controls</code> pointing at the nav, which starts <code>hidden</code>. The menu must be keyboard-operable, and it must not move content around the page when it opens.</p>
+<div class="codeWrap"><pre><code>&lt;header&gt;
+  &lt;button id="menu" class="burger"
+          aria-expanded="false" aria-controls="site-nav"&gt;
+    Menu
+  &lt;/button&gt;
+  &lt;nav id="site-nav" hidden&gt;
+    &lt;a href="/"&gt;Home&lt;/a&gt;
+    &lt;a href="/pricing/"&gt;Pricing&lt;/a&gt;
+    &lt;a href="/support/"&gt;Support&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+</code></pre></div>
+
+<h4 id="ch6-4-tabbar">Tabs and bottom navigation</h4>
+<p>Bottom navigation puts primary destinations under a thumb — the right pattern for apps with four or five top destinations. Tabs suit switching within one section. Both are persistent and visible, which is their strength; both crowd quickly, and the moment a destination does not fit, the answer is a "More" screen, not a menu that wraps. Keep the active tab visibly distinct (colour plus position), never just colour.</p>
+<div class="codeWrap"><pre><code>&lt;nav class="tabbar" aria-label="Primary"&gt;
+  &lt;a class="tab is-active" href="/"&gt;
+    &lt;svg aria-hidden="true"&gt;&lt;path d="M3 6h18M3 12h18M3 18h18"/&gt;&lt;/svg&gt;
+    &lt;span&gt;Home&lt;/span&gt;
+  &lt;/a&gt;
+  &lt;a class="tab" href="/search/"&gt;Search&lt;/a&gt;
+  &lt;a class="tab" href="/profile/"&gt;Profile&lt;/a&gt;
+&lt;/nav&gt;
+
+.tabbar { position: sticky; bottom: 0; }
+.tab.is-active { color: var(--accent); border-top: 2px solid var(--accent); }
+</code></pre></div>
+<div class="warn"><p>Hidden navs are the classic keyboard trap: the button opens the menu but focus stays on the button. Move focus into the opened nav, close on Escape, and return focus to the button on close.</p></div>
+
+<h3 id="ch6-5" data-toc>6.5 Performance-aware asset choice</h3>
+<p class="topic-desc">Every byte is a UX decision made in advance. The design chooses the images, fonts and scripts; performance decides whether the page is usable on the connection most visitors actually have.</p>
+
+<h4 id="ch6-5-media">Lazy media, eager hero</h4>
+<p>Below-the-fold images get <code>loading="lazy"</code> and <code>decoding="async"</code> so the browser skips them until they are near the viewport; the LCP image (usually the hero) loads eagerly and carries <code>width</code>/<code>height</code> or an <code>aspect-ratio</code> to prevent layout shift. Choose formats — <code>AVIF</code>/<code>WebP</code> for photos, <code>SVG</code> for icons — at design time, not in a panic later.</p>
+<div class="codeWrap"><pre><code>&lt;img src="card-480.webp"
+     width="480" height="360"
+     loading="lazy" decoding="async"
+     alt="Café seating near a window"&gt;
+
+&lt;!-- The hero is the LCP element: eager, sized, no shift -->
+&lt;img src="hero-1440.webp" width="1440" height="810"
+     fetchpriority="high" alt="..."&gt;
+</code></pre></div>
+
+<h4 id="ch6-5-budget">Budget the page before building it</h4>
+<p>A performance budget is a design constraint written down: total page weight, JavaScript payload, LCP and CLS targets. Budgets turn performance from an argument into a measurable pass/fail — and they catch creeping growth, which is how sites rot. Check against real network conditions (throttled 4G), not the office fibre, because the office fibre lies.</p>
+<div class="codeWrap"><pre><code># Performance budget - decide before you build, then measure
+# total page weight  &lt; 1 MB
+# main-thread JS     &lt; 170 KB uncompressed
+# LCP                &lt; 2.5 s on throttled 4G
+# CLS                &lt; 0.1
+# hero image         &lt; 100 KB
+# card images        &lt; 30 KB each
+# fonts              &lt; 2 families, woff2, latin subset
+</code></pre></div>
+<div class="tip"><p>Put the budget in the design hand-off and measure it in CI. A page that grew past its budget is a design regression, reported like any other.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Accessibility, Design Systems and Hand-Off</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">The final chapter makes the work durable: accessibility turns the design into something everyone can use, design tokens and component libraries turn it into a system, the hand-off turns it into code without guesswork, and documentation keeps the system true after you have moved on.</p>
+
+<h3 id="ch7-1" data-toc>7.1 WCAG essentials</h3>
+<p class="topic-desc">WCAG 2.2 organises accessibility into four principles — perceivable, operable, understandable, robust (POUR) — and each principle maps to concrete markup and design choices you can verify.</p>
+
+<h4 id="ch7-1-pour">POUR in practice</h4>
+<p>Perceivable: nothing essential is invisible — images have alt text, information is not colour-only. Operable: everything is reachable by keyboard, focus is visible, touch targets are large enough. Understandable: reading order matches the layout, errors say what to fix. Robust: semantic HTML so assistive tech can parse it, one <code>h1</code> per page, controls named correctly. Accessibility is not a feature to add at the end; each decision either supports it or costs a fix later.</p>
+<div class="codeWrap"><pre><code># WCAG 2.2 essentials - POUR in practice
+# Perceivable
+#   [ ] every image has alt text; icons are visible or labelled
+#   [ ] colour is never the only signal (add an icon or text)
+#   [ ] contrast 4.5:1 body text, 3:1 UI edges and large text
+# Operable
+#   [ ] everything keyboard reachable; focus ring visible
+#   [ ] touch targets 44px; no hover-only flows
+# Understandable
+#   [ ] nav order matches reading order; lang attribute set
+#   [ ] error messages say what to fix and how
+# Robust
+#   [ ] semantic HTML; one h1 per page; names announced correctly
+</code></pre></div>
+
+<h4 id="ch7-1-landmarks">Semantic HTML is the accessibility framework</h4>
+<p>Landmarks — <code>header</code>, <code>nav</code>, <code>main</code>, <code>footer</code> — are how screen-reader users jump around a page, so a div-only layout strips their navigation to zero. The heading order is the outline: one <code>h1</code>, then <code>h2</code>s that introduce sections. A "skip to content" link at the very top gives keyboard users the same shortcut a mouse user has. These are design decisions, made in the markup.</p>
+<div class="codeWrap"><pre><code>&lt;a class="skip" href="#main"&gt;Skip to content&lt;/a&gt;
+&lt;header&gt;brand, primary nav, search&lt;/header&gt;
+&lt;nav aria-label="Primary"&gt;...&lt;/nav&gt;
+&lt;main id="main"&gt;
+  &lt;h1&gt;Page title - the only h1 on the page&lt;/h1&gt;
+  &lt;section&gt;&lt;h2&gt;Section&lt;/h2&gt;...&lt;/section&gt;
+&lt;/main&gt;
+&lt;footer&gt;contact and legal&lt;/footer&gt;
+</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 Design tokens</h3>
+<p class="topic-desc">Design tokens are the decisions of a design system written as data: colours, spacing, radii, typography and shadows stored once and emitted everywhere. A token is a name with a value and a purpose — and a guarantee that the UI and the design tool agree.</p>
+
+<h4 id="ch7-2-source">Tokens are data with a source of truth</h4>
+<p>A token names a decision — <code>color.surface.page</code>, <code>size.space.3</code> — and the value belongs to the token file, not to any component. Components reference names; themes and platforms swap values. This is the rule that made the colour chapter's theming work, generalised: when a component hard-codes a value, the system has two truths, and they will silently diverge. Structure tokens by function (colour, size, radius, shadow, type) so tools can export them.</p>
+<div class="codeWrap"><pre><code>{
+  "color": {
+    "text":    { "primary": { "value": "#1a2433" } },
+    "surface": { "page":    { "value": "#ffffff" } },
+    "accent":  { "default": { "value": "#034db8" } }
+  },
+  "size": {
+    "space":  { "2": { "value": "8" }, "3": { "value": "16" } },
+    "radius": { "default": { "value": "4" } }
+  },
+  "type": {
+    "scale": { "body": { "value": "16" }, "display": { "value": "39" } }
+  }
+}
+</code></pre></div>
+
+<h4 id="ch7-2-emit">Emit tokens to every platform from one file</h4>
+<p>Transpilers such as Style Dictionary and Token Studio read the token JSON and emit CSS custom properties, Sass maps, iOS and Android constants — one file, N outputs, no drift. CSS variables are the web output; the naming convention maps one-to-one (<code>color.text.primary</code> becomes <code>--color-text-primary</code>). Ratchet check: if someone changes a hex in the CSS instead of the token file, the check that catches it is a diff of the generated file.</p>
+<div class="codeWrap"><pre><code>/* tokens.json -&gt; :root via a transpiler
+   one source of truth, emitted as CSS / iOS / Android */
+:root {
+  --color-text-primary: #1a2433;
+  --color-surface-page: #ffffff;
+  --color-accent-default: #034db8;
+  --size-space-2: 8px;
+  --size-space-3: 16px;
+  --size-radius-default: 4px;
+  --type-scale-body: 16px;
+  --type-scale-display: 39px;
+}
+/* components use the names; themes and platforms swap values */
+</code></pre></div>
+
+<h3 id="ch7-3" data-toc>7.3 Component libraries</h3>
+<p class="topic-desc">A component library is the design system rendered as code: each component is a contract — anatomy, styles, states, variants, content rules — implemented once and reused everywhere. The library is what makes a 40-page site feel like one product instead of forty.</p>
+
+<h4 id="ch7-3-anatomy">A component is a contract, not a drawing</h4>
+<p>Atomic design decomposes interfaces into atoms (tokens, single elements), molecules (small groupings like a search field), organisms (sections), templates and pages. The useful unit for shipping is the molecule: the button, the alert, the card. Each one is specified completely — anatomy, style variants, interaction states, content guidance — so "use the Button component" is a complete instruction and not an invitation to improvise.</p>
+<div class="codeWrap"><pre><code># Button - a component is a contract
+# anatomy   label + optional leading icon + spinner when busy
+# styles    primary, secondary, danger, ghost
+# states    rest, hover, active, focus-visible, disabled, loading
+# content   real words: "Book a seat", never "Click here"
+# variants  size: small / medium / large; full-width option
+# tokens    every colour and radius from the token file
+# demo      storybook entry + a live page example, in sync
+</code></pre></div>
+
+<h4 id="ch7-3-matrix">Document states before variants multiply</h4>
+<p>State matrices are where component libraries earn their keep and where they most often rot. The rule: every state row (rest, hover, active, focus, disabled, loading) is specified, or the component ships half-designed. Disabled is the row people skip — it needs a colour that reads but does not invite, focus is the row that must never be skipped on principle (keyboard users depend on it). Storybook's value is that every state and variant gets a visible, testable slot.</p>
+<div class="codeWrap"><pre><code># State matrix - specify every row before the component ships
+# state         colour      border  focus  behaviour
+# rest          accent      none    --     -
+# hover         1 step      none    --     cursor pointer
+#               darker
+# focus-visible accent      none    2px    keyboard ring,
+#                                  offset 2  moved with arrow keys
+# active        2 steps     none    --     pressed
+#               darker
+# disabled      grey 3:1    none    none   not clickable,
+#               on fill                     not announced
+# loading       accent      none    --     spinner, label kept
+</code></pre></div>
+
+<h3 id="ch7-4" data-toc>7.4 Developer hand-off</h3>
+<p class="topic-desc">The hand-off converts the design into buildable specifications. A good one is boring: complete, unambiguous, and checkable in the browser rather than in the mockup.</p>
+
+<h4 id="ch7-4-spec">The complete spec, so nobody guesses</h4>
+<p>Figma's Dev Mode and similar tools read measurements straight off the frame, but the artifacts that matter are the ones the tool cannot produce: the spacing scale, the type scale, the token names, the state rules and the asset exports. A hand-off that names tokens (<code>--space-3</code>, <code>--color-accent</code>) instead of raw values lets the developer wire components to the system instead of pasting hex. If a developer has to measure padding off a screenshot, the design still has work left.</p>
+<div class="codeWrap"><pre><code># Hand-off is complete when the developer never has to guess
+# spacing   8pt rhythm; padding 8/16, gap 8, margin 24
+# type      16px body / 20px lead / 25px h3, 1.6 leading
+# colour    token names only, never raw hex in the frame
+# radius    4px controls, 8px cards, 999px pills
+# states    hover / focus / disabled specified per component
+# assets    SVG icons + WebP images exported into the repo
+# measure   Lighthouse run on the built page vs the budget
+</code></pre></div>
+
+<h4 id="ch7-4-qa">Design review runs in the browser</h4>
+<p>The mockup is a proposal; the browser is where the design is judged. Review at the extreme widths, on keyboard, at 200% zoom, in both themes, on a touch emulator — the states a static frame cannot show. The QA list is the same list every launch: containers do not overflow, focus is visible everywhere, contrast passes on real backgrounds, targets are 44px, and Lighthouse matches the budget.</p>
+<div class="codeWrap"><pre><code># Launch QA - the design review that runs in the browser
+# [ ] 320px, 768px, 1280px: no overflow, no dead gaps
+# [ ] keyboard: tab through; ring visible; no focus traps
+# [ ] zoom to 200%: text wraps, controls usable
+# [ ] dark and light theme: tokens, not hard hex
+# [ ] contrast of every text on its real background
+# [ ] 44px targets on a touch emulator
+# [ ] Lighthouse against the performance budget
+# [ ] alt text on new images; page titles unique
+</code></pre></div>
+
+<h3 id="ch7-5" data-toc>7.5 Documentation and definition of done</h3>
+<p class="topic-desc">A design system without documentation is a rumour: it lives in whichever designer's head knew it last. Documentation lives with the code — versioned, reviewed, generated from the same tree — and a posted definition of done closes the loop on every piece of design work.</p>
+
+<h4 id="ch7-5-living">Living documentation: versioned with the code</h4>
+<p>Docs that sit in a separate wiki quietly die; docs that ship in the same repository as the code change together. The token file is documentation. The component markdown is documentation. The changelog that says what changed and why is documentation. When a design line item accompanies its pull request, the docs page is generated from the same tree and cannot lie.</p>
+<div class="codeWrap"><pre><code># Documentation lives with the code, or it lies
+# /design
+#   tokens.json        source of truth
+#   components.md      anatomy and states per component
+#   patterns.md        page-level recipes
+#   changelog.md       what changed and why, dated
+# Every design change ships with a PR, and the docs page is
+# generated from the same tree as the code.
+</code></pre></div>
+
+<h4 id="ch7-5-dod">Definition of done for design work</h4>
+<p>A definition of done turns "is it done?" into a checklist with no opinions: matches the accepted wireframe, uses tokens, all states specified, both themes pass contrast, assets exported and compressed, documentation updated, reviewed in the browser. Work that clears the list is shippable; work that does not is not "almost done", it is not done. This is the same discipline as the design loop in chapter 1 — the last step of the loop is what makes the first one matter.</p>
+<div class="codeWrap"><pre><code># Definition of done for design work
+# [ ] matches the accepted wireframe and content plan
+# [ ] tokens used; no ad-hoc hex, no ad-hoc spacing
+# [ ] all states specified; keyboard and touch verified
+# [ ] both themes pass contrast checks
+# [ ] assets exported, sized, and compressed
+# [ ] documented: components.md updated
+# [ ] reviewed in the browser, not the mockup
+</code></pre></div>
+<div class="tip"><p>The checklist is a gate, not a ritual. When a line is skipped, the ticket records the skip and the reason — a deliberate exception is a decision; an unreported one is a hole in the system.</p></div>
+</section>

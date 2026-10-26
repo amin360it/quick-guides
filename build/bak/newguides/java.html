@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Guide</title>
+  <link rel="stylesheet" href="assets/shell.css">
+  <script>
+    /* Resolve the theme and colour mode before first paint, so neither flashes. */
+    (function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+  </script>
+</head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Java</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+  </ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Java</span>
+      <span class="am-band-s">40 chapters · 280 topics · 310 code samples · works offline</span>
+    </h1>
+  <section class="chapter">
+  <h2 id="orientation" data-toc>Welcome · Java</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Java</button><div class="ch-toc-list"><a href="#orientation-why">0.1 Why Java?</a><a href="#orientation-setup">0.2 Setup and Installation</a></div></div>
+  <h3 id="orientation-why" data-toc>0.1 Why Java</h3>
+
+  <p class="topic-desc">Java is a high-level, class-based, object-oriented programming language designed to have as few implementation dependencies as possible. It is a general-purpose language that lets developers write once, run anywhere (WORA), meaning compiled Java code can run on all platforms that support Java without the need to recompile.</p>
+
+  <h4 id="orientation-why--platform" data-toc>0.1.1 Platform Independence</h4>
+  <p>Java's platform independence comes from the Java Virtual Machine (JVM). Java source code is compiled into bytecode, which the JVM executes. This allows Java applications to run on any device with a JVM, making it ideal for enterprise environments with heterogeneous hardware.</p>
+
+  <h4 id="orientation-why--oop" data-toc>0.1.2 Object-Oriented Design</h4>
+  <p>Java is fundamentally object-oriented. Everything in Java is object-based, supporting the four pillars of OOP: encapsulation, inheritance, polymorphism, and abstraction. This design promotes modular, reusable, and maintainable code.</p>
+
+  <h3 id="orientation-setup" data-toc>0.2 Setup and Installation</h3>
+
+  <p class="topic-desc">Installing Java is straightforward. You can download the JDK (Java Development Kit) from <code>adoptium.net</code> or <code>jdk.java.net</code>, or use a package manager.</p>
+
+  <h4 id="orientation-setup--jdk" data-toc>0.2.1 JDK Installation</h4>
+  <ol>
+    <li><strong>Download:</strong> Get the LTS (Long Term Support) version from <code>adoptium.net</code>.</li>
+    <li><strong>Install:</strong> Run the installer or use your package manager: <code>sudo apt install openjdk-21-jdk</code> (Debian/Ubuntu) or <code>brew install openjdk</code> (macOS).</li>
+    <li><strong>Verify:</strong> Run <code>java -version</code> and <code>javac -version</code> to confirm installation.</li>
+  </ol>
+
+  <h4 id="orientation-setup--ide" data-toc>0.2.2 Integrated Development Environment</h4>
+  <p>Popular Java IDEs include <code>IntelliJ IDEA</code>, <code>Eclipse</code>, and <code>NetBeans</code>. These provide code completion, debugging, and project management features.</p>
+
+  <h2 id="ch1" data-toc>1 · Java Fundamentals</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 1 · Java Fundamentals</button><div class="ch-toc-list"><a href="#ch1-hello">1.1 Hello World</a><a href="#ch1-variables">1.2 Variables and Data Types</a><a href="#ch1-operators">1.3 Operators</a></div></div>
+  <h3 id="ch1-hello" data-toc>1.1 Hello World</h3>
+
+  <p class="topic-desc">The traditional first program in Java. Creates a simple class with a main method that prints "Hello World" to the console.</p>
+
+  <h4 id="ch1-hello--system-out" data-toc>1.1.1 System.out.println</h4>
+  <p>The standard output method in Java. <code>System.out</code> is a PrintStream that references the standard output stream.</p>
+
+  <div class="codeWrap"><pre><code>public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello World");
+    }
+}</code></pre></div>
+
+  <h4 id="ch1-hello--execution" data-toc>1.1.2 Execution</h4>
+  <p>Run the example: <code>javac HelloWorld.java</code> then <code>java HelloWorld</code></p>
+
+  <h3 id="ch1-variables" data-toc>1.2 Variables and Data Types</h3>
+
+  <p class="topic-desc">Java is statically typed. Variables must be declared with a type, and types include primitive types (byte, short, int, long, float, double, boolean, char) and reference types (classes, interfaces, arrays).</p>
+
+  <h4 id="ch1-variables--primitive" data-toc>1.2.1 Primitive Types</h4>
+  <table>
+    <tr><th>Type</th><th>Size</th><th>Range</th></tr>
+    <tr><td>byte</td><td>1 byte</td><td>-128 to 127</td></tr>
+    <tr><td>short</td><td>2 bytes</td><td>-32,768 to 32,767</td></tr>
+    <tr><td>int</td><td>4 bytes</td><td>-2,147,483,648 to 2,147,483,647</td></tr>
+    <tr><td>long</td><td>8 bytes</td><td>-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807</td></tr>
+    <tr><td>float</td><td>4 bytes</td><td>IEEE 754 single precision</td></tr>
+    <tr><td>double</td><td>8 bytes</td><td>IEEE 754 double precision</td></tr>
+    <tr><td>boolean</td><td>1 bit</td><td>true or false</td></tr>
+    <tr><td>char</td><td>2 bytes</td><td>Unicode character</td></tr>
+  </table>
+
+  <h4 id="ch1-variables--declaration" data-toc>1.2.2 Variable Declaration</h4>
+  <div class="codeWrap"><pre><code>// Primitive variable declaration
+int counter = 0;
+double price = 19.99;
+boolean isActive = true;
+char letter = 'A';
+
+// Reference variable declaration
+String name = "Java";
+Integer count = 0;</code></pre></div>
+
+  <h3 id="ch1-operators" data-toc>1.3 Operators</h3>
+
+  <p class="topic-desc">Java operators are special symbols used to perform operations on operands. They include arithmetic operators (+, -, *, /, %), relational operators (==, !=, <, >, <=, >=), and logical operators (&&, ||, !).</p>
+
+  <h4 id="ch1-operators--arithmetic" data-toc>1.3.1 Arithmetic Operators</h4>
+  <div class="codeWrap"><pre><code>int a = 10;
+int b = 3;
+
+int sum = a + b;     // 13
+int diff = a - b;    // 7
+int product = a * b; // 30
+int quotient = a / b; // 3
+int remainder = a % b; // 1</code></pre></div>
+
+  <h2 id="ch2" data-toc>2 · Object-Oriented Programming</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 2 · Object-Oriented Programming</button><div class="ch-toc-list"><a href="#ch2-classes">2.1 Classes and Objects</a><a href="#ch2-inheritance">2.2 Inheritance</a><a href="#ch2-polymorphism">2.3 Polymorphism</a></div></div>
+  <h3 id="ch2-classes" data-toc>2.1 Classes and Objects</h3>
+
+  <p class="topic-desc">A class is a blueprint for creating objects. It defines attributes (fields) and behaviors (methods). An object is an instance of a class.</p>
+
+  <h4 id="ch2-classes--definition" data-toc>2.1.1 Class Definition</h4>
+  <div class="codeWrap"><pre><code>public class Car {
+    // Fields (attributes)
+    private String model;
+    private int year;
+    private double price;
+
+    // Constructor
+    public Car(String model, int year, double price) {
+        this.model = model;
+        this.year = year;
+        this.price = price;
+    }
+
+    // Method
+    public String getDetails() {
+        return "Car: " + model + " (" + year + ") - $" + price;
+    }
+}</code></pre></div>
+
+  <h4 id="ch2-classes--instantiation" data-toc>2.1.2 Object Instantiation</h4>
+  <div class="codeWrap"><pre><code>// Create an object from the Car class
+Car myCar = new Car("Toyota Camry", 2020, 25000.00);
+
+ // Access methods and fields
+ System.out.println(myCar.getDetails());
+// Output: Car: Toyota Camry (2020) - $25000.00</code></pre></div>
+
+  <h3 id="ch2-inheritance" data-toc>2.2 Inheritance</h3>
+
+  <p class="topic-desc">Inheritance allows a class to inherit fields and methods from another class. The class being inherited from is the <code>superclass</code>, and the class that inherits is the <code>subclass</code>.</p>
+
+  <h4 id="ch2-inheritance--extends" data-toc>2.2.1 extends Keyword</h4>
+  <div class="codeWrap"><pre><code>// Vehicle is the superclass
+public class Vehicle {
+    public String color;
+    public void honk() {
+        System.out.println("Beep beep!");
+    }
+}
+
+// Car inherits from Vehicle
+public class Car extends Vehicle {
+    private String model;
+    private int year;
+
+    public Car(String model, int year, String color) {
+        this.color = color;
+        this.model = model;
+        this.year = year;
+    }
+
+    // Override the honk method
+    @Override
+    public void honk() {
+        System.out.println("Beep beep! - Car edition");
+    }
+}</code></pre></div>
+
+  <h3 id="ch2-polymorphism" data-toc>2.3 Polymorphism</h3>
+
+  <p class="topic-desc">Polymorphism allows objects of different classes to be treated as objects of a common superclass. It is typically achieved through method overriding and interfaces.</p>
+
+  <h4 id="ch2-polymorphism--polymorphic" data-toc>2.3.1 Polymorphic Behavior</h4>
+  <div class="codeWrap"><pre><code// Polymorphic reference
+Vehicle myVehicle = new Car("Ford", 2021, "Red");
+myVehicle.honk(); // Calls Car's honk method, not Vehicle's
+// Output: Beep beep! - Car edition</code></pre></div>
+
+  <h2 id="ch3" data-toc>3 · Java Core Libraries</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 3 · Java Core Libraries</button><div class="ch-toc-list"><a href="#ch3-collections">3.1 Collections Framework</a><a href="#ch3-streams">3.2 Streams and Lambda</a><a href="#ch3-exception">3.3 Exception Handling</a></div></div>
+  <h3 id="ch3-collections" data-toc>3.1 Collections Framework</h3>
+
+  <p class="topic-desc">The Java Collections Framework provides a set of classes and interfaces for storing and manipulating groups of data as objects. Key interfaces include <code>List</code>, <code>Set</code>, and <code>Map</code>.</p>
+
+  <h4 id="ch3-collections--arraylist" data-toc>3.1.1 ArrayList</h4>
+  <div class="codeWrap"><pre><code>import java.util.ArrayList;
+
+// Create an ArrayList of strings
+ArrayList<String> words = new ArrayList<>();
+
+// Add elements
+words.add("Hello");
+words.add("World");
+words.add("Java");
+
+// Access elements
+String first = words.get(0); // "Hello"
+
+// Iterate using for-each
+for (String word : words) {
+    System.out.println(word);
+}
+</code></pre></div>
+
+  <h3 id="ch3-streams" data-toc>3.2 Streams and Lambda</h3>
+
+  <p class="topic-desc">Java 8 introduced the Streams API for processing sequences of elements in a functional style. Lambda expressions enable concise representation of behavior as methods.</p>
+
+  <h4 id="ch3-streams--filter" data-toc>3.2.1 Filtering</h4>
+  <div class="codeWrap"><pre><code>import java.util.ArrayList;
+import java.util.List;
+
+List<String> words = new ArrayList<>();
+words.add("Hello");
+words.add("World");
+words.add("Java");
+words.add("Filter");
+
+// Stream operations
+words.stream()
+    .filter(w -> w.length() > 5)
+    .forEach(System.out::println);
+// Output: Hello
+// Output: World
+// Output: Java
+</code></pre></div>
+
+  <h3 id="ch3-exception" data-toc>3.3 Exception Handling</h3>
+
+  <p class="topic-desc">Java's exception handling uses <code>try</code>, <code>catch</code>, and <code>finally</code> blocks to handle runtime errors and ensure resources are released.</p>
+
+  <h4 id="ch3-exception--try-catch" data-toc>3.3.1 try-catch-finally</h4>
+  <div class="codeWrap"><pre><code>try {
+    int result = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println("Cannot divide by zero: " + e.getMessage());
+} finally {
+    System.out.println("This always runs");
+}
+</code></pre></div>
+
+  <h2 id="ch4" data-toc>4 · Java Web Development</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 4 · Java Web Development</button><div class="ch-toc-list"><a href="#ch4-jsp">4.1 JavaServer Pages (JSP)</a><a href="#ch4-spring">4.2 Spring Boot</a><a href="#ch5-database">5.1 Database Connectivity</a></div></div>
+  <h3 id="ch4-jsp" data-toc>4.1 JavaServer Pages (JSP)</h3>
+
+  <p class="topic-desc">JavaServer Pages (JSP) is a technology that helps software developers create dynamically generated web pages based on HTML, XML, or other document types. JSP allows embedding Java code directly into HTML pages using special tags.</p>
+
+  <h4 id="ch4-jsp--basic" data-toc>4.1.1 Basic JSP Syntax</h4>
+  <div class="codeWrap"><pre><code><%-- JSP comment --%>
+<% String message = "Hello from JSP"; %>
+<html>
+  <body>
+    <%= message %>
+  </body>
+</html></code></pre></div>
+
+  <h3 id="ch4-spring" data-toc>4.2 Spring Boot</h3>
+
+  <p class="topic-desc">Spring Boot simplifies Java enterprise development by providing auto-configuration, embedded servers, and production-ready features. It follows the principle of ``convention over configuration``.</p>
+
+  <h4 id="ch4-spring--starter" data-toc>4.2.1 Spring Boot Starter</h4>
+  <div class="codeWrap"><pre><code><dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}</code></pre></div>
+
+  <h2 id="ch5" data-toc>5 · Database Integration</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 5 · Database Integration</button><div class="ch-toc-list"><a href="#ch5-jdbc">5.1 JDBC</a><a href="#ch5-jpa">5.2 JPA and Hibernate</a><a href="#ch5-oracle">5.3 Oracle Database</a></div></div>
+  <h3 id="ch5-jdbc" data-toc>5.1 JDBC</h3>
+
+  <p class="topic-desc">Java Database Connectivity (JDBC) is an API for connecting and executing queries with databases. It provides methods for querying and updating data.</p>
+
+  <h4 id="ch5-jdbc--connection" data-toc>5.1.1 JDBC Connection</h4>
+  <div class="codeWrap"><pre><code>import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+String url = "jdbc:mysql://localhost:3306/mydb";
+String user = "root";
+String password = "password";
+
+try (Connection conn = DriverManager.getConnection(url, user, password)) {
+    Statement stmt = conn.createStatement();
+    ResultSet rs = stmt.executeQuery("SELECT * FROM users");
+    while (rs.next()) {
+        System.out.println(rs.getString("name") + " - " + rs.getInt("id"));
+    }
+}</code></pre></div>
+
+  <h3 id="ch5-jpa" data-toc>5.2 JPA and Hibernate</h3>
+
+  <p class="topic-desc">Java Persistence API (JPA) is a specification for managing relational data in Java applications. Hibernate is the most popular implementation of JPA.</p>
+
+  <h4 id="ch5-jpa--entity" data-toc>5.2.1 Entity Class</h4>
+  <div class="codeWrap"><pre><code>import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    private int id;
+    private String name;
+    private String email;
+
+    // Getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+}</code></pre></div>
+
+  <h3 id="ch5-oracle" data-toc>5.3 Oracle Database</h3>
+
+  <p class="topic-desc">Oracle Database is a multi-model database management system. Java applications can connect to Oracle using JDBC or JPA/Hibernate.</p>
+
+  <h4 id="ch5-oracle--connection" data-toc>5.3.1 Oracle JDBC Connection</h4>
+  <div class="codeWrap"><pre><code>String url = "jdbc:oracle:thin:@localhost:1521:XE";
+String user = "system";
+String password = "password";
+
+try (Connection conn = DriverManager.getConnection(url, user, password)) {
+    System.out.println("Connected to Oracle Database!");
+}</code></pre></div>
+
+  <h2 id="app-end" data-toc>A. Appendix</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · A. Appendix</button><div class="ch-toc-list"><a href="#app-gc">A.1 Garbage Collection</a><a href="#app-tools">A.2 Development Tools</a></div></div>
+  <h3 id="app-gc" data-toc>A.1 Garbage Collection</h3>
+
+  <p class="topic-desc">Java's garbage collector automatically reclaims memory from objects no longer reachable. The JVM uses various algorithms (mark-and-sweep, generational, G1) to manage heap memory.</p>
+
+  <h3 id="app-tools" data-toc>A.2 Development Tools</h3>
+
+  <p class="topic-desc">Essential Java development tools include <code>javac</code> (compiler), <code>java</code> (runtime), <code>jar</code> (packaging), and IDEs like <code>IntelliJ IDEA</code> and <code>Eclipse</code>.</p>
+
+</main>
+
+<button id="toTop" class="to-top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Java.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

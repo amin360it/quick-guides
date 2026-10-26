@@ -1,0 +1,391 @@
+  <section class="chapter">
+<h2 id="ch18" data-toc>18 · Error Boundaries, Resilience and Testing</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Error boundaries, resilience and testing</button><div class="ch-toc-list"><a href="#ch18-boundaries">What an error boundary catches</a><a href="#ch18-recovery">Fallbacks that recover, not just fail</a><a href="#ch18-resilience">Async errors and the rest of the page</a><a href="#ch18-strategy">What to test, and at which layer</a><a href="#ch18-tools">Testing users, not implementations</a></div></div>
+    <p class="topic-desc">A React application's quality is measured by what it does when things go wrong: a render throws, a request times out, a chunk fails to load, a third-party widget misbehaves. Error boundaries contain the blast radius, resilient design limits how much can go wrong at once, and a testing strategy that mirrors the risk pyramid is what proves both hold after the next change.</p>
+    <h3 id="ch18-boundaries" data-toc>What an error boundary catches</h3>
+    <p>An error boundary is a component that catches errors thrown anywhere below it during render, in constructors, lifecycle methods, and effects — and renders a fallback instead of letting the tree unmount to the root. It is a class component with <code>static getDerivedStateFromError</code> (to switch to the fallback state) and optional <code>componentDidCatch</code> (to log). What it does not catch is a category list worth memorising: errors in event handlers (the boundary is not listening when you click), errors in async code after the render committed (a promise rejection in a fetch), errors in <code>setTimeout</code> or scheduled callbacks, errors thrown during server-side rendering, and errors the boundary itself throws. Those five each need their own containment, and confusing them with render errors is how a team concludes "boundaries don't work".</p>
+    <p>The placement logic is the same as chapter 14's Suspense boundaries but with a harsher default: an error without a boundary above it unmounts the whole application — every piece of state in memory, gone, a blank page. So the root boundary is mandatory, and the useful boundaries are placed by blast radius: one around each screen (a broken screen should not take the shell with it), one around each independently-failing widget (a chart library that throws should cost you the chart), and one around anything third-party, because foreign code has no error discipline you can influence. The test for a proposed boundary: if this throws on a Monday, what should still work on screen? The answer defines the boundary's location.</p>
+    <div class="codeWrap"><pre><code>import { Component } from 'react';
+
+class ErrorBoundary extends Component {
+  state = { error: null, key: 0 };
+
+  static getDerivedStateFromError(error) {
+    return { error };                 // render the fallback on the next pass
+  }
+
+  componentDidCatch(error, info) {
+    // logging happens HERE - not in getDerivedStateFromError, which must
+    // stay pure: it runs during the render phase
+    reportError({ error, info, digest: info.componentStack });
+  }
+
+  reset = () =&gt; {
+    // remount the subtree: clearing the error without a new key just
+    // re-throws on the next identical render
+    this.setState((s) =&gt; ({ error: null, key: s.key + 1 }));
+  };
+
+  render() {
+    if (this.state.error) {
+      return this.props.fallback(this.state.error, this.reset);
+    }
+    return &lt;Fragment key={this.state.key}&gt;{this.props.children}&lt;/Fragment&gt;;
+  }
+}
+
+// usage: the fallback is a function, so it can show the error and wire reset
+&lt;ErrorBoundary
+  fallback={(error, reset) =&gt; &lt;WidgetFailed error={error} onRetry={reset} /&gt;}&gt;
+  &lt;RevenueChart /&gt;
+&lt;/ErrorBoundary&gt;</code></pre></div>
+    <p>Two implementation details decide whether a boundary is useful in production. The reset must remount: clearing the error state alone re-renders the same component with the same bad props and throws again, which presents as a Retry button that does nothing — one of the most common boundary bugs. And the key subtlety of boundaries as state: the boundary remembers its error until reset, so a sibling update does not clear it, but a parent re-render passing new children re-attempts the render only after you reset. Design the interaction accordingly — Retry re-attempts (right for a transient data problem), Close hides the widget (right for a permanently broken one), and the fallback should say which case it is.</p>
+    <div class="codeWrap"><pre><code>// reset that actually works, and per-case fallback copy
+function WidgetBoundary({ children, label }) {
+  return (
+    &lt;ErrorBoundary
+      fallback={(error, reset) =&gt; (
+        &lt;div role="alert" className="widget-fallback"&gt;
+          &lt;p&gt;{label} could not load.&lt;/p&gt;
+          {/* transient? re-attempt. persistent? the error digest says so */}
+          &lt;button onClick={reset}&gt;Try again&lt;/button&gt;
+          &lt;details&gt;
+            &lt;summary&gt;Technical detail&lt;/summary&gt;
+            &lt;pre&gt;{String(error.message)}&lt;/pre&gt;
+          &lt;/details&gt;
+        &lt;/div&gt;
+      )}&gt;
+      {children}
+    &lt;/ErrorBoundary&gt;
+  );
+}
+
+// the classic bug: retry that clears state but not the failure
+function BrokenRetry({ error, onRetry }) {
+  return (
+    &lt;button onClick={() =&gt; { onRetry(); }}&gt;   {/* parent clears error... */}
+      Try again                                 {/* ...but children were never
+                                                   remounted: same props, same
+                                                   throw, dead button */}
+    &lt;/button&gt;
+  );
+}</code></pre></div>
+    <h4>Boundary granularity on a real screen</h4>
+    <p>A dashboard assembled from six widgets wants six boundaries, each rendering its own failure state in its own slot — because the failure modes are independent (one chart library, one third-party embed, four own components) and the cost of losing a widget should be proportional to the widget. The pattern composes: each widget boundary sits inside the screen boundary, which sits inside the root. An error that escapes a widget boundary is caught at the screen level with the context intact; an error that escapes the screen is caught at the root, where the fallback can offer navigation home. Three levels is usually the whole structure — root, screen, widget — and deeper nesting buys nothing because the state below a boundary that already caught the error is gone anyway.</p>
+    <div class="codeWrap"><pre><code>// three levels: root, screen, widget - each with its own fallback
+function App() {
+  return (
+    &lt;ErrorBoundary fallback={(e, reset) =&gt; &lt;RootFallback error={e} onRetry={reset} /&gt;}&gt;
+      &lt;RouterProvider router={router} /&gt;
+    &lt;/ErrorBoundary&gt;
+  );
+}
+
+const dashboardRoute = {
+  path: '/dashboard',
+  element: (
+    &lt;ErrorBoundary fallback={(e, reset) =&gt; &lt;ScreenFallback error={e} onRetry={reset} /&gt;}&gt;
+      &lt;Dashboard /&gt;
+    &lt;/ErrorBoundary&gt;
+  ),
+};
+
+function Dashboard() {
+  return (
+    &lt;div className="grid"&gt;
+      &lt;WidgetBoundary label="Revenue chart"&gt;&lt;RevenueChart /&gt;&lt;/WidgetBoundary&gt;
+      &lt;WidgetBoundary label="Activity feed"&gt;&lt;ActivityFeed /&gt;&lt;/WidgetBoundary&gt;
+      &lt;WidgetBoundary label="Third-party map"&gt;&lt;VendorMap /&gt;&lt;/WidgetBoundary&gt;
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <div class="note"><p>Pair each boundary with the route error element from chapter 16 where the boundary wraps a route: the error element catches loader failures, the boundary catches render failures. They are two channels into the same recovery UX, and a screen with only one of them has a hole exactly the shape of the other.</p></div>
+    <h3 id="ch18-recovery" data-toc>Fallbacks that recover, not just fail</h3>
+    <p>A fallback is a user interface under the worst conditions — the user was mid-task, the data may be half-visible, and the fallback is all they have. The four questions a good fallback answers: what was I trying to do (name the feature, not the error), is anything at risk (state the fate of unsaved work), what can I do now (retry, go back, continue without it), and is this my problem (make clear the fault is the application's). The failure mode to design against is the blank screen with a stack trace: it transfers the entire burden of interpretation to a user who cannot act on any of it. The second failure mode is the opposite overcorrection — a friendly "Something went wrong" with no route forward, which is a dead end with better manners.</p>
+    <p>Recovery design starts from what the boundary protected. If it wraps a widget, the fallback keeps the rest of the screen and offers widget-scoped retry — the task is intact, only one part failed. If it wraps the screen, offer navigation to a known-good route plus retry, and state explicitly whether in-progress form data survived (it did if the form was above the boundary; it did not if the boundary unmounted it — which is exactly why long forms get their own boundary or their own draft persistence from chapter 17). If it wraps the root, the only honest options are reload and a support path with a correlation id the user can quote. Match the fallback to the blast radius, and make the copy state the actual consequence rather than a generic apology.</p>
+    <div class="codeWrap"><pre><code>// fallback copy that answers the four questions, per blast radius
+function WidgetFallback({ label, error, onRetry }) {
+  return (
+    &lt;div role="alert" className="fallback fallback--widget"&gt;
+      &lt;p className="fallback-what"&gt;{label} failed to load.&lt;/p&gt;
+      &lt;p className="fallback-risk"&gt;The rest of the page is unaffected.&lt;/p&gt;
+      &lt;div className="fallback-actions"&gt;
+        &lt;button onClick={onRetry}&gt;Try again&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;p className="fallback-ref"&gt;Reference: {error.digest || 'local'}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+function ScreenFallback({ error, onRetry }) {
+  return (
+    &lt;div role="alert" className="fallback fallback--screen"&gt;
+      &lt;h1&gt;This screen stopped working&lt;/h1&gt;
+      &lt;p&gt;Your unsaved changes are kept in this browser until you navigate away.&lt;/p&gt;
+      &lt;div className="fallback-actions"&gt;
+        &lt;button onClick={onRetry}&gt;Reload this screen&lt;/button&gt;
+        &lt;Link to="/dashboard"&gt;Back to dashboard&lt;/Link&gt;
+      &lt;/div&gt;
+      &lt;p&gt;If it keeps happening, quote reference {error.digest} to support.&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <p>The correlation id deserves emphasis because it is the bridge from a user's screenshot to your logs: <code>componentDidCatch</code> logs with a generated digest, the fallback displays the same digest, and the log line carries the component stack and the user's session context. Without a shared id, "it crashed for Amina" is a bug report you investigate by reproducing; with one, it is a log query that returns the exact render path. Generate the id at catch time, show it in the fallback, store it in the log — three lines of code that cut mean-time-to-diagnosis by most of a day.</p>
+    <div class="codeWrap"><pre><code>// the digest is the contract between the fallback and the logs
+componentDidCatch(error, info) {
+  const digest = hashString(error.message + info.componentStack) &amp; 0xffff;
+  console.error('[boundary]', { digest, message: error.message,
+                                stack: info.componentStack });
+  // ship it: beacon to your logger with the same id the UI shows
+  logError({ digest, message: error.message, component: info.componentStack,
+             route: window.location.pathname, session: sessionId });
+}
+
+// the UI shows the SAME id - one string joins a support ticket to a trace
+function Fallback({ error }) {
+  return &lt;p&gt;Reference: {error.digest || 'local'}&lt;/p&gt;;
+}</code></pre></div>
+    <h4>Retry as a design element</h4>
+    <p>Not every failure deserves a retry button, and the distinction is whether a retry can plausibly succeed. A render error caused by bad data from the server: retry re-runs the same request against the same server and produces the same crash — the right action is navigation or reload, and a Retry button that cannot succeed is worse than no button. A failed chunk load (chapter 14's lazy components): retry genuinely works, the network blip was transient, so offer it. A timeout: retry works but may take time, so offer it with the pending state. Classify your failures into transient and persistent, wire retry only to transient, and give persistent ones a route out — the classification is the entire content of a good recovery design.</p>
+    <div class="codeWrap"><pre><code>// classifying failures: retry where retry can work, route out where it can't
+function recoveryFor(error) {
+  if (error instanceof ChunkLoadError) {
+    return { kind: 'transient', action: 'retry',
+             copy: 'The app was updated - reloading picks up the new version.' };
+  }
+  if (error instanceof TimeoutError) {
+    return { kind: 'transient', action: 'retry',
+             copy: 'The server took too long. Trying again often works.' };
+  }
+  if (error.status &gt;= 500) {
+    return { kind: 'transient', action: 'retry',
+             copy: 'Our side had a problem. Nothing you did caused it.' };
+  }
+  return { kind: 'persistent', action: 'navigate',
+           copy: 'This screen is not working right now. The dashboard is.' };
+}
+
+// the fallback renders from the classification, not from the error text
+function RecoveryFallback({ error }) {
+  const plan = recoveryFor(error);
+  return (
+    &lt;div role="alert"&gt;
+      &lt;p&gt;{plan.copy}&lt;/p&gt;
+      {plan.action === 'retry'
+        ? &lt;RetryButton /&gt;
+        : &lt;Link to="/dashboard"&gt;Go to the dashboard&lt;/Link&gt;}
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <div class="warn"><p>Chunk-load errors change meaning after a deploy: the user's cached app references a hashed file the new deploy deleted, so every retry of <code>import()</code> fails until a reload fetches the new HTML. Detect this case specifically and auto-reload once with a visible "Updating, one moment" message — the one failure where the correct recovery is a page load, not a retry.</p></div>
+    <h3 id="ch18-resilience" data-toc>Async errors and the rest of the page</h3>
+    <p>Boundaries cover render-phase errors, and the majority of production failures live elsewhere: promise rejections in fetch chains, event handlers that throw after commit, timers, websocket callbacks, third-party scripts. For each category there is a containment that actually works, and the discipline is knowing which channel a given failure travels. Promise rejections are handled where the promise is awaited — in the action or query from chapters 13 and 15, which return errors as data rather than throwing into the void. Event-handler errors are handled by a try/catch in the handler that translates to user-visible state, because by the time it throws, the render is long committed and no boundary is listening. The application-level backstop is the <code>window</code> <code>error</code> and <code>unhandledrejection</code> listeners, which catch what nothing else did and are a reporting channel, not a recovery one — by the time an error reaches them, you cannot render a fallback.</p>
+    <p>The design rule behind the channels: an error that can be shown to the user must travel as data to a component that is currently rendering; an error that reaches the window has already lost that chance. This is the argument for the shapes chapters 13 and 15 established — actions return error objects, queries surface error state — and against fire-and-forget promises in handlers. A handler that awaits and sets an error state gives the user a message in place; a handler that does not gives you a console line after the user's click silently did nothing. The second silence, the click that did nothing, is the failure users hate most, and no boundary can tell them about it.</p>
+    <div class="codeWrap"><pre><code>// four channels, four containments - pick by where the error travels
+function SubmissionPanel() {
+  const [state, action, pending] = useActionState(submitAction, { error: null });
+  const [handlerError, setHandlerError] = useState(null);
+
+  // channel 1: render errors -&gt; the widget boundary above this panel
+  // channel 2: the action's failures -&gt; returned as data, rendered inline
+  // channel 3: event-handler errors -&gt; caught HERE, because no boundary is
+  //            listening when a click throws after commit
+  async function handleExport() {
+    try {
+      await api.exportReport();
+    } catch (err) {
+      setHandlerError('Export failed: ' + err.message);   // shown in place
+    }
+  }
+
+  return (
+    &lt;WidgetBoundary label="Submission panel"&gt;
+      {state.error &amp;&amp; &lt;p role="alert"&gt;{state.error}&lt;/p&gt;}
+      {handlerError &amp;&amp; &lt;p role="alert"&gt;{handlerError}&lt;/p&gt;}
+      &lt;button onClick={handleExport}&gt;Export&lt;/button&gt;
+    &lt;/WidgetBoundary&gt;
+  );
+}
+
+// channel 4: the backstop - reporting only, nothing can render from here
+window.addEventListener('unhandledrejection', (event) =&gt; {
+  logError({ kind: 'unhandled-rejection', reason: String(event.reason) });
+});
+window.addEventListener('error', (event) =&gt; {
+  logError({ kind: 'global-error', message: event.message });
+});</code></pre></div>
+    <p>Timeouts, aborts and races deserve their own paragraph because they are errors the application creates for itself. A request that returns after its screen was replaced is not a failure — it is a response nobody asked for any more — and treating it as an error produces spurious failure messages on fast navigation. The containment is cancellation: AbortController wired to the query or effect cleanup (chapter 8's cleanup rule), so superseded requests stop being failures and start being nothing. The same reasoning applies to a retry storm: a flaky endpoint hit by three components at once needs one in-flight request per key (chapter 15's dedupe), not three error toasts teaching users the app is broken when the server is merely busy.</p>
+    <div class="codeWrap"><pre><code>// cancellation instead of failure: superseded requests are not errors
+function useSearch(term) {
+  return useQuery({
+    queryKey: ['search', term],
+    queryFn: ({ signal }) =&gt; api.search(term, { signal }),  // abort on change
+    retry: false,                        // a cancelled request must not retry
+    enabled: term.length &gt; 0,
+  });
+}
+
+// and in a raw effect, the chapter 8 cleanup discipline
+useEffect(() =&gt; {
+  const controller = new AbortController();
+  fetch('/api/report', { signal: controller.signal })
+    .then((r) =&gt; r.json())
+    .then(setReport)
+    .catch((err) =&gt; {
+      if (err.name === 'AbortError') return;   // superseded: NOT a failure
+      setError(err);
+    });
+  return () =&gt; controller.abort();
+}, [reportId]);</code></pre></div>
+    <h4>Degradation instead of failure</h4>
+    <p>The highest form of resilience is a screen that never fully fails because it was never fully dependent. Render the shell from what you have, then let each region arrive or fail independently — chapter 14's boundaries, chapter 15's per-key queries, chapter 16's per-route loaders are all the same architecture seen from three angles: components own nothing essential, the cache holds what arrived, and one failed key costs one region. A page where the header, list and sidebar can each fail alone has a failure mode measured in widgets; a page that fetches everything in one effect has a failure mode measured in pages. Build from regions, and most errors never reach a boundary at all.</p>
+    <div class="codeWrap"><pre><code>// degradation: three independent regions, three independent fates
+function AccountPage() {
+  return (
+    &lt;div className="stack"&gt;
+      &lt;WidgetBoundary label="Profile"&gt;
+        &lt;Suspense fallback={&lt;ProfileSkeleton /&gt;}&gt;&lt;ProfileSection /&gt;&lt;/Suspense&gt;
+      &lt;/WidgetBoundary&gt;
+      &lt;WidgetBoundary label="Invoices"&gt;
+        &lt;Suspense fallback={&lt;InvoiceSkeleton /&gt;}&gt;&lt;InvoiceSection /&gt;&lt;/Suspense&gt;
+      &lt;/WidgetBoundary&gt;
+      &lt;WidgetBoundary label="Usage chart"&gt;
+        &lt;Suspense fallback={&lt;UsageSkeleton /&gt;}&gt;&lt;UsageSection /&gt;&lt;/Suspense&gt;
+      &lt;/WidgetBoundary&gt;
+    &lt;/div&gt;
+  );
+}
+// if the invoice API is down: the profile renders, the usage chart renders,
+// one widget shows its fallback - the page itself never fails.</code></pre></div>
+    <div class="tip"><p>Chaos-test the design once a quarter: kill the API in a local environment, block a chunk, throw in a chart's render path, and watch what the screen does. Boundaries written but never exercised have a way of being placed one level too low, and the exercise takes an afternoon.</p></div>
+    <h3 id="ch18-strategy" data-toc>What to test, and at which layer</h3>
+    <p>A testing strategy for React is a risk allocation: spend the most tests where changes are most frequent and failures most expensive, and stop where marginal tests become slower than the bugs they miss. The shape that consistently earns its keep is a trophy, not a pyramid: a thin layer of unit tests on genuinely pure logic (validators, formatters, the domain functions from chapters 11 and 15), a broad layer of integration tests that render components with real providers against a mocked network (this is where most assertions belong), and a thin cap of a few end-to-end tests through a real browser for the paths where money or account state moves. Component unit tests — rendering one component in isolation with everything mocked — sit below the trophy: they assert on props and callbacks the integration test would cover anyway, and they break when you refactor the component's internals, which is precisely when you want tests to hold still.</p>
+    <p>The selection rule for what deserves a test: assertions on behaviour a user could observe (text, roles, network calls, navigation) survive refactors; assertions on internal state, call counts of internal callbacks, and snapshot of intermediate renders do not. Write the test as if describing the feature to someone who has not seen the code — "submitting an invalid form shows the server's message beside the email field" is stable and meaningful; "EmailField calls setErrors with an array of length one" is the same moment encoded as a coupling. The first survives the component being rewritten in a different style, which is when tests are most valuable and most fragile.</p>
+    <div class="codeWrap"><pre><code>// integration over unit: the feature, not the wiring
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// one harness the whole suite shares: real providers, mocked network
+function renderWithProviders(ui) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(&lt;QueryClientProvider client={client}&gt;{ui}&lt;/QueryClientProvider&gt;);
+}
+
+test('submitting an invalid invite shows the message beside the field', async () =&gt; {
+  server.use(
+    rest.post('/api/invites', (req, res, ctx) =&gt;
+      res(ctx.status(422), ctx.json({ errors: { email: 'Already a member' } })))
+  );
+  renderWithProviders(&lt;InviteForm /&gt;);
+
+  await user.type(screen.getByLabelText(/email/i), 'amina@example.com');
+  await user.click(screen.getByRole('button', { name: /send invite/i }));
+
+  // the assertion is about what the user sees, not what the component did
+  expect(await screen.findByRole('alert')).toHaveTextContent('Already a member');
+  expect(screen.getByLabelText(/email/i)).toHaveAttribute('aria-invalid', 'true');
+});</code></pre></div>
+    <p>Where each layer sits, concretely. Pure logic — a pricing rule, a slug generator, the key factories from chapter 15 — gets direct unit tests with no DOM at all: fastest, most precise, run on every save. Components and features get integration tests through the shared harness: real providers, mocked network, assertions on roles and text; these carry the bulk of the suite because they test the composition, which is where regressions actually occur. The network mock is the seam that keeps the whole thing deterministic — service-worker or fetch interception replacing the server — so integration tests exercise the real request shapes your API contract specifies without a live backend. End-to-end tests stay few: checkout, sign-up, the one workflow whose failure is a business incident, each asserted at exactly one point in the journey rather than duplicated down the stack.</p>
+    <div class="codeWrap"><pre><code>// the seam: mocked network at the fetch boundary, contract-shaped
+// test/server.js - requests hit the same paths production does
+import { setupServer } from 'msw/node';
+import { rest } from 'msw';
+
+export const server = setupServer(
+  rest.get('/api/projects/:id', (req, res, ctx) =&gt;
+    res(ctx.json(fixtures.project(req.params.id)))),
+  rest.post('/api/projects/:id/archive', (req, res, ctx) =&gt;
+    res(ctx.status(409), ctx.json({ changedBy: 'Sam' }))),
+
+  // unhandled request = a test reaching for something the contract does not
+  // define - fail loudly rather than silently succeeding
+  rest.get('*', (req, res, ctx) =&gt; {
+    console.error('Unmocked request: ' + req.url.pathname);
+    return res(ctx.status(500));
+  })
+);
+
+// in setupFiles: the suite runs against the mock, no network needed
+beforeAll(() =&gt; server.listen({ onUnhandledRequest: 'error' }));
+afterEach(() =&gt; server.resetHandlers());
+afterAll(() =&gt; server.close());</code></pre></div>
+    <h4>What not to test</h4>
+    <p>Four categories that cost more than they return: snapshots of whole component trees (they change on every legitimate refactor and reviewers approve them unread), tests of library behaviour already covered by the library's own suite (does React re-render on setState — really), assertions on private state or internal function calls (the coupling that breaks exactly when you improve the code), and tests that require a running backend to be meaningful (they are integration tests of the backend wearing a frontend badge). Every one of these appears in real codebases and each is a maintenance liability disguised as coverage; the discipline is that a test must fail when user-visible behaviour breaks, and never merely when the implementation changes.</p>
+    <div class="note"><p>Coverage percentage measures lines executed, not behaviour understood — a suite at 90 percent that asserts mocks and internals will pass while a navigation change breaks sign-in. Review tests the way you review features: what user-visible claim does this test make, and would its failure tell someone what to fix?</p></div>
+    <h3 id="ch18-tools" data-toc>Testing users, not implementations</h3>
+    <p>The query priority that keeps tests stable and honest: find elements the way a user finds them — by accessible role and visible name first, then by label text, then by placeholder, and never by test id as the first resort. Role queries force the markup to stay accessible (a <code>button</code> that becomes a <code>div</code> with an onClick breaks the query the same way it breaks a screen reader — which is the point: the test fails for the same reason a user would be harmed), and name queries force the visible label to stay attached to its control. Test ids sever both connections: they keep passing when the accessibility regresses, converting a real defect into a silent one. Reserve them for elements with no role and no text — a canvas overlay, a drag handle — where the other two queries genuinely cannot apply.</p>
+    <p>User events over fireEvent: <code>userEvent</code> types character by character, honours pointer and focus semantics, and produces the sequence the browser produces, which is what makes a form test catch the fact that the submit button never received focus or that a controlled input's onChange did not fire for pasted text. The complementary half is awaiting, and the rule that prevents the classic flake: never wait on time, always wait on the observed outcome — <code>findByRole</code> with a generous timeout instead of <code>sleep</code>, because a fixed sleep is wrong on both sides (too short on slow machines, wasted time on fast ones) and hides the real question, which is not "has enough time passed" but "has the thing appeared".</p>
+    <div class="codeWrap"><pre><code>// query priority: role, then label, then text - test id only as a last resort
+test('adding a task puts it in the list and clears the field', async () =&gt; {
+  renderWithProviders(&lt;TaskApp /&gt;);
+
+  // by role + accessible name: fails if the button loses its label OR its
+  // role - the same change that would strand a screen-reader user
+  const input = screen.getByRole('textbox', { name: /new task/i });
+  const add = screen.getByRole('button', { name: /^add$/i });
+
+  await userEvent.type(input, 'Write the release notes');
+  await userEvent.click(add);
+
+  // await the OUTCOME, never a duration - no sleep, no arbitrary timeout
+  expect(await screen.findByRole('listitem')).toHaveTextContent('Release notes');
+  expect(input).toHaveValue('');           // the field cleared, as designed
+});
+
+// the flake its replacing: time-based waiting hides the real condition
+async function flaky() {
+  await userEvent.click(add);
+  await new Promise((r) =&gt; setTimeout(r, 300));   // wrong on slow AND fast
+  expect(screen.getByText('Release notes')).toBeInTheDocument();
+}</code></pre></div>
+    <p>Interaction-level assertions complete the style. Test the workflow the way a user walks it — land on the screen, fill the form, submit, assert the outcome (a success message, a new row, a navigation) — rather than asserting each intermediate handler fired. This is what makes a test suite read as documentation: a colleague can scan the test names and learn what the application does, because each name is a capability, not an implementation event. And it is what makes the tests resilient: a capability persists through refactors of every kind, while an event fires only as long as the code fires it.</p>
+    <div class="codeWrap"><pre><code>// tests as documentation: capabilities, walked in order
+describe('task archive', () =&gt; {
+  test('archiving a task removes it from the open list', async () =&gt; {
+    renderWithProviders(&lt;TaskApp /&gt;);
+    const row = await screen.findByRole('listitem', { name: /write notes/i });
+    await userEvent.click(within(row).getByRole('button', { name: /archive/i }));
+    expect(screen.queryByRole('listitem', { name: /write notes/i })).toBeNull();
+  });
+
+  test('a failed archive keeps the task and explains why', async () =&gt; {
+    server.use(rest.post('/api/tasks/:id/archive',
+      (req, res, ctx) =&gt; res(ctx.status(403), ctx.json({ message: 'Read-only member' }))));
+    renderWithProviders(&lt;TaskApp /&gt;);
+    const row = await screen.findByRole('listitem', { name: /write notes/i });
+    await userEvent.click(within(row).getByRole('button', { name: /archive/i }));
+    // failure path asserted the same way: visible outcome, in place
+    expect(await screen.findByRole('alert')).toHaveTextContent('Read-only member');
+    expect(screen.getByRole('listitem', { name: /write notes/i })).toBeInTheDocument();
+  });
+});</code></pre></div>
+    <h4>The boundary between test kinds</h4>
+    <p>End-to-end tests earn their cost by covering the seams integration tests cannot: real routing with real history, real build output (code splitting, minification, the compiler from chapter 12), real browser form and focus behaviour, and third-party scripts that only exist in a browser. Everything else belongs in integration, which runs in seconds and diagnoses failures precisely, while an end-to-end failure reports only that "the journey broke". Keep the split by what each kind can see: if a test needs a real DOM layout, a real network stack or a real bundle, it is end-to-end; if it needs a mocked fetch and a rendered tree, it is integration; if it needs neither, it is a unit. Following that rule keeps the expensive suite small without leaving the risky paths uncovered.</p>
+    <div class="codeWrap"><pre><code>// the end-to-end suite: the few paths whose failure is an incident
+// e2e/checkout.spec.js - real browser, real build, real service worker
+test('a customer can complete checkout end to end', async ({ page }) =&gt; {
+  await page.goto('/products');
+  await page.getByRole('link', { name: /watering can/i }).click();
+  await page.getByRole('button', { name: /add to cart/i }).click();
+  await page.getByRole('link', { name: /cart/i }).click();
+  await page.getByRole('button', { name: /checkout/i }).click();
+
+  await page.getByLabel(/card number/i).fill('4242424242424242');
+  await page.getByRole('button', { name: /pay/i }).click();
+
+  // exactly one assertion at the end of the journey: the business outcome
+  await expect(page.getByRole('heading', { name: /order confirmed/i })).toBeVisible();
+});
+
+// everything the journey implies about components is covered faster and
+// more precisely in integration - the e2e test asserts only that it ENDS</code></pre></div>
+    <div class="warn"><p>The failure mode of a growing suite is not slowness but distrust: flakes taught the team to re-run rather than read, at which point red means nothing. Budget for determinism — no real clocks, no shared server state, no test-order dependence — and treat every flake as a defect in the test. A suite that is trusted when it is red is worth more than triple the tests that are only trusted when green.</p></div>
+    <div class="ex"><h4>Exercises 18</h4><ol>
+      <li>Draw your application's error containment map: for five realistic failures, state which boundary catches each. Add the missing root, screen and widget boundaries, then throw deliberately in each and confirm the fallback and its blast radius.</li>
+      <li>Take your worst fallback — the generic "something went wrong" — and rewrite it against the four questions, with a correlation id shared between the UI and the log line. Verify by triggering the error and finding the id in the logs.</li>
+      <li>Audit your error channels: find three <code>catch</code> blocks that swallow, one handler that fires a promise without awaiting, and one fire-and-forget effect. Convert each to the channel this chapter assigns it.</li>
+      <li>Write the trophy for one feature: a unit test for its pure logic, an integration test for its happy path and its failure path, and state in a comment why it needs no third layer.</li>
+      <li>Pick your three most valuable user journeys and write one end-to-end test each. Then delete one component unit test the integration suite already covers, and confirm nothing about confidence was lost.</li>
+    </ol></div>
+  </section>

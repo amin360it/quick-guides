@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NuxtJS - Vue Meta-Framework Guide</title>
+<meta name="description" content="This opening chapter explains how to work through the guide offline, chapter by chapter, so you build Nuxt…. 12 chapters, 66 topics and 45 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/nuxtjs.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="NuxtJS - Vue Meta-Framework Guide">
+<meta property="og:description" content="This opening chapter explains how to work through the guide offline, chapter by chapter, so you build Nuxt…. 12 chapters, 66 topics and 45 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/nuxtjs.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="NuxtJS - Vue Meta-Framework Guide">
+<meta name="twitter:description" content="This opening chapter explains how to work through the guide offline, chapter by chapter, so you build Nuxt…. 12 chapters, 66 topics and 45 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/nuxtjs.html#article","headline":"NuxtJS - Vue Meta-Framework Guide","name":"NuxtJS - Vue Meta-Framework Guide","description":"This opening chapter explains how to work through the guide offline, chapter by chapter, so you build Nuxt…. 12 chapters, 66 topics and 45 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/nuxtjs.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/nuxtjs.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"NuxtJS - Vue Meta-Framework Guide","item":"https://amin360it.github.io/quick-guides/nuxtjs.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">NuxtJS</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This NuxtJS Guide</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use all course long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Nuxt Fundamentals &amp; Setup</a><ul><li><a href="#ch1-vue" data-target="ch1-vue">1.1 What Nuxt adds over Vue</a></li><li><a href="#ch1-auto" data-target="ch1-auto">1.2 Auto-imports: no more import lines</a></li><li><a href="#ch1-files" data-target="ch1-files">1.3 The app structure that matters</a></li><li><a href="#ch1-nuxi" data-target="ch1-nuxi">1.4 Your first project with nuxi</a></li><li><a href="#ch1-config" data-target="ch1-config">1.5 nuxt.config.ts</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Pages &amp; File-Based Routing</a><ul><li><a href="#ch2-mapping" data-target="ch2-mapping">2.1 Static pages and the router root</a></li><li><a href="#ch2-dynamic" data-target="ch2-dynamic">2.2 Dynamic and catch-all routes</a></li><li><a href="#ch2-nested" data-target="ch2-nested">2.3 Nested routes with parent/child pages</a></li><li><a href="#ch2-nav" data-target="ch2-nav">2.4 Navigation, page metadata and middleware</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Components, Layouts &amp; SEO</a><ul><li><a href="#ch3-components" data-target="ch3-components">3.1 Auto-imported components</a></li><li><a href="#ch3-props" data-target="ch3-props">3.2 Props, emits and defineModel</a></li><li><a href="#ch3-layouts" data-target="ch3-layouts">3.3 Layouts and NuxtLayout</a></li><li><a href="#ch3-seo" data-target="ch3-seo">3.4 SEO with useHead and useSeoMeta</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Data Fetching</a><ul><li><a href="#ch4-usefetch" data-target="ch4-usefetch">4.1 useFetch</a></li><li><a href="#ch4-asyncdata" data-target="ch4-asyncdata">4.2 useAsyncData and $fetch</a></li><li><a href="#ch4-refresh" data-target="ch4-refresh">4.3 refresh, watch and cache keys</a></li><li><a href="#ch4-states" data-target="ch4-states">4.4 pending, error and immediate</a></li><li><a href="#ch4-parallel" data-target="ch4-parallel">4.5 Parallel and dependent requests</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · State Management</a><ul><li><a href="#ch5-usestate" data-target="ch5-usestate">5.1 useState</a></li><li><a href="#ch5-pinia" data-target="ch5-pinia">5.2 Installing and creating Pinia stores</a></li><li><a href="#ch5-actions" data-target="ch5-actions">5.3 Using stores in pages</a></li><li><a href="#ch5-persist" data-target="ch5-persist">5.4 Persistence patterns</a></li><li><a href="#ch5-when" data-target="ch5-when">5.5 When to use which</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Server Routes &amp; Nitro</a><ul><li><a href="#ch6-dir" data-target="ch6-dir">6.1 The server directory</a></li><li><a href="#ch6-handlers" data-target="ch6-handlers">6.2 Params, query and body</a></li><li><a href="#ch6-middleware" data-target="ch6-middleware">6.3 Server middleware</a></li><li><a href="#ch6-fetch" data-target="ch6-fetch">6.4 Calling your own API with $fetch</a></li><li><a href="#ch6-deploy" data-target="ch6-deploy">6.5 Deploying the Nitro server</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Middleware, Plugins &amp; Composables</a><ul><li><a href="#ch7-named" data-target="ch7-named">7.1 Named route middleware</a></li><li><a href="#ch7-global" data-target="ch7-global">7.2 Global and anonymous middleware</a></li><li><a href="#ch7-plugins" data-target="ch7-plugins">7.3 Plugins and the provide pattern</a></li><li><a href="#ch7-composables" data-target="ch7-composables">7.4 Writing custom composables</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Rendering Modes &amp; Performance</a><ul><li><a href="#ch8-ssr" data-target="ch8-ssr">8.1 SSR by default</a></li><li><a href="#ch8-ssg" data-target="ch8-ssg">8.2 Static generation and prerendering</a></li><li><a href="#ch8-spa" data-target="ch8-spa">8.3 SPA mode</a></li><li><a href="#ch8-hybrid" data-target="ch8-hybrid">8.4 Hybrid rendering with route rules</a></li><li><a href="#ch8-perf" data-target="ch8-perf">8.5 Payload extraction and image optimization</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Forms, Errors &amp; Auth Patterns</a><ul><li><a href="#ch9-forms" data-target="ch9-forms">9.1 Form handling with v-model</a></li><li><a href="#ch9-validation" data-target="ch9-validation">9.2 Validation</a></li><li><a href="#ch9-errors" data-target="ch9-errors">9.3 Custom error pages and createError</a></li><li><a href="#ch9-cookies" data-target="ch9-cookies">9.4 Cookies and session basics</a></li><li><a href="#ch9-auth" data-target="ch9-auth">9.5 The auth middleware pattern</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Deployment &amp; Best Practices</a><ul><li><a href="#ch10-build" data-target="ch10-build">10.1 The build output and presets</a></li><li><a href="#ch10-static" data-target="ch10-static">10.2 Serving static sites</a></li><li><a href="#ch10-config" data-target="ch10-config">10.3 runtimeConfig and environment</a></li><li><a href="#ch10-hosting" data-target="ch10-hosting">10.4 Hosting options compared</a></li><li><a href="#ch10-conventions" data-target="ch10-conventions">10.5 Project conventions worth keeping</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Quick Reference &amp; Glossary</a><ul><li><a href="#app-composables" data-target="app-composables">A.1 Nuxt composables quick reference</a></li><li><a href="#app-files" data-target="app-files">A.2 File-based conventions</a></li><li><a href="#app-config" data-target="app-config">A.3 Config keys and commands</a></li><li><a href="#app-glossary" data-target="app-glossary">A.4 Glossary</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">NuxtJS</span>
+      <span class="am-band-s">12 chapters &middot; 66 topics &middot; 45 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This NuxtJS Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This NuxtJS Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The right mindset</a><a href="#orientation-tools">Tools you will use all course long</a></div></div>
+    <p class="topic-desc">This opening chapter explains how to work through the guide offline, chapter by chapter, so you build Nuxt knowledge and muscle memory by typing real code. It sets expectations about pace and the workload ahead. Everything is self-contained, with copy-ready code in every chapter. Read it before starting the project setup so the later steps feel natural.</p>
+    <p>This is a complete, self-paced path through <strong>Nuxt 3 and Nuxt 4</strong>, from scaffolding your first app to hybrid rendering and deployment. Everything runs in a single HTML file — no internet required, progress is saved in your browser.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">This section lays out the guide’s three-part structure spanning ten chapters and a reference appendix. Each chapter covers one area of Nuxt, from fundamentals to deployment, and ends with exercises and copy-ready code you type out yourself. Understanding the arc helps you decide where to focus your practice. New readers can use it to plan their path through the material.</p>
+    <ul>
+      <li><strong>Part I (Ch. 1–3)</strong> — foundations: setup, file-based routing, components, layouts and SEO.</li>
+      <li><strong>Part II (Ch. 4–7)</strong> — application logic: data fetching, state, server routes, middleware, plugins and composables.</li>
+      <li><strong>Part III (Ch. 8–10)</strong> — delivery: rendering modes, forms and auth, deployment and best practices.</li>
+      <li>Every chapter ends with exercises. Code is copy-ready; type it rather than pasting to build muscle memory.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset</h3>
+    <p class="topic-desc">This section frames Nuxt’s core philosophy of conventions over configuration: folders and file names wire up most behavior automatically. When something appears to be magic, a naming convention or directory layout is behind it, from pages/ routes to auto-imported composables. Adopting that mindset makes Nuxt predictable once you learn the rules.</p>
+    <p>Nuxt rewards understanding <em>conventions</em>. Drop a file in the right folder and Nuxt wires it up — that is the whole idea. When something feels magical, ask: which folder or naming convention caused this? That one question answers most "how does Nuxt do that?" moments.</p>
+    <div class="tip"><p>Keep the official docs open beside this guide at <code>nuxt.com/docs</code>. This guide explains the why and the sequence; the docs are the exhaustive reference.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will use all course long</h3>
+    <p class="topic-desc">This section lists the tools you use throughout the course, starting with Node.js and npm, followed by the nuxi command-line tool that scaffolds, builds and serves the app. You also install the Vue devtools in the browser for inspecting component state and requests. Installing them once means every later chapter runs on the same setup.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Node 18.18+ (LTS 20 or 22)</td><td>Runtime for Nuxt and its build tools</td></tr>
+      <tr><td>npm / pnpm / yarn / bun</td><td>Package manager, installs Nuxt and dependencies</td></tr>
+      <tr><td>nuxi (the Nuxt CLI)</td><td>Create, dev, build, generate and preview your app</td></tr>
+      <tr><td>Vue devtools</td><td>Inspect components, state, routes and requests in the browser</td></tr>
+      <tr><td>VS Code with Volar</td><td>First-class editing support for .vue files</td></tr>
+      <tr><td>Nitro</td><td>Nuxt’s server engine; powers server routes and deploys</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Nuxt Fundamentals &amp; Setup</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Nuxt Fundamentals &amp; Setup</button><div class="ch-toc-list"><a href="#ch1-vue">1.1 What Nuxt adds over Vue</a><a href="#ch1-auto">1.2 Auto-imports: no more import lines</a><a href="#ch1-files">1.3 The app structure that matters</a><a href="#ch1-nuxi">1.4 Your first project with nuxi</a><a href="#ch1-config">1.5 nuxt.config.ts</a></div></div>
+    <p class="topic-desc">This chapter boots a working Nuxt application and explains what Nuxt adds on top of plain Vue, such as file-based routing, auto-imports and a built-in server. You scaffold a project with npx nuxi init, start the dev server, and explore the folder layout and nuxt.config.ts. By the end you can navigate and edit a running app confidently.</p>
+    <p>Nuxt is a meta-framework on top of Vue: it adds file-based routing, SSR and SSG, auto-imports, a server engine and SEO tooling while you keep writing ordinary Vue components. This chapter boots a project and explains the ideas the whole course rests on.</p>
+    <h3 id="ch1-vue" data-toc>1.1 What Nuxt adds over Vue</h3>
+    <p class="topic-desc">This section compares a plain Vue single-page app with a Nuxt application and details what Nuxt enables by default: file-based routing, auto-imports, a Nitro server and SSR. It explains why these defaults remove the manual wiring of build tools and libraries. The main takeaway is that Nuxt provides structure and a server without adding separate frameworks.</p>
+    <p>Plain Vue is a library you assemble: you choose the router, the state store, the SSR layer and the bundler. Nuxt is a framework with opinions — it brings Vue Router, Nitro, a folder contract and composables, so you skip the plumbing and start shipping pages.</p>
+    <div class="codeWrap"><pre><code>// package.json highlight — one dependency pulls in the whole framework
+{
+  "name": "my-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",            // HMR dev server on localhost:3000
+    "build": "nuxt build",        // production build into .output/
+    "preview": "nuxt preview"     // run the built output locally
+  },
+  "devDependencies": { "nuxt": "^3.14.0" }
+}</code></pre></div>
+    <p class="code-note">A Nuxt app needs only the nuxt package and three scripts; the nuxi CLI inside it handles dev, build and preview, and the router and server ship built in.</p>
+    <h3 id="ch1-auto" data-toc>1.2 Auto-imports: no more import lines</h3>
+    <p class="topic-desc">This section covers Nuxt’s auto-import system, where composables, utilities and components resolve by naming convention without import statements. Components in the components/ folder and functions in composables/ and utils/ folders become available automatically across the app. Relying on the convention keeps everyday code short and readable.</p>
+    <div class="codeWrap"><pre><code>// Anywhere in the app — no import statement needed
+const count = ref(0)                      // Vue APIs are auto-imported
+const router = useRouter()                // as are Nuxt composables
+const { data } = await useFetch('/api/posts')
+
+// Only unusual helpers need an explicit import
+import { formatDate } from '~/utils/date'</code></pre></div>
+    <p class="code-note">Nuxt auto-imports Vue APIs, Nuxt composables, and files inside composables/ and utils/, so everyday code carries almost no import lines at all.</p>
+    <div class="tip"><p>Auto-import resolves by file name and export name. Name files <code>useMyFeature</code>, <code>MyFeature</code> or <code>formatDate</code> and they become available app-wide.</p></div>
+    <h3 id="ch1-files" data-toc>1.3 The app structure that matters</h3>
+    <p class="topic-desc">This section maps the folders Nuxt watches by convention: pages/ for routes, components/ for UI, layouts/ for shared shells, composables/ and utils/ for logic, server/ for API endpoints, and public/ for static assets. Each folder has a defined job, and file names become the URL or tag name. Knowing what each directory does is half of mastering Nuxt.</p>
+    <table>
+      <tr><th>Path</th><th>What lives there</th></tr>
+      <tr><td><code>pages/</code></td><td>Routes as files (Nuxt 4: <code>app/pages/</code>)</td></tr>
+      <tr><td><code>components/</code></td><td>Vue components, auto-imported</td></tr>
+      <tr><td><code>layouts/</code></td><td>Shared page layouts; default.vue is the base</td></tr>
+      <tr><td><code>composables/</code>, <code>utils/</code></td><td>Auto-imported functions</td></tr>
+      <tr><td><code>assets/</code>, <code>public/</code></td><td>Source assets and files served as-is</td></tr>
+      <tr><td><code>server/</code></td><td>API routes and middleware running in Nitro</td></tr>
+      <tr><td><code>app.vue</code></td><td>The root component, usually hosting &lt;NuxtPage&gt;</td></tr>
+      <tr><td><code>nuxt.config.ts</code></td><td>Framework configuration</td></tr>
+    </table>
+    <h3 id="ch1-nuxi" data-toc>1.4 Your first project with nuxi</h3>
+    <p class="topic-desc">This section walks through scaffolding a first project with npx nuxi init and starting the development server with npm run dev. It explains the generated file structure and how to open the app in the browser before adding a first page. Within minutes you go from an empty directory to a live, editable Nuxt application.</p>
+    <div class="codeWrap"><pre><code>npx nuxi@latest init my-app --packageManager npm   # scaffold a fresh project
+cd my-app
+npm install                                          # install the dependencies
+npm run dev                                          # dev server with hot reload
+
+# open http://localhost:3000 — edits to pages/ reload instantly</code></pre></div>
+    <p class="code-note">nuxi init scaffolds the whole project, npm install pulls dependencies, and the dev server on localhost:3000 hot-reloads as you edit files.</p>
+    <h3 id="ch1-config" data-toc>1.5 nuxt.config.ts</h3>
+    <p class="topic-desc">This section introduces nuxt.config.ts, the single config file where most framework tweaks live. Here you set SSR mode, the default app head, favicon, css, modules and route rules using the defineNuxtConfig helper. Most features, including Pinia or Tailwind, are enabled simply by adding a module to the modules array. TypeScript gives autocomplete for every key.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  ssr: true,                    // server-side rendering is on by default
+  devtools: { enabled: true },  // in-browser devtools at /_devtools
+  app: {
+    head: {
+      title: 'My App',
+      htmlAttrs: { lang: 'en' },   // lang attribute on the root element
+    },
+  },
+  modules: ['@nuxtjs/tailwindcss'],   // add features by listing modules
+})</code></pre></div>
+    <p class="code-note">The config turns on devtools, sets global head defaults and registers modules; keeping it small means the framework does more of the work for you.</p>
+    <div class="ex"><h4 id="ch1-config--exercises-1">Exercises 1</h4><ol>
+      <li>Scaffold an app with <code>nuxi init</code>, run the dev server, and edit a heading in <code>app.vue</code>.</li>
+      <li>Add a second key to <code>nuxt.config.ts</code> and confirm the dev server accepts it.</li>
+      <li>Create <code>composables/useGreeting.ts</code> and call it in a page with no import line.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Pages &amp; File-Based Routing</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Pages &amp; File-Based Routing</button><div class="ch-toc-list"><a href="#ch2-mapping">2.1 Static pages and the router root</a><a href="#ch2-dynamic">2.2 Dynamic and catch-all routes</a><a href="#ch2-nested">2.3 Nested routes with parent/child pages</a><a href="#ch2-nav">2.4 Navigation, page metadata and middleware</a></div></div>
+    <p class="topic-desc">This chapter covers Nuxt’s file-based routing, where every file under pages/ becomes a route whose URL mirrors the file tree. You build static, dynamic and nested routes, navigate with NuxtLink and navigateTo, and attach page metadata and middleware with definePageMeta. The result is zero-config routing that scales naturally with your files.</p>
+    <p>Nuxt generates its router from the file tree — <code>pages/about.vue</code> becomes <code>/about</code>, and folders nest routes. Combined with auto-imported components, this replaces hundreds of lines of router config with folder names.</p>
+    <h3 id="ch2-mapping" data-toc>2.1 Static pages and the router root</h3>
+    <p class="topic-desc">This section shows how a file such as pages/about.vue becomes the about route and how the root component in app.vue hosts pages inside NuxtPage. The mapping is predictable: directory and file names translate directly into URL segments. This convention makes the route table trivial to predict and to extend.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- app.vue — the root component hosting every page --&gt;
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;NuxtPage /&gt;   &lt;!-- renders the matched page component --&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;!-- pages/index.vue      → / --&gt;
+&lt;!-- pages/about.vue      → /about --&gt;
+&lt;!-- pages/blog/index.vue → /blog --&gt;</code></pre></div>
+    <p class="code-note">NuxtPage renders the matched page, and each file under pages/ maps directly to a URL — nested folders become nested URL segments.</p>
+    <h3 id="ch2-dynamic" data-toc>2.2 Dynamic and catch-all routes</h3>
+    <p class="topic-desc">This section covers dynamic segments written in square brackets, such as pages/[id].vue, and catch-all routes written as [...slug].vue for matching several segments at once. The useRoute() composable reads the current params anywhere in a page, and navigateTo handles movement between dynamic paths. Matchers with no candidate can fall back to a 404 or a designated fallback route.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+const route = useRoute()               // the current route object, reactive
+const id = String(route.params.id)     // from pages/posts/[id].vue
+
+// fetch the post for this id — runs on the server and again on the client
+const { data: post } = await useFetch('/api/posts/' + id)
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;h1&gt;Post {{ id }}&lt;/h1&gt;
+  &lt;p&gt;{{ post?.title }}&lt;/p&gt;
+&lt;/template&gt;
+
+&lt;!-- pages/docs/[...slug].vue → matches /docs/a/b/c --&gt;
+&lt;!-- params.slug = ['a', 'b', 'c'] --&gt;</code></pre></div>
+    <p class="code-note">Square brackets capture one URL segment, [...] catches everything after it, and useRoute().params hands you those values inside the page.</p>
+    <h3 id="ch2-nested" data-toc>2.3 Nested routes with parent/child pages</h3>
+    <p class="topic-desc">This section builds nested layouts out of the file tree: a folder holds a parent page that includes NuxtPage, and the child page components render inside it. Both levels share route params through useRoute, and the parent state is preserved while children swap. This structure mirrors the filesystem exactly, making complex screens easy to organize.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- pages/users/[id].vue — the parent page --&gt;
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;User {{ $route.params.id }}&lt;/h1&gt;
+    &lt;NuxtPage /&gt;   &lt;!-- child pages render inside here --&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;!-- pages/users/[id]/posts.vue   → /users/7/posts --&gt;
+&lt;!-- pages/users/[id]/settings.vue → /users/7/settings --&gt;</code></pre></div>
+    <p class="code-note">A page with its own folder acts as a parent layout: child pages render in its NuxtPage, keeping shared headers and tabs in one file.</p>
+    <h3 id="ch2-nav" data-toc>2.4 Navigation, page metadata and middleware</h3>
+    <p class="topic-desc">This section shows navigation, page metadata and the simplest route middleware. You move between routes with the NuxtLink component or programmatically with navigateTo, publish titles and layouts through definePageMeta, and attach a named middleware to the same meta object. Together these control how users move through the app.</p>
+    <div class="codeWrap"><pre><code>&lt;template&gt;
+  &lt;nav&gt;
+    &lt;NuxtLink to="/"&gt;Home&lt;/NuxtLink&gt;
+    &lt;NuxtLink to="/blog"&gt;Blog&lt;/NuxtLink&gt;
+    &lt;NuxtLink :to="blogLink"&gt;Latest post&lt;/NuxtLink&gt;
+  &lt;/nav&gt;
+&lt;/template&gt;
+
+&lt;script setup lang="ts"&gt;
+const blogLink = { path: '/blog', query: { page: 2 } }   // object targets work too
+
+function go() {
+  navigateTo('/about')            // programmatic navigation
+}
+
+// per-page metadata plus a tiny inline route guard
+definePageMeta({
+  layout: 'default',
+  middleware: defineNuxtRouteMiddleware((to) =&gt; {
+    if (!to.query.token) return navigateTo('/login')
+  }),
+})
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">NuxtLink renders real prefetching links, navigateTo() moves the app programmatically, and definePageMeta wires a per-page layout plus an inline route guard.</p>
+    <div class="ex"><h4 id="ch2-nav--exercises-2">Exercises 2</h4><ol>
+      <li>Create pages for <code>/</code>, <code>/about</code> and <code>/help</code>, and link them with NuxtLink.</li>
+      <li>Add <code>pages/posts/[id].vue</code> and render a different title per id.</li>
+      <li>Build a <code>users/[id]/settings.vue</code> nested route and confirm the parent keeps rendering.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Components, Layouts &amp; SEO</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Components, Layouts &amp; SEO</button><div class="ch-toc-list"><a href="#ch3-components">3.1 Auto-imported components</a><a href="#ch3-props">3.2 Props, emits and defineModel</a><a href="#ch3-layouts">3.3 Layouts and NuxtLayout</a><a href="#ch3-seo">3.4 SEO with useHead and useSeoMeta</a></div></div>
+    <p class="topic-desc">This chapter turns page code into structured, shareable UI using auto-imported components, typed props and emits, and reusable layouts. It also covers the SEO composables useHead and useSeoMeta for titles, meta tags and Open Graph data. By the end you can build consistent interfaces with centralized head settings.</p>
+    <p>Any component in components/ is available in every template without an import. Layouts wrap the whole page chrome, and useHead layers per-page titles and meta. Together they replace most of the boilerplate of a hand-built Vue UI.</p>
+    <h3 id="ch3-components" data-toc>3.1 Auto-imported components</h3>
+    <p class="topic-desc">This section explains that any component placed under components/ is auto-imported, so its tag works anywhere without an import line. Nested folders extend the tag name with a prefix: components/base/Button.vue becomes BaseButton. The lazy option and dynamic imports handle on-demand loading when components grow large.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- components/BaseButton.vue → usable anywhere as &lt;BaseButton&gt; --&gt;
+&lt;template&gt;
+  &lt;button :class="variant"&gt;&lt;slot /&gt;&lt;/button&gt;
+&lt;/template&gt;
+
+&lt;!-- components/ui/Card.vue → &lt;UiCard&gt; (the folder becomes a prefix) --&gt;
+&lt;template&gt;
+  &lt;div class="card"&gt;&lt;slot /&gt;&lt;/div&gt;
+&lt;/template&gt;
+
+&lt;!-- everywhere else — no import needed --&gt;
+&lt;template&gt;
+  &lt;UiCard&gt;
+    &lt;BaseButton variant="primary"&gt;Save&lt;/BaseButton&gt;
+  &lt;/UiCard&gt;
+&lt;/template&gt;</code></pre></div>
+    <p class="code-note">Components resolve by name from the components/ folder — nesting adds a namespace — and slots let children pass content into the markup.</p>
+    <h3 id="ch3-props" data-toc>3.2 Props, emits and defineModel</h3>
+    <p class="topic-desc">This section shows the script setup pattern for passing data down and emitting events up. You declare props with defineProps and events with defineEmits using TypeScript types, which are then enforced at compile time. The defineModel macro creates a two-way binding with a single declaration. Typed definitions double as documentation and editor autocomplete.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+// typed props with defaults
+const props = defineProps&lt;{
+  title: string
+  variant?: 'primary' | 'ghost'      // union type documents the options
+}&gt;()
+
+// declared emits — the names a parent can listen for
+const emit = defineEmits&lt;{ (e: 'saved', id: number): void }&gt;()
+
+const count = defineModel&lt;number&gt;()   // two-way v-model with the parent
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;button @click="emit('saved', 42)"&gt;{{ title }} · {{ count }}&lt;/button&gt;
+&lt;/template&gt;</code></pre></div>
+    <p class="code-note">defineProps and defineEmits give typed component contracts, and defineModel wires a v-model pair without hand-written events.</p>
+    <h3 id="ch3-layouts" data-toc>3.3 Layouts and NuxtLayout</h3>
+    <p class="topic-desc">This section covers the default layout at layouts/default.vue and how to assign a different one per page with definePageMeta layout: name. NuxtLayout wraps the page inside the matched layout, and the naming convention keeps headers, footers and sidebars out of individual pages. Restructuring shared page chrome becomes a single file change.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- layouts/default.vue — applied when no layout is chosen --&gt;
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;header&gt;&lt;SiteNav /&gt;&lt;/header&gt;
+    &lt;main&gt;&lt;slot /&gt;&lt;/main&gt;               &lt;!-- the page content lands in the slot --&gt;
+    &lt;footer&gt;&lt;SiteFooter /&gt;&lt;/footer&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;!-- layouts/blank.vue — opt out of the chrome entirely --&gt;
+&lt;template&gt;&lt;slot /&gt;&lt;/template&gt;
+
+&lt;!-- pages/login.vue --&gt;
+&lt;script setup lang="ts"&gt;
+definePageMeta({ layout: 'blank' })   // pick a non-default layout per page
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">Layouts wrap pages in shared chrome: default.vue applies automatically, pages opt into another layout with definePageMeta, and the page itself lands in the slot.</p>
+    <div class="tip"><p>Layouts stay mounted between navigations, so keep stateful nav UI here instead of app.vue when you want per-path behavior.</p></div>
+    <h3 id="ch3-seo" data-toc>3.4 SEO with useHead and useSeoMeta</h3>
+    <p class="topic-desc">This section shows per-page SEO with the useHead and useSeoMeta composables in a page script setup. You set the title, description, canonical link and Open Graph tags for each screen, and a global title template in nuxt.config keeps branding consistent. Head values update reactively as users navigate.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+// per-page head — merges over the global config defaults
+useHead({ title: 'About' })
+
+// typed shortcut for the most common SEO fields
+useSeoMeta({
+  title: 'About — My App',
+  ogTitle: 'About — My App',
+  description: 'Who we are.',
+  ogImage: '/og/about.png',
+})
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">useHead and useSeoMeta set reactive head tags per component; pairing them with a global title template gives every page a branded title suffix.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts — global defaults and a title template
+export default defineNuxtConfig({
+  app: {
+    head: {
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
+      titleTemplate: '%s · My App',   // every page title ends with this suffix
+      htmlAttrs: { lang: 'en' },
+    },
+  },
+})</code></pre></div>
+    <p class="code-note">The config seeds charset, viewport and a title template; %s is replaced with a page’s own title, giving a consistent brand across every route.</p>
+    <div class="ex"><h4 id="ch3-seo--exercises-3">Exercises 3</h4><ol>
+      <li>Create a <code>UserAvatar</code> component and use it without an import.</li>
+      <li>Build a submit button with typed props and a <code>saved</code> emit, then listen to it in a page.</li>
+      <li>Add a <code>layouts/blog.vue</code>, assign it to a single page, and set per-page title and ogTitle.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Data Fetching</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Data Fetching</button><div class="ch-toc-list"><a href="#ch4-usefetch">4.1 useFetch</a><a href="#ch4-asyncdata">4.2 useAsyncData and $fetch</a><a href="#ch4-refresh">4.3 refresh, watch and cache keys</a><a href="#ch4-states">4.4 pending, error and immediate</a><a href="#ch4-parallel">4.5 Parallel and dependent requests</a></div></div>
+    <p class="topic-desc">This chapter covers server-safe data fetching with useFetch, useAsyncData and the $fetch helper, whose results are cached and reactive. You load data during SSR so the first HTML already contains the content, then refresh or watch it on the client and render loading and error states. This replaces hand-rolled fetch code across the whole app.</p>
+    <p>Nuxt’s data layer is built on three pieces: $fetch (the raw HTTP call), useAsyncData (caching, deduplication and SSR) and useFetch (a convenience wrapper around both). The result is data fetched once on the server and reused for the first client render.</p>
+    <h3 id="ch4-usefetch" data-toc>4.1 useFetch</h3>
+    <p class="topic-desc">This section presents useFetch as the everyday data composable. You pass a URL plus options such as method, params, query and body, and receive data, pending, error and refresh in return. It behaves the same during SSR and on the client and infers the payload type from the endpoint response.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+// fetches on the server at request time and reuses the data on the client
+const { data, pending, error, refresh } = await useFetch('/api/posts')
+
+// with a cache key and a transform — pick only what the page needs
+const { data: posts } = await useFetch('/api/posts', {
+  key: 'posts',                        // cache key, dedupes parallel calls
+  transform: (rows) =&gt; rows.slice(0, 10),
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;p v-if="pending"&gt;Loading&lt;/p&gt;
+  &lt;p v-else-if="error"&gt;{{ error.message }}&lt;/p&gt;
+  &lt;div v-else v-for="post in posts" :key="post.id"&gt;{{ post.title }}&lt;/div&gt;
+&lt;/template&gt;</code></pre></div>
+    <p class="code-note">useFetch runs during SSR and hands the page a reactive result; the template branches on pending and error before rendering the loaded posts.</p>
+    <h3 id="ch4-asyncdata" data-toc>4.2 useAsyncData and $fetch</h3>
+    <p class="topic-desc">This section shows useAsyncData, the lower-level composable that wraps any async function, and pairs it with the $fetch helper for full control. You supply a handler that returns the data and options that govern caching and SSR behavior. It is the building block behind useFetch and the right place to add custom logic around a request.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+const slug = String(useRoute().params.slug)
+
+// $fetch gives you full control of the request
+const { data: post } = await useAsyncData('post-' + slug, async () =&gt; {
+  const all = await $fetch('/api/posts')
+  const one = all.find((p) =&gt; p.slug === slug)   // pick from the full list
+  if (!one) throw createError({ statusCode: 404, message: 'Post missing' })
+  return one
+})
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">useAsyncData runs any async function with the same caching and SSR guarantees, while $fetch handles the HTTP call — the escape hatch for custom data logic.</p>
+    <h3 id="ch4-refresh" data-toc>4.3 refresh, watch and cache keys</h3>
+    <p class="topic-desc">This section explains how to re-fetch data and invalidate the cache. A clear key plus calling refresh() covers most stale-data problems, and the watch option refetches automatically when a reactive source changes. Reusing the same key across components shares one cached payload. This keeps fresh data visible after mutations.</p>
+    <div class="codeWrap"><pre><code>const route = useRoute()
+const { data: posts, refresh } = await useFetch('/api/posts', {
+  key: 'public-posts',                 // explicit key = dedicated cache slot
+})
+
+// re-fetch when the page query changes
+watch(() =&gt; route.query.page, () =&gt; refresh())
+
+// evict a cache slot so the next read goes to the network again
+clearNuxtData('public-posts')</code></pre></div>
+    <p class="code-note">A stable key makes the same request share one cache slot, watch re-fetches when inputs change, and clearNuxtData evicts a slot so the next read fetches fresh.</p>
+    <h3 id="ch4-states" data-toc>4.4 pending, error and immediate</h3>
+    <p class="topic-desc">This section shows the status fields returned by the data composables: pending and error tell templates what to render, while the immediate option controls whether fetching starts on mount or when you call execute(). Because the returned data is a ref, mutations update templates reactively with no extra wiring.</p>
+    <div class="codeWrap"><pre><code>const { data, pending, error, execute } = useFetch('/api/search', {
+  immediate: false,      // do not fire until execute() is called
+  watch: [query],        // auto re-fetch when query changes
+})
+
+function search() { execute() }
+
+data.value = []          // mutate to make fallback UI instantly
+if (error.value) console.error(error.value.statusCode)</code></pre></div>
+    <p class="code-note">immediate:false defers the request until execute(), watch ties refetching to other reactive values, and data/error are plain reactivity you can read and assign.</p>
+    <h3 id="ch4-parallel" data-toc>4.5 Parallel and dependent requests</h3>
+    <p class="topic-desc">This section covers running several independent requests efficiently. Multiple useFetch calls in a page run in parallel and are awaited together before the page renders, and a single useAsyncData can wrap Promise.all for grouped calls. Dependent sequences await the first result before starting the next. Parallel fetching keeps pages fast.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+// independent calls run in parallel; the await gates render both together
+const [profile, { data: posts }] = await Promise.all([
+  useAsyncData('profile', () =&gt; $fetch('/api/profile')),
+  useFetch('/api/posts'),
+])
+
+// a dependent call starts once its input value exists
+const { data: user } = await useFetch('/api/users/me')
+const { data: feed } = await useFetch(() =&gt; '/api/feed/' + user.value?.team)
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">Promise.all fires independent fetches at the same time, while a dependent fetch only starts once user.value exists — the pattern for building chained requests.</p>
+    <div class="ex"><h4 id="ch4-parallel--exercises-4">Exercises 4</h4><ol>
+      <li>Load a list with <code>useFetch</code> and render a pending branch.</li>
+      <li>Watch a search input and re-fetch the results as the user types.</li>
+      <li>Fetch profile and activity together with <code>Promise.all</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · State Management</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · State Management</button><div class="ch-toc-list"><a href="#ch5-usestate">5.1 useState</a><a href="#ch5-pinia">5.2 Installing and creating Pinia stores</a><a href="#ch5-actions">5.3 Using stores in pages</a><a href="#ch5-persist">5.4 Persistence patterns</a><a href="#ch5-when">5.5 When to use which</a></div></div>
+    <p class="topic-desc">This chapter covers shared reactive state with useState and Pinia for structured application state. You learn to define stores with state, getters and actions and to consume them from pages alongside the data-fetching composables. It also covers persistence patterns and guidance on when each tool is the right fit.</p>
+    <p>Nuxt has two state layers: the lightweight useState composable for a single shared value, and Pinia (a module) for a full store with state, getters and actions. SSR-safe by default, state created on the server is serialized into the payload so the client keeps the same data.</p>
+    <h3 id="ch5-usestate" data-toc>5.1 useState</h3>
+    <p class="topic-desc">This section shows useState, the SSR-safe shared state composable. A value created with the same key on the server and client resolves to one reactively shared ref, so hydrated state survives the transfer. An optional factory function provides the initial value, and TypeScript infers the payload type. State stays globally accessible across components.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+// shared, SSR-safe counter — the key makes it global across components
+const count = useState('counter', () =&gt; 0)
+
+function bump() { count.value++ }   // every component using the key sees the change
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;button @click="bump"&gt;Count: {{ count }}&lt;/button&gt;
+&lt;/template&gt;</code></pre></div>
+    <p class="code-note">useState(key, init) returns one reactive value shared by every component that uses the same key, initialized on the server and hydrated on the client.</p>
+    <div class="tip"><p>Put useState calls inside a composable in <code>composables/</code> so auto-import works and the key lives in exactly one place.</p></div>
+    <h3 id="ch5-pinia" data-toc>5.2 Installing and creating Pinia stores</h3>
+    <p class="topic-desc">This section adds the Pinia module to nuxt.config, either directly or via @pinia/nuxt, then defines the first store file in the stores/ directory with defineStore. Nuxt auto-imports the store hook from the file name with the use prefix. The module wires the store into the app lifecycle and SSR hydration automatically.</p>
+    <div class="codeWrap"><pre><code>npm install @pinia/nuxt pinia
+# then add '@pinia/nuxt' to the modules array in nuxt.config.ts
+
+// stores/cart.ts — any store file is found by the module
+export const useCartStore = defineStore('cart', () =&gt; {
+  const items = ref([])                                  // state
+  const total = computed(() =&gt;
+    items.value.reduce((sum, item) =&gt; sum + item.price, 0))   // getter
+  function add(item) { items.value.push(item) }          // action
+  return { items, total, add }
+})</code></pre></div>
+    <p class="code-note">With the module installed, a store is just defineStore; the setup style returns refs as state, computeds as getters and functions as actions.</p>
+    <h3 id="ch5-actions" data-toc>5.3 Using stores in pages</h3>
+    <p class="topic-desc">This section shows consuming a store from a page with its auto-imported hook and filling it from fetched data. Getters read like computed values and actions are invoked like methods, so stores compose naturally with useFetch and useState. A common first example is a login flow or a shopping cart that needs data on both server and client.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+const cart = useCartStore()                // auto-imported, shared across the app
+const { data } = await useFetch('/api/cart')
+
+// sync server data into the store on load
+cart.$patch(data.value ?? { items: [] })
+
+async function checkout() {
+  cart.saving = true                       // extra state can live alongside
+  await $fetch('/api/checkout', { method: 'POST', body: cart.items })
+  cart.saving = false
+  cart.items = []
+}
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">The page reads the shared store, hydrates it from the fetched payload, and calls a store action plus a plain assignment to drive the checkout flow.</p>
+    <h3 id="ch5-persist" data-toc>5.4 Persistence patterns</h3>
+    <p class="topic-desc">This section shows the two common persistence approaches: cookies for values the server must read, handled with the useCookie composable, and localStorage for state needed only by the client. The decision depends on who later consumes the data and how far it must survive reloads. Tokens typically live in cookies so every request carries them.</p>
+    <div class="codeWrap"><pre><code>// server/client-readable: useCookie is a Nuxt composable
+const theme = useCookie('theme', { maxAge: 60 * 60 * 24 * 365 })   // lasts one year
+
+// or mirror a client-only store to localStorage with a deep watch
+watch(cart.items, (value) =&gt; {
+  localStorage.setItem('cart', JSON.stringify(value))
+}, { deep: true })
+
+// and read it back when the store initializes
+const saved = ref(JSON.parse(localStorage.getItem('cart') || '[]'))</code></pre></div>
+    <p class="code-note">Small values the server must see belong in cookies via useCookie, while bulk client-only state can be mirrored to localStorage through a deep watch.</p>
+    <h3 id="ch5-when" data-toc>5.5 When to use which</h3>
+    <p class="topic-desc">This section decides between useState and Pinia based on the shape of your app. For a few shared values, useState keeps things minimal; Pinia pays off when state gains logic, cross-cutting usage or devtools requirements. The working rule is to start with useState and introduce Pinia as the codebase grows.</p>
+    <table>
+      <tr><th>Situation</th><th>Reach for</th></tr>
+      <tr><td>A single shared value across components</td><td><code>useState</code></td></tr>
+      <tr><td>Per-request values (theme, locale)</td><td><code>useCookie</code> or <code>useState</code></td></tr>
+      <tr><td>Related values with actions and getters</td><td>Pinia store</td></tr>
+      <tr><td>Data shared between server API and client</td><td>Pinia hydrated from <code>useFetch</code></td></tr>
+      <tr><td>Client-only caches and preferences</td><td>localStorage or IndexedDB via a plugin</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch5-when--exercises-5">Exercises 5</h4><ol>
+      <li>Share a <code>useState</code> counter between two components on one page.</li>
+      <li>Install Pinia and move the counter into a store with actions and a double getter.</li>
+      <li>Persist a theme cookie and read it in the layout to set a CSS class.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Server Routes &amp; Nitro</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Server Routes &amp; Nitro</button><div class="ch-toc-list"><a href="#ch6-dir">6.1 The server directory</a><a href="#ch6-handlers">6.2 Params, query and body</a><a href="#ch6-middleware">6.3 Server middleware</a><a href="#ch6-fetch">6.4 Calling your own API with $fetch</a><a href="#ch6-deploy">6.5 Deploying the Nitro server</a></div></div>
+    <p class="topic-desc">This chapter covers Nitro, Nuxt’s server engine, where files under server/ become API routes and middleware. You define handlers that read params, query strings and bodies, call the same routes from the client with $fetch, and understand the deployable output. Your API lives beside your application in one codebase and one build.</p>
+    <p>Every file under server/ runs in Nitro, a compact Node and H3 server bundled with Nuxt. Routes are files, handlers are functions, and the same engine powers dev, preview and most cloud deployments — no separate API project required.</p>
+    <h3 id="ch6-dir" data-toc>6.1 The server directory</h3>
+    <p class="topic-desc">This section maps the server/ folder conventions. Handlers in server/api/ are served under the matching /api path, server/routes/ holds other URL trees, and server/middleware/ runs before every handler. File names translate to URLs exactly like pages do, giving a coherent endpoint map for the whole app.</p>
+    <table>
+      <tr><th>Path</th><th>Route</th><th>Purpose</th></tr>
+      <tr><td><code>server/api/posts/index.get.ts</code></td><td>GET /api/posts</td><td>List posts</td></tr>
+      <tr><td><code>server/api/posts/[id].get.ts</code></td><td>GET /api/posts/:id</td><td>One post</td></tr>
+      <tr><td><code>server/api/posts/index.post.ts</code></td><td>POST /api/posts</td><td>Create a post</td></tr>
+      <tr><td><code>server/middleware/log.ts</code></td><td>All routes</td><td>Runs before every request</td></tr>
+      <tr><td><code>server/utils/db.ts</code></td><td>—</td><td>Auto-imported server helpers</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code>// server/api/posts/index.get.ts
+export default defineEventHandler(() =&gt; {
+  return posts                       // returning a value → JSON response
+})</code></pre></div>
+    <p class="code-note">A file in server/api becomes an endpoint and whatever the handler returns is sent as a JSON response — no response object to build by hand.</p>
+    <h3 id="ch6-handlers" data-toc>6.2 Params, query and body</h3>
+    <p class="topic-desc">This section explains reading route params, query strings and request bodies from the event object passed to each handler. Every route file exports a default function that receives the event, from which you read the URL params, the query object, and the request body with readBody. Read every input explicitly, mirroring the handler’s path and HTTP method.</p>
+    <div class="codeWrap"><pre><code>// server/api/posts/[id].get.ts
+export default defineEventHandler((event) =&gt; {
+  const id = getRouterParam(event, 'id')     // matches the [id] file segment
+  return posts.find((p) =&gt; p.id === Number(id))
+})
+
+// server/api/posts/index.post.ts
+export default defineEventHandler(async (event) =&gt; {
+  const { title } = await readBody(event)    // parsed JSON body
+  const page = getQuery(event).page ?? '1'   // ?page=2 → { page: '2' }
+  const post = { id: posts.length + 1, title, author: 'you' }
+  posts.push(post)
+  return post
+})</code></pre></div>
+    <p class="code-note">getRouterParam reads the file-defined segment, readBody parses the JSON body, and getQuery returns the query string — the three standard input channels.</p>
+    <h3 id="ch6-middleware" data-toc>6.3 Server middleware</h3>
+    <p class="topic-desc">This section shows server middleware defined in server/middleware/, which runs before every handler, for logging, authentication or early responses. Each middleware file exports a function that receives the event and shares the same event object as handlers. It may also return a response before the handler runs.</p>
+    <div class="codeWrap"><pre><code>// server/middleware/logger.ts — runs for every request to any server route
+export default defineEventHandler((event) =&gt; {
+  console.log(`[server] ${getMethod(event)} ${getRequestURL(event)}`)
+})
+
+// server/middleware/auth.ts — short-circuit before the handler runs
+export default defineEventHandler((event) =&gt; {
+  const token = getHeader(event, 'authorization')
+  if (!token) throw createError({ statusCode: 401, message: 'Missing token' })
+})</code></pre></div>
+    <p class="code-note">Server middleware wraps every handler: the logger observes each request, and the second example aborts with 401 before any handler sees the event.</p>
+    <div class="warn"><p>Do not duplicate work between route and server middleware: route middleware guards the browser UI, server middleware guards the API underneath it.</p></div>
+    <h3 id="ch6-fetch" data-toc>6.4 Calling your own API with $fetch</h3>
+    <p class="topic-desc">This section shows the internal fetch pattern with $fetch used in pages, components and server code alike. During SSR the $fetch request is routed to the same Nitro server without an absolute URL, avoiding an extra network round trip. The unified helper keeps client and server calls identical and typed.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+// pages/index.vue
+const { data: posts } = await useFetch('/api/posts')   // same origin during SSR
+
+async function create() {
+  await $fetch('/api/posts', {
+    method: 'POST',
+    body: { title: 'New post' },   // JSON is serialized automatically
+  })
+}
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">useFetch and $fetch target relative paths that resolve against the current origin — on the server that is Nuxt’s own process, so everything stays internal.</p>
+    <h3 id="ch6-deploy" data-toc>6.5 Deploying the Nitro server</h3>
+    <p class="topic-desc">This section explains how nuxi build compiles the app and the server/ tree into one deployable Nitro server. A preset selects the target runtime, such as node-server for a Node host or any of the serverless and edge presets, and the output folder then runs on that platform. Picking the preset is the main packaging decision.</p>
+    <div class="codeWrap"><pre><code>npm run build         # produces .output/ with the bundled server and assets
+
+# .output/server/index.mjs — a single entry point you can run or serve
+node .output/server/index.mjs        # works locally on Node
+
+# or target a platform preset instead (nuxt.config.ts)
+export default defineNuxtConfig({
+  nitro: { preset: 'node-server' }, // or 'vercel', 'netlify', 'cloudflare-pages'
+})</code></pre></div>
+    <p class="code-note">nuxt build bundles everything into .output/; the node-server preset runs it with plain Node, while platform presets emit the exact files a host expects.</p>
+    <div class="ex"><h4 id="ch6-deploy--exercises-6">Exercises 6</h4><ol>
+      <li>Create a <code>GET /api/hello</code> handler and call it in a page with <code>useFetch</code>.</li>
+      <li>Accept a <code>POST /api/posts</code> body and return the created object.</li>
+      <li>Add server middleware that logs the method and URL of every request.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Middleware, Plugins &amp; Composables</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Middleware, Plugins &amp; Composables</button><div class="ch-toc-list"><a href="#ch7-named">7.1 Named route middleware</a><a href="#ch7-global">7.2 Global and anonymous middleware</a><a href="#ch7-plugins">7.3 Plugins and the provide pattern</a><a href="#ch7-composables">7.4 Writing custom composables</a></div></div>
+    <p class="topic-desc">This chapter covers the three extension points of a Nuxt app: route middleware for navigation guards, plugins for app-wide bootstrap code, and custom composables for reusable logic. You write named, global and inline middleware, register plugins either in config or by convention, and author composables in composables/ that auto-import everywhere.</p>
+    <h3 id="ch7-named" data-toc>7.1 Named route middleware</h3>
+    <p class="topic-desc">This section shows named route middleware stored in the middleware/ directory and activated with the definePageMeta middleware option. A guard runs before the page renders and can redirect with navigateTo or return false to abort navigation. Because it is named, the same file is reusable across many pages.</p>
+    <div class="codeWrap"><pre><code>// middleware/auth.ts
+export default defineNuxtRouteMiddleware((to) =&gt; {
+  const user = useState('user')              // shared auth state from elsewhere
+  if (!user.value) {
+    // keep the attempted path so login can return the user where they were going
+    return navigateTo('/login?redirect=' + to.fullPath)
+  }
+})
+
+// pages/account.vue — attach the guard to a page
+definePageMeta({
+  middleware: 'auth',                    // string reference to middleware/auth.ts
+  // middleware: ['auth', 'twoFa']       // multiple guards run in order
+})</code></pre></div>
+    <p class="code-note">A file in middleware/ becomes a named guard a page opts into; returning navigateTo redirects the navigation instead of rendering the page.</p>
+    <h3 id="ch7-global" data-toc>7.2 Global and anonymous middleware</h3>
+    <p class="topic-desc">This section covers the remaining two middleware placements. A file named with the .global suffix in middleware/ runs on every navigation, while anonymous middleware can be defined inline within a page’s definePageMeta call. Both receive the to and from route arguments, and global ordering follows file name order.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+// inline anonymous middleware — defined and applied in the same file
+definePageMeta({
+  middleware: defineNuxtRouteMiddleware((to) =&gt; {
+    if (!to.params.id) return navigateTo('/posts', { replace: true })
+  }),
+})
+&lt;/script&gt;
+
+// middleware/analytics.global.ts — the .global suffix runs on every navigation
+export default defineNuxtRouteMiddleware(() =&gt; {
+  console.log('navigation started')
+})</code></pre></div>
+    <p class="code-note">Anonymous guards are inline in the page, while a file named with the .global suffix runs on every navigation automatically — three placements, one signature.</p>
+    <p>Server middleware from chapter six runs inside Nitro before an API handler; route middleware runs in the browser (and during SSR) before a page renders. Never reach for one to do the other’s job.</p>
+    <h3 id="ch7-plugins" data-toc>7.3 Plugins and the provide pattern</h3>
+    <p class="topic-desc">This section shows plugins in the plugins/ folder that run before the app mounts, useful for bootstrapping third-party libraries or shared instances. Older code injected values with the provide pattern, while modern Nuxt prefers a composable that lazily reads the plugin’s instance. This keeps components clean and avoids polluting global scope.</p>
+    <div class="codeWrap"><pre><code>// plugins/analytics.ts — runs once when the app boots
+export default defineNuxtPlugin((nuxtApp) =&gt; {
+  const analytics = { track(name) { console.log('track: ' + name) } }
+
+  nuxtApp.hook('app:mounted', () =&gt; analytics.track('app:ready'))
+  return { provide: { analytics } }   // exposes nuxtApp.$analytics
+})
+
+// composables/useAnalytics.ts — the recommended doorway to the value
+export function useAnalytics() {
+  const nuxtApp = useNuxtApp()
+  return nuxtApp.$analytics
+}</code></pre></div>
+    <p class="code-note">The plugin runs at boot, registers app hooks and exposes analytics through nuxtApp; a thin useAnalytics composable is the clean doorway components use.</p>
+    <h3 id="ch7-composables" data-toc>7.4 Writing custom composables</h3>
+    <p class="topic-desc">This section shows writing custom composables in the composables/ folder that wrap reactive logic and reuse Nuxt hooks such as useState or useNuxtApp. Anything exported from there auto-imports across the app under the use naming convention. This keeps shared logic centralized, type-safe and trivial to reuse between pages and components.</p>
+    <div class="codeWrap"><pre><code>// composables/useDebouncedSearch.ts
+export function useDebouncedSearch(fetchFn) {
+  const query = ref('')
+  const pending = ref(false)
+  const results = ref([])
+  let timer                             // handle for the pending timeout
+
+  async function search() {
+    pending.value = true
+    results.value = await fetchFn(query.value)
+    pending.value = false
+  }
+
+  watch(query, () =&gt; {
+    clearTimeout(timer)                  // debounce: wait for a pause in typing
+    timer = setTimeout(search, 300)
+  })
+
+  return { query, results, pending, search }
+}
+
+// composables are auto-imported, so a page uses it with no import
+const { query, results, pending } =
+  useDebouncedSearch(async (q) =&gt; $fetch('/api/search?q=' + q))</code></pre></div>
+    <p class="code-note">The composable combines a debounced query with an injected fetcher, and pages auto-import the same reactive, SSR-safe result object Nuxt itself uses.</p>
+    <div class="ex"><h4 id="ch7-composables--exercises-7">Exercises 7</h4><ol>
+      <li>Write a named guard that redirects guests and attach it to one page.</li>
+      <li>Create a plugin that registers an app hook, then read its value via a composable.</li>
+      <li>Extract the search logic from chapter four into a <code>useDebouncedSearch</code> composable.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Rendering Modes &amp; Performance</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Rendering Modes &amp; Performance</button><div class="ch-toc-list"><a href="#ch8-ssr">8.1 SSR by default</a><a href="#ch8-ssg">8.2 Static generation and prerendering</a><a href="#ch8-spa">8.3 SPA mode</a><a href="#ch8-hybrid">8.4 Hybrid rendering with route rules</a><a href="#ch8-perf">8.5 Payload extraction and image optimization</a></div></div>
+    <p class="topic-desc">This chapter covers the rendering modes Nuxt supports: server-side rendering by default, static prerendering and fully client-side SPA mode. Route rules allow hybrid per-route mixing in one app, and performance levers such as payload extraction and the image module trim what ships. You pick a mode per app, then tune.</p>
+    <h3 id="ch8-ssr" data-toc>8.1 SSR by default</h3>
+    <p class="topic-desc">This section explains how server-side rendering works. The server renders the full HTML for each request, the client downloads it and hydrates into an interactive Vue application. Benefits include fast first paint and built-in SEO, with the trade-offs of a Node runtime and careful server-safe data fetching. Nuxt runs this mode by default.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts
+export default defineNuxtConfig({ ssr: true })   // the default — usually leave it on
+
+// what the browser receives for a page:
+// 1. the server runs the setup code, fetches data and renders full HTML
+// 2. that HTML arrives immediately: SEO crawlers see real content
+// 3. a copy of the data ships in the payload for step 4
+// 4. the client hydrates — Vue takes over the DOM and the page goes live</code></pre></div>
+    <p class="code-note">SSR renders full HTML on the server and hydrates it client-side; the first paint is fast for users and readable by search engines, which is why it is the default.</p>
+    <h3 id="ch8-ssg" data-toc>8.2 Static generation and prerendering</h3>
+    <p class="topic-desc">This section shows static generation, where the site is prerendered to plain HTML at build time via the static preset or prerender route rules and the nuxi generate command. The output is static files any CDN can serve with no server process at all. Dynamic content then relies on client-side fetching or scheduled regeneration.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  nitro: {
+    prerender: {
+      // URLs to bake into static HTML at build time
+      routes: ['/', '/about', '/blog/hello-world'],
+    },
+  },
+})
+
+npm run generate     # crawls and prerenders → static HTML in .output/public</code></pre></div>
+    <p class="code-note">nuxt generate builds and prerenders the listed routes to static HTML, producing output a CDN can host with zero runtime computation per request.</p>
+    <h3 id="ch8-spa" data-toc>8.3 SPA mode</h3>
+    <p class="topic-desc">This section shows fully client-side rendering configured with ssr: false. The server sends an empty shell and a loading template, and everything renders in the browser once the JavaScript loads. This suits app-like interfaces where SEO is less important, at the cost of a slower first meaningful paint.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts — turn SSR off entirely
+export default defineNuxtConfig({ ssr: false })
+
+// spa-loading-template.html (app/ in Nuxt 4) — shown while the client boots
+&lt;div class="loader"&gt;Loading application&lt;/div&gt;</code></pre></div>
+    <p class="code-note">With ssr:false the app becomes a classic SPA: a tiny shell with a loading screen is sent first, then the client renders everything after boot.</p>
+    <p>Use SPA mode only for authenticated tools where SEO does not matter; content sites should stay on SSR or SSG.</p>
+    <h3 id="ch8-hybrid" data-toc>8.4 Hybrid rendering with route rules</h3>
+    <p class="topic-desc">This section shows hybrid rendering with routeRules in nuxt.config. One app can prerender its marketing pages, cache others with a stale-while-revalidate entry, and keep a dynamic dashboard fully live with SSR or CSR. Nitro matches each incoming request to the applicable route rule at runtime.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts — per-route rendering policy
+export default defineNuxtConfig({
+  routeRules: {
+    '/':         { prerender: true },   // bake once at build time
+    '/blog/**':  { swr: 3600 },         // serve cached, revalidate hourly
+    '/docs/**':  { isr: 3600 },         // incremental: same cache, older pages
+    '/admin/**': { ssr: false },        // client-side only (requires auth)
+    '/api/**':   { cors: true },        // open the API to other origins
+  },
+})</code></pre></div>
+    <p class="code-note">routeRules set a policy per URL pattern: pages are separately prerendered, cached or client-rendered, and the API gets CORS — all in one table.</p>
+    <h3 id="ch8-perf" data-toc>8.5 Payload extraction and image optimization</h3>
+    <p class="topic-desc">This section covers the main performance levers available. Payload extraction means transferred fetch data is not duplicated, the image module serves optimized images automatically, and there are config defaults worth verifying. Most speed wins come from not shipping the same data or bytes twice. These levers apply in every rendering mode.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts — performance defaults worth verifying
+export default defineNuxtConfig({
+  nitro: {
+    compressPublicAssets: true,      // gzip and brotli the static files
+    minify: true,                    // minify the server bundle
+  },
+  experimental: {
+    payloadExtraction: true,         // ship only the data each page needs
+  },
+})
+
+// images: swap &lt;img&gt; for NuxtImg (from the @nuxt/image module)
+&lt;template&gt;
+  &lt;NuxtImg
+    src="/img/hero.jpg"
+    width="1200"
+    height="630"
+    loading="lazy"        &lt;!-- defer off-screen images --&gt;
+    format="webp"         &lt;!-- served as webp where supported --&gt;
+  /&gt;
+&lt;/template&gt;</code></pre></div>
+    <p class="code-note">Payload extraction trims what ships to the browser, compression shrinks the static output, and the Nuxt image component handles resizing, format and laziness for you.</p>
+    <div class="ex"><h4 id="ch8-perf--exercises-8">Exercises 8</h4><ol>
+      <li>Prerender a small site and inspect the static HTML produced.</li>
+      <li>Add a route rule so <code>/blog/**</code> caches for one hour.</li>
+      <li>Swap an <code>&lt;img&gt;</code> for NuxtImg and confirm the webp output.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Forms, Errors &amp; Auth Patterns</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Forms, Errors &amp; Auth Patterns</button><div class="ch-toc-list"><a href="#ch9-forms">9.1 Form handling with v-model</a><a href="#ch9-validation">9.2 Validation</a><a href="#ch9-errors">9.3 Custom error pages and createError</a><a href="#ch9-cookies">9.4 Cookies and session basics</a><a href="#ch9-auth">9.5 The auth middleware pattern</a></div></div>
+    <p class="topic-desc">This chapter covers form handling with v-model and $fetch, lightweight validation, custom error pages and cookies, plus the classic auth guard pattern. The pieces compose into login, signup and protected-route flows built on the middleware from earlier chapters. By the end you can build real multi-page user workflows end to end.</p>
+    <h3 id="ch9-forms" data-toc>9.1 Form handling with v-model</h3>
+    <p class="topic-desc">This section shows a controlled form wired to reactive state with v-model and submitted with $fetch to a server route. Nuxt adds nothing special here, so the standard Vue patterns carry over directly, with field values read from the reactive object. Server validation errors come back as the response and update the form state.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+const form = reactive({ title: '', body: '' })
+const submitting = ref(false)
+
+async function submit() {
+  submitting.value = true
+  try {
+    await $fetch('/api/posts', { method: 'POST', body: form })  // JSON from state
+    await navigateTo('/posts')                                   // success → list page
+  } finally {
+    submitting.value = false
+  }
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;form @submit.prevent="submit"&gt;
+    &lt;input v-model="form.title" placeholder="Title" /&gt;
+    &lt;textarea v-model="form.body" placeholder="Body" /&gt;
+    &lt;button :disabled="submitting"&gt;{{ submitting ? 'Saving' : 'Save' }}&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/template&gt;</code></pre></div>
+    <p class="code-note">The form binds inputs to a reactive object, submits it as JSON with $fetch, and only navigates after a successful POST — the finally block resets state either way.</p>
+    <h3 id="ch9-validation" data-toc>9.2 Validation</h3>
+    <p class="topic-desc">This section shows a lightweight validation approach that avoids extra libraries. Each field carries an error ref computed from the value or the server response, updated on submit or change, and the messages can be swapped for any validation library later. The pattern keeps forms visibly aligned with the data they guard.</p>
+    <div class="codeWrap"><pre><code>const errors = ref({})
+
+function validate() {
+  errors.value = {}
+  if (!form.title) errors.value.title = 'Title is required'
+  if (form.body.length &lt; 10) errors.value.body = 'Body needs at least 10 characters'
+  return Object.keys(errors.value).length === 0
+}
+
+async function submit() {
+  if (!validate()) return           // stop before any request is sent
+  await $fetch('/api/posts', { method: 'POST', body: form })
+}
+
+// in the template, print one message per failed field
+// &lt;p v-if="errors.title" class="error"&gt;{{ errors.title }}&lt;/p&gt;</code></pre></div>
+    <p class="code-note">validate() fills a reactive errors object and returns success, letting the submit handler bail early while the template shows one message per field.</p>
+    <h3 id="ch9-errors" data-toc>9.3 Custom error pages and createError</h3>
+    <p class="topic-desc">This section shows Nuxt’s error.vue page, which renders when an error reaches the root, and how code throws one with createError from pages, plugins or server handlers. The error page receives statusCode and statusMessage as props and can dismiss the state with clearError. A custom page turns a crash into a designed experience.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- error.vue — rendered for any unhandled error or failed request --&gt;
+&lt;script setup lang="ts"&gt;
+const props = defineProps({ error: Object })   // { statusCode, statusMessage, ... }
+function retry() { clearError({ redirect: '/' }) }   // go home and reset the error
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;{{ props.error.statusCode }}&lt;/h1&gt;
+    &lt;p&gt;{{ props.error.statusMessage }}&lt;/p&gt;
+    &lt;button @click="retry"&gt;Back home&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+// anywhere in a page or server handler:
+throw createError({ statusCode: 404, statusMessage: 'Post not found' })</code></pre></div>
+    <p class="code-note">error.vue receives the error as a prop, createError constructs a consistent error from anywhere, and clearError resets the app so a retry walks back home.</p>
+    <h3 id="ch9-cookies" data-toc>9.4 Cookies and session basics</h3>
+    <p class="topic-desc">This section shows reading and writing cookies on both server and client with the useCookie composable, plus reading request headers from the event during SSR. Setting the returned ref also updates the cookie automatically in the browser. This is the foundation of stateless auth tokens, since cookies travel with every request.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+// a cookie shared between server and client — ideal for tokens and prefs
+const token = useCookie('token', { maxAge: 60 * 60 * 24 * 7, sameSite: 'lax' })
+token.value = 'abc123'       // setting it updates the cookie sent to the browser
+
+// server side: pass browser headers (cookies, user-agent) to an upstream fetch
+const headers = useRequestHeaders(['cookie', 'user-agent'])
+const { data } = await useFetch('/api/me', { headers })
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">useCookie keeps one value in sync between server and client, and useRequestHeaders forwards the browser’s own cookies, keeping server-side calls authenticated.</p>
+    <h3 id="ch9-auth" data-toc>9.5 The auth middleware pattern</h3>
+    <p class="topic-desc">This section assembles cookies, a login handler and route guards into the classic auth flow. The login handler validates credentials and sets a token cookie, the auth middleware reads it and redirects unauthenticated users, and logout clears the cookie. Sessions stay stateless because the token can be validated on each protected request.</p>
+    <div class="codeWrap"><pre><code>// server/api/login.post.ts — verify credentials, hand out a token
+export default defineEventHandler(async (event) =&gt; {
+  const { email, password } = await readBody(event)
+  if (email !== 'ada@example.com' || password !== 'secret') {
+    throw createError({ statusCode: 401, statusMessage: 'Bad credentials' })
+  }
+  return { token: 'signed-token-123' }   // in reality: sign a JWT or session id
+})
+
+// composables/useAuth.ts — one doorway for login, state and logout
+export const useAuth = () =&gt; {
+  const token = useCookie('token')
+  const user = useState('user')
+
+  async function login(email, password) {
+    const res = await $fetch('/api/login', { method: 'POST', body: { email, password } })
+    token.value = res.token              // cookie set → future requests carry it
+    user.value = { email }               // store the identity for guards
+  }
+  function logout() { token.value = null; user.value = null }
+  return { user: readonly(user), login, logout }
+}
+
+// middleware/auth.ts — guard protected pages
+export default defineNuxtRouteMiddleware(() =&gt; {
+  const { user } = useAuth()
+  if (!user.value) return navigateTo('/login')
+})</code></pre></div>
+    <p class="code-note">The login handler returns a token, useAuth stores it in a cookie and exposes login/logout, and the route middleware redirects guests — a complete pattern to extend with a real signing library.</p>
+    <div class="ex"><h4 id="ch9-auth--exercises-9">Exercises 9</h4><ol>
+      <li>Build a post form with in-page validation shown below each field.</li>
+      <li>Create <code>error.vue</code> and force a 404 with <code>createError</code>.</li>
+      <li>Protect a dashboard page with an auth guard and a login that sets a cookie.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Deployment &amp; Best Practices</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Deployment &amp; Best Practices</button><div class="ch-toc-list"><a href="#ch10-build">10.1 The build output and presets</a><a href="#ch10-static">10.2 Serving static sites</a><a href="#ch10-config">10.3 runtimeConfig and environment</a><a href="#ch10-hosting">10.4 Hosting options compared</a><a href="#ch10-conventions">10.5 Project conventions worth keeping</a></div></div>
+    <p class="topic-desc">This chapter covers what nuxi build produces, the server and static presets, runtimeConfig for environment values and the main hosting choices. You also keep the project conventions that keep a Nuxt codebase tidy as it grows. By the end your app is shaped and wired to ship to production.</p>
+    <h3 id="ch10-build" data-toc>10.1 The build output and presets</h3>
+    <p class="topic-desc">This section shows what nuxi build emits: a .output directory holding the Nitro server and the client assets, with a preset deciding where it runs. Picking the preset, such as node-server or one of the serverless, edge or static targets, is the main deployment decision. The result runs on the chosen platform unchanged.</p>
+    <div class="codeWrap"><pre><code>npm run build
+
+# .output/
+#   public/     static assets, images, and prerendered HTML when generated
+#   server/     the Nitro server (index.mjs boots it on Node)
+#   nitro.json  metadata describing the build for the target platform</code></pre></div>
+    <p class="code-note">The build leaves exactly two things worth knowing: a public/ folder of static files and a server/ engine — everything else is derived from those.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts — choose a preset per target platform
+export default defineNuxtConfig({
+  nitro: {
+    preset: 'node-server',
+    // 'vercel', 'netlify', 'cloudflare-pages', 'azure', 'aws-amplify'...
+  },
+})</code></pre></div>
+    <p class="code-note">Presets emit the deployment format a host expects — a Node server for self-managed VPSs or a platform-specific structure for managed hosts.</p>
+    <h3 id="ch10-static" data-toc>10.2 Serving static sites</h3>
+    <p class="topic-desc">This section shows static hosting with the static preset and the nuxi generate command, which prerenders every route to plain HTML. The output folder holds static files that any CDN can serve, with no dynamic process running. It fits content sites whose route set is known at build time.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  ssr: false,                       // or prerender everything with routeRules
+  nitro: { preset: 'static' },      // emit pure static files, no server runtime
+})
+
+npm run generate                    # alias for build with the static preset
+# deploy .output/public to Netlify, GitHub Pages, S3, or any CDN</code></pre></div>
+    <p class="code-note">The static preset and nuxt generate produce a folder of plain files that any static host and CDN serve instantly at a fraction of the running cost.</p>
+    <h3 id="ch10-config" data-toc>10.3 runtimeConfig and environment</h3>
+    <p class="topic-desc">This section shows how runtimeConfig in nuxt.config exposes environment-specific values and secrets, read at runtime through useRuntimeConfig instead of being baked into the build. Public settings live under the public key, private ones stay server-only, and both are read from environment variables at launch. Config changes no longer require a rebuild.</p>
+    <div class="codeWrap"><pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://example.com',  // client-visible
+    },
+    apiSecret: process.env.NUXT_API_SECRET,   // server-only, never shipped
+  },
+})
+
+// server code reads the secret via useRuntimeConfig
+const config = useRuntimeConfig()
+await $fetch('https://api.example.com', {
+  headers: { 'x-key': config.apiSecret },    // only ever used on the server
+})
+
+// components read only the public block
+const { siteUrl } = useRuntimeConfig().public</code></pre></div>
+    <p class="code-note">runtimeConfig splits client-visible values from server-only secrets, and NUXT_ environment variables override them at runtime without a rebuild.</p>
+    <h3 id="ch10-hosting" data-toc>10.4 Hosting options compared</h3>
+    <p class="topic-desc">This section compares managed and self-managed hosts for Nuxt applications. Static output runs on any CDN, while dynamic apps need a Node runtime such as a server, container, serverless function or edge environment. Your rendering mode decides which candidates are possible, and the chosen preset produces the matching build.</p>
+    <table>
+      <tr><th>Host</th><th>Good for</th><th>Notes</th></tr>
+      <tr><td>Vercel / Netlify / Cloudflare</td><td>Managed deploys, serverless</td><td>Pick their preset; generous free tiers</td></tr>
+      <tr><td>Node VPS (Fly.io, Railway, Render)</td><td>Full control, long-lived sockets</td><td>Run the node-server output</td></tr>
+      <tr><td>NuxtHub (Cloudflare)</td><td>Server and data in one</td><td>Preset <code>hub</code>; zero server config</td></tr>
+      <tr><td>Static CDN (S3, GitHub Pages)</td><td>Prerendered or SPA sites</td><td>Cheap and fast, no runtime</td></tr>
+    </table>
+    <h3 id="ch10-conventions" data-toc>10.5 Project conventions worth keeping</h3>
+    <p class="topic-desc">This section collects the practical conventions that keep Nuxt projects tidy as they grow: keep routes and components close to their usage, prefer small composables, reuse layouts, and keep business logic out of page components. These rules of thumb apply to every app. Following them makes larger codebases readable for the whole team.</p>
+    <ul>
+      <li><strong>Let conventions do the wiring</strong> — prefer pages/, components/ and composables/ over manual registration.</li>
+      <li><strong>Fetch data with useFetch or useAsyncData</strong>, never raw fetch in setup, so SSR and caching keep working.</li>
+      <li><strong>Keep the server API small and single-purpose</strong> — each file in server/api answers one question.</li>
+      <li><strong>Type everything with TypeScript</strong>; nuxt typegen keeps globals in sync.</li>
+      <li><strong>Pin Node versions and run npm audit</strong> before shipping; keep Nuxt updated.</li>
+      <li><strong>Use routeRules over per-page hacks</strong> for caching and rendering policy.</li>
+    </ul>
+    <div class="ex"><h4 id="ch10-conventions--exercises-10">Exercises 10</h4><ol>
+      <li>Build your app and inspect the <code>.output/</code> folder structure.</li>
+      <li>Deploy the static preset to any free static host and open the site.</li>
+      <li>Move a hardcoded secret into runtimeConfig and read it from a server route.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Quick Reference &amp; Glossary</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Quick Reference &amp; Glossary</button><div class="ch-toc-list"><a href="#app-composables">A.1 Nuxt composables quick reference</a><a href="#app-files">A.2 File-based conventions</a><a href="#app-config">A.3 Config keys and commands</a><a href="#app-glossary">A.4 Glossary</a></div></div>
+    <p class="topic-desc">The appendix bundles the Nuxt composables, file conventions, config keys and commands plus a glossary into one offline reference. Keep it open while you build and look up the right API or folder name whenever a detail fades. Skim it before returning to any chapter to recenter the vocabulary.</p>
+    <h3 id="app-composables" data-toc>A.1 Nuxt composables quick reference</h3>
+    <p class="topic-desc">This section lists the composables you reach for daily: useState, useFetch, useAsyncData, useRoute, useHead, useSeoMeta, useCookie and useRuntimeConfig, with what each returns or does. It is a quick lookup of signatures and typical return shapes. Keep it open while you build.</p>
+    <table>
+      <tr><th>Composable</th><th>Does</th></tr>
+      <tr><td><code>useRoute</code> / <code>useRouter</code></td><td>Current route / programmatic navigation</td></tr>
+      <tr><td><code>useFetch</code> / <code>useAsyncData</code></td><td>SSR-safe cached data fetching</td></tr>
+      <tr><td><code>$fetch</code></td><td>Raw HTTP client on server and client</td></tr>
+      <tr><td><code>useState</code> / <code>useCookie</code></td><td>Shared state / persisted values</td></tr>
+      <tr><td><code>useHead</code> / <code>useSeoMeta</code></td><td>Per-page head and SEO tags</td></tr>
+      <tr><td><code>useNuxtApp</code></td><td>The app instance: payload, hooks, provides</td></tr>
+      <tr><td><code>navigateTo</code> / <code>createError</code> / <code>clearError</code></td><td>Navigation and error control</td></tr>
+      <tr><td><code>useRuntimeConfig</code></td><td>Runtime configuration and env values</td></tr>
+    </table>
+    <h3 id="app-files" data-toc>A.2 File-based conventions</h3>
+    <p class="topic-desc">This section lists the folders Nuxt wires up by name: pages, components, layouts, composables, utils, middleware, plugins, server and public. Drop a file in the right place and the matching routing, import or runtime behavior starts working. This is the naming key to the whole framework.</p>
+    <table>
+      <tr><th>Folder</th><th>Convention</th></tr>
+      <tr><td><code>pages/</code></td><td>Each file is a route; [param] and [...] capture segments</td></tr>
+      <tr><td><code>components/</code></td><td>Tag names resolve from file names; folders add prefixes</td></tr>
+      <tr><td><code>layouts/</code></td><td>default.vue plus per-page choices via definePageMeta</td></tr>
+      <tr><td><code>composables/</code> / <code>utils/</code></td><td>Auto-imported functions under use- and $ prefixes</td></tr>
+      <tr><td><code>server/api/</code></td><td>Handlers; file name and method suffix define the endpoint</td></tr>
+      <tr><td><code>middleware/</code></td><td>Route guards; the .global suffix runs on every navigation</td></tr>
+      <tr><td><code>plugins/</code></td><td>Run once at app boot</td></tr>
+      <tr><td><code>stores/</code></td><td>Pinia stores (with the @pinia/nuxt module)</td></tr>
+    </table>
+    <h3 id="app-config" data-toc>A.3 Config keys and commands</h3>
+    <p class="topic-desc">This section collects the nuxt.config keys you adjust most, such as ssr, head, css, modules, routeRules and runtimeConfig, together with the nuxi commands that drive a project, including dev, build and generate. Each key is paired with why you set it. This table is a fast path to the framework’s configuration surface.</p>
+    <table>
+      <tr><th>Key / command</th><th>Purpose</th></tr>
+      <tr><td><code>ssr</code></td><td>Rendering mode switch (true / false)</td></tr>
+      <tr><td><code>app.head</code> / <code>app.titleTemplate</code></td><td>Global head defaults</td></tr>
+      <tr><td><code>routeRules</code></td><td>Per-route rendering and caching policy</td></tr>
+      <tr><td><code>runtimeConfig</code></td><td>Reactive, env-backed configuration</td></tr>
+      <tr><td><code>modules</code></td><td>Feature modules (tailwind, pinia, image)</td></tr>
+      <tr><td><code>nitro.preset</code></td><td>Deployment target of the server engine</td></tr>
+      <tr><td><code>nuxi dev</code> / <code>build</code> / <code>generate</code></td><td>Dev server / production build / static output</td></tr>
+      <tr><td><code>nuxi preview</code></td><td>Run the built output locally</td></tr>
+    </table>
+    <h3 id="app-glossary" data-toc>A.4 Glossary</h3>
+    <p class="topic-desc">This section defines the terms used across the guide in one pass, from SSR, SSG and hydration to Nitro, route rules and presets. Skimming it before returning to any chapter anchors the vocabulary the chapters assume. Short definitions keep a line-by-line lookup fast and painless.</p>
+    <ul>
+      <li><strong>Nuxi</strong> — the Nuxt CLI: scaffolding, dev, build, generate, preview.</li>
+      <li><strong>Nitro</strong> — the server engine behind Nuxt: API routes, middleware, presets, deployments.</li>
+      <li><strong>SSR</strong> — server-side rendering: HTML rendered on the server before hydration.</li>
+      <li><strong>Hydration</strong> — the client attaching Vue reactivity to server-rendered HTML.</li>
+      <li><strong>Prerender / SSG</strong> — baking routes to static HTML at build time.</li>
+      <li><strong>Payload</strong> — the serialized data shipped from server to client for hydration.</li>
+      <li><strong>Route rules</strong> — per-URL-pattern rendering and caching configuration.</li>
+      <li><strong>Auto-imports</strong> — resolving functions and components by naming convention with no import lines.</li>
+      <li><strong>Composable</strong> — a function using Vue reactivity; Nuxt auto-imports those in composables/ and utils/.</li>
+      <li><strong>Middleware</strong> — route middleware guards navigation; server middleware guards API requests.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>NuxtJS — Vue Meta-Framework Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

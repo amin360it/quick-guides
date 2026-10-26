@@ -1,0 +1,2440 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASP.NET Core 10 - Enterprise Development Guide</title>
+<meta name="description" content="This guide covers the full ASP.NET Core 10 ecosystem for building enterprise applications — from C#…. 11 chapters, 63 topics and 52 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/aspnet-core.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="ASP.NET Core 10 - Enterprise Development Guide">
+<meta property="og:description" content="This guide covers the full ASP.NET Core 10 ecosystem for building enterprise applications — from C#…. 11 chapters, 63 topics and 52 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/aspnet-core.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="ASP.NET Core 10 - Enterprise Development Guide">
+<meta name="twitter:description" content="This guide covers the full ASP.NET Core 10 ecosystem for building enterprise applications — from C#…. 11 chapters, 63 topics and 52 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/aspnet-core.html#article","headline":"ASP.NET Core 10 - Enterprise Development Guide","name":"ASP.NET Core 10 - Enterprise Development Guide","description":"This guide covers the full ASP.NET Core 10 ecosystem for building enterprise applications — from C#…. 11 chapters, 63 topics and 52 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/aspnet-core.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/aspnet-core.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"ASP.NET Core 10 - Enterprise Development Guide","item":"https://amin360it.github.io/quick-guides/aspnet-core.html"}]}]}</script>
+  <link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">ASP.NET Core</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+  <li class="chapter"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — Enterprise .NET Development</a>
+    <ul>
+      <li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li>
+      <li><a href="#orientation-stack" data-target="orientation-stack">The .NET 10 stack</a></li>
+      <li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · C# for Enterprise</a>
+    <ul>
+      <li><a href="#ch1-records" data-target="ch1-records">1.1 Records and immutability</a></li>
+      <li><a href="#ch1-patterns" data-target="ch1-patterns">1.2 Pattern matching</a></li>
+      <li><a href="#ch1-nullable" data-target="ch1-nullable">1.3 Nullable reference types</a></li>
+      <li><a href="#ch1-async" data-target="ch1-async">1.4 Async / await deep dive</a></li>
+      <li><a href="#ch1-linq" data-target="ch1-linq">1.5 LINQ for enterprise data</a></li>
+      <li><a href="#ch1-generics" data-target="ch1-generics">1.6 Generics and constraints</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · ASP.NET Core Fundamentals</a>
+    <ul>
+      <li><a href="#ch2-startup" data-target="ch2-startup">2.1 Startup and hosting</a></li>
+      <li><a href="#ch2-middleware" data-target="ch2-middleware">2.2 Middleware pipeline</a></li>
+      <li><a href="#ch2-di" data-target="ch2-di">2.3 Dependency injection</a></li>
+      <li><a href="#ch2-config" data-target="ch2-config">2.4 Configuration</a></li>
+      <li><a href="#ch2-env" data-target="ch2-env">2.5 Environments and secrets</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · MVC Pattern</a>
+    <ul>
+      <li><a href="#ch3-controllers" data-target="ch3-controllers">3.1 Controllers and actions</a></li>
+      <li><a href="#ch3-routing" data-target="ch3-routing">3.2 Routing</a></li>
+      <li><a href="#ch3-models" data-target="ch3-models">3.3 Models and validation</a></li>
+      <li><a href="#ch3-views" data-target="ch3-views">3.4 Views and Razor syntax</a></li>
+      <li><a href="#ch3-filters" data-target="ch3-filters">3.5 Filters</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Web API</a>
+    <ul>
+      <li><a href="#ch4-rest" data-target="ch4-rest">4.1 REST principles</a></li>
+      <li><a href="#ch4-minimal" data-target="ch4-minimal">4.2 Minimal APIs</a></li>
+      <li><a href="#ch4-versioning" data-target="ch4-versioning">4.3 API versioning</a></li>
+      <li><a href="#ch4-docs" data-target="ch4-docs">4.4 Documentation with OpenAPI</a></li>
+      <li><a href="#ch4-cors" data-target="ch4-cors">4.5 CORS and rate limiting</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Razor Pages</a>
+    <ul>
+      <li><a href="#ch5-intro" data-target="ch5-intro">5.1 Page-focused model</a></li>
+      <li><a href="#ch5-handlers" data-target="ch5-handlers">5.2 Page handlers</a></li>
+      <li><a href="#ch5-model" data-target="ch5-model">5.3 PageModel and binding</a></li>
+      <li><a href="#ch5-layout" data-target="ch5-layout">5.4 Layouts and sections</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Blazor</a>
+    <ul>
+      <li><a href="#ch6-server" data-target="ch6-server">6.1 Blazor Server</a></li>
+      <li><a href="#ch6-wasm" data-target="ch6-wasm">6.2 Blazor WebAssembly</a></li>
+      <li><a href="#ch6-components" data-target="ch6-components">6.3 Components and lifecycle</a></li>
+      <li><a href="#ch6-binding" data-target="ch6-binding">6.4 Data binding and events</a></li>
+      <li><a href="#ch6-state" data-target="ch6-state">6.5 State management</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Entity Framework Core</a>
+    <ul>
+      <li><a href="#ch7-context" data-target="ch7-context">7.1 DbContext and entities</a></li>
+      <li><a href="#ch7-config" data-target="ch7-config">7.2 Configuration and mapping</a></li>
+      <li><a href="#ch7-migrations" data-target="ch7-migrations">7.3 Migrations</a></li>
+      <li><a href="#ch7-query" data-target="ch7-query">7.4 Querying and performance</a></li>
+      <li><a href="#ch7-relationships" data-target="ch7-relationships">7.5 Relationships</a></li>
+      <li><a href="#ch7-interceptors" data-target="ch7-interceptors">7.6 Interceptors and auditing</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Enterprise Patterns</a>
+    <ul>
+      <li><a href="#ch8-clean" data-target="ch8-clean">8.1 Clean Architecture</a></li>
+      <li><a href="#ch8-cqrs" data-target="ch8-cqrs">8.2 CQRS with MediatR</a></li>
+      <li><a href="#ch8-validation" data-target="ch8-validation">8.3 FluentValidation pipeline</a></li>
+      <li><a href="#ch8-resilience" data-target="ch8-resilience">8.4 Resilience and Polly</a></li>
+      <li><a href="#ch8-caching" data-target="ch8-caching">8.5 Caching strategies</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Security</a>
+    <ul>
+      <li><a href="#ch9-auth" data-target="ch9-auth">9.1 Authentication with JWT</a></li>
+      <li><a href="#ch9-authz" data-target="ch9-authz">9.2 Authorization policies</a></li>
+      <li><a href="#ch9-identity" data-target="ch9-identity">9.3 ASP.NET Core Identity</a></li>
+      <li><a href="#ch9-https" data-target="ch9-https">9.4 HTTPS and security headers</a></li>
+    </ul>
+  </li>
+  <li class="chapter"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Testing &amp;amp; Deployment</a>
+    <ul>
+      <li><a href="#ch10-unit" data-target="ch10-unit">10.1 Unit testing with xUnit</a></li>
+      <li><a href="#ch10-integration" data-target="ch10-integration">10.2 Integration testing</a></li>
+      <li><a href="#ch10-docker" data-target="ch10-docker">10.3 Docker containerisation</a></li>
+      <li><a href="#ch10-cicd" data-target="ch10-cicd">10.4 CI/CD pipeline</a></li>
+    </ul>
+  </li>
+</ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">ASP.NET Core 10</span>
+      <span class="am-band-s">11 chapters &middot; 63 topics &middot; 52 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+  <h2 id="orientation" data-toc>Welcome — Enterprise .NET Development</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-stack">The .NET 10 stack</a><a href="#orientation-tools">Tools you will use</a></div></div>
+  <p class="topic-desc">This guide covers the full ASP.NET Core 10 ecosystem for building enterprise applications — from C# fundamentals through MVC, Web API, Razor Pages, Blazor, EF Core, security, testing, and deployment.</p>
+  <p>ASP.NET Core is a cross-platform, high-performance framework for building modern cloud-native applications. With .NET 10, the platform delivers unified hosting, minimal APIs, improved Blazor, and first-class AI integration.</p>
+  <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+  <p class="topic-desc">The guide is structured in ten chapters that mirror how you would learn and build a real enterprise application — starting with the language, moving through the framework, and ending with production concerns.</p>
+  <ul>
+    <li><strong>Ch. 1 — C# for Enterprise:</strong> language features every .NET developer must know</li>
+    <li><strong>Ch. 2 — ASP.NET Core Fundamentals:</strong> startup, middleware, DI, configuration</li>
+    <li><strong>Ch. 3 — MVC Pattern:</strong> controllers, views, models, routing</li>
+    <li><strong>Ch. 4 — Web API:</strong> REST, minimal APIs, versioning, documentation</li>
+    <li><strong>Ch. 5 — Razor Pages:</strong> page-focused development model</li>
+    <li><strong>Ch. 6 — Blazor:</strong> Server and WebAssembly components</li>
+    <li><strong>Ch. 7 — Entity Framework Core:</strong> ORM, migrations, performance</li>
+    <li><strong>Ch. 8 — Enterprise Patterns:</strong> Clean Architecture, CQRS, MediatR</li>
+    <li><strong>Ch. 9 — Security:</strong> auth, authz, JWT, Identity</li>
+    <li><strong>Ch. 10 — Testing &amp; Deployment:</strong> xUnit, integration tests, Docker, CI/CD</li>
+  </ul>
+  <h3 id="orientation-stack" data-toc>The .NET 10 stack</h3>
+  <p class="topic-desc">Understanding how the pieces fit together is essential before writing code. The .NET 10 stack provides a unified platform for all application types.</p>
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+    <tr><td>Runtime</td><td>.NET 10 CLR</td><td>Execution engine, GC, JIT</td></tr>
+    <tr><td>Language</td><td>C# 13</td><td>Primary development language</td></tr>
+    <tr><td>Web Framework</td><td>ASP.NET Core 10</td><td>HTTP pipeline, hosting, routing</td></tr>
+    <tr><td>ORM</td><td>EF Core 10</td><td>Database access, migrations</td></tr>
+    <tr><td>UI</td><td>Razor / Blazor</td><td>Server-rendered and interactive UI</td></tr>
+    <tr><td>Security</td><td>ASP.NET Core Identity</td><td>Authentication &amp; authorization</td></tr>
+  </table>
+  <h3 id="orientation-tools" data-toc>Tools you will use</h3>
+  <p class="topic-desc">These tools are used throughout the guide. Install them once and they carry you through every chapter.</p>
+  <table>
+    <tr><th>Tool</th><th>Purpose</th></tr>
+    <tr><td>.NET SDK 10</td><td>Build, run, and publish .NET apps</td></tr>
+    <tr><td>Visual Studio 2022 / VS Code</td><td>IDE with IntelliSense and debugging</td></tr>
+    <tr><td>dotnet CLI</td><td>Command-line project management</td></tr>
+    <tr><td>SQL Server / PostgreSQL</td><td>Relational database</td></tr>
+    <tr><td>Docker</td><td>Containerisation for deployment</td></tr>
+    <tr><td>Postman / HttpClient</td><td>API testing</td></tr>
+  </table>
+
+    <div class="ex"><h4 id="orientation-tools--exercises-0">Exercises 0</h4><ol>
+      <li>Sketch the projects in your current solution and write one sentence per layer describing its job.</li>
+      <li>Identify two boundaries in your codebase that could later become independently deployed services.</li>
+      <li>Write down which of the tools in the table you have installed, and which you still need to install.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch1" data-toc>1 · C# for Enterprise</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · C# for Enterprise</button><div class="ch-toc-list"><a href="#ch1-records">1.1 Records and immutability</a><a href="#ch1-patterns">1.2 Pattern matching</a><a href="#ch1-nullable">1.3 Nullable reference types</a><a href="#ch1-async">1.4 Async / await deep dive</a><a href="#ch1-linq">1.5 LINQ for enterprise data</a><a href="#ch1-generics">1.6 Generics and constraints</a></div></div>
+  <p class="topic-desc">Modern C# is a rich language with features that directly improve enterprise code quality — immutability, pattern matching, null safety, and powerful abstractions.</p>
+  <h3 id="ch1-records" data-toc>1.1 Records and immutability</h3>
+  <p class="topic-desc">Records provide value-based semantics for data transfer objects, domain models, and immutable configurations. They are the backbone of clean architecture in .NET.</p>
+  <div class="codeWrap"><pre><code>public record Product(int Id, string Name, decimal Price);
+
+// Records have value equality
+var p1 = new Product(1, "Laptop", 999.99m);
+var p2 = new Product(1, "Laptop", 999.99m);
+Console.WriteLine(p1 == p2); // True — value equality
+
+// with-expressions for non-destructive mutation
+var discounted = p1 with { Price = 899.99m };
+Console.WriteLine(discounted.Price); // 899.99
+Console.WriteLine(p1.Price);        // 999.99 — original unchanged
+
+// Positional records auto-generate Deconstruct
+var (id, name, price) = discounted;</code></pre></div>
+  <div class="tip"><p>Use records for DTOs, domain events, and configuration objects. They eliminate an entire class of bugs related to mutable shared state.</p></div>
+
+  <h3 id="ch1-patterns" data-toc>1.2 Pattern matching</h3>
+  <p class="topic-desc">C# pattern matching has evolved into a powerful tool for business logic, replacing complex if-else chains with expressive, compiler-checked code.</p>
+  <div class="codeWrap"><pre><code>public decimal CalculateDiscount(Customer customer, Product product) =&gt; customer switch
+{
+    { Tier: CustomerTier.Premium, YearsActive: &gt; 5 } =&gt; product.Price * 0.20m,
+    { Tier: CustomerTier.Premium }                        =&gt; product.Price * 0.15m,
+    { Tier: CustomerTier.Standard, YearsActive: &gt; 2 } =&gt; product.Price * 0.10m,
+    { Tier: CustomerTier.Standard }                        =&gt; product.Price * 0.05m,
+    _                                                        =&gt; 0m
+};
+
+// Property patterns with logical operators
+if (order is { Total: &gt; 1000m, Items.Count: &gt; 5, Status: OrderStatus.Pending })
+{
+    order.ApplyBulkDiscount();
+}
+
+// List patterns (C# 11+)
+int[] numbers = { 1, 2, 3, 4, 5 };
+if (numbers is [&gt; 0, &gt; 0, ..])
+{
+    Console.WriteLine("All positive");
+}</code></pre></div>
+
+  <h3 id="ch1-nullable" data-toc>1.3 Nullable reference types</h3>
+  <p class="topic-desc">Nullable reference types eliminate null reference exceptions at compile time. Every enterprise project should enable this feature.</p>
+  <div class="codeWrap"><pre><code>&lt;!-- In .csproj --&gt;
+&lt;PropertyGroup&gt;
+  &lt;Nullable&gt;enable&lt;/Nullable&gt;
+  &lt;TreatWarningsAsErrors&gt;true&lt;/TreatWarningsAsErrors&gt;
+&lt;/PropertyGroup&gt;
+
+// Code with nullable annotations
+public class OrderService
+{
+    // Non-nullable — must be initialised
+    private readonly IOrderRepository _repository;
+
+    // Nullable — may return null
+    public Order? FindById(int id) =&gt; _repository.FindById(id);
+
+    // Null-forgiving operator — use sparingly
+    public Order GetById(int id) =&gt; _repository.FindById(id)!;
+
+    // Null-coalescing assignment
+    public Customer GetOrCreateCustomer(string email)
+    {
+        var customer = _repository.FindByEmail(email);
+        customer ??= _repository.Create(new Customer(email));
+        return customer;
+    }
+}</code></pre></div>
+  <div class="warn"><p>Enabling nullable reference types in an existing codebase will produce many warnings. Address them incrementally file by file rather than suppressing globally.</p></div>
+
+  <h3 id="ch1-async" data-toc>1.4 Async / await deep dive</h3>
+  <p class="topic-desc">Async is not just about performance — it is about writing correct, scalable I/O-bound code. Understanding the internals prevents deadlocks and thread-pool starvation.</p>
+  <div class="codeWrap"><pre><code>public class OrderProcessingService
+{
+    private readonly IOrderRepository _repository;
+    private readonly IPaymentGateway _payment;
+    private readonly ILogger&lt;OrderProcessingService&gt; _logger;
+
+    public async Task&lt;OrderResult&gt; ProcessOrderAsync(Order order, CancellationToken ct = default)
+    {
+        order.Validate();
+        await _repository.AddAsync(order, ct);
+
+        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, timeoutCts.Token);
+
+        var payment = await _payment.ChargeAsync(order.Total, linkedCts.Token);
+
+        if (payment.Success)
+        {
+            order.Complete();
+            await _repository.UpdateAsync(order, ct);
+            return OrderResult.Success(order.Id);
+        }
+
+        order.Fail(payment.ErrorMessage);
+        await _repository.UpdateAsync(order, ct);
+        return OrderResult.Failure(payment.ErrorMessage);
+    }
+}
+
+// ValueTask for hot paths that complete synchronously
+public async ValueTask&lt;Order?&gt; FindCachedAsync(int id)
+{
+    if (_cache.TryGetValue(id, out var order))
+        return order;
+
+    order = await _repository.FindByIdAsync(id);
+    _cache[id] = order;
+    return order;
+}</code></pre></div>
+  <div class="tip"><p>Always flow CancellationToken through async call chains. It is the only way to implement proper timeout and cancellation behaviour in enterprise systems.</p></div>
+
+  <h3 id="ch1-linq" data-toc>1.5 LINQ for enterprise data</h3>
+  <p class="topic-desc">LINQ is the primary data manipulation tool in C#. Understanding deferred execution, projection, and aggregation is essential for writing efficient data access code.</p>
+  <div class="codeWrap"><pre><code>// Deferred execution — query is not executed until enumerated
+var query = _context.Orders
+    .Where(o =&gt; o.Status == OrderStatus.Pending)
+    .OrderByDescending(o =&gt; o.CreatedAt)
+    .Take(100);
+
+// Forces execution — use ToListAsync for EF Core
+var results = await query.ToListAsync();
+
+// Projection — select only needed fields
+var dtos = await _context.Orders
+    .Where(o =&gt; o.CreatedAt &gt; DateTime.UtcNow.AddDays(-30))
+    .Select(o =&gt; new OrderDto
+    {
+        Id = o.Id,
+        CustomerName = o.Customer.Name,
+        Total = o.Items.Sum(i =&gt; i.Quantity * i.UnitPrice),
+        ItemCount = o.Items.Count
+    })
+    .ToListAsync();
+
+// Grouping and aggregation
+var salesByCategory = await _context.OrderItems
+    .GroupBy(oi =&gt; oi.Product.Category)
+    .Select(g =&gt; new
+    {
+        Category = g.Key,
+        TotalRevenue = g.Sum(oi =&gt; oi.Quantity * oi.UnitPrice),
+        OrderCount = g.Select(oi =&gt; oi.OrderId).Distinct().Count()
+    })
+    .ToListAsync();</code></pre></div>
+
+  <h3 id="ch1-generics" data-toc>1.6 Generics and constraints</h3>
+  <p class="topic-desc">Generics enable type-safe, reusable components. Enterprise applications rely heavily on generic repositories, services, and middleware.</p>
+  <div class="codeWrap"><pre><code>public interface IRepository&lt;T&gt; where T : Entity
+{
+    Task&lt;T?&gt; GetByIdAsync(int id, CancellationToken ct = default);
+    Task&lt;IReadOnlyList&lt;T&gt;&gt; ListAsync(CancellationToken ct = default);
+    Task&lt;T&gt; AddAsync(T entity, CancellationToken ct = default);
+    Task UpdateAsync(T entity, CancellationToken ct = default);
+    Task DeleteAsync(int id, CancellationToken ct = default);
+}
+
+public class Repository&lt;T&gt; : IRepository&lt;T&gt; where T : Entity
+{
+    protected readonly AppDbContext _context;
+    protected readonly DbSet&lt;T&gt; _dbSet;
+
+    public Repository(AppDbContext context)
+    {
+        _context = context;
+        _dbSet = context.Set&lt;T&gt;();
+    }
+
+    public async Task&lt;T?&gt; GetByIdAsync(int id, CancellationToken ct = default)
+        =&gt; await _dbSet.FindAsync(new object[] { id }, ct);
+
+    public async Task&lt;IReadOnlyList&lt;T&gt;&gt; ListAsync(CancellationToken ct = default)
+        =&gt; await _dbSet.ToListAsync(ct);
+
+    public async Task&lt;T&gt; AddAsync(T entity, CancellationToken ct = default)
+    {
+        await _dbSet.AddAsync(entity, ct);
+        await _context.SaveChangesAsync(ct);
+        return entity;
+    }
+}</code></pre></div>
+
+    <div class="ex"><h4 id="ch1-generics--exercises-1">Exercises 1</h4><ol>
+      <li>Convert an existing mutable class into a <code>record</code> and confirm every construction site still compiles.</li>
+      <li>Rewrite a chain of <code>if</code>/<code>else if</code> on a status enum as a single <code>switch</code> expression.</li>
+      <li>Enable nullable reference types on a project, then fix every warning the compiler reports without suppressing any.</li>
+      <li>Convert a synchronous method that calls a blocking API into <code>async Task</code> all the way up its call chain.</li>
+      <li>Rewrite a <code>foreach</code> loop with an index as a <code>Select</code>/<code>Where</code> LINQ pipeline and compare readability.</li>
+      <li>Add a generic repository with a <code>where T : class, IEntity</code> constraint and implement <code>GetByIdAsync</code>.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch2" data-toc>2 · ASP.NET Core Fundamentals</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · ASP.NET Core Fundamentals</button><div class="ch-toc-list"><a href="#ch2-startup">2.1 Startup and hosting</a><a href="#ch2-middleware">2.2 Middleware pipeline</a><a href="#ch2-di">2.3 Dependency injection</a><a href="#ch2-config">2.4 Configuration</a><a href="#ch2-env">2.5 Environments and secrets</a></div></div>
+  <p class="topic-desc">ASP.NET Core is built on a composable middleware pipeline with first-class dependency injection. Understanding these fundamentals is critical for building maintainable enterprise applications.</p>
+  <h3 id="ch2-startup" data-toc>2.1 Startup and hosting</h3>
+  <p class="topic-desc">The Program.cs file is the entry point. With .NET 10, the minimal hosting model is the recommended approach for new projects.</p>
+  <div class="codeWrap"><pre><code>var builder = WebApplication.CreateBuilder(args);
+
+// Register services
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext&lt;AppDbContext&gt;(options =&gt;
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddScoped&lt;IOrderService, OrderService&gt;();
+builder.Services.AddScoped&lt;IOrderRepository, OrderRepository&gt;();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =&gt;
+    {
+        options.Authority = builder.Configuration["Auth:Authority"];
+        options.Audience = builder.Configuration["Auth:Audience"];
+    });
+
+var app = builder.Build();
+
+// Configure middleware pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();</code></pre></div>
+
+  <h3 id="ch2-middleware" data-toc>2.2 Middleware pipeline</h3>
+  <p class="topic-desc">Middleware components form a pipeline that handles each HTTP request. Order matters — each component can short-circuit or pass to the next.</p>
+  <div class="codeWrap"><pre><code>public class RequestTimingMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger&lt;RequestTimingMiddleware&gt; _logger;
+
+    public RequestTimingMiddleware(RequestDelegate next, ILogger&lt;RequestTimingMiddleware&gt; logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        var sw = Stopwatch.StartNew();
+        _logger.LogInformation("→ {Method} {Path}", context.Request.Method, context.Request.Path);
+
+        await _next(context);
+
+        sw.Stop();
+        _logger.LogInformation("&#8592; {StatusCode} {Method} {Path} in {ElapsedMs}ms",
+            context.Response.StatusCode, context.Request.Method, context.Request.Path, sw.ElapsedMilliseconds);
+    }
+}
+
+// Extension method for clean registration
+public static class MiddlewareExtensions
+{
+    public static IApplicationBuilder UseRequestTiming(this IApplicationBuilder app)
+        =&gt; app.UseMiddleware&lt;RequestTimingMiddleware&gt;();
+}</code></pre></div>
+  <div class="tip"><p>Middleware order is critical: ExceptionHandler → HttpsRedirection → StaticFiles → Routing → Authentication → Authorization → Endpoints. Getting this wrong causes subtle security and routing bugs.</p></div>
+
+  <h3 id="ch2-di" data-toc>2.3 Dependency injection</h3>
+  <p class="topic-desc">ASP.NET Core has a built-in DI container. Understanding service lifetimes is essential for avoiding captive dependencies and memory leaks.</p>
+  <div class="codeWrap"><pre><code>// Service lifetimes
+builder.Services.AddTransient&lt;IEmailService, EmailService&gt;();   // New instance every time
+builder.Services.AddScoped&lt;IOrderService, OrderService&gt;();       // One per HTTP request
+builder.Services.AddSingleton&lt;ICacheService, CacheService&gt;();    // One for app lifetime
+
+// Factory registration
+builder.Services.AddScoped&lt;IOrderRepository&gt;(sp =&gt;
+{
+    var context = sp.GetRequiredService&lt;AppDbContext&gt;();
+    var logger = sp.GetRequiredService&lt;ILogger&lt;OrderRepository&gt;&gt;();
+    return new OrderRepository(context, logger);
+});
+
+// Keyed services (.NET 8+)
+builder.Services.AddKeyedSingleton&lt;INotificationService, EmailNotificationService&gt;("email");
+builder.Services.AddKeyedSingleton&lt;INotificationService, SmsNotificationService&gt;("sms");
+
+// Common anti-pattern: captive dependency
+// WRONG: Singleton depending on Scoped
+builder.Services.AddSingleton&lt;BadService&gt;(); // Depends on IOrderService (scoped) — will cause bugs
+
+// CORRECT: Use IServiceScopeFactory
+public class GoodService
+{
+    private readonly IServiceScopeFactory _scopeFactory;
+
+    public GoodService(IServiceScopeFactory scopeFactory)
+    {
+        _scopeFactory = scopeFactory;
+    }
+
+    public async Task DoWorkAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var orderService = scope.ServiceProvider.GetRequiredService&lt;IOrderService&gt;();
+        await orderService.ProcessPendingOrdersAsync();
+    }
+}</code></pre></div>
+  <div class="warn"><p>Never inject Scoped services into Singleton services. This is the most common DI mistake in enterprise applications and causes data corruption under load.</p></div>
+
+  <h3 id="ch2-config" data-toc>2.4 Configuration</h3>
+  <p class="topic-desc">ASP.NET Core uses a layered configuration system with multiple providers. Enterprise apps need strongly-typed configuration with validation.</p>
+  <div class="codeWrap"><pre><code>public class DatabaseOptions
+{
+    public const string SectionName = "Database";
+    public string ConnectionString { get; set; } = string.Empty;
+    public int CommandTimeout { get; set; } = 30;
+    public bool EnableRetryOnFailure { get; set; } = true;
+}
+
+// Registration with validation
+builder.Services
+    .AddOptions&lt;DatabaseOptions&gt;()
+    .BindConfiguration(DatabaseOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+// Consume via IOptions&lt;T&gt;
+public class OrderService
+{
+    private readonly DatabaseOptions _dbOptions;
+
+    public OrderService(IOptions&lt;DatabaseOptions&gt; options)
+    {
+        _dbOptions = options.Value;
+    }
+}
+
+// IOptionsMonitor for reload-on-change
+public class FeatureFlagService
+{
+    private readonly IOptionsMonitor&lt;FeatureOptions&gt; _monitor;
+
+    public FeatureFlagService(IOptionsMonitor&lt;FeatureOptions&gt; monitor)
+    {
+        _monitor = monitor;
+        _monitor.OnChange(opts =&gt; Console.WriteLine("Features reloaded!"));
+    }
+
+    public bool IsEnabled(string feature) =&gt; _monitor.CurrentValue.Features.Contains(feature);
+}</code></pre></div>
+
+  <h3 id="ch2-env" data-toc>2.5 Environments and secrets</h3>
+  <p class="topic-desc">Environment-specific configuration and secret management are non-negotiable in enterprise applications.</p>
+  <div class="codeWrap"><pre><code>// Program.cs — environment-aware configuration
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables()
+    .AddUserSecrets&lt;Program&gt;(optional: true);
+
+// Environment checks
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler("/error");
+    app.UseHsts();
+}
+
+// User Secrets CLI
+// dotnet user-secrets init
+// dotnet user-secrets set "Database:ConnectionString" "Server=..."
+
+// Azure Key Vault (production)
+builder.Configuration.AddAzureKeyVault(
+    new Uri($"https://{builder.Configuration["KeyVault:Name"]}.vault.azure.net/"),
+    new DefaultAzureCredential());</code></pre></div>
+
+    <div class="ex"><h4 id="ch2-env--exercises-2">Exercises 2</h4><ol>
+      <li>Build a minimal API from scratch with GET and POST for one resource, then add OpenAPI metadata.</li>
+      <li>Write a custom middleware that logs the elapsed time of every request, and register it in the correct pipeline position.</li>
+      <li>Register a scoped service and a singleton service, then inject both into an endpoint and explain the lifetime difference.</li>
+      <li>Move a connection string from <code>appsettings.json</code> into user-secrets for development, and document how production supplies it.</li>
+      <li>Add a configuration section bound to a strongly typed options class with validation on startup.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch3" data-toc>3 · MVC Pattern</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · MVC Pattern</button><div class="ch-toc-list"><a href="#ch3-controllers">3.1 Controllers and actions</a><a href="#ch3-routing">3.2 Routing</a><a href="#ch3-models">3.3 Models and validation</a><a href="#ch3-views">3.4 Views and Razor syntax</a><a href="#ch3-filters">3.5 Filters</a></div></div>
+  <p class="topic-desc">The Model-View-Controller pattern is the foundation of server-rendered web applications in ASP.NET Core. It separates concerns and enables testable, maintainable code.</p>
+  <h3 id="ch3-controllers" data-toc>3.1 Controllers and actions</h3>
+  <p class="topic-desc">Controllers handle HTTP requests, orchestrate business logic, and return responses. They should be thin — delegating to services.</p>
+  <div class="codeWrap"><pre><code>public class ProductsController : ControllerBase
+{
+    private readonly IProductService _productService;
+    private readonly ILogger&lt;ProductsController&gt; _logger;
+
+    public ProductsController(IProductService productService, ILogger&lt;ProductsController&gt; logger)
+    {
+        _productService = productService;
+        _logger = logger;
+    }
+
+    [HttpGet]
+    [Route("api/[controller]")]
+    public async ActionResult&lt;IEnumerable&lt;ProductDto&gt;&gt; GetAll(
+        [FromQuery] ProductSearchRequest request,
+        CancellationToken ct)
+    {
+        _logger.LogInformation("Searching products: {SearchTerm}", request.SearchTerm);
+        var products = await _productService.SearchAsync(request, ct);
+        return Ok(products);
+    }
+
+    [HttpGet("{id:int}")]
+    public async ActionResult&lt;ProductDto&gt; GetById(int id, CancellationToken ct)
+    {
+        var product = await _productService.GetByIdAsync(id, ct);
+        return product == null ? NotFound() : Ok(product);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async ActionResult&lt;ProductDto&gt; Create([FromBody] CreateProductRequest request, CancellationToken ct)
+    {
+        var product = await _productService.CreateAsync(request, ct);
+        return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+    }
+
+    [HttpPut("{id:int}")]
+    public async ActionResult&lt;ProductDto&gt; Update(int id, [FromBody] UpdateProductRequest request, CancellationToken ct)
+    {
+        var product = await _productService.UpdateAsync(id, request, ct);
+        return product == null ? NotFound() : Ok(product);
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async ActionResult Delete(int id, CancellationToken ct)
+    {
+        var success = await _productService.DeleteAsync(id, ct);
+        return success ? NoContent() : NotFound();
+    }
+}</code></pre></div>
+
+  <h3 id="ch3-routing" data-toc>3.2 Routing</h3>
+  <p class="topic-desc">ASP.NET Core supports attribute routing, conventional routing, and minimal API routing. Attribute routing is preferred for APIs.</p>
+  <div class="codeWrap"><pre><code>// Attribute routing (recommended for APIs)
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+public class ProductsController : ControllerBase { }
+
+// Route constraints
+[HttpGet("{id:int:min(1)}")]           // Integer, minimum 1
+[HttpGet("{date:datetime}")]          // DateTime
+[HttpGet("{guid:guid}")]              // GUID
+[HttpGet("{name:alpha:min(2):max(50)}")] // Alpha, 2-50 chars
+
+// Conventional routing (for MVC views)
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Area routing
+[Area("Admin")]
+[Route("admin/[controller]/[action]")]
+public class DashboardController : Controller { }</code></pre></div>
+
+  <h3 id="ch3-models" data-toc>3.3 Models and validation</h3>
+  <p class="topic-desc">Model validation is built into ASP.NET Core via data annotations. Custom validators handle complex business rules.</p>
+  <div class="codeWrap"><pre><code>public class CreateProductRequest
+{
+    [Required]
+    [StringLength(200, MinimumLength = 2)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required]
+    [Range(0.01, 1000000)]
+    public decimal Price { get; set; }
+
+    [Required]
+    [Range(1, int.MaxValue)]
+    public int StockQuantity { get; set; }
+
+    [Url]
+    [StringLength(500)]
+    public string? ImageUrl { get; set; }
+
+    [Required]
+    [StringLength(50)]
+    [RegularExpression(@"^[A-Z]{2}-\d{4}$", ErrorMessage = "SKU must be in format XX-0000")]
+    public string Sku { get; set; } = string.Empty;
+}
+
+// FluentValidation (preferred for complex rules)
+public class CreateProductValidator : AbstractValidator&lt;CreateProductRequest&gt;
+{
+    public CreateProductValidator()
+    {
+        RuleFor(x =&gt; x.Name).NotEmpty().MaximumLength(200);
+        RuleFor(x =&gt; x.Price).GreaterThan(0).LessThanOrEqualTo(1000000);
+        RuleFor(x =&gt; x.Sku).Matches(@"^[A-Z]{2}-\d{4}$");
+        RuleFor(x =&gt; x.StockQuantity).GreaterThanOrEqualTo(0);
+    }
+}
+
+// Register in Program.cs
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining&lt;CreateProductValidator&gt;();</code></pre></div>
+
+  <h3 id="ch3-views" data-toc>3.4 Views and Razor syntax</h3>
+  <p class="topic-desc">Razor is the server-side templating engine. It combines HTML with C# to generate dynamic pages.</p>
+  <div class="codeWrap"><pre><code>&lt;!-- Views/Products/Index.cshtml --&gt;
+@model PagedResult&lt;ProductDto&gt;
+@{
+    ViewData["Title"] = "Products";
+}
+
+&lt;h1&gt;Products&lt;/h1&gt;
+
+&lt;table class="table"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Name&lt;/th&gt;
+            &lt;th&gt;Price&lt;/th&gt;
+            &lt;th&gt;Stock&lt;/th&gt;
+            &lt;th&gt;&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        @foreach (var product in Model.Items)
+        {
+            &lt;tr&gt;
+                &lt;td&gt;@product.Name&lt;/td&gt;
+                &lt;td&gt;@product.Price.ToString("C")&lt;/td&gt;
+                &lt;td&gt;@product.StockQuantity&lt;/td&gt;
+                &lt;td&gt;
+                    &lt;a asp-action="Details" asp-route-id="@product.Id" class="btn btn-sm btn-primary"&gt;View&lt;/a&gt;
+                    &lt;a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-sm btn-secondary"&gt;Edit&lt;/a&gt;
+                &lt;/td&gt;
+            &lt;/tr&gt;
+        }
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre></div>
+
+  <h3 id="ch3-filters" data-toc>3.5 Filters</h3>
+  <p class="topic-desc">Filters run before or after action execution. They implement cross-cutting concerns like logging, caching, and error handling.</p>
+  <div class="codeWrap"><pre><code>public class ValidationFilter : IAsyncActionFilter
+{
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        if (!context.ModelState.IsValid)
+        {
+            var errors = context.ModelState
+                .Where(x =&gt; x.Value?.Errors.Count &gt; 0)
+                .ToDictionary(
+                    x =&gt; x.Key,
+                    x =&gt; x.Value!.Errors.Select(e =&gt; e.ErrorMessage).ToArray());
+
+            context.Result = new BadRequestObjectResult(new { Errors = errors });
+            return;
+        }
+
+        await next();
+    }
+}
+
+// Global filter registration
+builder.Services.AddControllers(options =&gt;
+{
+    options.Filters.Add&lt;ValidationFilter&gt;();
+    options.Filters.Add&lt;ExceptionFilter&gt;();
+});</code></pre></div>
+
+    <div class="ex"><h4 id="ch3-filters--exercises-3">Exercises 3</h4><ol>
+      <li>Create a controller with three actions, then refactor each action body into a private application service method.</li>
+      <li>Add attribute routing and constraint routes, and explain when you would choose each over conventional routing.</li>
+      <li>Bind a complex model from the query string and from the body, and show the difference in how validation errors surface.</li>
+      <li>Write a custom action filter that logs slow requests, and register it globally and per-action.</li>
+      <li>Add a <code>[Range]</code> and a custom <code>IValidatableObject</code> rule, and verify both reject bad input.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch4" data-toc>4 · Web API</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Web API</button><div class="ch-toc-list"><a href="#ch4-rest">4.1 REST principles</a><a href="#ch4-minimal">4.2 Minimal APIs</a><a href="#ch4-versioning">4.3 API versioning</a><a href="#ch4-docs">4.4 Documentation with OpenAPI</a><a href="#ch4-cors">4.5 CORS and rate limiting</a></div></div>
+  <p class="topic-desc">Web APIs are the backbone of modern enterprise applications. ASP.NET Core provides both controller-based and minimal API approaches.</p>
+  <h3 id="ch4-rest" data-toc>4.1 REST principles</h3>
+  <p class="topic-desc">RESTful APIs use HTTP verbs, status codes, and resource-based URLs. Following REST conventions makes APIs predictable and self-documenting.</p>
+  <table>
+    <tr><th>HTTP Verb</th><th>Operation</th><th>Example</th><th>Success</th></tr>
+    <tr><td>GET</td><td>Read</td><td>GET /api/products</td><td>200 OK</td></tr>
+    <tr><td>POST</td><td>Create</td><td>POST /api/products</td><td>201 Created</td></tr>
+    <tr><td>PUT</td><td>Replace</td><td>PUT /api/products/1</td><td>200 OK</td></tr>
+    <tr><td>PATCH</td><td>Partial update</td><td>PATCH /api/products/1</td><td>200 OK</td></tr>
+    <tr><td>DELETE</td><td>Delete</td><td>DELETE /api/products/1</td><td>204 No Content</td></tr>
+  </table>
+  <div class="codeWrap"><pre><code>// Standard REST controller
+[ApiController]
+[Route("api/[controller]")]
+public class OrdersController : ControllerBase
+{
+    private readonly IOrderService _orderService;
+
+    public OrdersController(IOrderService orderService) =&gt; _orderService = orderService;
+
+    [HttpGet]
+    public async ActionResult&lt;PagedResult&lt;OrderDto&gt;&gt; GetAll(
+        [FromQuery] OrderSearchRequest request, CancellationToken ct)
+        =&gt; Ok(await _orderService.SearchAsync(request, ct));
+
+    [HttpGet("{id}")]
+    public async ActionResult&lt;OrderDto&gt; GetById(int id, CancellationToken ct)
+    {
+        var order = await _orderService.GetByIdAsync(id, ct);
+        return order == null ? NotFound() : Ok(order);
+    }
+
+    [HttpPost]
+    public async ActionResult&lt;OrderDto&gt; Create([FromBody] CreateOrderRequest request, CancellationToken ct)
+    {
+        var order = await _orderService.CreateAsync(request, ct);
+        return; CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
+    }
+
+    [HttpPut("{id}")]
+    public async ActionResult&lt;OrderDto&gt; Update(int id, [FromBody] UpdateOrderRequest request, CancellationToken ct)
+    {
+        var order = await _orderService.UpdateAsync(id, request, ct);
+        return order == null ? NotFound() : Ok(order);
+    }
+
+    [HttpDelete("{id}")]
+    public async ActionResult Delete(int id, CancellationToken ct)
+    {
+        var success = await _orderService.DeleteAsync(id, ct);
+        return success ? NoContent() : NotFound();
+    }
+}</code></pre></div>
+
+  <h3 id="ch4-minimal" data-toc>4.2 Minimal APIs</h3>
+  <p class="topic-desc">Minimal APIs are ideal for microservices, small endpoints, and rapid prototyping. They reduce boilerplate while maintaining full DI and middleware support.</p>
+  <div class="codeWrap"><pre><code>var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped&lt;IProductService, ProductService&gt;();
+
+var app = builder.Build();
+
+// GET all products
+app.MapGet("/api/products", async ([AsParameters] ProductSearchRequest req, IProductService svc, CancellationToken ct) =&gt;
+    Results.Ok(await svc.SearchAsync(req, ct)))
+.WithName("GetProducts")
+.WithOpenApi()
+.Produces&lt;PagedResult&lt;ProductDto&gt;&gt;(200)
+.Produces(400);
+
+// GET single product
+app.MapGet("/api/products/{id:int}", async (int id, IProductService svc, CancellationToken ct) =&gt;
+{
+    var product = await svc.GetByIdAsync(id, ct);
+    return product is null
+        ? Results.NotFound()
+        : Results.Ok(product);
+})
+.WithName("GetProduct")
+.WithOpenApi()
+.Produces&lt;ProductDto&gt;(200)
+.Produces(404);
+
+// POST create product
+app.MapPost("/api/products", async ([FromBody] CreateProductRequest req, IProductService svc, CancellationToken ct) =&gt;
+{
+    var product = await svc.CreateAsync(req, ct);
+    return Results.Created($"/api/products/{product.Id}", product);
+})
+.WithName("CreateProduct")
+.WithOpenApi()
+.Produces&lt;ProductDto&gt;(201)
+.Produces(400)
+.RequireAuthorization("AdminOnly");
+
+// PUT update product
+app.MapPut("/api/products/{id:int}", async (int id, [FromBody] UpdateProductRequest req, IProductService svc, CancellationToken ct) =&gt;
+{
+    var product = await svc.UpdateAsync(id, req, ct);
+    return product is null ? Results.NotFound() : Results.Ok(product);
+})
+.WithName("UpdateProduct")
+.WithOpenApi();
+
+// DELETE product
+app.MapDelete("/api/products/{id:int}", async (int id, IProductService svc, CancellationToken ct) =&gt;
+{
+    var success = await svc.DeleteAsync(id, ct);
+    return success ? Results.NoContent() : Results.NotFound();
+})
+.WithName("DeleteProduct")
+.WithOpenApi()
+.RequireAuthorization("AdminOnly");
+
+app.Run();</code></pre></div>
+
+  <h3 id="ch4-versioning" data-toc>4.3 API versioning</h3>
+  <p class="topic-desc">API versioning is essential for enterprise applications with multiple clients. ASP.NET Core supports URL, header, and query string versioning.</p>
+  <div class="codeWrap"><pre><code>// Program.cs
+builder.Services.AddApiVersioning(options =&gt;
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(),
+        new HeaderApiVersionReader("X-API-Version"));
+});
+
+builder.Services.AddVersionedApiExplorer(options =&gt;
+{
+    options.GroupNameFormat = 'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+// Versioned controller
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("1.0")]
+public class ProductsV1Controller : ControllerBase
+{
+    [HttpGet]
+    public async ActionResult&lt;IEnumerable&lt;ProductDto&gt;&gt; GetAll(CancellationToken ct)
+        =&gt; Ok(await _productService.GetAllAsync(ct));
+}
+
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("2.0")]
+public class ProductsV2Controller : ControllerBase
+{
+    [HttpGet]
+    public async ActionResult&lt;IEnumerable&lt;ProductV2Dto&gt;&gt; GetAll(CancellationToken ct)
+        =&gt; Ok(await _productService.GetAllV2Async(ct));
+}
+
+// Deprecate old versions
+[ApiVersion("1.0", Deprecated = true)]</code></pre></div>
+
+  <h3 id="ch4-docs" data-toc>4.4 Documentation with OpenAPI</h3>
+  <p class="topic-desc">Swagger/OpenAPI is the industry standard for API documentation. ASP.NET Core integrates it seamlessly.</p>
+  <div class="codeWrap"><pre><code>// Program.cs
+builder.Services.AddSwaggerGen(options =&gt;
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "My API",
+        Version = "v1",
+        Description = "Enterprise API for managing products and orders",
+        Contact = new OpenApiContact { Name = "Support", Email = "support@example.com" }
+    });
+
+    // Include XML comments
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+
+    // Add JWT auth to Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header
+    });
+});
+
+// In the pipeline
+app.UseSwagger();
+app.UseSwaggerUI(options =&gt;
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    options.RoutePrefix = "swagger";
+});</code></pre></div>
+
+  <h3 id="ch4-cors" data-toc>4.5 CORS and rate limiting</h3>
+  <p class="topic-desc">CORS and rate limiting are essential for public APIs. Both are built into ASP.NET Core.</p>
+  <div class="codeWrap"><pre><code>// CORS
+builder.Services.AddCors(options =&gt;
+{
+    options.AddPolicy("AllowFrontend", policy =&gt;
+    {
+        policy.WithOrigins(
+                builder.Configuration.GetSection("Cors:AllowedOrigins").Get&lt;string[]&gt;()!)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+app.UseCors("AllowFrontend");
+
+// Rate limiting (.NET 7+)
+builder.Services.AddRateLimiter(options =&gt;
+{
+    options.AddPolicy("fixed", context =&gt;
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.User.Identity?.Name ?? context.Request.Headers.Host.ToString(),
+            factory: _ =&gt; new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 2
+            }));
+
+    options.OnRejected = async (context, ct) =&gt;
+    {
+        context.HttpContext.Response.StatusCode = 429;
+        await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", ct);
+    };
+});
+
+app.UseRateLimiter();</code></pre></div>
+
+    <div class="ex"><h4 id="ch4-cors--exercises-4">Exercises 4</h4><ol>
+      <li>Expose one resource with full CRUD using minimal APIs, returning correct status codes for each case.</li>
+      <li>Add pagination, filtering and sorting to a list endpoint, then document the query-string contract in OpenAPI.</li>
+      <li>Implement API versioning so that <code>/api/v1/</code> and <code>/api/v2/</code> can run side by side during a migration.</li>
+      <li>Return RFC 7807 problem details for validation failures, not-found and unhandled exceptions.</li>
+      <li>Configure a rate-limiting policy and demonstrate that a client exceeding the quota receives HTTP 429.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch5" data-toc>5 · Razor Pages</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Razor Pages</button><div class="ch-toc-list"><a href="#ch5-intro">5.1 Page-focused model</a><a href="#ch5-handlers">5.2 Page handlers</a><a href="#ch5-model">5.3 PageModel and binding</a><a href="#ch5-layout">5.4 Layouts and sections</a></div></div>
+  <p class="topic-desc">Razor Pages provide a simpler alternative to MVC for page-focused scenarios. Each page is self-contained with its own model and handlers.</p>
+  <h3 id="ch5-intro" data-toc>5.1 Page-focused model</h3>
+  <p class="topic-desc">Razor Pages combine the view and controller into a single PageModel class. This reduces ceremony for simple CRUD pages.</p>
+  <div class="codeWrap"><pre><code>// Pages/Products/Index.cshtml
+@page
+@model Products.IndexModel
+@{
+    ViewData["Title"] = "Products";
+}
+
+&lt;h1&gt;Products&lt;/h1&gt;
+&lt;a asp-page="/Products/Create" class="btn btn-primary"&gt;Create New&lt;/a&gt;
+
+&lt;table class="table"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Price&lt;/th&gt;&lt;th&gt;Stock&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        @foreach (var item in Model.Products)
+        {
+            &lt;tr&gt;
+                &lt;td&gt;@item.Name&lt;/td&gt;
+                &lt;td&gt;@item.Price.ToString("C")&lt;/td&gt;
+                &lt;td&gt;@item.StockQuantity&lt;/td&gt;
+                &lt;td&gt;
+                    &lt;a asp-page="/Products/Edit" asp-route-id="@item.Id"&gt;Edit&lt;/a&gt;
+                    &lt;a asp-page="/Products/Delete" asp-route-id="@item.Id"&gt;Delete&lt;/a&gt;
+                &lt;/td&gt;
+            &lt;/tr&gt;
+        }
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre></div>
+
+  <h3 id="ch5-handlers" data-toc>5.2 Page handlers</h3>
+  <p class="topic-desc">Page handlers are named methods that correspond to HTTP verbs. OnGet, OnPost, OnPut, OnDelete, and custom named handlers.</p>
+  <div class="codeWrap"><pre><code>// Pages/Products/Edit.cshtml.cs
+public class EditModel : PageModel
+{
+    private readonly IProductService _productService;
+    private readonly ILogger&lt;EditModel&gt; _logger;
+
+    public EditModel(IProductService productService, ILogger&lt;EditModel&gt; logger)
+    {
+        _productService = productService;
+        _logger = logger;
+    }
+
+    [BindProperty]
+    public Product Product { get; set; } = new();
+
+    [BindProperty(SupportsGet = true)]
+    public int Id { get; set; }
+
+    public async IActionResult OnGetAsync(int id)
+    {
+        var product = await _productService.GetByIdAsync(id);
+        if (product == null) return NotFound();
+
+        Product = product;
+        return Page();
+    }
+
+    public async IActionResult OnPostAsync()
+    {
+        if (!ModelState.IsValid) return; Page();
+
+        await _productService.UpdateAsync(Product);
+        _logger.LogInformation("Product {ProductId} updated", Product.Id);
+
+        return RedirectToPage("./Index");
+    }
+
+    public async IActionResult OnPostDeleteAsync()
+    {
+        await _productService.DeleteAsync(Product.Id);
+        return RedirectToPage("./Index");
+    }
+}</code></pre></div>
+
+  <h3 id="ch5-model" data-toc>5.3 PageModel and binding</h3>
+  <p class="topic-desc">PageModel is the code-behind class for a Razor Page. It handles binding, validation, and orchestration.</p>
+  <div class="codeWrap"><pre><code>public class CreateModel : PageModel
+{
+    private readonly IProductService _productService;
+
+    public CreateModel(IProductService productService) =&gt; _productService = productService;
+
+    [BindProperty]
+    public CreateProductRequest Input { get; set; } = new();
+
+    public string? ErrorMessage { get; set; }
+
+    public void OnGet() { }
+
+    public async IActionResult OnPostAsync(CancellationToken ct)
+    {
+        if (!ModelState.IsValid) return Page();
+
+        try
+        {
+            await _productService.CreateAsync(Input, ct);
+            return RedirectToPage("./Index");
+        }
+        catch (DuplicateSkuException ex)
+        {
+            ModelState.AddModelError("Input.Sku", ex.Message);
+            return Page();
+        }
+    }
+}
+
+// Register in Program.cs
+builder.Services.AddRazorPages();</code></pre></div>
+
+  <h3 id="ch5-layout" data-toc>5.4 Layouts and sections</h3>
+  <p class="topic-desc">Layouts provide shared structure. Sections allow pages to inject content into specific layout regions.</p>
+  <div class="codeWrap"><pre><code>&lt;!-- Views/Shared/_Layout.cshtml --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+    &lt;title&gt;@ViewData["Title"] - MyApp&lt;/title&gt;
+    &lt;link rel="stylesheet" href="~/css/site.css" /&gt;
+    @RenderSection("Styles", required: false)
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="navbar"&gt;
+        &lt;a asp-page="/Index"&gt;Home&lt;/a&gt;
+        &lt;a asp-page="/Products/Index"&gt;Products&lt;/a&gt;
+        &lt;a asp-page="/Orders/Index"&gt;Orders&lt;/a&gt;
+    &lt;/nav&gt;
+
+    &lt;main class="container"&gt;
+        @RenderBody()
+    &lt;/main&gt;
+
+    &lt;footer&gt;
+        &amp;copy; @DateTime.Now.Year - MyApp
+    &lt;/footer&gt;
+
+    @RenderSection("Scripts", required: false)
+&lt;/body&gt;
+&lt;/html&gt;
+
+&lt;!-- In a page --&gt;
+@section Styles {
+    &lt;link rel="stylesheet" href="~/css/products.css" /&gt;
+}
+
+@section Scripts {
+    &lt;script src="~/js/products.js"&gt;&lt;/script&gt;
+}</code></pre></div>
+
+    <div class="ex"><h4 id="ch5-layout--exercises-5">Exercises 5</h4><ol>
+      <li>Build a Razor Page with a form that binds and validates a model on POST without a controller.</li>
+      <li>Implement handler methods for <code>OnGet</code> and <code>OnPostAsync</code>, and return a validation error without losing user input.</li>
+      <li>Use a layout with a shared header, then inject a page-specific section for extra scripts.</li>
+      <li>Add a custom model binder for a complex query-string type and unit test the binder in isolation.</li>
+      <li>Compare the same CRUD feature implemented once in MVC controllers and once in Razor Pages, and justify your choice.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch6" data-toc>6 · Blazor</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Blazor</button><div class="ch-toc-list"><a href="#ch6-server">6.1 Blazor Server</a><a href="#ch6-wasm">6.2 Blazor WebAssembly</a><a href="#ch6-components">6.3 Components and lifecycle</a><a href="#ch6-binding">6.4 Data binding and events</a><a href="#ch6-state">6.5 State management</a></div></div>
+  <p class="topic-desc">Blazor enables building interactive web UIs with C# instead of JavaScript. It supports both server-side and WebAssembly hosting models.</p>
+  <h3 id="ch6-server" data-toc>6.1 Blazor Server</h3>
+  <p class="topic-desc">Blazor Server runs components on the server and updates the DOM over SignalR. It offers fast startup and full .NET runtime access.</p>
+  <div class="codeWrap"><pre><code>// Program.cs — Blazor Server
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
+var app = builder.Build();
+
+app.MapRazorComponents&lt;App&gt;()
+    .AddInteractiveServerRenderMode();</code></pre></div>
+  <div class="codeWrap"><pre><code>&lt;!-- Pages/Counter.razor --&gt;
+@page "/counter"
+@rendermode InteractiveServer
+
+&lt;h1&gt;Counter&lt;/h1&gt;
+&lt;p role="status"&gt;Current count: @currentCount&lt;/p&gt;
+&lt;button class="btn btn-primary" @onclick="IncrementCount"&gt;Click me&lt;/button&gt;
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount() =&gt; currentCount++;
+}</code></pre></div>
+
+  <h3 id="ch6-wasm" data-toc>6.2 Blazor WebAssembly</h3>
+  <p class="topic-desc">Blazor WebAssembly runs the .NET runtime in the browser via WebAssembly. It enables true client-side execution with offline support.</p>
+  <div class="codeWrap"><pre><code>// Program.cs — Blazor WebAssembly
+builder.Services.AddRazorComponents()
+    .AddInteractiveWebAssemblyComponents();
+
+var app = builder.Build();
+
+app.MapRazorComponents&lt;App&gt;()
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(new[] { typeof(Client.Program).Assembly });</code></pre></div>
+  <div class="codeWrap"><pre><code>&lt;!-- Shared component: ProductList.razor --&gt;
+@page "/products"
+@inject IProductService ProductService
+@inject NavigationManager Navigation
+
+&lt;h3&gt;Products&lt;/h3&gt;
+
+&lt;button @onclick="LoadProducts"&gt;Refresh&lt;/button&gt;
+
+&lt;table class="table"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Price&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        @foreach (var product in products)
+        {
+            &lt;tr&gt;
+                &lt;td&gt;@product.Name&lt;/td&gt;
+                &lt;td&gt;@product.Price.ToString("C")&lt;/td&gt;
+                &lt;td&gt;&lt;button @onclick="() =&gt; ViewDetails(product.Id)"&gt;View&lt;/button&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+        }
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+@code {
+    private List&lt;ProductDto&gt; products = new();
+
+    protected override async Task OnInitializedAsync()
+        =&gt; await LoadProducts();
+
+    private async Task LoadProducts()
+        =&gt; products = await ProductService.GetAllAsync();
+
+    private void ViewDetails(int id)
+        =&gt; Navigation.NavigateTo($"/products/{id}");
+}</code></pre></div>
+
+  <h3 id="ch6-components" data-toc>6.3 Components and lifecycle</h3>
+  <p class="topic-desc">Blazor components have a well-defined lifecycle. Understanding the rendering pipeline is key to performance.</p>
+  <table>
+    <tr><th>Method</th><th>When it runs</th><th>Use case</th></tr>
+    <tr><td>OnInitialized</td><td>Once, after first render</td><td>Initialise fields</td></tr>
+    <tr><td>OnInitializedAsync</td><td>Once, async</td><td>Load initial data</td></tr>
+    <tr><td>OnParametersSet</td><td>After parameters set</td><td>React to parameter changes</td></tr>
+    <tr><td>OnParametersSetAsync</td><td>After parameters set, async</td><td>Load data based on parameters</td></tr>
+    <tr><td>OnAfterRender</td><td>After each render</td><td>JS interop calls</td></tr>
+    <tr><td>OnAfterRenderAsync</td><td>After each render, async</td><td>Async JS interop</td></tr>
+  </table>
+  <div class="codeWrap"><pre><code>public class ProductEdit : ComponentBase
+{
+    [Parameter] public int ProductId { get; set; }
+    [Parameter] public EventCallback&lt;int&gt; OnSaved { get; set; }
+
+    private Product? product;
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            product = await _productService.GetByIdAsync(ProductId);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (product == null) return;
+
+        await _productService.UpdateAsync(product);
+        await OnSaved.InvokeAsync(product.Id);
+    }
+}</code></pre></div>
+
+  <h3 id="ch6-binding" data-toc>6.4 Data binding and events</h3>
+  <p class="topic-desc">Blazor provides two-way data binding and event handling with a simple syntax.</p>
+  <div class="codeWrap"><pre><code>&lt;!-- Two-way binding --&gt;
+&lt;input @bind="product.Name" @bind:event="oninput" /&gt;
+&lt;textarea @bind="product.Description"&gt;&lt;/textarea&gt;
+&lt;select @bind="product.CategoryId"&gt;
+    @foreach (var cat in categories)
+    {
+        &lt;option value="@cat.Id"&gt;@cat.Name&lt;/option&gt;
+    }
+&lt;/select&gt;
+&lt;input type="checkbox" @bind="product.IsActive" /&gt;
+
+&lt;!-- Event handling --&gt;
+&lt;button @onclick="() =&gt; SaveAsync()"&gt;Save&lt;/button&gt;
+&lt;button @onclick="async () =&gt; await DeleteAsync(product.Id)"&gt;Delete&lt;/button&gt;
+
+&lt;!-- Form validation --&gt;
+&lt;EditForm Model="product" OnValidSubmit="SaveAsync"&gt;
+    &lt;DataAnnotationsValidator /&gt;
+    &lt;ValidationSummary /&gt;
+
+    &lt;div class="form-group"&gt;
+        &lt;label&gt;Name&lt;/label&gt;
+        &lt;InputText @bind-Value="product.Name" class="form-control" /&gt;
+        &lt;ValidationMessage For="() =&gt; product.Name" /&gt;
+    &lt;/div&gt;
+
+    &lt;button type="submit"&gt;Save&lt;/button&gt;
+&lt;/EditForm&gt;</code></pre></div>
+
+  <h3 id="ch6-state" data-toc>6.5 State management</h3>
+  <p class="topic-desc">Blazor Server requires careful state management due to its stateful nature. Use cascading values and DI scopes.</p>
+  <div class="codeWrap"><pre><code>// Cascading values for shared state
+&lt;CascadingValue Value="this"&gt;
+    @ChildContent
+&lt;/CascadingValue&gt;
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    public Cart Cart { get; set; } = new();
+    public event Action? OnChange;
+    private void NotifyStateChanged() =&gt; OnChange?.Invoke();
+}
+
+// In child component
+@code {
+    [CascadingParameter] public ParentComponent? Parent { get; set; }
+}
+
+// Scoped state container
+public class CartState
+{
+    private readonly List&lt;CartItem&gt; _items = new();
+    public IReadOnlyList&lt;CartItem&gt; Items =&gt; _items.AsReadOnly();
+    public event Action? OnChange;
+
+    public void AddItem(Product product, int quantity = 1)
+    {
+        var existing = _items.FirstOrDefault(i =&gt; i.ProductId == product.Id);
+        if (existing != null) existing.Quantity += quantity;
+        else _items.Add(new CartItem(product, quantity));
+        OnChange?.Invoke();
+    }
+
+    public void Clear()
+    {
+        _items.Clear();
+        OnChange?.Invoke();
+    }
+}
+
+// Register as scoped
+builder.Services.AddScoped&lt;CartState&gt;();</code></pre></div>
+
+    <div class="ex"><h4 id="ch6-state--exercises-6">Exercises 6</h4><ol>
+      <li>Create a Blazor Server component that fetches data in <code>OnInitializedAsync</code> and renders a loading state.</li>
+      <li>Repeat the same component for Blazor WebAssembly and note what changes: hosting, auth model and startup cost.</li>
+      <li>Implement two-way binding to an input and a select, and handle the <code>ValueChanged</code> event explicitly.</li>
+      <li>Move shared state out of a component into a scoped service, and explain why a field would not survive re-render.</li>
+      <li>Add parameterised components with cascading parameters, and demonstrate passing state to a child component.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch7" data-toc>7 · Entity Framework Core</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Entity Framework Core</button><div class="ch-toc-list"><a href="#ch7-context">7.1 DbContext and entities</a><a href="#ch7-config">7.2 Configuration and mapping</a><a href="#ch7-migrations">7.3 Migrations</a><a href="#ch7-query">7.4 Querying and performance</a><a href="#ch7-relationships">7.5 Relationships</a><a href="#ch7-interceptors">7.6 Interceptors and auditing</a></div></div>
+  <p class="topic-desc">EF Core is the primary ORM for .NET. It supports code-first and database-first approaches with migrations, change tracking, and LINQ translation.</p>
+  <h3 id="ch7-context" data-toc>7.1 DbContext and entities</h3>
+  <p class="topic-desc">DbContext is the bridge between your domain and the database. It manages change tracking, queries, and persistence.</p>
+  <div class="codeWrap"><pre><code>public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions&lt;AppDbContext&gt; options) : base(options) { }
+
+    public DbSet&lt;Product&gt; Products =&gt; Set&lt;Product&gt;();
+    public DbSet&lt;Order&gt; Orders =&gt; Set&lt;Order&gt;();
+    public DbSet&lt;Customer&gt; Customers =&gt; Set&lt;Customer&gt;();
+    public DbSet&lt;OrderItem&gt; OrderItems =&gt; Set&lt;OrderItem&gt;();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+        // Global query filter for soft delete
+        modelBuilder.Entity&lt;Product&gt;().HasQueryFilter(p =&gt; !p.IsDeleted);
+        modelBuilder.Entity&lt;Order&gt;().HasQueryFilter(o =&gt; !o.IsDeleted);
+    }
+
+    public override async Task&lt;int&gt; SaveChangesAsync(CancellationToken ct = default)
+    {
+        // Auto-audit
+        var entries = ChangeTracker.Entries()
+            .Where(e =&gt; e.Entity is IAuditable &amp;&amp; (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+        foreach (var entry in entries)
+        {
+            var auditable = (IAuditable)entry.Entity;
+            auditable.ModifiedAt = DateTime.UtcNow;
+
+            if (entry.State == EntityState.Added)
+                auditable.CreatedAt = DateTime.UtcNow;
+        }
+
+        return await base.SaveChangesAsync(ct);
+    }
+}
+
+public interface IAuditable
+{
+    DateTime CreatedAt { get; set; }
+    DateTime ModifiedAt { get; set; }
+    string? CreatedBy { get; set; }
+    string? ModifiedBy { get; set; }
+}</code></pre></div>
+
+  <h3 id="ch7-config" data-toc>7.2 Configuration and mapping</h3>
+  <p class="topic-desc">Entity configuration is done via IEntityTypeConfiguration classes, keeping mapping logic organised and testable.</p>
+  <div class="codeWrap"><pre><code>public class ProductConfiguration : IEntityTypeConfiguration&lt;Product&gt;
+{
+    public void Configure(EntityTypeBuilder&lt;Product&gt; builder)
+    {
+        builder.ToTable("Products");
+        builder.HasKey(p =&gt; p.Id);
+
+        builder.Property(p =&gt; p.Name)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(p =&gt; p.Sku)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.Property(p =&gt; p.Price)
+            .HasPrecision(18, 2);
+
+        builder.HasIndex(p =&gt; p.Sku).IsUnique();
+        builder.HasIndex(p =&gt; p.Name);
+
+        builder.HasOne(p =&gt; p.Category)
+            .WithMany(c =&gt; c.Products)
+            .HasForeignKey(p =&gt; p.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+public class OrderConfiguration : IEntityTypeConfiguration&lt;Order&gt;
+{
+    public void Configure(EntityTypeBuilder&lt;Order&gt; builder)
+    {
+        builder.ToTable("Orders");
+        builder.HasKey(o =&gt; o.Id);
+
+        builder.Property(o =&gt; o.OrderNumber)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.Property(o =&gt; o.Status)
+            .HasConversion&lt;string&gt;()
+            .HasMaxLength(20);
+
+        builder.Property(o =&gt; o.Total)
+            .HasPrecision(18, 2);
+
+        builder.HasOne(o =&gt; o.Customer)
+            .WithMany(c =&gt; c.Orders)
+            .HasForeignKey(o =&gt; o.CustomerId);
+
+        builder.HasMany(o =&gt; o.Items)
+            .WithOne(oi =&gt; oi.Order)
+            .HasForeignKey(oi =&gt; oi.OrderId);
+
+        builder.HasIndex(o =&gt; o.OrderNumber).IsUnique();
+        builder.HasIndex(o =&gt; o.CustomerId);
+        builder.HasIndex(o =&gt; o.Status);
+        builder.HasIndex(o =&gt; o.CreatedAt);
+    }
+}</code></pre></div>
+
+  <h3 id="ch7-migrations" data-toc>7.3 Migrations</h3>
+  <p class="topic-desc">Migrations manage database schema changes over time. They are essential for team collaboration and CI/CD.</p>
+  <div class="codeWrap"><pre><code>// CLI commands
+dotnet ef migrations add InitialCreate
+dotnet ef migrations add AddProductCategory
+dotnet ef database update
+dotnet ef migrations remove
+dotnet ef migrations list
+dotnet ef migrations script -o migration.sql
+
+// Programmatic migration (for deployment)
+using var scope = app.Services.CreateScope();
+var db = scope.ServiceProvider.GetRequiredService&lt;AppDbContext&gt;();
+await db.Database.MigrateAsync();
+
+// Seed data
+if (!db.Products.Any())
+{
+    db.Products.AddRange(
+        new Product { Name = "Laptop", Sku = "LP-0001", Price = 999.99m, StockQuantity = 50 },
+        new Product { Name = "Mouse", Sku = "MS-0001", Price = 29.99m, StockQuantity = 200 },
+        new Product { Name = "Keyboard", Sku = "KB-0001", Price = 79.99m, StockQuantity = 150 }
+    );
+    await db.SaveChangesAsync();
+}</code></pre></div>
+
+  <h3 id="ch7-query" data-toc>7.4 Querying and performance</h3>
+  <p class="topic-desc">EF Core performance depends on understanding change tracking, query translation, and N+1 prevention.</p>
+  <div class="codeWrap"><pre><code>// Eager loading with Include
+var orders = await _context.Orders
+    .AsNoTracking()
+    .Include(o =&gt; o.Customer)
+    .Include(o =&gt; o.Items).ThenInclude(oi =&gt; oi.Product)
+    .Where(o =&gt; o.Status == OrderStatus.Pending)
+    .OrderByDescending(o =&gt; o.CreatedAt)
+    .ToListAsync();
+
+// Projection — most efficient
+var dtos = await _context.Orders
+    .AsNoTracking()
+    .Where(o =&gt; o.CustomerId == customerId)
+    .Select(o =&gt; new OrderDto
+    {
+        Id = o.Id,
+        OrderNumber = o.OrderNumber,
+        Status = o.Status,
+        Total = o.Items.Sum(i =&gt; i.Quantity * i.UnitPrice),
+        ItemCount = o.Items.Count
+    })
+    .ToListAsync();
+
+// Compiled queries for hot paths
+private static readonly Func&lt;AppDbContext, int, Task&lt;Order?&gt;&gt; GetOrderById =
+    EF.CompileAsyncQuery(
+        (AppDbContext ctx, int id) =&gt;
+            ctx.Orders
+                .Include(o =&gt; o.Items)
+                .FirstOrDefaultAsync(o =&gt; o.Id == id));
+
+// Raw SQL for complex queries
+var products = await _context.Products
+    .FromSqlInterpolated($@"SELECT * FROM Products WHERE Price &gt; {minPrice}")
+    .ToListAsync();
+
+// Bulk operations (EF Core 7+)
+await _context.Products
+    .Where(p =&gt; p.StockQuantity == 0)
+    .ExecuteDeleteAsync();
+
+await _context.Products
+    .Where(p =&gt; p.CategoryId == categoryId)
+    .ExecuteUpdateAsync(setters =&gt; setters
+        .SetProperty(p =&gt; p.Price, p =&gt; p.Price * 1.1m));</code></pre></div>
+  <div class="warn"><p>Never call SaveChanges inside a loop. Batch your changes and call SaveChanges once at the end. This is the most common EF Core performance mistake.</p></div>
+
+  <h3 id="ch7-relationships" data-toc>7.5 Relationships</h3>
+  <p class="topic-desc">EF Core supports one-to-one, one-to-many, and many-to-many relationships with fluent configuration.</p>
+  <div class="codeWrap"><pre><code>// One-to-many: Customer → Orders
+public class Customer : Entity, IAuditable
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public List&lt;Order&gt; Orders { get; set; } = new();
+}
+
+// Many-to-many: Product ↔ Category (explicit join)
+public class ProductCategory
+{
+    public int ProductId { get; set; }
+    public int CategoryId { get; set; }
+    public Product Product { get; set; } = null!;
+    public Category Category { get; set; } = null!;
+}
+
+public class ProductConfiguration : IEntityTypeConfiguration&lt;Product&gt;
+{
+    public void Configure(EntityTypeBuilder&lt;Product&gt; builder)
+    {
+        builder.HasMany(p =&gt; p.Categories)
+            .WithMany(c =&gt; c.Products)
+            .UsingEntity&lt;ProductCategory&gt;(
+                j =&gt; j.HasOne(pc =&gt; pc.Product).WithMany().HasForeignKey(pc =&gt; pc.ProductId),
+                j =&gt; j.HasOne(pc =&gt; pc.Category).WithMany().HasForeignKey(pc =&gt; pc.CategoryId),
+                j =&gt; j.HasKey(pc =&gt; new { pc.ProductId, pc.CategoryId }));
+    }
+}</code></pre></div>
+
+  <h3 id="ch7-interceptors" data-toc>7.6 Interceptors and auditing</h3>
+  <p class="topic-desc">EF Core interceptors allow you to hook into database operations for auditing, logging, and soft delete.</p>
+  <div class="codeWrap"><pre><code>public class AuditInterceptor : SaveChangesInterceptor
+{
+    public override InterceptionResult&lt;int&gt; SavingChanges(
+        DbContextEventData eventData, InterceptionResult&lt;int&gt; result)
+    {
+        var entries = eventData.Context!.ChangeTracker.Entries&lt;IAuditable&gt;()
+            .Where(e =&gt; e.State == EntityState.Added || e.State == EntityState.Modified);
+
+        foreach (var entry in entries)
+        {
+            entry.Entity.ModifiedAt = DateTime.UtcNow;
+            entry.Entity.ModifiedBy = "current-user";
+
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedAt = DateTime.UtcNow;
+                entry.Entity.CreatedBy = "current-user";
+            }
+        }
+
+        return base.SavingChanges(eventData, result);
+    }
+}
+
+// Soft delete interceptor
+public class SoftDeleteInterceptor : SaveChangesInterceptor
+{
+    public override InterceptionResult&lt;int&gt; SavingChanges(
+        DbContextEventData eventData, InterceptionResult&lt;int&gt; result)
+    {
+        var entries = eventData.Context!.ChangeTracker.Entries()
+            .Where(e =&gt; e.Entity is ISoftDeletable &amp;&amp; e.State == EntityState.Deleted);
+
+        foreach (var entry in entries)
+        {
+            entry.State = EntityState.Modified;
+            ((ISoftDeletable)entry.Entity).IsDeleted = true;
+            ((ISoftDeletable)entry.Entity).DeletedAt = DateTime.UtcNow;
+        }
+
+        return base.SavingChanges(eventData, result);
+    }
+}
+
+// Register interceptors
+builder.Services.AddScoped&lt;AuditInterceptor&gt;();
+builder.Services.AddScoped&lt;SoftDeleteInterceptor&gt;();
+builder.Services.AddDbContext&lt;AppDbContext&gt;((sp, options) =&gt;
+{
+    options.UseSqlServer(connectionString)
+           .AddInterceptors(
+               sp.GetRequiredService&lt;AuditInterceptor&gt;(),
+               sp.GetRequiredService&lt;SoftDeleteInterceptor&gt;());
+});</code></pre></div>
+
+    <div class="ex"><h4 id="ch7-interceptors--exercises-7">Exercises 7</h4><ol>
+      <li>Define an entity with a <code>DbContext</code>, generate the initial migration, and apply it to a local database.</li>
+      <li>Configure a one-to-many and a many-to-many relationship using explicit configuration rather than conventions.</li>
+      <li>Write a paginated, projected query with <code>AsNoTracking</code>, and inspect the generated SQL to confirm the columns are narrowed.</li>
+      <li>Reproduce the N+1 problem with lazy loading, then fix it using a projection, and compare the two SQL logs.</li>
+      <li>Add a <code>SaveChanges</code> interceptor that stamps a <code>CreatedAt</code> and a <code>UpdatedAt</code> on every write.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch8" data-toc>8 · Enterprise Patterns</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Enterprise Patterns</button><div class="ch-toc-list"><a href="#ch8-clean">8.1 Clean Architecture</a><a href="#ch8-cqrs">8.2 CQRS with MediatR</a><a href="#ch8-validation">8.3 FluentValidation pipeline</a><a href="#ch8-resilience">8.4 Resilience and Polly</a><a href="#ch8-caching">8.5 Caching strategies</a></div></div>
+  <p class="topic-desc">Enterprise applications need patterns that manage complexity, improve testability, and enable evolution. Clean Architecture, CQRS, and resilience patterns are essential.</p>
+  <h3 id="ch8-clean" data-toc>8.1 Clean Architecture</h3>
+  <p class="topic-desc">Clean Architecture separates concerns into layers with dependencies pointing inward. The domain has no external dependencies.</p>
+  <div class="codeWrap"><pre><code>// Project structure
+// MyApp.Domain/          — Entities, value objects, domain events
+// MyApp.Application/     — Use cases, DTOs, interfaces
+// MyApp.Infrastructure/  — EF Core, external services, email
+// MyApp.WebApi/          — Controllers, middleware, configuration
+
+// Domain layer — no dependencies
+public class Order : Entity, IAuditable
+{
+    private readonly List&lt;OrderItem&gt; _items = new();
+
+    public int Id { get; private set; }
+    public string OrderNumber { get; private set; } = string.Empty;
+    public int CustomerId { get; private set; }
+    public OrderStatus Status { get; private set; }
+    public IReadOnlyList&lt;OrderItem&gt; Items =&gt; _items.AsReadOnly();
+    public decimal Total =&gt; _items.Sum(i =&gt; i.Quantity * i.UnitPrice);
+
+    public void AddItem(Product product, int quantity)
+    {
+        if (quantity &lt;= 0) throw new DomainException("Quantity must be positive");
+        if (Status != OrderStatus.Draft) throw new DomainException("Cannot modify submitted order");
+
+        var existing = _items.FirstOrDefault(i =&gt; i.ProductId == product.Id);
+        if (existing != null) existing.IncreaseQuantity(quantity);
+        else _items.Add(new OrderItem(product.Id, product.Name, quantity, product.Price));
+    }
+
+    public void Submit()
+    {
+        if (!_items.Any()) throw new DomainException("Order must have at least one item");
+        Status = OrderStatus.Submitted;
+    }
+}
+
+// Application layer — depends only on Domain
+public record CreateOrderCommand(int CustomerId, List&lt;OrderItemDto&gt; Items) : IRequest&lt;int&gt;;
+
+public class CreateOrderHandler : IRequestHandler&lt;CreateOrderCommand, int&gt;
+{
+    private readonly IOrderRepository _orderRepository;
+    private readonly IProductRepository _productRepository;
+
+    public CreateOrderHandler(IOrderRepository orderRepository, IProductRepository productRepository)
+    {
+        _orderRepository = orderRepository;
+        _productRepository = productRepository;
+    }
+
+    public async Task&lt;int&gt; Handle(CreateOrderCommand request, CancellationToken ct)
+    {
+        var order = new Order(request.CustomerId);
+
+        foreach (var item in request.Items)
+        {
+            var product = await _productRepository.GetByIdAsync(item.ProductId, ct)
+                ?? throw new NotFoundException($"Product {item.ProductId} not found");
+            order.AddItem(product, item.Quantity);
+        }
+
+        order.Submit();
+        await _orderRepository.AddAsync(order, ct);
+        return order.Id;
+    }
+}</code></pre></div>
+
+  <h3 id="ch8-cqrs" data-toc>8.2 CQRS with MediatR</h3>
+  <p class="topic-desc">CQRS separates reads and writes. MediatR implements the mediator pattern, decoupling controllers from business logic.</p>
+  <div class="codeWrap"><pre><code>// Command (write)
+public record UpdateOrderStatusCommand(int OrderId, OrderStatus NewStatus) : IRequest&lt;bool&gt;;
+
+public class UpdateOrderStatusHandler : IRequestHandler&lt;UpdateOrderStatusCommand, bool&gt;
+{
+    private readonly IOrderRepository _repository;
+
+    public UpdateOrderStatusHandler(IOrderRepository repository) =&gt; _repository = repository;
+
+    public async Task&lt;bool&gt; Handle(UpdateOrderStatusCommand request, CancellationToken ct)
+    {
+        var order = await _repository.GetByIdAsync(request.OrderId, ct);
+        if (order == null) return false;
+
+        order.UpdateStatus(request.NewStatus);
+        await _repository.UpdateAsync(order, ct);
+        return true;
+    }
+}
+
+// Query (read)
+public record GetOrderQuery(int OrderId) : IRequest&lt;OrderDto?&gt;;
+
+public class GetOrderHandler : IRequestHandler&lt;GetOrderQuery, OrderDto?&gt;
+{
+    private readonly IOrderRepository _repository;
+
+    public GetOrderHandler(IOrderRepository repository) =&gt; _repository = repository;
+
+    public async Task&lt;OrderDto?&gt; Handle(GetOrderQuery request, CancellationToken ct)
+    {
+        var order = await _repository.GetByIdAsync(request.OrderId, ct);
+        return order is null ? null : new OrderDto(order.Id, order.OrderNumber, order.Status.ToString(), order.Total);
+    }
+}
+
+// Controller — thin, just delegates to MediatR
+[ApiController]
+[Route("api/[controller]")]
+public class OrdersController : ControllerBase
+{
+    private readonly IMediator _mediator;
+
+    public OrdersController(IMediator mediator) =&gt; _mediator = mediator;
+
+    [HttpGet("{id}")]
+    public async ActionResult&lt;OrderDto&gt; Get(int id, CancellationToken ct)
+    {
+        var order = await _mediator.Send(new GetOrderQuery(id), ct);
+        return order is null ? NotFound() : Ok(order);
+    }
+
+    [HttpPost]
+    public async ActionResult&lt;int&gt; Create([FromBody] CreateOrderRequest request, CancellationToken ct)
+    {
+        var orderId = await _mediator.Send(new CreateOrderCommand(request.CustomerId, request.Items), ct);
+        return CreatedAtAction(nameof(Get), new { id = orderId }, new { id = orderId });
+    }
+}
+
+// Register MediatR
+builder.Services.AddMediatR(cfg =&gt;
+    cfg.RegisterServicesFromAssemblyContaining&lt;CreateOrderCommand&gt;());</code></pre></div>
+
+  <h3 id="ch8-validation" data-toc>8.3 FluentValidation pipeline</h3>
+  <p class="topic-desc">FluentValidation integrates with MediatR via pipeline behaviors, ensuring all commands are validated before handling.</p>
+  <div class="codeWrap"><pre><code>public class ValidationBehavior&lt;TRequest, TResponse&gt; : IPipelineBehavior&lt;TRequest, TResponse&gt;
+    where TRequest : IRequest&lt;TResponse&gt;
+{
+    private readonly IEnumerable&lt;IValidator&lt;TRequest&gt;&gt; _validators;
+
+    public ValidationBehavior(IEnumerable&lt;IValidator&lt;TRequest&gt;&gt; validators)
+        =&gt; _validators = validators;
+
+    public async Task&lt;TResponse&gt; Handle(
+        TRequest request, RequestHandlerDelegate&lt;TResponse&gt; next, CancellationToken ct)
+    {
+        if (!_validators.Any()) return await next();
+
+        var context = new ValidationContext&lt;TRequest&gt;(request);
+        var results = await Task.WhenAll(_validators.Select(v =&gt; v.ValidateAsync(context, ct)));
+        var failures = results.SelectMany(r =&gt; r.Errors).Where(f =&gt; f != null).ToList();
+
+        if (failures.Count != 0)
+            throw new ValidationException(failures);
+
+        return await next();
+    }
+}
+
+// Register pipeline behaviors
+builder.Services.AddTransient(typeof(IPipelineBehavior&lt;,&gt;), typeof(ValidationBehavior&lt;,&gt;));
+builder.Services.AddTransient(typeof(IPipelineBehavior&lt;,&gt;), typeof(LoggingBehavior&lt;,&gt;));
+builder.Services.AddTransient(typeof(IPipelineBehavior&lt;,&gt;), typeof(PerformanceBehavior&lt;,&gt;));</code></pre></div>
+
+  <h3 id="ch8-resilience" data-toc>8.4 Resilience and Polly</h3>
+  <p class="topic-desc">Polly provides retry, circuit breaker, timeout, and fallback policies for resilient distributed systems.</p>
+  <div class="codeWrap"><pre><code>// HttpClient with Polly policies
+builder.Services.AddHttpClient&lt;IExternalPaymentService, ExternalPaymentService&gt;(client =&gt;
+{
+    client.BaseAddress = new Uri(builder.Configuration["ExternalApis:Payment:BaseUrl"]!);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+})
+.AddPolicyHandler(Policy.TimeoutAsync&lt;HttpResponseMessage&gt;(TimeSpan.FromSeconds(10)))
+.AddPolicyHandler(GetRetryPolicy())
+.AddPolicyHandler(GetCircuitBreakerPolicy());
+
+static IAsyncPolicy&lt;HttpResponseMessage&gt; GetRetryPolicy() =&gt;
+    Policy.Handle&lt;HttpRequestException&gt;()
+        .OrResult&lt;HttpResponseMessage&gt;(r =&gt; (int)r.StatusCode &gt;= 500 || r.StatusCode == HttpStatusCode.RequestTimeout)
+        .WaitAndRetryAsync(3, retryAttempt =&gt;
+            TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+static IAsyncPolicy&lt;HttpResponseMessage&gt; GetCircuitBreakerPolicy() =&gt;
+    Policy.Handle&lt;HttpRequestException&gt;()
+        .OrResult&lt;HttpResponseMessage&gt;(r =&gt; (int)r.StatusCode &gt;= 500)
+        .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
+
+// Resilience pipeline (.NET 8+)
+builder.Services.AddResiliencePipeline("payment-pipeline", builder =&gt;
+{
+    builder.AddRetry(new RetryStrategyOptions
+    {
+        MaxRetryAttempts = 3,
+        Delay = TimeSpan.FromSeconds(1),
+        BackoffType = DelayBackoffType.Exponential
+    })
+    .AddTimeout(TimeSpan.FromSeconds(10))
+    .AddCircuitBreaker(new CircuitBreakerStrategyOptions
+    {
+        FailureRatio = 0.5,
+        SamplingDuration = TimeSpan.FromSeconds(30),
+        MinimumThroughput = 10,
+        BreakDuration = TimeSpan.FromSeconds(30)
+    });
+});</code></pre></div>
+
+  <h3 id="ch8-caching" data-toc>8.5 Caching strategies</h3>
+  <p class="topic-desc">ASP.NET Core provides in-memory, distributed, and response caching. Choose the right strategy for each scenario.</p>
+  <div class="codeWrap"><pre><code>// In-memory cache
+builder.Services.AddMemoryCache();
+
+// Distributed cache (Redis)
+builder.Services.AddStackExchangeRedisCache(options =&gt;
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "MyApp:";
+});
+
+// Cache service with fallback
+public class CachedProductService : IProductService
+{
+    private readonly IProductService _inner;
+    private readonly IDistributedCache _cache;
+    private readonly ILogger&lt;CachedProductService&gt; _logger;
+
+    public CachedProductService(
+        IProductService inner,
+        IDistributedCache cache,
+        ILogger&lt;CachedProductService&gt; logger)
+    {
+        _inner = inner;
+        _cache = cache;
+        _logger = logger;
+    }
+
+    public async Task&lt;ProductDto?&gt; GetByIdAsync(int id, CancellationToken ct)
+    {
+        var cacheKey = $"product:{id}";
+        var cached = await _cache.GetStringAsync(cacheKey, ct);
+
+        if (cached != null)
+        {
+            _logger.LogDebug("Cache hit for product {ProductId}", id);
+            return JsonSerializer.Deserialize&lt;ProductDto&gt;(cached);
+        }
+
+        var product = await _inner.GetByIdAsync(id, ct);
+        if (product != null)
+        {
+            var options = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+                SlidingExpiration = TimeSpan.FromMinutes(2)
+            };
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(product), options, ct);
+        }
+
+        return product;
+    }
+}
+
+// Response caching
+builder.Services.AddResponseCaching();
+app.UseResponseCaching();
+
+[HttpGet]
+[ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
+public async ActionResult&lt;IEnumerable&lt;ProductDto&gt;&gt; GetAll(CancellationToken ct)
+    =&gt; Ok(await _productService.GetAllAsync(ct));</code></pre></div>
+
+    <div class="ex"><h4 id="ch8-caching--exercises-8">Exercises 8</h4><ol>
+      <li>Split a fat service into Domain, Application, Infrastructure and Api projects, and verify the dependency arrows point inward.</li>
+      <li>Move one endpoint into a command handler and one into a query handler, and confirm the controller only translates HTTP.</li>
+      <li>Add a FluentValidation validator and a pipeline behaviour so every request is validated before its handler runs.</li>
+      <li>Wrap an external HTTP call in a Polly retry policy with exponential backoff and a circuit breaker.</li>
+      <li>Add a cache-aside Redis lookup in front of an expensive query, and set a TTL so stale data self-heals.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch9" data-toc>9 · Security</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Security</button><div class="ch-toc-list"><a href="#ch9-auth">9.1 Authentication with JWT</a><a href="#ch9-authz">9.2 Authorization policies</a><a href="#ch9-identity">9.3 ASP.NET Core Identity</a><a href="#ch9-https">9.4 HTTPS and security headers</a></div></div>
+  <p class="topic-desc">Security is non-negotiable in enterprise applications. ASP.NET Core provides built-in support for authentication, authorization, and protection against common attacks.</p>
+  <h3 id="ch9-auth" data-toc>9.1 Authentication with JWT</h3>
+  <p class="topic-desc">JWT (JSON Web Tokens) is the standard for stateless API authentication. ASP.NET Core supports both JWT validation and token generation.</p>
+  <div class="codeWrap"><pre><code>// Program.cs — JWT authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =&gt;
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+// Token generation service
+public class TokenService : ITokenService
+{
+    private readonly IConfiguration _config;
+
+    public TokenService(IConfiguration config) =&gt; _config = config;
+
+    public string GenerateToken(User user)
+    {
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role)
+        };
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: _config["Jwt:Issuer"],
+            audience: _config["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(2),
+            signingCredentials: creds);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+}
+
+// Login endpoint
+[ApiController]
+[Route("api/[controller]")]
+public class AuthController : ControllerBase
+{
+    private readonly ITokenService _tokenService;
+    private readonly IUserService _userService;
+
+    public AuthController(ITokenService tokenService, IUserService userService)
+    {
+        _tokenService = tokenService;
+        _userService = userService;
+    }
+
+    [HttpPost("login")]
+    public async ActionResult&lt;AuthResponse&gt; Login([FromBody] LoginRequest request)
+    {
+        var user = await _userService.AuthenticateAsync(request.Email, request.Password);
+        if (user == null)
+            return Unauthorized(new { Message = "Invalid credentials" });
+
+        var token = _tokenService.GenerateToken(user);
+        return Ok(new AuthResponse(token, user.Email, user.Role));
+    }
+}</code></pre></div>
+
+  <h3 id="ch9-authz" data-toc>9.2 Authorization policies</h3>
+  <p class="topic-desc">Authorization policies define who can access what. They support roles, claims, and custom requirements.</p>
+  <div class="codeWrap"><pre><code>// Policy-based authorization
+builder.Services.AddAuthorization(options =&gt;
+{
+    options.AddPolicy("AdminOnly", policy =&gt;
+        policy.RequireRole("Admin"));
+
+    options.AddPolicy("ManagerOrAdmin", policy =&gt;
+        policy.RequireRole("Admin", "Manager"));
+
+    options.AddPolicy("CanEditProducts", policy =&gt;
+        policy.RequireClaim("permission", "products.edit"));
+
+    options.AddPolicy("SeniorEmployee", policy =&gt;
+        policy.Requirements.Add(new MinimumYearsRequirement(5)));
+});
+
+// Custom authorization requirement
+public class MinimumYearsRequirement : IAuthorizationRequirement
+{
+    public int MinimumYears { get; }
+    public MinimumYearsRequirement(int minimumYears) =&gt; MinimumYears = minimumYears;
+}
+
+public class MinimumYearsHandler : AuthorizationHandler&lt;MinimumYearsRequirement&gt;
+{
+    protected override Task HandleRequirementAsync(
+        AuthorizationHandlerContext context, MinimumYearsRequirement requirement)
+    {
+        var yearsClaim = context.User.FindFirst("years_employed");
+        if (yearsClaim != null &amp;&amp; int.TryParse(yearsClaim.Value, out var years) &amp;&amp; years &gt;= requirement.MinimumYears)
+        {
+            context.Succeed(requirement);
+        }
+
+        return Task.CompletedTask;
+    }
+}
+
+// Usage in controller
+[Authorize(Policy = "AdminOnly")]
+[HttpGet("admin/users")]
+public async ActionResult&lt;IEnumerable&lt;UserDto&gt;&gt; GetAllUsers(CancellationToken ct)
+    =&gt; Ok(await _userService.GetAllAsync(ct));</code></pre></div>
+
+  <h3 id="ch9-identity" data-toc>9.3 ASP.NET Core Identity</h3>
+  <p class="topic-desc">Identity provides a complete user management system with registration, login, roles, claims, and external providers.</p>
+  <div class="codeWrap"><pre><code>// Program.cs
+builder.Services.AddIdentity&lt;ApplicationUser, IdentityRole&gt;()
+    .AddEntityFrameworkStores&lt;AppDbContext&gt;()
+    .AddDefaultTokenProviders();
+
+// ApplicationUser extends IdentityUser
+public class ApplicationUser : IdentityUser
+{
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+// Registration
+[ApiController]
+[Route("api/[controller]")]
+public class AuthController : ControllerBase
+{
+    private readonly UserManager&lt;ApplicationUser&gt; _userManager;
+    private readonly ITokenService _tokenService;
+
+    public AuthController(UserManager&lt;ApplicationUser&gt; userManager, ITokenService tokenService)
+    {
+        _userManager = userManager;
+        _tokenService = tokenService;
+    }
+
+    [HttpPost("register")]
+    public async ActionResult&lt;AuthResponse&gt; Register([FromBody] RegisterRequest request)
+    {
+        var user = new ApplicationUser
+        {
+            UserName = request.Email,
+            Email = request.Email,
+            FirstName = request.FirstName,
+            LastName = request.LastName
+        };
+
+        var result = await _userManager.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
+
+        await _userManager.AddToRoleAsync(user, "User");
+
+        var token = _tokenService.GenerateToken(user);
+        return Ok(new AuthResponse(token, user.Email, "User"));
+    }
+}</code></pre></div>
+
+  <h3 id="ch9-https" data-toc>9.4 HTTPS and security headers</h3>
+  <p class="topic-desc">Security headers protect against XSS, clickjacking, MIME sniffing, and other common attacks.</p>
+  <div class="codeWrap"><pre><code>// Security headers middleware
+app.Use(async (context, next) =&gt;
+{
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    context.Response.Headers.Append("Content-Security-Policy",
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'");
+    await next();
+});
+
+// HSTS (production only)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
+
+// HTTPS redirection
+app.UseHttpsRedirection();</code></pre></div>
+
+    <div class="ex"><h4 id="ch9-https--exercises-9">Exercises 9</h4><ol>
+      <li>Implement register and login endpoints that issue a JWT, then store the token in an httpOnly cookie rather than localStorage.</li>
+      <li>Define an authorization policy from a claim and protect an endpoint with it, then verify a user lacking the claim is rejected.</li>
+      <li>Wire ASP.NET Core Identity to EF Core and implement a password-reset flow using its token providers.</li>
+      <li>Add security headers (HSTS, <code>X-Content-Type-Options</code>, <code>Content-Security-Policy</code>) and explain what each prevents.</li>
+      <li>Write a test that proves an expired token is rejected, and one that proves a token signed with the wrong key is rejected.</li>
+    </ol></div>
+</section>
+
+<section class="chapter">
+  <h2 id="ch10" data-toc>10 · Testing &amp; Deployment</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Testing &amp; Deployment</button><div class="ch-toc-list"><a href="#ch10-unit">10.1 Unit testing with xUnit</a><a href="#ch10-integration">10.2 Integration testing</a><a href="#ch10-docker">10.3 Docker containerisation</a><a href="#ch10-cicd">10.4 CI/CD pipeline</a></div></div>
+  <p class="topic-desc">Testing and deployment are where enterprise applications prove their worth. Automated testing and containerised deployment are industry standards.</p>
+  <h3 id="ch10-unit" data-toc>10.1 Unit testing with xUnit</h3>
+  <p class="topic-desc">xUnit is the standard testing framework for .NET. It supports facts, theories, and async tests.</p>
+  <div class="codeWrap"><pre><code>public class OrderServiceTests
+{
+    private readonly Mock&lt;IOrderRepository&gt; _orderRepoMock = new();
+    private readonly Mock&lt;IProductRepository&gt; _productRepoMock = new();
+    private readonly OrderService _service;
+
+    public OrderServiceTests()
+    {
+        _service = new OrderService(_orderRepoMock.Object, _productRepoMock.Object);
+    }
+
+    [Fact]
+    public async Task CreateOrder_WithValidData_ReturnsOrder()
+    {
+        // Arrange
+        var product = new Product { Id = 1, Name = "Laptop", Price = 999.99m, StockQuantity = 10 };
+        _productRepoMock.Setup(r =&gt; r.GetByIdAsync(1, It.IsAny&lt;CancellationToken&gt;()))
+            .ReturnsAsync(product);
+
+        _orderRepoMock.Setup(r =&gt; r.AddAsync(It.IsAny&lt;Order&gt;(), It.IsAny&lt;CancellationToken&gt;()))
+            .ReturnsAsync((Order o, CancellationToken _) =&gt; o);
+
+        // Act
+        var result = await _service.CreateAsync(new CreateOrderRequest(1, new() { new OrderItemDto(1, 2) });
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Id.Should().BeGreaterThan(0);
+        _orderRepoMock.Verify(r =&gt; r.AddAsync(It.IsAny&lt;Order&gt;(), It.IsAny&lt;CancellationToken&gt;()), Times.Once);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task CreateOrder_WithInvalidQuantity_ThrowsException(int quantity)
+    {
+        var product = new Product { Id = 1, Name = "Laptop", Price = 999.99m, StockQuantity = 10 };
+        _productRepoMock.Setup(r =&gt; r.GetByIdAsync(1, It.IsAny&lt;CancellationToken&gt;()))
+            .ReturnsAsync(product);
+
+        var act = () =&gt; _service.CreateAsync(new CreateOrderRequest(1, new() { new OrderItemDto(1, quantity) });
+
+        await act.Should().ThrowAsync&lt;ValidationException&gt;();
+    }
+}</code></pre></div>
+
+  <h3 id="ch10-integration" data-toc>10.2 Integration testing</h3>
+  <p class="topic-desc">Integration tests verify the full stack — controllers, services, database, and middleware — working together.</p>
+  <div class="codeWrap"><pre><code>public class OrdersApiTests : IClassFixture&lt;WebApplicationFactory&lt;Program&gt;&gt;
+{
+    private readonly HttpClient _client;
+    private readonly WebApplicationFactory&lt;Program&gt; _factory;
+
+    public OrdersApiTests(WebApplicationFactory&lt;Program&gt; factory)
+    {
+        _factory = factory.WithWebHostBuilder(builder =&gt;
+        {
+            builder.ConfigureServices(services =&gt;
+            {
+                services.Remove&lt;DbContextOptions&lt;AppDbContext&gt;&gt;();
+                services.AddDbContext&lt;AppDbContext&gt;(options =&gt;
+                    options.UseInMemoryDatabase("TestDb"));
+            });
+        });
+        _client = _factory.CreateClient();
+    }
+
+    [Fact]
+    public async Task GetOrders_ReturnsSuccessStatusCode()
+    {
+        var response = await _client.GetAsync("/api/orders");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task CreateOrder_WithValidRequest_ReturnsCreated()
+    {
+        var request = new CreateOrderRequest(1, new() { new OrderItemDto(1, 2) });
+        var response = await _client.PostAsJsonAsync("/api/orders", request);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var order = await response.Content.ReadFromJsonAsync&lt;OrderDto&gt;();
+        order.Should().NotBeNull();
+    }
+}</code></pre></div>
+
+  <h3 id="ch10-docker" data-toc>10.3 Docker containerisation</h3>
+  <p class="topic-desc">Docker enables consistent deployment across environments. Multi-stage builds keep images small.</p>
+  <div class="codeWrap"><pre><code># Dockerfile
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY ["MyApp.WebApi/MyApp.WebApi.csproj", "MyApp.WebApi/"]
+RUN dotnet restore "MyApp.WebApi/MyApp.WebApi.csproj"
+COPY . .
+RUN dotnet build "MyApp.WebApi/MyApp.WebApi.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "MyApp.WebApi/MyApp.WebApi.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /App/publish .
+ENTRYPOINT ["dotnet", "MyApp.WebApi.dll"]</code></pre></div>
+  <div class="codeWrap"><pre><code># docker-compose.yml
+version: '3.8'
+services:
+  webapi:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__Default=Server=db;Database=MyApp;...
+    depends_on:
+      - db
+      - redis
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+    ports:
+      - "1433:1433"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"</code></pre></div>
+
+  <h3 id="ch10-cicd" data-toc>10.4 CI/CD pipeline</h3>
+  <p class="topic-desc">GitHub Actions provides a complete CI/CD pipeline for .NET applications with testing, building, and deployment.</p>
+  <div class="codeWrap"><pre><code># .github/workflows/dotnet.yml
+name: .NET CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+    - name: Publish
+      run: dotnet publish -c Release -o ./publish
+    - name: Docker Build and Push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: myregistry/myapp:latest
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - name: Deploy to production
+      run: |
+        echo "Deploying to production..."
+        # Add deployment steps here</code></pre></div>
+
+    <div class="ex"><h4 id="ch10-cicd--exercises-10">Exercises 10</h4><ol>
+      <li>Write unit tests for a service using xUnit, covering the happy path plus at least three edge cases.</li>
+      <li>Build an integration test that exercises a real endpoint against an in-memory or containerised database.</li>
+      <li>Produce a multi-stage <code>Dockerfile</code> for the API, and confirm the final image does not contain the SDK layer.</li>
+      <li>Define a CI pipeline that restores, builds, runs all tests, and refuses to publish an image if any test fails.</li>
+      <li>Deploy the container and verify a health-check endpoint plus graceful shutdown on SIGTERM.</li>
+    </ol></div>
+</section>
+
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <p>ASP.NET Core 10 Enterprise Development Guide — Built for learning and reference.</p>
+  </div>
+</footer>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

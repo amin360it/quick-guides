@@ -1,0 +1,1751 @@
+<section class="chapter">
+<h2 id="ch1" data-toc>1 &middot; Containers and virtualization: the landscape</h2>
+<p class="topic-desc">The three compute models — bare metal, virtual machines, and containers — what each one virtualizes, where the performance and isolation boundaries actually fall, and how the ecosystem around Docker, VPS hosting, LXC, and Kubernetes maps onto the problem each solves.</p>
+
+<h3 id="ch1-landscape" data-toc>1.1 Virtualization, containers, and bare metal</h3>
+<p class="topic-desc">Bare metal gives you raw performance and full control. Virtual machines give you hardware-level isolation with a guest operating system. Containers give you process-level isolation sharing the host kernel. Each model trades a different axis.</p>
+
+<h4 id="ch1-landscape-baremetal">Bare metal and the virtualization premise</h4>
+<p>Bare metal means an application runs directly on the hardware with no hypervisor in between. You get the full CPU, memory, and I/O capability of the machine, and the only failure modes are your own code and the hardware itself. The cost is rigidity: every workload needs its own machine or a careful partitioning scheme, and utilization is typically poor because you size for peak and pay for idle. A bare-metal server running a single application at 15% average utilization is the most expensive way to run software, yet it is also the simplest to reason about — there is no hypervisor scheduler, no noisy-neighbor problem from other tenants, and no virtualization overhead.</p>
+<p>Virtualization changes the unit of tenancy. A hypervisor — Type 1 like KVM or ESXi running directly on the hardware, Type 2 like VirtualBox running on a host OS — presents each guest with a virtual machine that believes it has its own hardware. Each guest runs a full operating system with its own kernel. The isolation is strong: a guest cannot see another guest's memory, and a kernel exploit in one guest is (in theory) contained. The price is overhead — every VM pays for its own kernel, its own device drivers, its own scheduling — and density: you might run twenty VMs on a host where you could run two hundred containers, because each VM carries a full OS.</p>
+<p>The insight that made containers practical is that most of what a guest OS provides is not what applications actually need. Applications need a filesystem view, a network stack, process isolation, and resource limits. They do not need their own kernel. Containers deliver exactly that: each container is an isolated process (or process group) on a shared host kernel, with its own filesystem namespace, its own network namespace, its own PID namespace, and CPU and memory limits enforced by the kernel's cgroups. The result is near-bare-metal performance with VM-like isolation, at the cost of sharing a kernel — which means a kernel exploit escapes every container on the host, and containers are Linux processes that cannot run a different kernel than the host.</p>
+
+<div class="codeWrap"><pre><code># Bare metal: what the application sees
+$ lscpu | grep "Model name"
+  Model name: AMD EPYC 7B13 64-Core Processor
+$ df -h / 
+  256G  45G  212G  18% /
+# One kernel, one filesystem, one network stack — total control, total responsibility</code></pre></div>
+
+<div class="codeWrap"><pre><code># Inside a VM: the guest believes it has its own hardware
+$ lscpu | grep "Model name"
+  Model name: QEMU Virtual Machine (KVM)
+$ ls /dev/vda*  # virtual disk presented by the hypervisor
+# The guest kernel schedules processes, manages memory, handles interrupts —
+# all emulated or paravirtualized by the hypervisor below it</code></pre></div>
+
+<h4 id="ch1-landscape-containers">Containers as isolated processes</h4>
+<p>A container is a Linux process with a restricted view of the system. The restrictions come from three kernel features: <strong>namespaces</strong> isolate what the process can see (its own process tree, its own network interfaces, its own filesystem mount points, its own hostname), <strong>cgroups</strong> limit what the process can consume (CPU shares, memory limits, I/O bandwidth), and <strong>seccomp</strong> restricts which syscalls the process can invoke. A container runtime like <code>runc</code> orchestrates these features to create a sandbox that feels like a lightweight VM but is, under the hood, just a process with a constrained kernel view.</p>
+<p>The performance implication is significant. A container starts in milliseconds because there is no kernel to boot — the host kernel is already running. Memory is shared at the page level, so ten containers using the same base image share one copy of the library pages. Density follows: a host that could run twenty VMs might run two hundred containers. The trade-off is that all containers on a host share the same kernel, so a kernel vulnerability or a kernel-level misconfiguration (say, a sysctl that affects every process) is a host-wide problem, not a per-container one.</p>
+<p>Containers also change what "the application" means. In the bare-metal world, the application is a binary that runs on the OS. In the container world, the application is the binary plus its entire runtime environment — libraries, configuration, environment variables, the filesystem layout — packaged into an image. This is what makes containers portable: the same image runs identically on a developer laptop, a CI runner, and a production server, because the application carries its environment with it rather than depending on the host having the right libraries installed.</p>
+
+<div class="codeWrap"><pre><code># Container: a process with a restricted view
+$ docker run --rm -it alpine:latest sh
+/ # ps aux
+PID   USER     TIME  COMMAND
+    1 root      0:00 sh          # PID 1 inside the container
+    7 root      0:00 ps
+/ # cat /etc/hostname
+a1b2c3d4e5f6                # its own hostname, not the host's
+/ # exit
+# Back on the host: the container's processes were just processes
+$ docker ps
+CONTAINER ID   IMAGE     COMMAND   STATUS    NAMES   # gone — no residue</code></pre></div>
+
+<h3 id="ch1-history" data-toc>1.2 A brief history of the ecosystem</h3>
+<p class="topic-desc">From chroot in 1979 through FreeBSD Jails, Solaris Zones, and Google's cgroups to Docker's 2013 release and Kubernetes' 2014 debut — the timeline that shaped today's tooling choices.</p>
+
+<h4 id="ch1-history-early">Before Docker: the building blocks existed for decades</h4>
+<p>The ideas behind containers are older than the term. <code>chroot</code>, introduced in 1979 in Version 7 Unix, changes the root directory for a process, giving it a restricted filesystem view. FreeBSD Jails (2000) added process and network isolation. Solaris Zones (2004) brought full resource control. Google contributed <code>cgroups</code> to the Linux kernel in 2007 to limit resource usage, and later developed LXC (Linux Containers) in 2008 as a userspace interface to these kernel features. All of the primitives existed; what was missing was a cohesive tool that made them usable by ordinary developers.</p>
+<p>Docker's contribution was not a new kernel technology but a packaging and experience innovation. Before Docker, building a container required hand-writing LXC configuration, managing cgroups manually, and assembling filesystem layers with AUFS. Docker wrapped all of that in a simple CLI, introduced the concept of a layered image with a Dockerfile, and — critically — launched Docker Hub as a registry where you could push and pull images with <code>docker push</code> and <code>docker pull</code>. The combination of a declarative build format, a union filesystem for layering, and a public registry created a network effect that no earlier project achieved.</p>
+
+<div class="codeWrap"><pre><code># 2008-era LXC: correct but unergonomic
+$ sudo lxc-create -t ubuntu -n mycontainer
+$ sudo lxc-start -n mycontainer -d
+$ sudo lxc-attach -n mycontainer
+# Three commands, root privileges, manual networking, no image format,
+# no registry, no standard build recipe. Powerful but not a product.</code></pre></div>
+
+<div class="codeWrap"><pre><code># 2013-era Docker: the same primitives, wrapped for developers
+$ docker run -it ubuntu:14.04 bash
+# One command. Non-root (with the docker group). Automatic networking.
+# A build format (Dockerfile). A registry (Docker Hub). A community.</code></pre></div>
+
+<h4 id="ch1-history-k8s">From Docker to Kubernetes and the CNCF</h4>
+<p>Docker solved the packaging and single-host running problem. It did not solve the multi-host orchestration problem: scheduling containers across a cluster, restarting them on failure, rolling out updates, and managing service discovery at scale. Google, which had been running containers in production for years with its internal Borg system, open-sourced Kubernetes in 2014 as a Borg-inspired orchestrator. It won the orchestration war against Docker Swarm and Mesos by being more extensible, more aggressively community-driven, and backed by every major cloud provider.</p>
+<p>The Cloud Native Computing Foundation (CNCF), founded in 2015 under the Linux Foundation, became the umbrella for the ecosystem: Kubernetes, Prometheus (monitoring), Envoy (service proxy), containerd (container runtime), Helm (package manager), and dozens of other projects. The result is a layered stack: containerd or CRI-O runs the containers, Kubernetes schedules and orchestrates them, Envoy or similar handles traffic, Prometheus and Grafana observe them, and a GitOps tool like Argo CD or Flux delivers them. Each layer is swappable, which is both the ecosystem's strength and its complexity tax.</p>
+
+<h3 id="ch1-ecosystem" data-toc>1.3 The ecosystem map and where each tool fits</h3>
+<p class="topic-desc">Docker, containerd, CRI-O, LXC, LXD, Kubernetes, and a VPS are not competitors so much as layers in a stack. Understanding what each one owns is the prerequisite for choosing the right tool for a given problem.</p>
+
+<h4 id="ch1-ecosystem-layers">The stack, bottom to top</h4>
+<p>At the bottom is the <strong>kernel</strong>: Linux namespaces, cgroups, and seccomp provide the isolation primitives. Above that sits the <strong>low-level runtime</strong>: <code>runc</code> (used by Docker via containerd) or <code>crun</code> actually creates and starts containers by configuring these kernel features. <strong>containerd</strong> is the high-level daemon that manages container lifecycles, image distribution, and storage; Docker Engine embeds containerd, and Kubernetes talks to it via CRI-O or directly via the CRI (Container Runtime Interface).</p>
+<p>Above the runtime sits the <strong>orchestrator</strong>. Docker Compose handles multi-container applications on a single host. Docker Swarm (now largely dormant) was Docker's built-in clustering. Kubernetes is the dominant multi-host orchestrator, managing pods, services, deployments, and a control plane API. Below Kubernetes — or beside it, for simpler workloads — sits the <strong>VPS</strong>: a virtual private server is itself a VM running on a hypervisor, and it is the right tool when you want a full OS you control, not just containerized applications.</p>
+<p>LXC and LXD occupy a distinct niche. They are <strong>system containers</strong> — they run a full init system and feel like VMs, but share the host kernel. LXC is the low-level runtime; LXD is the management daemon that gives it a Docker-like UX for VMs. The right mental model: Docker containers are for applications, LXC/LXD containers are for full operating systems, and Kubernetes is for orchestrating containers across machines.</p>
+
+<table>
+<tr><th>Layer</th><th>Tools</th><th>Owns</th></tr>
+<tr><td>Kernel primitives</td><td>Linux namespaces, cgroups, seccomp</td><td>Isolation and resource limits</td></tr>
+<tr><td>Low-level runtime</td><td>runc, crun</td><td>Creating and starting containers</td></tr>
+<tr><td>High-level runtime</td><td>containerd, CRI-O</td><td>Image management, container lifecycle</td></tr>
+<tr><td>Developer runtime</td><td>Docker Engine, Podman</td><td>Build, run, push, pull</td></tr>
+<tr><td>System containers</td><td>LXC, LXD, systemd-nspawn</td><td>Full-OS containers with init</td></tr>
+<tr><td>Orchestration (single host)</td><td>Docker Compose</td><td>Multi-container apps on one machine</td></tr>
+<tr><td>Orchestration (multi-host)</td><td>Kubernetes, Nomad, Swarm</td><td>Scheduling, self-healing, rollouts</td></tr>
+<tr><td>Infrastructure</td><td>VPS (KVM, Xen), bare metal</td><td>The machines themselves</td></tr>
+</table>
+
+<h4 id="ch1-ecosystem-choose">Choosing by workload, not by hype</h4>
+<p>The decision framework starts with the workload. A single application with a handful of dependencies: Docker. A full LAMP stack you want to manage like a VM: LXD. A fleet of microservices that must self-heal and roll out across ten machines: Kubernetes. A single web server or database you just want running on a VPS: a VPS with Docker or even bare metal. The mistake is reaching for Kubernetes because it is impressive, the way the mistake in application architecture is reaching for microservices because they are modern. Each layer of the stack adds operational complexity, and that complexity must be justified by a workload that needs it.</p>
+
+<div class="warn">The number of teams running Kubernetes who would be better served by two VPS instances and Docker Compose is not zero. The operational burden of Kubernetes — etcd backups, certificate rotation, control-plane upgrades, RBAC design, network policies — is real and recurring. If your workload fits on one host, keep it there.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 &middot; Docker: images and containers</h2>
+<p class="topic-desc">Images as immutable layers, containers as running instances of those images, the union filesystem that makes layering efficient, and the lifecycle from build to registry to run.</p>
+
+<h3 id="ch2-layers" data-toc>2.1 Image layers and the union filesystem</h3>
+<p class="topic-desc">A Docker image is a stack of read-only layers, each representing a filesystem change. The union filesystem overlays them into a single coherent view. Understanding layers is the key to understanding Docker's caching, image size, and build speed.</p>
+
+<h4 id="ch2-layers-union">How layers stack</h4>
+<p>Every instruction in a Dockerfile that modifies the filesystem — <code>RUN</code>, <code>COPY</code>, <code>ADD</code> — creates a new layer. Each layer contains only the changes from the layer below it: added files, modified files, deleted files (recorded as whiteout markers). When a container starts, the union filesystem (historically AUFS, now typically OverlayFS on modern kernels) stacks all the image layers and presents them as a single unified filesystem. A read checks each layer from top to bottom and returns the first match; a write goes to the container's writable layer on top.</p>
+<p>The layering model has three practical consequences. First, <strong>caching</strong>: if a layer's instruction hasn't changed and none of the layers below it changed, Docker reuses the cached layer. This is why you order a Dockerfile from least-frequent-change to most-frequent-change — dependencies before source code, because source code changes on every commit and dependencies change weekly. Second, <strong>deduplication</strong>: two images based on the same <code>FROM</code> share the same base layers on disk, so pulling a second variant of the same application downloads only the new layers. Third, <strong>copy-on-write</strong>: when a container modifies a file that exists in an image layer, the union filesystem copies that file up to the writable layer first, so the image layer stays pristine.</p>
+
+<div class="codeWrap"><pre><code># Inspecting layers: each one is a filesystem diff
+$ docker history nginx:1.27
+IMAGE          CREATED        SIZE      COMMENT
+f4e1b8e5a8f3   3 weeks ago    192MB    CMD ["nginx" "-g" "daemon off;"]
+&lt;missing&gt;      3 weeks ago    192MB    EXPOSE 80
+&lt;missing&gt;      3 weeks ago    1.59MB   COPY nginx.conf /etc/nginx/
+# ... layers below: the base OS, the nginx install, the config</code></pre></div>
+
+<div class="codeWrap"><pre><code># Seeing the layers on disk (overlay2 example)
+$ docker inspect nginx:1.27 --format '{{json .GraphDriver.Data}}'
+{"LowerDir": "/var/lib/docker/overlay2/l1:/var/lib/docker/overlay2/l2:...",
+ "UpperDir": "/var/lib/docker/overlay2/l3/diff",
+ "WorkDir":  "/var/lib/docker/overlay2/l3/work"}
+# LowerDir: the read-only image layers
+# UpperDir: the writable container layer (created at container start)</code></pre></div>
+
+<h4 id="ch2-layers-dedup">Why layer ordering matters for cache hits</h4>
+<p>Docker builds a cache key for each instruction based on the instruction text and the content of the layer below it. When you <code>COPY package*.json</code> before <code>COPY .</code>, the <code>COPY .</code> layer's cache key changes every time any source file changes, which is correct — but the <code>RUN npm ci</code> layer above the first <code>COPY</code> is only invalidated when <code>package.json</code> or <code>package-lock.json</code> changes, which means the expensive dependency install is cached across most commits. Reverse the order — <code>COPY . .</code> then <code>RUN npm ci</code> — and every code change busts the dependency cache, adding minutes to every build.</p>
+
+<div class="codeWrap"><pre><code># GOOD: dependencies cached across code changes
+FROM node:22-slim
+WORKDIR /app
+COPY package*.json ./          # changes rarely - cache hit most builds
+RUN npm ci                      # expensive - cached
+COPY . .                        # changes every commit - cache miss, but fast layer
+RUN npm run build
+
+# BAD: every code change busts the dependency cache
+FROM node:22-slim
+WORKDIR /app
+COPY . .                        # changes every commit
+RUN npm ci                      # runs every time - slow builds</code></pre></div>
+
+<h3 id="ch2-run" data-toc>2.2 Running containers</h3>
+<p class="topic-desc"><code>docker run</code> and its flags, what happens when you invoke it, the difference between foreground and detached modes, and the flags that matter in production.</p>
+
+<h4 id="ch2-run-flags">The flags that do real work</h4>
+<p><code>docker run</code> takes an image and creates a container from it. The flags you will actually use: <code>-d</code> detaches (runs in background), <code>-p</code> maps a host port to a container port, <code>-v</code> mounts a volume or bind mount, <code>--name</code> assigns a name, <code>--rm</code> removes the container when it exits, <code>--network</code> attaches to a specific network, <code>-e</code> sets an environment variable, <code>--memory</code> and <code>--cpus</code> set resource limits, and <code>--restart</code> sets the restart policy. A production container almost always needs at least <code>-d</code>, <code>--restart unless-stopped</code>, resource limits, and a health check (via <code>HEALTHCHECK</code> in the Dockerfile or an orchestrator probe).</p>
+<p>Port mapping deserves attention because it is the most common source of confusion. <code>-p 8080:80</code> means host port 8080 forwards to container port 80. The container's port is whatever the application listens on inside the container; the host port is what external clients connect to. If two containers both listen on port 80 internally, you map them to different host ports (<code>-p 8080:80</code> and <code>-p 8081:80</code>) with no conflict. The container's internal port does not need to match the host port — the mapping is arbitrary.</p>
+
+<div class="codeWrap"><pre><code># A production-shaped run command
+$ docker run -d \
+  --name web \
+  --restart unless-stopped \
+  -p 8080:80 \
+  -v webdata:/var/www/html \
+  -e NODE_ENV=production \
+  --memory=256m \
+  --cpus=0.5 \
+  --health-cmd="curl -f http://localhost/ || exit 1" \
+  --health-interval=30s \
+  myapp:1.4.2
+# The container restarts on failure but stops if you stop it manually
+# (unless-stopped). Memory is capped at 256 MB; CPU at half a core.</code></pre></div>
+
+<div class="codeWrap"><pre><code># What happens when you run it (simplified)
+# 1. Docker checks for the image locally; if absent, pulls it
+# 2. Creates a writable layer on top of the image layers
+# 3. Sets up namespaces (PID, network, mount, IPC, UTS, user)
+# 4. Applies cgroup limits
+# 5. Configures the network interface and port mappings
+# 6. Executes the entrypoint / CMD as PID 1 inside the container
+$ docker ps
+CONTAINER ID   IMAGE         STATUS         PORTS
+a1b2c3d4e5f6   myapp:1.4.2   Up 2 seconds   0.0.0.0:8080-&gt;80/tcp</code></pre></div>
+
+<h4 id="ch2-run-detached">Foreground versus detached, and why PID 1 matters</h4>
+<p>When you run a container without <code>-d</code>, it runs in the foreground: your terminal is attached to the container's stdout and stdin, and Ctrl-C sends SIGTERM to the container's PID 1. This is how you run a one-shot command (<code>docker run --rm node:22 node script.js</code>) or debug an interactive application. In production you almost always use <code>-d</code> so the container detaches and runs as a background service, managed by the Docker daemon's restart policy.</p>
+<p>The PID 1 issue is the subtle one. Inside a container, your application runs as PID 1 — the init process. PID 1 has special semantics in Linux: it does not die from signals the way normal processes do, and it is responsible for reaping zombie child processes. If your application is not written to handle signals and reap children, a <code>docker stop</code> (which sends SIGTERM) may not shut it down cleanly, and orphaned child processes accumulate. The fix is to use an init system as the entrypoint: Docker's <code>--init</code> flag injects <code>tini</code>, a minimal init that forwards signals and reaps zombies. For applications that spawn subprocesses (a Java app running shell scripts, a PHP-FPM master spawning workers), <code>--init</code> is not optional.</p>
+
+<h3 id="ch2-lifecycle" data-toc>2.3 Container lifecycle and state</h3>
+<p class="topic-desc">From <code>created</code> to <code>running</code> to <code>exited</code>, what each state means, why containers are ephemeral by design, and how to manage state that must survive.</p>
+
+<h4 id="ch2-lifecycle-states">The state machine</h4>
+<p>A container moves through a defined set of states: <code>created</code> (configured but not started), <code>running</code> (executing), <code>paused</code> (processes frozen via cgroup freezer), <code>restarting</code> (in the middle of a restart-policy retry), <code>exited</code> (stopped, with the exit code preserved), and <code>dead</code> (failed to stop, needs manual intervention). You can see all of them with <code>docker ps -a</code>. The important state for operations is <code>exited</code>: the container is stopped but not removed, so <code>docker start</code> brings it back with the same filesystem (writable layer) and the same configuration.</p>
+<p>The design principle is that containers are <strong>ephemeral and disposable</strong>. A container should be treated as cattle, not a pet: if it misbehaves, you kill it and start a new one rather than nursing it back to health. This works only if the container holds no irreplaceable state — any data that must survive goes in a volume, a bind mount, or an external database. The writable layer is deleted when the container is removed (<code>docker rm</code>), so anything written outside a volume is lost. The common failure mode is a container that accumulates state in its writable layer (logs, uploads, cache) and becomes impossible to replace without data loss.</p>
+
+<div class="codeWrap"><pre><code># The lifecycle in practice
+$ docker create --name db postgres:17        # created
+$ docker start db                             # running
+$ docker ps
+CONTAINER ID   IMAGE          STATUS
+a1b2c3d4e5f6   postgres:17    Up 3 seconds
+$ docker stop db                              # exited (code 0)
+$ docker ps -a
+CONTAINER ID   IMAGE          STATUS
+a1b2c3d4e5f6   postgres:17    Exited (0) 5 seconds ago
+$ docker rm db                                # gone — writable layer deleted
+# State in volumes survives: $ docker volume inspect pgdata</code></pre></div>
+
+<div class="codeWrap"><pre><code># The restart policy in action
+$ docker run -d --restart unless-stopped nginx:1.27
+$ docker inspect nginx --format '{{.RestartCount}}'
+0
+$ docker kill nginx        # SIGKILL — simulates a crash
+$ docker ps
+CONTAINER ID   IMAGE         STATUS
+a1b2c3d4e5f6   nginx:1.27    Up 1 second (restarting)
+# unless-stopped: restarted because it was not stopped manually
+$ docker stop nginx
+# Now it will NOT restart on daemon reboot — that's the "unless" part</code></pre></div>
+
+<h3 id="ch2-registries" data-toc>2.4 Registries, tags, and digests</h3>
+<p class="topic-desc">How images are stored and distributed, the tag versus digest distinction, when to use a private registry, and how image pulling resolves through the layer store.</p>
+
+<h4 id="ch2-registries-tags">Tags are mutable labels; digests are immutable</h4>
+<p>A registry stores images and their layers. An image is identified by a repository name (<code>nginx</code>, <code>ghcr.io/acme/api</code>) and a tag (<code>latest</code>, <code>1.4.2</code>, <code>sha-8f3a2b1</code>). The critical thing to understand is that <strong>a tag is a mutable pointer</strong> — <code>nginx:latest</code> can refer to different image content over time, as the nginx team publishes new builds. This is convenient for getting updates and dangerous for reproducibility, because <code>docker pull nginx:latest</code> today and next month may fetch different code.</p>
+<p>Every image also has a <strong>content digest</strong> — a SHA-256 hash of the image manifest — that is immutable. Pulling by digest (<code>docker pull nginx@sha256:abc123...</code>) guarantees you get the exact image you tested. For production deployments, pin by tag at minimum (never <code>latest</code>), and pin by digest when you need absolute reproducibility (security-sensitive deployments, compliance requirements). The digest appears in the image manifest and is shown by <code>docker images --digests</code>.</p>
+
+<div class="codeWrap"><pre><code># Pulling by tag: what you asked for and what you got
+$ docker pull nginx:1.27
+$ docker inspect nginx:1.27 --format '{{index .RepoDigests 0}}'
+nginx@sha256:8f3a2b1c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a
+
+# Pulling by digest: immutable, reproducible
+$ docker pull nginx@sha256:8f3a2b1c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a
+# This will always resolve to the exact same image, forever</code></pre></div>
+
+<div class="codeWrap"><pre><code># Using a private registry: authenticate, tag, push
+$ docker login ghcr.io -u myuser
+$ docker tag myapp:1.4.2 ghcr.io/acme/myapp:1.4.2
+$ docker push ghcr.io/acme/myapp:1.4.2
+# On the pull side (e.g. a production server):
+$ docker pull ghcr.io/acme/myapp:1.4.2
+# Configure registry credentials in /etc/docker/daemon.json or via
+# kubernetes secrets + imagePullSecrets for K8s</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 &middot; Dockerfiles and multi-stage builds</h2>
+<p class="topic-desc">Writing efficient Dockerfiles, the multi-stage build pattern that separates build dependencies from runtime artifacts, and the practices that keep images small, fast to build, and reproducible.</p>
+
+<h3 id="ch3-dockerfile" data-toc>3.1 Writing effective Dockerfiles</h3>
+<p class="topic-desc">The Dockerfile as a build recipe: instructions that create layers, how to minimize layer count, and the patterns that separate concerns between build time and runtime.</p>
+
+<h4 id="ch3-dockerfile-instructions">Instructions that create layers</h4>
+<p>Every Dockerfile instruction that modifies the filesystem creates a layer. The filesystem-modifying instructions are <code>RUN</code> (executes a command and captures the filesystem changes), <code>COPY</code> and <code>ADD</code> (add files from the build context), and <code>WORKDIR</code> (creates a directory if it does not exist). Instructions that only set metadata — <code>ENV</code>, <code>LABEL</code>, <code>EXPOSE</code>, <code>USER</code>, <code>CMD</code>, <code>ENTRYPOINT</code>, <code>ARG</code>, <code>HEALTHCHECK</code> — do not create filesystem layers but do create image metadata. The distinction matters because only filesystem layers are cached; metadata changes invalidate the cache for that instruction and everything below it.</p>
+<p>The most common Dockerfile mistake is a <code>RUN</code> that combines unrelated operations to "save layers." Each <code>RUN</code> is a layer, and layers are cheap — the constraint is build time and context size, not layer count. A <code>RUN apt-get update && apt-get install -y package1 package2 && rm -rf /var/lib/apt/lists/*</code> is idiomatic: the update and install must be in the same <code>RUN</code> because a cached <code>RUN apt-get update</code> layer could be reused with a stale package list, and the cleanup reduces image size. But splitting unrelated installs into separate <code>RUN</code> layers is fine and often better for caching — if <code>package2</code> changes, <code>package1</code>'s layer is still cached.</p>
+
+<div class="codeWrap"><pre><code># A well-ordered Dockerfile for a Node.js application
+FROM node:22-slim AS base
+WORKDIR /app
+
+# Layer 1: dependency manifest (changes rarely)
+COPY package*.json ./
+RUN npm ci --omit=dev &amp;&amp; npm cache clean --force
+
+# Layer 2: application source (changes frequently)
+COPY . .
+RUN npm run build &amp;&amp; rm -rf src/ tests/
+
+# Metadata: not a layer, but part of the image config
+EXPOSE 3000
+ENV NODE_ENV=production
+USER node
+CMD ["node", "dist/server.js"]</code></pre></div>
+
+<div class="codeWrap"><pre><code># A poorly-ordered Dockerfile: every change busts the cache
+FROM node:22-slim
+WORKDIR /app
+COPY . .                          # everything - changes every commit
+RUN npm ci                        # dependencies re-installed every build
+RUN npm run build                 # build re-runs every time
+RUN rm -rf node_modules/.cache    # trying to save space at the wrong layer
+USER node
+CMD ["node", "dist/server.js"]</code></pre></div>
+
+<h3 id="ch3-multistage" data-toc>3.2 Multi-stage builds</h3>
+<p class="topic-desc">The pattern that uses multiple <code>FROM</code> instructions in one Dockerfile to build in one stage and copy only the runtime artifacts into a clean final stage, producing images that are a fraction of the size.</p>
+
+<h4 id="ch3-multistage-pattern">Build stage, runtime stage</h4>
+<p>A multi-stage Dockerfile has two or more <code>FROM</code> instructions. The first stage (the build stage) contains everything needed to compile or build the application: the SDK, the compiler, the build tools, the source code. The final stage (the runtime stage) contains only what the application needs to run: the runtime, the built artifacts, configuration. You copy from the build stage to the runtime stage with <code>COPY --from=build /app/dist ./dist</code>. The build stage's layers — the compiler, the intermediate object files, the source code — are discarded and never appear in the final image.</p>
+<p>The size difference is dramatic. A Go application built in a <code>golang:1.23</code> image (which includes the full Go toolchain, ~800 MB) produces a final binary that is 15 MB. A multi-stage build copies just that binary into a <code>scratch</code> or <code>alpine</code> base, yielding a 20 MB image instead of 815 MB. For compiled languages (Go, Rust, C++) the win is enormous. For interpreted languages (Python, Node.js, Ruby) the win is smaller but real — you exclude the build toolchain, test frameworks, and development dependencies.</p>
+
+<div class="codeWrap"><pre><code># Multi-stage build for a Go application
+FROM golang:1.23 AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/server
+
+FROM gcr.io/distroless/static-debian12:nonroot
+WORKDIR /app
+COPY --from=build /app/server /app/server
+USER nonroot:nonroot
+EXPOSE 8080
+ENTRYPOINT ["/app/server"]
+# Final image: ~20 MB. The Go toolchain is nowhere in it.</code></pre></div>
+
+<div class="codeWrap"><pre><code># Multi-stage for a Node.js TypeScript application
+FROM node:22-slim AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+FROM node:22-slim AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build &amp;&amp; npm prune --omit=dev
+
+FROM node:22-slim AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY package.json ./
+USER node
+EXPOSE 3000
+CMD ["node", "dist/server.js"]
+# No TypeScript compiler, no test framework, no source code in the runtime image</code></pre></div>
+
+<h4 id="ch3-multistage-targets">Targeting a specific stage</h4>
+<p>You can build only up to a specific stage with <code>docker build --target build -t myapp:build .</code>, which is useful for debugging a failing build or for CI pipelines that need to run tests in the build stage but only push the runtime stage. You can also use a stage as the base for another stage: <code>FROM build AS test</code> inherits the build stage's filesystem, so a test stage has the compiler and the source code available. The <code>--target</code> flag means one Dockerfile can serve multiple purposes — development, test, and production — without duplicating the recipe.</p>
+
+<h3 id="ch3-practices" data-toc>3.3 Build practices and image hygiene</h3>
+<p class="topic-desc">Small images, fast builds, and reproducible artifacts: the practices that separate a Dockerfile that works from one that survives contact with production.</p>
+
+<h4 id="ch3-practices-small">Minimal base images and layer hygiene</h4>
+<p>The base image is the largest contributor to final image size. <code>ubuntu:24.04</code> is ~80 MB compressed; <code>alpine:3.20</code> is ~8 MB; <code>gcr.io/distroless/static</code> is ~2 MB; <code>scratch</code> is 0 MB. The trade-off is that smaller images have fewer tools: Alpine uses musl libc instead of glibc, which can cause subtle compatibility issues with binaries compiled against glibc, and Distroless has no shell at all, which makes debugging harder (you use <code>docker exec</code> with a debug variant or ephemeral containers). For most applications, Alpine is a reasonable default; for maximum safety and minimal attack surface, Distroless is the right choice.</p>
+<p>Layer hygiene means: exclude unnecessary files with <code>.dockerignore</code> (node_modules, .git, test files, secrets), clean up package manager caches in the same <code>RUN</code> that installs, and avoid <code>ADD</code> (which has surprising behavior with remote URLs and tar extraction — use <code>COPY</code> unless you specifically need ADD's features). A <code>.dockerignore</code> that excludes <code>.git</code> can reduce the build context from hundreds of MB to a few KB, which speeds up every build because the daemon sends the context to the builder before it starts.</p>
+
+<div class="codeWrap"><pre><code># .dockerignore - as important as the Dockerfile itself
+.git
+.gitignore
+node_modules
+npm-debug.log
+Dockerfile
+.dockerignore
+.env
+.env.local
+coverage/
+test/
+tests/
+__tests__/
+*.md
+.vscode/
+.idea/
+# Without this file, the build context is the entire repo —
+# including .git (potentially huge) and node_modules (definitely huge)</code></pre></div>
+
+<div class="codeWrap"><pre><code># Comparing base image sizes (compressed, approximate)
+# ubuntu:24.04          ~80 MB   - full OS, glibc, package manager
+# debian:12-slim        ~45 MB   - Debian without the extras
+# alpine:3.20            ~8 MB   - musl libc, busybox, package manager
+# gcr.io/distroless/...  ~2 MB   - no shell, no package manager, no libc (static)
+# scratch                0 MB   - empty; only for fully static binaries
+#
+# Choose the smallest base that your application can run on.
+# Test musl-vs-glibc compatibility if you use Alpine with compiled binaries.</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 &middot; Docker networking and volumes</h2>
+<p class="topic-desc">How containers communicate, the four network drivers, when to use each, and the volume models that persist data across container lifecycles.</p>
+
+<h3 id="ch4-networks" data-toc>4.1 Network drivers and container communication</h3>
+<p class="topic-desc">Bridge, host, none, and overlay: what each driver does, when to use it, and how Docker's embedded DNS makes service discovery work on a user-defined bridge.</p>
+
+<h4 id="ch4-networks-bridge">Bridge networks and the default isolation</h4>
+<p>When you install Docker, it creates a default bridge network called <code>bridge</code>. Containers attached to it get a private IP (typically in <code>172.17.0.0/16</code>) and can reach each other by IP but not by name — the default bridge does not have embedded DNS. A <strong>user-defined bridge</strong> (created with <code>docker network create mynet</code>) adds automatic DNS resolution: containers on the same user-defined bridge can resolve each other's names. This is the mechanism that makes <code>docker run --network mynet --name db postgres</code> reachable from another container as <code>db:5432</code>.</p>
+<p>The bridge network is the right default for multi-container applications on a single host. Each container gets its own network namespace (its own loopback, its own interfaces, its own firewall rules), which means two containers can both listen on port 80 internally without conflict — they have separate network stacks. Traffic between containers on the same bridge goes through the kernel's bridge interface, which is fast (no NAT for container-to-container on the same bridge). Containers reach the outside world through NAT (masquerade) on the host's IP.</p>
+
+<div class="codeWrap"><pre><code># User-defined bridge: DNS, isolation, and internal communication
+$ docker network create frontend
+$ docker network create backend
+$ docker run -d --name db --network backend postgres:17
+$ docker run -d --name api --network backend -e DB_HOST=db myapi:1.0
+$ docker run -d --name web --network frontend -p 8080:80 myweb:1.0
+$ docker network connect frontend api   # api joins both networks
+# web reaches api (both on frontend), api reaches db (both on backend),
+# db is NOT on frontend — it's unreachable from web directly.
+# That's network segmentation enforced by Docker.</code></pre></div>
+
+<div class="codeWrap"><pre><code># Inspecting what the daemon set up
+$ docker network inspect backend
+[
+  {
+    "Name": "backend",
+    "Driver": "bridge",
+    "IPAM": { "Config": [{ "Subnet": "172.18.0.0/16" }] },
+    "Containers": {
+      "a1b2c3...": { "Name": "db", "IPv4Address": "172.18.0.2/16" },
+      "d4e5f6...": { "Name": "api", "IPv4Address": "172.18.0.3/16" }
+    }
+  }
+]
+# Docker created a Linux bridge, assigned IPs, set up NAT for outbound,
+# and is running an embedded DNS server on 127.0.0.11</code></pre></div>
+
+<h4 id="ch4-networks-host">Host and none: the isolation extremes</h4>
+<p>The <code>host</code> driver removes network isolation entirely: the container shares the host's network namespace, so it listens on the host's interfaces directly. There is no NAT, no port mapping, and no network-level separation from other processes on the host. This gives maximum performance (no NAT overhead) and is required for applications that need to see the host's network configuration directly (network monitoring tools, some VPN clients, applications that bind to specific interfaces). The security cost is total: a container on the host network can reach anything the host can reach, and any port it listens on is a port on the host.</p>
+<p>The <code>none</code> driver gives no network at all: the container has only a loopback interface. This is for batch jobs that need no network access — a data processing container that reads from a mounted volume and writes to another mounted volume. It is also the most secure network configuration, because there is no network path in or out.</p>
+
+<table>
+<tr><th>Driver</th><th>Isolation</th><th>DNS</th><th>Performance</th><th>Use when</th></tr>
+<tr><td>bridge (default)</td><td>Full</td><td>No</td><td>Good</td><td>Legacy apps, single-container</td></tr>
+<tr><td>user-defined bridge</td><td>Full</td><td>Yes</td><td>Good</td><td>Multi-container apps on one host</td></tr>
+<tr><td>host</td><td>None</td><td>N/A</td><td>Best</td><td>Network tools, performance-critical</td></tr>
+<tr><td>none</td><td>No network</td><td>N/A</td><td>N/A</td><td>Batch jobs, maximum security</td></tr>
+<tr><td>overlay</td><td>Full (encrypted)</td><td>Yes</td><td>Good</td><td>Multi-host (Swarm, K8s)</td></tr>
+<tr><td>macvlan</td><td>Full (MAC)</td><td>No</td><td>Best</td><td>App needs a real LAN IP</td></tr>
+</table>
+
+<h3 id="ch4-volumes" data-toc>4.2 Volumes and data persistence</h3>
+<p class="topic-desc">Named volumes, bind mounts, and tmpfs: the three ways to get data out of the container's writable layer, and when to use each.</p>
+
+<h4 id="ch4-volumes-named">Named volumes: Docker-managed persistence</h4>
+<p>A named volume is a directory managed by Docker, stored under <code>/var/lib/docker/volumes/</code> on the host (or wherever the daemon's data root points). You create it with <code>docker volume create pgdata</code> or implicitly by referencing it in <code>-v pgdata:/var/lib/postgresql/data</code>. Volumes survive container removal: <code>docker rm -v</code> removes the container and its anonymous volumes, but named volumes are only removed with <code>docker volume rm</code> or <code>docker volume prune</code>. This is the right choice for databases, file uploads, and any data that must outlive the container.</p>
+<p>Volumes have three advantages over the container's writable layer. First, they persist across container recreation — <code>docker rm</code> then <code>docker run</code> with the same volume gives you the old data back. Second, they can be shared between containers — two containers mounting the same volume see the same files, which is how you do shared caches or a web server reading files written by a batch job. Third, they can be backed up, migrated, and managed independently of any container. The performance is near-native because the volume is a bind mount under the hood, going through the kernel's filesystem directly.</p>
+
+<div class="codeWrap"><pre><code># A database with persistent state
+$ docker volume create pgdata
+$ docker run -d --name db -v pgdata:/var/lib/postgresql/data postgres:17
+$ docker exec -it db psql -U postgres -c "CREATE TABLE test (id int);"
+$ docker rm -f db                    # container gone
+$ docker run -d --name db2 -v pgdata:/var/lib/postgresql/data postgres:17
+$ docker exec -it db2 psql -U postgres -c "SELECT * FROM test;"
+# Data survived: the volume persisted through the container replacement.
+# This is the pattern: ephemeral container, durable volume.</code></pre></div>
+
+<div class="codeWrap"><pre><code># Volume management
+$ docker volume ls
+DRIVER    VOLUME NAME
+local     pgdata
+local     redisdata
+$ docker volume inspect pgdata
+[
+  {
+    "Name": "pgdata",
+    "Mountpoint": "/var/lib/docker/volumes/pgdata/_data",
+    "Driver": "local"
+  }
+]
+$ docker volume prune    # removes all unused volumes — be careful, this is destructive</code></pre></div>
+
+<h4 id="ch4-volumes-bind">Bind mounts and tmpfs: the alternatives</h4>
+<p>A bind mount maps a specific host directory or file into the container: <code>-v /home/user/app/config:/etc/app/config:ro</code>. Unlike a named volume, the host path is explicit and the directory is not managed by Docker. This is the right choice for development (mount source code into the container so changes are live), for configuration files you edit on the host, and for cases where you need to know exactly where the data lives. The <code>:ro</code> suffix makes the mount read-only inside the container, which is a security best practice for configuration.</p>
+<p>A tmpfs mount is stored in the host's memory (RAM), not on disk. It is fast and ephemeral: the data disappears when the container stops, and it never touches the filesystem. Use tmpfs for caches, session data, session tokens, or any data that must not persist to disk (security-sensitive data, temporary computation state). The size is limited by available memory, so set <code>--tmpfs /tmp:size=128m</code> to cap it.</p>
+
+<table>
+<tr><th>Model</th><th>Persistence</th><th>Managed by Docker</th><th>Performance</th><th>Best for</th></tr>
+<tr><td>Container layer</td><td>Lost on <code>rm</code></td><td>Yes</td><td>Good</td><td>Ephemeral scratch, cache</td></tr>
+<tr><td>Named volume</td><td>Survives <code>rm</code></td><td>Yes</td><td>Near-native</td><td>Databases, uploads</td></tr>
+<tr><td>Bind mount</td><td>Depends on host</td><td>No</td><td>Native</td><td>Dev (source code), host config</td></tr>
+<tr><td>tmpfs</td><td>Lost on stop</td><td>Yes</td><td>RAM speed</td><td>Caches, secrets-in-memory</td></tr>
+</table>
+
+<h3 id="ch4-dns" data-toc>4.3 DNS and service discovery</h3>
+<p class="topic-desc">How Docker's embedded DNS resolves container names, the search-domain behavior, and how this maps onto Kubernetes' service discovery model.</p>
+
+<h4 id="ch4-dns-embedded">The embedded DNS server at 127.0.0.11</h4>
+<p>Every container on a user-defined bridge network has Docker's embedded DNS server at <code>127.0.0.11</code> configured as its resolver. When a container queries <code>db</code>, the request goes to 127.0.0.11, which checks Docker's internal DNS records and returns the container's IP. The mapping is maintained by Docker's daemon: when a container joins a network, its name-to-IP mapping is registered; when it leaves, the mapping is removed. This is why container names must be unique on a network — the DNS resolution would be ambiguous otherwise.</p>
+<p>The DNS server also handles search domains. If a container's hostname is <code>web</code> and it queries <code>api</code>, Docker first tries <code>api</code>, then <code>api.&lt;network-name&gt;</code>, then the fully qualified name. This means you can use short names within a network and FQDNs across networks. The search-domain behavior is configurable via <code>--dns-search</code> and the <code>dns_search</code> compose option, but the default works for most cases.</p>
+
+<div class="codeWrap"><pre><code># DNS in action
+$ docker run -d --name api --network mynet myapi:1.0
+$ docker run --rm --network mynet alpine:latest nslookup api
+Server:    127.0.0.11
+Address 1: 127.0.0.11
+Name:      api
+Address 1: 172.20.0.2    # Docker resolved the name to the container's IP
+
+$ docker run --rm --network mynet alpine:latest getent hosts api
+172.20.0.2    api           # Same resolution via the standard resolver
+# Any DNS tool in the container uses the embedded server transparently</code></pre></div>
+
+<div class="codeWrap"><pre><code># Custom DNS and search domains
+$ docker run -d \
+  --dns 8.8.8.8 \
+  --dns-search example.com \
+  --network mynet \
+  --name api myapi:1.0
+# Now queries for "db" try:
+#   db -> db.example.com -> db.mynet -> (fail)
+# and external queries (if the embedded server can't resolve)
+# fall through to 8.8.8.8</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 &middot; Docker Compose</h2>
+<p class="topic-desc">Declarative multi-container applications with Compose: the file format, the commands, and the patterns that take Compose from local development to production deployments.</p>
+
+<h3 id="ch5-basics" data-toc>5.1 Compose essentials</h3>
+<p class="topic-desc">The Compose file format, the project concept, service definitions, and the commands that manage a multi-container stack.</p>
+
+<h4 id="ch5-basics-file">The compose.yaml structure</h4>
+<p>A Compose file declares a project: a set of services, networks, and volumes that work together. The top-level keys are <code>services</code> (required), <code>networks</code>, <code>volumes</code>, <code>configs</code>, <code>secrets</code>, and <code>name</code> (the project name override). Each service declares its image or build, its environment, its ports, its volumes, its networks, and its dependencies. Compose reads the file, resolves the desired state, and reconciles the running containers to match.</p>
+<p>The project name defaults to the directory name but should be set explicitly with <code>name:</code> or <code>-p</code> when data matters, because it prefixes every resource. Two projects with the same default name (e.g., two checkouts in directories named <code>shop</code>) will collide on volumes, networks, and container names. The <code>name</code> key in the file or the <code>COMPOSE_PROJECT_NAME</code> environment variable prevents this.</p>
+
+<div class="codeWrap"><pre><code># compose.yaml - a three-service application
+name: shop
+
+services:
+  web:
+    image: nginx:1.27
+    ports:
+      - "8080:80"
+    networks:
+      - frontend
+    depends_on:
+      - api
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgres://shop:${DB_PASSWORD}@db:5432/shop
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:17
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shop"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  pgdata:</code></pre></div>
+
+<div class="codeWrap"><pre><code># The Compose command surface
+$ docker compose up -d              # create and start all services
+$ docker compose ps                # list containers in the project
+$ docker compose logs -f api       # follow logs from one service
+$ docker compose exec api bash     # open a shell in a running container
+$ docker compose down              # stop and remove everything
+$ docker compose down -v           # ... and remove volumes (destructive!)
+$ docker compose build             # build all buildable services
+$ docker compose config            # print the resolved, interpolated file</code></pre></div>
+
+<h4 id="ch5-basics-depends">depends_on and startup ordering</h4>
+<p><code>depends_on</code> controls the order in which services start, but it does not wait for a service to be ready — only for it to be running. By default, <code>depends_on</code> starts the dependency in a previous "generation" but does not wait for a health check to pass. The <code>condition: service_healthy</code> option changes this: Compose waits until the dependency's health check reports healthy before starting the dependent service. Without this, your API container will start before Postgres is ready to accept connections and will crash on the first database call.</p>
+<div class="note"><code>depends_on</code> is a Compose-level feature. It does not exist in Kubernetes (where init containers or readiness probes serve the same purpose) and it does not exist in plain Docker. If you are deploying the same containers under Kubernetes, you need a different mechanism for startup ordering.</div>
+
+<h3 id="ch5-production" data-toc>5.2 Compose in production</h3>
+<p class="topic-desc">Using Compose for single-host deployments: profiles, overrides, environment-specific configuration, and the operational realities of running a Compose stack on a server.</p>
+
+<h4 id="ch5-production-profiles">Profiles and environment separation</h4>
+<p>Profiles let you include services conditionally. A database admin tool, a debug proxy, or a test runner can be assigned a profile that is only activated when you explicitly pass <code>--profile debug</code> to <code>docker compose up</code>. Without the profile, the service is not created. This keeps a production <code>up</code> from starting debug tooling while letting you opt in with <code>docker compose --profile debug up -d</code>.</p>
+<p>Environment separation uses Compose's override system. The base <code>compose.yaml</code> declares the common structure. A <code>compose.prod.yaml</code> (merged automatically when you set <code>COMPOSE_FILE=compose.yaml:compose.prod.yaml</code> or pass <code>-f</code> twice) adds production-specific settings: resource limits, restart policies, logging constraints, and the removal of debug ports. The two files merge by key, with the override file winning for any key it declares.</p>
+
+<div class="codeWrap"><pre><code># compose.yaml (base)
+services:
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+  debug-tool:
+    image: nicolaka/netshoot
+    profiles: ["debug"]          # only starts with --profile debug
+    command: sleep infinity
+
+# compose.prod.yaml (override, merged in production)
+services:
+  api:
+    ports: []                    # remove direct port exposure
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"</code></pre></div>
+
+<div class="codeWrap"><pre><code># Running with an override
+$ docker compose -f compose.yaml -f compose.prod.yaml up -d
+# or via environment:
+$ COMPOSE_FILE=compose.yaml:compose.prod.yaml docker compose up -d
+# Verify what Compose resolved:
+$ docker compose config
+# This is the exact YAML Compose will use — always check it before deploying</code></pre></div>
+
+<h4 id="ch5-production-limits">The operational ceiling of Compose</h4>
+<p>Compose is designed for a single host. It has no scheduler, no multi-node placement, no rolling update strategy, and no self-healing beyond Docker's restart policy. When a container dies, Docker restarts it on the same host — there is no rescheduling to a healthy node because there is only one node. This makes Compose ideal for a single VPS running a handful of containers, and inadequate for anything that needs high availability across machines.</p>
+<p>The operational ceiling shows up in three places. First, updates: <code>docker compose up -d</code> does a create-new-then-stop-old swap, but there is no rolling update with health checks between steps — if the new container fails to become healthy, the old one is already stopped. Second, secrets: Compose reads from environment variables or files, but there is no integration with a secrets manager (HashiCorp Vault, AWS Secrets Manager, Kubernetes Secrets). Third, scaling: <code>docker compose up --scale api=3</code> starts three replicas of a service, but they all land on the same host with no load balancing between them.</p>
+
+<h3 id="ch5-patterns" data-toc>5.3 Patterns and pitfalls</h3>
+<p class="topic-desc">The sidecar pattern, the init-container pattern, and the Compose-specific traps that cost people weekends.</p>
+
+<h4 id="ch5-patterns-sidecar">The sidecar and adapter patterns</h4>
+<p>The sidecar pattern runs a helper container alongside the main application container in the same pod (in Kubernetes) or on the same Compose network. The helper handles a cross-cutting concern — log shipping, TLS termination, configuration reloading — so the application container stays focused on business logic. In Compose, a sidecar is just another service on the same network; in Kubernetes, it is a second container in the same pod sharing a volume and network namespace.</p>
+<p>The adapter pattern normalizes output from a heterogeneous set of services. If you have three services emitting logs in three different formats, an adapter container (or a set of adapter containers) reads from a shared volume, normalizes, and writes to stdout where a log shipper can collect it. The pattern is the same whether you use a sidecar per service or a fleet of adapters — the goal is to push format conversion out of the application code.</p>
+
+<div class="codeWrap"><pre><code># Sidecar pattern: log shipping
+services:
+  api:
+    build: ./api
+    volumes:
+      - logs:/var/log/api
+    # The api container writes logs to /var/log/api/app.log
+
+  log-shipper:
+    image: fluent/fluent-bit:3
+    volumes:
+      - logs:/var/log/api:ro          # same volume, read-only
+      - ./fluent-bit.conf:/etc/fluent-bit/fluent-bit.conf:ro
+    # fluent-bit reads /var/log/api/app.log, parses, forwards to Elasticsearch
+
+volumes:
+  logs:</code></pre></div>
+
+<div class="codeWrap"><pre><code># Init-container pattern: wait for dependencies
+services:
+  db:
+    image: postgres:17
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shop"]
+      interval: 3s
+      retries: 20
+
+  migrate:
+    image: ghcr.io/acme/migrations:1.2
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["migrate", "up"]
+    # Runs once, exits, and the deploy can proceed
+
+  api:
+    build: ./api
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 &middot; VPS: provisioning and hardening</h2>
+<p class="topic-desc">Choosing and securing a virtual private server: the initial provisioning, the hardening checklist, firewall rules, SSH configuration, and the maintenance rhythm that keeps a VPS from becoming a liability.</p>
+
+<h3 id="ch6-provision" data-toc>6.1 Provisioning a VPS</h3>
+<p class="topic-desc">Selecting a provider and plan, the first-boot sequence, user creation, and the package updates that bring a fresh VPS to a known state.</p>
+
+<h4 id="ch6-provision-firstboot">The first-boot sequence</h4>
+<p>A fresh VPS is a blank slate with a default configuration that assumes you will log in as root with a password. The first-boot sequence is: (1) log in as root with the password or SSH key the provider gave you, (2) create a non-root user with sudo, (3) disable root SSH login, (4) configure the firewall, (5) update packages, (6) install fail2ban or equivalent, (7) set the timezone and hostname. Every minute a fresh VPS sits on the public internet without steps 2–5 is a minute it is being scanned by bots.</p>
+<p>The non-root user is the single most important step. Root can do anything — delete every file, reformat the disk, change the kernel. A non-root user with sudo can do the same things but only after a password prompt (or with a grace period), which means an automated exploit that gains a shell as the non-root user cannot immediately reconfigure the SSH daemon or install a kernel module. The sudo configuration should require a password for every privilege escalation, not the default NOPASSWD that many cloud images ship with.</p>
+
+<div class="codeWrap"><pre><code># First-boot hardening script (Ubuntu/Debian)
+#!/bin/bash
+set -euo pipefail
+
+# 1. Update and upgrade
+apt-get update &amp;&amp; apt-get upgrade -y
+apt-get install -y ufw fail2ban unattended-upgrades
+
+# 2. Create admin user
+useradd -m -s /bin/bash admin
+usermod -aG sudo admin
+mkdir -p /home/admin/.ssh
+cp /root/.ssh/authorized_keys /home/admin/.ssh/
+chown -R admin:admin /home/admin/.ssh
+chmod 700 /home/admin/.ssh
+chmod 600 /home/admin/.ssh/authorized_keys
+
+# 3. Harden SSH
+sed -i 's/#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+sed -i 's/#PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+sed -i 's/#PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+systemctl restart sshd
+
+# 4. Firewall
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22/tcp comment 'SSH'
+ufw allow 80/tcp comment 'HTTP'
+ufw allow 443/tcp comment 'HTTPS'
+ufw --force enable</code></pre></div>
+
+<div class="codeWrap"><pre><code># After the script: verify before disconnecting root
+$ ssh admin@your-vps "whoami"
+admin
+$ ssh admin@your-vps "sudo -n true" 2>&1 || echo "sudo needs password - good"
+sudo -n true
+a password is required
+$ sudo reboot   # test that sudo works, then reboot to apply all changes
+# If you locked yourself out, most providers offer a web console as a fallback</code></pre></div>
+
+<h3 id="ch6-hardening" data-toc>6.2 Hardening the attack surface</h3>
+<p class="topic-desc">Closing unnecessary ports, configuring the firewall, disabling password authentication, and the SSH hardening that turns a default server into one that survives the automated scan-and-exploit ecosystem.</p>
+
+<h4 id="ch6-hardening-ssh">SSH hardening</h4>
+<p>The SSH daemon is the most attacked service on any internet-facing server. The defaults are designed for convenience: root login allowed, password authentication enabled, the standard port 22. Each of those is a liability. Disabling root login forces an attacker to guess a username as well as a password. Disabling password authentication and requiring SSH keys removes the password-guessing attack surface entirely — an attacker cannot brute-force a 2048-bit RSA key the way they can brute-force a password. Changing the port from 22 to a high-numbered port reduces log noise from automated scanners (though it is security through obscurity, not a real defense).</p>
+<p>Beyond the basics: limit which users can SSH in (<code>AllowUsers admin deploy</code>), set a short login grace time (<code>LoginGraceTime 30</code>), disable X11 forwarding and TCP forwarding if you do not need them (<code>X11Forwarding no</code>, <code>AllowTcpForwarding no</code>), and use <code>fail2ban</code> to temporarily ban IPs that fail authentication too many times. The <code>PermitRootLogin no</code> and <code>PasswordAuthentication no</code> pair is the most important; everything else is defense in depth.</p>
+
+<div class="codeWrap"><pre><code># /etc/ssh/sshd_config - the lines that matter
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+PermitEmptyPasswords no
+AllowUsers admin deploy
+LoginGraceTime 30
+MaxAuthTries 3
+X11Forwarding no
+AllowTcpForwarding no
+ClientAliveInterval 300
+ClientAliveCountMax 2
+# After editing:
+$ sudo sshd -t          # test the config — catches syntax errors
+$ sudo systemctl restart sshd</code></pre></div>
+
+<div class="codeWrap"><pre><code># fail2ban: ban IPs that fail too many times
+# /etc/fail2ban/jail.local
+[sshd]
+enabled = true
+port = ssh
+maxretry = 5
+bantime = 3600
+findtime = 600
+# 5 failures in 10 minutes → ban for 1 hour
+# Check status:
+$ sudo fail2ban-client status sshd
+Status for the jail: sshd
+|- Filter
+|  |- Currently failed: 2
+|  |- Total failed: 47
+|  `- File list: /var/log/auth.log
+`- Actions
+   |- Currently banned: 1
+   |- Total banned: 12
+   `- Banned IP list: 203.0.113.42</code></pre></div>
+
+<h4 id="ch6-hardening-firewall">Firewall and network exposure</h4>
+<p>The firewall rule is simple: deny everything incoming by default, allow only the ports you need (SSH, HTTP, HTTPS), and allow everything outgoing. Uncomplicated Firewall (ufw) on Ubuntu and firewalld on RHEL/CentOS both express this in a few commands. The principle is that every open port is an attack surface: a service listening on a port can have vulnerabilities, and the fewer services exposed, the fewer vulnerabilities to patch.</p>
+<p>Beyond the firewall: disable IPv6 if you are not using it (an open IPv6 port bypasses an IPv4-only firewall), configure the kernel to ignore ICMP redirects and source-routed packets (<code>net.ipv4.conf.all.accept_redirects = 0</code>), and enable SYN cookies (<code>net.ipv4.tcp_syncookies = 1</code>) to mitigate SYN flood attacks. These are one-line <code>sysctl</code> settings that go in <code>/etc/sysctl.conf</code> and persist across reboots.</p>
+
+<h3 id="ch6-maintenance" data-toc>6.3 Maintenance and the update rhythm</h3>
+<p class="topic-desc">Automated security updates, the patching cadence, backup strategy, and the monitoring that tells you when something goes wrong before your users do.</p>
+
+<h4 id="ch6-maintenance-updates">Unattended upgrades and the patch cadence</h4>
+<p>The single most effective security practice on a VPS is keeping packages updated. Vulnerabilities in OpenSSL, the kernel, OpenSSH, and other core components are discovered and exploited within hours. Manual patching cannot keep up; automated patching can. Ubuntu's <code>unattended-upgrades</code> package installs security updates automatically, reboots if the kernel was updated (configurable), and emails you the result. The alternative — a monthly patching window — leaves you vulnerable for up to a month.</p>
+<p>Automated updates are not risk-free: a bad update can break a service. The mitigation is to have a rollback strategy (a snapshot or a backup) and to monitor after updates. On a single VPS, the practical approach is to take a snapshot before major updates (most providers offer this as a one-click operation), enable automated security updates for everything else, and have a monitoring check that alerts you if a critical service goes down after an update window.</p>
+
+<div class="codeWrap"><pre><code># Enable automated security updates (Ubuntu/Debian)
+sudo apt-get install unattended-upgrades
+sudo dpkg-reconfigure -plow unattended-upgrades
+# /etc/apt/apt.conf.d/50unattended-upgrades - the key lines:
+Unattended-Upgrade::Allowed-Origins {
+    "${distro_id}:${distro_codename}-security";
+};
+Unattended-Upgrade::Automatic-Reboot "false";   # set true if you can reboot safely
+Unattended-Upgrade::Mail "admin@example.com";
+# Check what's pending:
+$ apt-get -s upgrade | grep -i security</code></pre></div>
+
+<div class="codeWrap"><pre><code># Backup strategy: dump what matters, test the restore
+# Database backup
+$ pg_dump -U shop shop | gzip &gt; /backups/shop-$(date +%F).sql.gz
+# File backup with rsync
+$ rsync -avz --delete /var/www/ /backups/www-$(date +%F)/
+# Or use a tool like restic for deduplicated, encrypted backups to S3:
+$ restic -r s3:https://s3.amazonaws.com/mybackups backup /var/www /etc
+$ restic -r s3:https://s3.amazonaws.com/mybackups snapshots
+# Test the restore — an untested backup is a rumor, not a backup</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 &middot; LXC and LXD: system containers</h2>
+<p class="topic-desc">System containers as a middle ground between VMs and application containers: LXC's kernel-level primitives, LXD's management layer, and the use cases where a system container beats both a VM and a Docker container.</p>
+
+<h3 id="ch7-concepts" data-toc>7.1 LXC concepts</h3>
+<p class="topic-desc">How LXC differs from Docker at the kernel level, what a system container provides that an application container does not, and the isolation model that makes LXC feel like a VM.</p>
+
+<h4 id="ch7-concepts-vs-docker">LXC versus application containers</h4>
+<p>Docker containers run a single application process. The container's PID 1 is your application — a web server, a database, a queue worker. There is no init system by default, no cron daemon, no syslog, no systemd. LXC containers, by contrast, run a full init system: PID 1 is systemd or another init, and the container boots like a VM — it has cron jobs, system daemons, multiple processes managed by init, and a full <code>/etc</code>. The result is that an LXC container behaves like a VM: you can SSH into it, run <code>systemctl</code> to manage services, and install packages with <code>apt</code>, all while sharing the host kernel.</p>
+<p>The kernel-level difference is that LXC uses the same primitives Docker uses (namespaces, cgroups) but with a different configuration: LXC gives the container a full filesystem (not layered image mounts), a full network stack (not a virtual Ethernet pair on a bridge), and a process tree managed by an init system (not a single application process). The performance is closer to a VM than to a Docker container — there is more overhead than Docker's minimalist approach, but far less than a VM's full kernel boot. An LXC container starts in seconds, not milliseconds, because it boots an init system.</p>
+
+<div class="codeWrap"><pre><code># Inside an LXC container: it's a full OS
+$ lxc launch ubuntu:24.04 mycontainer
+$ lxc exec mycontainer -- bash
+root@mycontainer:~# ps aux
+PID   USER     TIME  COMMAND
+    1 root      0:00 /sbin/init         # systemd, not an application
+    2 root      0:00 systemd-journald
+    3 root      0:00 systemd-networkd
+   12 root      0:00 sshd
+   18 root      0:00 cron
+root@mycontainer:~# systemctl status ssh
+● ssh.service - OpenBSD Secure Shell server
+     Active: active (running)
+root@mycontainer:~# apt-get install nginx
+# Full package management, full service management — it's a VM-shaped thing</code></pre></div>
+
+<div class="codeWrap"><pre><code># Inside a Docker container: it's a single process
+$ docker run -it ubuntu:24.04 bash
+root@a1b2c3:/# ps aux
+PID   USER     TIME  COMMAND
+    1 root      0:00 bash          # your shell is PID 1, no systemd
+root@a1b2c3:/# systemctl status ssh
+System has not been booted with systemd as init system (PID 1).
+# One process tree, one application, no init — minimal and fast</code></pre></div>
+
+<h3 id="ch7-lxd" data-toc>7.2 LXD: the management layer</h3>
+<p class="topic-desc">LXD's architecture, the <code>lxc</code> command, image management, storage backends, and how LXD makes system containers as easy to manage as Docker makes application containers.</p>
+
+<h4 id="ch7-lxd-command">The lxc command surface</h4>
+<p>LXD is a daemon (<code>lxd</code>) that manages LXC containers through a REST API. The <code>lxc</code> command is the CLI client. The core operations are: <code>lxc launch &lt;image&gt; &lt;name&gt;</code> to create and start a container from an image, <code>lxc exec &lt;name&gt; -- &lt;command&gt;</code> to run a command inside, <code>lxc stop</code> / <code>lxc start</code> / <code>lxc restart</code> to manage the lifecycle, <code>lxc delete</code> to remove, and <code>lxc list</code> to see what is running. Images come from remote image servers (the default is the Ubuntu image server) or can be imported from a tarball.</p>
+<p>LXD manages storage through storage backends: <code>dir</code> (a directory, the default), <code>lvm</code> (logical volumes), <code>btrfs</code> (subvolumes), <code>zfs</code> (datasets), and <code>ceph</code> (distributed storage). The choice affects snapshot performance, copy-on-write efficiency, and thin provisioning. For most workloads, <code>dir</code> with btrfs on the host is a good default — it gives you fast snapshots and copy-on-write without dedicated LVM configuration. ZFS is the traditional favorite for its data integrity features; Ceph is for clusters where storage must be distributed.</p>
+
+<div class="codeWrap"><pre><code># LXD essentials
+$ lxc launch ubuntu:24.04 web1           # create + start
+$ lxc list
++------+---------+----------------------+------+-----------+-----------+
+| NAME |  STATE  |         IPV4         | IPV6 |   TYPE    | SNAPSHOTS |
++------+---------+----------------------+------+-----------+-----------+
+| web1 | RUNNING | 10.10.10.5 (eth0)    |      | CONTAINER | 0         |
++------+---------+----------------------+------+-----------+-----------+
+$ lxc exec web1 -- apt-get update
+$ lxc exec web1 -- apt-get install nginx
+$ lxc file push ./default.conf web1/etc/nginx/sites-available/default
+$ lxc snapshot web1 snap1                  # snapshot (btrfs/zfs: instant)
+$ lxc restore web1 snap1                   # restore from snapshot</code></pre></div>
+
+<div class="codeWrap"><pre><code># Storage and networking configuration
+$ lxc storage list
++--------+--------+--------+
+|  NAME  | DRIVER | USED BY |
++--------+--------+--------+
+| default| btrfs  | 3      |
++--------+--------+--------+
+$ lxc network list
++----------+---------+----------------+
+|   NAME   |  TYPE   |     IPV4       |
++----------+---------+----------------+
+| lxdbr0   | bridge  | 10.10.10.1/24  |
++----------+---------+----------------+
+| eth0     | physical| (the host NIC) |
++----------+---------+----------------+
+$ lxc config device add web1 disk0 disk source=/data path=/mnt/data
+# Attaching host directories as bind mounts into the container</code></pre></div>
+
+<h3 id="ch7-usecases" data-toc>7.3 Use cases and the comparison</h3>
+<p class="topic-desc">When to choose a system container over a VM or a Docker container, the performance and density comparison, and the operational trade-offs of LXC's shared-kernel model.</p>
+
+<h4 id="ch7-usecases-when">When LXC wins</h4>
+<p>LXC is the right tool when you need something that behaves like a VM but you do not want the overhead of a full VM. The classic use cases: running a full LAMP stack that needs a real init system and cron jobs, hosting multiple isolated development environments on one physical machine, running a legacy application that expects a full OS (systemd, /etc/init.d scripts, specific kernel modules), and building a homelab where you want VM-like isolation without allocating 2 GB of RAM per "VM." LXC gives you a full OS in 100 MB of RAM and a boot time of two seconds, compared to a VM's 2 GB and thirty seconds.</p>
+<p>LXC also shines for workloads that need kernel-level access or specific kernel modules. Because LXC containers share the host kernel, a module loaded on the host (a VPN driver, a custom filesystem, a network driver) is available to every container without being loaded per-container. In a VM, you would need to load the module in every guest. This makes LXC ideal for network appliances, storage servers, and any workload that depends on kernel features the host provides.</p>
+
+<table>
+<tr><th>Dimension</th><th>Bare metal</th><th>VM (KVM)</th><th>LXC container</th><th>Docker container</th></tr>
+<tr><td>Boot time</td><td>Minutes</td><td>~30 seconds</td><td>~2 seconds</td><td>~50 milliseconds</td></tr>
+<tr><td>RAM overhead</td><td>—</td><td>~512 MB + guest OS</td><td>~100 MB</td><td>~10 MB</td></tr>
+<tr><td>Kernel</td><td>Host</td><td>Guest (own kernel)</td><td>Host (shared)</td><td>Host (shared)</td></tr>
+<tr><td>Init system</td><td>Full</td><td>Full</td><td>Full</td><td>None (single process)</td></tr>
+<tr><td>Isolation</td><td>—</td><td>Hardware-level</td><td>Kernel-level</td><td>Kernel-level</td></tr>
+<tr><td>Density per host</td><td>1</td><td>10–30</td><td>50–200</td><td>200–1000+</td></tr>
+<tr><td>Best for</td><td>Bare-metal perf</td><td>Multi-OS, strong isolation</td><td>VM-like workloads, homelabs</td><td>Microservices, CI</td></tr>
+</table>
+
+<div class="warn">LXC's shared kernel is both its strength and its weakness. A kernel exploit in an LXC container escapes to the host and every other container. A VM's guest kernel exploit is contained within the VM. If you are running untrusted workloads or workloads from different trust domains, VMs (or Kata Containers / gVisor, which add a kernel shim) are the safer choice.</div>
+
+<div class="codeWrap"><pre><code># Density comparison: what fits on one host
+# A host with 32 GB RAM, 8 cores:
+#   - VMs: ~10 (3 GB each, with overhead)
+#   - LXC:  ~50 (500 MB each)
+#   - Docker: ~200+ (128 MB each)
+# The right density depends on isolation needs, not just RAM.</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch8" data-toc>8 &middot; Kubernetes: the control plane</h2>
+<p class="topic-desc">Kubernetes architecture, the API server and etcd, how the control plane makes decisions, and the installation options that range from a single-node minikube to a production-grade kubeadm cluster.</p>
+
+<h3 id="ch8-architecture" data-toc>8.1 Architecture and core components</h3>
+<p class="topic-desc">The control plane (API server, scheduler, controller manager, etcd) and the worker nodes (kubelet, kube-proxy, container runtime), how they communicate, and what each component owns.</p>
+
+<h4 id="ch8-architecture-control">The control plane: brain of the cluster</h4>
+<p>The control plane is a set of processes that maintains the cluster's desired state. The <strong>API server</strong> (<code>kube-apiserver</code>) is the front end: every component — <code>kubectl</code>, the scheduler, the controller manager, the kubelet — talks to it over a REST API. It is the only component that talks to <strong>etcd</strong>, the distributed key-value store that holds every cluster object (pods, services, deployments, secrets, config maps). When you run <code>kubectl apply -f deployment.yaml</code>, the YAML is sent to the API server, which validates it, stores it in etcd, and returns success. The cluster's entire state lives in etcd; if etcd loses data, the cluster loses its memory.</p>
+<p>The <strong>scheduler</strong> (<code>kube-scheduler</code>) watches for pods that have no node assigned and picks a node for each one, considering resource requests, affinity rules, taints and tolerations, and topology constraints. The <strong>controller manager</code> (<code>kube-controller-manager</code>) runs the control loops that drive the cluster toward the desired state: the deployment controller ensures the right number of replicas are running, the node controller monitors node health, the service account controller manages tokens. The pattern is the same for every controller: observe the current state, compare it to the desired state, take action to close the gap, repeat.</p>
+
+<div class="codeWrap"><pre><code># What the control plane looks like on a kubeadm node
+$ kubectl get pods -n kube-system
+NAME                              READY   STATUS    RESTARTS
+etcd-control-plane                1/1     Running   1
+kube-apiserver-control-plane      1/1     Running   1
+kube-controller-manager-...       1/1     Running   1
+kube-scheduler-...                1/1     Running   0
+# Every control-plane component runs as a static pod — a pod whose manifest
+# is in /etc/kubernetes/manifests/ and is managed by the kubelet directly,
+# without going through the scheduler</code></pre></div>
+
+<div class="codeWrap"><pre><code># The etcd store: every object in the cluster
+$ sudo ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  get / --prefix --keys-only | head -20
+/registry/configmaps/default/kubernetes
+/registry/deployments/default/nginx
+/registry/nodes/worker-1
+/registry/pods/default/nginx-7d4f8b9c5-x2v8z
+/registry/secrets/default/default-token-x9k2m
+# The entire cluster state is these keys. Back up etcd, back up everything.</code></pre></div>
+
+<h4 id="ch8-architecture-worker">Worker nodes: where the work runs</h4>
+<p>Each worker node runs three components. The <strong>kubelet</strong> is the node agent: it watches the API server for pods assigned to this node, tells the container runtime to start or stop containers, and reports pod status back to the API server. <strong>kube-proxy</strong> maintains network rules on the node — iptables or IPVS rules that implement service virtual IPs and load balancing. The <strong>container runtime</strong> (containerd or CRI-O) is what actually creates and runs the containers, pulling images and configuring namespaces and cgroups.</p>
+<p>The communication model is hub-and-spoke: every component talks to the API server, and no component talks directly to another. The scheduler does not tell the kubelet to start a pod — it writes an assignment to the API server, and the kubelet sees the assignment and acts. This decoupled design means any component can be restarted or replaced without the others noticing, and the API server is the single source of truth. It also means the API server is the bottleneck: a cluster with thousands of nodes and tens of thousands of pods can overwhelm a single API server instance, which is why production clusters run multiple API server replicas behind a load balancer.</p>
+
+<h3 id="ch8-install" data-toc>8.2 Installation options</h3>
+<p class="topic-desc">The spectrum from local development (minikube, kind, k3d) to production (kubeadm, kubespray, managed services), and the trade-offs of each.</p>
+
+<h4 id="ch8-install-local">Local development clusters</h4>
+<p><code>minikube</code>, <code>kind</code> (Kubernetes IN Docker), and <code>k3d</code> (K3s in Docker) all run a Kubernetes cluster on your laptop, but they take different approaches. minikube creates a VM (or uses a container) and runs a full cluster inside it — the closest to production but the heaviest. kind runs each cluster node as a Docker container, which is lighter and faster but uses Docker as the node boundary, not a real VM. k3d runs K3s (a lightweight Kubernetes distribution) in Docker containers, optimized for speed and low resource use.</p>
+<p>The choice matters less than the habit: whatever tool you use, deploy to it the same way you deploy to production (via <code>kubectl apply</code>, Helm, or a GitOps tool), so the YAML you test is the YAML that ships. The danger of local clusters is that they tolerate things production does not — a single node, no network policies, no resource limits — and you develop against a fantasy environment.</p>
+
+<div class="codeWrap"><pre><code># Fastest path to a local cluster
+$ kind create cluster --name dev
+$ kubectl cluster-info
+Kubernetes control plane is running at https://127.0.0.1:34567
+$ kubectl apply -f deployment.yaml
+$ kubectl get pods
+# kind: Docker containers as nodes, full API server, ~30 seconds to start
+# k3d: even lighter (K3s), ~10 seconds, but K3s is a different distribution</code></pre></div>
+
+<h4 id="ch8-install-prod">Production installation: kubeadm and managed services</h4>
+<p>For a self-managed production cluster, <code>kubeadm</code> is the standard tool. It bootstraps a cluster: initializes the control plane on the first node, generates certificates, configures etcd, and prints a join command for worker nodes. You run <code>kubeadm init</code> on the control-plane node, set up kubeconfig, install a CNI (Container Network Interface) plugin — Calico, Cilium, or Flannel — and then <code>kubeadm join</code> on each worker. The result is a production-grade cluster you own entirely, including upgrades, certificate rotation, and etcd backups.</p>
+<p>Managed Kubernetes (EKS, GKE, AKS) trade control for convenience. The cloud provider runs the control plane — API server, scheduler, controller manager, etcd — as a managed service with SLAs, automatic upgrades, and multi-master replication. You manage only the worker nodes (or even those are managed, in the case of Fargate or GKE Autopilot). The cost is a control-plane fee (typically $70–100/month for the managed control plane) and a reduced ability to customize the control plane. For most teams, managed Kubernetes is the right default: the control plane is the hardest part to operate, and the provider's team is better at it than yours.</p>
+
+<div class="codeWrap"><pre><code># kubeadm: the production bootstrap
+# On the control-plane node:
+$ sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+# ... output includes the join command for workers
+$ mkdir -p $HOME/.kube
+$ sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+# Install a CNI (Calico in this example):
+$ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
+# On each worker node:
+$ sudo kubeadm join &lt;control-plane-ip&gt;:6443 --token &lt;token&gt; \
+  --discovery-token-ca-cert-hash sha256:&lt;hash&gt;</code></pre></div>
+
+<h3 id="ch8-objects" data-toc>8.3 Core objects and the API model</h3>
+<p class="topic-desc">Pods, Deployments, Services, and the other objects that make up a Kubernetes application, and the label/selector model that connects them.</p>
+
+<h4 id="ch8-objects-pods">Pods: the unit of deployment</h4>
+<p>A pod is the smallest deployable unit in Kubernetes: one or more containers that share a network namespace (same IP, same ports) and can share volumes. You almost never create pods directly — you create a higher-level object (Deployment, StatefulSet, DaemonSet, Job) that manages pods. The pod is the scheduling unit: the scheduler assigns pods to nodes, and the kubelet on that node starts the pod's containers. If a container in a pod dies, the kubelet restarts it (per the pod's restart policy); if the pod itself is deleted, it is gone.</p>
+<p>The key insight is that a pod is a logical host, not a VM. Containers in the same pod communicate over <code>localhost</code> because they share a network namespace — this is the sidecar pattern in Kubernetes (an Envoy proxy next to your application container). Volumes in a pod are shared by all its containers, which is how an init container can write files that the main container reads. But the pod is ephemeral: when the pod is deleted, its containers, IP, and writable storage are gone. Persistent data lives outside the pod, in PersistentVolumes.</p>
+
+<div class="codeWrap"><pre><code># A pod with an init container and a main container
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  labels:
+    app: myapp
+spec:
+  initContainers:
+  - name: wait-for-db
+    image: busybox:1.36
+    command: ['sh', '-c', 'until nslookup db; do sleep 2; done']
+    # Runs to completion before the main container starts
+  containers:
+  - name: app
+    image: myapp:1.4.2
+    ports:
+    - containerPort: 3000
+    env:
+    - name: DATABASE_URL
+      value: "postgres://db:5432/myapp"</code></pre></div>
+
+<h4 id="ch8-objects-deployments">Deployments and the reconciliation loop</h4>
+<p>A Deployment manages a set of identical pods (replicas) and ensures the desired number are running. You specify a pod template and a replica count; the Deployment controller watches the cluster and takes action to match reality to the spec. If a pod dies, the controller creates a replacement. If you change the image tag, the controller creates new pods and deletes old ones in a rolling update (by default: at most one pod unavailable during the update, at most one extra pod created). The Deployment is the object you interact with 95% of the time in Kubernetes.</p>
+<p>The label/selector model is what connects objects. A Deployment has a selector (e.g., <code>app=myapp</code>) and creates pods with that label. A Service has a selector (<code>app=myapp</code>) and load-balances traffic to all pods matching that label. The Deployment does not know about the Service; the Service does not know about the Deployment. They are connected only by the label, which means you can update the Deployment (new image) and the Service automatically routes traffic to the new pods. This loose coupling is the core design principle of Kubernetes.</p>
+
+<div class="codeWrap"><pre><code># A Deployment and Service connected by labels
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp              # selects which pods this manages
+  template:
+    metadata:
+      labels:
+        app: myapp            # pods get this label
+    spec:
+      containers:
+      - name: app
+        image: myapp:1.4.2
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  selector:
+    app: myapp               # routes to pods with this label
+  ports:
+  - port: 80
+    targetPort: 3000</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch9" data-toc>9 &middot; Kubernetes workloads and services</h2>
+<p class="topic-desc">Deployments, StatefulSets, DaemonSets, and Jobs: the four workload controllers, when each is right, and how Services and Ingress expose them to the world.</p>
+
+<h3 id="ch9-deployments" data-toc>9.1 Deployments and stateless workloads</h3>
+<p class="topic-desc">The Deployment controller in depth: rolling updates, rollbacks, scaling, and the health checks that make them work.</p>
+
+<h4 id="ch9-deployments-rolling">Rolling updates and rollbacks</h4>
+<p>When you update a Deployment — change the image tag, modify an environment variable — the controller performs a rolling update. It creates a new ReplicaSet (the new version), scales it up gradually, and scales the old ReplicaSet down to zero. The <code>maxUnavailable</code> and <code>maxSurge</code> parameters control the pace: <code>maxUnavailable: 1</code> means at most one pod is down during the update; <code>maxSurge: 1</code> means at most one extra pod is created beyond the desired replica count. With 3 replicas and <code>maxUnavailable: 1</code>, the update proceeds one pod at a time: create a new pod, wait for it to be ready, delete an old pod, repeat.</p>
+<p>The rollback is automatic in the sense that the old ReplicaSet is not deleted — it is scaled to zero but retained. <code>kubectl rollout undo deployment/myapp</code> scales the old ReplicaSet back up and the new one down, reverting to the previous version. The history is kept (default 10 revisions, configurable with <code>revisionHistoryLimit</code>), so you can roll back to any recent version. The rollback is not instantaneous: it follows the same rolling update strategy, so it takes as long as the original rollout.</p>
+
+<div class="codeWrap"><pre><code># A Deployment with update strategy and health checks
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels: { app: myapp }
+  template:
+    metadata:
+      labels: { app: myapp }
+    spec:
+      containers:
+      - name: app
+        image: myapp:1.4.2
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20</code></pre></div>
+
+<div class="codeWrap"><pre><code># Scaling and rolling operations
+$ kubectl scale deployment/myapp --replicas=5
+$ kubectl rollout status deployment/myapp
+$ kubectl rollout history deployment/myapp
+$ kubectl rollout undo deployment/myapp --to-revision=3
+$ kubectl set image deployment/myapp app=myapp:1.4.3
+$ kubectl rollout pause deployment/myapp      # hold mid-rollout
+$ kubectl rollout resume deployment/myapp     # continue
+# The readiness probe is what makes rolling updates safe:
+# a pod that fails readiness is removed from the Service endpoints,
+# so it stops receiving traffic before the liveness probe would kill it</code></pre></div>
+
+<h3 id="ch9-services" data-toc>9.2 Services and networking</h3>
+<p class="topic-desc">ClusterIP, NodePort, LoadBalancer, and Headless services; how kube-proxy implements them; and how Ingress and Gateway API expose HTTP services to the outside world.</p>
+
+<h4 id="ch9-services-types">The four service types</h4>
+<p>A Service is a stable virtual IP (ClusterIP) that load-balances traffic to a set of pods selected by label. <strong>ClusterIP</strong> (the default) is reachable only from inside the cluster — it is how your API talks to your database. <strong>NodePort</strong> opens a port on every node (30000–32767 by default) that routes to the Service — useful for development or when you have no load balancer. <strong>LoadBalancer</strong> provisions an external load balancer from the cloud provider (an AWS ALB, a GCP Load Balancer) that routes to the Service — the standard for production HTTP traffic. <strong>Headless</strong> (<code>clusterIP: None</code>) returns the pod IPs directly from DNS instead of a virtual IP, which is what StatefulSets use for stable network identities.</p>
+<p>kube-proxy implements the Service virtual IP with iptables or IPVS rules on each node. When a packet arrives for the Service's ClusterIP, the kernel rewrites the destination to one of the pod IPs (chosen round-robin). The rewrite happens in the kernel, so there is no userspace proxy in the data path — performance is close to direct pod-to-pod traffic. The endpoints are watched continuously: when pods are added or removed (by the Deployment controller, by a rollout, by a scale event), kube-proxy updates the iptables rules, and traffic flows to the new set of pods within seconds.</p>
+
+<div class="codeWrap"><pre><code># A LoadBalancer service for production HTTP
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  type: LoadBalancer
+  selector:
+    app: myapp
+  ports:
+  - port: 80
+    targetPort: 3000
+  - port: 443
+    targetPort: 3000
+# The cloud provider provisions a load balancer, and its DNS name
+# becomes the public endpoint for your application</code></pre></div>
+
+<div class="codeWrap"><pre><code># A headless service for a StatefulSet
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  clusterIP: None          # headless: DNS returns pod IPs, not a VIP
+  selector:
+    app: db
+  ports:
+  - port: 5432
+# DNS lookup returns:
+#   db-0.db.default.svc.cluster.local → 10.1.2.3
+#   db-1.db.default.svc.cluster.local → 10.1.2.4
+# Each pod gets a stable DNS name that survives rescheduling</code></pre></div>
+
+<h4 id="ch9-services-ingress">Ingress and the Gateway API</h4>
+<p>An Ingress is a Layer 7 (HTTP/HTTPS) load balancer defined as a Kubernetes object. It maps hostnames and paths to Services: <code>api.example.com/v1</code> → <code>myapp:80</code>, <code>api.example.com/v2</code> → <code>myapp-v2:80</code>. The Ingress resource is just a specification; an Ingress controller (nginx-ingress, Traefik, HAProxy Ingress, or the cloud provider's controller) watches for Ingress objects and configures the actual load balancer. The controller runs as a DaemonSet or Deployment in the cluster and manages the external load balancer (or an in-cluster nginx) that fronts all HTTP traffic.</p>
+<p>The Gateway API is the successor to Ingress, designed to fix its limitations: Ingress has no standard way to express traffic splitting (canary releases), no separation between infrastructure provider and application developer, and no standard for TCP/UDP routing. Gateway API introduces GatewayClass (the infrastructure), Gateway (the listener, owned by the platform team), and HTTPRoute (the routing rules, owned by the application team). For new projects, evaluate Gateway API; for existing projects, Ingress is still the pragmatic default.</p>
+
+<h3 id="ch9-stateful" data-toc>9.3 Stateful workloads</h3>
+<p class="topic-desc">StatefulSets for databases and other stateful applications, the stable identity and storage model, and when to run a database in Kubernetes versus outside it.</p>
+
+<h4 id="ch9-stateful-sets">StatefulSets: identity and order</h4>
+<p>A StatefulSet is like a Deployment but with two guarantees: stable network identity (each pod gets a predictable name: <code>db-0</code>, <code>db-1</code>, <code>db-2</code>, and the DNS name <code>db-0.db.default.svc.cluster.local</code> survives rescheduling) and stable storage (each pod gets its own PersistentVolumeClaim that follows it across restarts). The pods are created and deleted in order (<code>db-0</code> before <code>db-1</code>), which matters for applications that form a cluster and need to discover each other in a defined order.</p>
+<p>The storage model is the critical part. Each pod in a StatefulSet mounts its own PersistentVolumeClaim, backed by a StorageClass that defines how volumes are provisioned (AWS EBS, GCP PD, Ceph RBD, local storage). When <code>db-0</code> is rescheduled to a different node, its PersistentVolume is detached from the old node and attached to the new one, and the pod starts with the same data. This is how you run a database in Kubernetes — but it is also why many teams choose not to. The operational complexity of running a database (backups, failover, replication, capacity planning) is high even without Kubernetes adding its own layer of complexity.</p>
+
+<div class="codeWrap"><pre><code># A StatefulSet for a PostgreSQL primary with one replica
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+spec:
+  serviceName: db
+  replicas: 2
+  selector:
+    matchLabels: { app: db }
+  template:
+    metadata:
+      labels: { app: db }
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:17
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 50Gi
+# Each pod gets its own 50 GB volume. db-0 and db-1 have separate storage.</code></pre></div>
+
+<div class="warn">Running databases in Kubernetes is a legitimate choice (GitLab, CockroachDB, and many others do it), but it is an advanced one. The failure modes are subtle: a volume attachment failure during a node drain can leave a database pod stuck in ContainerCreating; a storage performance mismatch can cause replication lag; a misconfigured eviction can trigger a failover at the worst moment. If your team does not already operate Kubernetes well, run your database outside it (managed RDS, a dedicated VM, or a separate bare-metal server) and keep Kubernetes for stateless application workloads.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch10" data-toc>10 &middot; Kubernetes configuration, storage and RBAC</h2>
+<p class="topic-desc">ConfigMaps and Secrets for configuration, PersistentVolumes and StorageClasses for storage, and Role-Based Access Control for the authorization model that keeps a cluster safe.</p>
+
+<h3 id="ch10-config" data-toc>10.1 ConfigMaps and Secrets</h3>
+<p class="topic-desc">The configuration model: ConfigMaps for non-sensitive data, Secrets for sensitive data, how they are injected into pods, and the patterns for managing configuration across environments.</p>
+
+<h4 id="ch10-config-configmaps">ConfigMaps: non-sensitive configuration</h4>
+<p>A ConfigMap is a Kubernetes object that stores key-value pairs of configuration data. You create it imperatively (<code>kubectl create configmap app-config --from-file=config.yaml</code>) or declaratively (a YAML manifest). It can then be injected into pods in three ways: as environment variables (each key becomes an env var), as a volume mount (each key becomes a file), or as a command-line argument. The volume mount approach is preferred for anything but the simplest configuration because it does not require a pod restart to update — when the ConfigMap changes, the files in the mounted volume update automatically (within a minute, propagated by the kubelet).</p>
+<p>ConfigMaps are not encrypted. They are stored in etcd as plain text, and anyone with read access to the namespace can see their contents. This is fine for non-sensitive configuration (feature flags, log levels, connection pool sizes) and wrong for anything sensitive (passwords, API keys, TLS certificates). The size limit is 1 MB per ConfigMap (etcd's value size limit), which is enough for most configuration but not for large files or binary data — for that, use a volume mount from an external source.</p>
+
+<div class="codeWrap"><pre><code># A ConfigMap and a Deployment that consumes it
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  app.yaml: |
+    server:
+      port: 3000
+      timeout: 30s
+    database:
+      pool_size: 10
+      ssl_mode: require
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        image: myapp:1.4.2
+        volumeMounts:
+        - name: config
+          mountPath: /etc/app
+      volumes:
+      - name: config
+        configMap:
+          name: app-config
+# The file /etc/app/app.yaml inside the container is the ConfigMap content.
+# Update the ConfigMap, the file updates, the app re-reads it (if designed to).</code></pre></div>
+
+<div class="codeWrap"><pre><code># Environment variable injection (simpler but requires restart to update)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-env
+data:
+  LOG_LEVEL: info
+  DATABASE_POOL: "10"
+---
+# In the container spec:
+env:
+- name: LOG_LEVEL
+  valueFrom:
+    configMapKeyRef:
+      name: app-env
+      key: LOG_LEVEL
+# All keys in the ConfigMap become env vars — no volume mount needed,
+# but the pod must be restarted to pick up changes</code></pre></div>
+
+<h3 id="ch10-storage" data-toc>10.2 Persistent storage</h3>
+<p class="topic-desc">PersistentVolumes, PersistentVolumeClaims, StorageClasses, and the dynamic provisioning model that separates storage infrastructure from storage consumption.</p>
+
+<h4 id="ch10-storage-pv">PVs, PVCs, and dynamic provisioning</h4>
+<p>The storage model separates three concerns. A <strong>PersistentVolume</strong> (PV) is a piece of storage in the cluster — an EBS volume, a GCP PD, an NFS share, a Ceph RBD image. A <strong>PersistentVolumeClaim</strong> (PVC) is a request for storage: "I need 50 GB of read-write storage." A <strong>StorageClass</strong> defines how PVs are provisioned: the provisioner (e.g., <code>ebs.csi.aws.com</code>), parameters (volume type, IOPS, encryption), and reclaim policy. When a PVC references a StorageClass, the provisioner dynamically creates a PV that matches the request and binds it to the PVC — no manual PV creation needed.</p>
+<p>The binding is a matching process: a PVC requests a size, an access mode (ReadWriteOnce, ReadOnlyMany, ReadWriteMany), and optionally a StorageClass. The cluster finds a PV that matches (or provisions one dynamically) and binds the two. The binding is exclusive — one PVC binds to one PV, and one PV is bound to one PVC at a time. When the PVC is deleted, the PV's reclaim policy determines what happens: <code>Delete</code> removes the volume and its data, <code>Retain</code> keeps the volume for manual recovery, <code>Recycle</code> (deprecated) wipes the data for reuse.</p>
+
+<div class="codeWrap"><pre><code># A StorageClass and a PVC that uses it
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast-ssd
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp3
+  iops: "3000"
+  encrypted: "true"
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-data
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 50Gi
+# On creation, the AWS EBS CSI driver provisions a 50 GB gp3 volume,
+# binds it to this PVC, and the pod mounts it at /var/lib/postgresql/data</code></pre></div>
+
+<h3 id="ch10-rbac" data-toc>10.3 RBAC: Role-Based Access Control</h3>
+<p class="topic-desc">The authorization model: Roles, ClusterRoles, RoleBindings, and ClusterRoleBindings, and the principle of least privilege applied to Kubernetes API access.</p>
+
+<h4 id="ch10-rbac-model">Roles, bindings, and least privilege</h4>
+<p>RBAC controls who can do what in a cluster. A <strong>Role</strong> is a set of permissions (verbs on resources: <code>get</code>, <code>list</code>, <code>create</code>, <code>update</code>, <code>delete</code>, <code>watch</code>) scoped to a namespace. A <strong>ClusterRole</strong> is the same but cluster-scoped (applies to all namespaces or to cluster-level resources like nodes and PersistentVolumes). A <strong>RoleBinding</strong> grants a Role to a user, group, or ServiceAccount within a namespace; a <strong>ClusterRoleBinding</strong> grants a ClusterRole cluster-wide. The subject is typically a ServiceAccount (for applications running in the cluster) or a user/group (for humans accessing via <code>kubectl</code>).</p>
+<p>The principle of least privilege means granting only the permissions a workload needs — nothing more. A web application that reads its configuration from a ConfigMap and does not need to create pods should have a Role with <code>get</code> and <code>list</code> on configmaps in its namespace, and no permissions on pods, services, or deployments. A CI/CD pipeline that deploys to one namespace needs <code>get</code>, <code>list</code>, <code>create</code>, <code>update</code>, and <code>patch</code> on the resources it manages, in that namespace only. The default <code>cluster-admin</code> ClusterRole is equivalent to root on the cluster — grant it only to break-glass accounts and cluster administrators.</p>
+
+<div class="codeWrap"><pre><code># A minimal Role for a web application
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: webapp-reader
+  namespace: production
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+  # The app can read ConfigMaps but nothing else
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: webapp-reader-binding
+  namespace: production
+subjects:
+- kind: ServiceAccount
+  name: webapp
+  namespace: production
+roleRef:
+  kind: Role
+  name: webapp-reader
+  apiGroup: rbac.authorization.k8s.io</code></pre></div>
+
+<div class="codeWrap"><pre><code># Auditing who has access
+$ kubectl auth can-i get pods -n production --as=system:serviceaccount:production:webapp
+yes
+$ kubectl auth can-i create deployments -n production --as=system:serviceaccount:production:webapp
+no
+$ kubectl auth can-i --list -n production --as=system:serviceaccount:production:webapp
+# The auth can-i command is the fastest way to debug RBAC</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch11" data-toc>11 &middot; Observability, logging and monitoring</h2>
+<p class="topic-desc">The three pillars — metrics, logs, and traces — how they work in Kubernetes, the tools that implement them, and the practices that turn raw telemetry into actionable signal.</p>
+
+<h3 id="ch11-metrics" data-toc>11.1 Metrics and monitoring</h3>
+<p class="topic-desc">Prometheus as the metrics backbone, the metrics pipeline from exporters to alerting, and the ServiceMonitor and PodMonitor objects that make metric discovery declarative.</p>
+
+<h4 id="ch11-metrics-prometheus">Prometheus: the pull model</h4>
+<p>Prometheus is an open-source monitoring system built around a time-series database. It works by <strong>pulling</strong> metrics from targets at regular intervals (typically every 15–60 seconds), rather than receiving pushed metrics. Each target exposes an HTTP endpoint (<code>/metrics</code>) that returns metrics in a text format: <code>http_requests_total{method="POST",status="200"} 1027</code>. Prometheus scrapes these endpoints, stores the samples in its time-series database, and evaluates alerting rules against them.</p>
+<p>In Kubernetes, Prometheus discovers targets automatically. The <strong>ServiceMonitor</strong> object tells Prometheus which Services to scrape and how: the selector matches Services by label, and the monitor defines the scrape path, port, and interval. A PodMonitor does the same for pods directly (bypassing the Service abstraction). The result is that when you deploy a new Service with the right labels, Prometheus starts scraping it without any configuration change — the monitoring is declarative, defined alongside the application.</p>
+
+<div class="codeWrap"><pre><code># A ServiceMonitor that tells Prometheus what to scrape
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: myapp
+  labels:
+    release: prometheus     # matches the Prometheus operator's selector
+spec:
+  selector:
+    matchLabels:
+      app: myapp            # matches the Service to scrape
+  endpoints:
+  - port: metrics          # the Service port that exposes /metrics
+    interval: 30s
+    path: /metrics
+# Prometheus discovers this ServiceMonitor, finds the matching Service,
+# and starts scraping its /metrics endpoint every 30 seconds</code></pre></div>
+
+<div class="codeWrap"><pre><code># Key metrics every cluster should alert on
+# Node-level:
+#   node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes &lt; 0.1
+#   node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes &lt; 0.1
+#   rate(node_cpu_seconds_total{mode="idle"}[5m]) &lt; 0.2
+# Pod-level:
+#   rate(container_cpu_usage_seconds_total{pod=~"myapp-.*"}[5m]) &gt; 0.8
+#   container_memory_working_set_bytes{pod=~"myapp-.*"} &gt; 0.9
+#   kube_pod_status_phase{phase="Failed"} &gt; 0
+# Application-level (RED method):
+#   rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) &gt; 0.01</code></pre></div>
+
+<h3 id="ch11-logging" data-toc>11.2 Logging</h3>
+<p class="topic-desc">The logging pipeline from container stdout to a queryable store, structured logging as a prerequisite, and the trade-offs of the sidecar versus daemonset log shipping patterns.</p>
+
+<h4 id="ch11-logging-pipeline">From stdout to Loki or Elasticsearch</h4>
+<p>Containers write logs to stdout and stderr — that is the contract. The kubelet captures these and writes them to files on the node (<code>/var/log/pods/&lt;namespace&gt;_&lt;pod&gt;_&lt;uid&gt;/&lt;container&gt;.log</code>). A log shipper then collects these files and forwards them to a central store. The two common patterns: a <strong>DaemonSet</strong> log shipper (one agent per node, shipping all logs from that node) and a <strong>sidecar</strong> log shipper (one sidecar container per pod, shipping only that pod's logs). The DaemonSet pattern is simpler and uses fewer resources; the sidecar pattern gives per-pod isolation and is necessary when a pod writes to a file instead of stdout.</p>
+<p>Structured logging is the prerequisite for useful log querying. If your application emits plain text logs (<code>ERROR: connection failed</code>), you can only grep for substrings. If it emits JSON (<code>{"level":"error","msg":"connection failed","service":"api","request_id":"abc123"}</code>), you can filter by any field, aggregate by service, and join logs to traces. The structured format costs almost nothing to emit (every logging library supports JSON) and pays for itself the first time you debug a production incident.</p>
+
+<div class="codeWrap"><pre><code># Structured logging in a Node.js application
+const logger = require('pino')();
+logger.info({
+  service: 'api',
+  request_id: req.id,
+  method: req.method,
+  path: req.path,
+  duration_ms: Date.now() - start
+}, 'request completed');
+// Output: {"level":30,"time":1697123456789,"service":"api",
+//          "request_id":"abc123","method":"GET","path":"/users",
+//          "duration_ms":42,"msg":"request completed"}
+# This JSON line is what lands in the log store, queryable by any field</code></pre></div>
+
+<h3 id="ch11-tracing" data-toc>11.3 Distributed tracing</h3>
+<p class="topic-desc">OpenTelemetry as the tracing standard, how traces propagate across service boundaries, and the sampling and retention trade-offs that make tracing affordable at scale.</p>
+
+<h4 id="ch11-tracing-otel">OpenTelemetry and trace propagation</h4>
+<p>Distributed tracing follows a request across service boundaries. Each service creates a <strong>span</strong> (a named operation with a start time, end time, and metadata) and injects a trace context into the outgoing request (via the <code>traceparent</code> HTTP header, per the W3C Trace Context standard). The next service extracts the context, creates a child span linked to the same trace, and propagates it further. The result is a tree of spans — one trace per user request — that shows exactly which services were involved, how long each took, and where the time went.</p>
+<p>OpenTelemetry (OTel) is the open standard for traces (and metrics and logs). The OTel SDK is integrated into most application frameworks; the OTel Collector is a proxy that receives telemetry from applications, processes it (filtering, sampling, enrichment), and exports it to a backend (Jaeger, Tempo, Zipkin, Honeycomb, Datadog). The Collector is deployed as a DaemonSet (receiving via a push model) or a sidecar (receiving via gRPC), and it decouples applications from the backend — you can change tracing backends without touching application code.</p>
+
+<div class="codeWrap"><pre><code># OTel Collector configuration (simplified)
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+processors:
+  batch: {}
+  probabilistic_sampler:
+    sampling_percentage: 10    # sample 10% of traces at scale
+exporters:
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, probabilistic_sampler]
+      exporters: [jaeger]</code></pre></div>
+
+<div class="codeWrap"><pre><code># Tracing in a Go application with OTel
+import "go.opentelemetry.io/otel"
+func handleRequest(w http.ResponseWriter, r *http.Request) {
+  ctx, span := otel.Tracer("api").Start(r.Context(), "handleRequest")
+  defer span.End()
+  span.SetAttributes(
+    attribute.String("http.method", r.Method),
+    attribute.String("http.path", r.URL.Path),
+  )
+  // The trace context is automatically injected into outgoing HTTP calls
+  // by the OTel instrumentation libraries — no manual propagation needed
+}</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch12" data-toc>12 &middot; CI/CD and GitOps delivery</h2>
+<p class="topic-desc">The path from commit to production: CI pipelines that build and test, CD pipelines that deploy, and GitOps as the model where Git is the single source of truth for cluster state.</p>
+
+<h3 id="ch12-cicd" data-toc>12.1 CI/CD pipelines for containers</h3>
+<p class="topic-desc">The build pipeline (lint, test, build, scan, push) and the deploy pipeline (apply, verify, promote), and how to structure them so the same artifact flows from CI to CD unchanged.</p>
+
+<h4 id="ch12-cicd-pipeline">The container delivery pipeline</h4>
+<p>A container delivery pipeline has two stages. The <strong>CI stage</strong> runs on every commit: lint the code, run unit tests, build the container image, scan the image for vulnerabilities, and push the image to a registry with a tag that uniquely identifies the build (a git SHA, not <code>latest</code>). The <strong>CD stage</strong> runs on every push to the main branch (or on a manual trigger): deploy the image to a staging environment, run integration tests, and promote to production. The critical principle is that the <strong>same image</strong> flows through every stage — you never rebuild between staging and production, because a rebuild can produce a different image and invalidate the testing you did.</p>
+<p>The pipeline is defined as code (a YAML file in the repository) so it is versioned, reviewable, and reproducible. GitHub Actions, GitLab CI, CircleCI, and Jenkins X all express the same structure: a sequence of steps, each running in a container, with artifacts and secrets passed between steps. The pipeline definition lives in the same repository as the code it builds, so a change to the build process is a pull request, not a ticket.</p>
+
+<div class="codeWrap"><pre><code># .github/workflows/ci.yaml - a container CI pipeline
+name: ci
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build image
+      run: docker build -t ghcr.io/acme/myapp:${{ github.sha }} .
+    - name: Scan image
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ghcr.io/acme/myapp:${{ github.sha }}
+        severity: CRITICAL
+    - name: Push image
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+        docker push ghcr.io/acme/myapp:${{ github.sha }}</code></pre></div>
+
+<div class="codeWrap"><pre><code># The CD stage: deploy the exact image CI built
+# deploy.yaml - runs after CI succeeds
+name: deploy
+on:
+  workflow_run:
+    workflows: [ci]
+    branches: [main]
+    types: [completed]
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Update image tag
+      run: |
+        sed -i "s|image: ghcr.io/acme/myapp:.*|image: ghcr.io/acme/myapp:${{ github.sha }}|" k8s/deployment.yaml
+    - name: Apply to cluster
+      run: kubectl apply -f k8s/
+    - name: Verify rollout
+      run: kubectl rollout status deployment/myapp --timeout=300s</code></pre></div>
+
+<h3 id="ch12-gitops" data-toc>12.2 GitOps: Git as the source of truth</h3>
+<p class="topic-desc">The GitOps model, how Argo CD and Flux implement it, and why pulling from Git is safer and more auditable than pushing from a pipeline.</p>
+
+<h4 id="ch12-gitops-model">Pull-based deployment</h4>
+<p>GitOps inverts the deployment direction. In a traditional CI/CD pipeline, the pipeline <strong>pushes</strong> changes to the cluster (<code>kubectl apply</code>). In GitOps, a controller running <strong>inside</strong> the cluster <strong>pulls</strong> the desired state from a Git repository and reconciles the cluster to match. The Git repository becomes the single source of truth: every change is a commit, every commit is reviewable and revertible, and the cluster state is always reconcilable to the declared state. If someone makes a manual change (<code>kubectl edit</code>), the controller detects the drift and reverts it — self-healing by default.</p>
+<p>The two dominant GitOps tools are Argo CD and Flux. Argo CD provides a web UI that shows the sync status of every application, a clear diff between desired and actual state, and a point-and-click sync. Flux is more CLI-oriented and tighter integrated with the cluster's internal APIs. Both watch a Git repository for changes, apply the manifests to the cluster, and report status back to Git (commit status checks that say "synced" or "out of sync"). The choice between them is mostly about UI preference and ecosystem fit.</p>
+
+<div class="codeWrap"><pre><code># An Argo CD Application that syncs from Git
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/acme/myapp-gitops
+    targetRevision: HEAD
+    path: overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true        # delete resources removed from Git
+      selfHeal: true     # revert manual changes
+    syncOptions:
+    - CreateNamespace=true</code></pre></div>
+
+<div class="codeWrap"><pre><code># The GitOps repository structure
+# myapp-gitops/
+# ├── base/
+# │   ├── deployment.yaml
+# │   ├── service.yaml
+# │   └── kustomization.yaml
+# └── overlays/
+#     ├── staging/
+#     │   ├── kustomization.yaml    # patches base for staging
+#     │   └── patch-replicas.yaml  # replicas: 1
+#     └── production/
+#         ├── kustomization.yaml
+#         └── patch-replicas.yaml  # replicas: 5
+# Each overlay is a complete, deployable environment.
+# Promoting from staging to production is a commit to the production overlay.</code></pre></div>
+
+<h3 id="ch12-progressive" data-toc>12.3 Progressive delivery</h3>
+<p class="topic-desc">Canary releases, blue-green deployments, and feature flags: the techniques that reduce the blast radius of a bad deploy from "everyone" to "a small percentage."</p>
+
+<h4 id="ch12-progressive-canary">Canary releases with Argo Rollouts</h4>
+<p>A canary release routes a small percentage of traffic to the new version and the majority to the old version, then gradually shifts traffic over if the new version's metrics look healthy. Argo Rollouts implements this with a <code>Rollout</code> object (replacing a Deployment) that defines a stepwise analysis: set canary weight to 10%, wait 5 minutes, check error rate and latency, set weight to 25%, wait, check, and so on. If any check fails, the rollout is aborted and traffic reverts to the stable version automatically.</p>
+<p>The canary analysis is what makes this more sophisticated than a simple weighted Service. The analysis step queries Prometheus (or another metrics backend) for the canary's error rate and latency, compares it to the stable version's, and makes a decision: proceed, pause for manual approval, or abort. This turns a deploy from a human judgment call ("does it look OK?") into an automated, metric-driven decision — which is more consistent and faster, but requires that your metrics are trustworthy and your analysis thresholds are well-tuned.</p>
+
+<div class="codeWrap"><pre><code># An Argo Rollout with canary analysis
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: myapp
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      steps:
+      - setWeight: 10
+      - pause: {duration: 5m}
+      - setWeight: 25
+      - pause: {duration: 5m}
+      - setWeight: 50
+      - pause: {duration: 10m}
+      - setWeight: 100
+      analysis:
+        templates:
+        - templateName: error-rate
+        args:
+        - name: service
+          value: myapp-canary</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch13" data-toc>13 &middot; Security and supply-chain hardening</h2>
+<p class="topic-desc">The container security model, image scanning and signing, runtime threat detection, and the supply-chain practices that ensure the image you deploy is the image you built.</p>
+
+<h3 id="ch13-images" data-toc>13.1 Image security</h3>
+<p class="topic-desc">Vulnerability scanning, minimal base images, and the signing and verification pipeline that guarantees image integrity from build to deployment.</p>
+
+<h4 id="ch13-images-scanning">Vulnerability scanning with Trivy</h4>
+<p>Every container image contains software with known vulnerabilities. A base image published last week may include a package with a CVE discovered yesterday. Vulnerability scanning inspects an image's packages against a database of known CVEs and reports what it finds, sorted by severity. Trivy is the dominant open-source scanner: it scans the filesystem layers of an image, identifies every installed package (including OS packages, language libraries, and application dependencies), and matches them against vulnerability databases from multiple sources.</p>
+<p>The scan is a gate, not a report. A CI pipeline that scans the image and fails the build if any CRITICAL vulnerability is found prevents vulnerable images from reaching production. The gate is only as good as the database it checks against — a scanner with an up-to-date database finds current CVEs, and a scanner with a stale database finds nothing. The scan should run on every build (not just on merges to main) so that a vulnerability is caught on the commit that introduced it, not weeks later during a periodic audit.</p>
+
+<div class="codeWrap"><pre><code># Scanning an image with Trivy in CI
+$ trivy image --severity CRITICAL,HIGH --exit-code 1 \
+  ghcr.io/acme/myapp:latest
+# Output shows each vulnerability: CVE ID, severity, package, fixed version
+# --exit-code 1: fail the build if any CRITICAL or HIGH is found
+# In GitHub Actions:
+- name: Scan
+  uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: ghcr.io/acme/myapp:${{ github.sha }}
+    severity: CRITICAL
+    exit-code: '1'</code></pre></div>
+
+<h4 id="ch13-images-signing">Image signing with Cosign</h4>
+<p>Signing proves that an image was built by whom you expect and has not been tampered with. Cosign (part of the Sigstore project) signs images with a key pair: the private key signs the image digest, and the public key is used to verify the signature. The signature is stored in the registry alongside the image. Verification happens at deploy time — an admission controller in Kubernetes checks every pod's image against the public key and rejects pods whose images are not signed by an approved key.</p>
+<p>The key management is the hard part. Cosign supports keyless signing (using an identity provider to authenticate the signer and a transparency log to record the signature) and key-based signing (using a key pair you manage). Keyless signing is simpler to operate because there is no key to rotate or protect; the transparency log (Rekor) provides an auditable record of every signature. For CI/CD, keyless signing with the pipeline's OIDC identity (GitHub Actions' built-in token) is the recommended pattern: the pipeline signs the image after a successful build, and the key is ephemeral, tied to that specific workflow run.</p>
+
+<div class="codeWrap"><pre><code># Signing an image in CI with Cosign (keyless)
+$ cosign sign --yes ghcr.io/acme/myapp:${GITHUB_SHA}
+# The signature is pushed to the registry alongside the image
+# and recorded in the Rekor transparency log
+# Verify locally:
+$ cosign verify ghcr.io/acme/myapp:${GITHUB_SHA} \
+  --certificate-identity=https://github.com/acme/myapp/.github/workflows/ci.yaml@refs/heads/main \
+  --certificate-oidc-issuer=https://token.actions.githubusercontent.com
+# Verification confirms: signed by the right workflow, image not tampered</code></pre></div>
+
+<div class="warn">Image scanning finds known vulnerabilities; it does not find unknown vulnerabilities, misconfigurations, or malicious code inserted by a compromised build pipeline. Scanning is necessary but not sufficient. The full defense is layered: minimal base images (fewer packages to be vulnerable), signing (guarantees provenance), runtime detection (catches what scanning missed), and network policies (limit lateral movement).</div>
+
+<h3 id="ch13-runtime" data-toc>13.2 Runtime security</h3>
+<p class="topic-desc">Seccomp, AppArmor, SELinux, and the admission controllers and runtime tools that enforce security policy on running containers.</p>
+
+<h4 id="ch13-runtime-seccomp">Seccomp and the syscall filter</h4>
+<p>Seccomp (Secure Computing Mode) restricts which system calls a container can make. Docker applies a default seccomp profile that blocks about 40 syscalls that are unnecessary for most applications (including <code>reboot</code>, <code>kexec_load</code>, <code>open_by_handle_at</code>, and <code>ptrace</code>). A custom profile can be stricter: allow only the syscalls your application needs, block everything else. The result is that even if an attacker gains code execution inside the container, the kernel syscalls they need for privilege escalation, container escape, or network reconnaissance are blocked.</p>
+<p>Kubernetes allows seccomp profiles to be set per-pod via the <code>securityContext.seccompProfile</code> field. The profile can be <code>RuntimeDefault</code> (the container runtime's default), <code>Unconfined</code> (no restriction, for debugging), or <code>Localhost</code> (a custom profile file on the node). The practice is to start with <code>RuntimeDefault</code>, monitor for blocked syscalls in production, and write a custom profile only if the default is too restrictive for your application.</p>
+
+<div class="codeWrap"><pre><code># A pod with a seccomp profile
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+spec:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault    # blocks ~40 dangerous syscalls
+  containers:
+  - name: app
+    image: myapp:1.4.2
+    securityContext:
+      allowPrivilegeEscalation: false    # no setuid binaries
+      readOnlyRootFilesystem: true       # root fs is read-only
+      runAsNonRoot: true                  # run as non-root user
+      runAsUser: 1000                     # specific UID
+      capabilities:
+        drop: ["ALL"]                     # drop all Linux capabilities</code></pre></div>
+
+<div class="codeWrap"><pre><code># Admission control: OPA Gatekeeper or Kyverno
+# Kyverno policy: require read-only root filesystem
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-readonly-rootfs
+spec:
+  validationFailureAction: Enforce
+  rules:
+  - name: check-readonly-rootfs
+    match:
+      resources:
+        kinds: [Pod]
+    validate:
+      message: "Root filesystem must be read-only"
+      pattern:
+        spec:
+          containers:
+          - securityContext:
+              readOnlyRootFilesystem: true
+# Any pod that does not set readOnlyRootFilesystem: true is rejected</code></pre></div>
+
+<h3 id="ch13-supplychain" data-toc>13.3 Supply-chain hardening</h3>
+<p class="topic-desc">The SLSA framework, provenance generation, dependency pinning, and the practices that make a supply-chain attack detectable rather than silent.</p>
+
+<h4 id="ch13-supplychain-slsa">SLSA levels and provenance</h4>
+<p>SLSA (Supply-chain Levels for Software Artifacts) is a framework with four levels of supply-chain security. Level 1 requires that the build process generates provenance — a signed record of how the artifact was built, including the source commit, the build configuration, and the dependencies. Level 2 requires a hosted build service that generates the provenance automatically (not a script on a developer laptop). Level 3 requires that the build service is tamper-resistant and the provenance is independently verifiable. Level 4 requires two-party review and a hermetic, reproducible build.</p>
+<p>Practical supply-chain hardening is a checklist, not a level. Pin your dependencies (lock files with hashes, not floating ranges). Pin your base images by digest, not tag. Generate provenance in CI (GitHub Actions can generate SLSA provenance with a few lines of configuration). Verify provenance at deploy time (the admission controller checks the signature against the expected identity). Scan your dependencies for known vulnerabilities (Trivy, Snyk, Dependabot). And monitor for unexpected changes — a dependency that suddenly has a new major version or a maintainer change is a red flag, regardless of whether it has a known CVE.</p>
+
+<div class="codeWrap"><pre><code># Pinning dependencies: the lock file is the contract
+# package-lock.json (Node.js) - every dependency has an integrity hash
+"dependencies": {
+  "express": {
+    "version": "4.21.2",
+    "resolved": "https://registry.npmjs.org/express/-/express-4.21.2.tgz",
+    "integrity": "sha512-2B8a+6M7vY6P1tHPD6lCx9j9p8r8x8z8..."
+  }
+}
+# A tampered package (even one byte different) has a different hash.
+# npm ci refuses to install if the integrity check fails.
+# The same principle applies to go.sum, Cargo.lock, requirements.txt with hashes</code></pre></div>
+
+<div class="codeWrap"><pre><code># Generating SLSA provenance in GitHub Actions
+# .github/workflows/ci.yaml
+- name: Generate provenance
+  uses: slsa-framework/slsa-github-generator@v2
+  with:
+    base64-subjects: "${{ steps.build.outputs.hashes }}"
+# Produces a provenance file signed by the workflow's OIDC identity.
+# The provenance records: source commit, build config, dependencies,
+# and is verifiable independently — anyone can confirm the artifact
+# was built by this workflow at this commit.</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch14" data-toc>14 &middot; Operations, cost and the decision matrix</h2>
+<p class="topic-desc">The operational realities: Day-2 operations, capacity planning, cost optimization, and the decision framework that matches workload to infrastructure model.</p>
+
+<h3 id="ch14-ops" data-toc>14.1 Day-2 operations</h3>
+<p class="topic-desc">What happens after the deploy: upgrades, backups, disaster recovery, and the operational rhythms that keep a cluster healthy.</p>
+
+<h4 id="ch14-ops-upgrades">Cluster and workload upgrades</h4>
+<p>Kubernetes releases a new minor version every three months (1.31, 1.32, 1.33, ...), each supported for about 14 months after release. The upgrade cadence for a production cluster is roughly: upgrade to the latest minor version within a few months of its release, and never run a version that has reached end-of-life (the API deprecations between versions mean an upgrade that skips versions is unsupported). The upgrade process is: upgrade the control plane (one API server replica at a time for managed services, or sequentially for kubeadm), then upgrade the worker nodes (drain, upgrade, uncordon, repeat).</p>
+<p>Workload upgrades are simpler: a Deployment update triggers a rolling update, and the readiness probe ensures the new version is healthy before the old one is removed. The operational risk is in the details: a new Kubernetes version may deprecate an API your manifests use, a new container runtime version may change behavior, or a new node kernel version may have a regression. The practice is to test upgrades in a staging cluster first, read the release notes for breaking changes, and have a rollback plan (the previous ReplicaSet is retained by default).</p>
+
+<div class="codeWrap"><pre><code># kubeadm upgrade: control plane, then workers
+# On the control-plane node:
+$ sudo apt-get update
+$ sudo apt-get install kubeadm=1.31.0-1.1
+$ sudo kubeadm upgrade plan
+$ sudo kubeadm upgrade apply v1.31.0
+$ sudo apt-get install kubelet=1.31.0-1.1 kubectl=1.31.0-1.1
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart kubelet
+# On each worker node (one at a time):
+$ sudo kubectl drain &lt;node&gt; --ignore-daemonsets --delete-emptydir-data
+$ sudo apt-get install kubeadm=1.31.0-1.1 kubelet=1.31.0-1.1
+$ sudo systemctl restart kubelet
+$ sudo kubectl uncordon &lt;node&gt;</code></pre></div>
+
+<div class="codeWrap"><pre><code># etcd backup and restore: the disaster recovery drill
+# Backup:
+$ sudo ETCDCTL_API=3 etcdctl snapshot save /backup/etcd-$(date +%F).db \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key
+# Restore (on a new cluster):
+$ sudo ETCDCTL_API=3 etcdctl snapshot restore /backup/etcd-2026-10-01.db \
+  --data-dir=/var/lib/etcd
+# Test the restore — an untested restore is a rumor.
+# Schedule the backup via cron, and keep the last 30 days.</code></pre></div>
+
+<h3 id="ch14-cost" data-toc>14.2 Cost management and optimization</h3>
+<p class="topic-desc">Where the money goes in a container infrastructure, the levers that reduce cost, and theFinOps practices that keep spending aligned with value.</p>
+
+<h4 id="ch14-cost-where">Where the money goes</h4>
+<p>The cost of a container infrastructure falls into four buckets. <strong>Compute</strong> (the largest): the VMs or nodes that run your containers — a Kubernetes cluster with 3 control-plane nodes and 5 worker nodes costs roughly $300–500/month in compute alone. <strong>Storage</strong>: persistent volumes (EBS, PD), image registry storage, and backup storage. <strong>Networking</strong>: load balancers ($15–25/month each), NAT gateways, data transfer between zones and to the internet. <strong>Managed services</strong>: the control-plane fee for managed Kubernetes ($70–100/month), monitoring and logging platforms, and the operational tooling. A small production cluster (3 workers, 1 load balancer, 100 GB storage) costs $400–800/month; a larger one (10+ workers, multiple load balancers, HA databases) runs $2,000–5,000/month.</p>
+<p>The cost levers, in order of impact: <strong>right-size your nodes</strong> (most clusters run at 30–40% average utilization — smaller nodes or fewer of them saves more than any other single change); <strong>use spot or preemptible instances</strong> for stateless workloads that can tolerate interruption (60–90% cheaper than on-demand); <strong>turn off non-production environments</strong> outside business hours (a staging cluster running 24/7 when it is used 8 hours a day wastes 2/3 of its cost); and <strong>clean up orphaned resources</strong> (unused load balancers, unattached volumes, old snapshots — the "orphaned resource" tax is typically 10–20% of the bill).</p>
+
+<div class="codeWrap"><pre><code># Finding cost waste: orphaned volumes and load balancers
+# Unused PersistentVolumes (bound to no PVC or PVC is orphaned):
+$ kubectl get pv --no-headers | grep -v Bound
+# Unused Services (LoadBalancer with no endpoints):
+$ kubectl get svc -A -o json | jq -r '.items[] | 
+  select(.spec.type=="LoadBalancer") | .metadata.name'
+$ kubectl get endpoints -A | grep "&lt;none&gt;"
+# Idle nodes (low CPU and memory utilization):
+$ kubectl top nodes | awk '$3+0 &lt; 20 {print $1, $3, $5}'
+# A node using less than 20% CPU is a candidate for downsizing or removal</code></pre></div>
+
+<h3 id="ch14-decision" data-toc>14.3 The decision matrix</h3>
+<p class="topic-desc">A framework for choosing between Docker, Docker Compose, a VPS, LXC, and Kubernetes — based on workload characteristics, team size, and operational maturity rather than fashion.</p>
+
+<h4 id="ch14-decision-framework">Matching workload to model</h4>
+<p>The decision starts with three questions. First, <strong>how many hosts?</strong> One host: Docker Compose or a VPS. Multiple hosts: Kubernetes or a cluster of LXC/LXD nodes. Second, <strong>what is the workload?</strong> A single application or a small set of coordinated services: Docker Compose. A fleet of microservices with independent scaling: Kubernetes. A full OS with multiple services and a traditional init: LXC. A database or stateful service with strict durability requirements: a dedicated VPS or managed database. Third, <strong>what can the team operate?</strong> Kubernetes is the most complex option by a wide margin; if the team does not already operate it well, the operational tax will exceed the architectural benefit.</p>
+<p>The practical decision for most small-to-medium teams in 2026: a single VPS (or two for redundancy) running Docker Compose, with a CI/CD pipeline that builds and deploys the containers. This handles 90% of workloads — web applications, APIs, databases, caches, background workers — with a fraction of the operational complexity of Kubernetes. Graduate to Kubernetes when the workload genuinely requires it: multiple teams deploying independently, a need for self-healing across machines, or a service count that makes Compose unwieldy. The mistake is adopting Kubernetes because it is the industry standard, the way the mistake in application architecture is adopting microservices because they are modern — the infrastructure should serve the workload, not the reverse.</p>
+
+<table>
+<tr><th>If your workload is...</th><th>Choose...</th><th>Because...</th></tr>
+<tr><td>One app, one host, one team</td><td>Docker on a VPS</td><td>Simplest thing that works; minimal ops burden</td></tr>
+<tr><td>A few coordinated services, one host</td><td>Docker Compose</td><td>Declarative multi-container; still one host</td></tr>
+<tr><td>A full OS with init, cron, multiple services</td><td>LXC/LXD</td><td>VM-like behavior without VM overhead</td></tr>
+<tr><td>Multiple teams, independent deploys, self-healing</td><td>Kubernetes</td><td>The orchestration pays for itself at scale</td></tr>
+<tr><td>A database with strict HA requirements</td><td>Managed DB or dedicated VPS</td><td>K8s adds complexity without adding durability</td></tr>
+<tr><td>Batch jobs, event-driven processing</td><td>Kubernetes Jobs + queue</td><td>Scheduling, retries, parallelism built in</td></tr>
+<tr><td>A homelab or dev environments</td><td>LXC or VMs</td><td>Density and isolation without cloud cost</td></tr>
+</table>
+
+<div class="tip">The infrastructure decision is not permanent. A workload that starts on Docker Compose can move to Kubernetes later — the container image is the same, the Dockerfile is the same, only the orchestration layer changes. Choose the simplest model that works today, and keep the option to graduate open by writing clean Dockerfiles and keeping state in volumes.</div>
+
+<div class="codeWrap"><pre><code># The cost ladder: monthly infrastructure spend for a small team
+# (2026, approximate, USD)
+#
+# Single VPS + Docker:           $20-60/month    - one host, simple stack
+# Two VPS (prod + staging):      $40-120/month   - redundancy, separation
+# VPS + managed database:        $80-200/month   - offload the hardest part
+# Single-host K3s (lightweight): $30-80/month    - K8s experience, low cost
+# Managed K8s (small):        $300-800/month  - control plane managed
+# Self-managed K8s (3 nodes):    $400-1200/month - you run everything
+# The jump from "some VPS instances" to "Kubernetes" is 5-10x.
+# Make sure the workload justifies the jump.</code></pre></div>
+</section>

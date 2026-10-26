@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R Programming</title>
+<meta name="description" content="R is a language designed for statistics and data analysis, and it is the tool of choice for data science…. 3 chapters, 7 topics and 8 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/r-programming.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="R Programming">
+<meta property="og:description" content="R is a language designed for statistics and data analysis, and it is the tool of choice for data science…. 3 chapters, 7 topics and 8 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/r-programming.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="R Programming">
+<meta name="twitter:description" content="R is a language designed for statistics and data analysis, and it is the tool of choice for data science…. 3 chapters, 7 topics and 8 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/r-programming.html#article","headline":"R Programming","name":"R Programming","description":"R is a language designed for statistics and data analysis, and it is the tool of choice for data science…. 3 chapters, 7 topics and 8 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/r-programming.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/r-programming.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"R Programming","item":"https://amin360it.github.io/quick-guides/r-programming.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome · R Programming</a><ul>
+<li><a href="#orientation-why" data-target="orientation-why">0.1 Why R, and what it is for</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Vectors, Data Frames and Base R</a><ul>
+<li><a href="#ch1-vector" data-target="ch1-vector">1.1 Vectors: the most important data structure in R</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Tidyverse, ggplot, and Statistics</a><ul>
+<li><a href="#ch2-ggplot" data-target="ch2-ggplot">2.1 ggplot2: the grammar of graphics</a></li>
+<li><a href="#ch2-stats" data-target="ch2-stats">2.2 Statistics: hypothesis testing, regression, and the four things to check</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">R Programming</span>
+      <span class="am-band-s">3 chapters &middot; 7 topics &middot; 8 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="orientation" data-toc>Welcome · R Programming</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; Welcome · R Programming</button><div class="ch-toc-list"><a href="#orientation-why">0.1 Why R, and what it is for</a></div></div>
+<h3 id="orientation-why" data-toc>0.1 Why R, and what it is for</h3>
+
+<p class="topic-desc">R is a language designed for statistics and data analysis, and it is the tool of choice for data science, machine learning, and academic research.</p>
+<h4 id="orientation-why--section">Three reasons to pick R</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p><strong>Vectorised semantics.</strong> Most R functions operate on whole vectors; you rarely write explicit loops. This both shortens code and lets R delegate heavy arithmetic to optimised C/Fortran routines. <strong>Data frames</strong> are R's table format: a list of equal-length vectors treated as one rectangular object. <strong>Packages</strong> on CRAN cover nearly every discipline in academia, medicine, finance, and ML.</p>
+<h4 id="orientation-why--section-2">The shape of a minimal script</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<div class="codeWrap"><pre><code># hello.R
+age <- c(25, 30, 35)
+mean(age)          # 30
+plot(age, 1:3)     # a scatter plot
+</code></pre></div>
+<h4 id="orientation-why--section-3">A more realistic data step</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<div class="codeWrap"><pre><code># load a CSV and compute summaries
+library(dplyr)
+df <- read.csv("data.csv")
+summary_stats <- df %>%
+  group_by(group) %>%
+  summarise(mean_y = mean(y), n = n())
+</code></pre></div>
+<h4 id="orientation-why--section-4">Why R beats plain Python for statistics</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p>R was built for statistical software from the ground up. Its formulas — <code>y ~ x1 + x2</code> — are direct. A mixed model that looks awful in Python is a single <code>lmer()</code> call. The statistical tests (<code>t.test</code>, <code>aov</code>, <code>coxph</code>) are built in and documented with actual references.</p>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch1" data-toc>1 · Vectors, Data Frames and Base R</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 · Vectors, Data Frames and Base R</button><div class="ch-toc-list"><a href="#ch1-vector">1.1 Vectors: the most important data structure in R</a></div></div>
+<h3 id="ch1-vector" data-toc>1.1 Vectors: the most important data structure in R</h3>
+<p class="topic-desc">In R every object is a vector, and almost every surprising behaviour follows from that one fact: there is no scalar type, arithmetic applies element-wise, and a vector's length is whatever the operation produced rather than what you asked for.</p>
+
+<h4 id="ch1-vector-types">The four basic types and the coercion ladder</h4>
+<p>R has four atomic types: logical, integer, double and character. Composite types are factors, which are integers with a level set attached, and lists, which can hold anything. When a vector contains mixed types, R coerces along a fixed ladder: logical becomes integer, integer becomes double, double becomes character. The ladder is total, so <code>c(TRUE, 1)</code> gives you <code>1 1</code> rather than an error, and <code>c(1, "a")</code> gives you two strings rather than a warning.</p>
+
+<div class="codeWrap"><pre><code>x  <- c(1, 2, 3)                    # double
+i  <- c(1L, 2L, 3L)                # integer
+b  <- c(TRUE, FALSE)               # logical
+s  <- c("a", "b")                  # character
+
+typeof(x)                          # "double"
+c(TRUE, 1)                         # 1 1          (logical -> integer)
+c(TRUE, 1.5)                       # 1 1.5        (integer -> double)
+c(1, "a")                          # "1" "a"      (double -> character)
+
+# there is no scalar type. A "scalar" is a length-1 vector and
+# every operation on it is still a vector operation.
+length(42)                         # 1
+is.vector(42, "double")            # TRUE
+</code></pre></div>
+
+<h4 id="ch1-vector-arith">Element-wise arithmetic, and why a loop is usually wrong</h4>
+<p>Because arithmetic is element-wise and vectors recycle, <code>x * 2</code> multiplies every element and a loop is almost never the right tool. The one thing to know is recycling: R will repeat a shorter operand to match a longer one, silently, and warns only when the length is not a whole multiple. A length-3 vector added to a length-2 vector produces a length-6 result and no complaint about the one that was probably a mistake.</p>
+
+<div class="codeWrap"><pre><code>a <- c(1, 2, 3)
+b <- c(10, 20)
+
+a + b          # 11 22 31 12 22 32  <- RECYCLED, and warned about
+a * 2          # 2 4 6              <- length-1 recycles cleanly
+a + 1          # 2 3 4
+
+# a length-3 against a length-2 is almost always a bug, and R only
+# warns. Use rep_len to make the mistake impossible to hide:
+rep_len(b, length(a)) + a          # 11 22 31, no ambiguity
+</code></pre></div>
+
+<h4 id="ch1-vector-list">Lists are the one heterogenous container</h4>
+<p>A list holds elements of any type, including other lists, and is R's equivalent of a JSON object. The distinction between <code>[]</code> and <code>[[]]</code> on a list is the single most common source of confusion in the language: single brackets always return a list, double brackets return the element. For a list of exactly length one — which is what a function returning a list usually is — that difference is the difference between a list and the thing inside it.</p>
+
+<div class="codeWrap"><pre><code>config <- list(
+  host  = "localhost",
+  port  = 8080,
+  flags = c(TRUE, TRUE, FALSE),
+  db    = list(user = "app", name = "prod")
+)
+
+class(config)                      # "list"
+length(config)                     # 4
+config$port                       # 8080      ($ is shorthand for [[]])
+config[["port"]]                  # 8080
+config[[1]]                       # "localhost"
+
+config["port"]                    # a LIST of length 1, not 8080
+class(config["port"])             # "list"  <- the gotcha
+
+config$db$name                    # "prod"    nested access works
+</code></pre></div>
+
+<h4 id="ch1-vector-factor">Factors, and the trap that has bitten everyone once</h4>
+<p>A factor stores integers and a separate table of level names, which is efficient for grouping and efficient for forgetting: the levels are alphabetical unless you set them. Sorting a factor sorts by its integer codes, so a factor with default levels sorts as "high low medium" rather than "high low medium" alphabetically — and the plot axis inherits that. It also silently converts character vectors to factors in old data frames, so a postal code with a leading zero arrives as a number.</p>
+
+<div class="codeWrap"><pre><code>grade <- factor(c("medium", "low", "high"))
+levels(grade)                      # "high" "low" "medium"  (alphabetical)
+sort(grade)                        # high low medium  -- already sorted!
+as.integer(sort(grade))            # 1 2 3              -- meaningless
+
+# declare the order you mean:
+grade <- factor(c("medium", "low", "high"),
+                levels = c("low", "medium", "high"),
+                ordered = TRUE)
+sort(grade)                        # low medium high  <- correct
+levels(grade)                      # "low" "medium" "high"
+
+# the leading-zero trap:
+zip <- factor(c("02134", "02135"))
+nchar(as.character(zip[1]))        # 5, but as.numeric() gives 2134
+</code></pre></div>
+
+<h4 id="ch1-vector-subset">The subsetting operator, and its three forms</h4>
+<p><code>x[i]</code> selects and <em>always returns a vector</em>, which is why it can change length. <code>x[i, j]</code> on a data frame selects a cell and on a matrix selects a submatrix. Logical indexing filters and changes length; numeric indexing selects by position and also changes length; character indexing on a named vector selects by name. Knowing which one you have is what makes a surprising length change explicable rather than mysterious.</p>
+
+<div class="codeWrap"><pre><code>v <- c(alpha = 10, beta = 20, gamma = 30)
+
+v[2]                  # beta 20        numeric: by position
+v[c(1, 3)]            # alpha gamma    numeric: several
+v[v &gt; 15]           # beta gamma     logical: FILTERED, len 2
+v[["beta"]]          # 20             [[ ]] on a vector: by name
+v[c("alpha","beta")]  # alpha beta     character: by name
+
+# the surprise, explained:
+n <- c(1, 2, 3, 4, 5)
+n[n &gt; 3]             # 4 5  <- length 2, and that is correct
+# ...using length(n) as an index into another vector after this is
+# the classic off-by-N bug, because the length is no longer 5.
+</code></pre></div>
+
+<p>Four disciplines: <strong>always set <code>levels =</code> on a factor used for ordering or plotting,</strong> because the default is alphabetical and both sort and axis inherit it; <strong>use <code>[[</code> when you want the element and <code>[</code> when you want a list,</strong> because on a length-one list the two give different types and the difference surfaces three lines later; <strong>check the length after any logical subset,</strong> because it is not the length you expect when a filter drops rows; and <strong>use <code>rep_len</code> rather than relying on recycling</strong>, because recycling a length-2 against a length-3 warns but succeeds, and the resulting six-element vector is not an error anyone will notice.</p>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 · Tidyverse, ggplot, and Statistics</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 · Tidyverse, ggplot, and Statistics</button><div class="ch-toc-list"><a href="#ch2-ggplot">2.1 ggplot2: the grammar of graphics</a><a href="#ch2-stats">2.2 Statistics: hypothesis testing, regression, and the four things to check</a></div></div>
+<h3 id="ch2-ggplot" data-toc>2.1 ggplot2: the grammar of graphics</h3>
+<p class="topic-desc">ggplot2 is not a function, it is a grammar. A plot is assembled from a dataset, a set of mappings from variables to visual properties, one or more layers that draw something, a scale specification, a theme and a title block — and because the pieces compose with <code>+</code>, the order you write them is irrelevant and a plot can be built up incrementally.</p>
+
+<h4 id="ch2-ggplot-six">The six pieces and what each controls</h4>
+<p><code>ggplot(data, aes(...))</code> establishes the data and the aesthetic mappings: which column becomes which visual property. A <code>geom_*</code> layer draws something and inherits the mappings. <code>scale_*</code> functions transform or relabel an axis. <code>facet_*</code> splits the plot into a grid of small plots. <code>theme_*</code> controls everything that is not data: fonts, grid lines, background. <code>labs()</code> sets the title and axis labels.</p>
+
+<div class="codeWrap"><pre><code>library(ggplot2)
+
+df <- data.frame(
+  age    = c(25, 30, 35, 40, 28, 33, 45),
+  height = c(165, 175, 180, 170, 162, 172, 185),
+  weight = c(60, 78, 85, 72, 55, 74, 92),
+  gender = c("F", "M", "M", "F", "F", "M", "M")
+)
+
+# the minimal scatter: one mapping, one layer
+ggplot(df, aes(x = age, y = height)) +
+  geom_point(size = 3) +
+  theme_minimal() +
+  labs(title = "Height vs Age", x = "Age", y = "Height (cm)")
+
+# adding a colour mapping: one more aesthetic, no new layer
+ggplot(df, aes(x = age, y = height, color = gender)) +
+  geom_point(size = 3) +
+  theme_minimal()
+</code></pre></div>
+
+<h4 id="ch2-ggplot-layers">Layers, and the aesthetics each one uses</h4>
+<p>Every geometry has a different set of aesthetics it understands, and passing an aesthetic a geom does not support is one of the most common errors. <code>geom_point</code> uses x, y, colour, shape, size and alpha. <code>geom_line</code> uses x, y, colour, linetype and group, and <strong>requires a group</strong> or it draws one line across all the data. <code>geom_bar</code> uses x, y and fill, and defaults to counting rather than plotting a supplied y. <code>geom_histogram</code> uses only x, because it bins y for you.</p>
+
+<div class="codeWrap"><pre><code># a bar chart COUNTS unless you say otherwise
+ggplot(df, aes(x = gender)) +
+  geom_bar(fill = "steelblue")
+
+# to plot a supplied y you must say stat = "identity"
+ggplot(summarise(df, g = gender, m = mean(height)), aes(x = g, y = m)) +
+  geom_bar(stat = "identity", fill = "steelblue")
+
+# a line needs a group: one line per gender
+ggplot(df, aes(x = age, y = height, color = gender, group = gender)) +
+  geom_line() +
+  geom_point()
+# ...colour alone is NOT enough for geom_line. This is the single
+# most common reason a multi-series line chart comes out as a
+# zigzag through every point.
+</code></pre></div>
+
+<h4 id="ch2-ggplot-facets">Facets: one plot per group, and the difference between the two</h4>
+<p><code>facet_wrap</code> arranges panels in a grid that wraps, treating the variable as unordered — useful when you have many levels. <code>facet_grid</code> arranges panels by two factors, one per axis, and shows every combination including empty ones. Both inherit every mapping and every layer, so a faceted plot is the same plot repeated rather than a separate construction. The fixed aspect control is the one that matters when comparing across panels: <code>scales = "free_y"</code> lets each panel scale independently, which stops one outlier from flattening every other panel.</p>
+
+<div class="codeWrap"><pre><code># wrap: one panel per gender, arranged automatically
+ggplot(df, aes(x = age, y = height)) +
+  geom_point() +
+  facet_wrap(~ gender) +
+  theme_minimal()
+
+# grid: row and column factors, every combination shown
+df$smoker <- ifelse(df$age &gt; 30, "over30", "under30")
+ggplot(df, aes(x = age, y = height)) +
+  geom_point() +
+  facet_grid(gender ~ smoker) +
+  theme_minimal()
+
+# free scales: the difference between seeing a trend and not
+ggplot(df, aes(x = age, y = weight)) +
+  geom_point() +
+  facet_wrap(~ gender, scales = "free_y") +
+  theme_minimal()
+</code></pre></div>
+
+<h4 id="ch2-ggplot-save">Saving, and the two arguments that matter</h4>
+<p><code>ggsave()</code> writes the current plot, and it infers the format from the filename extension — <code>.png</code>, <code>.pdf</code>, <code>.svg</code>. The <code>width</code> and <code>height</code> arguments are in inches and the default is the current device's size, which is why a plot produced in RStudio and one produced by a script come out different sizes. Set both explicitly for anything that will be published or version-controlled, and use <code>bg = "white"</code> for <code>.png</code> because a transparent background renders black in most viewers.</p>
+
+<div class="codeWrap"><pre><code>p &lt;- ggplot(df, aes(x = age, y = height, color = gender)) +
+  geom_point(size = 3) +
+  theme_minimal() +
+  labs(title = "Height vs Age", x = "Age", y = "Height (cm)")
+
+# explicit size, white background, print-quality
+ggsave("height-vs-age.png", p,
+       width = 8, height = 5, dpi = 300, bg = "white")
+ggsave("height-vs-age.pdf", p, width = 8, height = 5)   # vector
+ggsave("height-vs-age.svg", p, width = 8, height = 5)   # vector
+
+# and the two ways to get the data out for a caption or a report
+library(ggplot2)
+b <- ggplot_build(p)
+b$data[[1]]        # the layer's computed coordinates
+ggplot2::layer_data(p, 1)
+</code></pre></div>
+
+<p>Three disciplines: <strong>give <code>geom_line</code> a <code>group</code> mapping whenever the colour mapping is categorical,</strong> because colour alone produces one line through every point in the order they appear; <strong>state <code>stat = "identity"</code> on a bar chart when your y is already an aggregate,</strong> because the default re-counts and silently replaces your values with ones; and <strong>set <code>width</code>, <code>height</code> and <code>bg</code> explicitly in <code>ggsave</code></strong>, because the defaults come from the current device and therefore differ between an IDE and a script.</p>
+<h3 id="ch2-stats" data-toc>2.2 Statistics: hypothesis testing, regression, and the four things to check</h3>
+
+<p class="topic-desc">R has the deepest statistical ecosystem of any language: over 1,000 statistics packages on CRAN, and base R built-ins for the fundamental tests.</p>
+<h4 id="ch2-stats--section">The four things you will reach for</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p>Then <strong>the four functions,</strong> and what each answers. <strong><code>t.test()</code></strong> — is the mean of one or two samples what we expect? <strong><code>lm()</code></strong> — is there a linear relationship between a predictor and an outcome? <strong><code>cor.test()</code></strong> — are two variables related? <strong><code>chisq.test()</code></strong> — is the observed count of categories different from what theory predicts? Then <strong>the two things to check on every test's result.</strong> <strong>The p-value tells you the probability of seeing the data if the null is true,</strong> — it does NOT tell you the probability the null is true. And <strong>Effect size is the more honest number,</strong> — Cohen's d for t-tests, R-squared for regression, and they answer "how much difference does this make?" rather than "is it different?". Then <strong>the one discipline.</strong> <strong>Plot the data first.</strong> A statistical test assumes the data has a particular shape — independence, normality, equal variance — and the only way to check those assumptions is to look at a histogram, a scatterplot, and a residual plot.</p>
+<div class="codeWrap"><pre><code># t-test: is the mean height different between groups?
+group_a <- c(170, 175, 165, 180, 172)
+group_b <- c(178, 182, 175, 185, 180)
+t.test(group_a, group_b)
+# Welch Two Sample t-test
+# t = -3.4521, df = 7.8312, p-value = 0.0094
+
+# Linear regression: height ~ age
+df <- data.frame(age = 20:30, height = 165:175 + rnorm(11, 0, 2))
+model <- lm(height ~ age, data = df)
+summary(model)
+# Coefficients, R-squared, F-statistic, p-values
+
+# Correlation test
+x <- rnorm(100); y <- x + rnorm(100, 0, 0.5)
+cor.test(x, y)
+
+# Chi-square test of independence
+observed <- matrix(c(50, 30, 20, 40, 60, 10), nrow=2)
+chisq.test(observed)
+</code></pre></div>
+<div class="codeWrap"><pre><code># THE TWO THINGS TO CHECK ON EVERY RESULT.
+# 1. p-value is NOT the probability the null is true
+#    It IS the probability of seeing data at least this extreme
+#    IF the null hypothesis is true. A small p-value means the
+#    data is unlikely under the null, NOT that the null is
+#    unlikely given the data.
+
+# 2. Effect size matters more than significance
+#    p-value depends on sample size: a tiny difference on a huge
+#    sample is "significant" but meaningless. Cohen's d, R-squared,
+#    and the confidence interval are the honest numbers.
+
+# THE DISCIPLINE: plot before you test
+par(mfrow=c(2,2)); plot(model)   # residual vs fitted, normal Q-Q,
+                                  # scale-location, residual vs leverage
+# These diagnostic plots tell you whether the test's assumptions
+# (linearity, normality of residuals, equal variance) are plausible.</code></pre></div>
+
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>R Programming.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+const fs = require('fs');
+const s = fs.readFileSync('index.html', 'utf8');
+console.log('Has burger:', s.includes('id="burger"'));
+console.log('Has topnav:', s.includes('id="topnav"'));
+console.log('Has modeBtn:', s.includes('id="modeBtn"'));
+console.log('Has modePop:', s.includes('id="modePop"'));
+console.log('Has mode-wrap:', s.includes('class="mode-wrap"'));
+console.log('Has burger svg:', s.includes('M3 6h18'));
+console.log('data-theme:', s.includes('data-theme="dark"'));
+console.log('data-mode:', s.includes('data-mode="default"'));
+console.log('Has am-band:', s.includes('am-band'));
+console.log('Has sidebar:', s.includes('id="sidebar"'));

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search - Amin360iT Quick Guides</title>
+<meta name="description" content="Search every guide, chapter and section in the Amin360iT quick-guides library by keyword or topic. Runs entirely offline, with no server and no tracking.">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/search.html">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3Csvg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:title" content="Search - Amin360iT Quick Guides">
+<meta property="og:description" content="Search every guide, chapter and section in the Amin360iT library. JSON-based, fully offline.">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/search.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Search - Amin360iT Quick Guides">
+<meta name="twitter:description" content="Search every guide, chapter and section in the Amin360iT library. JSON-based, fully offline.">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script>
+</head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Search</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<main id="content">
+  <h1 class="am-band">
+    <span class="am-band-t">Search</span>
+    <span class="am-band-s">Every guide, chapter and section &middot; JSON-based &middot; works offline</span>
+  </h1>
+
+  <section class="am-main" style="max-width:760px; margin:0 auto; padding:0 24px;">
+    <div class="am-searchwrap" style="margin:18px 0 8px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="gSearch" type="search" placeholder="Search all guides — try 'hooks', 'SEO', 'Docker'…" aria-label="Search all guides" autocomplete="off">
+    </div>
+    <p class="am-hero-p" id="gStats" style="font-size:14px;">Loading index…</p>
+    <div id="gResults" aria-live="polite"></div>
+  </section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Search.</strong> One JSON index, every guide, zero network. Results open straight to the section anchor.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+<script>
+/* Global search — loads build/tmp/searchindex.json (copied next to this
+   page at build time) and renders Google-style results entirely offline. */
+(function(){
+  var input = document.getElementById('gSearch');
+  var stats = document.getElementById('gStats');
+  var out = document.getElementById('gResults');
+  var INDEX_URL = 'searchindex.json';
+
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function hi(text, q){
+    if(!q) return esc(text);
+    var i = text.toLowerCase().indexOf(q.toLowerCase());
+    if(i === -1) return esc(text);
+    return esc(text.slice(0,i)) + '<mark>' + esc(text.slice(i, i+q.length)) + '</mark>' + esc(text.slice(i+q.length));
+  }
+
+  function run(q){
+    q = q.trim();
+    if(q.length < 2){ stats.textContent = 'Type at least 2 characters.'; out.innerHTML=''; return; }
+    var ql = q.toLowerCase();
+    var results = [];
+    for(var i=0;i<DATA.length;i++){
+      var g = DATA[i];
+      var score = 0, bestChap = null, bestSnip = null;
+
+      /* Title match = strongest */
+      var ti = g.title.toLowerCase().indexOf(ql);
+      if(ti !== -1) score += 100 - ti;
+
+      /* Chapter heading matches */
+      for(var c=0;c<g.chapters.length;c++){
+        var ch = g.chapters[c];
+        var ci = ch.text.toLowerCase().indexOf(ql);
+        if(ci !== -1){
+          var s = (ch.level===2 ? 40 : 30) - ci;
+          if(s > score || !bestChap){ score = Math.max(score, s); bestChap = ch; }
+        }
+      }
+
+      /* Snippet matches */
+      for(var s2=0;s2<g.snippets.length;s2++){
+        var si = g.snippets[s2].toLowerCase().indexOf(ql);
+        if(si !== -1){ score = Math.max(score, 15 - si); if(!bestSnip) bestSnip = g.snippets[s2]; }
+      }
+
+      /* Haystack fallback (substring anywhere) */
+      if(score === 0 && g.hay.indexOf(ql) !== -1) score = 5;
+
+      if(score > 0) results.push({g:g, score:score, chap:bestChap, snip:bestSnip});
+    }
+
+    results.sort(function(a,b){ return b.score - a.score; });
+    var top = results.slice(0, 30);
+
+    if(!top.length){
+      stats.textContent = 'No results for "' + q + '".';
+      out.innerHTML = '<p class="am-hero-p">Try a shorter or more general term.</p>';
+      return;
+    }
+    stats.textContent = top.length + ' result' + (top.length===1?'':'s') + ' for "' + q + '"';
+
+    var html = '';
+    top.forEach(function(r){
+      var g = r.g;
+      var url = g.file + (r.chap ? '#' + r.chap.id : '');
+      html += '<div style="margin:14px 0; padding:14px 16px; background:var(--panel); border:1px solid var(--am-line); border-radius:var(--radius);">'
+        + '<div style="font-size:12px; color:var(--muted); margin-bottom:4px;">amin360it.github.io/' + esc(g.file) + '</div>'
+        + '<a href="' + url + '" style="font-size:16.5px; font-weight:700; color:var(--text); text-decoration:none;">' + hi(g.title, q) + '</a>'
+        + (r.chap ? '<div style="font-size:13px; color:var(--accent); margin:2px 0 6px;">§ ' + hi(r.chap.text, q) + '</div>' : '')
+        + '<div style="font-size:13.5px; color:var(--muted); line-height:1.5;">' + hi(r.snip || g.desc, q) + '</div>'
+        + '</div>';
+    });
+    out.innerHTML = html;
+  }
+
+  var DATA = [];
+  fetch(INDEX_URL).then(function(r){ return r.json(); }).then(function(j){
+    DATA = j;
+    stats.textContent = j.length + ' guides indexed — start typing above.';
+    if(input.value.trim().length >= 2) run(input.value);
+  }).catch(function(){
+    stats.textContent = 'Index failed to load. Make sure searchindex.json sits next to search.html.';
+  });
+
+  var t;
+  input.addEventListener('input', function(){
+    clearTimeout(t);
+    t = setTimeout(function(){ run(input.value); }, 180);
+  });
+})();
+</script>
+</body>
+</html>

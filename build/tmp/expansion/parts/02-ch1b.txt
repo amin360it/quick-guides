@@ -1,0 +1,63 @@
+<h3 id="ch1-2" data-toc>1.2 Cargo, rustup and the edition system</h3>
+<p class="topic-desc">Rust's toolchain is two programs and one file. <code>cargo</code> builds, tests, documents, publishes and resolves dependencies; <code>rustc</code> is the compiler underneath; and <code>Cargo.toml</code> is where the package's identity, its edition and its dependency versions live. Nearly every confusing thing about a Rust project traces back to a value in that file.</p>
+
+<h4 id="ch1-2-verbs">Six verbs, and what each guarantees</h4>
+<p><code>cargo new</code> creates a project with a standard layout. <code>cargo build</code> compiles; adding <code>--release</code> turns on optimisation and is the difference between a development binary and a production one. <code>cargo run</code> builds and runs in one step. <code>cargo test</code> compiles and runs the unit tests, the integration tests and the documentation tests. <code>cargo clippy</code> is the linter, and <code>cargo fmt</code> rewrites the source to one canonical form. Everything else in the ecosystem hangs off those six.</p>
+<div class="codeWrap"><pre><code>$ cargo new hello        # a new binary crate, git already initialised
+$ cd hello
+$ cargo build            # debug profile: fast to compile, slow to run
+$ cargo build --release  # optimised. THIS is what you deploy
+$ cargo run              # build (if stale) and execute
+$ cargo test             # unit, integration and doc tests
+$ cargo fmt -- --check   # fail CI on unformatted code
+$ cargo clippy           # 500+ extra lints on top of rustc
+$ cargo doc --open       # build and open the API docs
+$ cargo add serde        # add a dependency, editing Cargo.toml
+$ cargo tree             # the full transitive dependency graph</code></pre></div>
+
+<h4 id="ch1-2-edition">Why the edition matters more than it looks</h4>
+<p>An edition is a set of language rules versioned separately from the compiler. A crate declaring <code>edition = "2021"</code> compiles with today's rustc under 2021 semantics, so it keeps working when the language changes underneath it. Omitting the field defaults to 2015, which disables every post-2015 feature in your code — no <code>async</code>/<code>await</code>, no <code>dyn Trait</code>, no 2018 module paths. Editions in order are 2015, 2018, 2021 and 2024; the field is the only place a whole language generation is switched on.</p>
+<div class="codeWrap"><pre><code># Cargo.toml
+[package]
+name    = "billing"
+version = "1.4.0"
+edition = "2021"     # NEVER omit this. The 2015 default disables
+                     # async, dyn Trait, the 2018 module paths and more.
+
+[dependencies]
+serde      = { version = "1", features = ["derive"] }
+tokio      = { version = "1", features = ["full"] }
+anyhow     = "1"
+
+[dev-dependencies]
+criterion  = "0.5"   # test-only: never in the shipped binary
+
+[profile.release]
+lto         = true   # link-time optimisation
+codegen-units = 1
+opt-level   = 3</code></pre></div>
+
+<h4 id="ch1-2-profiles">The debug profile is not just slower</h4>
+<p>The debug profile enables <code>debug_assertions</code> and integer overflow checks, both of which are <em>removed</em> in release — so an arithmetic bug that panics in development silently wraps in production. The debug profile also generates no inlining and no optimisation, so debug timings are meaningless. This is the single most common way a Rust service passes its tests and fails in production, and the fix is a test suite that also runs against a release build.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let x: u8 = 255;
+    println!("{}", x + 1);
+    // debug build:   panics — overflow checks are on
+    // release build: prints 0 — it wraps, silently
+}
+
+// catch it in CI, not in production:
+//   cargo test            (debug profile of the tests)
+//   cargo test --release  (the run that matters)</code></pre></div>
+
+<h4 id="ch1-2-rustup">What rustup manages, and what cargo does not</h4>
+<p><code>rustup</code> manages toolchains: which compiler versions are installed, which is the default, and which targets are available for each. <code>cargo</code> manages one project: its dependencies, its profiles, its build script, and its output. The frequent confusion is looking for cargo subcommands that are actually rustup commands — installing a toolchain is <code>rustup toolchain install</code>, not a cargo operation at all. A team should pin one toolchain via <code>rust-toolchain.toml</code> so every checkout builds identically.</p>
+<div class="codeWrap"><pre><code>$ rustup show
+active toolchain
+stable-x86_64-pc-windows-msvc (default)
+stable-x86_64-unknown-linux-musl
+
+$ rustup toolchain install 1.78.0
+$ cargo +1.78.0 build          # one project, one pinned toolchain
+$ rustup component add clippy rustfmt
+$ rustup target add wasm32-unknown-unknown</code></pre></div>

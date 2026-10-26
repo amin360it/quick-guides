@@ -1,0 +1,10 @@
+const fs = require('fs');
+const p = 'build/tmp/ch19.html';
+let s = fs.readFileSync(p, 'utf8');
+const before = s.length;
+s = s.split('</section>\n\n    <section class="chapter">\n    <h3 id="ch19-pipeline"').join('\n    <h3 id="ch19-pipeline"');
+s = s.split('</section>\n\n    <section class="chapter">\n    <h3 id="ch19-production"').join('\n    <h3 id="ch19-production"');
+s = s.split('</section>\n  </main>').join('</section>');
+fs.writeFileSync(p, s);
+console.log('delta', before - s.length);
+console.log(JSON.stringify(s.slice(-80)));

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Infrastructure System Design Guide</title>
+<meta name="description" content="This opening section explains what the guide covers: the complete infrastructure stack, from physical…. 20 chapters, 79 topics and 19 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/it-infrastructure.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="IT Infrastructure System Design Guide">
+<meta property="og:description" content="This opening section explains what the guide covers: the complete infrastructure stack, from physical…. 20 chapters, 79 topics and 19 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/it-infrastructure.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="IT Infrastructure System Design Guide">
+<meta name="twitter:description" content="This opening section explains what the guide covers: the complete infrastructure stack, from physical…. 20 chapters, 79 topics and 19 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/it-infrastructure.html#article","headline":"IT Infrastructure System Design Guide","name":"IT Infrastructure System Design Guide","description":"This opening section explains what the guide covers: the complete infrastructure stack, from physical…. 20 chapters, 79 topics and 19 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/it-infrastructure.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/it-infrastructure.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"IT Infrastructure System Design Guide","item":"https://amin360it.github.io/quick-guides/it-infrastructure.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">IT Infrastructure</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — IT Infrastructure System Design</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-layers" data-target="orientation-layers">The infrastructure stack</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · What IT Infrastructure Is</a><ul><li><a href="#ch1-scope" data-target="ch1-scope">1.1 Scope and goals</a></li><li><a href="#ch1-attributes" data-target="ch1-attributes">1.2 Infrastructure quality attributes</a></li><li><a href="#ch1-onprem-cloud" data-target="ch1-onprem-cloud">1.3 On-premises, cloud and hybrid</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Data Centres &amp; Physical Layer</a><ul><li><a href="#ch2-facility" data-target="ch2-facility">2.1 The facility</a></li><li><a href="#ch2-power" data-target="ch2-power">2.2 Power and redundancy</a></li><li><a href="#ch2-racks" data-target="ch2-racks">2.3 Racks, cabling and labelling</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Compute</a><ul><li><a href="#ch3-servers" data-target="ch3-servers">3.1 Servers and sizing</a></li><li><a href="#ch3-virtual" data-target="ch3-virtual">3.2 Virtualisation</a></li><li><a href="#ch3-containers" data-target="ch3-containers">3.3 Containers and orchestration</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Storage</a><ul><li><a href="#ch4-types" data-target="ch4-types">4.1 Block, file and object</a></li><li><a href="#ch4-raid" data-target="ch4-raid">4.2 RAID levels</a></li><li><a href="#ch4-tiers" data-target="ch4-tiers">4.3 Tiers, snapshots and replication</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Networking for Infrastructure</a><ul><li><a href="#ch5-layers" data-target="ch5-layers">5.1 Addressing, VLANs and subnets</a></li><li><a href="#ch5-services" data-target="ch5-services">5.2 Core network services</a></li><li><a href="#ch5-redundancy" data-target="ch5-redundancy">5.3 Redundancy and topology</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Virtualisation, Cloud &amp; Platform Models</a><ul><li><a href="#ch6-cloud-models" data-target="ch6-cloud-models">6.1 Service models</a></li><li><a href="#ch6-regions" data-target="ch6-regions">6.2 Regions, zones and edge</a></li><li><a href="#ch6-landing" data-target="ch6-landing">6.3 Landing zones and guardrails</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Operating Systems &amp; Configuration Management</a><ul><li><a href="#ch7-os" data-target="ch7-os">7.1 Standardisation and patching</a></li><li><a href="#ch7-config" data-target="ch7-config">7.2 Configuration management</a></li><li><a href="#ch7-access" data-target="ch7-access">7.3 Access and remote management</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Identity &amp; Access Management</a><ul><li><a href="#ch8-directory" data-target="ch8-directory">8.1 Directories and SSO</a></li><li><a href="#ch8-rbac" data-target="ch8-rbac">8.2 RBAC, ABAC and least privilege</a></li><li><a href="#ch8-pam" data-target="ch8-pam">8.3 Privileged access management</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Monitoring, Logging &amp; Observability</a><ul><li><a href="#ch9-pillars" data-target="ch9-pillars">9.1 The three pillars and a fourth</a></li><li><a href="#ch9-sli" data-target="ch9-sli">9.2 SLIs, SLOs and error budgets</a></li><li><a href="#ch9-what" data-target="ch9-what">9.3 What infrastructure should monitor</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Backup, Disaster Recovery &amp; Continuity</a><ul><li><a href="#ch10-321" data-target="ch10-321">10.1 The 3-2-1 rule</a></li><li><a href="#ch10-dr" data-target="ch10-dr">10.2 DR tiers and RTO/RPO</a></li><li><a href="#ch10-bcp" data-target="ch10-bcp">10.3 Business continuity</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · High Availability &amp; Clustering</a><ul><li><a href="#ch11-patterns" data-target="ch11-patterns">11.1 HA building blocks</a></li><li><a href="#ch11-calc" data-target="ch11-calc">11.2 Availability maths</a></li><li><a href="#ch11-spof" data-target="ch11-spof">11.3 Finding and removing SPOFs</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch12" data-target="ch12">12 · Security Infrastructure</a><ul><li><a href="#ch12-perimeter" data-target="ch12-perimeter">12.1 Network security controls</a></li><li><a href="#ch12-zero-trust" data-target="ch12-zero-trust">12.2 Zero trust</a></li><li><a href="#ch12-hardening" data-target="ch12-hardening">12.3 Hardening and vulnerability management</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch13" data-target="ch13">13 · Automation, IaC &amp; CI/CD for Infrastructure</a><ul><li><a href="#ch13-iac" data-target="ch13-iac">13.1 Infrastructure as Code</a></li><li><a href="#ch13-pipeline" data-target="ch13-pipeline">13.2 Pipeline for infrastructure</a></li><li><a href="#ch13-gitops" data-target="ch13-gitops">13.3 GitOps and drift detection</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch14" data-target="ch14">14 · Capacity Planning &amp; Performance</a><ul><li><a href="#ch14-method" data-target="ch14-method">14.1 A capacity method</a></li><li><a href="#ch14-metrics" data-target="ch14-metrics">14.2 Key utilisation signals</a></li><li><a href="#ch14-performance" data-target="ch14-performance">14.3 Performance engineering</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch15" data-target="ch15">15 · Cloud &amp; Hybrid Architecture</a><ul><li><a href="#ch15-patterns" data-target="ch15-patterns">15.1 Common patterns</a></li><li><a href="#ch15-networking" data-target="ch15-networking">15.2 Hybrid connectivity</a></li><li><a href="#ch15-resilience" data-target="ch15-resilience">15.3 Cloud resilience</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch16" data-target="ch16">16 · Cost Management (FinOps)</a><ul><li><a href="#ch16-visibility" data-target="ch16-visibility">16.1 Visibility and attribution</a></li><li><a href="#ch16-optimise" data-target="ch16-optimise">16.2 Optimisation levers</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch17" data-target="ch17">17 · Operations, SRE &amp; Runbooks</a><ul><li><a href="#ch17-sre" data-target="ch17-sre">17.1 SRE practices</a></li><li><a href="#ch17-runbook" data-target="ch17-runbook">17.2 Runbooks and on-call</a></li><li><a href="#ch17-change" data-target="ch17-change">17.3 Change and incident management</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch18" data-target="ch18">18 · Case Study — Designing Enterprise Infrastructure</a><ul><li><a href="#ch18-requirements" data-target="ch18-requirements">18.1 Requirements</a></li><li><a href="#ch18-design" data-target="ch18-design">18.2 The design</a></li><li><a href="#ch18-decisions" data-target="ch18-decisions">18.3 Decisions &amp; trade-offs</a></li><li><a href="#ch18-risks" data-target="ch18-risks">18.4 Risks and mitigations</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Checklists &amp; Roadmap</a><ul><li><a href="#app-checklist" data-target="app-checklist">A.1 Infrastructure design checklist</a></li><li><a href="#app-roadmap" data-target="app-roadmap">A.2 Roadmap: beginner to advanced</a></li><li><a href="#app-rules" data-target="app-rules">A.3 Rules of thumb</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">IT Infrastructure System Design Guide</span>
+      <span class="am-band-s">20 chapters &middot; 79 topics &middot; 19 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — IT Infrastructure System Design</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — IT Infrastructure System Design</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-layers">The infrastructure stack</a></div></div>
+    <p class="topic-desc">This opening section explains what the guide covers: the complete infrastructure stack, from physical facilities up to cloud and SRE practice. It positions the book as both a front-to-back tutorial and a lasting reference. Read it once in order, then return to chapters as needed while you build. The section sets expectations for how each later topic builds on what came before.</p>
+    <p>A practical guide to designing and operating the <strong>foundation layer</strong> that everything else runs on: compute, storage, network, identity, monitoring and recovery. Single file, offline, progress saved locally.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">The guide is organised into four parts: foundations, platform, resilience, and operating at scale. Each chapter is a dependent building block, so the foundations must be understood before the later material makes full sense. Practitioners should follow the suggested reading order the first time, then dip into individual chapters as a reference. The cross-references between chapters are deliberate and carry definitions forward.</p>
+    <ul>
+      <li><strong>Foundations (Ch. 1–5)</strong> — what infrastructure is, data centres, compute, storage and networking.</li>
+      <li><strong>Platform (Ch. 6–9)</strong> — virtualisation/cloud, operating systems, identity, monitoring.</li>
+      <li><strong>Resilience (Ch. 10–12)</strong> — backup/DR, high availability, security infrastructure.</li>
+      <li><strong>Operating at scale (Ch. 13–18)</strong> — automation/IaC, capacity, cloud/hybrid, FinOps, SRE and a case study.</li>
+    </ul>
+    <h3 id="orientation-layers" data-toc>The infrastructure stack</h3>
+    <p class="topic-desc">Every system rests on a stack of layers spanning facilities, network, compute, storage, identity and applications. Each layer is designed to fail independently so a single fault does not take the whole stack down. In practice you work bottom-up, hardening the physical and network base first because everything above depends on it. This stack model is the organising idea behind every chapter.</p>
+    <div class="codeWrap"><pre><code>Applications  (business systems)
+Middleware    (web servers, queues, databases)
+Platform      (OS, containers, orchestrators, IAM)
+Compute       (servers, VMs, cloud instances)
+Storage       (SAN/NAS/object, backup)
+Network       (switching, routing, firewalls, DNS, LB)
+Facilities    (power, cooling, racks, cabling)</code></pre></div>
+    <p class="code-note">The seven-layer stack from facilities up to applications; every layer depends on the ones below it, so lower-layer failures sink everything.</p>
+    <div class="tip"><p>Every layer depends on the one below. Most "application outages" are actually failures in a lower layer. Design each layer to fail without taking the stack down.</p></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · What IT Infrastructure Is</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · What IT Infrastructure Is</button><div class="ch-toc-list"><a href="#ch1-scope">1.1 Scope and goals</a><a href="#ch1-attributes">1.2 Infrastructure quality attributes</a><a href="#ch1-onprem-cloud">1.3 On-premises, cloud and hybrid</a></div></div>
+    <p class="topic-desc">This chapter defines what infrastructure is and separates it from the applications that run on top. It establishes the core vocabulary and the quality attributes that matter, because those definitions reappear in every later chapter. Reader attention here pays off throughout, as terms like availability, scalability and security recur constantly. The goal is shared language before any deeper design work.</p>
+    <h3 id="ch1-scope" data-toc>1.1 Scope and goals</h3>
+    <p class="topic-desc">Infrastructure provides five pillars that everything else depends on: compute, storage, network, identity and management. This section explains what each pillar covers and how they interact, so you can locate where your own system sits in the stack. Knowing the boundaries helps you decide what to own, what to buy, and what to delegate to a provider.</p>
+    <p>Infrastructure provides the <strong>compute, storage, network, identity and management</strong> capabilities other systems consume. Its goals are availability, performance, security, scalability and cost-efficiency.</p>
+    <h3 id="ch1-attributes" data-toc>1.2 Infrastructure quality attributes</h3>
+    <p class="topic-desc">The quality attributes are the measurable targets a good system is judged against, including availability, RTO and RPO, scalability, security and cost. This section explains what each number means and why agreeing them first shapes every later decision. In practice you set these targets before designing, because capacity, redundancy and budget all follow from them, and undefined attributes get decided by default.</p>
+    <table>
+      <tr><th>Attribute</th><th>Typical target</th></tr>
+      <tr><td>Availability</td><td>99.9% – 99.99% per service</td></tr>
+      <tr><td>RTO</td><td>Recovery Time Objective (how long to restore)</td></tr>
+      <tr><td>RPO</td><td>Recovery Point Objective (how much data may be lost)</td></tr>
+      <tr><td>Scalability</td><td>Elastic with demand</td></tr>
+      <tr><td>Security</td><td>Least privilege, defence in depth</td></tr>
+      <tr><td>Observability</td><td>Know before users tell you</td></tr>
+      <tr><td>Cost</td><td>Predictable, attributable per service</td></tr>
+    </table>
+    <h3 id="ch1-onprem-cloud" data-toc>1.3 On-premises, cloud and hybrid</h3>
+    <p class="topic-desc">This section compares on-premises, cloud and hybrid deployment, each trading control against operational overhead for different outcomes. On-premise systems let you keep full control of hardware and data but carry power, cooling and maintenance costs, while cloud shifts those burdens to a provider. In practice you choose based on data residency rules, legacy dependencies and the size of the operations team you can staff.</p>
+    <table>
+      <tr><th>Model</th><th>You manage</th><th>Best for</th></tr>
+      <tr><td>On-prem</td><td>Everything</td><td>Data residency, legacy, predictable heavy load</td></tr>
+      <tr><td>IaaS</td><td>OS and above</td><td>Lift-and-shift, full control</td></tr>
+      <tr><td>PaaS</td><td>App and data</td><td>Fast delivery, less ops</td></tr>
+      <tr><td>SaaS</td><td>Usage</td><td>Commodity functions (mail, CRM)</td></tr>
+      <tr><td>Hybrid</td><td>Mix</td><td>Cloud burst + on-prem data</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch1-onprem-cloud--exercises-1">Exercises 1</h4><ol>
+      <li>List the five infrastructure services your product consumes.</li>
+      <li>Set an availability target and an RTO/RPO for one system.</li>
+      <li>Decide on-prem vs cloud for a regulated workload.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Data Centres &amp; Physical Layer</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Data Centres &amp; Physical Layer</button><div class="ch-toc-list"><a href="#ch2-facility">2.1 The facility</a><a href="#ch2-power">2.2 Power and redundancy</a><a href="#ch2-racks">2.3 Racks, cabling and labelling</a></div></div>
+    <p class="topic-desc">Data centres are the physical foundation that compute, storage and networking all depend on. This chapter covers the facility itself, power distribution, cooling, fire suppression, racks and cabling, the parts that cannot be patched from software. The guiding rule is that every clever layer above dies the moment the facility does. Practitioners plan redundancy and physical security for the whole site before any server goes in.</p>
+    <h3 id="ch2-facility" data-toc>2.1 The facility</h3>
+    <p class="topic-desc">A data centre facility must guarantee power paths, cooling and physical security for everything inside. This section explains the tiers of facility redundancy from basic to fault tolerant, and how those tiers set the budget and design constraints you build against. In practice you would inspect the power feeds, cooling loop and access control layers and confirm the facility tier matches what the applications running there actually require.</p>
+    <div class="codeWrap"><pre><code>Power:   utility feed -&gt; UPS -&gt; PDU -&gt; rack -&gt; dual-corded servers
+Cooling: CRAC/CRAH units, hot/cold aisle containment
+Fire:    inert gas / water mist, early detection
+Security:badge + biometric access, CCTV, cabinets locked
+Tiers:   I (basic) ... IV (fault tolerant, 99.995%)</code></pre></div>
+    <p class="code-note">A quick sketch of the facility essentials from the power path to fire suppression, physical security and the fault-tolerant tier scale.</p>
+    <h3 id="ch2-power" data-toc>2.2 Power and redundancy</h3>
+    <p class="topic-desc">Power is delivered from the utility feed through uninterruptible supplies, standby generators and distribution units down to each server. Redundancy is typically N+1 or 2N, meaning a spare unit or a fully duplicated path for every component. In practice you trace the whole path from grid to rack and treat any single unprotected fuse or switch as a single point of failure.</p>
+    <table>
+      <tr><th>Component</th><th>Redundancy</th></tr>
+      <tr><td>Utility feeds</td><td>N+1 or 2N</td></tr>
+      <tr><td>UPS</td><td>Battery/generator ride-through</td></tr>
+      <tr><td>PDUs</td><td>Dual A/B power paths</td></tr>
+      <tr><td>Generators</td><td>Automatic transfer + fuel contracts</td></tr>
+    </table>
+    <h3 id="ch2-racks" data-toc>2.3 Racks, cabling and labelling</h3>
+    <p class="topic-desc">Racks are where cabling, power budgets and asset tracking are actually carried out. This section covers planning the power draw per rack, structured cabling between switches and servers, and labelling every cable and asset so failures can be found quickly. In practice good labelling and a current documentation system let a technician trace any circuit in minutes, while a chaotic rack can cost hours of downtime at the least convenient moment.</p>
+    <ul>
+      <li>Asset tags and structured cabling with documented patching.</li>
+      <li>Power budget per rack; never exceed the breaker.</li>
+      <li>Dual-network paths (A/B switches) for redundancy.</li>
+      <li>Spare capacity for growth and maintenance windows.</li>
+    </ul>
+    <div class="ex"><h4 id="ch2-racks--exercises-2">Exercises 2</h4><ol>
+      <li>Draw the power path from utility to a server.</li>
+      <li>Calculate a rack’s power budget.</li>
+      <li>Define a labelling standard for cables.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Compute</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Compute</button><div class="ch-toc-list"><a href="#ch3-servers">3.1 Servers and sizing</a><a href="#ch3-virtual">3.2 Virtualisation</a><a href="#ch3-containers">3.3 Containers and orchestration</a></div></div>
+    <p class="topic-desc">Compute is the layer where workloads actually run, in the form of physical servers, virtual machines or containers. This chapter explains how to size those resources and how the abstraction you choose, hypervisor or container runtime, shapes every behaviour above it. In practice you match the compute type to the workload and plan headroom, because getting sizing and the right abstraction right makes everything above behave predictably.</p>
+    <h3 id="ch3-servers" data-toc>3.1 Servers and sizing</h3>
+    <p class="topic-desc">Server sizing balances CPU, memory, disk and network capacity against what the workload actually needs. In practice you measure real utilisation before buying or allocating, because memory is usually the first resource exhausted and the hardest to add later. Plan for headroom and growth while keeping per-host costs reasonable, and favour horizontal patterns that let you add capacity without replacing hardware.</p>
+    <table>
+      <tr><th>Resource</th><th>Consideration</th></tr>
+      <tr><td>CPU</td><td>Core count vs clock speed; oversubscription ratios</td></tr>
+      <tr><td>Memory</td><td>Usually the first constraint; reserve host overhead</td></tr>
+      <tr><td>Local disk</td><td>OS/scratch; boot devices in RAID 1</td></tr>
+      <tr><td>Network</td><td>1/10/25/100 GbE; bonded uplinks</td></tr>
+      <tr><td>Form factor</td><td>1U/2U/4U rack, blade, or cloud instance</td></tr>
+    </table>
+    <h3 id="ch3-virtual" data-toc>3.2 Virtualisation</h3>
+    <p class="topic-desc">A hypervisor runs many virtual machines on one physical host and isolates each guest operating system from the others. Virtualisation is the foundation of almost every modern data centre because it turns hardware into a pool of allocatable resources. In practice you pick a hypervisor such as VMware or KVM, size the physical hosts for the spread of guests, and rely on live migration and snapshots for maintenance and resilience.</p>
+    <div class="codeWrap"><pre><code>Bare-metal host
+  hypervisor (ESXi / Hyper-V / KVM / Proxmox)
+    +-- VM (guest OS)   +-- VM   +-- VM
+Containers share the host kernel instead of running a full guest OS
+and start in milliseconds vs minutes.</code></pre></div>
+    <p class="code-note">VMs get a full guest OS isolated by a hypervisor, while containers share the host kernel and start in milliseconds instead of minutes.</p>
+    <h3 id="ch3-containers" data-toc>3.3 Containers and orchestration</h3>
+    <p class="topic-desc">Containers package an application with its dependencies and share the host operating system kernel, so they start in milliseconds and use far less overhead than a full VM. Orchestrators such as Kubernetes handle scheduling, scaling, networking and self-healing across a cluster of machines. In practice you build immutable images, declare the desired state in manifests, and let the orchestrator keep the running workload matched to it.</p>
+    <ul>
+      <li>Containers package app + dependencies into an immutable image.</li>
+      <li>Kubernetes schedules, scales, heals and networks container workloads.</li>
+      <li>Allocate CPU/memory requests and limits to prevent noisy neighbours.</li>
+      <li>Use node pools to separate workload types (system, app, GPU).</li>
+    </ul>
+    <div class="warn"><p>CPU oversubscription is normal; memory oversubscription risks the OOM killer and node instability. Budget memory conservatively.</p></div>
+    <div class="ex"><h4 id="ch3-containers--exercises-3">Exercises 3</h4><ol>
+      <li>Size a host for 20 VMs (vCPU:physical ratio).</li>
+      <li>Compare VMs and containers for two workloads.</li>
+      <li>Set requests/limits for a containerised API.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Storage</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Storage</button><div class="ch-toc-list"><a href="#ch4-types">4.1 Block, file and object</a><a href="#ch4-raid">4.2 RAID levels</a><a href="#ch4-tiers">4.3 Tiers, snapshots and replication</a></div></div>
+    <p class="topic-desc">Storage comes in three models: block, file and object, each with its own access pattern, performance and durability profile. This chapter explains when to use raw volumes, shared file systems or HTTP object stores, and how to protect them with RAID, snapshots and replication. In practice the choice follows the workload: databases like block storage, shared files like NFS or SMB, and backups and archives like object stores.</p>
+    <h3 id="ch4-types" data-toc>4.1 Block, file and object</h3>
+    <p class="topic-desc">Block storage presents raw volumes to a single host, file storage serves shared folders over NFS or SMB to many clients, and object storage exposes buckets over HTTP with flat namespaces. Each model matches different workloads, from databases and virtual machine disks to shared documents and backup archives. In practice you choose by access pattern and scale, and you mix types within one system where each tier needs a different behaviour.</p>
+    <table>
+      <tr><th>Type</th><th>Access</th><th>Examples</th><th>Use</th></tr>
+      <tr><td>Block</td><td>Raw volumes</td><td>SAN, EBS, iSCSI</td><td>Databases, VMs</td></tr>
+      <tr><td>File</td><td>Shared folders</td><td>NAS (NFS/SMB)</td><td>Shared docs, home dirs</td></tr>
+      <tr><td>Object</td><td>HTTP API</td><td>S3, Azure Blob, GCS, MinIO</td><td>Backups, media, static assets</td></tr>
+    </table>
+    <h3 id="ch4-raid" data-toc>4.2 RAID levels</h3>
+    <p class="topic-desc">RAID combines multiple disks into one logical volume to improve performance or redundancy. The levels run from simple striping to mirroring to double parity, each trading usable capacity, performance and tolerance for failed disks. In practice you pick a level to match your performance needs and data risk, such as RAID 10 for databases and RAID 5 or 6 for bulk storage, and you always back parity levels with monitored spare disks.</p>
+    <table>
+      <tr><th>Level</th><th>Layout</th><th>Tolerates</th><th>Notes</th></tr>
+      <tr><td>RAID 0</td><td>Striping</td><td>0 failures</td><td>Fast, no protection</td></tr>
+      <tr><td>RAID 1</td><td>Mirroring</td><td>1 disk</td><td>Simple, 50% usable</td></tr>
+      <tr><td>RAID 5</td><td>Stripe + parity</td><td>1 disk</td><td>Write penalty</td></tr>
+      <tr><td>RAID 6</td><td>Double parity</td><td>2 disks</td><td>Large arrays</td></tr>
+      <tr><td>RAID 10</td><td>Mirror + stripe</td><td>1 per mirror</td><td>Performance + protection</td></tr>
+    </table>
+    <h3 id="ch4-tiers" data-toc>4.3 Tiers, snapshots and replication</h3>
+    <p class="topic-desc">Storage tiering, snapshots and replication manage the trade-off between cost, performance and durability. Tiering moves cold data to cheaper media, snapshots capture fast point-in-time states, and replication keeps copies across systems or sites. In practice you tier by age and access frequency, snapshot on a schedule that matches your recovery point, and note that snapshots are not backups on their own because they live on the same failing storage.</p>
+    <ul>
+      <li>Tiering: hot SSD/NVMe, warm SAS, cold archive/object.</li>
+      <li>Snapshots give fast point-in-time copies; they are <em>not</em> backups.</li>
+      <li>Replication (sync/async) protects against array loss; async introduces lag.</li>
+      <li>Thin provisioning saves capacity but risks overcommitment.</li>
+    </ul>
+    <div class="ex"><h4 id="ch4-tiers--exercises-4">Exercises 4</h4><ol>
+      <li>Choose storage type for a database, a file share and backups.</li>
+      <li>Pick a RAID level for a 20 TB array and justify it.</li>
+      <li>Explain why snapshots are not backups.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Networking for Infrastructure</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Networking for Infrastructure</button><div class="ch-toc-list"><a href="#ch5-layers">5.1 Addressing, VLANs and subnets</a><a href="#ch5-services">5.2 Core network services</a><a href="#ch5-redundancy">5.3 Redundancy and topology</a></div></div>
+    <p class="topic-desc">Networking connects every component and carries the most complexity and the most outage blame in infrastructure. This chapter covers addressing, VLANs and subnets, core services like DNS, DHCP and NTP, load balancing, and redundant topologies. In practice you segment networks to limit blast radius, keep names and time consistent, and design every link with a standby so no single switch or cable can take a service down.</p>
+    <h3 id="ch5-layers" data-toc>5.1 Addressing, VLANs and subnets</h3>
+    <p class="topic-desc">VLANs and subnets divide a physical network into separate broadcast domains so that traffic, faults and policies stay contained. Segmentation limits the blast radius of a misconfigured host and makes firewall rules much easier to reason about. In practice you group hosts by role and trust level, assign each group its own subnet, and attach access control lists at the boundaries so a compromise in one lane cannot roam the whole network.</p>
+    <div class="codeWrap"><pre><code>VLAN 10  Management   10.10.0.0/24
+VLAN 20  Servers      10.20.0.0/22
+VLAN 30  Storage      10.30.0.0/24  (jumbo frames, isolated)
+VLAN 40  DMZ          10.40.0.0/24
+VLAN 50  Clients      10.50.0.0/22
+
+Segmentation limits blast radius and enables firewall policy.</code></pre></div>
+    <p class="code-note">A sample segmented network with management, servers, storage, DMZ and clients in separate VLANs, each with its own subnet and blast radius.</p>
+    <h3 id="ch5-services" data-toc>5.2 Core network services</h3>
+    <p class="topic-desc">DNS, DHCP, NTP and load balancers are the quiet core services that everything else quietly depends on. When one drifts or fails, name resolution, addressing, time and traffic distribution break everywhere at once. In practice you run these as redundant pairs, monitor them first, and keep NTP stable because certificate validation and logs depend on accurate time, with load balancers added to spread traffic and detect failing backends.</p>
+    <table>
+      <tr><th>Service</th><th>Purpose</th></tr>
+      <tr><td>DNS</td><td>Name resolution (internal + external zones)</td></tr>
+      <tr><td>DHCP</td><td>Address assignment (reservations for servers)</td></tr>
+      <tr><td>NTP</td><td>Time sync — critical for auth, logs, TLS</td></tr>
+      <tr><td>Load balancer</td><td>Distribute traffic, health checks, TLS termination</td></tr>
+      <tr><td>Reverse proxy</td><td>Routing, caching, WAF</td></tr>
+    </table>
+    <h3 id="ch5-redundancy" data-toc>5.3 Redundancy and topology</h3>
+    <p class="topic-desc">Redundant links, switches and out-of-band management remove single points of failure from the network path. The topology is designed for the realistic case where a switch, link or power feed fails at an inconvenient moment. In practice you run protocols such as VRRP or ECMP for failover, keep a management network independent of the production fabric, and test failover regularly because a standby path that has never been exercised usually fails when you need it most.</p>
+    <ul>
+      <li>Redundant switches/routers with link aggregation and redundant uplinks.</li>
+      <li>Spanning tree / MLAG to avoid loops and single points of failure.</li>
+      <li>Out-of-band management network for consoles (iDRAC/iLO/IPMI).</li>
+      <li>Uplinks sized for peak + failover (a failed link doubles the load).</li>
+    </ul>
+    <div class="ex"><h4 id="ch5-redundancy--exercises-5">Exercises 5</h4><ol>
+      <li>Design VLANs and subnets for a small office + server room.</li>
+      <li>Plan DNS zones for internal services.</li>
+      <li>Explain why NTP drift breaks authentication.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Virtualisation, Cloud &amp; Platform Models</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Virtualisation, Cloud &amp; Platform Models</button><div class="ch-toc-list"><a href="#ch6-cloud-models">6.1 Service models</a><a href="#ch6-regions">6.2 Regions, zones and edge</a><a href="#ch6-landing">6.3 Landing zones and guardrails</a></div></div>
+    <p class="topic-desc">Virtualisation and cloud both deliver the same compute, storage and network capabilities as a managed service, differing mainly in how much of the stack the provider runs. The model you choose decides how much operational load remains on your team. In practice you compare IaaS, PaaS and managed services by the control you need, then accept and document everything you are delegating. This chapter sets up those decisions.</p>
+    <h3 id="ch6-cloud-models" data-toc>6.1 Service models</h3>
+    <p class="topic-desc">The service models IaaS, PaaS, FaaS and SaaS shift progressively more of the stack to the provider, from raw virtual machines all the way to finished applications. Each step reduces your operational load but also your control and visibility. In practice you take the smallest managed slice that still meets your compliance and customisation needs, and you explicitly accept the shared responsibility for everything the provider now runs.</p>
+    <table>
+      <tr><th>Model</th><th>Provider manages</th><th>You manage</th></tr>
+      <tr><td>IaaS</td><td>Compute/storage/network</td><td>OS, runtime, app</td></tr>
+      <tr><td>PaaS</td><td>OS + runtime</td><td>App + data</td></tr>
+      <tr><td>FaaS</td><td>Scaling + runtime</td><td>Functions</td></tr>
+      <tr><td>SaaS</td><td>Everything</td><td>Configuration</td></tr>
+    </table>
+    <h3 id="ch6-regions" data-toc>6.2 Regions, zones and edge</h3>
+    <p class="topic-desc">Cloud resources are organised into regions, each containing availability zones that have independent power, cooling and network. Spreading replicas across zones is the standard way to survive the loss of one facility entirely. In practice you place application instances and data copies in at least two zones within a region, and you keep lower-latency traffic local while accepting that cross-region failover is the next level of resilience.</p>
+    <div class="codeWrap"><pre><code>Region (e.g. eu-west-1)
+  +-- Availability Zone A   (independent power/network)
+  +-- Availability Zone B
+  +-- Availability Zone C
+Spread replicas across &gt;= 2 (better 3) AZs for HA.
+Multi-region for DR and latency; accept data-replication complexity.</code></pre></div>
+    <p class="code-note">A region contains availability zones with independent power and network; spread replicas across at least two, better three, zones for high availability.</p>
+    <h3 id="ch6-landing" data-toc>6.3 Landing zones and guardrails</h3>
+    <p class="topic-desc">A landing zone is a governed, repeatable starting point that every team or environment gets before they can create resources. It puts network layout, identity, logging and budgets in place by default instead of leaving each team to improvise. In practice you build golden images, baseline subnets and policy guardrails such as IAM roles and resource tagging, so new projects start secure and compliant without bespoke effort.</p>
+    <ul>
+      <li>Accounts/subscriptions per environment and per team.</li>
+      <li>Central networking, identity and logging.</li>
+      <li>Policy guardrails (SCPs, Azure Policy) enforcing standards.</li>
+      <li>Golden images / blueprints for repeatable deployments.</li>
+    </ul>
+    <div class="ex"><h4 id="ch6-landing--exercises-6">Exercises 6</h4><ol>
+      <li>Choose a service model for three workloads.</li>
+      <li>Design AZ placement for a 3-tier app.</li>
+      <li>List guardrails you would enforce centrally.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Operating Systems &amp; Configuration Management</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Operating Systems &amp; Configuration Management</button><div class="ch-toc-list"><a href="#ch7-os">7.1 Standardisation and patching</a><a href="#ch7-config">7.2 Configuration management</a><a href="#ch7-access">7.3 Access and remote management</a></div></div>
+    <p class="topic-desc">Operating systems stay consistent and patched, or they quietly become the root cause of incidents. This chapter covers standardising the build through golden images, managing configuration after deployment, and controlling remote access. In practice you provision from a known baseline, keep the fleet patched on a fixed cadence, apply configuration with automation, and control remote access through broker gateways.</p>
+    <h3 id="ch7-os" data-toc>7.1 Standardisation and patching</h3>
+    <p class="topic-desc">Standardisation starts with golden images: a minimal, approved baseline operating system that every host is provisioned from. A fixed patch cadence and a minimal installed footprint keep the fleet consistent and easier to secure, provision and replace. In practice you build the image in a pipeline, scan and patch it on a schedule, and allow service-specific changes only through configuration management so drift never accumulates.</p>
+    <table>
+      <tr><th>Practice</th><th>Benefit</th></tr>
+      <tr><td>Standard build/golden image</td><td>Consistency, faster provisioning</td></tr>
+      <tr><td>Patch cadence</td><td>Security, stability</td></tr>
+      <tr><td>Minimal footprint</td><td>Smaller attack surface</td></tr>
+      <tr><td>Immutable infra</td><td>Replace, don’t mutate</td></tr>
+    </table>
+    <h3 id="ch7-config" data-toc>7.2 Configuration management</h3>
+    <p class="topic-desc">Configuration management tools declare the state a system should be in and converge the live system toward it, so servers never depend on someone remembering manual steps. Ansible typically manages configuration and ad-hoc tasks on existing servers, while Terraform provisions resources and manages their lifecycle. In practice you store everything as code in version control, run playbooks and plans through review, and let the tools report drift when reality stops matching the declared state.</p>
+    <div class="codeWrap"><pre><code>Ansible   - agentless, YAML playbooks (great for config + patching)
+Puppet/Chef - agent-based, continuous convergence
+Terraform - provision infrastructure (see Ch. 13)
+Desired state: define the target; the tool converges reality to it.</code></pre></div>
+    <p class="code-note">Tool comparison: Ansible is agentless and great for config, Puppet and Chef converge continuously, and Terraform provisions the infrastructure itself.</p>
+    <div class="codeWrap"><pre><code>- hosts: web  # target the web servers
+  tasks:
+    - name: ensure nginx is present and running
+      ansible.builtin.package: { name: nginx, state: present }  # desired package state
+    - name: start nginx
+      ansible.builtin.service: { name: nginx, state: started, enabled: true }  # run at boot too</code></pre></div>
+    <p class="code-note">A minimal Ansible playbook that installs nginx and starts it as an enabled service on the web hosts, keeping them in the declared state.</p>
+    <h3 id="ch7-access" data-toc>7.3 Access and remote management</h3>
+    <p class="topic-desc">Remote access to servers and appliances should never be exposed directly to the internet. It goes through a bastion host or session broker that authenticates, logs and forwards connections to the internal network. In practice you use short-lived or certificate-based credentials instead of standing passwords, gate access to a specific SSH port, and record privileged sessions for audit, so every administration action is attributable.</p>
+    <ul>
+      <li>SSH/RDP only from a bastion or via a policy broker; never exposed publicly.</li>
+      <li>Certificate-based or short-lived credential auth over passwords.</li>
+      <li>Session recording and full audit of privileged access.</li>
+    </ul>
+    <div class="ex"><h4 id="ch7-access--exercises-7">Exercises 7</h4><ol>
+      <li>Define a golden image baseline.</li>
+      <li>Write an Ansible task that installs and starts a service.</li>
+      <li>Remove direct SSH exposure from the internet.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Identity &amp; Access Management</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Identity &amp; Access Management</button><div class="ch-toc-list"><a href="#ch8-directory">8.1 Directories and SSO</a><a href="#ch8-rbac">8.2 RBAC, ABAC and least privilege</a><a href="#ch8-pam">8.3 Privileged access management</a></div></div>
+    <p class="topic-desc">Identity is the master key to the whole estate, so this chapter treats directories, access models and privileged access as security-critical infrastructure. A broken identity layer breaks authentication everywhere and every system that depends on it. In practice you run a central directory, connect applications to it via single sign-on, and apply least privilege together with strict controls on administrator accounts.</p>
+    <h3 id="ch8-directory" data-toc>8.1 Directories and SSO</h3>
+    <p class="topic-desc">The directory is the single source of truth for users, groups and policies, and everything else authenticates against it. Single sign-on sits on top so a user logs in once, often with MFA, and accesses many systems with that one session. In practice you deploy a directory such as Active Directory or a cloud identity provider, federate the applications to it, and centralise deprovisioning so removing one person revokes access everywhere.</p>
+    <div class="codeWrap"><pre><code>On-prem AD / cloud Entra ID / LDAP
+  -&gt; single source of truth for users and groups
+SSO via OIDC / SAML / Kerberos
+  -&gt; one login, MFA, central deprovisioning</code></pre></div>
+    <p class="code-note">The directory is the single source of truth for users and groups, with SSO providing one login, MFA and central deprovisioning.</p>
+    <h3 id="ch8-rbac" data-toc>8.2 RBAC, ABAC and least privilege</h3>
+    <p class="topic-desc">RBAC assigns permissions through roles given to people or groups, while ABAC decides access from attributes such as department, environment and time of day. Just-in-time access adds short-lived elevation for tasks that need more privilege than the day-to-day role. In practice you grant the least access that still gets the work done, review role membership regularly, and prefer temporary elevation over permanently broad roles.</p>
+    <table>
+      <tr><th>Model</th><th>Decision basis</th></tr>
+      <tr><td>RBAC</td><td>Roles assigned to users</td></tr>
+      <tr><td>ABAC</td><td>Attributes (dept, location, resource tags)</td></tr>
+      <tr><td>Just-in-time</td><td>Elevate temporarily with approval</td></tr>
+    </table>
+    <h3 id="ch8-pam" data-toc>8.3 Privileged access management</h3>
+    <p class="topic-desc">Privileged access management vaults administrator credentials so passwords are rotated, checked out only when needed and individually attributable. It watches the highest-risk accounts that can change configuration, read every secret or delete backups. In practice you route privileged logins through the PAM broker, approve checkouts with workflows, and maintain a sealed break-glass account for emergencies that is monitored the moment it is opened.</p>
+    <ul>
+      <li>Vault and rotate privileged credentials.</li>
+      <li>Break-glass accounts, sealed and monitored.</li>
+      <li>Separate admin identities from daily-use accounts.</li>
+      <li>Review access regularly; remove stale entitlements.</li>
+    </ul>
+    <div class="warn"><p>Service accounts with standing admin rights are the most common path to a full compromise. Scope them narrowly and rotate their secrets.</p></div>
+    <div class="ex"><h4 id="ch8-pam--exercises-8">Exercises 8</h4><ol>
+      <li>Model roles for a small engineering org.</li>
+      <li>Design a JIT elevation flow.</li>
+      <li>Find and remove one over-privileged account.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Monitoring, Logging &amp; Observability</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Monitoring, Logging &amp; Observability</button><div class="ch-toc-list"><a href="#ch9-pillars">9.1 The three pillars and a fourth</a><a href="#ch9-sli">9.2 SLIs, SLOs and error budgets</a><a href="#ch9-what">9.3 What infrastructure should monitor</a></div></div>
+    <p class="topic-desc">Observability means you find out a problem exists before a user reports it. This chapter covers the three pillars of monitoring, the SLI, SLO and error-budget framework, and the specific infrastructure signals worth watching. In practice you collect metrics, logs and traces into a single platform, define alert rules that page on real user impact, and review trends so capacity exhaustion is caught while it is still a trend rather than an outage.</p>
+    <h3 id="ch9-pillars" data-toc>9.1 The three pillars and a fourth</h3>
+    <p class="topic-desc">Metrics, logs and traces answer three different questions: how much, what happened and where the time went. Metrics are numeric counters gathered over time, logs record discrete events, and traces follow a request across services. A fourth pillar, alerting, decides when any of the data is severe enough to page a human. In practice you correlate all three in one tool so one incident can be seen across every dimension.</p>
+    <table>
+      <tr><th>Pillar</th><th>Answers</th><th>Examples</th></tr>
+      <tr><td>Metrics</td><td>How much / how fast</td><td>Prometheus, Azure Monitor</td></tr>
+      <tr><td>Logs</td><td>What happened</td><td>ELK/OpenSearch, Loki</td></tr>
+      <tr><td>Traces</td><td>Where time went</td><td>Jaeger, Tempo, OTel</td></tr>
+      <tr><td>Alerts</td><td>When to act</td><td>Alertmanager, PagerDuty</td></tr>
+    </table>
+    <h3 id="ch9-sli" data-toc>9.2 SLIs, SLOs and error budgets</h3>
+    <p class="topic-desc">SLIs measure how often a service actually delivers good events, such as successful requests over total requests, while SLOs set the target for that ratio over a period. The error budget is the allowed shortfall, and it is spent on releases and changes rather than treated as failure. In practice you alert on burn rate so the budget is spent at a predictable pace, instead of alerting on raw noise that pages people for nothing.</p>
+    <div class="codeWrap"><pre><code>SLI  = fraction of good events (e.g. successful requests under 300ms)
+SLO  = target over a window (99.9% / 30 days)
+Budget = 100% - SLO; spend it on releases, freeze when exhausted
+Alert on burn rate, not on every transient spike</code></pre></div>
+    <p class="code-note">SLIs measure good events, SLOs set a target over a window, and the error budget decides when you freeze releases and alert on burn rate.</p>
+    <h3 id="ch9-what" data-toc>9.3 What infrastructure should monitor</h3>
+    <p class="topic-desc">Infrastructure monitoring watches the golden signals and the systems underneath them. You collect the same four metrics, latency, traffic, errors and saturation, for each service, and you watch the support infrastructure that hosts it. In practice you set thresholds from capacity models, alert on trends and utilisation approaching the ceiling, and treat capacity exhaustion as a slow and silent outage that is entirely avoidable if watched early.</p>
+    <ul>
+      <li>Golden signals per service: latency, traffic, errors, saturation.</li>
+      <li>Infrastructure: CPU, memory, disk, network, power, temperature.</li>
+      <li>Capacity trends to forecast exhaustion.</li>
+      <li>Synthetic checks and real-user monitoring for availability.</li>
+    </ul>
+    <div class="ex"><h4 id="ch9-what--exercises-9">Exercises 9</h4><ol>
+      <li>Define SLIs/SLOs for one service.</li>
+      <li>Write an alert with a burn-rate condition.</li>
+      <li>List the top five metrics per layer.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Backup, Disaster Recovery &amp; Continuity</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Backup, Disaster Recovery &amp; Continuity</button><div class="ch-toc-list"><a href="#ch10-321">10.1 The 3-2-1 rule</a><a href="#ch10-dr">10.2 DR tiers and RTO/RPO</a><a href="#ch10-bcp">10.3 Business continuity</a></div></div>
+    <p class="topic-desc">Backup, disaster recovery and continuity are how you survive the day your primary systems go away. This chapter covers the 3-2-1 rule, DR tiers with their RTO and RPO implications, and the people and process side of business continuity. In practice you treat this spend as insurance, design it into the architecture, and most importantly rehearse restore and failover so the plan works exactly when the primary has already failed.</p>
+    <h3 id="ch10-321" data-toc>10.1 The 3-2-1 rule</h3>
+    <p class="topic-desc">The 3-2-1 rule says keep at least three copies of your data, on two different media types, with one copy stored off-site. Immutable and air-gapped copies extend this by protecting against ransomware that cannot delete or encrypt them. In practice you automate the copy pipeline, run backups to a separate storage class or cloud availability zone, and test restores on a schedule so the copies are known to be readable.</p>
+    <div class="codeWrap"><pre><code>3 copies of data
+2 different media/types
+1 off-site (offline/immutable ideally)
+
+Add "0 errors" by TESTING restores and using immutable/air-gapped copies
+to defeat ransomware.</code></pre></div>
+    <p class="code-note">The 3-2-1 rule with tested restores and immutable, air-gapped copies added as the defence against ransomware.</p>
+    <h3 id="ch10-dr" data-toc>10.2 DR tiers and RTO/RPO</h3>
+    <p class="topic-desc">DR tiers trade cost against recovery time, from slow backup-and-restore through pilot light and warm standby up to active-active. Each tier delivers a different RTO and RPO at a different price. In practice you work out what each system can tolerate, in downtime and data loss, then buy only the tier it needs, because an active-active tier for everything is unaffordable and a backup tier for everything is not enough.</p>
+    <table>
+      <tr><th>Tier</th><th>Strategy</th><th>RTO</th><th>Cost</th></tr>
+      <tr><td>Backup &amp; restore</td><td>Restore from backups</td><td>Hours–days</td><td>Low</td></tr>
+      <tr><td>Pilot light</td><td>Core kept warm</td><td>Hours</td><td>Medium</td></tr>
+      <tr><td>Warm standby</td><td>Scaled-down live copy</td><td>Minutes</td><td>Medium+</td></tr>
+      <tr><td>Active-active</td><td>Both sites serving</td><td>Seconds</td><td>High</td></tr>
+    </table>
+    <h3 id="ch10-bcp" data-toc>10.3 Business continuity</h3>
+    <p class="topic-desc">Business continuity covers the people and process side that technology alone cannot: documentation, communication and rehearsed responses. It answers who decides what, who talks to whom, and how a team keeps working while systems are down. In practice you write call trees and runbooks, schedule drills and tabletop exercises, and treat an untested plan as a hope rather than a capability.</p>
+    <ul>
+      <li>Document dependencies and manual workarounds.</li>
+      <li>Define communication and escalation during an incident.</li>
+      <li>Test failover and restores on a schedule (a DR drill).</li>
+      <li>Review after incidents; update RTO/RPO with real data.</li>
+    </ul>
+    <div class="warn"><p>An untested DR plan is a hope. Schedule drills, record actual RTO/RPO, and fix the gaps you find.</p></div>
+    <div class="ex"><h4 id="ch10-bcp--exercises-10">Exercises 10</h4><ol>
+      <li>Apply 3-2-1 to a database.</li>
+      <li>Choose a DR tier for two systems by RTO/RPO.</li>
+      <li>Run a restore test and time it.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · High Availability &amp; Clustering</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · High Availability &amp; Clustering</button><div class="ch-toc-list"><a href="#ch11-patterns">11.1 HA building blocks</a><a href="#ch11-calc">11.2 Availability maths</a><a href="#ch11-spof">11.3 Finding and removing SPOFs</a></div></div>
+    <p class="topic-desc">High availability is the engineering discipline of removing single points of failure so a system stays up when a component dies. The tools are redundancy, health checks, load balancing and clustering working together. In practice you add redundant components, verify them with automated health checks, and distribute traffic so a failing node is removed automatically, then you test the whole mechanism because unexercised failover is the most common reason high availability quietly fails.</p>
+    <h3 id="ch11-patterns" data-toc>11.1 HA building blocks</h3>
+    <p class="topic-desc">Redundant components, load balancing, clustering and multi-zone deployment cover different failure modes, from a failed disk to a lost data centre. Each technique protects a different part of the stack at a different cost. In practice you match the technique to what you are protecting: hardware redundancy for a single server, a load-balanced pool for stateless services, and cluster data replication where state must survive a node loss.</p>
+    <table>
+      <tr><th>Technique</th><th>Protects against</th></tr>
+      <tr><td>Redundant components (N+1)</td><td>Single device failure</td></tr>
+      <tr><td>Load balancing + health checks</td><td>Node failure, uneven load</td></tr>
+      <tr><td>Clustering / quorum</td><td>Server failure with state</td></tr>
+      <tr><td>Database failover</td><td>DB node failure</td></tr>
+      <tr><td>Multi-AZ / multi-site</td><td>Facility/zone loss</td></tr>
+    </table>
+    <h3 id="ch11-calc" data-toc>11.2 Availability maths</h3>
+    <p class="topic-desc">Availability maths is a simple composition rule: components in series multiply their availability, while redundant components in parallel add to it. Two servers in series can hit two nines, but the moment one is 99 percent, the chain drops to the weaker link. In practice you model the chain, then look past the arithmetic for shared dependencies, since one un-redundant service still caps the availability of everything that uses it.</p>
+    <div class="codeWrap"><pre><code>Serial:   A = A1 * A2        (dependencies multiply -&gt; lower)
+Parallel: A = 1 - (1-A1)(1-A2)  (redundancy -&gt; higher)
+
+Example: two 99.9% components in parallel
+  = 1 - (0.001 * 0.001) = 99.9999%
+But a shared dependency (one DB) still caps the whole chain.</code></pre></div>
+    <p class="code-note">Serial dependencies multiply availability down and redundancy lifts it back up; notice how a single shared dependency still caps the whole chain.</p>
+    <h3 id="ch11-spof" data-toc>11.3 Finding and removing SPOFs</h3>
+    <p class="topic-desc">To find single points of failure you draw every dependency path and circle anything that exists only once on it. Hardware is the obvious case, but shared services, a single firewall, one key and even a team with only one expert who knows a system are points of failure too. In practice you remove or duplicate each one, and where duplication is impossible you at least make the failure fast, visible and recoverable.</p>
+    <ul>
+      <li>Walk every path and circle anything with a single instance.</li>
+      <li>Watch shared services: DNS, identity, the load balancer, the database.</li>
+      <li>Remember people and processes: one expert, one runbook, one key.</li>
+    </ul>
+    <div class="ex"><h4 id="ch11-spof--exercises-11">Exercises 11</h4><ol>
+      <li>Calculate availability of a 3-tier chain.</li>
+      <li>Diagram your SPOFs.</li>
+      <li>Remove one SPOF and re-measure.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch12" data-toc>12 · Security Infrastructure</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Security Infrastructure</button><div class="ch-toc-list"><a href="#ch12-perimeter">12.1 Network security controls</a><a href="#ch12-zero-trust">12.2 Zero trust</a><a href="#ch12-hardening">12.3 Hardening and vulnerability management</a></div></div>
+    <p class="topic-desc">Security infrastructure is the layered net around the estate, plus the working assumption that it will be breached. This chapter combines network controls, zero trust and hardening so that no single failure is fatal. In practice you layer firewall and WAF controls at the edges, apply posture checks and software-defined segmentation inside, and harden hosts so the blast radius of any breach stays small.</p>
+    <h3 id="ch12-perimeter" data-toc>12.1 Network security controls</h3>
+    <p class="topic-desc">Firewalls, web application firewalls, VPNs and intrusion detection shape and monitor traffic where the network meets the outside world. Each control filters or detects a different kind of attack, from port scans to web injection to tunnelled traffic. In practice you layer them on the traffic path, run default-deny rules, analyse logs from all of them together, and remember that the perimeter is only the first line, not the whole defence.</p>
+    <table>
+      <tr><th>Control</th><th>Role</th></tr>
+      <tr><td>Firewall / security groups</td><td>Filter traffic by rule</td></tr>
+      <tr><td>WAF</td><td>Block web attacks (SQLi, XSS)</td></tr>
+      <tr><td>VPN / ZTNA</td><td>Secure remote access</td></tr>
+      <tr><td>IDS/IPS</td><td>Detect/block intrusions</td></tr>
+      <tr><td>SIEM</td><td>Correlate logs and alert</td></tr>
+      <tr><td>EDR</td><td>Endpoint detection and response</td></tr>
+    </table>
+    <h3 id="ch12-zero-trust" data-toc>12.2 Zero trust</h3>
+    <p class="topic-desc">Zero trust assumes the network is always hostile and that every request must be verified on its own merits, never trusted because of its origin. Identity-aware proxies and mutual TLS verify the caller and the connection, while micro-segmentation isolates workloads so a compromised host cannot roam laterally. In practice you replace the flat trusted LAN with per-request authentication and least-privilege routes between services.</p>
+    <div class="codeWrap"><pre><code>Old: trusted internal network, hard outside.
+New: never trust, always verify.
+  - identity-aware proxy for every service
+  - mTLS between workloads
+  - micro-segmentation instead of a flat VLAN
+  - least privilege, continuous verification</code></pre></div>
+    <p class="code-note">The shift from a trusted internal network to never trust, always verify, using identity-aware proxies, mTLS and micro-segmentation.</p>
+    <h3 id="ch12-hardening" data-toc>12.3 Hardening and vulnerability management</h3>
+    <p class="topic-desc">Hardening shrinks the attack surface by removing unneeded software, applying secure defaults and locking down services on every host. Vulnerability management keeps the surface shrinking as new flaws appear, by scanning, prioritising and patching to an agreed severity SLA. In practice you apply CIS-style baselines, scan images before deployment, patch tracked findings on schedule, and store secrets in a vault instead of config files.</p>
+    <ul>
+      <li>Baselines and CIS benchmarks; disable unused services.</li>
+      <li>Patch management with SLAs by severity.</li>
+      <li>Regular vulnerability scanning and penetration tests.</li>
+      <li>Secrets in a vault; never in config files or images.</li>
+    </ul>
+    <div class="ex"><h4 id="ch12-hardening--exercises-12">Exercises 12</h4><ol>
+      <li>Write firewall rules for a 3-tier app.</li>
+      <li>Replace a VPN with identity-aware access for one app.</li>
+      <li>Define a patch SLA by CVSS severity.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch13" data-toc>13 · Automation, IaC &amp; CI/CD for Infrastructure</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Automation, IaC &amp; CI/CD for Infrastructure</button><div class="ch-toc-list"><a href="#ch13-iac">13.1 Infrastructure as Code</a><a href="#ch13-pipeline">13.2 Pipeline for infrastructure</a><a href="#ch13-gitops">13.3 GitOps and drift detection</a></div></div>
+    <p class="topic-desc">Automation and infrastructure as code turn design decisions into reviewable, reproducible artifacts instead of manual tribal knowledge. Nothing depends on a human remembering a step, and every change can be peer reviewed and rolled back. In practice you write infrastructure in configuration files, store them in git, and run apply through a pipeline so the same change is made the same way every time.</p>
+    <h3 id="ch13-iac" data-toc>13.1 Infrastructure as Code</h3>
+    <p class="topic-desc">Infrastructure as code declares servers, networks and cloud resources in files that are planned, reviewed and then applied, instead of being clicked together by hand. The state file records what exists and becomes the source of truth for what is live. In practice you write Terraform or equivalent, keep state remotely so a team shares it, and lock state during apply so two changes cannot fight over the same resources.</p>
+    <div class="codeWrap"><pre><code># one declarative EC2 instance
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.medium"  # small size for a test/example
+  subnet_id     = aws_subnet.public.id
+  tags          = { Name = "web", Env = "prod" }  # tags drive ownership and cost
+}
+
+terraform init / plan / apply  # review the plan before apply
+State is the source of truth; keep it remote and locked.</code></pre></div>
+    <p class="code-note">A Terraform block declaring one AWS instance, driven through init, plan and apply, with remote locked state as the source of truth.</p>
+    <h3 id="ch13-pipeline" data-toc>13.2 Pipeline for infrastructure</h3>
+    <p class="topic-desc">Infrastructure changes should run through the same discipline as code changes: plan, policy check, approval and then apply. This prevents a risky change from being typed directly against a production environment from a laptop. In practice you run the plan step in CI, enforce policies and security scans on the diff, require an approval gate for production, and apply with the same credentials every time so the outcome is reproducible.</p>
+    <div class="codeWrap"><pre><code>fmt -&gt; validate -&gt; plan -&gt; policy check -&gt; approval -&gt; apply
+Never `apply` from a laptop on production; run it through CI with
+review, state locking and an audit trail.</code></pre></div>
+    <p class="code-note">Run infrastructure changes through CI: format, validate, plan, policy-check, approve, then apply, with review, state locking and an audit trail.</p>
+    <h3 id="ch13-gitops" data-toc>13.3 GitOps and drift detection</h3>
+    <p class="topic-desc">GitOps holds the desired state of the entire environment in git and lets controllers continuously reconcile the live systems to match it. Any difference between the repository and reality is drift that the controller either corrects or reports. In practice you store manifests in git, run agents such as Flux or Argo CD in the cluster, merge changes through pull requests, and alert on drift so unauthorised or manual modifications become visible immediately.</p>
+    <ul>
+      <li>Declarative desired state in git; controllers reconcile.</li>
+      <li>Detect and alert on drift between declared and actual state.</li>
+      <li>Immutable infrastructure: rebuild rather than patch.</li>
+    </ul>
+    <div class="ex"><h4 id="ch13-gitops--exercises-13">Exercises 13</h4><ol>
+      <li>Codify one environment in Terraform.</li>
+      <li>Add plan + policy checks to CI.</li>
+      <li>Detect drift on a live resource.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch14" data-toc>14 · Capacity Planning &amp; Performance</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Capacity Planning &amp; Performance</button><div class="ch-toc-list"><a href="#ch14-method">14.1 A capacity method</a><a href="#ch14-metrics">14.2 Key utilisation signals</a><a href="#ch14-performance">14.3 Performance engineering</a></div></div>
+    <p class="topic-desc">Capacity planning is how you run out of headroom on a schedule you control instead of by surprise. It combines measuring utilisation, forecasting growth, modelling headroom and setting trigger points for buying or scaling. In practice you review demand and capacity on a regular cadence, keep forecasts fed by real utilisation data, and act on the agreed triggers before the plateau is reached so users never feel the constraint.</p>
+    <h3 id="ch14-method" data-toc>14.1 A capacity method</h3>
+    <p class="topic-desc">A capacity method is a repeatable loop: measure current utilisation, forecast future demand, model how much headroom remains, and set triggers for action. The review runs on a schedule, typically monthly, because growth does not stay where you left it. In practice you instrument the infrastructure to capture trends, project several horizons out, and use the modelling to justify when to expand or purchase before supply runs short.</p>
+    <div class="codeWrap"><pre><code>1 Measure current utilisation and growth rate
+2 Forecast demand (seasonal + organic)
+3 Model headroom: target &lt;= 60-70% steady-state
+4 Plan scale-up/scale-out triggers
+5 Review monthly; capacities always shift</code></pre></div>
+    <p class="code-note">A five-step capacity method: measure, forecast, model headroom, set triggers, and review monthly since demand always moves.</p>
+    <h3 id="ch14-metrics" data-toc>14.2 Key utilisation signals</h3>
+    <p class="topic-desc">The key utilisation signals are the sustained CPU, memory pressure, IOPS and throughput numbers that show when a resource is nearing its ceiling. You watch sustained values and trends rather than peaks, because a slow climb is the signature of approaching exhaustion. In practice you monitor the ratio of demand to capacity, set thresholds on sustained utilisation, and forecast from the trend so you add capacity before the metric flattens against its ceiling.</p>
+    <table>
+      <tr><th>Resource</th><th>Watch</th></tr>
+      <tr><td>CPU</td><td>Sustained utilisation, run-queue length</td></tr>
+      <tr><td>Memory</td><td>Pressure, swap, OOM events</td></tr>
+      <tr><td>Disk</td><td>IOPS, latency, free space, queue depth</td></tr>
+      <tr><td>Network</td><td>Throughput vs link capacity, errors</td></tr>
+      <tr><td>Power/heat</td><td>Rack and circuit limits</td></tr>
+    </table>
+    <h3 id="ch14-performance" data-toc>14.3 Performance engineering</h3>
+    <p class="topic-desc">Performance engineering finds and removes the constraint that actually limits throughput instead of hiding it behind bigger caches. You load test to find the knee, the point where performance drops sharply as load rises, and you design the scaling levers to respond before it. In practice you profile and benchmark each layer, then set autoscaling on leading indicators so capacity grows ahead of the demand that would push the system past the knee.</p>
+    <ul>
+      <li>Little’s Law: concurrency = throughput × latency.</li>
+      <li>Load test to find the knee of the curve before production does.</li>
+      <li>Cache and queue to smooth demand, not to hide a bottleneck.</li>
+      <li>Autoscale on leading indicators, not just CPU.</li>
+    </ul>
+    <div class="ex"><h4 id="ch14-performance--exercises-14">Exercises 14</h4><ol>
+      <li>Forecast capacity for 12 months of growth.</li>
+      <li>Set a scale-out trigger for a web tier.</li>
+      <li>Load-test and identify the knee.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch15" data-toc>15 · Cloud &amp; Hybrid Architecture</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Cloud &amp; Hybrid Architecture</button><div class="ch-toc-list"><a href="#ch15-patterns">15.1 Common patterns</a><a href="#ch15-networking">15.2 Hybrid connectivity</a><a href="#ch15-resilience">15.3 Cloud resilience</a></div></div>
+    <p class="topic-desc">Cloud and hybrid architecture moves workloads to wherever they run best, either fully in the cloud or split across cloud and on-premise sites. The chapter covers the migration patterns, connectivity between sites and cloud-specific resilience, including the reality of egress cost. In practice you make the move pattern-explicit, connect sites with VPN or dedicated links, spread across availability zones, and budget for data leaving the cloud.</p>
+    <h3 id="ch15-patterns" data-toc>15.1 Common patterns</h3>
+    <p class="topic-desc">The four migration playbooks are lift and shift, re-platform, refactor and hybrid, ordered by depth of change and return. Lift and shift moves workloads as they are, re-platform swaps managed services in, refactor rewrites for the cloud, and hybrid keeps part of the estate on-premise. In practice you match the playbook to the workload’s age, its coupling to old infrastructure and your appetite for change, and you treat the choice as architectural, not cosmetic.</p>
+    <table>
+      <tr><th>Pattern</th><th>Use</th></tr>
+      <tr><td>Lift &amp; shift</td><td>Fast migration, then optimise</td></tr>
+      <tr><td>Re-platform</td><td>Managed DB/queue with minor changes</td></tr>
+      <tr><td>Refactor</td><td>Cloud-native (containers, serverless)</td></tr>
+      <tr><td>Hybrid</td><td>Keep data on-prem, burst to cloud</td></tr>
+    </table>
+    <h3 id="ch15-networking" data-toc>15.2 Hybrid connectivity</h3>
+    <p class="topic-desc">Hybrid connectivity links cloud and on-premise networks across sites, with VPNs being cheap and temperamental and dedicated links such as Direct Connect or ExpressRoute being predictable and pricey. The design must cover routing, DNS resolution and egress cost before the first byte moves. In practice you plan overlapping CIDR avoidance, decide DNS split between the sites, and calculate transfer costs so data-heavy workflows do not surprise the bill.</p>
+    <div class="codeWrap"><pre><code>VPN over internet  - cheap, variable latency
+Dedicated link     - ExpressRoute / Direct Connect / Interconnect
+                      predictable, higher cost
+
+Design for: routing, DNS resolution across sites, and data egress cost.</code></pre></div>
+    <p class="code-note">VPN is cheap but variable, a dedicated link is predictable and pricier; design routing, DNS and egress cost across sites.</p>
+    <h3 id="ch15-resilience" data-toc>15.3 Cloud resilience</h3>
+    <p class="topic-desc">Cloud resilience starts from the fact that regions are made of availability zones and that a whole zone can fail or shed capacity. Workloads should be spread across zones and designed to degrade gracefully when one of them or a quota limit appears. In practice you replicate stateless tiers across zones with load balancing, keep state in replicated services, and deliberately test zone failure with game days so the design is proven rather than assumed.</p>
+    <ul>
+      <li>Spread across AZs; test zone-failure scenarios.</li>
+      <li>Automate backup and restore with infrastructure as code.</li>
+      <li>Beware service quotas and regional limits.</li>
+      <li>Design for graceful degradation when a managed service wobbles.</li>
+    </ul>
+    <div class="ex"><h4 id="ch15-resilience--exercises-15">Exercises 15</h4><ol>
+      <li>Choose a migration pattern for a legacy app.</li>
+      <li>Design hybrid connectivity for a data-residency requirement.</li>
+      <li>Simulate an AZ failure.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch16" data-toc>16 · Cost Management (FinOps)</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Cost Management (FinOps)</button><div class="ch-toc-list"><a href="#ch16-visibility">16.1 Visibility and attribution</a><a href="#ch16-optimise">16.2 Optimisation levers</a></div></div>
+    <p class="topic-desc">FinOps is cost control that starts in the architecture rather than at the billing report. It adds tagging and attribution first so every cent is accountable, then optimisation with budgets and the right pricing levers. In practice you enforce tagging on everything, run showback to teams, set budgets with anomaly alerts, and review spend with the same regularity you review capacity.</p>
+    <h3 id="ch16-visibility" data-toc>16.1 Visibility and attribution</h3>
+    <p class="topic-desc">Visibility starts by tagging every resource with owner, environment and cost centre so the bill can be attributed to whoever created it. Showback shares those numbers with each team, and anomaly alerts flag when spend departs from the expected pattern. In practice you make tagging mandatory at creation time, model the tag hierarchy, and let owners act on their own cost reports before central finance has to intervene.</p>
+    <div class="codeWrap"><pre><code>Tag everything: owner, env, service, cost-centre
+Showback/chargeback by team -&gt; behaviour changes
+Budgets + anomaly alerts catch runaway spend early</code></pre></div>
+    <p class="code-note">Tag every resource with owner, environment and cost-centre so spend is attributable, then add budgets and anomaly alerts.</p>
+    <h3 id="ch16-optimise" data-toc>16.2 Optimisation levers</h3>
+    <p class="topic-desc">Right-sizing matches instance sizes to real utilisation, reservations and commitment discounts buy predictable capacity at lower prices, and spot instances run interruptible workloads on spare provider capacity. Idle resources and over-provisioning are the quiet leaks to find first. In practice you start with a right-sizing review, cover steady-state load with reservations, and leave batch and stateless work on spot, while keeping an eye on egress costs.</p>
+    <table>
+      <tr><th>Lever</th><th>Typical saving</th></tr>
+      <tr><td>Right-sizing</td><td>Large — match capacity to demand</td></tr>
+      <tr><td>Reserved/savings plans</td><td>Large — for steady state</td></tr>
+      <tr><td>Spot/preemptible</td><td>Large — for fault-tolerant work</td></tr>
+      <tr><td>Storage tiering / lifecycle</td><td>Medium</td></tr>
+      <tr><td>Killing idle resources</td><td>Medium–large</td></tr>
+      <tr><td>Egress reduction</td><td>Variable</td></tr>
+    </table>
+    <div class="warn"><p>Cost is an architecture concern. A design that replicates everything across three regions for no reason is a permanent bill, not a one-time decision.</p></div>
+    <div class="ex"><h4 id="ch16-optimise--exercises-16">Exercises 16</h4><ol>
+      <li>Tag a workload and attribute its cost.</li>
+      <li>Find three idle resources to remove.</li>
+      <li>Model reserved vs on-demand for a steady service.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch17" data-toc>17 · Operations, SRE &amp; Runbooks</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Operations, SRE &amp; Runbooks</button><div class="ch-toc-list"><a href="#ch17-sre">17.1 SRE practices</a><a href="#ch17-runbook">17.2 Runbooks and on-call</a><a href="#ch17-change">17.3 Change and incident management</a></div></div>
+    <p class="topic-desc">Operations, SRE and runbooks are how a system stays healthy after it goes live. The SRE practice turns operations into engineering by grounding work in SLOs, reducing toil and making change management blameless. In practice you define error budgets, automate repetitive work, keep tested runbooks for the on-call rotation, and treat every incident as a process improvement opportunity.</p>
+    <h3 id="ch17-sre" data-toc>17.1 SRE practices</h3>
+    <p class="topic-desc">SRE balances the speed of shipping against the reliability of the running service using SLOs and their error budgets. Automating repetitive toil frees engineers to improve the system, and incidents are reviewed without blame so the real causes surface. In practice you set SLO targets with monitoring, spend the error budget deliberately on releases, and measure toil as a metric that drives automation.</p>
+    <table>
+      <tr><th>Practice</th><th>Purpose</th></tr>
+      <tr><td>SLOs + error budgets</td><td>Balance reliability and velocity</td></tr>
+      <tr><td>Toil reduction</td><td>Automate repetitive operations</td></tr>
+      <tr><td>Change management</td><td>Safe, observable changes</td></tr>
+      <tr><td>Postmortems</td><td>Learn without blame</td></tr>
+    </table>
+    <h3 id="ch17-runbook" data-toc>17.2 Runbooks and on-call</h3>
+    <p class="topic-desc">Runbooks give an on-call engineer a tested, ordered path through a known failure before they touch anything. A good runbook starts with confirming the scope of the incident, works through the likely fixes, and ends with restoring the fixable state. In practice you write runbooks from real incidents, keep them current with the system, and test them so the first time they are followed is not at 3 a.m. during an outage.</p>
+    <div class="codeWrap"><pre><code>Runbook: Database failover
+  Trigger: primary unreachable &gt; 60s
+  1 Confirm scope (monitoring dashboard link)
+  2 Announce in #incident
+  3 Promote replica: &lt;exact command&gt;
+  4 Verify app health; scale if needed
+  5 Post-incident: restore HA, write postmortem</code></pre></div>
+    <p class="code-note">A runbook template for database failover: confirm scope, announce, promote the replica, verify health, then restore HA and write a postmortem.</p>
+    <h3 id="ch17-change" data-toc>17.3 Change and incident management</h3>
+    <p class="topic-desc">Change and incident management keep operations honest: changes are peer reviewed and reversible, and incidents get defined roles and a clear response structure. You track mean time to repair and repeat incidents as the honest health metrics of the operation. In practice you require review before production changes, standardise incident roles such as incident commander, and review the metrics monthly so the operation improves measurably.</p>
+    <ul>
+      <li>Peer-reviewed, reversible changes; feature flags for risk.</li>
+      <li>Incident roles: commander, comms, ops scribe.</li>
+      <li>Blameless reviews that produce system fixes.</li>
+      <li>Track MTTR and repeat incidents as health metrics.</li>
+    </ul>
+    <div class="ex"><h4 id="ch17-change--exercises-17">Exercises 17</h4><ol>
+      <li>Write a runbook for a common failure.</li>
+      <li>Define incident roles for a small team.</li>
+      <li>Automate one piece of toil.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch18" data-toc>18 · Case Study — Designing Enterprise Infrastructure</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Case Study — Designing Enterprise Infrastructure</button><div class="ch-toc-list"><a href="#ch18-requirements">18.1 Requirements</a><a href="#ch18-design">18.2 The design</a><a href="#ch18-decisions">18.3 Decisions &amp; trade-offs</a><a href="#ch18-risks">18.4 Risks and mitigations</a></div></div>
+    <p class="topic-desc">The final chapter is a worked example that ties every earlier chapter into one enterprise infrastructure design. It shows how availability, disaster recovery, identity and cost decisions land together in a coherent whole. In practice you follow the same order here as in the real world: collect requirements first, design the layers against them, and make every trade-off explicit.</p>
+    <h3 id="ch18-requirements" data-toc>18.1 Requirements</h3>
+    <p class="topic-desc">Requirements set the targets for every decision downstream: availability, recovery point and recovery time objectives, data residency, growth expectations and team size. Everything in the design is ultimately a response to one of these numbers or constraints. In practice you interview stakeholders, quantify the targets, and write them down as the acceptance criteria the design will be judged against.</p>
+    <table>
+      <tr><th>Driver</th><th>Target</th></tr>
+      <tr><td>Availability</td><td>99.95% customer-facing; 99.9% internal</td></tr>
+      <tr><td>RTO / RPO</td><td>4h / 15min for core systems</td></tr>
+      <tr><td>Compliance</td><td>Data residency in-region, audit trails</td></tr>
+      <tr><td>Growth</td><td>3-year growth with elastic capacity</td></tr>
+      <tr><td>Team</td><td>Small platform team, automate ruthlessly</td></tr>
+    </table>
+    <h3 id="ch18-design" data-toc>18.2 The design</h3>
+    <p class="topic-desc">The design chooses concrete technologies and topologies for each layer of the stack, showing exactly how the pieces fit together. Every choice is traceable back to a named requirement from the previous section. In practice you pick the tools and redundancy levels per layer, draw the topology, and document the reasoning so that anyone revisiting the design understands why each component was chosen.</p>
+    <div class="codeWrap"><pre><code>Facilities: 2 data centres (active/active for web, active/passive for data)
+Network:    dual-homed, segmented VLANs, IDS/IPS, ZTNA for remote
+Compute:    VMware cluster + Kubernetes for app workloads
+Storage:    SAN for VMs/DB, object (S3-compatible) for backups/media
+Identity:   central directory + SSO + MFA + PAM vault
+Data:       Postgres primary + replica, backups 3-2-1 immutable
+Platform:   Terraform + Ansible + GitOps, golden images
+Observability: metrics/logs/traces + SLO alerting
+DR:         warm standby, quarterly failover drills, documented RTO/RPO</code></pre></div>
+    <p class="code-note">The full enterprise design in one card: facilities, network, compute, storage, identity, data, platform, observability and DR, each tied to a requirement.</p>
+    <h3 id="ch18-decisions" data-toc>18.3 Decisions &amp; trade-offs</h3>
+    <p class="topic-desc">Every design decision comes with an explicit trade-off, such as active-passive data replication, a mix of virtual machines and containers, and immutable backups. None of them are defaults or habits; each is a reasoned choice against the requirements. In practice you list the decision, the alternative, the reason and the cost, so the case study shows what a defendable infrastructure design decision actually looks like.</p>
+    <ul>
+      <li><strong>Active/active web, active/passive data</strong> — web scales horizontally; data failover is simpler and safer than multi-master.</li>
+      <li><strong>VMs + containers together</strong> — legacy on VMs, new apps on Kubernetes; migrate gradually.</li>
+      <li><strong>Immutable backups</strong> — ransomware protection justifies the cost.</li>
+      <li><strong>Everything as code</strong> — no snowflake servers, full audit.</li>
+    </ul>
+    <h3 id="ch18-risks" data-toc>18.4 Risks and mitigations</h3>
+    <p class="topic-desc">The biggest risks in the case study are shared identity, untested disaster recovery, cost creep and dependence on key individuals. Each risk gets a named mitigation before it can become an incident. In practice you assess the estate against that risk list, assign an owner and a mitigation to each, and revisit them on a schedule the same way you revisit capacity.</p>
+    <table>
+      <tr><th>Risk</th><th>Mitigation</th></tr>
+      <tr><td>Shared identity outage blocks all access</td><td>Cached credentials + break-glass path</td></tr>
+      <tr><td>DR site drift / untested</td><td>Quarterly automated drills</td></tr>
+      <tr><td>Cost creep</td><td>Tagging, budgets, monthly FinOps review</td></tr>
+      <tr><td>Key-person dependency</td><td>Runbooks, pairing, on-call rotation</td></tr>
+    </table>
+    <div class="ex"><h4 id="ch18-risks--exercises-18">Exercises 18</h4><ol>
+      <li>Adjust the design for a single-region mandate.</li>
+      <li>Pick the first DR drill you would run and why.</li>
+      <li>Write the ADR for active/passive data.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Checklists &amp; Roadmap</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Checklists &amp; Roadmap</button><div class="ch-toc-list"><a href="#app-checklist">A.1 Infrastructure design checklist</a><a href="#app-roadmap">A.2 Roadmap: beginner to advanced</a><a href="#app-rules">A.3 Rules of thumb</a></div></div>
+    <p class="topic-desc">The appendix takes the whole guide and compresses it into practical, repeatable tools you carry into real projects. It provides checklists to run against your environment and a roadmap from beginner to architect. In practice you work through the checklist honestly, treat the gaps it exposes as your backlog, and use the roadmap to decide what to learn next.</p>
+    <h3 id="app-checklist" data-toc>A.1 Infrastructure design checklist</h3>
+    <p class="topic-desc">The design checklist captures every chapter on a single page as concrete questions applied to a real infrastructure. Running it against your estate reveals the gaps that would otherwise show up as incidents. In practice you work through one domain at a time, accept the empty boxes as future work, and repeat the checklist after major changes.</p>
+    <ul>
+      <li>Availability target and RTO/RPO defined and agreed.</li>
+      <li>Every single point of failure identified and addressed.</li>
+      <li>Segmentation, least privilege and encryption in place.</li>
+      <li>Backups immutable, off-site and restore-tested.</li>
+      <li>Monitoring, alerting and on-call cover the golden signals.</li>
+      <li>Everything provisioned as code; drift detected.</li>
+      <li>Capacity forecast and autoscaling configured.</li>
+      <li>Costs tagged, attributed and reviewed.</li>
+      <li>Runbooks and DR drills current.</li>
+    </ul>
+    <h3 id="app-roadmap" data-toc>A.2 Roadmap: beginner to advanced</h3>
+    <p class="topic-desc">The roadmap lays out a progression from beginner to architect, from provisioning a single VM through configuration management, automation and networking up to designing multi-site systems. It is a learning order rather than a sequence of promotions. In practice you locate yourself in it, pick the next level’s goal, and treat each rung as a guideline for what to study, build and operate next.</p>
+    <table>
+      <tr><th>Stage</th><th>You can…</th></tr>
+      <tr><td>Beginner</td><td>Explain compute/storage/network, provision a VM, basic monitoring</td></tr>
+      <tr><td>Intermediate</td><td>Virtualise, configure VLANs/DNS/LB, backups, IaC basics</td></tr>
+      <tr><td>Advanced</td><td>HA clusters, DR design, zero trust, automation pipelines, capacity</td></tr>
+      <tr><td>Architect</td><td>Multi-site/cloud design, FinOps, SRE practice, enterprise governance</td></tr>
+    </table>
+    <h3 id="app-rules" data-toc>A.3 Rules of thumb</h3>
+    <p class="topic-desc">The rules of thumb encode the whole book into short, memorable lines you can hold without a manual. They work as a personal checklist whenever a design decision is being rushed. In practice you keep them where you will see them, run each rule against a proposed choice, and let any mismatch between the rule and the plan flag a reason to slow down and reconsider.</p>
+    <ul>
+      <li><strong>No single point of failure for anything customer-facing.</strong></li>
+      <li><strong>If it isn’t as code, it isn’t repeatable.</strong></li>
+      <li><strong>Backups you haven’t restored are hopes.</strong></li>
+      <li><strong>Segment, least-privilege, verify continuously.</strong></li>
+      <li><strong>Keep 30–40% headroom; the pager punishes 95% utilisation.</strong></li>
+      <li><strong>Cost and reliability are architecture decisions.</strong></li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>IT Infrastructure System Design Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

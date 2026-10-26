@@ -1,0 +1,510 @@
+﻿/* ==========================================================================
+   Amin360iT | Quick Guides - shared script
+   Theme and colour-mode handling, sidebar, table of contents, search, reading
+   progress and per-chapter prev/next navigation. One copy, shared by every
+   guide instead of duplicated 33 times.
+   Nothing in this file is guide-specific.
+   ========================================================================== */
+
+// TWO INDEPENDENT AXES, and why they are two rather than one
+// data-theme = light | dark      the LIGHTNESS axis. Unchanged since launch,
+// so the pre-paint script, every verifier and every existing page keep working.
+// data-mode  = one of ten        the COLOUR axis. A palette family, each
+// with its own light and dark variant.
+
+// Folding them together would have meant either twenty data-theme values or
+// throwing away the two-valued attribute every check depends on. Keeping them
+// orthogonal means a mode can be added without touching the theme logic, and
+// the light/dark behaviour that already shipped is untouched.
+
+// The light theme previously had NO light code theme: :root declared a dark
+// navy --code-bg and four of the seven code tokens were byte-identical to the
+// dark theme's values, so code blocks never actually changed. That is fixed in
+// the CSS, where the base :root block now carries real light code colours, and
+// the mode blocks are an override of a correct base rather than a mask over a
+// wrong one.
+
+/* ==========================================================================
+   Amin360iT | Pre-paint script
+   Runs before first paint so there is no flash of wrong theme/mode.
+   Reads from localStorage and sets data-theme and data-mode on <html>.
+   Defaults: dark theme + default mode.
+   ========================================================================== */
+
+// KEYS for localStorage
+var THEME_KEY = 'amin360it-theme';
+var MODE_KEY = 'amin360it-mode';
+
+// The ten valid colour-mode ids. Stored either as one of these or absent; a
+// stale id is rejected rather than trusted (see readMode).
+var MODE_IDS = ['default', 'nord', 'dracula', 'tokyo', 'rose', 'gruvbox', 'mocha', 'solar', 'paper', 'midnight'];
+
+// Read stored theme (only 'dark' or 'light' are valid)
+function readStored() {
+  try {
+    var v = localStorage.getItem(THEME_KEY);
+    return (v === 'dark' || v === 'light') ? v : null;
+  } catch (e) { return null; }
+}
+
+// Read stored mode (must be one of the 10 MODES ids)
+function readMode() {
+  try {
+    var v = localStorage.getItem(MODE_KEY);
+    // an unknown id is rejected rather than trusted: a stale key from a
+    // renamed mode would otherwise leave the page with no palette at all
+    return MODE_IDS.indexOf(v) !== -1 ? v : null;
+  } catch (e) { return null; }
+}
+
+// System theme (OS preference), used only if no stored preference exists
+function systemTheme() {
+  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+}
+
+// Apply a theme name, storing it and updating chrome
+function applyTheme(next) {
+  var root = document.documentElement;
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  syncChrome();
+}
+
+// Apply a mode name, storing it and updating chrome
+function applyMode(id) {
+  if (MODE_IDS.indexOf(id) === -1) id = 'default';
+  var root = document.documentElement;
+  root.setAttribute('data-mode', id);
+  try { localStorage.setItem(MODE_KEY, id); } catch (e) {}
+  syncChrome();
+}
+
+// syncChrome updates the UI chrome (theme icons + labels) from the current
+// theme, and is called from applyTheme / applyMode on every page. The actual
+// CSS token values live in assets/shell.css blocks that target
+// html[data-theme="light"], html[data-theme="dark"], etc.
+function syncChrome() {
+  var d = document.documentElement.getAttribute('data-theme') === 'dark';
+  var sun = document.getElementById('icSun');
+  var moon = document.getElementById('icMoon');
+  var lbl = document.getElementById('themeLabel');
+  var btn = document.getElementById('themeBtn');
+  if (sun) sun.style.display = d ? 'none' : '';
+  if (moon) moon.style.display = d ? '' : 'none';
+  if (lbl) lbl.textContent = d ? 'Light mode' : 'Dark mode';
+  if (btn) btn.setAttribute('title', d ? 'Switch to light mode' : 'Switch to dark mode');
+}
+
+// PRE-PAINT: runs before first paint so there is no flash of wrong theme/mode
+// This reads from localStorage and sets data-theme and data-mode on <html>
+// Defaults: dark theme + default mode (matches the original behaviour).
+(function() {
+  var r = document.documentElement;
+  try {
+    var s = localStorage.getItem(THEME_KEY),
+        d = (s === 'dark' || s === 'light') ? s : 'dark',
+        m = localStorage.getItem(MODE_KEY);
+    r.setAttribute('data-theme', d);
+    r.setAttribute('data-mode', m || 'default');
+  } catch (e) {}
+})();
+
+// ==========================================================================
+// Theme toggle button (dark/light)
+// ==========================================================================
+
+// Get the theme button element and add click listener
+var themeBtn = document.getElementById('themeBtn');
+if (themeBtn) {
+  themeBtn.addEventListener('click', function () {
+    // Toggle whatever is showing NOW. Basing the toggle on the stored value
+    // made the first click a no-op for a first-time visitor (nothing stored).
+    var cur = document.documentElement.getAttribute('data-theme');
+    applyTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+}
+
+// ==========================================================================
+// Mode picker (10 colour palettes)
+// ==========================================================================
+
+// Get the mode button, popover, and related elements
+var modeBtn = document.getElementById('modeBtn');
+var modePop = document.getElementById('modePop');
+var modeSwatch = document.getElementById('modeSwatch');
+var modeLabel = document.getElementById('modeLabel');
+
+// Build the mode picker list from the MODES array
+var MODES = [
+  { id: 'default', label: 'Amin360iT', swatch: '#00d1ff' },
+  { id: 'nord',    label: 'Nord',       swatch: '#88c0d0' },
+  { id: 'dracula', label: 'Dracula',    swatch: '#bd93f9' },
+  { id: 'tokyo',   label: 'Tokyo Night', swatch: '#7aa2f7' },
+  { id: 'rose',    label: 'Rose Pine',  swatch: '#c4a7e7' },
+  { id: 'gruvbox', label: 'Gruvbox',    swatch: '#fe8019' },
+  { id: 'mocha',   label: 'Catppuccin', swatch: '#cba6f7' },
+  { id: 'solar',   label: 'Solarized',  swatch: '#268bd2' },
+  { id: 'paper',   label: 'Paper',      swatch: '#a8632a' },
+  { id: 'midnight', label: 'Midnight',  swatch: '#00e5a0' }
+];
+
+// Populate the mode popover if it doesn't already have children
+if (modePop && !modePop.children.length) {
+  for (var i = 0; i < MODES.length; i++) {
+    var m = MODES[i];
+    var row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'mode-opt';
+    row.setAttribute('data-mode', m.id);
+    row.setAttribute('role', 'menuitemradio');
+    row.title = m.label + (m.id === 'default' ? ' (brand)' : '');
+    var dot = document.createElement('span');
+    dot.className = 'mode-dot';
+    dot.style.background = m.swatch;
+    var txt = document.createElement('span');
+    txt.className = 'mode-name';
+    txt.textContent = m.label;
+    var tick = document.createElement('span');
+    tick.className = 'mode-tick';
+    tick.setAttribute('aria-hidden', 'true');
+    tick.textContent = '\u25B6';
+    row.appendChild(dot);
+    row.appendChild(txt);
+    row.appendChild(tick);
+    modePop.appendChild(row);
+  }
+}
+
+// Mode popover click handler - apply the selected mode and close
+if (modePop) {
+  modePop.addEventListener('click', function (e) {
+    var row = e.target.closest ? e.target.closest('[data-mode]') : null;
+    if (!row) return;
+    applyMode(row.getAttribute('data-mode'));
+    close();
+    modeBtn.focus();
+  });
+}
+
+// Open/close functionality for the mode popover
+function open() {
+  modePop.hidden = false;
+  modeBtn.setAttribute('aria-expanded', 'true');
+  // focus the current selection so a keyboard user lands on the right row
+  var cur = modePop.querySelector('[aria-checked="true"]');
+  (cur || modePop.firstChild).focus();
+}
+function close() {
+  modePop.hidden = true;
+  modeBtn.setAttribute('aria-expanded', 'false');
+}
+function isOpen() { return !modePop.hidden; }
+
+// Mode button click toggles open/close
+if (modeBtn) {
+  modeBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (isOpen()) close(); else open();
+  });
+}
+
+// Close when clicking outside the popover
+if (modePop) {
+  document.addEventListener('click', function (e) {
+    if (!isOpen()) return;
+    if (modePop.contains(e.target) || modeBtn.contains(e.target)) return;
+    close();
+  });
+}
+
+// Keyboard navigation for the mode popover
+if (modePop) {
+  document.addEventListener('keydown', function (e) {
+    if (!isOpen()) return;
+    var rows = Array.prototype.slice.call(modePop.querySelectorAll('[data-mode]'));
+    var at = rows.indexOf(document.activeElement);
+    if (e.key === 'Escape') { close(); modeBtn.focus(); return; }
+    if (e.key === 'Tab') { close(); return; }
+    if (e.key === 'ArrowDown') { var next = (at + 1) % rows.length; e.preventDefault(); rows[next].focus(); }
+    else if (e.key === 'ArrowUp') { var next = (at - 1 + rows.length) % rows.length; e.preventDefault(); rows[next].focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); rows[0].focus(); }
+    else if (e.key === 'End') { e.preventDefault(); rows[rows.length - 1].focus(); }
+  });
+}
+
+// Initial mode setup: read stored mode, apply it, then sync
+// If no stored mode, the pre-paint script already set a default
+(function() {
+  var storedMode = readMode();
+  if (storedMode) {
+    applyMode(storedMode);
+  } else {
+    // No stored mode: the pre-paint script already set a default
+    // syncChrome to apply the CSS tokens for the default palette
+    syncChrome();
+  }
+})();
+
+// ==========================================================================
+// Top-bar GUIDES menu (every page)
+// A single "Guides" dropdown in #topnav. The markup it builds matches the
+// .topnav .tn-item / .tn-menu design in shell.css; this is the one place the
+// catalog lives, so a guide added to index.html only needs its card there.
+// ==========================================================================
+
+var GUIDES_CATALOG = [
+  { id: 'web-basics', name: 'Web Basics', guides: [
+    ['webapp-design.html', 'Web App Design'],
+    ['web-app-development.html', 'Web App Development'],
+    ['website-webapp-deployment.html', 'Website & Web App Deployment'],
+    ['website-seo.html', 'Website SEO'],
+    ['digital-marketing.html', 'Digital Marketing'],
+    ['website-design.html', 'Website Design'],
+    ['website-development.html', 'Website Development'],
+    ['static-dynamic-website-development.html', 'Static and Dynamic Website Development']
+  ] },
+  { id: 'foundations', name: 'Foundations', guides: [
+    ['software-engineering.html', 'Software Engineering'],
+    ['idea-to-deploy.html', 'Idea to Deploy'],
+    ['ui-ux.html', 'UI / UX Design']
+  ] },
+  { id: 'languages', name: 'Languages', guides: [
+    ['javascript.html', 'JavaScript & ES6+'],
+    ['typescript.html', 'TypeScript'],
+    ['nodejs.html', 'Node.js'],
+    ['bun.html', 'Bun'],
+    ['java.html', 'Java'],
+    ['csharp.html', 'C# 14 & .NET 10'],
+    ['python.html', 'Python 3.14'],
+    ['php.html', 'PHP 8.5'],
+    ['php-oop-mysql.html', 'PHP OOP & MySQL'],
+    ['c-programming.html', 'C Programming'],
+    ['cpp-programming.html', 'C++ Programming'],
+    ['go-programming.html', 'Go Programming'],
+    ['rust-programming.html', 'Rust'],
+    ['r-programming.html', 'R Programming'],
+    ['windows-batch.html', 'Windows Batch Scripting'],
+    ['linux-shell.html', 'Linux Bash and Shell Scripting'],
+    ['hardware-interfaces.html', 'Port API and Hardware Access'],
+    ['powershell-scripting.html', 'Windows PowerShell Scripting']
+  ] },
+  { id: 'frontend', name: 'Frontend', guides: [
+    ['html.html', 'HTML5'],
+    ['css.html', 'CSS3'],
+    ['bootstrap5.html', 'Bootstrap 5'],
+    ['fontawesome-icons.html', 'Font Awesome & Material Icons'],
+    ['jquery.html', 'jQuery'],
+    ['axios.html', 'Axios'],
+    ['alpinejs.html', 'Alpine.js'],
+    ['react.html', 'React 19'],
+    ['ui-ux-graphics.html', 'UI / UX Design']
+  ] },
+  { id: 'frameworks', name: 'Frameworks', guides: [
+    ['spring-boot.html', 'Spring Boot'],
+    ['jsp.html', 'JSP & Servlets'],
+    ['laravel.html', 'Laravel 13'],
+    ['laravel-blade.html', 'Laravel Blade'],
+    ['aspnet-core.html', 'ASP.NET Core 10'],
+    ['aspnet-core-advanced.html', 'ASP.NET Core 10 - Advanced'],
+    ['winforms-wpf.html', 'C# .NET 10 Desktop'],
+    ['dotnet-vue.html', '.NET Core + Vue'],
+    ['laravel-vue.html', 'Laravel + Vue'],
+    ['leaf-mvc.html', 'LEAF PHP MVC'],
+    ['blazor.html', 'Blazor'],
+    ['laravel13-advanced.html', 'Laravel 13 - Advanced Architecture'],
+    ['nuxtjs.html', 'NuxtJS'],
+    ['vuejs.html', 'Vue 3 Framework'],
+    ['svelte.html', 'Svelte'],
+    ['sveltekit.html', 'SvelteKit'],
+    ['nextjs.html', 'Next.js 15'],
+    ['electron-apps.html', 'Building Service Apps with Electron']
+  ] },
+  { id: 'mobile', name: 'Mobile & Cross-Platform', guides: [
+    ['dart.html', 'Dart'],
+    ['flutter.html', 'Flutter — Advanced'],
+    ['react-native.html', 'React Native'],
+    ['capacitor.html', 'Capacitor'],
+    ['vue-nuxt-capacitor.html', 'Vue / Nuxt + Capacitor']
+  ] },
+  { id: 'architecture', name: 'Architecture & Design', guides: [
+    ['microservices.html', 'Microservices'],
+    ['system-design.html', 'System Design'],
+    ['software-design.html', 'Software Design'],
+    ['architecture.html', 'Software Architecture']
+  ] },
+  { id: 'data', name: 'Data & Delivery', guides: [
+    ['oracle-sql.html', 'Oracle SQL'],
+    ['postgresql.html', 'PostgreSQL 18'],
+    ['mysql.html', 'MySQL 9'],
+    ['cicd.html', 'CI/CD Pipelines'],
+    ['database.html', 'Databases & SQL'],
+    ['sqlserver.html', 'SQL Server 2025 & T-SQL'],
+    ['db-design.html', 'Database System Design'],
+    ['mongodb.html', 'MongoDB'],
+    ['api-design.html', 'API Design']
+  ] },
+  { id: 'devops', name: 'DevOps & Hosting', guides: [
+    ['docker-compose.html', 'Docker Compose'],
+    ['git-github.html', 'Git & GitHub'],
+    ['vercel.html', 'Vercel'],
+    ['netlify.html', 'Netlify'],
+    ['cpanel.html', 'cPanel & WHM'],
+    ['it-infrastructure.html', 'IT Infrastructure'],
+    ['network-design.html', 'Network System Design'],
+    ['tech-networking.html', 'Tech Networking'],
+    ['servers.html', 'Servers & Roles'],
+    ['domains-hosting.html', 'Domains & Hosting'],
+    ['package-publishing.html', 'Publishing & Deployment']
+  ] },
+  { id: 'wordpress', name: 'WordPress', guides: [
+    ['wordpress.html', 'WordPress'],
+    ['wp-theme.html', 'WordPress Theme Development'],
+    ['wp-plugin.html', 'WordPress Plugin Development']
+  ] },
+  { id: 'ai', name: 'AI & ML', guides: [
+    ['ai-models.html', 'AI Models'],
+    ['ai-engineering.html', 'AI Engineering'],
+    ['chatgpt.html', 'ChatGPT'],
+    ['claude.html', 'Claude'],
+    ['midjourney.html', 'Midjourney'],
+    ['n8n.html', 'n8n Automation']
+  ] }
+];
+
+(function () {
+  var nav = document.getElementById('topnav');
+  if (!nav || nav.querySelector('.tn-item')) return;
+
+  // A hub page may still carry the older single-panel markup. The tree below
+  // replaces it so every page renders the same control.
+  nav.innerHTML = '';
+
+  var NS = 'http://www.w3.org/2000/svg';
+  var item = document.createElement('div');
+  item.className = 'tn-item';
+
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'tn-btn';
+  btn.id = 'tnGuidesBtn';
+  btn.setAttribute('aria-haspopup', 'true');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.textContent = 'Guides';
+  var caret = document.createElementNS(NS, 'svg');
+  caret.setAttribute('class', 'tn-caret');
+  caret.setAttribute('viewBox', '0 0 24 24');
+  caret.setAttribute('fill', 'none');
+  caret.setAttribute('stroke', 'currentColor');
+  caret.setAttribute('stroke-width', '2.5');
+  caret.setAttribute('stroke-linecap', 'round');
+  caret.setAttribute('stroke-linejoin', 'round');
+  caret.setAttribute('aria-hidden', 'true');
+  var p = document.createElementNS(NS, 'path');
+  p.setAttribute('d', 'm9 5 7 7-7 7');
+  caret.appendChild(p);
+  btn.appendChild(caret);
+  item.appendChild(btn);
+
+  var menu = document.createElement('div');
+  menu.className = 'tn-menu';
+  menu.setAttribute('role', 'group');
+  menu.setAttribute('aria-label', 'All guides');
+
+  var filterBox = document.createElement('div');
+  filterBox.className = 'tn-filter';
+  var input = document.createElement('input');
+  input.type = 'search';
+  input.placeholder = 'Filter guides\u2026';
+  input.setAttribute('aria-label', 'Filter guides');
+  input.setAttribute('autocomplete', 'off');
+  filterBox.appendChild(input);
+  menu.appendChild(filterBox);
+
+  var scroll = document.createElement('div');
+  scroll.className = 'tn-scroll';
+  var links = [];
+  var currentFile = (location.pathname.split('/').pop() || '') ;
+  for (var g = 0; g < GUIDES_CATALOG.length; g++) {
+    var group = GUIDES_CATALOG[g];
+    var head = document.createElement('div');
+    head.className = 'tn-cat-h';
+    head.textContent = group.name;
+    scroll.appendChild(head);
+    for (var k = 0; k < group.guides.length; k++) {
+      var gd = group.guides[k];
+      var a = document.createElement('a');
+      a.className = 'tn-link';
+      a.href = gd[0];
+      a.setAttribute('data-file', gd[0]);
+      a.setAttribute('data-cat', group.id);
+      a.textContent = gd[1];
+      if (gd[0] === currentFile) a.className += ' cur';
+      scroll.appendChild(a);
+      links.push(a);
+    }
+  }
+  menu.appendChild(scroll);
+
+  var note = document.createElement('a');
+  note.className = 'tn-menu-note';
+  note.href = 'index.html#guides';
+  note.textContent = 'All guides and topics \u203A';
+  menu.appendChild(note);
+
+  item.appendChild(menu);
+  nav.appendChild(item);
+
+  function setOpen(open, focusInput) {
+    item.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open && focusInput && input) { try { input.focus(); } catch (e) {} }
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    setOpen(!item.classList.contains('open'), !item.classList.contains('open'));
+  });
+
+  // Desktop hover opens the menu; leaving it closes unless focus is inside.
+  item.addEventListener('mouseenter', function () {
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) setOpen(true, false);
+  });
+  item.addEventListener('mouseleave', function () {
+    if (!document.activeElement || !item.contains(document.activeElement)) setOpen(false, false);
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!item.classList.contains('open')) return;
+    if (item.contains(e.target)) return;
+    setOpen(false, false);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (!item.classList.contains('open')) return;
+    if (e.key === 'Escape') { setOpen(false, false); btn.focus(); }
+  });
+
+  input.addEventListener('input', function () {
+    var q = input.value.trim().toLowerCase();
+    for (var i = 0; i < links.length; i++) links[i].style.display = '';
+    var kids = scroll.children;
+    for (var k2 = 0; k2 < kids.length; k2++) {
+      if (kids[k2].classList.contains('tn-cat-h')) kids[k2].style.display = '';
+    }
+    if (!q) return;
+    for (var j = 0; j < links.length; j++) {
+      links[j].style.display = (links[j].textContent.toLowerCase().indexOf(q) !== -1) ? '' : 'none';
+    }
+    // hide a category header when none of its links are visible
+    for (var hh = 0; hh < kids.length; hh++) {
+      if (!kids[hh].classList.contains('tn-cat-h')) continue;
+      var any = false;
+      for (var ss = hh + 1; ss < kids.length; ss++) {
+        var sib = kids[ss];
+        if (sib.classList.contains('tn-cat-h')) break;
+        if (sib.style.display !== 'none') { any = true; break; }
+      }
+      if (!any) kids[hh].style.display = 'none';
+    }
+  });
+})();

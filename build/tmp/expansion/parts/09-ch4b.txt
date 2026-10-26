@@ -1,0 +1,150 @@
+<h3 id="ch4-3" data-toc>4.3 Custom error types</h3>
+<p class="topic-desc">A hand-written error type is an enum whose variants name every way the operation can fail. It is matchable, testable, and — with <code>From</code> impls — the thing the <code>?</code> operator converts into.</p>
+
+<h4 id="ch4-3-enum">An error enum with Display and Error</h4>
+<p>The two implementations a custom error needs are <code>Display</code> — the human-readable message, used by <code>println!</code> and logging — and <code>std::error::Error</code>, the marker that lets the type be used as <code>Box&lt;dyn Error&gt;</code> and that provides <code>source()</code> for error chaining. The enum's variants document the failure modes in the code itself: reading them is reading the function's failure contract.</p>
+<div class="codeWrap"><pre><code>use std::fmt;
+
+#[derive(Debug)]
+enum CliError {
+    Io(std::io::Error),
+    Parse(std::num::ParseIntError),
+    Empty,
+}
+
+impl fmt::Display for CliError {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
+        match self {
+            CliError::Io(e) =&gt; write!(f, "io error: {e}"),
+            CliError::Parse(e) =&gt; write!(f, "parse error: {e}"),
+            CliError::Empty =&gt; write!(f, "no input given"),
+        }
+    }
+}
+
+impl std::error::Error for CliError {}
+
+fn main() {
+    println!("{}", CliError::Empty);
+}</code></pre></div>
+
+<h4 id="ch4-3-from">From impls let ? convert between errors</h4>
+<p>Once <code>From&lt;std::io::Error&gt; for AppError</code> exists, every <code>?</code> in the function converts an underlying error into your error type automatically. This is how a function that touches both the filesystem and the parser can return <em>one</em> error type while <code>?</code> handles both conversions inline. Without the <code>From</code> impl, the same code needs explicit <code>map_err</code> at every call site.</p>
+<div class="codeWrap"><pre><code>use std::fmt;
+
+#[derive(Debug)]
+enum AppError {
+    Io(std::io::Error),
+    Parse(std::num::ParseIntError),
+}
+
+impl fmt::Display for AppError {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
+        match self {
+            AppError::Io(e) =&gt; write!(f, "io: {e}"),
+            AppError::Parse(e) =&gt; write!(f, "parse: {e}"),
+        }
+    }
+}
+
+impl std::error::Error for AppError {}
+
+impl From&lt;std::io::Error&gt; for AppError {
+    fn from(e: std::io::Error) -&gt; Self {
+        AppError::Io(e)
+    }
+}
+
+impl From&lt;std::num::ParseIntError&gt; for AppError {
+    fn from(e: std::num::ParseIntError) -&gt; Self {
+        AppError::Parse(e)
+    }
+}
+
+fn load() -&gt; Result&lt;i32, AppError&gt; {
+    let raw = std::fs::read_to_string("n.txt")?;   // io::Error -&gt; AppError
+    let n: i32 = raw.trim().parse()?;              // ParseIntError too
+    Ok(n)
+}
+
+fn main() {
+    println!("{:?}", load());
+}</code></pre></div>
+
+<h4 id="ch4-3-thiserror">thiserror: derive the boilerplate</h4>
+<p>The <code>thiserror</code> crate derives <code>Display</code>, <code>Error</code> and <code>From</code> from declarative annotations, collapsing the three impls above into a derive. The <code>#[error(...)]</code> attribute is the Display message with field interpolation; <code>#[from]</code> generates the <code>From</code> impl; <code>#[error(transparent)]</code> delegates for wrapper variants. This is the standard choice for library error types — the kind callers will <code>match</code> on.</p>
+<div class="codeWrap"><pre><code>use thiserror::Error;
+
+#[derive(Debug, Error)]
+enum ConfigError {
+    #[error("missing key `{key}`")]
+    Missing { key: String },
+
+    #[error("invalid value for `{key}`: {value}")]
+    Invalid { key: String, value: String },
+
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+}
+
+fn main() {
+    let err = ConfigError::Missing { key: "host".into() };
+    println!("{err}");     // missing key `host`
+}</code></pre></div>
+
+<h3 id="ch4-4" data-toc>4.4 Panic vs error, and adding context</h3>
+<p class="topic-desc">The dividing line is simple: if the program can recover, return a <code>Result</code>; if the program's own invariant is broken and continuing would be wrong, panic. Panics are for programmer errors; <code>Result</code> is for user errors.</p>
+
+<h4 id="ch4-4-panic">panic!, unreachable! and assert!</h4>
+<p><code>panic!</code> aborts execution with a message; <code>unreachable!()</code> documents a branch the logic says can never happen (a bug if it is reached); <code>assert!</code> and <code>assert_eq!</code> verify invariants and panic with the failing values when they break. All three are how you encode "this state is impossible" so that a future refactor that makes it possible fails loudly instead of corrupting data.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let xs = [1, 2, 3];
+    let i = 5;
+    if i &gt;= xs.len() {
+        // a programmer error: an invariant WE broke, not the user
+        panic!("index {i} out of bounds (len {})", xs.len());
+    }
+    println!("{}", xs[i]);
+}
+
+// assert! is the same idea in testable form:
+fn main2() {
+    let total: i32 = (1..=5).sum();
+    assert_eq!(total, 15, "1+2+3+4+5 must equal 15");
+    println!("{total}");
+}</code></pre></div>
+
+<h4 id="ch4-4-context">anyhow and context for application errors</h4>
+<p>Binaries do not match on their own errors nearly as often as libraries do — they report them. <code>anyhow::Result&lt;T&gt;</code> wraps an arbitrary error, and <code>.context("...")</code> attaches a human explanation to the chain: <code>failed to load config: could not read data/config.toml: No such file or directory</code>. The <code>context</code> is the layer's story of what it was doing; the chain beneath it is the low-level cause. Libraries use <code>thiserror</code>; applications use <code>anyhow</code> — that division is the ecosystem convention.</p>
+<div class="codeWrap"><pre><code>use anyhow::{Context, Result};
+
+fn load() -&gt; Result&lt;String&gt; {
+    let path = "data/config.toml";
+    let raw = std::fs::read_to_string(path)
+        .with_context(|| format!("could not read {path}"))?;
+    Ok(raw)
+}
+
+fn main() -&gt; Result&lt;()&gt; {
+    let cfg = load()?;
+    println!("{} bytes", cfg.len());
+    Ok(())
+}</code></pre></div>
+
+<h4 id="ch4-4-choose">Choosing panic or Result</h4>
+<p>Two questions decide it. First: did the caller pass in bad data? Then it is a <code>Result</code> — the caller should be able to recover, retry or show a message. Second: did <em>your own code</em> violate a contract — an index that is out of range for data you control, a <code>None</code> where the logic says <code>Some</code>? Then panic, because the correct response is a fix, not handling. The pattern to avoid is panicking on ordinary user input, which turns every bad file into a crash and every crash into lost work.</p>
+<div class="codeWrap"><pre><code>// A library boundary: bad input is Err, not a panic.
+fn divide(a: i64, b: i64) -&gt; Result&lt;i64, String&gt; {
+    if b == 0 {
+        return Err("division by zero".into());
+    }
+    Ok(a / b)
+}
+
+fn main() {
+    match divide(10, 0) {
+        Ok(q) =&gt; println!("{q}"),
+        Err(e) =&gt; eprintln!("{e}"),   // recovered: no crash
+    }
+}</code></pre></div>
+<div class="warn">A panic in a spawned thread does not abort the process — <code>join()</code> returns an <code>Err</code>, and everything else keeps running. If a panic must stop the whole service, propagate it back through <code>join</code> and exit deliberately; do not assume a thread panic is process-wide.</div></section>

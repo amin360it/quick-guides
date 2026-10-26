@@ -1,0 +1,13 @@
+const fs = require('fs');
+const s = fs.readFileSync('bootstrap5.html', 'utf8');
+console.log('Has data-theme:', s.includes('data-theme'));
+console.log('Has data-mode:', s.includes('data-mode'));
+console.log('Has am-band h1:', s.includes('am-band'));
+console.log('Has sidebar:', s.includes('id="sidebar"'));
+console.log('Has ch-toc:', s.includes('ch-toc'));
+const codeWrapCount = (s.match(/<div class="codeWrap"/g) || []).length;
+console.log('Has codeWrap:', codeWrapCount, 'codeWrap divs');
+const h3Count = (s.match(/<h3 id=/g) || []).length;
+const h4Count = (s.match(/<h4 /g) || []).length;
+console.log('h3 count: ' + h3Count);
+console.log('h4 count: ' + h4Count);

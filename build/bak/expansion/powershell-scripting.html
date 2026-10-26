@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows PowerShell Scripting</title>
+<meta name="description" content="PowerShell is a command-line shell and scripting language built on .NET. Its single design decision — that a…. 1 chapters, 2 topics and 6 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/powershell-scripting.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Windows PowerShell Scripting">
+<meta property="og:description" content="PowerShell is a command-line shell and scripting language built on .NET. Its single design decision — that a…. 1 chapters, 2 topics and 6 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/powershell-scripting.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Windows PowerShell Scripting">
+<meta name="twitter:description" content="PowerShell is a command-line shell and scripting language built on .NET. Its single design decision — that a…. 1 chapters, 2 topics and 6 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/powershell-scripting.html#article","headline":"Windows PowerShell Scripting","name":"Windows PowerShell Scripting","description":"PowerShell is a command-line shell and scripting language built on .NET. Its single design decision — that a…. 1 chapters, 2 topics and 6 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/powershell-scripting.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/powershell-scripting.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Windows PowerShell Scripting","item":"https://amin360it.github.io/quick-guides/powershell-scripting.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome · Windows PowerShell</a><ul>
+<li><a href="#orientation-why" data-target="orientation-why">0.1 What PowerShell is, and when to reach for it</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Windows PowerShell Scripting</span>
+      <span class="am-band-s">1 chapters &middot; 2 topics &middot; 6 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="orientation" data-toc>Welcome · Windows PowerShell</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; Welcome · Windows PowerShell</button><div class="ch-toc-list"><a href="#orientation-why">0.1 What PowerShell is, and when to reach for it</a></div></div>
+<h3 id="orientation-why" data-toc>0.1 What PowerShell is, and when to reach for it</h3>
+
+<p class="topic-desc">PowerShell is a command-line shell and scripting language built on .NET. Its single design decision — that a command's output is typed objects rather than formatted text — is what separates it from cmd.exe and from every POSIX shell, and almost every practical difference follows from that one choice.</p>
+
+<h4 id="orientation-why--section">Why objects, and what that buys you</h4>
+<p><code>Get-Process</code> emits <code>System.Diagnostics.Process</code> instances carrying <code>Id</code>, <code>CPU</code>, <code>WorkingSet64</code> and <code>StartTime</code> as real typed properties. <code>Where-Object</code> tests <code>$_.CPU -gt 100</code> as a number rather than as a column of text it must first parse, so no script has to know which column is which. A property that is a <code>DateTime</code> can be compared with <code>-gt</code> against a date, and a property that is a byte array can be measured with <code>.Length</code>, in either case without the author knowing the underlying type. This is why a PowerShell script that filters on a property does not break when the device manager changes its output formatting, which is the single most common cause of breakage in a script written against a text pipeline.</p>
+
+<div class="codeWrap"><pre><code># The same question, two shells.
+# PowerShell: property access, typed comparison, no parsing
+Get-Process | Where-Object { $_.CPU -gt 100 } |
+    Select-Object ProcessName, Id, @{N='RAM_MB';E={[math]::Round($_.WorkingSet64/1MB,1)}}
+
+# bash: you must know which column is CPU, and that changes
+ps aux | awk '$3 &amp;gt; 100 { printf "%-20s %s
+", $11, $2 }'
+# ...and the equivalent batch is worse still, because there is no
+# way to parse a formatted table at all.
+</code></pre></div>
+
+<h4 id="orientation-why--section-2">Inspecting an object before you use it</h4>
+<p>The first move when a command returns something unexpected is <code>Get-Member</code>, which prints the type and every property and method it carries. It substitutes for a documentation lookup and it is faster, because the answer is authoritative for the version installed rather than for the version documented. Two companions are worth knowing: <code>Format-List *</code> shows every property with its value, and <code>Format-Table</code> with an explicit property list controls the default view so you get the columns you want rather than the five the cmdlet's author chose.</p>
+
+<div class="codeWrap"><pre><code>Get-Process -Name notepad | Get-Member
+# TypeName: System.Diagnostics.Process
+# Name       MemberType Definition
+# CPU        Property  double CPU
+# Id         Property  int32 Id
+# Path       Property  string Path
+# Kill()     Method    void Kill()
+
+# a custom view, so the default output is the one you actually read
+Get-Process |
+    Format-Table ProcessName, Id,
+        @{N='RAM_MB'; E={[math]::Round($_.WorkingSet64/1MB,1)}},
+        @{N='CPU_s';  E={[math]::Round($_.CPU,1)}} -AutoSize
+</code></pre></div>
+
+<h4 id="orientation-why--section-3">Every store is a drive, and the cmdlets never change</h4>
+<p>PowerShell drives the filesystem, the registry, the certificate store, Active Directory and dozens of other stores through one abstraction called a provider, and a drive prefix selects which one. <code>Get-ChildItem C:Windows</code> lists files; <code>Get-ChildItem HKLM:SOFTWARE</code> lists registry keys; <code>Get-ChildItem Cert:CurrentUserMy</code> lists certificates. The cmdlet is identical in all three cases, which is why a script that manipulates the registry and a script that manipulates files share the same code shape. The four prefixes you will actually meet are the filesystem, <code>HKLM:</code> and <code>HKCU:</code> for the registry, <code>Cert:</code> for certificates, and <code>Env:</code> for environment variables.</p>
+
+<div class="codeWrap"><pre><code>Get-ChildItem C:Windows            | Select-Object -First 5 Name
+Get-ChildItem HKLM:SOFTWAREMicrosoft | Select-Object -First 5 PSChildName
+Get-ChildItem Env: | Where-Object { $_.Name -match 'PATH|USER' }
+Get-ChildItem Cert:CurrentUserMy  | Format-Table Subject, NotAfter
+
+# ...and the same operations, on any provider
+Get-Content HKLM:SOFTWAREContosoSettings
+Set-Content HKCU:Environment -Value 'x=1'
+New-Item HKCU:SoftwareContoso -Force
+</code></pre></div>
+
+<h4 id="orientation-why--section-4">The verbs, and why Get-ChildItem is not Get-Directory</h4>
+<p>Every cmdlet is <code>Verb-Noun</code>, drawn from a fixed approved list that <code>Get-Verb</code> prints. The verbs worth knowing cold are <code>Get</code>, <code>Set</code>, <code>New</code>, <code>Remove</code>, <code>Test</code>, <code>Start</code>, <code>Stop</code>, <code>Invoke</code>, <code>Convert</code>, <code>Export</code>, <code>Import</code>, <code>Format</code> and <code>Select</code>. The naming is not decorative: a script that invents its own verb names cannot be discovered by tab completion, cannot be mocked in a test, and reads to the next person as an amateur. It also explains the noun choices — <code>Test-Path</code> is a boolean test rather than a getter, <code>Get-Content</code> is a getter whose noun happens to be "Content" rather than "File", and <code>Get-Item</code> and <code>Get-FileHash</code> are both getters distinguished by what they return.</p>
+
+<div class="codeWrap"><pre><code>Get-Verb | Select-Object -ExpandProperty Verb
+# Add Clear Close Copy Enter Exit Expand Export Find Format Get
+# Group Hide Import Insert Join Lock Merge Mount Move New Open
+# Optimize Pop Push Redo Remove Rename Reset Resize Search Select
+# Set Show Skip Split Step Switch Trace Undo Uninstall Unlock Watch
+
+Test-Path C:WindowsSystem32
+otepad.exe   # True / False - a TEST
+Get-Item C:Windows
+otepad.exe            # metadata, no content read
+Get-Content C:Windows
+otepad.exe -TotalCount 1   # one line of content
+</code></pre></div>
+
+<h4 id="orientation-why--section-5">A minimal script, and what each line is doing</h4>
+<p><code>param()</code> declares the script's arguments with types and defaults, which is what makes the script callable with <code>-Name value</code> rather than by position alone. <code>Write-Host</code> writes to the console and is the correct choice for anything meant for a person. The backtick at the end of a line continues it, and it is the one piece of PowerShell syntax with no real equivalent elsewhere — most other constructs in the language do not need it.</p>
+
+<div class="codeWrap"><pre><code># hello.ps1
+param(
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$Name,
+
+    [int]$Times = 1,
+
+    [switch]$Loud
+)
+for ($i = 0; $i -lt $Times; $i++) {
+    $msg = "Hello, $Name (iteration $($i + 1))"
+    if ($Loud) { Write-Host $msg -ForegroundColor Green }
+    else       { Write-Host $msg }
+}
+# .hello.ps1 -Name World -Times 2 -Loud
+</code></pre></div>
+
+<h4 id="orientation-why--section-6">Execution policy, and what it actually restricts</h4>
+<p>The execution policy is not a security boundary and Microsoft has said so; it is a guard against accidental execution. <code>Restricted</code>, the default, runs nothing from a file. <code>RemoteSigned</code> allows local scripts and requires a signature only on downloaded ones, which is the right setting for a developer machine. <code>AllSigned</code> requires a code-signing certificate and is what an enterprise deployment should use. <code>Bypass</code> blocks nothing and is useful for a one-off call without changing machine state.</p>
+
+<div class="codeWrap"><pre><code># the right setting for a developer machine, once
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+Get-ExecutionPolicy -List      # shows all five scopes and which applies
+
+# a one-off run without touching machine state
+powershell -ExecutionPolicy Bypass -File .hello.ps1 -Name World
+
+# and the modern cross-platform host, which ignores most of this
+pwsh -File ./hello.ps1
+# ...PowerShell 7 (pwsh) is available on Linux and macOS too, and
+# where you deploy on either, use pwsh rather than powershell.exe
+</code></pre></div>
+
+<p>Three disciplines: <strong>run <code>Get-Member</code> before using a property you have not used before,</strong> because property names are not guessable and the cmdlet is authoritative for the version installed; <strong>use providers rather than raw paths,</strong> so <code>Get-Content Cert:...</code> and <code>Get-Item HKLM:...</code> carry the same interface as the filesystem; and <strong>set <code>RemoteSigned -Scope CurrentUser</code> rather than machine-wide,</strong> because a per-user scope needs no administrative rights and does not change the policy for anyone else on the machine.</p>
+
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>PowerShell.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

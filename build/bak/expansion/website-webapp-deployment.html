@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website and Web App Deployment - From Build to Production</title>
+<meta name="description" content="Website and Web App Deployment - static hosting, CI pipelines, domains, HTTPS, CDNs, and server rollouts.">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/website-webapp-deployment.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Website and Web App Deployment - From Build to Production">
+<meta property="og:description" content="Website and Web App Deployment - static hosting, CI pipelines, domains, HTTPS, CDNs, and server rollouts.">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/website-webapp-deployment.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-08">
+<meta property="article:section" content="Web Basics">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Website and Web App Deployment - From Build to Production">
+<meta name="twitter:description" content="Website and Web App Deployment - static hosting, CI pipelines, domains, HTTPS, CDNs, and server rollouts.">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/website-webapp-deployment.html#article","headline":"Website and Web App Deployment - From Build to Production","name":"Website and Web App Deployment - From Build to Production","description":"Website and Web App Deployment - static hosting, CI pipelines, domains, HTTPS, CDNs, and server rollouts.","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/website-webapp-deployment.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/website-webapp-deployment.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-08","articleSection":"Web Basics","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Web Basics","item":"https://amin360it.github.io/quick-guides/index.html#cat-web-basics"},{"@type":"ListItem","position":3,"name":"Website and Web App Deployment - From Build to Production","item":"https://amin360it.github.io/quick-guides/website-webapp-deployment.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script>
+</head>
+<body>
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Website and Web App Deployment</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This Deployment Guide</a><ul>
+<li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li>
+<li><a href="#orientation-mindset" data-target="orientation-mindset">The mindset: deploy early, deploy often</a></li>
+<li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use throughout</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 ▸ Build &amp; Pack</a><ul>
+<li><a href="#ch1-build" data-target="ch1-build">1.1 Build scripts &amp; output</a></li>
+<li><a href="#ch1-pack" data-target="ch1-pack">1.2 Docker &amp; static assets</a></li>
+<li><a href="#ch1-env" data-target="ch1-env">1.3 Environment config</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 ▸ Host &amp; Ship</a><ul>
+<li><a href="#ch2-host" data-target="ch2-host">2.1 Static vs server hosting</a></li>
+<li><a href="#ch2-cdn" data-target="ch2-cdn">2.2 CDNs, caching &amp; HTTPS</a></li>
+<li><a href="#ch2-ci" data-target="ch2-ci">2.3 CI/CD pipeline</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+  <h1 class="am-band">
+    <span class="am-band-t">Website and Web App Deployment</span>
+    <span class="am-band-s">12 chapters &middot; 56 topics &middot; 98 code samples &middot; works offline</span>
+  </h1>
+
+<section class="chapter">
+<h2 id="orientation" data-toc>Welcome — How to Use This Deployment Guide</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; Welcome — How to Use This Deployment Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The mindset: deploy early, deploy often</a><a href="#orientation-tools">Tools you will use throughout</a></div></div>
+<h3 id="orientation-how" data-toc>How this guide is organised</h3>
+
+<p class="topic-desc">Deployment is the final step that turns code into a live website or web app. This guide covers static hosting, server hosting, CDNs, HTTPS, and CI/CD.</p>
+<h4 id="orientation-how--structure">Structure of every section</h4>
+<p>Each h3 section is a self-contained unit with an intro, prose, two examples, and a callout. Chapters 1–2 cover build and packaging. Chapters 3–6 cover hosting, CDN, CI/CD, and monitoring. The remaining chapters go deep on rollbacks, scaling, and disaster recovery.</p>
+
+<h3 id="orientation-mindset" data-toc>The mindset: deploy early, deploy often</h3>
+
+<p class="topic-desc">Deploying to production on the last day is risky. Deploy frequently, even with small changes. A working site on a subdomain beats a polished draft on localhost.</p>
+
+<h3 id="orientation-tools" data-toc>Tools you will use throughout</h3>
+
+<p class="topic-desc">GitHub Actions, Netlify, Vercel, Docker, and a DNS provider. All free for personal projects. No paid service is required for any chapter.</p>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Build &amp; Pack</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 ▸ Build &amp; Pack</button><div class="ch-toc-list"><a href="#ch1-build">1.1 Build scripts &amp; output</a><a href="#ch1-pack">1.2 Docker &amp; static assets</a><a href="#ch1-env">1.3 Environment config</a></div></div>
+<h3 id="ch1-build" data-toc>1.1 Build scripts &amp; output</h3>
+
+<p class="topic-desc">A build script turns source into a deployable artifact. For static sites, it copies files to a dist folder. For dynamic apps, it bundles JS, compiles CSS, and may prerender HTML.</p>
+<div class="codeWrap"><pre><code>{
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview"
+  }
+}</code></pre></div>
+
+<h3 id="ch1-pack" data-toc>1.2 Docker &amp; static assets</h3>
+
+<p class="topic-desc">Docker wraps your app in a container with a fixed Node version, OS, and file structure. It guarantees the same result on your laptop and in production.</p>
+<div class="codeWrap"><pre><code>FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+CMD ["npm", "run", "preview"]</code></pre></div>
+
+<h3 id="ch1-env" data-toc>1.3 Environment config</h3>
+
+<p class="topic-desc">Never hardcode API keys or database URLs. Use environment variables: a.env file locally, injected secrets in production.</p>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Host &amp; Ship</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 ▸ Host &amp; Ship</button><div class="ch-toc-list"><a href="#ch2-host">2.1 Static vs server hosting</a><a href="#ch2-cdn">2.2 CDNs, caching &amp; HTTPS</a><a href="#ch2-ci">2.3 CI/CD pipeline</a></div></div>
+<h3 id="ch2-host" data-toc>2.1 Static vs server hosting</h3>
+
+<p class="topic-desc">Static hosting serves pre-built files directly. Server hosting runs your app code on every request. Choose static for speed and cost; choose server for dynamic data.</p>
+
+<h3 id="ch2-cdn" data-toc>2.2 CDNs, caching &amp; HTTPS</h3>
+
+<p class="topic-desc">A CDN caches your assets at edge locations worldwide. HTTPS encrypts traffic and is required for HTTP/2. Always force HTTPS in production.</p>
+
+<h3 id="ch2-ci" data-toc>2.3 CI/CD pipeline</h3>
+
+<p class="topic-desc">A CI pipeline runs tests, builds artifacts, and deploys when the main branch changes. GitHub Actions is the simplest option.</p>
+
+</section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Website and Web App Deployment - From Build to Production.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

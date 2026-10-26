@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker Compose - Multi-Container Guide</title>
+<meta name="description" content="Compose multi-container Docker applications: services, networks, volumes, environment files, healthchecks, profiles and production deployment workflows.">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/docker-compose.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Docker Compose - Multi-Container Guide">
+<meta property="og:description" content="Compose multi-container Docker applications: services, networks, volumes, environment files, healthchecks, profiles and production deployment workflows.">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/docker-compose.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-14">
+<meta property="article:section" content="DevOps &amp; Hosting">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Docker Compose - Multi-Container Guide">
+<meta name="twitter:description" content="Compose multi-container Docker applications: services, networks, volumes, environment files, healthchecks, profiles and production deployment workflows.">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/docker-compose.html#article","headline":"Docker Compose - Multi-Container Guide","name":"Docker Compose - Multi-Container Guide","description":"Compose multi-container Docker applications: services, networks, volumes, environment files, healthchecks, profiles and production deployment workflows.","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/docker-compose.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/docker-compose.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-14","articleSection":"DevOps & Hosting","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"DevOps & Hosting","item":"https://amin360it.github.io/quick-guides/index.html#cat-devops"},{"@type":"ListItem","position":3,"name":"Docker Compose - Multi-Container Guide","item":"https://amin360it.github.io/quick-guides/docker-compose.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Docker Compose</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch0-orientation" data-target="ch0-orientation">0 &middot; Orientation</a><ul>
+<li><a href="#ch0-what" data-target="ch0-what">0.1 What Docker Compose is</a></li>
+<li><a href="#ch0-v2" data-target="ch0-v2">0.2 Compose v2 versus v1</a></li>
+<li><a href="#ch0-install" data-target="ch0-install">0.3 Installing and verifying</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1-anatomy" data-target="ch1-anatomy">1 &middot; Anatomy of compose.yaml</a><ul>
+<li><a href="#ch1-toplevel" data-target="ch1-toplevel">1.1 Top-level keys</a></li>
+<li><a href="#ch1-name" data-target="ch1-name">1.2 The name key and project identity</a></li>
+<li><a href="#ch1-version" data-target="ch1-version">1.3 The obsolete version key</a></li>
+<li><a href="#ch1-interpolation" data-target="ch1-interpolation">1.4 Variable interpolation</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2-services" data-target="ch2-services">2 &middot; Services, Images and Builds</a><ul>
+<li><a href="#ch2-image" data-target="ch2-image">2.1 image versus build</a></li>
+<li><a href="#ch2-build" data-target="ch2-build">2.2 Build context, Dockerfile and args</a></li>
+<li><a href="#ch2-target" data-target="ch2-target">2.3 Multi-stage targets</a></li>
+<li><a href="#ch2-pull" data-target="ch2-pull">2.4 pull_policy</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3-ports-volumes" data-target="ch3-ports-volumes">3 &middot; Ports, Volumes and Bind Mounts</a><ul>
+<li><a href="#ch3-ports" data-target="ch3-ports">3.1 Publishing ports</a></li>
+<li><a href="#ch3-volumes" data-target="ch3-volumes">3.2 Named volumes versus bind mounts</a></li>
+<li><a href="#ch3-romodes" data-target="ch3-romodes">3.3 Read-only, tmpfs and mount options</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4-env" data-target="ch4-env">4 &middot; Environment, Secrets and Profiles</a><ul>
+<li><a href="#ch4-environment" data-target="ch4-environment">4.1 environment</a></li>
+<li><a href="#ch4-envfile" data-target="ch4-envfile">4.2 env_file and .env</a></li>
+<li><a href="#ch4-precedence" data-target="ch4-precedence">4.3 Precedence</a></li>
+<li><a href="#ch4-secrets" data-target="ch4-secrets">4.4 secrets and profiles</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch5-networks" data-target="ch5-networks">5 &middot; Networks and Service Discovery</a><ul>
+<li><a href="#ch5-default" data-target="ch5-default">5.1 The default network</a></li>
+<li><a href="#ch5-custom" data-target="ch5-custom">5.2 Custom networks</a></li>
+<li><a href="#ch5-dns" data-target="ch5-dns">5.3 DNS by service name</a></li>
+<li><a href="#ch5-networkmode" data-target="ch5-networkmode">5.4 network_mode</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch6-deps" data-target="ch6-deps">6 &middot; Dependencies, Health and Restarts</a><ul>
+<li><a href="#ch6-depends" data-target="ch6-depends">6.1 depends_on and conditions</a></li>
+<li><a href="#ch6-health" data-target="ch6-health">6.2 healthcheck</a></li>
+<li><a href="#ch6-restart" data-target="ch6-restart">6.3 restart policies</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch7-stacks" data-target="ch7-stacks">7 &middot; Real Stacks</a><ul>
+<li><a href="#ch7-node" data-target="ch7-node">7.1 Node, PostgreSQL and Redis</a></li>
+<li><a href="#ch7-nginx" data-target="ch7-nginx">7.2 Nginx reverse proxy plus app</a></li>
+<li><a href="#ch7-wordpress" data-target="ch7-wordpress">7.3 WordPress and MySQL</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch8-cli" data-target="ch8-cli">8 &middot; The CLI Workflow</a><ul>
+<li><a href="#ch8-lifecycle" data-target="ch8-lifecycle">8.1 up, down, ps and build</a></li>
+<li><a href="#ch8-logs" data-target="ch8-logs">8.2 logs, exec and run</a></li>
+<li><a href="#ch8-config" data-target="ch8-config">8.3 config and validation</a></li>
+<li><a href="#ch8-maint" data-target="ch8-maint">8.4 pull, images, stats and events</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch9-overrides" data-target="ch9-overrides">9 &middot; Multiple Files and Overrides</a><ul>
+<li><a href="#ch9-override" data-target="ch9-override">9.1 The automatic override file</a></li>
+<li><a href="#ch9-f" data-target="ch9-f">9.2 Layering with -f</a></li>
+<li><a href="#ch9-extends" data-target="ch9-extends">9.3 extends</a></li>
+<li><a href="#ch9-merge" data-target="ch9-merge">9.4 Merge rules</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch10-production" data-target="ch10-production">10 &middot; Production, Scaling and Watch</a><ul>
+<li><a href="#ch10-resources" data-target="ch10-resources">10.1 Resource limits</a></li>
+<li><a href="#ch10-deploy" data-target="ch10-deploy">10.2 The deploy block and replicas</a></li>
+<li><a href="#ch10-scale" data-target="ch10-scale">10.3 Scaling and host-port conflicts</a></li>
+<li><a href="#ch10-watch" data-target="ch10-watch">10.4 Watch mode and develop</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch11-troubleshoot" data-target="ch11-troubleshoot">11 &middot; Troubleshooting and Best Practices</a><ul>
+<li><a href="#ch11-errors" data-target="ch11-errors">11.1 Common errors and what they mean</a></li>
+<li><a href="#ch11-drift" data-target="ch11-drift">11.2 Image drift</a></li>
+<li><a href="#ch11-links" data-target="ch11-links">11.3 The links myth</a></li>
+<li><a href="#ch11-best" data-target="ch11-best">11.4 Best practices</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch12-cheatsheet" data-target="ch12-cheatsheet">12 &middot; Appendix — Cheat Sheet</a><ul>
+<li><a href="#ch12-keys" data-target="ch12-keys">12.1 Top-level key reference</a></li>
+<li><a href="#ch12-cli" data-target="ch12-cli">12.2 CLI cheat sheet</a></li>
+<li><a href="#ch12-patterns" data-target="ch12-patterns">12.3 Reusable patterns</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+  <h1 class="am-band">
+    <span class="am-band-t">Docker Compose</span>
+    <span class="am-band-s">13 chapters &middot; 60 topics &middot; 61 code samples &middot; works offline</span>
+  </h1>
+<section class="chapter">
+<h2 id="ch0-orientation" data-toc>0 &middot; Orientation</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 0 &middot; Orientation</button><div class="ch-toc-list"><a href="#ch0-what">0.1 What Docker Compose is</a><a href="#ch0-v2">0.2 Compose v2 versus v1</a><a href="#ch0-install">0.3 Installing and verifying</a></div></div><p class="topic-desc">What Docker Compose actually is, why the file format is now the Compose Specification rather than a vendor format, how the modern <code>docker compose</code> plugin differs from the retired Python <code>docker-compose</code> tool, and how to install and verify the current release.</p>
+<p>Docker Compose is the declarative front end to the Docker engine for anything larger than a single container. Instead of remembering a wall of <code>docker run</code> flags — networks, volumes, environment variables, restart policy — you describe the desired end state in one YAML document and let Compose reconcile it.</p>
+
+<h3 id="ch0-what" data-toc>0.1 What Docker Compose is</h3>
+<h4>A description of desired state, not a script</h4>
+<p>Compose is not a shell script in YAML clothing. You declare <em>what</em> the finished system looks like — three services, two networks, one named volume, a handful of environment variables — and Compose decides the order of operations: create networks, pull or build images, create volumes, start containers, attach them. Because the document describes state rather than steps, running <code>up</code> twice is safe and idempotent: the second run finds most objects already correct and changes only what drifted.</p>
+<p>The unit of work is the <strong>project</strong>. A project is a set of services that live and die together, get a shared network namespace, and share a name prefix on every object they create. By default the project name is the basename of the directory holding the compose file, so <code>~/code/shop/compose.yaml</code> produces a project called <code>shop</code>, a network called <code>shop_default</code>, and containers named <code>shop-web-1</code>, <code>shop-db-1</code> and so on.</p>
+<p>That shared network is the quietly important part. Every service in a project joins the same user-defined bridge network automatically, and Docker's embedded DNS server resolves each service's name to the right container. That single design decision is why a service can connect to <code>db:5432</code> instead of chasing an IP address: the name <code>db</code> is a DNS record that Compose maintains for you.</p>
+
+<h4>Where Compose stops and orchestration begins</h4>
+<p>Compose runs containers on one Docker host. It has no scheduler, no multi-node placement, no self-healing reconciliation loop that keeps a desired replica count alive across a cluster. That is a deliberate boundary, not a gap. Compose is the right tool for local development, CI test environments, single-host deployments and edge boxes; Kubernetes or a managed orchestrator is the right tool once you need many machines.</p>
+<p>In practice the two are complementary: the same service definitions you use locally often get translated into a deployment manifest later, and the discipline of writing a precise <code>compose.yaml</code> forces you to make container boundaries, data volumes and wiring explicit long before production.</p>
+
+<div class="tip">If a task needs two hosts, Compose is the wrong answer. If it needs one host with several coordinating containers, Compose will usually save you an afternoon.</div>
+
+<h3 id="ch0-v2" data-toc>0.2 Compose v2 versus v1</h3>
+<h4>The command changed shape</h4>
+<p>The original Compose was a standalone Python program invoked as <code>docker-compose</code> with a hyphen. Since Compose v2 it is a Docker CLI plugin, and the command is <code>docker compose</code> with a space. The plugin ships with Docker Desktop and with the <code>docker-compose-plugin</code> package on Linux, so on any current install it is already there. The old Python tool reached end of life in July 2023 and should not be used for new work.</p>
+<p>The practical differences are worth knowing because they show up in tutorials that predate 2023. v2 is written in Go, starts noticeably faster (no Python interpreter to boot), and runs natively on every platform the Docker CLI supports. It also removed the split between "build info" and "run info" ordering quirks, and it uses BuildKit by default for builds, which gives you multi-platform builds, better caching and secrets-aware Dockerfiles without extra setup.</p>
+
+<div class="codeWrap"><pre><code># v1 (retired): a separate binary
+docker-compose up -d
+
+# v2 (current): a Docker CLI plugin
+docker compose up -d
+
+# both can coexist if the old binary is still on PATH,
+# but only `docker compose` gets new features</code></pre></div>
+
+<h4>The Compose Specification</h4>
+<p>The other half of the v2 story is standardization. The file format is no longer owned by a single product: it is the <strong>Compose Specification</strong>, an open document maintained under the compose-spec umbrella. Docker Compose implements it, and other tooling reads the same schema. That is why the file is now simply a <em>Compose file</em>, and why the filename preference moved to <code>compose.yaml</code>.</p>
+<p>The specification also stopped the older custom extension keys from being declared at the top level. Everything user-defined now belongs under the <code>x-</code> prefix, which the tooling is required to ignore, and every top-level key has a defined meaning.</p>
+
+<h3 id="ch0-install" data-toc>0.3 Installing and verifying</h3>
+<h4>Confirming you have the plugin</h4>
+<p>Before writing anything, confirm which command your machine answers to. Running <code>docker compose version</code> should print a v2 version string and mention the plugin. If it errors with "docker: 'compose' is not a docker command", the plugin is missing and you should install it from Docker's package repository rather than reaching for the legacy binary.</p>
+
+<div class="codeWrap"><pre><code># shell - verify the plugin is present and current
+docker compose version
+# Docker Compose version v2.32.x
+
+docker info --format '{{.ServerVersion}}'
+# 27.x - the engine Compose talks to
+
+# list the compose files Compose would use, in priority order
+ls compose.yaml compose.yml docker-compose.yml docker-compose.yaml 2&gt;/dev/null</code></pre></div>
+
+<h4>The filename Compose looks for</h4>
+<p>If you do not pass <code>-f</code>, Compose searches the current directory for a file in a fixed order: <code>compose.yaml</code>, then <code>compose.yml</code>, then the legacy <code>docker-compose.yml</code>, then <code>docker-compose.yaml</code>. The first one found is used. New projects should prefer <code>compose.yaml</code>; the hyphenated forms remain supported so that repositories written before 2023 keep working unchanged.</p>
+<p>On Windows and macOS the plugin arrives with Docker Desktop and needs no extra step. On Linux, install the engine first, then the plugin package, and make sure the Compose CLI plugin directory is on <code>DOCKER_CONFIG</code> or the default <code>~/.docker/cli-plugins</code>.</p>
+
+<div class="codeWrap"><pre><code># Debian/Ubuntu - plugin from Docker's own repository
+sudo apt-get update
+sudo apt-get install docker-compose-plugin
+
+# verify, then run a one-shot smoke test
+docker compose version
+mkdir -p /tmp/scaffold &amp;&amp; cd /tmp/scaffold
+docker compose init  # or write the file by hand</code></pre></div>
+
+<div class="note">A minimal smoke test is worth doing once per machine: bring a two-service stack up, confirm it is healthy, then bring it down with <code>-v</code>. That proves networking, DNS and volume mounts all work before you debug them inside a real project.</div>
+</section>
+<section class="chapter">
+<h2 id="ch1-anatomy" data-toc>1 &middot; Anatomy of compose.yaml</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 &middot; Anatomy of compose.yaml</button><div class="ch-toc-list"><a href="#ch1-toplevel">1.1 Top-level keys</a><a href="#ch1-name">1.2 The name key and project identity</a><a href="#ch1-version">1.3 The obsolete version key</a><a href="#ch1-interpolation">1.4 Variable interpolation</a></div></div><p class="topic-desc">The top-level keys, the project <code>name</code>, why the <code>version</code> key is obsolete and should be deleted, and how variable interpolation resolves a value from four different sources in a defined order.</p>
+
+<h3 id="ch1-toplevel" data-toc>1.1 Top-level keys</h3>
+<h4>The small set that matters</h4>
+<p>A Compose file is a mapping with a handful of recognized top-level keys. <code>services</code> is the only required one; every other key is optional and exists to declare shared resources that services reference by name.</p>
+<table>
+<tr><th>Key</th><th>Purpose</th></tr>
+<tr><td><code>services</code></td><td>The containers to run. Required.</td></tr>
+<tr><td><code>networks</code></td><td>Named networks services can join.</td></tr>
+<tr><td><code>volumes</code></td><td>Named volumes that survive <code>down</code>.</td></tr>
+<tr><td><code>secrets</code></td><td>Secret values mounted under <code>/run/secrets</code>.</td></tr>
+<tr><td><code>configs</code></td><td>Non-secret configuration files mounted into services.</td></tr>
+<tr><td><code>name</code></td><td>Overrides the project name.</td></tr>
+<tr><td><code>include</code></td><td>Pulls in other Compose files as reusable units.</td></tr>
+<tr><td><code>x-*</code></td><td>Extension fields; ignored by Compose but usable via YAML anchors.</td></tr>
+</table>
+<p>Two rules catch people out. First, a network or volume referenced by a service does not have to be declared at the top level — using it implicitly creates it with project defaults — but declaring it is how you attach options such as <code>driver</code>, <code>external</code> or <code>driver_opts</code>. Second, an <code>external: true</code> resource must already exist; Compose will not create it and will fail loudly if it is missing.</p>
+
+<h4>A skeleton with every key</h4>
+<div class="codeWrap"><pre><code># compose.yaml
+name: shop               # project name; everything is prefixed with it
+
+x-common: &amp;common        # reusable block, referenced with *common
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  web:
+    image: ghcr.io/acme/shop-web:1.4.2
+    &lt;&lt;: *common
+    networks: [frontend, backend]
+  db:
+    image: postgres:17
+    &lt;&lt;: *common
+    networks: [backend]
+
+networks:
+  frontend: {}
+  backend: {}
+
+volumes:
+  pgdata: {}</code></pre></div>
+
+<div class="tip">YAML merge keys (<code>&lt;&lt;</code>) plus an <code>x-</code> extension field are the idiomatic way to share a block of settings without editing generated files. In the real YAML file it is literally two less-than signs.</div>
+
+<h3 id="ch1-name" data-toc>1.2 The name key and project identity</h3>
+<h4>Why the project name matters more than it looks</h4>
+<p>The project name is a namespace prefix applied to every object Compose creates: networks, volumes, and the default container names. If you run two checkouts of the same repository on one machine without changing the name, their containers collide on names and their published ports collide on the host. Setting an explicit <code>name</code>, or passing <code>-p</code>, is how you run a second instance side by side.</p>
+
+<div class="codeWrap"><pre><code># shell - three ways to control the project name
+docker compose -p shop-staging up -d        # CLI flag wins
+COMPOSE_PROJECT_NAME=shop-ci docker compose up -d   # env var
+# or declare it in the file itself:
+# name: shop</code></pre></div>
+
+<h4>Resolution order</h4>
+<p>Compose resolves the project name in a fixed precedence. The <code>-p</code> flag on the command line beats the <code>COMPOSE_PROJECT_NAME</code> environment variable, which beats the <code>name</code> key in the Compose file, which beats the <code>name</code> from any included file. If none of those are set, Compose derives the name from the directory containing the first Compose file, sanitizing it to lowercase letters, digits, dashes and underscores.</p>
+<p>That last fallback is why a project moved from <code>~/proj</code> to <code>~/proj-v2</code> suddenly grows a second set of volumes named <code>proj-v2_pgdata</code> and appears to have lost its data. The data is still there under the old prefix; the new project simply does not see it. Pin <code>name</code> explicitly whenever data persistence matters.</p>
+
+<h3 id="ch1-version" data-toc>1.3 The obsolete version key</h3>
+<h4>Delete it</h4>
+<p>Older files began with <code>version: "3.9"</code>. That key is obsolete in the Compose Specification. It no longer selects a schema and cannot enable or disable features; modern Compose reads the whole document and warns that the key is meaningless. The single most common cleanup in a 2026 repository is deleting that line.</p>
+
+<div class="codeWrap"><pre><code># legacy - produces a warning on current Compose
+version: "3.9"
+services:
+  web:
+    image: nginx:1.27
+
+# current - no version key at all
+services:
+  web:
+    image: nginx:1.27</code></pre></div>
+
+<h4>What replaced the schema split</h4>
+<p>Before the specification existed, the major version number gated which features were legal — for example, <code>deploy</code> was only meaningful in the swarm-oriented version 3. The specification folded all of that into one schema: every key has a defined meaning, features that only apply to a scheduler are documented as such, and Compose implements the ones that make sense on a single host. The result is that you can use a health check, a <code>deploy</code> block and a profile in the same file without declaring a version that claims you can.</p>
+<div class="warn">If a tutorial tells you to add <code>version: "3.8"</code> to fix a parse error, the tutorial is out of date. The fix is almost always a typo in the YAML, not a missing version key.</div>
+
+<h3 id="ch1-interpolation" data-toc>1.4 Variable interpolation</h3>
+<h4>Substituting values at parse time</h4>
+<p>Compose interpolates <code>${VARIABLE}</code> references before it validates the document, using a small but expressive syntax. A bare reference substitutes the empty string when unset, and each modifier changes what happens in that case.</p>
+<table>
+<tr><th>Syntax</th><th>Behaviour when the variable is unset</th></tr>
+<tr><td><code>${VAR}</code></td><td>Substitutes empty string</td></tr>
+<tr><td><code>${VAR:-def}</code></td><td>Uses <code>def</code> when unset <em>or</em> empty</td></tr>
+<tr><td><code>${VAR-def}</code></td><td>Uses <code>def</code> only when unset</td></tr>
+<tr><td><code>${VAR:?err}</code></td><td>Fails with the message <code>err</code> when unset or empty</td></tr>
+<tr><td><code>${VAR:+alt}</code></td><td>Uses <code>alt</code> only when set</td></tr>
+<tr><td><code>$$</code></td><td>A literal <code>$</code>, not interpolated</td></tr>
+</table>
+
+<div class="codeWrap"><pre><code># compose.yaml
+services:
+  api:
+    image: ghcr.io/acme/api:${TAG:-latest}
+    environment:
+      DATABASE_URL: "postgres://app:${DB_PASS:?DB_PASS must be set}@db:5432/app"
+    command: ["sh", "-c", "echo cost is $$5 and stay"]</code></pre></div>
+
+<h4>Where values come from</h4>
+<p>Interpolation reads from the shell environment first, then from the project's <code>.env</code> file (or the file named by <code>--env-file</code>). That order matters: a value exported in your shell silently overrides the <code>.env</code> file, which is exactly what you want on CI and exactly what fools you when a stale export lingers in a terminal. Use <code>:?</code> for anything the stack cannot sensibly guess, so a missing password stops the run instead of producing a broken container that fails ten seconds later.</p>
+<p>Keep interpolation and <code>environment:</code> straight. Interpolation happens in the file before Compose ever starts a container; <code>environment:</code> sets variables inside the container. A common bug is writing <code>PASSWORD: ${PASSWORD}</code> and expecting the container to expand it — the container only ever sees the already-substituted literal value.</p>
+
+<div class="codeWrap"><pre><code># shell - inspect what interpolation produced, safely
+docker compose config          # fully resolved, all ${} replaced
+docker compose config --quiet  # validates and prints nothing on success</code></pre></div>
+</section>
+<section class="chapter">
+<h2 id="ch2-services" data-toc>2 &middot; Services, Images and Builds</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 &middot; Services, Images and Builds</button><div class="ch-toc-list"><a href="#ch2-image">2.1 image versus build</a><a href="#ch2-build">2.2 Build context, Dockerfile and args</a><a href="#ch2-target">2.3 Multi-stage targets</a><a href="#ch2-pull">2.4 pull_policy</a></div></div><p class="topic-desc">Choosing between <code>image</code> and <code>build</code>, wiring the build context and Dockerfile, passing build arguments, selecting a stage from a multi-stage Dockerfile, and controlling when Compose is allowed to pull a newer image.</p>
+
+<h3 id="ch2-image" data-toc>2.1 image versus build</h3>
+<h4>Two ways to get a container</h4>
+<p>Every service needs an image. You either name a prebuilt one with <code>image:</code> or ask Compose to build one with <code>build:</code>. You may specify both: <code>build</code> tells Compose how to produce the image, and <code>image</code> gives that built result a local tag so pushes and references stay stable.</p>
+
+<div class="codeWrap"><pre><code># pull-only service
+services:
+  db:
+    image: postgres:17.2
+
+# build-only service: Compose tags it project-service automatically
+  api:
+    build: ./api
+
+# build-and-tag: the recommended shape for anything you push
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    image: ghcr.io/acme/worker:${TAG:-dev}</code></pre></div>
+
+<h4>Which to reach for</h4>
+<p>Use <code>image</code> alone for off-the-shelf software — databases, caches, proxies — where you want a specific published artifact and nothing more. Use <code>build</code> for your own code. When you set both, remember that <code>docker compose up</code> will build the image but will not push it; pushing is a separate <code>docker compose push</code> step, and in a CI pipeline you usually build and push with <code>docker buildx bake</code> or the plain <code>docker build</code> so the same artifact can be promoted unchanged.</p>
+<p>A subtle trap: if a service declares both <code>image</code> and <code>build</code> and the local tag already exists, Compose may skip rebuilding, so you keep running yesterday's code after editing the source. <code>docker compose up --build</code> forces a rebuild, and <code>docker compose build</code> does it explicitly.</p>
+
+<h3 id="ch2-build" data-toc>2.2 Build context, Dockerfile and args</h3>
+<h4>The three knobs that decide what gets built</h4>
+<p><code>context</code> is the directory sent to the builder. It defines the boundaries of what the Dockerfile can <code>COPY</code>. Send the smallest context that contains what the build needs; a context of the repository root quietly uploads the entire tree, including <code>node_modules</code> and <code>.git</code>, unless a <code>.dockerignore</code> excludes it. <code>dockerfile</code> names the file to use when it is not literally <code>Dockerfile</code>. <code>args</code> supplies values for the Dockerfile's <code>ARG</code> instructions.</p>
+
+<div class="codeWrap"><pre><code>services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      args:
+        NODE_VERSION: "22"
+        BUILD_ENV: production
+      # BuildKit cache mount reuse across builds
+      cache_from:
+        - ghcr.io/acme/web:cache
+      target: runtime</code></pre></div>
+
+<div class="codeWrap"><pre><code># docker/web.Dockerfile
+ARG NODE_VERSION=22
+FROM node:${NODE_VERSION} AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+FROM deps AS build
+COPY . .
+ARG BUILD_ENV=production
+RUN npm run build -- --mode "$BUILD_ENV"
+
+FROM node:${NODE_VERSION}-slim AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/dist ./dist
+COPY package*.json ./
+RUN npm ci --omit=dev
+USER node
+CMD ["node", "dist/server.js"]</code></pre></div>
+
+<h4>Arguments versus environment</h4>
+<p>Build arguments are visible in image history and are not a place for secrets; use them for version pins and build modes. They are also not environment variables inside the running container — an <code>ARG</code> that is not promoted with <code>ENV</code> disappears once the layer is built. For values that must not leak into a layer, BuildKit's <code>--mount=type=secret</code> or a Compose <code>secrets:</code> block is the correct mechanism, and the classic mistake is baking a token into an image with an <code>ARG</code>.</p>
+
+<h3 id="ch2-target" data-toc>2.3 Multi-stage targets</h3>
+<h4>One Dockerfile, several usable images</h4>
+<p>Multi-stage Dockerfiles produce more than one image; the final stage is what you get by default, but <code>target</code> lets a service stop at an earlier stage. This is extremely useful for development: the <code>deps</code> stage has everything installed, the <code>build</code> stage has tooling, and the <code>runtime</code> stage is slim. A development service can target a stage that includes dev dependencies and a shell, while the production profile targets <code>runtime</code>.</p>
+
+<div class="codeWrap"><pre><code># compose.yaml - develop against a fat stage, ship the slim one
+services:
+  web:
+    build:
+      context: .
+      target: deps      # includes devDependencies and ts-node
+    command: npm run dev
+    volumes:
+      - ./src:/app/src
+    ports: ["3000:3000"]
+
+  web-prod:
+    profiles: ["prod"]
+    build:
+      context: .
+      target: runtime   # slim, no toolchain
+    ports: ["8080:3000"]</code></pre></div>
+
+<h4>Why this beats maintaining two Dockerfiles</h4>
+<p>A single multi-stage Dockerfile guarantees the base image, the language version and the system packages are identical across the stages you ship and the stages you develop against. Two separate Dockerfiles drift, and the drift is invisible until a production-only bug appears. The trade-off is that a target earlier than the last still builds every stage it depends on, so targeting <code>deps</code> does not avoid the cost of the base layers — it only avoids the final assembly.</p>
+
+<h3 id="ch2-pull" data-toc>2.4 pull_policy</h3>
+<h4>Controlling when an image is fetched</h4>
+<p>By default Compose uses a local image if one exists and only pulls when it is missing — which is why <code>postgres:17</code> can silently mean a months-old local copy. <code>pull_policy</code> makes that decision explicit and is one of the highest-value lines in a Compose file for reproducibility.</p>
+<table>
+<tr><th>Value</th><th>Behaviour</th></tr>
+<tr><td><code>always</code></td><td>Pull on every <code>up</code>; fail if the pull fails.</td></tr>
+<tr><td><code>never</code></td><td>Never pull; use only local images.</td></tr>
+<tr><td><code>missing</code></td><td>Pull only if not present locally (the default).</td></tr>
+<tr><td><code>build</code></td><td>Build if the image is absent; never pull.</td></tr>
+<tr><td><code>if_not_present</code></td><td>Legacy spelling of <code>missing</code>.</td></tr>
+<tr><td><code>daily</code>, <code>weekly</code></td><td>Pull if the local copy is older than that.</td></tr>
+</table>
+
+<div class="codeWrap"><pre><code>services:
+  db:
+    image: postgres:17.2
+    pull_policy: always      # never accidentally run a stale local copy
+
+  api:
+    image: ghcr.io/acme/api:1.4.2
+    pull_policy: missing
+
+# shell equivalents for a one-off run
+docker compose pull            # update every image
+docker compose up -d --pull always</code></pre></div>
+
+<h4>Pinning beats pulling</h4>
+<p>Pulling often is a mitigation; pinning is the cure. A tag such as <code>17</code> or <code>latest</code> is a moving pointer, so the container you tested and the container that restarts tomorrow are not guaranteed to be the same bytes. Pin a full version, and for anything security-sensitive pin the digest: <code>postgres:17.2@sha256:...</code>. The digest cannot change, so <code>pull_policy</code> becomes a performance question rather than a correctness one.</p>
+</section>
+<section class="chapter">
+<h2 id="ch3-ports-volumes" data-toc>3 &middot; Ports, Volumes and Bind Mounts</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 &middot; Ports, Volumes and Bind Mounts</button><div class="ch-toc-list"><a href="#ch3-ports">3.1 Publishing ports</a><a href="#ch3-volumes">3.2 Named volumes versus bind mounts</a><a href="#ch3-romodes">3.3 Read-only, tmpfs and mount options</a></div></div><p class="topic-desc">Publishing container ports with the short and long syntax, binding host addresses, the difference between named volumes and host bind mounts, and the read-only and tmpfs options that keep a container's filesystem honest.</p>
+
+<h3 id="ch3-ports" data-toc>3.1 Publishing ports</h3>
+<h4>Short syntax and what it hides</h4>
+<p>The short form is <code>[HOST_IP:][HOST_PORT:]CONTAINER_PORT[/PROTOCOL]</code>. Compose fills in the missing pieces: no host IP means bind on all interfaces, no host port means publish a random free port, and no protocol means TCP. The short form is compact and covers ninety percent of cases, but it cannot express two things you sometimes need — a specific host IP and a port range mapped to a different range.</p>
+
+<div class="codeWrap"><pre><code>services:
+  web:
+    image: nginx:1.27
+    ports:
+      - "8080:80"                 # host 8080 -&gt; container 80
+      - "127.0.0.1:8081:80"       # loopback only, not the LAN
+      - "8443:443/tcp"
+      - "53:53/udp"
+      - "9090-9091:8080-8081"     # ranges, mapped one-to-one
+      - "80"                      # random free host port</code></pre></div>
+
+<h4>Long syntax and the mode you almost never need</h4>
+<p>The long form names each field, which removes ambiguity and lets you set <code>mode</code>. On a single host <code>mode: host</code> is what actually happens; <code>mode: ingress</code> belongs to swarm's routing mesh and has no effect under plain Compose, so declaring it is a sign of a file copied from a swarm deployment.</p>
+
+<div class="codeWrap"><pre><code>services:
+  web:
+    image: nginx:1.27
+    ports:
+      - target: 80          # inside the container
+        published: "8080"   # on the host
+        host_ip: 0.0.0.0    # which interface to bind
+        protocol: tcp
+        app_protocol: http  # hint for tooling
+        mode: host</code></pre></div>
+
+<div class="warn">Two containers cannot publish the same host port. This is the single most common reason <code>--scale</code> fails for a service with a fixed <code>published</code> port. Give the service an unpublished port and put a proxy in front, or publish a range.</div>
+
+<h3 id="ch3-volumes" data-toc>3.2 Named volumes versus bind mounts</h3>
+<h4>Two very different things wearing one syntax</h4>
+<p>Both write as <code>source:target</code>, but they are not interchangeable. A <strong>bind mount</strong> maps a path on the host into the container: the source is a real host path, your editor edits the files directly, and the container sees your latest save. A <strong>named volume</strong> is storage that Docker manages in its own area — the source is just a name, the path on the host is an implementation detail, and the data is created and owned by Docker.</p>
+<table>
+<tr><th></th><th>Bind mount</th><th>Named volume</th></tr>
+<tr><td>Source</td><td>Host filesystem path</td><td>Docker-managed name</td></tr>
+<tr><td>Lives in the repo</td><td>Yes, it is your files</td><td>No</td></tr>
+<tr><td>Survives <code>down -v</code></td><td>Yes</td><td>No, it is deleted</td></tr>
+<tr><td>Portable across hosts</td><td>No</td><td>Yes</td></tr>
+<tr><td>Typical use</td><td>Source code, config</td><td>Database data</td></tr>
+</table>
+
+<div class="codeWrap"><pre><code>services:
+  api:
+    build: .
+    volumes:
+      - ./src:/app/src          # bind: live code, edit and rerun
+      - ./config/app.yml:/app/config/app.yml:ro
+
+  db:
+    image: postgres:17
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # named: persistent data
+
+volumes:
+  pgdata: {}   # declared, so it survives `docker compose down`</code></pre></div>
+
+<h4>The long syntax and the empty-directory catch</h4>
+<p>The long form adds <code>type</code>, <code>read_only</code> and per-type options such as <code>bind.propagation</code> and <code>volume.nocopy</code>. One behaviour to internalize: when Docker mounts a named volume onto a container path that already contains files from the image, it copies those files into the fresh volume on first use. That is how a Postgres image initializes its data directory — and why a bind mount over that same path can appear to "lose" the image's files, because a bind mount never copies first.</p>
+
+<div class="codeWrap"><pre><code>volumes:
+  - type: volume
+    source: pgdata
+    target: /var/lib/postgresql/data
+    volume:
+      nocopy: true          # skip the initial copy from the image
+  - type: bind
+    source: ./backups
+    target: /backups
+    read_only: true
+    bind:
+      create_host_path: true   # make the dir if missing (the default)</code></pre></div>
+
+<h3 id="ch3-romodes" data-toc>3.3 Read-only, tmpfs and mount options</h3>
+<h4>Closing the writable surface</h4>
+<p>Most containers never need to write outside a few explicit locations. Mounting config as <code>:ro</code> and running the root filesystem read-only shrinks the blast radius of a compromised process and makes accidental writes fail loudly instead of persisting. The short syntax accepts a comma-separated option list after the target.</p>
+
+<div class="codeWrap"><pre><code>services:
+  web:
+    image: nginx:1.27
+    read_only: true               # root filesystem is immutable
+    tmpfs:
+      - /var/cache/nginx
+      - /run
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./html:/usr/share/nginx/html:ro
+      - nginx-logs:/var/log/nginx:rw</code></pre></div>
+
+<h4>tmpfs and SELinux sharing</h4>
+<p>A <code>tmpfs</code> mount is memory-backed and disappears with the container, which is perfect for socket directories, PID files and caches that must not touch disk. On SELinux hosts the <code>:z</code> and <code>:Z</code> options relabel the host path so the container is allowed to read it: <code>:z</code> shares one label across containers, <code>:Z</code> gives a private label to a single container. Omitting them on RHEL-family hosts produces a permission denied that looks like a filesystem bug.</p>
+
+<div class="codeWrap"><pre><code>volumes:
+  - ./data:/data:z          # shared label, multiple containers
+  - ./private:/private:Z    # private label, one container only
+  - /tmp/sock:/var/run/app.sock:rw</code></pre></div>
+
+<div class="tip">If a container cannot see files it obviously should, check permissions and SELinux before checking your paths. On Docker Desktop the file-sharing settings for the drive can also silently drop a bind mount.</div>
+</section>
+<section class="chapter">
+<h2 id="ch4-env" data-toc>4 &middot; Environment, Secrets and Profiles</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 &middot; Environment, Secrets and Profiles</button><div class="ch-toc-list"><a href="#ch4-environment">4.1 environment</a><a href="#ch4-envfile">4.2 env_file and .env</a><a href="#ch4-precedence">4.3 Precedence</a><a href="#ch4-secrets">4.4 secrets and profiles</a></div></div><p class="topic-desc">Setting container environment variables, sourcing them from files, understanding the precedence order that decides who wins, mounting real secrets instead of baking passwords into env, and using profiles to keep optional services out of the default start.</p>
+
+<h3 id="ch4-environment" data-toc>4.1 environment</h3>
+<h4>Mapping or list</h4>
+<p><code>environment</code> accepts either a mapping or a list of <code>KEY=value</code> strings. The mapping form is clearer for fixed values; the list form with a bare key passes the value through from Compose's own environment, which is a shorthand you should use deliberately rather than by accident.</p>
+
+<div class="codeWrap"><pre><code>services:
+  api:
+    image: acme/api:1.4.2
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: info
+      CACHE_TTL: "300"          # quote numbers? YAML is fine, but quote to be safe
+      # bare key: take the value from the shell/.env when Compose runs
+      DATABASE_URL:
+      FEATURE_FLAGS: "a,b,c"</code></pre></div>
+
+<h4>Values are strings</h4>
+<p>Environment variables are always strings inside the container. YAML will happily parse <code>CACHE_TTL: 300</code> as a number and Compose will coerce it, but a leading zero or a value like <code>yes</code> can be reinterpreted by YAML in surprising ways. Quoting anything that looks numeric or boolean is cheap insurance. An unset bare key resolves to an empty string rather than an error, which is why <code>${VAR:?}</code> in the value is the better pattern when a variable is mandatory.</p>
+<p>Do not confuse the two layers again: <code>${VAR}</code> is interpolation performed by Compose on the file, while <code>environment:</code> is what the process inside the container reads via <code>getenv</code>. Interpolation happens once, at parse time, and the container never sees the original reference.</p>
+
+<h3 id="ch4-envfile" data-toc>4.2 env_file and .env</h3>
+<h4>Two files with confusingly similar names</h4>
+<p>These are different features and the names trip people up. The <code>.env</code> file at the project root is read by Compose to interpolate <code>${}</code> references in the Compose file — it is Compose's own input. An <code>env_file:</code> entry on a service is read by Compose and handed to that container as its environment — it is the container's input. A value can appear in both, and it serves two different purposes.</p>
+
+<div class="codeWrap"><pre><code># .env (project root) - feeds ${} interpolation in the file
+TAG=1.4.2
+DB_PASS=devpassword
+
+# services/api.env - feeds container environment only
+NODE_ENV=production
+PORT=3000
+
+# compose.yaml
+services:
+  api:
+    image: ghcr.io/acme/api:${TAG}
+    env_file:
+      - services/api.env
+      - path: services/api.local.env   # optional, ignored if absent
+        required: false
+    environment:
+      PORT: "8080"                     # overrides the env_file value</code></pre></div>
+
+<h4>Choosing env_file in v2</h4>
+<p>Newer Compose versions support the long form of <code>env_file</code> with <code>path</code>, <code>required</code> and <code>format</code>. That optional-file form is far better than committing a placeholder file just to satisfy a missing-file error. Keep secret values out of any <code>env_file</code> that is committed — use <code>.env.local</code> and a <code>.gitignore</code> entry, or move the truth into <code>secrets:</code>.</p>
+
+<h3 id="ch4-precedence" data-toc>4.3 Precedence</h3>
+<h4>Who wins inside the container</h4>
+<p>When the same key arrives from several places, the highest source in this list wins:</p>
+<ol>
+<li><code>docker compose run -e KEY=value</code> on the command line.</li>
+<li><code>environment:</code> in the Compose file (including a pass-through shell value).</li>
+<li>The <code>env_file:</code> files, in the order listed, later files overriding earlier ones.</li>
+<li><code>ENV</code> instructions baked into the image by its Dockerfile.</li>
+</ol>
+<p>The container's <code>CMD</code> and <code>ENTRYPOINT</code> do not read any of this until the process asks; a shell that refuses to inherit variables is a separate bug from this ordering.</p>
+
+<h4>Who wins inside the Compose file</h4>
+<p>Separately, interpolation (<code>${}</code>) reads from the shell environment, then from <code>--env-file</code> or the default <code>.env</code>. A shell export beats the file. On CI this is usually what you want — the pipeline exports <code>TAG</code> and it wins — but the same behaviour means a leftover <code>export DB_PASS=old</code> in a terminal quietly overrides your <code>.env</code>. Run <code>docker compose config</code> to see the resolved truth rather than the source files.</p>
+
+<div class="codeWrap"><pre><code># shell - prove what actually won
+docker compose config | grep -A5 environment
+docker compose run --rm api env | sort</code></pre></div>
+
+<h3 id="ch4-secrets" data-toc>4.4 secrets and profiles</h3>
+<h4>Secrets: files by default</h4>
+<p>A Compose secret is mounted as a file under <code>/run/secrets/&lt;name&gt;</code>, not exported as an environment variable. That matters because environment variables leak into <code>docker inspect</code>, crash reports and child processes far more readily than a file does. The source can be a host file or the value of an environment variable.</p>
+
+<div class="codeWrap"><pre><code>services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  api_token:
+    environment: API_TOKEN        # read from Compose's environment
+
+# Inside the container the value is at:
+#   /run/secrets/db_password</code></pre></div>
+
+<h4>Profiles: optional services, off by default</h4>
+<p>A service that declares <code>profiles:</code> does not start unless one of its profiles is active. Services with no profile always start. This lets one Compose file describe the whole system without forcing the debug tools, the admin UI and the migration runner on every developer.</p>
+
+<div class="codeWrap"><pre><code>services:
+  api:
+    image: acme/api:1.4.2          # always starts
+
+  adminer:
+    image: adminer:5
+    profiles: ["tools"]            # only with --profile tools
+
+  migrate:
+    image: acme/api:1.4.2
+    command: node dist/migrate.js
+    profiles: ["migrate"]
+
+  # shell
+  # docker compose --profile tools up -d
+  # docker compose run --rm migrate
+  # COMPOSE_PROFILES=tools,migrate docker compose up -d</code></pre></div>
+
+<p>A service pulled in by <code>depends_on</code> from an active profile starts even if it has no profile of its own — dependencies override the filter. The wildcard <code>--profile "*"</code> starts every profiled service, which is occasionally useful in CI but almost never what a developer wants interactively.</p>
+</section>
+<section class="chapter">
+<h2 id="ch5-networks" data-toc>5 &middot; Networks and Service Discovery</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 5 &middot; Networks and Service Discovery</button><div class="ch-toc-list"><a href="#ch5-default">5.1 The default network</a><a href="#ch5-custom">5.2 Custom networks</a><a href="#ch5-dns">5.3 DNS by service name</a><a href="#ch5-networkmode">5.4 network_mode</a></div></div><p class="topic-desc">The network Compose creates for every project, how to add your own to segment traffic, how DNS resolves a service name to the right container, and when to drop out of the model entirely with <code>network_mode</code>.</p>
+
+<h3 id="ch5-default" data-toc>5.1 The default network</h3>
+<h4>Created for you, named after the project</h4>
+<p>If a service does not declare a network, Compose attaches it to a project-wide bridge network called <code>&lt;project&gt;_default</code>. Every service in the project can reach every other service on that network by name. There is no configuration, and for a small stack there is no reason to add any.</p>
+
+<div class="codeWrap"><pre><code># shell - see the network Compose made
+docker network ls
+# NETWORK ID   NAME            DRIVER   SCOPE
+# 1a2b3c4d5e6f shop_default    bridge   local
+
+docker network inspect shop_default --format '{{range .Containers}}{{.Name}} {{end}}'</code></pre></div>
+
+<h4>Why the default is a user-defined bridge, not the legacy bridge</h4>
+<p>Containers on Docker's legacy <code>bridge</code> network cannot resolve each other by name; they only get IP addresses. User-defined bridge networks enable the embedded DNS server, so a service name is a hostname. That is the entire reason Compose defaults to a user-defined network and why "just use the default bridge" advice from 2016 is now actively harmful.</p>
+
+<h3 id="ch5-custom" data-toc>5.2 Custom networks</h3>
+<h4>Segmenting on purpose</h4>
+<p>Declare additional networks when you want to separate traffic — typically a <code>frontend</code> that the proxy shares with the app, and a <code>backend</code> that only the app and the database share. A container only reaches another if they share at least one network, so segmentation is a real boundary, not a convention.</p>
+
+<div class="codeWrap"><pre><code>services:
+  proxy:
+    image: nginx:1.27
+    networks: [frontend]
+
+  api:
+    image: acme/api:1.4.2
+    networks: [frontend, backend]
+
+  db:
+    image: postgres:17
+    networks: [backend]
+
+networks:
+  frontend: {}
+  backend:
+    internal: true      # no route to the outside world
+
+volumes: {}</code></pre></div>
+
+<h4>Options worth knowing</h4>
+<p><code>internal: true</code> gives a network no gateway to the outside, so a compromised database container cannot phone home — but it also means that container cannot pull updates or reach a package mirror at runtime, so keep images self-contained. <code>external: true</code> joins a network created outside Compose, which is how you let two projects or a manually-run container talk to a stack. <code>driver_opts</code> passes driver-specific settings such as MTU or a specific bridge name.</p>
+
+<div class="codeWrap"><pre><code>networks:
+  shared:
+    external: true
+    name: acme-shared        # the real name, since external skips the prefix
+  tuned:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "1400"</code></pre></div>
+
+<h3 id="ch5-dns" data-toc>5.3 DNS by service name</h3>
+<h4>The name is the hostname</h4>
+<p>On any user-defined network, Docker's DNS resolves a service's name to its container's IP. If a service is on several networks, it gets an address on each and the DNS answer is scoped to the network the asking container is attached to — which is precisely why segmentation works. Aliases add extra names.</p>
+
+<div class="codeWrap"><pre><code>services:
+  db:
+    image: postgres:17
+    networks:
+      backend:
+        aliases: [postgres, database]   # extra DNS names
+
+  api:
+    image: acme/api:1.4.2
+    networks: [backend]
+    environment:
+      # use the service name, not localhost and not an IP
+      DATABASE_URL: postgres://app:secret@db:5432/app</code></pre></div>
+
+<h4>What actually breaks name resolution</h4>
+<p>Three things routinely cause "could not resolve host" inside a stack. First, a service on only an <code>internal</code> network being asked to reach the public internet — the name resolves, but there is no route. Second, a hard-coded <code>localhost</code>: inside a container that means the container itself, never the host or a sibling. Third, overriding DNS with a custom <code>dns:</code> list can shadow Docker's embedded resolver for service names if you are careless. When in doubt, <code>docker compose exec api getent hosts db</code> tells you what the container's resolver actually returns.</p>
+
+<h3 id="ch5-networkmode" data-toc>5.4 network_mode</h3>
+<h4>Leaving the Compose network model</h4>
+<p><code>network_mode</code> replaces the whole networking setup for a service. It cannot be combined with <code>networks:</code> — Compose rejects the file if you try. The common values are <code>host</code>, <code>none</code>, <code>service:&lt;name&gt;</code> and <code>container:&lt;id&gt;</code>.</p>
+
+<div class="codeWrap"><pre><code>services:
+  metrics:
+    image: prom/node-exporter:v1.8.2
+    network_mode: host        # sees the host's real interfaces
+    pid: host
+
+  debug:
+    image: busybox:1.37
+    network_mode: "service:api"   # share api's network namespace</code></pre></div>
+
+<h4>Trade-offs</h4>
+<p><code>host</code> mode removes the network boundary: the container shares the host's interfaces, so <code>ports:</code> is meaningless and two containers cannot both bind the same host port. It is occasionally necessary for tools that must see real interface counters, but it gives up Compose's DNS and isolation. <code>service:&lt;name&gt;</code> is the old "the container reaches a sibling at <code>localhost</code>" pattern, useful for a sidecar proxy, but it is fragile because you have now coupled two services by a namespace instead of by a hostname. Prefer normal networking and a service name in almost every case.</p>
+<div class="tip">On Docker Desktop for Mac and Windows, <code>network_mode: host</code> does not behave like it does on Linux — it refers to the VM, not your laptop. Do not build workflows that depend on it being the real host.</div>
+</section>
+<section class="chapter">
+<h2 id="ch6-deps" data-toc>6 &middot; Dependencies, Health and Restarts</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 6 &middot; Dependencies, Health and Restarts</button><div class="ch-toc-list"><a href="#ch6-depends">6.1 depends_on and conditions</a><a href="#ch6-health">6.2 healthcheck</a><a href="#ch6-restart">6.3 restart policies</a></div></div><p class="topic-desc">Ordering startup with <code>depends_on</code> and its conditions, using <code>healthcheck</code> to define what "ready" means, and picking a <code>restart</code> policy that survives a crash without fighting you during development.</p>
+
+<h3 id="ch6-depends" data-toc>6.1 depends_on and conditions</h3>
+<h4>Start order is not readiness</h4>
+<p>The classic Compose trap: <code>depends_on: [db]</code> starts the database container before the app container, but starting is not the same as being ready to accept connections. Postgres takes a second or two to initialize; the app starts immediately and crashes with "connection refused". The fix is a condition, not a longer sleep.</p>
+<table>
+<tr><th>Condition</th><th>Waits until</th></tr>
+<tr><td><code>service_started</code></td><td>The container has started (the default).</td></tr>
+<tr><td><code>service_healthy</code></td><td>Its healthcheck reports healthy.</td></tr>
+<tr><td><code>service_completed_successfully</code></td><td>It ran to completion with exit code 0.</td></tr>
+</table>
+
+<div class="codeWrap"><pre><code>services:
+  api:
+    image: acme/api:1.4.2
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true            # restart api if db is restarted
+      migrate:
+        condition: service_completed_successfully
+
+  migrate:
+    image: acme/api:1.4.2
+    command: node dist/migrate.js
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  db:
+    image: postgres:17
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s</code></pre></div>
+
+<h4>What depends_on does not do</h4>
+<p>It orders startup; it does not add retries to your application and it does not restart a crashed dependency. For robust stacks, combine a healthcheck with client-side retry in the app itself — a database that is healthy at boot can still be restarted later, and only the client knows how to reconnect. <code>depends_on</code> also has no effect on <code>docker compose run</code> beyond starting dependencies; it does not gate the command you asked to run.</p>
+<p>The <code>restart: true</code> option on a dependency is worth noting: it makes Compose restart the dependent service when the dependency is updated or restarted explicitly. Without it, restarting the database leaves the app connected to a dead socket.</p>
+
+<h3 id="ch6-health" data-toc>6.2 healthcheck</h3>
+<h4>Defining what ready means</h4>
+<p>A healthcheck is a command Compose runs inside the container on a schedule. Exit code 0 means healthy, 1 means unhealthy, 2 is reserved. The container starts in the <code>starting</code> state, moves to <code>healthy</code> when the first success arrives, and flips to <code>unhealthy</code> after <code>retries</code> consecutive failures.</p>
+
+<div class="codeWrap"><pre><code>services:
+  web:
+    image: nginx:1.27
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/healthz"]
+      interval: 30s        # time between checks once running
+      timeout: 5s          # a check that runs this long counts as failed
+      retries: 3           # consecutive failures before unhealthy
+      start_period: 20s    # grace period; failures here do not count
+      start_interval: 5s   # faster checks during the start period
+
+  queue:
+    image: acme/worker:1.4.2
+    healthcheck:
+      disable: true        # explicitly opt out of any image-defined check</code></pre></div>
+
+<h4>Writing a healthcheck that tells the truth</h4>
+<p>Two failure modes dominate. The first is a healthcheck that checks nothing useful — <code>test: ["CMD", "true"]</code> reports healthy for a process that is stuck. Check the thing the dependents actually need: an HTTP endpoint that hits the database, or <code>pg_isready</code> for Postgres, or a Redis <code>PING</code>. The second is a probe that is too aggressive: an interval of one second with no <code>start_period</code> marks a slow-starting container unhealthy before it has finished booting.</p>
+<p>Use <code>CMD-SHELL</code> when you need shell features such as pipes or variable expansion and <code>CMD</code> (an argv array) when you do not, because <code>CMD</code> avoids a shell and is slightly faster and more predictable. Healthchecks are also what <code>depends_on: service_healthy</code> consumes, so a stack with no healthchecks can only ever order by "started".</p>
+
+<h3 id="ch6-restart" data-toc>6.3 restart policies</h3>
+<h4>Four values, one good default</h4>
+<table>
+<tr><th>Policy</th><th>Behaviour</th></tr>
+<tr><td><code>no</code></td><td>Never restart (the default).</td></tr>
+<tr><td><code>always</code></td><td>Restart on any exit, including a clean stop — which can be surprising.</td></tr>
+<tr><td><code>on-failure[:n]</code></td><td>Restart only on a non-zero exit, optionally at most <code>n</code> times.</td></tr>
+<tr><td><code>unless-stopped</code></td><td>Restart on exit except when you stopped it yourself. Restarts after a daemon reboot.</td></tr>
+</table>
+
+<div class="codeWrap"><pre><code>services:
+  api:
+    image: acme/api:1.4.2
+    restart: unless-stopped          # the sensible default for a service
+
+  batch:
+    image: acme/batch:1.4.2
+    restart: "no"                    # one-shot job; do not resurrect it
+
+  flaky:
+    image: acme/flaky:1.4.2
+    restart: on-failure:5            # give up after five crashes</code></pre></div>
+
+<h4>Restart is not a supervision strategy</h4>
+<p>A restart policy recovers from a process that exits; it does nothing for a process that hangs while still running. That is what a healthcheck is for, and on a single host Compose does not automatically restart unhealthy containers — you would use <code>docker compose up --wait</code> to fail fast at startup and an external supervisor or a small script for ongoing cases. Also note that <code>restart</code> and a swarm-style <code>deploy.restart_policy</code> are different keys: set <code>restart</code> for plain Compose, and expect the swarm key to be ignored outside a swarm.</p>
+<div class="warn">Do not put <code>restart: always</code> on a migration or seed job. It will run, exit and immediately run again, forever.</div>
+</section>
+<section class="chapter">
+<h2 id="ch7-stacks" data-toc>7 &middot; Real Stacks</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 7 &middot; Real Stacks</button><div class="ch-toc-list"><a href="#ch7-node">7.1 Node, PostgreSQL and Redis</a><a href="#ch7-nginx">7.2 Nginx reverse proxy plus app</a><a href="#ch7-wordpress">7.3 WordPress and MySQL</a></div></div><p class="topic-desc">Three complete, runnable stacks that exercise the whole feature set: a Node application with PostgreSQL and Redis, an Nginx reverse proxy in front of an app, and a WordPress site on MySQL with a CLI helper.</p>
+
+<h3 id="ch7-node" data-toc>7.1 Node, PostgreSQL and Redis</h3>
+<h4>The stack</h4>
+<p>This is the shape most web services converge on: an application container, a relational database with a named volume, and a cache. The app waits for the database to be genuinely healthy, connects using the service name as the hostname, and keeps its data outside the container.</p>
+
+<div class="codeWrap"><pre><code># compose.yaml - Node + PostgreSQL + Redis
+name: shop
+
+x-log: &amp;log
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  api:
+    build:
+      context: .
+      target: runtime
+    image: ghcr.io/acme/shop-api:1.4.2
+    &lt;&lt;: *log
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: postgres://app:${DB_PASS:?set DB_PASS}@db:5432/shop
+      REDIS_URL: redis://cache:6379
+    ports:
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "node", "dist/healthcheck.js"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+
+  db:
+    image: postgres:17.2
+    &lt;&lt;: *log
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASS:?set DB_PASS}
+      POSTGRES_DB: shop
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d shop"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  cache:
+    image: redis:7.4-alpine
+    &lt;&lt;: *log
+    restart: unless-stopped
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata: {}
+  redisdata: {}</code></pre></div>
+
+<h4>Why it is arranged this way</h4>
+<p>The app binds to loopback only, so nothing on the LAN can reach it directly; a proxy or platform ingress is expected to sit in front. The database uses a named volume and reads any bootstrap SQL from <code>./db/init</code>, a directory the official image executes once on an empty data directory. Redis is configured with a light snapshot and a real <code>PING</code> healthcheck so the app's <code>depends_on</code> actually waits for a working cache.</p>
+<p>The <code>x-log</code> anchor is repeated into each service rather than written three times. Every log driver option here exists to stop a chatty container from filling the host disk, which is a real production incident and not a hypothetical one.</p>
+
+<h3 id="ch7-nginx" data-toc>7.2 Nginx reverse proxy plus app</h3>
+<h4>One published port, two containers</h4>
+<p>A reverse proxy is the standard way to terminate TLS and give several services one front door. The proxy is the only service with a published port; it reaches the app by service name over the shared network. TLS is handled by mounting certificates read-only, and ACME challenges are served from a mounted webroot.</p>
+
+<div class="codeWrap"><pre><code># compose.yaml - Nginx in front of an app
+name: edge
+
+services:
+  proxy:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certs:/etc/nginx/certs:ro
+      - ./acme-webroot:/var/www/acme:ro
+      - proxylogs:/var/log/nginx
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  app:
+    build: ./app
+    image: ghcr.io/acme/edge-app:2.1.0
+    restart: unless-stopped
+    expose:
+      - "3000"                 # reachable on the network, not on the host
+    environment:
+      TRUST_PROXY: "1"
+      BASE_URL: https://shop.example.com
+    healthcheck:
+      test: ["CMD", "node", "dist/healthcheck.js"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  proxylogs: {}</code></pre></div>
+
+<div class="codeWrap"><pre><code># nginx/conf.d/shop.conf
+server {
+    listen 443 ssl;
+    server_name shop.example.com;
+
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/acme;
+    }
+
+    location / {
+        proxy_pass         http://app:3000;   # service name, not an IP
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}
+
+server {
+    listen 80;
+    server_name shop.example.com;
+    location / { return 301 https://$host$request_uri; }
+}</code></pre></div>
+
+<h4>The details that make it work</h4>
+<p>Nginx resolves <code>app</code> once at startup and caches the address. If the app container is recreated and gets a new IP, a running Nginx can keep sending traffic to the old address. Two mitigations: let a resolver do it dynamically, or simply recreate the proxy alongside the app. The <code>expose:</code> key on the app documents that port 3000 is intended for the internal network only — it does not publish it, and the app is unreachable from the host as a result.</p>
+
+<h3 id="ch7-wordpress" data-toc>7.3 WordPress and MySQL</h3>
+<h4>The full stack</h4>
+<p>WordPress adds a second web-facing tier and a well-known set of environment conventions. The official images expect database credentials in environment variables and use named volumes for both the database and the uploads.</p>
+
+<div class="codeWrap"><pre><code># compose.yaml - WordPress + MySQL + WP-CLI
+name: blog
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    command:
+      - --default-authentication-plugin=caching_sha2_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  wordpress:
+    image: wordpress:6.7-php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME', 'http://localhost:8080');
+        define('WP_SITEURL', 'http://localhost:8080');
+        define('DISALLOW_FILE_EDIT', true);
+    volumes:
+      - wpdata:/var/www/html
+      - ./themes/acme:/var/www/html/wp-content/themes/acme
+      - ./plugins/acme:/var/www/html/wp-content/plugins/acme
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/wp-login.php"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  cli:
+    image: wordpress:cli-2.11-php8.3
+    profiles: ["cli"]
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    user: "33:33"                     # www-data
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD}
+    volumes:
+      - wpdata:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ["wp"]
+
+volumes:
+  dbdata: {}
+  wpdata: {}</code></pre></div>
+
+<h4>Running and using it</h4>
+<div class="codeWrap"><pre><code># shell - start the site, then use the CLI profile
+export MYSQL_PASSWORD=devpass
+export MYSQL_ROOT_PASSWORD=rootpass
+docker compose up -d
+docker compose --profile cli run --rm cli core install \
+  --url=http://localhost:8080 \
+  --title="Acme Blog" \
+  --admin_user=admin \
+  --admin_password=change-me \
+  --admin_email=admin@example.com
+docker compose --profile cli run --rm cli plugin list</code></pre></div>
+
+<p>Mounting only the custom theme and plugin keeps the rest of <code>wp-content</code> inside the named volume, so a rebuild of the image does not wipe uploads while your code still lives in git. The CLI service runs as the web user id because files it creates must be writable by Apache, and it is hidden behind a profile so it never starts during a normal <code>up</code>. The database healthcheck uses <code>mysqladmin ping</code> with the root password, which is the only reliable signal that MySQL is actually accepting logins rather than merely listening.</p>
+</section>
+<section class="chapter">
+<h2 id="ch8-cli" data-toc>8 &middot; The CLI Workflow</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 8 &middot; The CLI Workflow</button><div class="ch-toc-list"><a href="#ch8-lifecycle">8.1 up, down, ps and build</a><a href="#ch8-logs">8.2 logs, exec and run</a><a href="#ch8-config">8.3 config and validation</a><a href="#ch8-maint">8.4 pull, images, stats and events</a></div></div><p class="topic-desc">The commands you actually type every day: bringing a stack up and down, following logs, opening a shell, running one-off commands, inspecting status and validating configuration before it bites you.</p>
+
+<h3 id="ch8-lifecycle" data-toc>8.1 up, down, ps and build</h3>
+<h4>The core loop</h4>
+<div class="codeWrap"><pre><code># shell - the everyday loop
+docker compose up -d                  # create/start in the background
+docker compose up -d --build          # rebuild images first
+docker compose up -d --force-recreate # throw away containers, keep images
+docker compose up --wait              # block until healthy, or fail
+docker compose ps                     # what is running
+docker compose ps --format json       # machine-readable
+docker compose stop                   # stop, keep containers
+docker compose down                   # stop and remove containers + network
+docker compose down -v                # also delete named volumes (data!)
+docker compose down --rmi local       # also remove built images</code></pre></div>
+
+<h4>What each command really does</h4>
+<p><code>up</code> is idempotent: it creates only what is missing and recreates a container when its configuration changed. <code>down</code> removes containers, networks and the default network but deliberately leaves named volumes and images alone, because deleting data by default would be indefensible. <code>stop</code> and <code>start</code> preserve the containers, which is the fastest way to pause a stack while keeping its state.</p>
+<p>The <code>--wait</code> flag is the one worth adding to every script. Without it <code>up -d</code> returns as soon as containers are created, so the next line of your script races the application's boot. With it, <code>up</code> blocks until services are healthy or the wait times out and the command exits non-zero.</p>
+
+<div class="codeWrap"><pre><code># shell - remove orphans left by a renamed or deleted service
+docker compose up -d --remove-orphans
+
+# only build, do not run
+docker compose build --pull --no-cache api
+docker compose build --progress plain   # readable CI logs</code></pre></div>
+
+<h3 id="ch8-logs" data-toc>8.2 logs, exec and run</h3>
+<h4>Three different ways to get a shell or output</h4>
+<p><code>logs</code> reads the aggregated stdout/stderr of the containers. <code>exec</code> runs a command in an <em>already running</em> container. <code>run</code> starts a <em>new, one-off</em> container from a service definition. Confusing the last two is the most common CLI mistake: <code>exec</code> fails with "container is not running" when the service is down, and <code>run</code> starts a second copy that may try to bind the same port or write to the same volume.</p>
+
+<div class="codeWrap"><pre><code># shell - logs
+docker compose logs                 # everything
+docker compose logs -f api          # follow one service
+docker compose logs --tail=100 -f   # last 100 lines, then follow
+docker compose logs --since 10m db
+docker compose logs --no-log-prefix api
+
+# shell - exec into a running service
+docker compose exec api sh
+docker compose exec -u root web bash
+docker compose exec db psql -U app -d shop
+docker compose exec -T db pg_dump -U app shop &gt; dump.sql   # no TTY, pipeable
+
+# shell - one-off containers
+docker compose run --rm api node scripts/report.js
+docker compose run --rm --service-ports web            # publish its ports
+docker compose run --rm -e LOG_LEVEL=debug api npm test
+docker compose run --rm --no-deps api node -e "console.log(1)"</code></pre></div>
+
+<h4>Things that save time</h4>
+<p><code>-T</code> disables TTY allocation, which is required whenever you pipe output or run in CI; without it the CLI complains about a non-terminal. <code>--no-deps</code> stops <code>run</code> from starting the service's dependencies, which is what you want for a pure unit-test container. <code>--service-ports</code> is needed because <code>run</code> does not publish ports by default — a deliberate choice so a one-off container cannot collide with the running service.</p>
+
+<h3 id="ch8-config" data-toc>8.3 config and validation</h3>
+<h4>Resolve, then inspect</h4>
+<p><code>docker compose config</code> renders the final document after interpolation, file merging and path resolution, and validates it against the schema. It is the single most useful debugging command in the tool: it shows you what Compose thinks you wrote, not what you think you wrote.</p>
+
+<div class="codeWrap"><pre><code># shell - validate and inspect the resolved config
+docker compose config                    # full resolved YAML
+docker compose config --quiet            # exit code only, for CI
+docker compose config --services         # list service names
+docker compose config --volumes          # list top-level volume names
+docker compose config --images           # list images the stack will use
+docker compose config --profiles         # list declared profile names
+docker compose config --hash="*"         # config hashes, for cache keys
+docker compose config --format json      # machine-readable</code></pre></div>
+
+<h4>Using it in CI</h4>
+<p>A single <code>docker compose config --quiet</code> in a pipeline catches the entire class of "the file does not parse" failures before a runner spins up any container, and it is cheap. Pair it with <code>docker compose config --images</code> to feed an image scanner, and with <code>--hash</code> to invalidate a cache only when the effective configuration really changed. Because <code>config</code> performs interpolation, run it with the same environment and <code>--env-file</code> the deployment uses, or the validation is testing a different document.</p>
+
+<h3 id="ch8-maint" data-toc>8.4 pull, images, stats and events</h3>
+<h4>Inspecting and updating a running stack</h4>
+<div class="codeWrap"><pre><code># shell - update and inspect
+docker compose pull                     # refresh all images
+docker compose pull db                  # refresh one
+docker compose push                     # push built images (needs image: set)
+docker compose images                   # local images used by the project
+docker compose top                      # host processes running in containers
+docker compose stats --no-stream        # CPU/memory snapshot per container
+docker compose events --json            # stream daemon events for the project
+docker compose port web 80              # what host port mapped to 80
+docker compose cp api:/app/logs ./logs  # copy files out of a container</code></pre></div>
+
+<h4>A safe update sequence</h4>
+<p>To move a running stack to newer images without a surprise: pull first, then recreate, then check health. Running <code>down</code> and <code>up</code> is a larger hammer that drops the network and any anonymous volumes, and it briefly removes the ability of other things to resolve the services. For a single-host stack the routine is:</p>
+<div class="codeWrap"><pre><code># shell - rolling-ish update on one host
+docker compose pull
+docker compose up -d --wait --remove-orphans
+docker compose ps
+# roll back by pointing TAG at the previous version and repeating
+TAG=1.4.1 docker compose up -d --wait</code></pre></div>
+<p><code>docker compose events</code> is underused. It streams what the daemon is doing — container created, started, died, network connected — with timestamps, which turns "it restarted at some point" into "it restarted at 03:14 with exit code 137", and exit code 137 is the signature of an out-of-memory kill.</p>
+</section>
+<section class="chapter">
+<h2 id="ch9-overrides" data-toc>9 &middot; Multiple Files and Overrides</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 9 &middot; Multiple Files and Overrides</button><div class="ch-toc-list"><a href="#ch9-override">9.1 The automatic override file</a><a href="#ch9-f">9.2 Layering with -f</a><a href="#ch9-extends">9.3 extends</a><a href="#ch9-merge">9.4 Merge rules</a></div></div><p class="topic-desc">The automatic <code>docker-compose.override.yml</code>, layering several files with <code>-f</code>, reusing a service definition with <code>extends</code>, and the merge rules that decide what happens when two files define the same key.</p>
+
+<h3 id="ch9-override" data-toc>9.1 The automatic override file</h3>
+<h4>What Compose reads without being asked</h4>
+<p>If <code>compose.yaml</code> exists, Compose looks for <code>compose.override.yaml</code> and <code>docker-compose.override.yml</code> and merges them on top automatically. This is the intended place for developer-only settings — bind-mounting source for live reload, publishing extra ports, running a debug command — so that the base file stays production-shaped and is never edited just to develop.</p>
+
+<div class="codeWrap"><pre><code># compose.yaml (committed - the real shape)
+services:
+  api:
+    image: ghcr.io/acme/api:1.4.2
+    restart: unless-stopped
+
+# compose.override.yaml (committed or git-ignored - dev shape)
+services:
+  api:
+    build: ./api                 # build locally instead of using the tag
+    command: npm run dev
+    environment:
+      LOG_LEVEL: debug
+    volumes:
+      - ./api/src:/app/src       # live code
+    ports:
+      - "9229:9229"              # node inspector</code></pre></div>
+
+<h4>Turning it off</h4>
+<p>The automatic merge is convenient and occasionally dangerous: a CI job that expects the base file gets dev settings if the override is present. Pass an explicit <code>-f</code> list to suppress discovery, or set <code>COMPOSE_FILE</code> to pin the exact set. A file named exactly <code>compose.override.yaml</code> is the only one auto-loaded; a second override is not.</p>
+
+<div class="codeWrap"><pre><code># shell - ignore the override and use only the base file
+docker compose -f compose.yaml config
+
+# or pin the set for everyone in the environment
+export COMPOSE_FILE=compose.yaml:compose.prod.yaml</code></pre></div>
+
+<h3 id="ch9-f" data-toc>9.2 Layering with -f</h3>
+<h4>Files apply left to right</h4>
+<p>Passing several <code>-f</code> flags builds one document by merging each into the result, later files winning. This is how you keep a base, a local override and a production overlay separate instead of maintaining three near-identical files.</p>
+
+<div class="codeWrap"><pre><code># shell - base + local, or base + prod
+docker compose -f compose.yaml -f compose.local.yaml up -d
+docker compose -f compose.yaml -f compose.prod.yaml up -d
+
+# equivalently, via COMPOSE_FILE (colon-separated on Linux/macOS,
+# semicolon-separated on Windows)
+COMPOSE_FILE=compose.yaml:compose.prod.yaml docker compose up -d</code></pre></div>
+
+<h4>Ordering and the override gotcha</h4>
+<p>Order is the whole semantics. <code>-f base.yaml -f prod.yaml</code> means "base, then prod on top", which is almost always what you mean. Reversing the order silently inverts everything. Note also that an explicit <code>-f</code> disables the automatic <code>compose.override.yaml</code> lookup, so if you add <code>-f</code> to a developer workflow, you must list the override yourself.</p>
+
+<h3 id="ch9-extends" data-toc>9.3 extends</h3>
+<h4>Reusing a service definition</h4>
+<p><code>extends</code> copies the configuration of another service, either in the same file or in another file. It is a text-level reuse mechanism, not a runtime relationship: there is no dependency created, only settings inherited. It is the right tool when several services share a near-identical block but are otherwise independent.</p>
+
+<div class="codeWrap"><pre><code># compose.yaml
+x-service: &amp;service
+  restart: unless-stopped
+  logging: { driver: json-file, options: { max-size: "10m" } }
+
+services:
+  api:
+    &lt;&lt;: *service
+    image: acme/api:1.4.2
+  api-canary:
+    &lt;&lt;: *service
+    image: acme/api:1.5.0-rc1
+  worker:
+    extends:
+      file: common.yaml
+      service: base-worker
+    command: node dist/worker.js</code></pre></div>
+
+<div class="codeWrap"><pre><code># common.yaml
+services:
+  base-worker:
+    image: acme/api:1.4.2
+    restart: unless-stopped
+    environment:
+      QUEUE: default
+    volumes:
+      - work:/work
+volumes:
+  work: {}</code></pre></div>
+
+<h4>extends versus YAML anchors</h4>
+<p>Both remove duplication and they solve different problems. A YAML anchor works only inside one file and is resolved by the YAML parser before Compose sees anything. <code>extends</code> crosses files and is resolved by Compose, so it can pull a block from a shared repository file. The catch: <code>extends</code> cannot inherit <code>depends_on</code>, <code>links</code> or <code>volumes_from</code>, and a few keys are restricted. When you only need to share a few keys in one file, an anchor is simpler and has no restrictions.</p>
+
+<h3 id="ch9-merge" data-toc>9.4 Merge rules</h3>
+<h4>Scalars replace, mappings merge, lists append</h4>
+<p>Getting the merge rules right is what makes multi-file setups predictable rather than spooky.</p>
+<table>
+<tr><th>Field type</th><th>Rule</th><th>Example</th></tr>
+<tr><td>Scalar (<code>image</code>, <code>restart</code>, <code>command</code>)</td><td>Later file replaces</td><td><code>restart:</code> value is overwritten</td></tr>
+<tr><td>Mapping (<code>environment</code>, <code>labels</code>, <code>build.args</code>)</td><td>Merged by key</td><td>New keys added, duplicates replaced</td></tr>
+<tr><td>Unique-resource list (<code>ports</code>, <code>volumes</code>, <code>secrets</code>)</td><td>Merged by key, then combined</td><td>Volumes key on target path</td></tr>
+<tr><td>Plain sequence (<code>dns</code>, <code>expose</code>, <code>env_file</code>)</td><td>Appended</td><td>Both files' entries present</td></tr>
+<tr><td>Shell command</td><td>Replaced, not appended</td><td><code>command:</code> fully overrides</td></tr>
+</table>
+
+<div class="codeWrap"><pre><code># base
+services:
+  api:
+    environment: { A: "1", B: "2" }
+    ports: ["8080:80"]
+    command: ["node", "server.js"]
+
+# override
+services:
+  api:
+    environment: { B: "9", C: "3" }
+    ports: ["9090:80"]
+
+# result
+#   environment: A=1 B=9 C=3     (merged, later key wins)
+#   ports: ["8080:80", "9090:80"] (both kept: different published ports)
+#   command: fully replaced</code></pre></div>
+
+<h4>Forcing the merge in a direction</h4>
+<p>Because appending is the default for lists, you sometimes cannot remove an entry from a base file with an override. Compose provides explicit tags for exactly this, and they are the modern answer to a problem people used to solve with duplicate files.</p>
+
+<div class="codeWrap"><pre><code># override that removes a base port and replaces the list outright
+services:
+  api:
+    ports: !reset []
+    environment: !override { A: "only-this" }</code></pre></div>
+<p><code>!reset</code> clears a field so the base value is discarded and the file's own value, if any, is used. <code>!override</code> replaces the base value entirely instead of merging into it. Use them sparingly — a stack whose final configuration depends on two merge tags in a third file is hard to reason about — but when you need to delete an inherited entry, they are the only clean way.</p>
+</section>
+<section class="chapter">
+<h2 id="ch10-production" data-toc>10 &middot; Production, Scaling and Watch</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 10 &middot; Production, Scaling and Watch</button><div class="ch-toc-list"><a href="#ch10-resources">10.1 Resource limits</a><a href="#ch10-deploy">10.2 The deploy block and replicas</a><a href="#ch10-scale">10.3 Scaling and host-port conflicts</a><a href="#ch10-watch">10.4 Watch mode and develop</a></div></div><p class="topic-desc">Resource limits, the <code>deploy</code> block and replicas on a single host, why scaling collides with published ports, and the file-watch workflow that quietly fixes the worst part of local development.</p>
+
+<h3 id="ch10-resources" data-toc>10.1 Resource limits</h3>
+<h4>Constrain the container, protect the host</h4>
+<p>Without limits, one runaway service can consume all the memory on the host and get other containers or the Docker daemon itself killed. Compose expresses limits in two places and it is worth knowing which applies where.</p>
+
+<div class="codeWrap"><pre><code>services:
+  api:
+    image: acme/api:1.4.2
+    mem_limit: 512m            # plain-Compose limit
+    memswap_limit: 768m        # hard cap including swap
+    cpus: 1.5                  # max CPU cores
+    pids_limit: 200            # fork-bomb protection
+    oom_kill_disable: false
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  # the deploy form is what Compose honours in a swarm,
+  # and modern Compose also maps it on a single host
+  worker:
+    image: acme/worker:1.4.2
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1g
+        reservations:
+          cpus: "0.25"
+          memory: 256m</code></pre></div>
+
+<h4>Limits versus reservations</h4>
+<p>A limit is a ceiling the kernel enforces: exceeding the memory limit triggers the OOM killer and the container dies with exit code 137. A reservation is a hint about the minimum needed, used by a scheduler for placement; on a single host it has much less effect. Set limits from measurements, not guesses — a limit lower than the application's peak working set converts a slow service into a crashing one, and the crash looks like an application bug until someone checks the container's exit code.</p>
+<div class="tip">If a container restarts periodically with no application error, check <code>docker compose events</code> and <code>docker inspect --format '{{.State.OOMKilled}}'</code> before blaming the code.</div>
+
+<h3 id="ch10-deploy" data-toc>10.2 The deploy block and replicas</h3>
+<h4>What Compose honours without a swarm</h4>
+<p>The <code>deploy</code> block originated for swarm and Kubernetes-style semantics, and Compose now implements the parts that make sense on one host: <code>replicas</code>, <code>resources.limits</code>, <code>restart_policy</code>, <code>update_config</code> and <code>placement.constraints</code>. Other keys, such as <code>mode: global</code> or the ingress endpoint mode, only take effect under a real orchestrator.</p>
+
+<div class="codeWrap"><pre><code>services:
+  api:
+    image: ghcr.io/acme/api:1.4.2
+    deploy:
+      replicas: 3
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.role == worker
+    # NOTE: no `ports:` here - see 10.3</code></pre></div>
+
+<h4>replicas versus --scale</h4>
+<p><code>deploy.replicas</code> is the declared desired count; <code>docker compose up --scale api=5</code> overrides it for that run. The scale flag is applied at <code>up</code> time and is not persisted into the file, so a later <code>up</code> without it reverts to the declared number. Replicas of the same service share the service's configuration, so anything that must differ per replica has to come from the environment or from a mounted file.</p>
+
+<h3 id="ch10-scale" data-toc>10.3 Scaling and host-port conflicts</h3>
+<h4>The error everyone meets once</h4>
+<p>Scaling a service that publishes a fixed host port fails, because only one process can bind a given host port. Compose reports a bind error and the second replica never starts.</p>
+
+<div class="codeWrap"><pre><code># fails: "Bind for 0.0.0.0:8080 failed: port is already allocated"
+services:
+  api:
+    ports: ["8080:3000"]     # a fixed host port
+# docker compose up -d --scale api=3   -&gt; error
+
+# works: publish no host port (or a range) and put a proxy in front
+services:
+  api:
+    expose: ["3000"]         # internal only
+    # or, for a quick local test, let Docker choose: - "3000"
+  proxy:
+    image: nginx:1.27
+    ports: ["8080:80"]
+
+# shell
+docker compose up -d --scale api=3
+docker compose ps                     # three api containers, one proxy</code></pre></div>
+
+<h4>Why a proxy is the real answer</h4>
+<p>Removing the host port makes the replicas start, then creates the next problem: how does traffic reach one of three containers by a stable name? Docker DNS round-robins across replicas of a service on a user-defined network, which is enough for many cases, but a proxy that can retry a failed backend is more robust. The proxy is the only service with a published port, and it forwards to the service name, which now resolves to whichever replica the resolver picks.</p>
+<div class="warn">Scaling is per service, and a database usually should not be scaled this way. Multiple Postgres containers sharing one data volume is corruption, not redundancy. Scale the stateless tier.</div>
+
+<h3 id="ch10-watch" data-toc>10.4 Watch mode and develop</h3>
+<h4>Rebuild on change, without thinking about it</h4>
+<p><code>docker compose watch</code> watches the files a service declares under <code>develop.watch</code> and reacts to changes. The three actions are <code>sync</code> (copy a changed file into the container), <code>rebuild</code> (rebuild the image and recreate the container) and <code>sync+restart</code> (sync, then restart the process). It replaces the two worst local-development habits: remembering to restart, and bind-mounting everything.</p>
+
+<div class="codeWrap"><pre><code>services:
+  api:
+    build: ./api
+    develop:
+      watch:
+        - action: sync
+          path: ./api/src
+          target: /app/src
+          ignore:
+            - "**/*.test.ts"
+        - action: sync+restart
+          path: ./api/config
+          target: /app/config
+        - action: rebuild
+          path: ./api/package.json
+
+# shell
+docker compose watch
+docker compose up --watch          # same, as part of up</code></pre></div>
+
+<h4>Why watch beats a blanket bind mount</h4>
+<p>A bind mount of the source directory into the container shadows the dependencies the image installed — the classic "cannot find module" after mounting because <code>node_modules</code> was replaced by an empty host directory. Watch mode syncs only the paths you name, so the image's installed dependencies stay where they are, and CPU-heavy builds use the image's own toolchain rather than the host's. Reach for <code>rebuild</code> only for inputs that genuinely require a new image, such as a changed dependency manifest or a Dockerfile; use <code>sync</code> for ordinary source edits.</p>
+</section>
+<section class="chapter">
+<h2 id="ch11-troubleshoot" data-toc>11 &middot; Troubleshooting and Best Practices</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 11 &middot; Troubleshooting and Best Practices</button><div class="ch-toc-list"><a href="#ch11-errors">11.1 Common errors and what they mean</a><a href="#ch11-drift">11.2 Image drift</a><a href="#ch11-links">11.3 The links myth</a><a href="#ch11-best">11.4 Best practices</a></div></div><p class="topic-desc">The error messages you will actually see and what each one means, why a stack drifts away from the image you thought you were running, the truth about <code>links</code>, and the habits that keep a Compose project healthy.</p>
+
+<h3 id="ch11-errors" data-toc>11.1 Common errors and what they mean</h3>
+<h4>The short list</h4>
+<table>
+<tr><th>Message</th><th>Cause and fix</th></tr>
+<tr><td><code>port is already allocated</code></td><td>Another container or process holds the host port. Change it, or find the holder with <code>docker ps</code>.</td></tr>
+<tr><td><code>no configuration file provided</code></td><td>No Compose file in the directory or upstream. Run from the right folder or pass <code>-f</code>.</td></tr>
+<tr><td><code>dependency failed to start</code></td><td>A <code>service_healthy</code> dependency never became healthy. Read the dependency's logs.</td></tr>
+<tr><td><code>service "x" is unhealthy</code></td><td>The healthcheck failed. Check its command and <code>start_period</code>.</td></tr>
+<tr><td><code>variable is not set. Defaulting to a blank string</code></td><td>An interpolated <code>${VAR}</code> is unset. Use <code>:?</code> to make it fatal.</td></tr>
+<tr><td><code>Cannot connect to the Docker daemon</code></td><td>The engine is not running, or the socket path is wrong.</td></tr>
+<tr><td><code>permission denied</code> on a bind mount</td><td>SELinux labels or wrong UID. Add <code>:z</code> or fix ownership.</td></tr>
+</table>
+
+<div class="codeWrap"><pre><code># shell - diagnose, in the order that finds answers fastest
+docker compose config                     # did the file resolve as intended?
+docker compose ps -a                      # exited containers are still here
+docker compose logs --tail=200 api        # the service that failed
+docker inspect --format '{{.State.ExitCode}} {{.State.OOMKilled}}' \
+  "$(docker compose ps -q api)"
+docker compose events --json              # what the daemon actually did
+docker compose exec db getent hosts api   # can it resolve its neighbours?</code></pre></div>
+
+<h4>Reading an exit code</h4>
+<p>Exit code 0 is a clean exit — for a one-shot container that is success, for a long-running service it means it returned when it should have kept running. 137 is SIGKILL, usually the OOM killer. 143 is SIGTERM, a normal stop. 1 is a generic application failure whose real message is in the logs. The distinction between 137 and 1 is exactly the difference between "give it more memory" and "fix the bug", and it is worth checking before reading a single line of application output.</p>
+
+<h3 id="ch11-drift" data-toc>11.2 Image drift</h3>
+<h4>The stack that is not the stack you tested</h4>
+<p>Image drift is the slow divergence between what the Compose file appears to say and what actually runs. Three mechanisms cause it, and all three are silent.</p>
+<ul>
+<li><strong>Mutable tags.</strong> <code>latest</code>, <code>3</code> and <code>stable</code> are pointers that move. A rebuild pull returns different bytes than last week.</li>
+<li><strong>Locally cached images.</strong> With the default <code>missing</code> pull policy, Compose never checks the registry, so a stale local copy runs indefinitely.</li>
+<li><strong>Images built locally under the same tag as a published one.</strong> Your development build shadows the registry image and no one notices until a different machine behaves differently.</li>
+</ul>
+
+<div class="codeWrap"><pre><code># shell - detect and prevent drift
+docker compose images                        # digests of what is in use
+docker inspect --format '{{index .RepoDigests 0}}' postgres:17.2
+docker compose pull --dry-run                # what would change
+docker compose up -d --pull always --wait
+
+# prevent it: pin a digest, not a tag
+#   image: postgres:17.2@sha256:8f7b1d2c... 
+# and record the digests in a lockfile-style file in the repo</code></pre></div>
+
+<h4>Why the digest is the only stable identity</h4>
+<p>A tag is a human convenience; the digest is the content address of the exact image manifest. Pinning <code>@sha256:...</code> means the same bytes every time, on every machine, forever, and makes <code>pull_policy</code> a performance concern rather than a correctness one. The trade-off is that updates become an explicit, reviewable pull request that changes the digest, which is precisely the point: an update should be a decision, not something that happens during a lunchtime restart.</p>
+
+<h3 id="ch11-links" data-toc>11.3 The links myth</h3>
+<h4>links is legacy, and unnecessary</h4>
+<p><code>links</code> dates from Compose v1, before user-defined networks had an embedded DNS server. Back then a service could not resolve another by name, so <code>links</code> created an alias and an environment-variable entry. On any current network, Docker resolves service names automatically, so <code>links</code> adds nothing except a deprecated field that keeps generating warnings and, worse, an environment variable that applications still read and that pins them to an old topology.</p>
+
+<div class="codeWrap"><pre><code># legacy - delete this
+services:
+  api:
+    links:
+      - db            # creates DB_PORT_5432_TCP_ADDR etc. in the env
+
+# current - the network already provides name resolution
+services:
+  api:
+    networks: [backend]
+  db:
+    networks: [backend]
+# the app connects to  db:5432  with no link declaration at all</code></pre></div>
+
+<h4>What to use instead</h4>
+<p>Use the service name as the hostname. If you want an additional name, use a network <code>alias</code>. If you want a container to share another's network namespace — the one thing <code>links</code> approximated — use <code>network_mode: "service:name"</code> and understand that you have given up isolation to do it. The correct migration for a <code>links</code> declaration is deletion, followed by a check that nothing in the application was reading the generated <code>*_PORT_*</code> variables.</p>
+<div class="tip">If an application code path still reads <code>DB_PORT_5432_TCP_ADDR</code>, the fix belongs in the application, not in a resurrected <code>links</code> entry.</div>
+
+<h3 id="ch11-best" data-toc>11.4 Best practices</h3>
+<h4>The short, high-value list</h4>
+<ol>
+<li><strong>Pin everything.</strong> Images to a full version or a digest; base images the same. A pin is documentation.</li>
+<li><strong>Never bake secrets into an image or a committed file.</strong> Use <code>secrets:</code> or an untracked <code>.env.local</code>, and keep <code>.env</code> out of version control if it holds anything real.</li>
+<li><strong>Healthcheck every service that others depend on</strong> and use <code>condition: service_healthy</code>. Sleeps are lies.</li>
+<li><strong>Default to <code>restart: unless-stopped</code></strong> on long-running services and <code>restart: "no"</code> on jobs.</li>
+<li><strong>Declare named volumes explicitly</strong> and know which of them <code>down -v</code> will delete.</li>
+<li><strong>Do not set <code>container_name</code></strong> unless you truly need the name; it blocks scaling and collides across projects.</li>
+<li><strong>Set a log driver with a size cap.</strong> An unbounded json-file log is a disk-full incident waiting for a busy day.</li>
+<li><strong>Validate in CI</strong> with <code>docker compose config --quiet</code>, and scan with <code>--images</code>.</li>
+<li><strong>Keep the base file production-shaped</strong> and put developer conveniences in an override, never the other way round.</li>
+<li><strong>Segment networks</strong> so the database is not reachable from the thing that faces the internet.</li>
+</ol>
+
+<div class="codeWrap"><pre><code># a CI check worth its bytes
+set -e
+docker compose config --quiet                 # parses and validates
+docker compose config --images | sort -u      # feed to a scanner
+docker compose build --pull
+docker compose up -d --wait --remove-orphans
+docker compose ps
+docker compose down -v</code></pre></div>
+
+<h4>Growing out of Compose well</h4>
+<p>Compose is a single-host tool, and the moment a project needs several hosts, zero-downtime rolling updates across them, or a control plane that heals a failed node, the honest answer is an orchestrator. The graceful path is to keep the Compose file as the source of truth for the development environment and to generate or hand-write the orchestration manifests from the same service boundaries. The worst path is to keep adding shell scripts around Compose until it is an unmaintainable scheduler — at that point the requirements have outgrown the tool, and stretching it further only delays the migration.</p>
+</section>
+<section class="chapter">
+<h2 id="ch12-cheatsheet" data-toc>12 &middot; Appendix — Cheat Sheet</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 12 &middot; Appendix — Cheat Sheet</button><div class="ch-toc-list"><a href="#ch12-keys">12.1 Top-level key reference</a><a href="#ch12-cli">12.2 CLI cheat sheet</a><a href="#ch12-patterns">12.3 Reusable patterns</a></div></div><p class="topic-desc">A compact reference to the top-level keys, the CLI commands, and the patterns that come up again and again in real Compose files.</p>
+
+<h3 id="ch12-keys" data-toc>12.1 Top-level key reference</h3>
+<h4>Everything at the root of the file</h4>
+<table>
+<tr><th>Key</th><th>Required</th><th>Notes</th></tr>
+<tr><td><code>name</code></td><td>No</td><td>Project name; prefixes every object Compose creates.</td></tr>
+<tr><td><code>services</code></td><td>Yes</td><td>The containers, keyed by service name.</td></tr>
+<tr><td><code>networks</code></td><td>No</td><td>Named networks; referenced by services.</td></tr>
+<tr><td><code>volumes</code></td><td>No</td><td>Named volumes; survive <code>down</code>, deleted by <code>down -v</code>.</td></tr>
+<tr><td><code>secrets</code></td><td>No</td><td>Mounted at <code>/run/secrets/&lt;name&gt;</code>.</td></tr>
+<tr><td><code>configs</code></td><td>No</td><td>Non-secret files mounted into services.</td></tr>
+<tr><td><code>include</code></td><td>No</td><td>Pull in other Compose files as units.</td></tr>
+<tr><td><code>x-*</code></td><td>No</td><td>Extension fields, ignored by Compose, usable with anchors.</td></tr>
+<tr><td><code>version</code></td><td>Obsolete</td><td>Delete it; it selects nothing.</td></tr>
+</table>
+
+<h4>Service keys at a glance</h4>
+<div class="codeWrap"><pre><code>services:
+  svc:
+    image: repo/name:tag         # or...
+    build:                       # ...build it
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+      args: { KEY: value }
+    pull_policy: always
+    ports: ["8080:80", "127.0.0.1:9000:9000"]
+    expose: ["3000"]
+    volumes:
+      - named:/data
+      - ./host:/container:ro
+    tmpfs: ["/run"]
+    environment: { KEY: value }
+    env_file: [./svc.env]
+    secrets: [db_password]
+    profiles: ["tools"]
+    networks: [frontend, backend]
+    depends_on:
+      db: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources: { limits: { cpus: "1.0", memory: 512m } }
+    develop:
+      watch:
+        - { action: sync, path: ./src, target: /app/src }</code></pre></div>
+
+<h3 id="ch12-cli" data-toc>12.2 CLI cheat sheet</h3>
+<h4>Everyday commands</h4>
+<table>
+<tr><th>Command</th><th>Does</th></tr>
+<tr><td><code>docker compose up -d</code></td><td>Create and start in the background.</td></tr>
+<tr><td><code>docker compose up -d --build --wait</code></td><td>Rebuild, start, and block until healthy.</td></tr>
+<tr><td><code>docker compose down</code></td><td>Stop and remove containers and networks.</td></tr>
+<tr><td><code>docker compose down -v --rmi local</code></td><td>Also delete volumes and locally built images.</td></tr>
+<tr><td><code>docker compose ps -a</code></td><td>Show running and exited containers.</td></tr>
+<tr><td><code>docker compose logs -f --tail=100 svc</code></td><td>Follow the last 100 lines of one service.</td></tr>
+<tr><td><code>docker compose exec svc sh</code></td><td>Shell into a running container.</td></tr>
+<tr><td><code>docker compose run --rm svc cmd</code></td><td>New one-off container, removed afterwards.</td></tr>
+<tr><td><code>docker compose build --pull --no-cache</code></td><td>Rebuild without any cache.</td></tr>
+<tr><td><code>docker compose pull</code></td><td>Refresh every image.</td></tr>
+<tr><td><code>docker compose config --quiet</code></td><td>Validate the resolved file; exit non-zero on error.</td></tr>
+<tr><td><code>docker compose config --images</code></td><td>List the images the stack will use.</td></tr>
+<tr><td><code>docker compose watch</code></td><td>Sync or rebuild on file changes.</td></tr>
+<tr><td><code>docker compose events --json</code></td><td>Stream daemon events for the project.</td></tr>
+<tr><td><code>docker compose top</code>, <code>stats</code></td><td>Processes and live resource usage.</td></tr>
+</table>
+
+<div class="codeWrap"><pre><code># flags worth memorising
+-f FILE            # use a specific compose file (repeatable)
+-p NAME            # project name
+--profile NAME     # activate a profile
+--env-file FILE    # interpolation source other than .env
+--project-directory DIR
+--dry-run          # show what would happen
+-q                 # ids only, for scripting
+--format json      # machine-readable output</code></pre></div>
+
+<h3 id="ch12-patterns" data-toc>12.3 Reusable patterns</h3>
+<h4>Three shapes worth copying</h4>
+<div class="codeWrap"><pre><code># 1. shared defaults via an extension field
+x-defaults: &amp;defaults
+  restart: unless-stopped
+  logging: { driver: json-file, options: { max-size: "10m" } }
+services:
+  a: { &lt;&lt;: *defaults, image: acme/a:1.0 }
+  b: { &lt;&lt;: *defaults, image: acme/b:2.0 }
+
+# 2. a health-gated dependency chain
+services:
+  migrate:
+    image: acme/api:1.4.2
+    command: node dist/migrate.js
+    depends_on: { db: { condition: service_healthy } }
+    restart: "no"
+  api:
+    image: acme/api:1.4.2
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+# 3. an optional debug tool behind a profile
+services:
+  adminer:
+    image: adminer:5
+    profiles: ["tools"]
+    ports: ["8081:8080"]</code></pre></div>
+
+<h4>Final advice</h4>
+<p>Treat the Compose file as code: review it, validate it in CI, pin its images and keep secrets out of it. The file is the single description of how the system is wired, and everything downstream — local development, the test environment, the single-host deployment — is more reliable when that description is exact and boring. When it stops being enough, that is a signal to move up a level of tooling, not to add another script around it.</p>
+</section>
+</main>
+
+<button id="toTop" class="to-top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Docker Compose.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

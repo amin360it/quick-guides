@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laravel + Vue - Scalable Web Application Guide</title>
+<meta name="description" content="A practical guide to building production-grade web applications with a Laravel backend and a Vue 3 frontend.…. 18 chapters, 67 topics and 35 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/laravel-vue.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Laravel + Vue - Scalable Web Application Guide">
+<meta property="og:description" content="A practical guide to building production-grade web applications with a Laravel backend and a Vue 3 frontend.…. 18 chapters, 67 topics and 35 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/laravel-vue.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Laravel + Vue - Scalable Web Application Guide">
+<meta name="twitter:description" content="A practical guide to building production-grade web applications with a Laravel backend and a Vue 3 frontend.…. 18 chapters, 67 topics and 35 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/laravel-vue.html#article","headline":"Laravel + Vue - Scalable Web Application Guide","name":"Laravel + Vue - Scalable Web Application Guide","description":"A practical guide to building production-grade web applications with a Laravel backend and a Vue 3 frontend.…. 18 chapters, 67 topics and 35 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/laravel-vue.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/laravel-vue.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Laravel + Vue - Scalable Web Application Guide","item":"https://amin360it.github.io/quick-guides/laravel-vue.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Laravel + Vue</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — Scalable Web Apps with Laravel + Vue</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-stack" data-target="orientation-stack">The stack</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Architecture Overview</a><ul><li><a href="#ch1-shape" data-target="ch1-shape">1.1 SPA + API shape</a></li><li><a href="#ch1-inertia-vs-api" data-target="ch1-inertia-vs-api">1.2 Inertia vs JSON API + SPA</a></li><li><a href="#ch1-modular" data-target="ch1-modular">1.3 Modular monolith first</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Laravel Fundamentals</a><ul><li><a href="#ch2-routing" data-target="ch2-routing">2.1 Routing and controllers</a></li><li><a href="#ch2-di" data-target="ch2-di">2.2 The service container</a></li><li><a href="#ch2-artisan" data-target="ch2-artisan">2.3 Artisan and the lifecycle</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Domain Structure &amp; Actions</a><ul><li><a href="#ch3-actions" data-target="ch3-actions">3.1 Actions and services</a></li><li><a href="#ch3-dtos" data-target="ch3-dtos">3.2 DTOs and validation</a></li><li><a href="#ch3-events" data-target="ch3-events">3.3 Domain events</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Eloquent &amp; Database</a><ul><li><a href="#ch4-models" data-target="ch4-models">4.1 Models and relationships</a></li><li><a href="#ch4-migrations" data-target="ch4-migrations">4.2 Migrations and indexes</a></li><li><a href="#ch4-eager" data-target="ch4-eager">4.3 Avoiding N+1 with eager loading</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Authentication &amp; Authorization</a><ul><li><a href="#ch5-sanctum" data-target="ch5-sanctum">5.1 Sanctum for SPAs</a></li><li><a href="#ch5-tokens" data-target="ch5-tokens">5.2 API tokens</a></li><li><a href="#ch5-policies" data-target="ch5-policies">5.3 Policies and Gates</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · API Resources &amp; Errors</a><ul><li><a href="#ch6-resources" data-target="ch6-resources">6.1 API Resources</a></li><li><a href="#ch6-errors" data-target="ch6-errors">6.2 Consistent error responses</a></li><li><a href="#ch6-versioning" data-target="ch6-versioning">6.3 Versioning</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Queues, Events &amp; Caching</a><ul><li><a href="#ch7-queues" data-target="ch7-queues">7.1 Queues and jobs</a></li><li><a href="#ch7-cache" data-target="ch7-cache">7.2 Caching</a></li><li><a href="#ch7-broadcast" data-target="ch7-broadcast">7.3 Broadcasting events</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Vue 3 Frontend Foundations</a><ul><li><a href="#ch8-setup" data-target="ch8-setup">8.1 Project setup</a></li><li><a href="#ch8-components" data-target="ch8-components">8.2 Components with script setup</a></li><li><a href="#ch8-props" data-target="ch8-props">8.3 Props, emits, slots</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Routing, State &amp; Data Fetching</a><ul><li><a href="#ch9-router" data-target="ch9-router">9.1 Vue Router</a></li><li><a href="#ch9-pinia" data-target="ch9-pinia">9.2 Pinia stores</a></li><li><a href="#ch9-client" data-target="ch9-client">9.3 A typed API client</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Forms &amp; UI Patterns in Vue</a><ul><li><a href="#ch10-forms" data-target="ch10-forms">10.1 Forms and validation</a></li><li><a href="#ch10-ux" data-target="ch10-ux">10.2 Loading, empty and error states</a></li><li><a href="#ch10-perf" data-target="ch10-perf">10.3 Component performance</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · Inertia.js Alternative</a><ul><li><a href="#ch11-why" data-target="ch11-why">11.1 What Inertia gives you</a></li><li><a href="#ch11-forms" data-target="ch11-forms">11.2 Forms with useForm</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch12" data-target="ch12">12 · Real-time with Reverb + Echo</a><ul><li><a href="#ch12-server" data-target="ch12-server">12.1 Server side</a></li><li><a href="#ch12-client" data-target="ch12-client">12.2 Vue client with Laravel Echo</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch13" data-target="ch13">13 · Testing the Full Stack</a><ul><li><a href="#ch13-backend" data-target="ch13-backend">13.1 Pest / PHPUnit feature tests</a></li><li><a href="#ch13-frontend" data-target="ch13-frontend">13.2 Frontend tests</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch14" data-target="ch14">14 · Observability &amp; Operations</a><ul><li><a href="#ch14-tools" data-target="ch14-tools">14.1 Tooling</a></li><li><a href="#ch14-health" data-target="ch14-health">14.2 Health checks</a></li><li><a href="#ch14-watch" data-target="ch14-watch">14.3 What to watch</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch15" data-target="ch15">15 · Deployment &amp; Scaling</a><ul><li><a href="#ch15-deploy" data-target="ch15-deploy">15.1 Deploying Laravel</a></li><li><a href="#ch15-scale" data-target="ch15-scale">15.2 Scaling</a></li><li><a href="#ch15-cicd" data-target="ch15-cicd">15.3 CI/CD pipeline</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch16" data-target="ch16">16 · Performance Tuning</a><ul><li><a href="#ch16-backend" data-target="ch16-backend">16.1 Backend</a></li><li><a href="#ch16-frontend" data-target="ch16-frontend">16.2 Frontend</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Commands, Patterns &amp; Roadmap</a><ul><li><a href="#app-commands" data-target="app-commands">A.1 Artisan cheat sheet</a></li><li><a href="#app-roadmap" data-target="app-roadmap">A.2 Roadmap: beginner to advanced</a></li><li><a href="#app-cheatsheets" data-target="app-cheatsheets">A.3 Rules of thumb</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Laravel + Vue</span>
+      <span class="am-band-s">18 chapters &middot; 67 topics &middot; 35 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — Scalable Web Apps with Laravel + Vue</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — Scalable Web Apps with Laravel + Vue</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-stack">The stack</a></div></div>
+    <p class="topic-desc">A practical guide to building production-grade web applications with a Laravel backend and a Vue 3 frontend. It walks you through designing, building, testing and shipping the full stack, from Eloquent models through API routes and into the SPA components. By the end you can architect, implement and operate the whole system yourself.</p>
+    <p>A complete guide to building a <strong>production-grade, scalable web application</strong> with a Laravel (PHP) backend and a Vue 3 frontend. Single file, offline, progress saved locally.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">The book is organised as a progression from Laravel backend architecture through the Vue frontend, then combines both for realtime, testing and deployment. Each chapter builds on the material before it, so following them in order gives a sensible learning path. Later chapters reuse the patterns introduced earlier instead of starting over.</p>
+    <ul>
+      <li><strong>Architecture &amp; backend (Ch. 1–7)</strong> — structure, routing, Eloquent, auth (Sanctum), API resources, queues and caching.</li>
+      <li><strong>Frontend (Ch. 8–11)</strong> — Vue 3 + Vite + TypeScript, routing, Pinia, forms and the API client.</li>
+      <li><strong>Together (Ch. 12–16)</strong> — Inertia vs SPA, real-time with Reverb, testing, observability, deployment and scaling.</li>
+    </ul>
+    <div class="tip"><p>Laravel pairs beautifully with Vue two ways: a classic JSON API + SPA, or <strong>Inertia.js</strong> for a monolith feel with Vue components. This guide covers both and when to choose each.</p></div>
+    <h3 id="orientation-stack" data-toc>The stack</h3>
+    <p class="topic-desc">A single reference table maps every layer of the stack to its recommended tool, from Eloquent and Sanctum on the backend to Vue 3, Vite, Pinia and Redis on the frontend. Use it as a quick recap whenever you forget which tool fills which role. Each choice is presented as the safe default for this kind of application.</p>
+    <table>
+      <tr><th>Layer</th><th>Choice</th></tr>
+      <tr><td>Runtime</td><td>PHP 8.3+ / Laravel 11–12</td></tr>
+      <tr><td>Data</td><td>Eloquent + MySQL/PostgreSQL</td></tr>
+      <tr><td>Auth</td><td>Laravel Sanctum (SPA/API) / Passport (OAuth2)</td></tr>
+      <tr><td>Frontend</td><td>Vue 3 (script setup), Vite, TypeScript, Pinia, Vue Router</td></tr>
+      <tr><td>Realtime</td><td>Laravel Reverb / Pusher + Laravel Echo</td></tr>
+      <tr><td>Queue/Cache</td><td>Redis, Horizon</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Architecture Overview</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Architecture Overview</button><div class="ch-toc-list"><a href="#ch1-shape">1.1 SPA + API shape</a><a href="#ch1-inertia-vs-api">1.2 Inertia vs JSON API + SPA</a><a href="#ch1-modular">1.3 Modular monolith first</a></div></div>
+    <p class="topic-desc">Chapter one frames the big picture before you write any code, comparing a browser SPA talking to a JSON API against an Inertia setup and Blade-rendered islands. It argues that the modular monolith is the safe default architecture for most teams. Nailing the architecture here saves painful refactors later in the project.</p>
+    <h3 id="ch1-shape" data-toc>1.1 SPA + API shape</h3>
+    <p class="topic-desc">A topology diagram shows how the browser SPA, Laravel JSON API, database, websockets and CDN fit together in one system. The SPA talks to Laravel over HTTP endpoints while static assets are served from the CDN and pushes arrive over websockets. Understand how these pieces connect before defining your first API route.</p>
+    <div class="codeWrap"><pre><code>Browser (Vue SPA) --HTTPS/JSON--&gt; Laravel API --&gt; Database
+      |                              |
+      +-- Echo/Reverb (websockets) --+
+      +-- CDN (static assets)
+
+Two deployables, or one Laravel app serving both (Inertia / Sanctum cookie auth).</code></pre></div>
+    <p class="code-note">An ASCII diagram of the SPA plus API topology: browser, Laravel API, database, websockets and CDN, with two deployment options noted.</p>
+    <h3 id="ch1-inertia-vs-api" data-toc>1.2 Inertia vs JSON API + SPA</h3>
+    <p class="topic-desc">A decision table compares Inertia against a separate JSON API and Blade islands, weighing each option for teams that need mobile or third-party clients. A standalone JSON API is the right choice when consumers besides your Vue SPA exist. Inertia suits single-app teams that want a modern SPA without hand-building data endpoints.</p>
+    <table>
+      <tr><th>Approach</th><th>Best for</th><th>Trade-off</th></tr>
+      <tr><td>Inertia.js</td><td>Teams wanting SPA UX without an API</td><td>Couples frontend to Laravel routing</td></tr>
+      <tr><td>JSON API + SPA</td><td>Mobile/other clients, independent deploys</td><td>More plumbing, auth/CORS work</td></tr>
+      <tr><td>Blade + islands</td><td>Mostly server-rendered apps</td><td>Less interactive</td></tr>
+    </table>
+    <h3 id="ch1-modular" data-toc>1.3 Modular monolith first</h3>
+    <p class="topic-desc">Keep your domain logic out of controllers by delegating work to action classes and services, which stay easy to reason about and test. Split the monolith into separate modules only when a real boundary demands independent scaling or team ownership. This avoids the premature complexity of microservices.</p>
+    <p>Keep domain logic out of controllers with actions/services. Split into services only when a boundary needs independent scaling or team ownership.</p>
+    <div class="ex"><h4 id="ch1-modular--exercises-1">Exercises 1</h4><ol>
+      <li>Decide Inertia vs SPA for a project and justify it.</li>
+      <li>Sketch your app’s modules.</li>
+      <li>List which modules could become separate services later.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Laravel Fundamentals</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Laravel Fundamentals</button><div class="ch-toc-list"><a href="#ch2-routing">2.1 Routing and controllers</a><a href="#ch2-di">2.2 The service container</a><a href="#ch2-artisan">2.3 Artisan and the lifecycle</a></div></div>
+    <p class="topic-desc">The core Laravel building blocks covered here are routing, controllers, the service container and your daily Artisan workflow. Routes map requests to controller methods, the container resolves dependencies automatically, and Artisan drives migrations, scaffolding and production caching. Master these fundamentals and every later chapter clicks into place.</p>
+    <h3 id="ch2-routing" data-toc>2.1 Routing and controllers</h3>
+    <p class="topic-desc">API routes in routes/api.php delegate to named controllers, which stay thin by forwarding the real work to action classes. Route model binding injects models straight into methods and resource controllers provide conventional REST methods out of the box. This split keeps request handling clean and easy to test.</p>
+    <div class="codeWrap"><pre><code>// routes/api.php
+Route::middleware('auth:sanctum')-&gt;group(function () {
+    Route::apiResource('posts', PostController::class);
+});
+
+// Controller: thin — delegate to an action
+public function store(StorePostRequest $request, CreatePost $action)
+{
+    $post = $action-&gt;execute($request-&gt;validated(), $request-&gt;user()); // delegate; the action owns the logic
+    return new PostResource($post);
+}</code></pre></div>
+    <p class="code-note">A Sanctum-protected API resource route delegates to a thin controller that runs a CreatePost action and returns a shaped resource.</p>
+    <h3 id="ch2-di" data-toc>2.2 The service container</h3>
+    <p class="topic-desc">Laravel’s service container resolves dependencies for you, wiring objects together without manual instantiation. Bind an interface to its concrete implementation once in a service provider, then type-hint it in a constructor for automatic injection. Swapping implementations and injecting test mocks then becomes trivial.</p>
+    <div class="codeWrap"><pre><code>// Bind an interface to an implementation
+$this-&gt;app-&gt;bind(PaymentGateway::class, StripeGateway::class); // swap implementations in one place
+
+// Constructor injection is resolved automatically
+public function __construct(private PaymentGateway $gateway) {}</code></pre></div>
+    <p class="code-note">Bind the interface to a concrete class once, then rely on container auto-injection in constructors.</p>
+    <h3 id="ch2-artisan" data-toc>2.3 Artisan and the lifecycle</h3>
+    <p class="topic-desc">Artisan is the command line interface you use every day, covering serve for local development, make commands for scaffolding, migrate for schema changes, route:list for inspection and optimize for production caching. The framework lifecycle bootstraps the app and then routes each request through the HTTP kernel. One consistent workflow carries you from development to deployment.</p>
+    <div class="codeWrap"><pre><code>php artisan serve # start the dev server
+php artisan make:model Post -mrc       # model, migration, resource, controller
+php artisan migrate
+php artisan route:list
+php artisan optimize                   # config/route/view cache for prod</code></pre></div>
+    <p class="code-note">A shell session showing the standard Artisan workflow, from starting a dev server through migrations to caching config for production.</p>
+    <div class="warn"><p>Run <code>php artisan optimize</code> in production but never in local dev — cached config/routes hide changes and cause confusing bugs.</p></div>
+    <div class="ex"><h4 id="ch2-artisan--exercises-2">Exercises 2</h4><ol>
+      <li>Create an API resource controller with routes.</li>
+      <li>Bind an interface in a service provider and inject it.</li>
+      <li>Run <code>route:list</code> and explain the middleware groups.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Domain Structure &amp; Actions</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Domain Structure &amp; Actions</button><div class="ch-toc-list"><a href="#ch3-actions">3.1 Actions and services</a><a href="#ch3-dtos">3.2 DTOs and validation</a><a href="#ch3-events">3.3 Domain events</a></div></div>
+    <p class="topic-desc">Keep business rules out of controllers by moving them into single-purpose action classes and FormRequests that validate input early. Domain events then decouple side-effects like notifications and logging from the request cycle. The result is controllers that simply orchestrate the flow instead of implementing logic themselves.</p>
+    <h3 id="ch3-actions" data-toc>3.1 Actions and services</h3>
+    <p class="topic-desc">An action class exposes one public execute method, accepts typed inputs and delegates persistence through a repository. This single-purpose design forms the backbone of clean Laravel domain logic, keeping each business operation focused and straightforward to test. Larger workflows compose several actions behind a dedicated service.</p>
+    <div class="codeWrap"><pre><code>final class CreatePost
+{
+    public function __construct(private PostRepository $posts) {} // inject the repository
+
+    // single entry point the controller calls
+    public function execute(array $data, User $author): Post
+    {
+        return $this-&gt;posts-&gt;create([
+            'title' =&gt; $data['title'],
+            'body' =&gt; $data['body'],
+            'author_id' =&gt; $author-&gt;id,
+        ]);
+    }
+}</code></pre></div>
+    <p class="code-note">The CreatePost action takes validated data, injects its repository and returns a fresh Post, keeping controllers thin.</p>
+    <h3 id="ch3-dtos" data-toc>3.2 DTOs and validation</h3>
+    <p class="topic-desc">FormRequests validate incoming data before your action ever runs, declaring rules per field with matching messages. Laravel automatically returns structured 422 responses with per-field errors that the SPA can map back onto inputs. Data transfer objects then carry that validated payload into the action layer.</p>
+    <div class="codeWrap"><pre><code>class StorePostRequest extends FormRequest
+{
+    // rules run before the controller or action
+    public function rules(): array
+    {
+        return [
+            'title' =&gt; ['required', 'string', 'max:200'], // required string, capped length
+            'body'  =&gt; ['required', 'string', 'min:10'],
+        ];
+    }
+}</code></pre></div>
+    <p class="code-note">A FormRequest declares per-field rules that run before the controller or action, so invalid data never reaches your logic.</p>
+    <h3 id="ch3-events" data-toc>3.3 Domain events</h3>
+    <p class="topic-desc">Fire events such as PostCreated from your actions and let listeners handle the follow-up work like sending mail, dispatching queues and broadcasting. This decouples side-effects from the request cycle so the controller stays focused on the primary operation. Listeners can run synchronously or be pushed onto a queue.</p>
+    <div class="codeWrap"><pre><code>event(new PostCreated($post)); // fire-and-forget side-effects
+
+// Listeners can queue work, send mail, broadcast, etc.
+// Decouples side-effects from the request cycle.</code></pre></div>
+    <p class="code-note">Firing an event broadcasts intent while listeners handle mail, work or broadcasts, so side-effects leave the request cycle.</p>
+    <div class="ex"><h4 id="ch3-events--exercises-3">Exercises 3</h4><ol>
+      <li>Extract controller logic into an action class.</li>
+      <li>Create a FormRequest for validation.</li>
+      <li>Fire a domain event and handle it in a queued listener.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Eloquent &amp; Database</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Eloquent &amp; Database</button><div class="ch-toc-list"><a href="#ch4-models">4.1 Models and relationships</a><a href="#ch4-migrations">4.2 Migrations and indexes</a><a href="#ch4-eager">4.3 Avoiding N+1 with eager loading</a></div></div>
+    <p class="topic-desc">Eloquent provides models, relationships, migrations and the query patterns that keep your database fast. The chapter’s main goal is avoiding N+1 queries from day one through eager loading and careful column selection. A solid schema defined in migrations underlies every model relationship you build.</p>
+    <h3 id="ch4-models" data-toc>4.1 Models and relationships</h3>
+    <p class="topic-desc">Eloquent models map to database tables, with fillable and casts protecting which attributes can be mass-assigned and how values are converted. Relationships are expressed as typed methods, for example a belongsTo method wiring the post model to the user. That lets you write fluent, chainable queries over related data.</p>
+    <div class="codeWrap"><pre><code>class Post extends Model
+{
+    protected $fillable = ['title', 'body', 'author_id']; // only these are mass-assignable
+    protected $casts = ['published_at' =&gt; 'datetime'];
+
+    public function author(): BelongsTo { return $this-&gt;belongsTo(User::class); } // typed relation
+    public function tags(): BelongsToMany { return $this-&gt;belongsToMany(Tag::class); }
+}</code></pre></div>
+    <p class="code-note">A Post model lists its fillable attributes, casts a date column and wires author and tags as eager-loadable relationships.</p>
+    <h3 id="ch4-migrations" data-toc>4.2 Migrations and indexes</h3>
+    <p class="topic-desc">Migrations define the schema as versioned, replayable code so every environment can build the same database. They configure foreign keys, column types and indexes, and you keep indexes on the columns you filter or sort by such as published_at. Versioning schema this way prevents drift between environments.</p>
+    <div class="codeWrap"><pre><code>Schema::create('posts', function (Blueprint $t) {
+    $t-&gt;id();
+    $t-&gt;foreignId('author_id')-&gt;constrained('users'); // FK to users, indexed
+    $t-&gt;string('title');
+    $t-&gt;text('body');
+    $t-&gt;timestamp('published_at')-&gt;nullable()-&gt;index(); // index for date filters
+    $t-&gt;timestamps();
+});</code></pre></div>
+    <p class="code-note">This schema creates posts with a constrained author foreign key and an indexed nullable timestamp for date filtering.</p>
+    <h3 id="ch4-eager" data-toc>4.3 Avoiding N+1 with eager loading</h3>
+    <p class="topic-desc">Eager loading with with on the query fetches related models in a single query instead of one per row, slashing overall query counts. Selecting only needed columns with select or pluck reduces the payload further. Strict mode enabled in development catches accidental lazy loads with an exception immediately.</p>
+    <div class="codeWrap"><pre><code>// N+1: one query per author
+$posts = Post::all();
+
+// Fixed:
+$posts = Post::with('author:id,name')
+    -&gt;select('id', 'title', 'author_id')
+    -&gt;latest()
+    -&gt;paginate(20);
+
+// Enable strict mode in dev to catch lazy loads:
+Model::preventLazyLoading(!app()-&gt;isProduction());</code></pre></div>
+    <p class="code-note">Eager loading via with() collapses the N+1 problem into one query, and preventLazyLoading turns regressions into errors in dev.</p>
+    <div class="tip"><p>Use <code>select()</code> to fetch only needed columns, <code>with()</code> for relations, and <code>paginate()</code> for every list. Laravel Telescope or Debugbar reveals N+1s instantly.</p></div>
+    <div class="ex"><h4 id="ch4-eager--exercises-4">Exercises 4</h4><ol>
+      <li>Create two related models and their migrations.</li>
+      <li>Fix an N+1 with eager loading and verify the query count.</li>
+      <li>Add an index and inspect it with <code>EXPLAIN</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Authentication &amp; Authorization</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Authentication &amp; Authorization</button><div class="ch-toc-list"><a href="#ch5-sanctum">5.1 Sanctum for SPAs</a><a href="#ch5-tokens">5.2 API tokens</a><a href="#ch5-policies">5.3 Policies and Gates</a></div></div>
+    <p class="topic-desc">Authentication proves who a user is while authorization decides what they may do, and this chapter covers both with Sanctum and policies. Sanctum secures SPA cookie sessions and issues API tokens, while Gate and policies enforce ownership rules. The two layers together protect every route from anonymous abuse.</p>
+    <h3 id="ch5-sanctum" data-toc>5.1 Sanctum for SPAs</h3>
+    <p class="topic-desc">Sanctum guards your Vue SPA with cookie-based, CSRF-protected authentication through the API. The login route checks credentials, regenerates the session and returns no content, with later requests riding on the session cookie. Clients must read the XSRF-TOKEN cookie and send it as a header for state-changing requests.</p>
+    <div class="codeWrap"><pre><code>// stateful SPA auth: cookie-based, CSRF-protected
+// config/sanctum.php stateful domains include your SPA origin
+Route::post('/login', function (LoginRequest $r) {
+    if (!Auth::attempt($r-&gt;only('email', 'password'))) {
+        throw ValidationException::withMessages(['email' =&gt; 'Invalid credentials']);
+    }
+    $r-&gt;session()-&gt;regenerate();
+    return response()-&gt;noContent();
+});
+
+// SPA sends X-XSRF-TOKEN header; axios includes it automatically.</code></pre></div>
+    <p class="code-note">A stateful login route checks credentials, regenerates the session and returns no content; the SPA then sends the CSRF token automatically.</p>
+    <h3 id="ch5-tokens" data-toc>5.2 API tokens</h3>
+    <p class="topic-desc">Sanctum issues plain-text API tokens with named abilities so third-party clients can act as a user. Each token is scoped to a narrow set of abilities, and the tokenCan method on the underlying model enforces them per request. Tokens can be issued and revoked individually for fine-grained control.</p>
+    <div class="codeWrap"><pre><code>$token = $user-&gt;createToken('spa', ['posts:read', 'posts:write']); // scoped to this client
+return ['token' =&gt; $token-&gt;plainTextToken];
+
+// Protect + check abilities:
+Route::middleware(['auth:sanctum', 'ability:posts:write'])-&gt;post('/posts', ...);</code></pre></div>
+    <p class="code-note">A personal access token scoped to read and write abilities is handed to the client, then enforced by the ability middleware.</p>
+    <h3 id="ch5-policies" data-toc>5.3 Policies and Gates</h3>
+    <p class="topic-desc">Policies centralize authorization rules such as only the owner may update a post, with one method per action. Controllers and views enforce the same policy through Gate checks, so the authorization check cannot be misplaced. The SPA then surfaces or hides UI based on the matching ability flags.</p>
+    <div class="codeWrap"><pre><code>class PostPolicy
+{
+    public function update(User $u, Post $p): bool { return $u-&gt;id === $p-&gt;author_id; } // owner-only rule
+}
+// Controller: $this-&gt;authorize('update', $post);</code></pre></div>
+    <p class="code-note">The policy encodes the owner-only rule and the controller invokes it with authorize, centralizing authorization.</p>
+    <div class="warn"><p>Never expose raw models with sensitive columns. Use API Resources or <code>$hidden</code> to control exactly what leaves the server.</p></div>
+    <div class="ex"><h4 id="ch5-policies--exercises-5">Exercises 5</h4><ol>
+      <li>Protect routes with Sanctum.</li>
+      <li>Issue a token with abilities and enforce one.</li>
+      <li>Write a policy that only allows the owner to edit.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · API Resources &amp; Errors</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · API Resources &amp; Errors</button><div class="ch-toc-list"><a href="#ch6-resources">6.1 API Resources</a><a href="#ch6-errors">6.2 Consistent error responses</a><a href="#ch6-versioning">6.3 Versioning</a></div></div>
+    <p class="topic-desc">This chapter shapes what the frontend actually receives and keeps errors consistent. API Resources control the JSON contract field by field, a global handler standardises failures, and versioning buys you time when the contract changes. Together they keep the API predictable as it evolves.</p>
+    <h3 id="ch6-resources" data-toc>6.1 API Resources</h3>
+    <p class="topic-desc">Resource classes map Eloquent models to clean JSON you fully control, including loaded relations and ISO-formatted dates. Resource collections wrap paginated lists so the response shape stays stable whether one item or many come back. You decide exactly which fields ever leave your API.</p>
+    <div class="codeWrap"><pre><code>class PostResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' =&gt; $this-&gt;id, // map only what the client needs
+            'title' =&gt; $this-&gt;title,
+            'body' =&gt; $this-&gt;body,
+            'author' =&gt; new UserResource($this-&gt;whenLoaded('author')), // skips unless eager loaded
+            'createdAt' =&gt; $this-&gt;created_at-&gt;toIso8601String(),
+        ];
+    }
+}
+// Collection: PostResource::collection(Post::paginate());</code></pre></div>
+    <p class="code-note">The resource dictates the JSON contract, including when a relation is loaded, and collections wrap paginated lists the same way.</p>
+    <h3 id="ch6-errors" data-toc>6.2 Consistent error responses</h3>
+    <p class="topic-desc">A central exception renderer, typically the render method of the exception handler, turns validation failures and exceptions into one JSON shape. Every error then carries a status code and machine-readable details the SPA can read predictably. The frontend centralises handling for this contract in an Axios interceptor.</p>
+    <div class="codeWrap"><pre><code>// bootstrap/app.php (Laravel 11+)
+-&gt;withExceptions(function (Exceptions $e) {
+    $e-&gt;render(function (ValidationException $ex) { // one shape for all validation errors
+        return response()-&gt;json(['message' =&gt; $ex-&gt;getMessage(),
+            'errors' =&gt; $ex-&gt;errors()], 422);
+    });
+});</code></pre></div>
+    <p class="code-note">A global exception renderer converts validation failures into one JSON shape, so the frontend only ever parses one error format.</p>
+    <h3 id="ch6-versioning" data-toc>6.3 Versioning</h3>
+    <p class="topic-desc">Prefix routes with a version such as api/v1 and keep the old versions alive while clients migrate to the new one. An OpenAPI specification documents the contract, letting the frontend generate TypeScript types straight from the backend definition. This approach buys time and safety when breaking changes are unavoidable.</p>
+    <p>Prefix routes with <code>/api/v1</code>, keep old versions until clients migrate, and publish an OpenAPI spec so the SPA can generate types.</p>
+    <div class="ex"><h4 id="ch6-versioning--exercises-6">Exercises 6</h4><ol>
+      <li>Create a resource for a model with a loaded relation.</li>
+      <li>Standardise validation error JSON.</li>
+      <li>Version an API and document it.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Queues, Events &amp; Caching</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Queues, Events &amp; Caching</button><div class="ch-toc-list"><a href="#ch7-queues">7.1 Queues and jobs</a><a href="#ch7-cache">7.2 Caching</a><a href="#ch7-broadcast">7.3 Broadcasting events</a></div></div>
+    <p class="topic-desc">Move slow work off the request path and reuse expensive results to keep responses fast and resilient. Queues, event broadcasting and caching work together: jobs handle background work, events notify other parts of the system, and the cache stores hot results. Each plays a clear role in moving effort away from user requests.</p>
+    <h3 id="ch7-queues" data-toc>7.1 Queues and jobs</h3>
+    <p class="topic-desc">Dispatch jobs onto named Redis queues and run supervised workers with queue:work to process them. Horizon adds a dashboard, metrics and queue configuration so you can watch health and spread work across connections. Retries and failure handling keep transient errors from losing work permanently.</p>
+    <div class="codeWrap"><pre><code>// generate the job class
+php artisan make:job ProcessVideo
+// dispatch onto a named queue
+ProcessVideo::dispatch($video)-&gt;onQueue('media');
+
+// Runner (prod): supervise workers
+php artisan queue:work --queue=media,default --tries=3
+
+// Laravel Horizon gives a dashboard + metrics for Redis queues.</code></pre></div>
+    <p class="code-note">A job is generated and dispatched to a named queue, then picked up by a worker; Horizon adds a dashboard and metrics around that.</p>
+    <h3 id="ch7-cache" data-toc>7.2 Caching</h3>
+    <p class="topic-desc">Cache::remember holds an expensive result for a TTL and recomputes it once after expiry, with Redis as the backend. Tags let you flush a whole related group at once, for example every comment cache when a post changes. Choosing a good key scheme and TTL makes invalidation predictable.</p>
+    <div class="codeWrap"><pre><code>// remember caches the result and recomputes after the TTL
+$stats = Cache::remember('stats', now()-&gt;addMinutes(5), fn () =&gt;
+    Post::query()-&gt;selectRaw('count(*) as total')-&gt;first()
+);
+
+// Cache tags let you invalidate a group:
+Cache::tags(['posts'])-&gt;flush();</code></pre></div>
+    <p class="code-note">Cache::remember stores the result for five minutes and recomputes on miss; tags let you flush a whole group in one call.</p>
+    <h3 id="ch7-broadcast" data-toc>7.3 Broadcasting events</h3>
+    <p class="topic-desc">Broadcast Laravel events to private channels with a ShouldBroadcast event and the Reverb driver, authorizing subscriptions with channel closures. The Vue SPA listens with Laravel Echo and receives arriving items over the websocket connection. Only the authorized channel owner ever receives the payload, keeping data private.</p>
+    <div class="codeWrap"><pre><code>class PostCreated implements ShouldBroadcast
+{
+    public function broadcastOn(): array { return [new PrivateChannel('user.'.$this-&gt;post-&gt;author_id)]; } // owner's private channel
+}
+
+// Frontend: Echo.private(`user.${id}`).listen('PostCreated', e =&gt; ...)</code></pre></div>
+    <p class="code-note">A model event implements ShouldBroadcast to a private channel, and Echo listens for it on the frontend.</p>
+    <div class="ex"><h4 id="ch7-broadcast--exercises-7">Exercises 7</h4><ol>
+      <li>Dispatch a job on a named queue and run a worker.</li>
+      <li>Cache an expensive query with a TTL.</li>
+      <li>Broadcast a model event to a private channel.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Vue 3 Frontend Foundations</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Vue 3 Frontend Foundations</button><div class="ch-toc-list"><a href="#ch8-setup">8.1 Project setup</a><a href="#ch8-components">8.2 Components with script setup</a><a href="#ch8-props">8.3 Props, emits, slots</a></div></div>
+    <p class="topic-desc">Scaffold a Vue 3 project with Vite and TypeScript, then build components the modern way. The script setup style with ref, computed, props and emits covers most of your UI without legacy options objects. This foundation underlies the routing and state chapters that follow.</p>
+    <h3 id="ch8-setup" data-toc>8.1 Project setup</h3>
+    <p class="topic-desc">create-vue scaffolds the SPA with TypeScript, Vue Router and Pinia preconfigured so you can start coding immediately. A Vite dev server proxy forwards API calls to your local Laravel application, avoiding CORS during development. Everything from the build tool to the linting setup is in place after one command.</p>
+    <div class="codeWrap"><pre><code>npm create vue@latest client # scaffold the SPA
+# choose: TypeScript, Router, Pinia, ESLint, Prettier
+cd client &amp;&amp; npm install &amp;&amp; npm run dev
+
+// vite.config.ts — proxy API in dev
+export default defineConfig({
+  server: { proxy: { '/api': 'http://localhost:8000' } },
+  plugins: [vue()]
+});</code></pre></div>
+    <p class="code-note">create-vue scaffolds the app and the Vite proxy forwards /api calls to Laravel during development.</p>
+    <h3 id="ch8-components" data-toc>8.2 Components with script setup</h3>
+    <p class="topic-desc">The Composition API in script setup reads like plain TypeScript: ref tracks mutable state and computed derives values reactively with zero boilerplate. Watchers and lifecycle hooks slot in naturally when side effects are needed. Components stay small, focused and easy to reason about.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+import { ref, computed } from 'vue' // reactivity helpers
+const count = ref(0)
+const doubled = computed(() =&gt; count.value * 2) // derived value recomputes on change
+function inc() { count.value++ }
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;button @click="inc"&gt;{{ count }} ({{ doubled }})&lt;/button&gt;
+&lt;/template&gt;</code></pre></div>
+    <p class="code-note">A minimal script setup component shows reactive state, a computed double and a click handler bound with @click.</p>
+    <h3 id="ch8-props" data-toc>8.3 Props, emits, slots</h3>
+    <p class="topic-desc">defineProps types the data flowing into a component and defineEmits declares the events it can fire, making the contract explicit. Slots allow parent components to inject markup into a child’s layout between its own content. TypeScript then flags mismatches between what parents pass and what children expect.</p>
+    <div class="codeWrap"><pre><code>const props = defineProps&lt;{ post: Post }&gt;() // typed input from parent
+const emit = defineEmits&lt;{ (e: 'select', id: number): void }&gt;() // typed event contract
+
+&lt;article @click="emit('select', props.post.id)"&gt;{{ post.title }}&lt;/article&gt;</code></pre></div>
+    <p class="code-note">Typed props define what flows in and a typed emit contract defines what flows out, so components stay predictable.</p>
+    <div class="tip"><p>Prefer <code>&lt;script setup&gt;</code> + Composition API: it is the modern default and plays best with TypeScript inference.</p></div>
+    <div class="ex"><h4 id="ch8-props--exercises-8">Exercises 8</h4><ol>
+      <li>Scaffold a Vue 3 project and configure the API proxy.</li>
+      <li>Build a component with props, an emit and a slot.</li>
+      <li>Compute derived state with <code>computed</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Routing, State &amp; Data Fetching</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Routing, State &amp; Data Fetching</button><div class="ch-toc-list"><a href="#ch9-router">9.1 Vue Router</a><a href="#ch9-pinia">9.2 Pinia stores</a><a href="#ch9-client">9.3 A typed API client</a></div></div>
+    <p class="topic-desc">This chapter gives the SPA navigation, shared state and one typed way to talk to Laravel. Vue Router handles navigation between views, Pinia stores shared client-side state, and a single Axios client carries every request. The three concerns each get a dedicated pattern used throughout the guide.</p>
+    <h3 id="ch9-router" data-toc>9.1 Vue Router</h3>
+    <p class="topic-desc">Vue Router maps URL paths to view components with history mode and lazy route imports. A global beforeEach guard inspects route meta flags and redirects unauthenticated users to the login page. Mark public routes with a meta flag so the guard lets them through without a session.</p>
+    <div class="codeWrap"><pre><code>const router = createRouter({
+  history: createWebHistory(), // real browser history
+  routes: [
+    { path: '/', component: HomeView },
+    { path: '/posts/:id', component: PostView, props: true }, // params passed as props
+    { path: '/login', component: LoginView, meta: { public: true } },
+  ],
+})
+
+router.beforeEach((to) =&gt; { // auth guard, runs before navigation
+  if (!to.meta.public &amp;&amp; !useAuth().isLoggedIn) return '/login'
+})</code></pre></div>
+    <p class="code-note">Routes map URLs to components and a global beforeEach guard bounces unauthenticated users to the login page.</p>
+    <h3 id="ch9-pinia" data-toc>9.2 Pinia stores</h3>
+    <p class="topic-desc">Pinia keeps reactive client-side state in one place, with state, getters and actions defined in a setup-style store. Actions fetch data from the API and components read the store instead of duplicating fetch logic. Because stores are reactive, every component using the store updates when the data changes.</p>
+    <div class="codeWrap"><pre><code>export const usePosts = defineStore('posts', () =&gt; {
+  const items = ref&lt;Post[]&gt;([]) // reactive cache of posts
+  const loading = ref(false)
+  async function fetchAll() {
+    loading.value = true
+    try { items.value = await api.get('/posts') }
+    finally { loading.value = false }
+  }
+  return { items, loading, fetchAll }
+})</code></pre></div>
+    <p class="code-note">The store owns reactive items and loading state and exposes a fetchAll action that writes the API result into it.</p>
+    <h3 id="ch9-client" data-toc>9.3 A typed API client</h3>
+    <p class="topic-desc">A single Axios instance carries the base URL, withCredentials for cookies and one shared error handler. An interceptor watches for 401 responses, refreshes the expired token through a refresh endpoint, then retries the original request transparently. Wrapping the client in typed functions keeps Laravel endpoints strongly typed in the frontend.</p>
+    <div class="codeWrap"><pre><code>const api = axios.create({ baseURL: '/api/v1', withCredentials: true }) // base URL and cookies in one place
+
+// Sanctum CSRF cookie must be fetched first for cookie auth:
+await axios.get('/sanctum/csrf-cookie')
+
+api.interceptors.response.use(r =&gt; r.data, async (err) =&gt; { // unwrap data; refresh on 401
+  if (err.response?.status === 401) await refreshToken()
+  return Promise.reject(err)
+})</code></pre></div>
+    <p class="code-note">One axios instance carries base URL and cookies, unwraps response data, and refreshes the token before retrying after a 401.</p>
+    <div class="ex"><h4 id="ch9-client--exercises-9">Exercises 9</h4><ol>
+      <li>Add three routes with an auth guard.</li>
+      <li>Create a Pinia store that fetches and caches posts.</li>
+      <li>Fetch the CSRF cookie before login and call a protected endpoint.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Forms &amp; UI Patterns in Vue</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Forms &amp; UI Patterns in Vue</button><div class="ch-toc-list"><a href="#ch10-forms">10.1 Forms and validation</a><a href="#ch10-ux">10.2 Loading, empty and error states</a><a href="#ch10-perf">10.3 Component performance</a></div></div>
+    <p class="topic-desc">Real forms need validation, loading states and performance discipline, and this chapter shows the patterns shared by every data-heavy Vue screen. Composable functions wrap form state, submission and error mapping so views stay declarative. Applying the same pattern everywhere keeps the UI consistent and maintainable.</p>
+    <h3 id="ch10-forms" data-toc>10.1 Forms and validation</h3>
+    <p class="topic-desc">A reactive form holds its fields, posts them with Axios, and maps Laravel 422 errors back onto the matching inputs. Submit stays guarded until the form is valid and not already pending, so users only send clean data. On success the form resets and the view moves on.</p>
+    <div class="codeWrap"><pre><code>const form = reactive({ title: '', body: '' }) // two-way form state
+const errors = ref&lt;Record&lt;string, string[]&gt;&gt;({})
+
+async function submit() {
+  try { await api.post('/posts', form); router.push('/posts') }
+  catch (e) {
+    if (e.response?.status === 422) errors.value = e.response.data.errors // map Laravel errors to fields
+  }
+}</code></pre></div>
+    <p class="code-note">A reactive form is posted to the API and a 422 response copies Laravel’s per-field errors back onto the form.</p>
+    <p>Laravel returns <code>422</code> with an <code>errors</code> map keyed by field — map it straight onto your form fields.</p>
+    <h3 id="ch10-ux" data-toc>10.2 Loading, empty and error states</h3>
+    <p class="topic-desc">Every async view needs loading, empty, error and success states so the user is never staring at a blank screen while a request runs. Track a pending flag, check whether the data array is empty, and render a friendly error with a retry button when a call fails. This turns every fetch into an explicit state machine.</p>
+    <ul>
+      <li>Every async view needs loading, empty, error and success states.</li>
+      <li>Disable submit while in flight; show optimistic updates with rollback.</li>
+      <li>Never leave the user staring at a blank screen.</li>
+    </ul>
+    <h3 id="ch10-perf" data-toc>10.3 Component performance</h3>
+    <p class="topic-desc">Lazy-load route components and virtualise long lists to keep bundles small and the UI smooth. Avoid over-optimising until measurements show a real bottleneck. Keeping components small and splitting dependencies by route pays off on slow connections.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- lazy-load routes --&gt;
+{ path: '/posts', component: () =&gt; import('./PostList.vue') }
+
+&lt;!-- virtualise long lists --&gt;
+&lt;VirtualList :items="rows" :item-height="48" /&gt;</code></pre></div>
+    <p class="code-note">Lazy-load routes with dynamic imports and virtualise long lists so initial bundles stay small and scrolling stays smooth.</p>
+    <div class="ex"><h4 id="ch10-perf--exercises-10">Exercises 10</h4><ol>
+      <li>Build a validated form mapping Laravel 422 errors to fields.</li>
+      <li>Add loading/empty/error states to a list view.</li>
+      <li>Lazy-load one route and measure the bundle.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · Inertia.js Alternative</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Inertia.js Alternative</button><div class="ch-toc-list"><a href="#ch11-why">11.1 What Inertia gives you</a><a href="#ch11-forms">11.2 Forms with useForm</a></div></div>
+    <p class="topic-desc">Inertia renders Vue pages straight from Laravel controllers without a separate API, passing props and data instead of JSON. It is ideal when you want SPA UX while sharing auth, middleware and content with the server in one place. The frontend skips client-side data plumbing entirely.</p>
+    <h3 id="ch11-why" data-toc>11.1 What Inertia gives you</h3>
+    <p class="topic-desc">Controllers return Inertia page responses that name the Vue component and pass props, sharing auth state and middleware along the way. The client swaps in the versioned page component and reuses the shared layout, moving via small XHR payloads. You skip the API layer and still get a modern SPA experience.</p>
+    <p>Inertia lets Laravel controllers return Vue pages directly with props — no separate API, no client-side routing config for data, and shared middleware/auth. Perfect for teams who want SPA UX without building an API.</p>
+    <div class="codeWrap"><pre><code>// Controller
+return Inertia::render('Posts/Index', [ // render a Vue page with props
+    'posts' =&gt; PostResource::collection(Post::latest()-&gt;paginate(20)),
+]);
+
+// Vue page receives props
+&lt;script setup lang="ts"&gt;
+defineProps&lt;{ posts: Paginated&lt;Post&gt; }&gt;()
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">A Laravel controller renders a Vue page with paginated posts as props, then the Vue page types those props directly.</p>
+    <h3 id="ch11-forms" data-toc>11.2 Forms with useForm</h3>
+    <p class="topic-desc">The useForm composable tracks fields and posts them through Inertia’s visit mechanism, mapping Laravel validation errors straight into form.errors per field. It also manages processing state and resets the form on success. This keeps form handling consistent without a hand-rolled request client.</p>
+    <div class="codeWrap"><pre><code>const form = useForm({ title: '', body: '' }) // tracks fields and submit state
+form.post('/posts', { onSuccess: () =&gt; form.reset() })
+// Validation errors from Laravel appear on form.errors automatically.</code></pre></div>
+    <p class="code-note">useForm posts the fields and surfaces Laravel validation errors out of the box, resetting the form on success.</p>
+    <div class="ex"><h4 id="ch11-forms--exercises-11">Exercises 11</h4><ol>
+      <li>Render one Inertia page from a controller.</li>
+      <li>Submit a form with <code>useForm</code> and show errors.</li>
+      <li>Compare Inertia vs API+SPA for your team.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch12" data-toc>12 · Real-time with Reverb + Echo</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Real-time with Reverb + Echo</button><div class="ch-toc-list"><a href="#ch12-server">12.1 Server side</a><a href="#ch12-client">12.2 Vue client with Laravel Echo</a></div></div>
+    <p class="topic-desc">Push updates to the SPA the moment they happen on the backend using Laravel Reverb as the websocket server. Reverb broadcasts events over websockets and Laravel Echo subscribes in the Vue client. This replaces polling with instant, server-driven updates across authorized private channels.</p>
+    <h3 id="ch12-server" data-toc>12.1 Server side</h3>
+    <p class="topic-desc">Run the install:broadcasting command to wire Reverb in, then reverb:start to launch the server. Private channels are authorized by a channel closure or channel class that checks the authenticated user. Broadcasting events with ShouldBroadcast and a channel name routes payloads to the right subscribers.</p>
+    <div class="codeWrap"><pre><code>php artisan install:broadcasting   # sets up Reverb
+php artisan reverb:start
+
+// authorize who may join the private user channel
+Broadcast::channel('user.{id}', fn (User $user, $id) =&gt; (int) $user-&gt;id === (int) $id);</code></pre></div>
+    <p class="code-note">install:broadcasting wires Reverb, reverb:start runs it, and a channel closure authorizes who may join the private user channel.</p>
+    <h3 id="ch12-client" data-toc>12.2 Vue client with Laravel Echo</h3>
+    <p class="topic-desc">Echo connects the SPA to the Reverb server using the key from your environment and the configured broadcasting driver. Listen on a private signed channel and push arriving items straight into a Pinia store so the UI updates reactively. The server only delivers events the channel authorization allowed.</p>
+    <div class="codeWrap"><pre><code>import Echo from 'laravel-echo'
+window.Echo = new Echo({ broadcaster: 'reverb', key: import.meta.env.VITE_REVERB_KEY }) // connect to Reverb
+
+Echo.private(`user.${auth.userId}`) // join the owner's private channel
+    .listen('PostCreated', (e) =&gt; store.items.unshift(e.post)) // push new posts into state
+</code></pre></div>
+    <p class="code-note">Echo subscribes to the private channel for the current user and unshifts each new PostCreated payload into the store.</p>
+    <div class="tip"><p>For scale, run Reverb behind a load balancer or use a managed service (Pusher/Ably). On reconnect, re-fetch missed state from the API.</p></div>
+    <div class="ex"><h4 id="ch12-client--exercises-12">Exercises 12</h4><ol>
+      <li>Broadcast an event and listen in Vue.</li>
+      <li>Authorize a private channel.</li>
+      <li>Resync state after a reconnect.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch13" data-toc>13 · Testing the Full Stack</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Testing the Full Stack</button><div class="ch-toc-list"><a href="#ch13-backend">13.1 Pest / PHPUnit feature tests</a><a href="#ch13-frontend">13.2 Frontend tests</a></div></div>
+    <p class="topic-desc">Tests lock in behavior on both sides of the wire. Feature tests cover the Laravel API endpoints, component tests cover the Vue views, and Playwright end-to-end tests prove the whole flow in a real browser. Each layer trusts the one below it only after it is verified.</p>
+    <h3 id="ch13-backend" data-toc>13.1 Pest / PHPUnit feature tests</h3>
+    <p class="topic-desc">Feature tests hit real endpoints with factory-built users or data and assert on status codes, the JSON response and database state. Pest wraps PHPUnit so each test reads like a sentence with describe and it blocks. These tests prove routes, validation and middleware behave exactly as specified.</p>
+    <div class="codeWrap"><pre><code>it('creates a post', function () {
+    $user = User::factory()-&gt;create(); // factory user, no real data
+    $this-&gt;actingAs($user)
+        -&gt;postJson('/api/v1/posts', ['title' =&gt; 'Hi', 'body' =&gt; 'Body text'])
+        -&gt;assertCreated(); // expects HTTP 201
+    expect(Post::count())-&gt;toBe(1);
+});</code></pre></div>
+    <p class="code-note">A Pest feature test acts as a factory user, posts valid JSON, asserts the created status and verifies exactly one post was made.</p>
+    <h3 id="ch13-frontend" data-toc>13.2 Frontend tests</h3>
+    <p class="topic-desc">Vitest mounts components with testing utilities, simulates clicks and typing, and asserts on the rendered output and emitted events. Testing Library style queries keep the tests close to how a user actually sees the app. Playwright end-to-end tests then drive the complete login and data flow in a real browser.</p>
+    <div class="codeWrap"><pre><code>// Vitest + Vue Test Utils
+import { mount } from '@vue/test-utils'
+test('increments', async () =&gt; {
+  const w = mount(Counter)
+  await w.find('button').trigger('click') // simulate a real click
+  expect(w.text()).toContain('1')
+})
+
+// End-to-end with Playwright against the running app.</code></pre></div>
+    <p class="code-note">Vitest mounts the component, triggers a real click and asserts the rendered text, with Playwright covering the full user flow.</p>
+    <div class="warn"><p>Use a separate test database and <code>RefreshDatabase</code> so tests never touch real data. Seed factories, not fixtures.</p></div>
+    <div class="ex"><h4 id="ch13-frontend--exercises-13">Exercises 13</h4><ol>
+      <li>Write a feature test for a protected endpoint.</li>
+      <li>Unit-test a Vue component with Vitest.</li>
+      <li>Add a Playwright smoke test for the login flow.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch14" data-toc>14 · Observability &amp; Operations</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Observability &amp; Operations</button><div class="ch-toc-list"><a href="#ch14-tools">14.1 Tooling</a><a href="#ch14-health">14.2 Health checks</a><a href="#ch14-watch">14.3 What to watch</a></div></div>
+    <p class="topic-desc">Observability shows what your app is doing in production, from errors and latency to queue depth and overall health. Tooling such as Telescope, Sentry, OpenTelemetry and Horizon turns guesswork into concrete data. A health endpoint then gives infrastructure a single place to probe readiness.</p>
+    <h3 id="ch14-tools" data-toc>14.1 Tooling</h3>
+    <p class="topic-desc">A reference table maps each operational need to a tool: Telescope for local debugging, Sentry for error tracking, OpenTelemetry for distributed traces and Horizon for queue monitoring. Each tool answers a specific question about your running application. Combined, they give visibility across requests, jobs and failures.</p>
+    <table>
+      <tr><th>Need</th><th>Tool</th></tr>
+      <tr><td>Local debugging</td><td>Telescope, Debugbar</td></tr>
+      <tr><td>Errors</td><td>Sentry / Flare</td></tr>
+      <tr><td>Metrics/traces</td><td>OpenTelemetry, Grafana</td></tr>
+      <tr><td>Queue monitoring</td><td>Horizon</td></tr>
+      <tr><td>Schedules</td><td><code>schedule:work</code> / cron</td></tr>
+    </table>
+    <h3 id="ch14-health" data-toc>14.2 Health checks</h3>
+    <p class="topic-desc">A tiny healthz route reports database, cache and queue status for load balancers, dashboards and uptime monitoring. Each probe performs a lightweight check such as a quick database query or cache ping, then reports overall readiness. Simple probes catch failing dependencies early, before real users are affected.</p>
+    <div class="codeWrap"><pre><code>Route::get('/healthz', fn () =&gt; response()-&gt;json([ // one endpoint pings every dependency
+    'db' =&gt; DB::connection()-&gt;getPdo() !== null,
+    'cache' =&gt; Cache::store('redis')-&gt;get('ping') === null ? 'ok' : 'ok',
+    'queue' =&gt; Queue::size(),
+]));</code></pre></div>
+    <p class="code-note">A healthz endpoint reports database, cache and queue status in one JSON payload for load balancers to ping.</p>
+    <h3 id="ch14-watch" data-toc>14.3 What to watch</h3>
+    <p class="topic-desc">The four metrics that matter most are latency percentiles, error rate, queue depth and Core Web Vitals. Track them as trends over time rather than looking only during incidents. These numbers tell you whether today’s release actually improved the experience for users.</p>
+    <ul>
+      <li>Request latency p95/p99, error rate, queue depth.</li>
+      <li>Slow queries and connection saturation.</li>
+      <li>Failed jobs and retry storms.</li>
+      <li>Frontend Core Web Vitals.</li>
+    </ul>
+    <div class="ex"><h4 id="ch14-watch--exercises-14">Exercises 14</h4><ol>
+      <li>Add a health endpoint reporting DB and queue.</li>
+      <li>Set up an error tracker.</li>
+      <li>Chart queue depth over time.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch15" data-toc>15 · Deployment &amp; Scaling</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Deployment &amp; Scaling</button><div class="ch-toc-list"><a href="#ch15-deploy">15.1 Deploying Laravel</a><a href="#ch15-scale">15.2 Scaling</a><a href="#ch15-cicd">15.3 CI/CD pipeline</a></div></div>
+    <p class="topic-desc">Ship the app reliably today and grow it tomorrow with scripted deploys, stateless application nodes and a CI pipeline that tests every change. Each release follows the same repeatable sequence so nothing is left to memory. Scaling then adds nodes and Redis-backed services only when the traffic pattern calls for it.</p>
+    <h3 id="ch15-deploy" data-toc>15.1 Deploying Laravel</h3>
+    <p class="topic-desc">The production sequence runs composer install, php artisan migrate --force, config caching and a worker restart in a fixed order. Zero-downtime deploys point a symlink at the new release directory instead of overwriting files in place. This release sequence makes every deploy identical and easy to roll back.</p>
+    <div class="codeWrap"><pre><code>composer install --no-dev --optimize-autoloader # prod deps only, optimized autoloader
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan queue:restart   # signal workers to reload code
+
+# Zero-downtime: deploy to a new release dir, switch a symlink, reload php-fpm.</code></pre></div>
+    <p class="code-note">The production sequence installs prod dependencies, force-migrates, caches config and routes, then restarts workers with zero downtime.</p>
+    <h3 id="ch15-scale" data-toc>15.2 Scaling</h3>
+    <p class="topic-desc">Stateless application nodes behind a load balancer, Redis for shared sessions and cache, and independent queue workers let you add capacity horizontally. Read replicas offload reporting queries and a CDN serves static assets from the edge. Each layer scales on its own axis when traffic demands it.</p>
+    <ul>
+      <li>Stateless app nodes behind a load balancer; sessions in Redis/DB.</li>
+      <li>Horizon workers scale independently of web nodes.</li>
+      <li>Redis for cache, sessions and queues.</li>
+      <li>Read replicas for heavy read traffic; a CDN for the SPA.</li>
+      <li>Octane (Swoole/FrankenPHP) for a persistent-worker speedup.</li>
+    </ul>
+    <h3 id="ch15-cicd" data-toc>15.3 CI/CD pipeline</h3>
+    <p class="topic-desc">A pipeline installs dependencies, runs tests, builds and pushes a container image on every push, then deploys with a fresh migrate and restart. Automation makes releases boring and safe because the same steps run every time. A failed check blocks the deploy, so only verified code reaches production.</p>
+    <div class="codeWrap"><pre><code>- run: composer install --no-dev --prefer-dist # install prod-facing deps
+- run: php artisan test # run the whole suite
+- run: npm ci &amp;&amp; npm run build
+- run: docker build -t ghcr.io/acme/app:$GITHUB_SHA . # bake an immutable image
+- run: docker push ghcr.io/acme/app:$GITHUB_SHA
+# deploy: migrate --force, symlink switch, queue:restart</code></pre></div>
+    <p class="code-note">A CI pipeline installs dependencies, runs tests and the build, then tags and pushes a Docker image ready for deploy.</p>
+    <div class="ex"><h4 id="ch15-cicd--exercises-15">Exercises 15</h4><ol>
+      <li>Write the production deploy command sequence.</li>
+      <li>Move sessions to Redis and verify.</li>
+      <li>Add a CI pipeline that tests and builds.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch16" data-toc>16 · Performance Tuning</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Performance Tuning</button><div class="ch-toc-list"><a href="#ch16-backend">16.1 Backend</a><a href="#ch16-frontend">16.2 Frontend</a></div></div>
+    <p class="topic-desc">Fix the obvious backend and frontend hotspots before buying bigger machines. Profile first with your profiler or Telescope, then apply caching, query reductions and bundle splitting where they will actually help. Measuring each change against a baseline guarantees the effort is worth it.</p>
+    <h3 id="ch16-backend" data-toc>16.1 Backend</h3>
+    <p class="topic-desc">Kill N+1 queries, select only the columns you need, cache expensive reads and queue slow work off the request path. Consider OPcache or Laravel Octane to raise request throughput, but profile before guessing. Validate every optimization against a measured baseline.</p>
+    <ul>
+      <li>Fix N+1s; select only needed columns; paginate.</li>
+      <li>Cache expensive reads and computed aggregates.</li>
+      <li>Queue anything slow (email, media, third-party calls).</li>
+      <li>Use OPcache + <code>optimize</code>; consider Octane.</li>
+      <li>Profile with Telescope, Blackfire or Xdebug before guessing.</li>
+    </ul>
+    <h3 id="ch16-frontend" data-toc>16.2 Frontend</h3>
+    <p class="topic-desc">Code-split by route, virtualise long lists, debounce searches and abort stale requests with AbortController. Then measure bundle sizes with Lighthouse and real-user metrics such as Core Web Vitals. The frontend stays responsive by shrinking both what loads and what renders at any moment.</p>
+    <ul>
+      <li>Code-split by route; analyse the bundle.</li>
+      <li>Virtualise long lists; debounce search; abort stale requests.</li>
+      <li>Cache API responses; use skeleton loaders.</li>
+      <li>Measure with Lighthouse and real-user metrics.</li>
+    </ul>
+    <div class="ex"><h4 id="ch16-frontend--exercises-16">Exercises 16</h4><ol>
+      <li>Find and fix an N+1 in your app.</li>
+      <li>Add a cache around a slow endpoint.</li>
+      <li>Split the largest JS chunk and measure.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Commands, Patterns &amp; Roadmap</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Commands, Patterns &amp; Roadmap</button><div class="ch-toc-list"><a href="#app-commands">A.1 Artisan cheat sheet</a><a href="#app-roadmap">A.2 Roadmap: beginner to advanced</a><a href="#app-cheatsheets">A.3 Rules of thumb</a></div></div>
+    <p class="topic-desc">A quick-reference appendix holds every Artisan command on one table, a beginner-to-advanced roadmap, and the rules of thumb worth keeping near your keyboard. It distills the whole guide into material you can consult after finishing the chapters. Keep it open while you build your first full application.</p>
+    <h3 id="app-commands" data-toc>A.1 Artisan cheat sheet</h3>
+    <p class="topic-desc">The daily Artisan commands on one table, covering make for scaffolding, migrate for schema, route:list for inspection, queue:work for workers and optimize for production caching. Use it as a checklist so you never forget which command belongs at a given step. Pin it next to your editor for fast lookup.</p>
+    <table>
+      <tr><th>Task</th><th>Command</th></tr>
+      <tr><td>Scaffold model</td><td><code>php artisan make:model Post -mrc</code></td></tr>
+      <tr><td>Migrate</td><td><code>php artisan migrate</code></td></tr>
+      <tr><td>Routes</td><td><code>php artisan route:list</code></td></tr>
+      <tr><td>Queue worker</td><td><code>php artisan queue:work</code></td></tr>
+      <tr><td>Broadcast server</td><td><code>php artisan reverb:start</code></td></tr>
+      <tr><td>Prod cache</td><td><code>php artisan optimize</code></td></tr>
+    </table>
+    <h3 id="app-roadmap" data-toc>A.2 Roadmap: beginner to advanced</h3>
+    <p class="topic-desc">A stage-by-stage plan runs from basic CRUD through authentication, queues, tests, realtime and scaling, ordered so each stage builds on the last. Use it as a checklist on your way to advanced, revisiting stages as you gain confidence. Each milestone has a concrete deliverable tied to a chapter.</p>
+    <table>
+      <tr><th>Stage</th><th>You can…</th></tr>
+      <tr><td>Beginner</td><td>Eloquent CRUD, API resources, Vue list/detail</td></tr>
+      <tr><td>Intermediate</td><td>Sanctum auth, Pinia, queues, caching, tests</td></tr>
+      <tr><td>Advanced</td><td>Inertia or SPA, Reverb realtime, Horizon, Octane, CI/CD, scaling</td></tr>
+    </table>
+    <h3 id="app-cheatsheets" data-toc>A.3 Rules of thumb</h3>
+    <p class="topic-desc">Five short rules capture the whole guide: thin controllers, eager loading, queue slow work, use Sanctum for SPA auth and measure before optimising. They act as a mental checklist while you write code. These heuristics prevent the most common architectural mistakes early in a project.</p>
+    <ul>
+      <li><strong>Thin controllers; logic in actions.</strong></li>
+      <li><strong>Eager-load and paginate; never ship an N+1.</strong></li>
+      <li><strong>Queue anything slow.</strong></li>
+      <li><strong>Sanctum cookies for SPAs; tokens for third parties.</strong></li>
+      <li><strong>Cache, then measure, then optimise.</strong></li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Laravel + Vue — Scalable Web Application Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rust Programming - Ownership, Borrowing and Cargo</title>
+<meta name="description" content="Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage…. 7 chapters, 37 topics and 93 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/rust-programming.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Rust Programming - Ownership, Borrowing and Cargo">
+<meta property="og:description" content="Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage…. 7 chapters, 37 topics and 93 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/rust-programming.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Rust Programming - Ownership, Borrowing and Cargo">
+<meta name="twitter:description" content="Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage…. 7 chapters, 37 topics and 93 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/rust-programming.html#article","headline":"Rust Programming - Ownership, Borrowing and Cargo","name":"Rust Programming - Ownership, Borrowing and Cargo","description":"Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage…. 7 chapters, 37 topics and 93 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/rust-programming.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/rust-programming.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Rust Programming - Ownership, Borrowing and Cargo","item":"https://amin360it.github.io/quick-guides/rust-programming.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 ▸ Orientation: Why Rust</a><ul>
+<li><a href="#ch1-1" data-target="ch1-1">1.1 Why Rust, and what it guarantees</a></li>
+<li><a href="#ch1-2" data-target="ch1-2">1.2 Cargo, rustup and the edition system</a></li>
+<li><a href="#ch1-3" data-target="ch1-3">1.3 Hello, world — and the compiler as teacher</a></li>
+<li><a href="#ch1-4" data-target="ch1-4">1.4 Where Rust fits, and where it does not</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 ▸ Ownership, Borrowing and Lifetimes</a><ul>
+<li><a href="#ch2-1" data-target="ch2-1">2.1 Ownership: the three rules every type obeys</a></li>
+<li><a href="#ch2-2" data-target="ch2-2">2.2 References and the borrow rules</a></li>
+<li><a href="#ch2-3" data-target="ch2-3">2.3 Slices: a borrow that sees a run of elements</a></li>
+<li><a href="#ch2-4" data-target="ch2-4">2.4 Lifetimes, and when the borrow checker fights</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 ▸ Types and Pattern Matching</a><ul>
+<li><a href="#ch3-1" data-target="ch3-1">3.1 Primitives and scalar types</a></li>
+<li><a href="#ch3-2" data-target="ch3-2">3.2 Structs and enums</a></li>
+<li><a href="#ch3-3" data-target="ch3-3">3.3 Option and Result</a></li>
+<li><a href="#ch3-4" data-target="ch3-4">3.4 Match and destructuring</a></li>
+<li><a href="#ch3-5" data-target="ch3-5">3.5 Type conversions: From, Into and as</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 ▸ Error Handling</a><ul>
+<li><a href="#ch4-1" data-target="ch4-1">4.1 Result and the ? operator</a></li>
+<li><a href="#ch4-2" data-target="ch4-2">4.2 unwrap, expect and when they are acceptable</a></li>
+<li><a href="#ch4-3" data-target="ch4-3">4.3 Custom error types</a></li>
+<li><a href="#ch4-4" data-target="ch4-4">4.4 Panic vs error, and adding context</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 ▸ Collections and Iterators</a><ul>
+<li><a href="#ch5-1" data-target="ch5-1">5.1 Vec: the growable sequence</a></li>
+<li><a href="#ch5-2" data-target="ch5-2">5.2 HashMap and HashSet</a></li>
+<li><a href="#ch5-3" data-target="ch5-3">5.3 String vs &amp;str</a></li>
+<li><a href="#ch5-4" data-target="ch5-4">5.4 Iterators, adaptors and closures</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 ▸ Modules, Traits and Generics</a><ul>
+<li><a href="#ch6-1" data-target="ch6-1">6.1 Modules and visibility</a></li>
+<li><a href="#ch6-2" data-target="ch6-2">6.2 impl blocks: methods and associated functions</a></li>
+<li><a href="#ch6-3" data-target="ch6-3">6.3 Traits: definition and implementation</a></li>
+<li><a href="#ch6-4" data-target="ch6-4">6.4 Generic bounds and trait objects</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 ▸ Concurrency, Testing and the Ecosystem</a><ul>
+<li><a href="#ch7-1" data-target="ch7-1">7.1 Threads</a></li>
+<li><a href="#ch7-2" data-target="ch7-2">7.2 Channels and shared state</a></li>
+<li><a href="#ch7-3" data-target="ch7-3">7.3 Send and Sync</a></li>
+<li><a href="#ch7-4" data-target="ch7-4">7.4 Unit and integration tests</a></li>
+<li><a href="#ch7-5" data-target="ch7-5">7.5 The ecosystem: serde, clap, tokio and cargo tooling</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+<h1 class="am-band">
+      <span class="am-band-t">Rust</span>
+      <span class="am-band-s">7 chapters &middot; 37 topics &middot; 93 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation: Why Rust</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 ▸ Orientation: Why Rust</button><div class="ch-toc-list"><a href="#ch1-1">1.1 Why Rust, and what it guarantees</a><a href="#ch1-2">1.2 Cargo, rustup and the edition system</a><a href="#ch1-3">1.3 Hello, world — and the compiler as teacher</a><a href="#ch1-4">1.4 Where Rust fits, and where it does not</a></div></div>
+<p class="topic-desc">Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage collector, by enforcing ownership rules in the type system. This chapter orients you: what Rust promises, how the toolchain is organised, and the territory — and the non-territory — where it earns its keep.</p>
+
+<h3 id="ch1-1" data-toc>1.1 Why Rust, and what it guarantees</h3>
+<p class="topic-desc">Every shortcoming that Rust removes comes from one of two places: a tool that makes a promise it does not keep, or a process that is not checking the promise at the boundary. Rust fixes the silence first, which makes the debugging much quieter.</p>
+
+<h4 id="ch1-1-pillars">The three pillars</h4>
+<p><strong>Ownership</strong> means every value has exactly one owner, and the value is dropped when that owner goes out of scope. <strong>Borrowing</strong> means you can pass a reference to a value without giving up ownership, but the reference cannot outlive the owner. <strong>Lifetimes</strong> are the compile-time proof that borrowing is safe. The three ideas are one mechanism with three names: the compiler can prove a program is memory-safe because it can see, at every point, who owns what and which references are still valid.</p>
+<div class="codeWrap"><pre><code>fn sum(xs: &amp;[i32]) -&gt; i32 {
+    xs.iter().sum()
+}
+
+fn main() {
+    let xs = vec![1, 2, 3];
+    println!("{}", sum(&amp;xs));   // 6
+}</code></pre></div>
+
+<h4 id="ch1-1-promise">What the compiler promises — and what it does not</h4>
+<p>The guarantee is narrow and strong: no dangling pointers, no use-after-free, no data races, no buffer overflows. Rust will <em>not</em> stop you from leaking memory deliberately with <code>std::mem::forget</code>, and it will not catch logical errors — you can still return the wrong sum, or dead-lock a mutex. It is a memory-safety guarantee, not a correctness guarantee. When several places genuinely need to share one value, the normal answer is a reference-counted handle: <code>Rc</code> on one thread, <code>Arc</code> across threads, both cloning by bumping a counter rather than copying the data.</p>
+<div class="codeWrap"><pre><code>use std::rc::Rc;
+
+fn main() {
+    let a = Rc::new(vec![1, 2, 3]);
+    let b = a.clone();                // cheap: bumps the refcount
+    println!("a and b share {:?}", a);
+    println!("strong refs: {}", Rc::strong_count(&amp;a));   // 2
+}</code></pre></div>
+
+<h4 id="ch1-1-limits">The one leak Rust allows on purpose</h4>
+<p><code>std::mem::forget</code> takes a value and declares it unreachable: the destructor never runs, so the memory is never returned. It is there for genuinely exotic cases — embedding a value into a lifetime-managed runtime, or handing a buffer to C code that takes over ownership. Because it compiles without complaint, the line <em>is</em> the documentation: a deliberate leak is visible, a buggy one is not.</p>
+<div class="codeWrap"><pre><code>use std::mem::forget;
+
+fn main() {
+    let s = String::from("leak me");
+    forget(s);   // compiles and runs: the buffer is never freed.
+                 // Rust stops accidents, not deliberate decisions.
+}</code></pre></div>
+<h3 id="ch1-2" data-toc>1.2 Cargo, rustup and the edition system</h3>
+<p class="topic-desc">Rust's toolchain is two programs and one file. <code>cargo</code> builds, tests, documents, publishes and resolves dependencies; <code>rustc</code> is the compiler underneath; and <code>Cargo.toml</code> is where the package's identity, its edition and its dependency versions live. Nearly every confusing thing about a Rust project traces back to a value in that file.</p>
+
+<h4 id="ch1-2-verbs">Six verbs, and what each guarantees</h4>
+<p><code>cargo new</code> creates a project with a standard layout. <code>cargo build</code> compiles; adding <code>--release</code> turns on optimisation and is the difference between a development binary and a production one. <code>cargo run</code> builds and runs in one step. <code>cargo test</code> compiles and runs the unit tests, the integration tests and the documentation tests. <code>cargo clippy</code> is the linter, and <code>cargo fmt</code> rewrites the source to one canonical form. Everything else in the ecosystem hangs off those six.</p>
+<div class="codeWrap"><pre><code>$ cargo new hello        # a new binary crate, git already initialised
+$ cd hello
+$ cargo build            # debug profile: fast to compile, slow to run
+$ cargo build --release  # optimised. THIS is what you deploy
+$ cargo run              # build (if stale) and execute
+$ cargo test             # unit, integration and doc tests
+$ cargo fmt -- --check   # fail CI on unformatted code
+$ cargo clippy           # 500+ extra lints on top of rustc
+$ cargo doc --open       # build and open the API docs
+$ cargo add serde        # add a dependency, editing Cargo.toml
+$ cargo tree             # the full transitive dependency graph</code></pre></div>
+
+<h4 id="ch1-2-edition">Why the edition matters more than it looks</h4>
+<p>An edition is a set of language rules versioned separately from the compiler. A crate declaring <code>edition = "2021"</code> compiles with today's rustc under 2021 semantics, so it keeps working when the language changes underneath it. Omitting the field defaults to 2015, which disables every post-2015 feature in your code — no <code>async</code>/<code>await</code>, no <code>dyn Trait</code>, no 2018 module paths. Editions in order are 2015, 2018, 2021 and 2024; the field is the only place a whole language generation is switched on.</p>
+<div class="codeWrap"><pre><code># Cargo.toml
+[package]
+name    = "billing"
+version = "1.4.0"
+edition = "2021"     # NEVER omit this. The 2015 default disables
+                     # async, dyn Trait, the 2018 module paths and more.
+
+[dependencies]
+serde      = { version = "1", features = ["derive"] }
+tokio      = { version = "1", features = ["full"] }
+anyhow     = "1"
+
+[dev-dependencies]
+criterion  = "0.5"   # test-only: never in the shipped binary
+
+[profile.release]
+lto         = true   # link-time optimisation
+codegen-units = 1
+opt-level   = 3</code></pre></div>
+
+<h4 id="ch1-2-profiles">The debug profile is not just slower</h4>
+<p>The debug profile enables <code>debug_assertions</code> and integer overflow checks, both of which are <em>removed</em> in release — so an arithmetic bug that panics in development silently wraps in production. The debug profile also generates no inlining and no optimisation, so debug timings are meaningless. This is the single most common way a Rust service passes its tests and fails in production, and the fix is a test suite that also runs against a release build.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let x: u8 = 255;
+    println!("{}", x + 1);
+    // debug build:   panics — overflow checks are on
+    // release build: prints 0 — it wraps, silently
+}
+
+// catch it in CI, not in production:
+//   cargo test            (debug profile of the tests)
+//   cargo test --release  (the run that matters)</code></pre></div>
+
+<h4 id="ch1-2-rustup">What rustup manages, and what cargo does not</h4>
+<p><code>rustup</code> manages toolchains: which compiler versions are installed, which is the default, and which targets are available for each. <code>cargo</code> manages one project: its dependencies, its profiles, its build script, and its output. The frequent confusion is looking for cargo subcommands that are actually rustup commands — installing a toolchain is <code>rustup toolchain install</code>, not a cargo operation at all. A team should pin one toolchain via <code>rust-toolchain.toml</code> so every checkout builds identically.</p>
+<div class="codeWrap"><pre><code>$ rustup show
+active toolchain
+stable-x86_64-pc-windows-msvc (default)
+stable-x86_64-unknown-linux-musl
+
+$ rustup toolchain install 1.78.0
+$ cargo +1.78.0 build          # one project, one pinned toolchain
+$ rustup component add clippy rustfmt
+$ rustup target add wasm32-unknown-unknown</code></pre></div>
+<h3 id="ch1-3" data-toc>1.3 Hello, world — and the compiler as teacher</h3>
+<p class="topic-desc">Your first Rust program is also your first real interaction with the compiler, and the compiler is deliberately talkative. Learning to read its diagnostics — location, cause, then a concrete suggested fix — is the fastest skill you can acquire in this language.</p>
+
+<h4 id="ch1-3-new">cargo new and the standard layout</h4>
+<p><code>cargo new hello</code> creates <code>src/main.rs</code> and a <code>Cargo.toml</code>, and initialises git. The layout is the contract: every cargo project looks the same, so tooling and other engineers do not need to learn per-project structure. The binary's entry point is the <code>main</code> function in <code>src/main.rs</code>; <code>println!</code> writes a line to standard output.</p>
+<div class="codeWrap"><pre><code>$ cargo new hello
+$ cd hello
+# src/main.rs  — the file cargo created for you:
+fn main() {
+    println!("Hello, world!");
+}
+
+# $ cargo run
+# Hello, world!
+# the result is a native binary in target/debug/hello.exe
+# (or target/debug/hello on Linux/macOS)</code></pre></div>
+
+<h4 id="ch1-3-errors">Reading a compiler error</h4>
+<p>Every rustc diagnostic names the error code, points at the offending line with a caret, and — crucially — usually suggests the fix. Do not fear the red text; it is a code review that runs at every build. The error below is the first one most people meet: variables are immutable by default, so assigning twice to <code>answer</code> is rejected before the program ever runs.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let answer = 40;
+    answer += 2;   // error[E0384]: cannot assign twice to
+}                  // immutable variable `answer`
+//   |
+// 2 |     let answer = 40;
+//   |         ------ first assignment to `answer`
+// 3 |     answer += 2;
+//   |     ^^^^^^^^^^ cannot assign twice to immutable variable
+//   |
+// help: consider making this binding mutable: `mut answer`</code></pre></div>
+
+<h4 id="ch1-3-fix">Taking the suggestion</h4>
+<p>Notice what the compiler asked for: not a change of value, but a change of <em>intent</em>. <code>mut</code> says the binding is meant to change. That is the pattern of every Rust fix — the compiler is usually right about the mechanics, and the suggestion is a good first move. When the fix is structural rather than cosmetic, the diagnostic will say so and point you at the documentation for the rule.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut answer = 40;   // the compiler's own suggestion
+    answer += 2;
+    println!("{answer}");  // 42
+}</code></pre></div>
+
+<h3 id="ch1-4" data-toc>1.4 Where Rust fits, and where it does not</h3>
+<p class="topic-desc">Rust shines where a wrong pointer, a data race or an unsafe buffer is expensive: network services, embedded and real-time code, CLI tools, parsers and anything that must run for years. It is a poor fit where iteration speed and your own thinking time dominate — that is the territory of dynamic languages, and choosing the right tool is part of the job.</p>
+
+<h4 id="ch1-4-fits">The territory: services, CLIs, embedded, parsers</h4>
+<p>A web service holding connection state and parsing untrusted input is classic Rust ground: every potential buffer overflow and race is a compile error, and the release binary is small and starts fast. The same loop that a dynamic language runs through an interpreter runs as native arithmetic here — but only if you actually build with <code>--release</code>, because the debug binary is unoptimised by design.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    // The same loop a dynamic language runs in its interpreter
+    // runs as native arithmetic here. Compile with --release or
+    // the timings mean nothing.
+    let total: u64 = (0..10_000_000).map(|n| n * n).sum();
+    println!("{total}");
+}</code></pre></div>
+
+<h4 id="ch1-4-not">Where Rust is the wrong tool</h4>
+<p>Rapid-prototyping glue code, one-off scripts, data exploration — anywhere the bottleneck is your own thinking rather than the machine — is dynamic-language territory. Rust makes you decide ownership early, and paying that tax on a program that will be rewritten tomorrow is wasted effort. The signal to watch is allocation patterns: a loop churning out formatted strings is fine in a script and the wrong shape for a hot path in Rust, where the fix is restructuring, not more memory.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut events: Vec&lt;String&gt; = Vec::new();
+    for i in 0..1000 {
+        events.push(format!("event-{i}"));   // one allocation each
+    }                                        // fine at 1,000, not 10M
+    println!("{} events", events.len());
+}</code></pre></div>
+
+<h4 id="ch1-4-deploy">The deployment story: one static binary</h4>
+<p>Rust's other unfair advantage is the artifact. Because rustc is the entire compiler, cross-compiling needs no toolchain packages — just a target added via rustup — and the musl target produces a statically linked binary with no glibc version dependency. That one file runs on any Linux distribution and inside the smallest scratch container, which makes packaging and container images dramatically simpler than for a language with a shared runtime.</p>
+<div class="codeWrap"><pre><code>$ rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
+
+$ cargo build --release --target x86_64-unknown-linux-musl
+$ file target/x86_64-unknown-linux-musl/release/billing
+# ELF 64-bit LSB pie executable, x86-64, statically linked
+
+# no dynamic linker, no shared libraries to install: copy the file
+# onto any Linux host (or into a scratch container) and run it.</code></pre></div>
+
+<div class="tip">Run <code>cargo doc --open</code> on a project you did not write. The documentation is built from the source comments, and browsing it is the fastest way to learn how a crate actually wants to be used.</div>
+<div class="warn">Never ship the debug build. It has no optimisation, keeps overflow checks — good for finding bugs, wrong for serving traffic — and its timings are meaningless. <code>cargo build --release</code> is the artifact.</div></section>
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Ownership, Borrowing and Lifetimes</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 ▸ Ownership, Borrowing and Lifetimes</button><div class="ch-toc-list"><a href="#ch2-1">2.1 Ownership: the three rules every type obeys</a><a href="#ch2-2">2.2 References and the borrow rules</a><a href="#ch2-3">2.3 Slices: a borrow that sees a run of elements</a><a href="#ch2-4">2.4 Lifetimes, and when the borrow checker fights</a></div></div>
+<p class="topic-desc">Ownership is the rule system that lets Rust deallocate memory automatically without a garbage collector. This chapter explains the three ownership rules, the borrow rules that follow from them, slices as the canonical borrow, and lifetimes — the annotations that prove a reference stays valid.</p>
+
+<h3 id="ch2-1" data-toc>2.1 Ownership: the three rules every type obeys</h3>
+<p class="topic-desc">Every value in Rust is owned by exactly one variable, and when that variable goes out of scope the value is dropped. Assignment moves ownership, and no other mainstream language has this exact semantics.</p>
+
+<h4 id="ch2-1-rules">The three rules, and the tree they build</h4>
+<p>Rule one: each value has exactly one owner. Rule two: when the owner goes out of scope, the value is dropped. Rule three: ownership can be transferred — moved — but there is never more than one binding holding the value. Together the rules make ownership a tree: one root, no sharing at the leaves, and drop order decided by the braces at compile time. That determinism is why Rust needs no garbage collector at all.</p>
+<div class="codeWrap"><pre><code>// Ownership is a tree: one owner per value, drop order decided by
+// the scopes, no collector needed.
+
+fn main() {
+    let s1 = String::from("hello");   // s1 owns the heap buffer
+    let s2 = s1;                      // ownership MOVES to s2
+    // println!("{s1}");              // ERROR: use of moved value
+    println!("{s2}");                 // s2 is the owner now
+}</code></pre></div>
+
+<h4 id="ch2-1-move">Move, clone and copy</h4>
+<p><strong>Move is the default for heap types</strong> — <code>String</code>, <code>Vec</code>, <code>Box</code>, <code>Rc</code>. <strong>Clone is deep and explicit</strong> — <code>s.clone()</code> duplicates the buffer, and the name is always written out because it can be expensive. <strong>Copy types are bitwise-copied</strong> — integers, bools, chars, arrays and tuples of Copy types — and for them assignment behaves the way it does in C. The distinction is not memory layout; it is whether the type owns a resource that must be freed exactly once.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let s1 = String::from("hello");
+    let s2 = s1.clone();          // DEEP copy: a fresh buffer
+    println!("{s1} {s2}");        // both valid, both own their own
+
+    let x = 42;                   // i32 is Copy: assignment copies
+    let y = x;
+    println!("{x} {y}");          // both still valid
+}</code></pre></div>
+
+<h4 id="ch2-1-copy">Which types are Copy, and how to ask the compiler</h4>
+<p>A type is Copy when it has no <code>Drop</code> implementation and no interior pointers — the compiler proves it, and you can ask the proof. <code>std::mem::needs_drop</code> reports whether a type's deallocation is mandatory; <code>std::mem::size_of</code> reports the stack size. The litmus test that matters is simpler: if a type would be broken by a bitwise copy, it is not Copy — a <code>String</code> copied bitwise would leave two owners of one buffer, so it is moved instead.</p>
+<div class="codeWrap"><pre><code>use std::mem::{needs_drop, size_of};
+
+fn main() {
+    println!("i64:    needs_drop={} size={}", needs_drop::&lt;i64&gt;(), size_of::&lt;i64&gt;());
+    println!("String: needs_drop={} size={}", needs_drop::&lt;String&gt;(), size_of::&lt;String&gt;());
+}</code></pre></div>
+
+<h3 id="ch2-2" data-toc>2.2 References and the borrow rules</h3>
+<p class="topic-desc">A reference lets code read — or with <code>&amp;mut</code>, write — a value without taking ownership. The two borrow rules make the system safe: you may have any number of shared borrows or one exclusive borrow, and a borrow must not outlive its referent.</p>
+
+<h4 id="ch2-2-refs">References borrow without taking</h4>
+<p>Passing <code>&amp;s</code> to a function hands it a read-only view; the function promises not to keep it beyond the call, and the caller keeps ownership. The signature <code>&amp;String</code> is self-documenting — the function reads, it does not consume. This is the workhorse pattern of the whole language, and it is what lets a function compute a length without the caller losing the string.</p>
+<div class="codeWrap"><pre><code>fn calculate_length(s: &amp;String) -&gt; usize {
+    s.len()     // read through the reference
+}
+
+fn main() {
+    let s = String::from("hello");
+    let len = calculate_length(&amp;s);   // borrow: s keeps ownership
+    println!("{s} has {len} chars");  // 5 — s is still usable
+}</code></pre></div>
+
+<h4 id="ch2-2-mut">One mutable or many immutable</h4>
+<p>The second borrow rule, in one sentence: either any number of shared (<code>&amp;T</code>) borrows <em>or</em> one exclusive (<code>&amp;mut T</code>) borrow — never both at the same time. The rule exists because two readers can race nothing, while a reader plus a writer can read garbage mid-write. Modern Rust also uses non-lexical lifetimes: a borrow ends at its <em>last use</em>, not at the end of its scope, so the sequence below compiles because the shared borrow is already finished when the mutable one starts.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut v = vec![1, 2, 3];
+    let first = &amp;v[0];            // shared borrow
+    println!("{first}");          // last use: the borrow ends here
+
+    let last = &amp;mut v[2];         // exclusive borrow, later
+    *last *= 10;
+    println!("{:?}", v);          // [1, 2, 30]
+}</code></pre></div>
+
+<h4 id="ch2-2-failures">The three failures, all caught at compile time</h4>
+<p>Each of these is silent undefined behaviour in C++ and a compile error in Rust: using a value after it has been moved; letting a reference outlive the value it points at; and mutating through one path while a shared borrow is alive. The borrow checker is never wrong about the mechanics. When it rejects your code, the correct response is to restructure — pass an index, return an owned value, or reorder the operations — rather than to fight it.</p>
+<div class="codeWrap"><pre><code>// 1) Use after move
+//    let s = String::from("hi");
+//    let t = s;               // s is moved into t
+//    println!("{s}");         // ERROR: use of moved value
+//
+// 2) A reference outliving its referent
+//    let r;
+//    {
+//        let s = String::from("hi");
+//        r = &amp;s;               // s dies here: r would dangle
+//    }
+//    println!("{r}");         // ERROR: does not live long enough
+//
+// 3) Mutating while borrowed
+//    let mut v = vec![1, 2, 3];
+//    let first = &amp;v[0];
+//    v.push(4);               // ERROR: cannot borrow as mutable
+//    println!("{first}");
+//
+// The discipline: if the checker says no, restructure. Do not reach
+// for unsafe, Rc&lt;RefCell&lt;T&gt;&gt;, or a clone in a hot loop as the first
+// response.</code></pre></div>
+<div class="warn">Rc&lt;RefCell&lt;T&gt;&gt; is the classic escape hatch — and it moves the safety check from compile time to runtime, where a violation is a panic, not an error message. Use it for legitimate interior mutability with shared ownership, never as a way to silence the borrow checker.</div>
+<h3 id="ch2-3" data-toc>2.3 Slices: a borrow that sees a run of elements</h3>
+<p class="topic-desc">A slice is a reference to a contiguous run of elements — a pointer plus a length, with no ownership of the underlying storage. Slices are the standard way to look at a substring or a sub-vector without copying, and they come with bounds checked at runtime.</p>
+
+<h4 id="ch2-3-str">String slices</h4>
+<p><code>&amp;str</code> is the immutable view over a <code>String</code>'s buffer, and string literals are <code>&amp;str</code> pointing into the compiled binary. Slicing uses half-open ranges: <code>&amp;s[0..5]</code> is characters at indexes 0, 1, 2, 3 and 4. The range index is a <em>byte</em> offset, and slicing panic guards it: cutting through the middle of a multi-byte UTF-8 character is an error, not silent corruption.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let s = String::from("hello world");
+    let hello = &amp;s[0..5];     // half-open range: 0..=4
+    let world = &amp;s[6..11];
+    println!("{hello} {world}");
+
+    let whole: &amp;str = &amp;s;     // borrow the entire string
+    println!("{whole}");
+}</code></pre></div>
+
+<h4 id="ch2-3-array">Array and vector slices</h4>
+<p>The same slice type works for arrays and vectors: <code>&amp;xs[1..4]</code> and <code>&amp;v[2..]</code> are both <code>&amp;[T]</code>. A slice carries its length with it, so unlike a raw pointer it can never overrun — bounds are checked at access time. That is why so many functions take <code>&amp;[T]</code> rather than a specific collection: any contiguous sequence of <code>T</code> qualifies.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let xs = [10, 20, 30, 40, 50];
+    let mid = &amp;xs[1..4];         // [20, 30, 40]
+
+    let v = vec![1, 2, 3, 4];
+    let tail = &amp;v[2..];          // [3, 4]
+
+    println!("{mid:?} {tail:?}");
+}</code></pre></div>
+
+<h4 id="ch2-3-frozen">The slice borrow freezes its source</h4>
+<p>A slice is a borrow, so while it is alive the source cannot be mutated — mutation could invalidate the slice's assumption about the data. The compiler enforces it, which is exactly what prevents the classic vector-reallocation bug of other languages. When you genuinely need to mutate, end the borrow first (or let it end at its last use) and then change the collection.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut v = vec![1, 2, 3];
+    let slice = &amp;v[..];          // the whole vector, borrowed
+    println!("{slice:?}");
+    // v.push(4);                // ERROR: cannot borrow as mutable
+    //                           // while the slice borrow is alive
+    drop(slice);                 // end the borrow explicitly
+    v.push(4);                   // now allowed
+    println!("{:?}", v);
+}</code></pre></div>
+
+<h3 id="ch2-4" data-toc>2.4 Lifetimes, and when the borrow checker fights</h3>
+<p class="topic-desc">A lifetime is a name for the scope in which a reference is valid. The compiler infers lifetimes in most cases; you annotate them when a function returns a reference derived from a parameter, or when a struct stores one.</p>
+
+<h4 id="ch2-4-elision">Why most functions need no annotation</h4>
+<p>Three elision rules cover the common cases: each reference parameter gets its own lifetime; with exactly one input lifetime, every output reference inherits it; and with several inputs, an output borrows from <code>&amp;self</code>. The rules are chosen so that the obvious reading — a function that takes one reference and returns one reference is borrowing from its input — never needs to be spelled out.</p>
+<div class="codeWrap"><pre><code>fn first_char(s: &amp;str) -&gt; &amp;str {   // elided: the compiler infers
+    s.get(..1).unwrap_or("")
+}
+
+fn main() {
+    let w = first_char("hello");
+    println!("{w}");               // h
+}</code></pre></div>
+
+<h4 id="ch2-4-annotate">Two inputs, one output: the annotation is required</h4>
+<p>When a function takes two reference parameters and returns a reference, elision cannot decide which one the result borrows from — so you say so: <code>'a</code> ties the output to the shorter of the two inputs, and the compiler checks the guarantee at every call site. The same lifetime appears on structs holding references: <code>Excerpt&lt;'a&gt;</code> promises the struct does not outlive the string it borrows.</p>
+<div class="codeWrap"><pre><code>fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
+    if x.len() &gt; y.len() { x } else { y }
+}
+
+struct Excerpt&lt;'a&gt; {
+    part: &amp;'a str,
+}
+
+fn main() {
+    let novel = String::from("Call me Ishmael.");
+    let e = Excerpt { part: &amp;novel[..4] };   // "Call"
+    println!(
+        "{} {}",
+        longest(&amp;novel, "Ishmael"),
+        e.part
+    );
+}</code></pre></div>
+
+<h4 id="ch2-4-escape">The most common lifetime error</h4>
+<p>Returning a reference to a local — <code>fn bad() -&gt; &amp;String</code> building a <code>String</code> inside — is the error most people meet first, and the one the compiler explains best: "borrowed value does not live long enough". The fix is structural, not a cleverer annotation: return the owned value and let the caller own the result. A reference into a function's own locals can never be valid after the function returns, no matter how the lifetimes are written.</p>
+<div class="codeWrap"><pre><code>// The classic lifetime error: a reference to a local.
+fn bad() -&gt; &amp;String {
+    let s = String::from("hello");
+    &amp;s     // ERROR: `s` does not live long enough
+}
+
+// The fix: return the owned value, and the ownership moves out.
+fn good() -&gt; String {
+    String::from("hello")   // the caller owns it now
+}</code></pre></div>
+
+<h4 id="ch2-4-naming">Name lifetimes for their role; restructure when they fight</h4>
+<p><code>'a</code> says nothing; <code>'input</code> says what is being borrowed. Naming lifetimes for their role turns a wall of annotations into readable documentation, and it matters because lifetimes are not exotic — they appear in every function that returns a slice of a parameter. If the annotations keep fighting you, the fix is usually to change the shape: return an owned value, return an index or a key instead of a reference, or take the reference as a parameter and write through it. The borrow checker reflects structure; it does not invent it.</p>
+<div class="codeWrap"><pre><code>fn trimmed_len&lt;'input&gt;(text: &amp;'input str) -&gt; usize {
+    text.trim().len()
+}
+
+fn main() {
+    let s = String::from("  pad  ");
+    println!("{}", trimmed_len(&amp;s));   // 3
+}</code></pre></div>
+<div class="note">Lifetimes are a compile-time construct: no runtime metadata, no cost, no effect on the compiled code. They exist purely to give the checker the information it needs to prove your references are valid.</div></section>
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Types and Pattern Matching</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 ▸ Types and Pattern Matching</button><div class="ch-toc-list"><a href="#ch3-1">3.1 Primitives and scalar types</a><a href="#ch3-2">3.2 Structs and enums</a><a href="#ch3-3">3.3 Option and Result</a><a href="#ch3-4">3.4 Match and destructuring</a><a href="#ch3-5">3.5 Type conversions: From, Into and as</a></div></div>
+<p class="topic-desc">Rust's type system is where most of its safety lives. This chapter covers the scalar primitives, the two workhorse composite types — structs and enums — the <code>Option</code> and <code>Result</code> types that replace null and exceptions, pattern matching with <code>match</code>, and the conversion traits that move data between representations.</p>
+
+<h3 id="ch3-1" data-toc>3.1 Primitives and scalar types</h3>
+<p class="topic-desc">The scalar types are integers, floats, booleans, characters and the unit type. Their sizes are explicit in the type name, and — unlike C — Rust never chooses a width for you silently.</p>
+
+<h4 id="ch3-1-int">Integer widths and the default</h4>
+<p>Every integer type names its width and signedness: <code>u8</code>, <code>i8</code>, <code>u16</code>, <code>i32</code>, <code>u64</code>, <code>i64</code>, <code>u128</code>, <code>isize</code> and <code>usize</code>. The default for an unsuffixed literal is <code>i32</code> — the deliberate choice of a size that fits the common case. Underscores in literals (<code>1_000_000</code>) are purely visual; overflow panics in debug builds and wraps in release, so pick a width that cannot overflow rather than relying on the wrap.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let a: u8 = 255;                  // unsigned, 0..=255
+    let b: i8 = -128;                 // signed, -128..=127
+    let big: u64 = 18_446_744_073_709_551_615;  // max u64
+    let x = 42;                       // inferred as i32
+    println!("{a} {b} {big} {x}");
+}</code></pre></div>
+
+<h4 id="ch3-1-float">Floats, bool and char</h4>
+<p>There are two float types, <code>f32</code> and <code>f64</code>, and the default is <code>f64</code> — double precision, matching the IEEE 754 double. <code>bool</code> is <code>true</code> or <code>false</code>, and in arithmetic contexts it is not a number; conversions are explicit. <code>char</code> is a Unicode scalar value: four bytes wide, able to hold any single code point, and never half a character — which is why string indexing uses bytes and why <code>char</code> cannot be used to split a string by position blindly.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let pi: f64 = 3.141_592_653_589_793;
+    let e: f32 = 2.718_282;
+    let done = true;                  // bool
+    let heart = '♥';                  // char: a Unicode scalar value
+    println!("{pi} {e} {done} {heart}");
+}</code></pre></div>
+
+<h4 id="ch3-1-tuple">Tuples, arrays and the unit</h4>
+<p>A tuple groups values of any types — <code>("rust", 2024)</code> is a <code>(&amp;str, i32)</code> — and destructures positionally. An array is a fixed-length run of one type, sized at compile time; the vector in chapter 5 is the growable version. The unit type <code>()</code> is the type with exactly one value, and it is the return type of functions that return nothing — which, in Rust, means they return <code>()</code>.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let pair = ("rust", 2024);        // a tuple of (&amp;str, i32)
+    let (name, year) = pair;          // destructure positionally
+    println!("{name} {year}");
+
+    let xs = [1, 2, 3, 4, 5];         // array: fixed length, one type
+    println!("{} items", xs.len());
+
+    let unit = ();                    // the unit type: "no value here"
+    println!("{unit:?}");
+}</code></pre></div>
+
+<h3 id="ch3-2" data-toc>3.2 Structs and enums</h3>
+<p class="topic-desc">Structs group named fields into one type; enums enumerate a closed set of variants, each of which may carry its own data. Together they give Rust algebraic data types: composition by naming, and choice by exhaustion.</p>
+
+<h4 id="ch3-2-struct">Structs: named fields</h4>
+<p>A struct is declared with <code>struct</code> and constructed with field names, so field order never matters and a missing field is a compile error. Fields are independently mutable through the owning variable, and the struct update syntax <code>..u</code> copies the untouched fields from another instance. A struct without fields is a unit struct — useful as a marker for traits- and type-level dispatch.</p>
+<div class="codeWrap"><pre><code>#[derive(Debug)]
+struct User {
+    name: String,
+    age: u8,
+    active: bool,
+}
+
+fn main() {
+    let mut u = User {
+        name: String::from("Amin"),
+        age: 30,
+        active: true,
+    };
+    u.active = false;                      // fields are independently mutable
+
+    let younger = User { age: 29, ..u };   // struct update syntax
+    println!("{:?}", younger);
+}</code></pre></div>
+
+<h4 id="ch3-2-enum">Enums: closed sets of variants</h4>
+<p>An enum declares every value the type can hold, and the compiler knows all of them — that is what makes exhaustiveness checking possible. Each variant can carry different data: <code>V4(u8, u8, u8, u8)</code> carries four octets, <code>V6(String)</code> carries one string. This is how Rust models things that other languages model with class hierarchies or tagged unions, and the matching code is forced to handle every case.</p>
+<div class="codeWrap"><pre><code>// An enum is a closed set: the compiler knows every possible value.
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+fn main() {
+    let home = IpAddr::V4(127, 0, 0, 1);
+    match home {
+        IpAddr::V4(a, b, c, d) =&gt; println!("{a}.{b}.{c}.{d}"),
+        IpAddr::V6(addr) =&gt; println!("{addr}"),
+    }
+}</code></pre></div>
+
+<h4 id="ch3-2-derive">Deriving behaviour instead of writing it</h4>
+<p>Traits like <code>Debug</code>, <code>Clone</code> and <code>PartialEq</code> have one canonical implementation per type, so the compiler generates it on request via <code>#[derive(...)]</code>. Deriving is not magic — a macro writes the same <code>impl</code> you would — but it is the difference between one line and twenty, and it is the fastest way to get printing, cloning and equality on your own types before you write the traits that are genuinely yours.</p>
+<div class="codeWrap"><pre><code>#[derive(Debug, Clone, PartialEq)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let a = Point { x: 1, y: 2 };
+    let b = a.clone();           // from Clone
+    println!("{:?}", a);         // from Debug
+    assert_eq!(a, b);            // from PartialEq
+}</code></pre></div>
+<h3 id="ch3-3" data-toc>3.3 Option and Result</h3>
+<p class="topic-desc">Rust has no null and no exceptions. Absence is <code>Option&lt;T&gt;</code> — a value or nothing — and failure is <code>Result&lt;T, E&gt;</code> — a value or an error. Both are enums, so the compiler forces you to handle both cases wherever you use them.</p>
+
+<h4 id="ch3-3-option">Option: presence or absence</h4>
+<p><code>Option&lt;T&gt;</code> is either <code>Some(value)</code> or <code>None</code>. Because it is a regular enum, there is no way to read a value that might be absent without acknowledging the possibility — the <code>None</code> case must be handled or explicitly ignored. Functions like <code>Vec::get</code> and <code>str::find</code> return <code>Option</code> specifically so that "not there" is a value you can branch on, not a crash.</p>
+<div class="codeWrap"><pre><code>fn first_word(s: &amp;str) -&gt; Option&lt;&amp;str&gt; {
+    for (i, &amp;byte) in s.as_bytes().iter().enumerate() {
+        if byte == b' ' {
+            return Some(&amp;s[..i]);
+        }
+    }
+    Some(s)
+}
+
+fn main() {
+    match first_word("hello world") {
+        Some(w) =&gt; println!("first word: {w}"),
+        None =&gt; println!("no space at all"),
+    }
+}</code></pre></div>
+
+<h4 id="ch3-3-result">Result: success or error</h4>
+<p><code>Result&lt;T, E&gt;</code> is <code>Ok(value)</code> or <code>Err(error)</code>. It carries the failure reason with it, so the error type is part of the function's signature — the caller can see, before calling, exactly which failure modes exist. The exhaustive <code>match</code> below is the honest way to handle it; chapter 4 builds the ergonomics on top with the <code>?</code> operator.</p>
+<div class="codeWrap"><pre><code>use std::fs;
+
+fn main() {
+    match fs::read_to_string("Cargo.toml") {
+        Ok(text) =&gt; println!("{} lines", text.lines().count()),
+        Err(e) =&gt; eprintln!("could not read file: {e}"),
+    }
+}</code></pre></div>
+
+<h4 id="ch3-3-combine">Combining them without panicking</h4>
+<p><code>map</code> transforms the success case and leaves the failure untouched; <code>unwrap_or</code> supplies a default for absence; <code>filter_map</code> skips <code>None</code> values entirely. These combinators let you compose fallible steps into a pipeline where the failure policy is a single decision at the end, rather than a ladder of nested matches.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    // map + unwrap_or: turn a fallible step into a plain value
+    let doubled = "42".parse::&lt;i32&gt;().map(|n| n * 2).unwrap_or(0);
+    println!("{doubled}");   // 84
+
+    // filter_map: skip the values that fail to parse
+    let nums = ["1", "two", "3"];
+    let sum: i32 = nums.iter().filter_map(|s| s.parse().ok()).sum();
+    println!("{sum}");       // 4: "two" contributes nothing
+}</code></pre></div>
+<div class="tip">The combinators (<code>map</code>, <code>and_then</code>, <code>unwrap_or_else</code>) are the same names on <code>Option</code> and <code>Result</code>. Learn them once with <code>Option</code> and the <code>Result</code> versions are a free upgrade.</div>
+
+<h3 id="ch3-4" data-toc>3.4 Match and destructuring</h3>
+<p class="topic-desc"><code>match</code> is the switch statement done properly: exhaustive, expression-valued, and able to pull data out of what it matches. Destructuring is the same mechanism applied to structs, tuples and enums.</p>
+
+<h4 id="ch3-4-match">match must be exhaustive</h4>
+<p>A <code>match</code> must cover every possible value — the compiler refuses to compile a non-exhaustive one — so adding a variant to an enum forces every site that matches on it to be revisited. Arms can combine values with <code>|</code>, match ranges with <code>..=</code>, and fall back with the wildcard <code>_</code>. Because <code>match</code> is an expression, it returns a value, which is how branching becomes data.</p>
+<div class="codeWrap"><pre><code>fn classify(n: i32) -&gt; &amp;'static str {
+    match n {
+        0 =&gt; "zero",
+        1 | 2 =&gt; "tiny",
+        3..=9 =&gt; "small",
+        _ =&gt; "big",        // the wildcard satisfies exhaustiveness
+    }
+}
+
+fn main() {
+    for n in [0, 2, 5, 42] {
+        println!("{n}: {}", classify(n));
+    }
+}</code></pre></div>
+
+<h4 id="ch3-4-destructure">Destructuring structs, tuples and enums</h4>
+<p>Patterns can reach into values: <code>let Point { x, y } = p</code> pulls the fields out, <code>Shape::Rect { w, h }</code> extracts the variant's data, and tuple patterns destructure positionally. Destructuring by reference keeps the original usable; destructuring by value moves the pieces out. The same pattern syntax works in <code>match</code> arms, <code>if let</code>, and <code>let else</code>.</p>
+<div class="codeWrap"><pre><code>struct Point {
+    x: i32,
+    y: i32,
+}
+
+enum Shape {
+    Circle { r: f64 },
+    Rect { w: f64, h: f64 },
+}
+
+fn main() {
+    let p = Point { x: 10, y: 20 };
+    let Point { x, y } = p;              // destructure the struct
+    println!("{x} {y}");
+
+    let s = Shape::Rect { w: 2.0, h: 3.0 };
+    match s {
+        Shape::Circle { r } =&gt; println!("circle radius {r}"),
+        Shape::Rect { w, h } =&gt; println!("rect area {}", w * h),
+    }
+}</code></pre></div>
+
+<h4 id="ch3-4-guard">Guards and @ bindings</h4>
+<p>A guard, <code>x if condition</code>, adds a boolean test to an arm without changing what the pattern binds. The <code>@</code> binding captures a value <em>and</em> checks a pattern on it at the same time — <code>n @ 1..=9</code> both matches the range and binds the value so the arm can use it. Guards are evaluated in order top to bottom, so put the most specific conditions first.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    for n in 1..=15 {
+        match n {
+            x if x % 15 == 0 =&gt; println!("fizzbuzz"),
+            x if x % 3 == 0 =&gt; println!("fizz"),
+            x if x % 5 == 0 =&gt; println!("buzz"),
+            x @ 1..=9 =&gt; println!("single digit {x}"),
+            x =&gt; println!("{x}"),
+        }
+    }
+}</code></pre></div>
+
+<h3 id="ch3-5" data-toc>3.5 Type conversions: From, Into and as</h3>
+<p class="topic-desc">Rust converts between types in three deliberately different ways: <code>as</code> for lossy numeric casts, <code>From</code>/<code>Into</code> for infallible conversions you design, and <code>parse</code> for fallible string conversion. The distinction between them is the difference between "I know this is safe" and "the compiler knows".</p>
+
+<h4 id="ch3-5-as">as casts, and where they truncate</h4>
+<p><code>as</code> is the blunt instrument: narrowing an integer wraps modulo the target width, casting a float to an integer truncates toward zero, and <code>char</code> to <code>u8</code> gives the code point. Rust makes these explicit so the loss is visible at the call site — but <code>as</code> never checks, so prefer conversions that can fail (<code>try_from</code>) when the input is not a literal you control.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let big: i64 = 300;
+    let small = big as u8;        // 300 -&gt; 44: wraps modulo 256
+    println!("{small}");
+
+    let x = 3.9_f64 as i32;       // truncates toward zero: 3
+    println!("{x}");
+
+    let c = 'A' as u8;            // 65: the code point
+    println!("{c}");
+}</code></pre></div>
+
+<h4 id="ch3-5-from">From and Into</h4>
+<p><code>From&lt;T&gt; for U</code> is the authoritative conversion: implement it once, and <code>Into&lt;U&gt;</code> arrives for free — every <code>U::from(t)</code> can be written <code>t.into()</code>. The direction matters: implement <code>From</code> for the target type you want to be able to construct from others. The std library ships hundreds of these, so <code>String::from</code>, <code>Vec::from</code> and friends are already in scope for most ordinary conversions.</p>
+<div class="codeWrap"><pre><code>struct Celsius(f64);
+
+impl From&lt;f64&gt; for Celsius {
+    fn from(c: f64) -&gt; Self {
+        Celsius(c)
+    }
+}
+
+fn main() {
+    let temp = Celsius::from(21.5);
+    let temp2: Celsius = 18.0.into();   // Into comes free with From
+    println!("{} {}", temp.0, temp2.0);
+}</code></pre></div>
+
+<h4 id="ch3-5-parse">Parsing strings: FromStr and parse</h4>
+<p><code>"42".parse()</code> implements <code>FromStr</code>, converting a string into a target type if the text is well formed — and failing with a descriptive error if it is not. The target type is almost always written on the left: <code>let n: i32 = "42".parse()</code>. Numbers, booleans, chars and <code>SocketAddr</code> all implement <code>FromStr</code>, as can your own types via <code>impl FromStr for MyType</code>.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let n: i32 = "42".parse().unwrap();
+    let f: f64 = "3.14".parse().unwrap();
+    let flag: bool = "true".parse().unwrap();
+    let port: u16 = "8080".parse().unwrap();
+
+    // a failed parse returns an Err, never a crash:
+    let bad: i32 = "not a number".parse().unwrap_or(-1);
+    println!("{n} {f} {flag} {port} {bad}");
+}</code></pre></div>
+<div class="note">The error type of a failed <code>parse</code> is nearly always <code>std::num::ParseIntError</code> (or an equivalent). Its <code>Display</code> message names the offending string, which is exactly what you want to log.</div></section>
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Error Handling</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 ▸ Error Handling</button><div class="ch-toc-list"><a href="#ch4-1">4.1 Result and the ? operator</a><a href="#ch4-2">4.2 unwrap, expect and when they are acceptable</a><a href="#ch4-3">4.3 Custom error types</a><a href="#ch4-4">4.4 Panic vs error, and adding context</a></div></div>
+<p class="topic-desc">Rust has no exceptions: recoverable failure is a returned value (<code>Result</code>), and unrecoverable failure is a panic. This chapter covers the <code>?</code> operator that threads errors through a call stack, the panicking accessors and when they are justified, hand-written and derived error types, and the distinction between an error and a panic.</p>
+
+<h3 id="ch4-1" data-toc>4.1 Result and the ? operator</h3>
+<p class="topic-desc">The return type is the function's contract: <code>Result&lt;T, E&gt;</code> says this call may fail, and the <code>?</code> operator converts failure into an early return without obscuring the happy path.</p>
+
+<h4 id="ch4-1-contract">The Result type is the function's contract</h4>
+<p>Because failure is encoded in the return type, a caller can see, before calling, what can go wrong and what the error values are. There is no hidden control flow and no exception to forget to catch. The cost is that every fallible call must be acknowledged — which is why libraries carefully choose which operations return <code>Result</code> and which are infallible by construction.</p>
+<div class="codeWrap"><pre><code>use std::fs;
+
+// The contract: either produce a String or report why not.
+fn read_input(path: &amp;str) -&gt; Result&lt;String, std::io::Error&gt; {
+    fs::read_to_string(path)
+}
+
+fn main() {
+    match read_input("input.txt") {
+        Ok(text) =&gt; println!("{} chars", text.len()),
+        Err(e) =&gt; eprintln!("failed: {e}"),
+    }
+}</code></pre></div>
+
+<h4 id="ch4-1-question">The ? operator</h4>
+<p>Hand-written matches on every <code>Result</code> would bury the logic in boilerplate, so <code>?</code> does the obvious thing: on <code>Ok(v)</code> it yields <code>v</code>; on <code>Err(e)</code> it returns <code>Err(e.into())</code> from the <em>current</em> function. The <code>into()</code> is the interesting part — it converts the error into whatever the function's return type demands, provided a <code>From</code> implementation exists (chapter 4.3 shows how to build one). A function that uses <code>?</code> must itself return a <code>Result</code> (or <code>Option</code>).</p>
+<div class="codeWrap"><pre><code>use std::fs;
+
+fn first_line(path: &amp;str) -&gt; Result&lt;String, std::io::Error&gt; {
+    let text = fs::read_to_string(path)?;   // early return on Err
+    Ok(text.lines().next().unwrap_or("").to_string())
+}
+
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let line = first_line("Cargo.toml")?;
+    println!("{line}");
+    Ok(())
+}</code></pre></div>
+
+<h4 id="ch4-1-main">? in main: Box&lt;dyn Error&gt;</h4>
+<p><code>main</code> may return a <code>Result</code> too, and when it does, the error is printed and the process exits with a non-zero code. The conventional catch-all type is <code>Box&lt;dyn std::error::Error&gt;</code> — a trait object that can hold any error — which is exactly right for a binary that just wants to report failure and stop. When you need to distinguish errors for exit codes or continued execution, return a concrete error type instead.</p>
+<div class="codeWrap"><pre><code>use std::env;
+
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let args: Vec&lt;String&gt; = env::args().collect();
+    if args.len() &lt; 2 {
+        eprintln!("usage: {} &lt;file&gt;", args[0]);
+        std::process::exit(2);       // usage error, not a Result
+    }
+    let text = std::fs::read_to_string(&amp;args[1])?;
+    println!("{} lines", text.lines().count());
+    Ok(())
+}</code></pre></div>
+
+<h3 id="ch4-2" data-toc>4.2 unwrap, expect and when they are acceptable</h3>
+<p class="topic-desc"><code>unwrap</code> and <code>expect</code> are the panicking accessors: they return the <code>Ok</code>/<code>Some</code> value and panic on the error case. They are not wrong — but they are only right where failure is genuinely impossible.</p>
+
+<h4 id="ch4-2-unwrap">unwrap: panic on error</h4>
+<p><code>unwrap</code> says "I am certain this cannot fail", and when the certainty is wrong it aborts with a generic message naming the operation. That is perfect for literals and invariants, and fatal for anything user-controlled — a malformed file name becomes a crash instead of a handled error. The rule of thumb: <code>unwrap</code> on values that come from your own code's constants, never on values that crossed a trust boundary.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    // "10" is a literal: the parse cannot fail, unwrap is honest
+    let n: i32 = "10".parse().unwrap();
+    println!("{n}");
+
+    // a user-supplied string would deserve a Result instead
+    let raw = std::env::args().nth(1).unwrap_or_else(|| "10".into());
+    let m: i32 = raw.parse().unwrap_or(0);   // fall back, don't panic
+    println!("{m}");
+}</code></pre></div>
+
+<h4 id="ch4-2-expect">expect: the message that survives</h4>
+<p><code>expect</code> is <code>unwrap</code> with a caller-written message that appears in the panic output — the difference between "called <code>Option::unwrap()</code> on a <code>None</code> value" and "server requires a port argument". The message is your future self's debugging context, so it should state the <em>invariant</em>, not the panic: "port must be a number in 0..=65535" beats "parse failed". It still panics; it just explains better.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let raw = std::env::args().nth(1);
+    let port: u16 = raw
+        .expect("usage: server &lt;port&gt;")        // None: custom message
+        .parse()
+        .expect("port must be a number 0-65535");
+    println!("listening on {port}");
+}</code></pre></div>
+
+<h4 id="ch4-2-fallback">Graceful fallbacks before you panic</h4>
+<p>Most "unwrap" sites are really asking for a policy: a default, a skip, a retry. <code>unwrap_or</code> supplies a default value, <code>unwrap_or_else</code> computes one lazily, <code>ok</code>/<code>err</code> convert to <code>Option</code>, and <code>unwrap_or_default</code> leans on the type's <code>Default</code>. Reaching for these first — and keeping <code>unwrap</code> for true invariants — makes the crate's panic sites countable on one hand.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let port: u16 = "8080".parse().unwrap_or(8080);   // fallback default
+    let home = std::env::var("HOME")
+        .ok()                                          // Result -&gt; Option
+        .unwrap_or_else(|| "/home/guest".to_string());
+    let jobs: usize = std::env::var("JOBS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(4);
+    println!("{port} {home} {jobs}");
+}</code></pre></div>
+<h3 id="ch4-3" data-toc>4.3 Custom error types</h3>
+<p class="topic-desc">A hand-written error type is an enum whose variants name every way the operation can fail. It is matchable, testable, and — with <code>From</code> impls — the thing the <code>?</code> operator converts into.</p>
+
+<h4 id="ch4-3-enum">An error enum with Display and Error</h4>
+<p>The two implementations a custom error needs are <code>Display</code> — the human-readable message, used by <code>println!</code> and logging — and <code>std::error::Error</code>, the marker that lets the type be used as <code>Box&lt;dyn Error&gt;</code> and that provides <code>source()</code> for error chaining. The enum's variants document the failure modes in the code itself: reading them is reading the function's failure contract.</p>
+<div class="codeWrap"><pre><code>use std::fmt;
+
+#[derive(Debug)]
+enum CliError {
+    Io(std::io::Error),
+    Parse(std::num::ParseIntError),
+    Empty,
+}
+
+impl fmt::Display for CliError {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
+        match self {
+            CliError::Io(e) =&gt; write!(f, "io error: {e}"),
+            CliError::Parse(e) =&gt; write!(f, "parse error: {e}"),
+            CliError::Empty =&gt; write!(f, "no input given"),
+        }
+    }
+}
+
+impl std::error::Error for CliError {}
+
+fn main() {
+    println!("{}", CliError::Empty);
+}</code></pre></div>
+
+<h4 id="ch4-3-from">From impls let ? convert between errors</h4>
+<p>Once <code>From&lt;std::io::Error&gt; for AppError</code> exists, every <code>?</code> in the function converts an underlying error into your error type automatically. This is how a function that touches both the filesystem and the parser can return <em>one</em> error type while <code>?</code> handles both conversions inline. Without the <code>From</code> impl, the same code needs explicit <code>map_err</code> at every call site.</p>
+<div class="codeWrap"><pre><code>use std::fmt;
+
+#[derive(Debug)]
+enum AppError {
+    Io(std::io::Error),
+    Parse(std::num::ParseIntError),
+}
+
+impl fmt::Display for AppError {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
+        match self {
+            AppError::Io(e) =&gt; write!(f, "io: {e}"),
+            AppError::Parse(e) =&gt; write!(f, "parse: {e}"),
+        }
+    }
+}
+
+impl std::error::Error for AppError {}
+
+impl From&lt;std::io::Error&gt; for AppError {
+    fn from(e: std::io::Error) -&gt; Self {
+        AppError::Io(e)
+    }
+}
+
+impl From&lt;std::num::ParseIntError&gt; for AppError {
+    fn from(e: std::num::ParseIntError) -&gt; Self {
+        AppError::Parse(e)
+    }
+}
+
+fn load() -&gt; Result&lt;i32, AppError&gt; {
+    let raw = std::fs::read_to_string("n.txt")?;   // io::Error -&gt; AppError
+    let n: i32 = raw.trim().parse()?;              // ParseIntError too
+    Ok(n)
+}
+
+fn main() {
+    println!("{:?}", load());
+}</code></pre></div>
+
+<h4 id="ch4-3-thiserror">thiserror: derive the boilerplate</h4>
+<p>The <code>thiserror</code> crate derives <code>Display</code>, <code>Error</code> and <code>From</code> from declarative annotations, collapsing the three impls above into a derive. The <code>#[error(...)]</code> attribute is the Display message with field interpolation; <code>#[from]</code> generates the <code>From</code> impl; <code>#[error(transparent)]</code> delegates for wrapper variants. This is the standard choice for library error types — the kind callers will <code>match</code> on.</p>
+<div class="codeWrap"><pre><code>use thiserror::Error;
+
+#[derive(Debug, Error)]
+enum ConfigError {
+    #[error("missing key `{key}`")]
+    Missing { key: String },
+
+    #[error("invalid value for `{key}`: {value}")]
+    Invalid { key: String, value: String },
+
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+}
+
+fn main() {
+    let err = ConfigError::Missing { key: "host".into() };
+    println!("{err}");     // missing key `host`
+}</code></pre></div>
+
+<h3 id="ch4-4" data-toc>4.4 Panic vs error, and adding context</h3>
+<p class="topic-desc">The dividing line is simple: if the program can recover, return a <code>Result</code>; if the program's own invariant is broken and continuing would be wrong, panic. Panics are for programmer errors; <code>Result</code> is for user errors.</p>
+
+<h4 id="ch4-4-panic">panic!, unreachable! and assert!</h4>
+<p><code>panic!</code> aborts execution with a message; <code>unreachable!()</code> documents a branch the logic says can never happen (a bug if it is reached); <code>assert!</code> and <code>assert_eq!</code> verify invariants and panic with the failing values when they break. All three are how you encode "this state is impossible" so that a future refactor that makes it possible fails loudly instead of corrupting data.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let xs = [1, 2, 3];
+    let i = 5;
+    if i &gt;= xs.len() {
+        // a programmer error: an invariant WE broke, not the user
+        panic!("index {i} out of bounds (len {})", xs.len());
+    }
+    println!("{}", xs[i]);
+}
+
+// assert! is the same idea in testable form:
+fn main2() {
+    let total: i32 = (1..=5).sum();
+    assert_eq!(total, 15, "1+2+3+4+5 must equal 15");
+    println!("{total}");
+}</code></pre></div>
+
+<h4 id="ch4-4-context">anyhow and context for application errors</h4>
+<p>Binaries do not match on their own errors nearly as often as libraries do — they report them. <code>anyhow::Result&lt;T&gt;</code> wraps an arbitrary error, and <code>.context("...")</code> attaches a human explanation to the chain: <code>failed to load config: could not read data/config.toml: No such file or directory</code>. The <code>context</code> is the layer's story of what it was doing; the chain beneath it is the low-level cause. Libraries use <code>thiserror</code>; applications use <code>anyhow</code> — that division is the ecosystem convention.</p>
+<div class="codeWrap"><pre><code>use anyhow::{Context, Result};
+
+fn load() -&gt; Result&lt;String&gt; {
+    let path = "data/config.toml";
+    let raw = std::fs::read_to_string(path)
+        .with_context(|| format!("could not read {path}"))?;
+    Ok(raw)
+}
+
+fn main() -&gt; Result&lt;()&gt; {
+    let cfg = load()?;
+    println!("{} bytes", cfg.len());
+    Ok(())
+}</code></pre></div>
+
+<h4 id="ch4-4-choose">Choosing panic or Result</h4>
+<p>Two questions decide it. First: did the caller pass in bad data? Then it is a <code>Result</code> — the caller should be able to recover, retry or show a message. Second: did <em>your own code</em> violate a contract — an index that is out of range for data you control, a <code>None</code> where the logic says <code>Some</code>? Then panic, because the correct response is a fix, not handling. The pattern to avoid is panicking on ordinary user input, which turns every bad file into a crash and every crash into lost work.</p>
+<div class="codeWrap"><pre><code>// A library boundary: bad input is Err, not a panic.
+fn divide(a: i64, b: i64) -&gt; Result&lt;i64, String&gt; {
+    if b == 0 {
+        return Err("division by zero".into());
+    }
+    Ok(a / b)
+}
+
+fn main() {
+    match divide(10, 0) {
+        Ok(q) =&gt; println!("{q}"),
+        Err(e) =&gt; eprintln!("{e}"),   // recovered: no crash
+    }
+}</code></pre></div>
+<div class="warn">A panic in a spawned thread does not abort the process — <code>join()</code> returns an <code>Err</code>, and everything else keeps running. If a panic must stop the whole service, propagate it back through <code>join</code> and exit deliberately; do not assume a thread panic is process-wide.</div></section>
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Collections and Iterators</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 5 ▸ Collections and Iterators</button><div class="ch-toc-list"><a href="#ch5-1">5.1 Vec: the growable sequence</a><a href="#ch5-2">5.2 HashMap and HashSet</a><a href="#ch5-3">5.3 String vs &amp;str</a><a href="#ch5-4">5.4 Iterators, adaptors and closures</a></div></div>
+<p class="topic-desc">Most programs are plumbing: data in, data transformed, data out. This chapter covers the standard collections — <code>Vec</code>, <code>HashMap</code>, <code>HashSet</code> — the owned vs borrowed string distinction, and the iterator pipeline that turns collections into transformations without the intermediate allocations of imperative code.</p>
+
+<h3 id="ch5-1" data-toc>5.1 Vec: the growable sequence</h3>
+<p class="topic-desc"><code>Vec&lt;T&gt;</code> is a contiguous, growable buffer of <code>T</code> — the array you can resize. It is the default sequence type, and most iteration in Rust starts from one.</p>
+
+<h4 id="ch5-1-create">Creating and indexing</h4>
+<p><code>vec![1, 2, 3]</code> is the idiomatic constructor; <code>vec![0; 5]</code> repeats a value five times; <code>Vec::new()</code> starts empty. Indexing with <code>v[i]</code> reads from the buffer directly, and slicing <code>&amp;v[1..3]</code> borrows a run of elements. The capacity is distinct from the length: the buffer may hold more than the logical length, which is what makes <code>push</code> cheap on average.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut v: Vec&lt;i32&gt; = Vec::new();
+    v.push(1);
+    v.push(2);
+
+    let zeros = vec![0; 5];          // five zeroes
+    let ab = vec![1, 2, 3];
+    println!("{} {} {:?}", v.len(), zeros.len(), &amp;ab[1..3]);
+}</code></pre></div>
+
+<h4 id="ch5-1-mutate">push, pop, insert, remove, extend</h4>
+<p><code>push</code> appends and <code>pop</code> removes from the end — both O(1) amortised. <code>insert</code> and <code>remove</code> work at any position by shifting the following elements, so they are O(n): use them when the vector is small or the position genuinely matters. <code>extend</code> appends a whole iterator, which is how you concatenate collections without a loop.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut v = vec![10, 20, 30];
+    v.push(40);                 // [10, 20, 30, 40]
+    v.insert(1, 15);            // [10, 15, 20, 30, 40]
+    let last = v.pop().unwrap();// 40
+    v.remove(0);                // drop the first element
+    v.extend([50, 60]);
+    v.sort();
+    println!("{last} {v:?}");   // 40 [15, 20, 30, 50, 60]
+}</code></pre></div>
+
+<h4 id="ch5-1-get">Indexing vs get: panic versus Option</h4>
+<p><code>v[i]</code> with an out-of-range index panics; <code>v.get(i)</code> returns <code>Option</code> instead. The choice is the same policy as chapter 4: use the panicking form when the index is an invariant, the checked form when it crosses a boundary. <code>first</code> and <code>last</code> return <code>Option</code>s for the endpoints, and <code>iter</code>, <code>iter_mut</code> and <code>into_iter</code> give borrow, mutable borrow and owned iteration respectively.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let v = vec![10, 20, 30];
+
+    match v.get(9) {
+        Some(x) =&gt; println!("{x}"),
+        None =&gt; println!("index 9 out of bounds — no panic"),
+    }
+
+    let first = v.first().copied().unwrap_or(0);
+    let last = v.last().copied().unwrap_or(0);
+    println!("{first} {last}");
+}</code></pre></div>
+<div class="warn">Never reach for <code>insert(0, ...)</code> or <code>remove(0)</code> in a hot path on a big vector — every call shifts every element. If the front matters, consider <code>VecDeque</code>, which is the ring buffer type made for exactly that.</div>
+
+<h3 id="ch5-2" data-toc>5.2 HashMap and HashSet</h3>
+<p class="topic-desc">A <code>HashMap&lt;K, V&gt;</code> maps keys to values with average O(1) lookup; a <code>HashSet&lt;T&gt;</code> is a <code>HashMap</code> whose values are the unit type — membership is the whole value.</p>
+
+<h4 id="ch5-2-map">HashMap basics</h4>
+<p><code>insert</code> overwrites an existing key; <code>get</code> returns <code>Option&lt;&amp;V&gt;</code> — the <code>Option</code> again, so absence is a handled possibility, and <code>copied</code> turns the borrowed value into an owned <code>V</code> when <code>V: Copy</code>. <code>contains_key</code> is the pure membership test. Iteration visits in hash order, which is deliberate and non-deterministic, so anything that must print stably should collect and sort first.</p>
+<div class="codeWrap"><pre><code>use std::collections::HashMap;
+
+fn main() {
+    let mut scores = HashMap::new();
+    scores.insert("blue", 10);
+    scores.insert("red", 5);
+    scores.insert("blue", 12);       // overwrites the earlier blue
+
+    for (team, pts) in &amp;scores {
+        println!("{team}: {pts}");
+    }
+
+    let blue = scores.get("blue").copied().unwrap_or(0);
+    println!("blue has {blue}");
+}</code></pre></div>
+
+<h4 id="ch5-2-entry">The entry API: read-modify-write in one step</h4>
+<p>The classic counting bug — <code>if let Some(v) = map.get_mut(k) { *v += 1 } else { map.insert(k, 1) }</code> — does two lookups and a lot of noise. <code>entry(k)</code> borrows a slot once: <code>or_insert(0)</code> returns a <code>&amp;mut V</code> that is either the existing value or a freshly inserted default, and the <code>+= 1</code> writes through it. One lookup, one mutation, no duplicated logic.</p>
+<div class="codeWrap"><pre><code>use std::collections::HashMap;
+
+fn main() {
+    let mut counts = HashMap::new();
+    for word in "the cat and the dog and the bird".split_whitespace() {
+        *counts.entry(word).or_insert(0) += 1;
+    }
+    println!("the={} dog={}", counts["the"], counts["dog"]);
+}</code></pre></div>
+<div class="tip"><code>entry(k).or_insert_with(|| expensive_default())</code> computes the default lazily, only when the key is absent — the map version of <code>unwrap_or_else</code>.</div>
+
+<h4 id="ch5-2-set">HashSet: uniqueness and set maths</h4>
+<p>A <code>HashSet</code> rejects duplicates on insert — a second <code>insert</code> of an equal value is a no-op — and that single property makes it the tool of choice for deduplication and membership checks. The set operations <code>union</code>, <code>intersection</code> and <code>difference</code> return iterators, which is why the sample collects them into vectors for printing. Filtering a stream by "seen before?" is the canonical use.</p>
+<div class="codeWrap"><pre><code>use std::collections::HashSet;
+
+fn main() {
+    let a: HashSet&lt;i32&gt; = [1, 2, 3].into_iter().collect();
+    let b: HashSet&lt;i32&gt; = [2, 3, 4].into_iter().collect();
+
+    let all: Vec&lt;i32&gt; = a.union(&amp;b).copied().collect();
+    let common: Vec&lt;i32&gt; = a.intersection(&amp;b).copied().collect();
+    let only_in_a: Vec&lt;i32&gt; = a.difference(&amp;b).copied().collect();
+    println!("{all:?} {common:?} {only_in_a:?}");
+}</code></pre></div>
+<h3 id="ch5-3" data-toc>5.3 String vs &amp;str</h3>
+<p class="topic-desc">Rust has two string types and the difference is ownership: <code>String</code> owns a growable heap buffer; <code>&amp;str</code> is an immutable view into a buffer owned by someone else. Getting the boundary right is most of the story.</p>
+
+<h4 id="ch5-3-ownership">The difference is ownership</h4>
+<p><code>String</code> owns; <code>&amp;str</code> borrows. String literals are <code>&amp;str</code> baked into the binary, and <code>&amp;s</code> on a <code>String</code> gives a <code>&amp;str</code> view of its buffer. Functions therefore take <code>&amp;str</code> when they only need to read text — that is what most functions should do — and return <code>String</code> when they must produce text the caller will own. Converting between them is cheap in the borrowing direction and an allocation in the owning direction.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let owned = String::from("hello");   // owns a heap buffer
+    let borrowed: &amp;str = &amp;owned;         // a view; no allocation
+    let literal: &amp;str = "hello";         // points into the binary
+    println!("{borrowed} {literal}");
+}</code></pre></div>
+
+<h4 id="ch5-3-build">Building strings efficiently</h4>
+<p><code>push_str</code> appends a slice and <code>push</code> appends a single <code>char</code>; <code>format!</code> is the convenient one-shot builder; and joining an iterator of owned strings via <code>collect</code> then <code>join</code> is the idiomatic way to build a delimited list. None of this is slow in absolute terms — a <code>String</code> grows geometrically, so appending is amortised O(1) — but a <code>format!</code> inside a hot loop allocates every iteration, which is where the "one pass, then join" shape wins.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let mut out = String::new();
+    for i in 0..10 {
+        out.push_str(&amp;format!("{i} "));   // 10 small allocations
+    }
+    out.push('!');
+
+    // one pass, one allocation, then a single join:
+    let joined = (0..10)
+        .map(|i| i.to_string())
+        .collect::&lt;Vec&lt;_&gt;&gt;()
+        .join(", ");
+
+    println!("{out}");
+    println!("{joined}");
+}</code></pre></div>
+
+<h4 id="ch5-3-utf8">UTF-8: bytes versus chars</h4>
+<p>A <code>String</code> is UTF-8, so <code>s.len()</code> counts <em>bytes</em>, not characters — <code>"héllo"</code> is 6 bytes and 5 chars because <code>é</code> is two bytes. <code>s.chars()</code> iterates code points and <code>s.char_indices()</code> gives the byte offset of each. Direct indexing <code>s[0]</code> is a compile-time-ish runtime error, because byte 0 might land inside a multi-byte character; slicing must fall on a character boundary, which is what <code>s.get(..n)</code> checks safely.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let s = "héllo";
+    println!("bytes: {}", s.len());            // 6: é is two bytes
+    println!("chars: {}", s.chars().count());  // 5
+    for (i, ch) in s.char_indices() {
+        println!("byte {i}: {ch}");
+    }
+    // s[0] would be an error: indexing must land on a char boundary.
+    // s.get(..2) returns Some("hé") — the checked alternative.
+}</code></pre></div>
+
+<h3 id="ch5-4" data-toc>5.4 Iterators, adaptors and closures</h3>
+<p class="topic-desc">Iterators are the engine of idiomatic Rust: a lazy sequence of items, a set of adaptors that transform the sequence, and <code>collect</code> that turns the result back into a concrete collection. Closures are the small anonymous functions the adaptors take.</p>
+
+<h4 id="ch5-4-lazy">Iterators are lazy; next advances</h4>
+<p>Creating an iterator — <code>v.iter()</code>, <code>s.chars()</code>, <code>1..=10</code> — runs nothing. Values are produced one at a time as the iterator is consumed, by calling <code>next()</code> until it returns <code>None</code>. That laziness is what makes infinite iterators like <code>(0..)</code> safe to construct: nothing is generated until an adaptor pulls, and <code>take(3)</code> pulls exactly three times.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let v = vec![1, 2, 3];
+    let it = v.iter();                 // lazy: nothing has run yet
+    for n in it {                      // iterating pulls the values
+        println!("{n}");
+    }
+
+    let mut it2 = [10, 20].iter();     // drive it manually:
+    println!("{:?}", it2.next());      // Some(10)
+    println!("{:?}", it2.next());      // Some(20)
+    println!("{:?}", it2.next());      // None — the iterator is spent
+}</code></pre></div>
+
+<h4 id="ch5-4-adapt">map, filter, fold, take</h4>
+<p>Adaptors (<code>map</code>, <code>filter</code>, <code>fold</code>, <code>take</code>, <code>skip</code>, <code>enumerate</code>, <code>zip</code>) take one iterator and return another, and they chain naturally. <code>map</code> transforms each item, <code>filter</code> keeps items passing a predicate, <code>fold</code> accumulates a state across the sequence — the general form of sums and products — and <code>take</code> truncates. Each adaptor is a small struct that implements <code>Iterator</code>, so the whole chain compiles to a single fused loop with no intermediate collections.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let evens: Vec&lt;i32&gt; = (1..=10).filter(|n| n % 2 == 0).collect();
+    let sum: i32 = (1..=100).map(|n| n * n).sum();
+    let product: i32 = (1..=5).fold(1, |acc, n| acc * n);
+    let first: Vec&lt;i32&gt; = (0..).take(3).collect();
+    println!("{evens:?} {sum} {product} {first:?}");
+}</code></pre></div>
+
+<h4 id="ch5-4-consume">Collecting and consuming</h4>
+<p>Adaptors are lazy; <code>collect</code> is where the pipeline becomes data. Its target type is inferred from the binding: <code>collect::&lt;Vec&lt;_&gt;&gt;()</code> is the explicitness you need when inference cannot see the collection type. The consuming methods (<code>sum</code>, <code>product</code>, <code>min</code>, <code>max</code>, <code>count</code>, <code>any</code>, <code>all</code>) pull the whole iterator to produce one value. The iterator pipeline exists so that <code>filter</code>, <code>map</code> and <code>sum</code> describe a transformation without building the intermediate vectors a naive imperative version would.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let chars: Vec&lt;char&gt; = "hello".chars().collect();
+    let words: Vec&lt;String&gt; =
+        "a b c".split_whitespace().map(String::from).collect();
+    let total: i32 = [1, 2, 3].into_iter().sum();
+    let max = [4, 9, 1].into_iter().max();
+    let has_big = [4, 9, 1].iter().any(|n| *n &gt; 5);
+
+    println!("{chars:?} {words:?} {total} {max:?} {has_big}");
+}</code></pre></div>
+
+<h4 id="ch5-4-closure">Closures: capture, borrow, move</h4>
+<p>A closure is an anonymous function that can capture variables from its environment. By default it borrows them; <code>move</code> makes it take ownership — mandatory when the closure outlives the scope, as with threads in chapter 7. A closure's capture style is inferred from its body: reading <code>base</code> borrows it, and that borrowed value is held for as long as the closure lives. Closures that capture nothing are usable anywhere a function pointer is.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let base = 10;                    // captured by reference
+    let add_base = |n: i32| n + base;
+    println!("{}", add_base(5));      // 15
+
+    let text = String::from("data");  // moved in, not borrowed
+    let take = move || println!("{text}");
+    take();
+    // println!("{text}");            // ERROR: moved into the closure
+}</code></pre></div>
+<div class="note">The pipeline looks like it allocates a list per step; it does not. <code>map(...).filter(...).sum()</code> compiles to one loop over the source — the iterator types are erased to a single fused state machine.</div></section>
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Modules, Traits and Generics</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 6 ▸ Modules, Traits and Generics</button><div class="ch-toc-list"><a href="#ch6-1">6.1 Modules and visibility</a><a href="#ch6-2">6.2 impl blocks: methods and associated functions</a><a href="#ch6-3">6.3 Traits: definition and implementation</a><a href="#ch6-4">6.4 Generic bounds and trait objects</a></div></div>
+<p class="topic-desc">Programs grow by being split. This chapter covers the module system that splits a crate into files, the <code>impl</code> blocks that attach behaviour to types, and the trait system that provides polymorphism without inheritance — with generics for the statically dispatched case and <code>dyn Trait</code> for the dynamically dispatched one.</p>
+
+<h3 id="ch6-1" data-toc>6.1 Modules and visibility</h3>
+<p class="topic-desc">A module is a namespace with a privacy boundary. The module tree mirrors the directory layout, and <code>pub</code> is the only way to let the outside world see what is inside.</p>
+
+<h4 id="ch6-1-tree">A module tree mirrors the filesystem</h4>
+<p>The crate root is <code>src/main.rs</code> (a binary) or <code>src/lib.rs</code> (a library). A <code>pub mod db;</code> declaration in the root pulls in <code>src/db.rs</code>, and a nested <code>pub mod pool;</code> inside it pulls in <code>src/db/pool.rs</code> — or the directory form <code>src/db/mod.rs</code>. The path <code>mylib::db::pool::connect</code> is the same name written down as nested modules; there is no other lookup step. Modest crates can skip files entirely with inline <code>mod</code> blocks; files are for the ones that grow.</p>
+<div class="codeWrap"><pre><code>// A module tree mirrors the filesystem, but inline modules compile
+// in one file — handy for sketching before you split files out.
+mod db {
+    pub mod pool {
+        pub fn connect(conn: &amp;str) -&gt; bool {
+            !conn.is_empty()
+        }
+    }
+}
+
+fn main() {
+    println!("{}", db::pool::connect("postgres://db"));   // true
+}
+
+// With real files the same path is:  src/db.rs  +  src/db/pool.rs
+//   // src/lib.rs
+//   pub mod db;      // src/db.rs (or src/db/mod.rs)
+//   pub mod http;</code></pre></div>
+
+<h4 id="ch6-1-pub">pub gates what the outside sees</h4>
+<p>Privacy in Rust is item-level: everything is private to its module unless marked <code>pub</code>, and a private item is invisible to every module that is not its descendant. That means a module's internals — helper functions, implementation details, intermediate types — can change freely without breaking callers, because callers cannot name them at all. The public surface of a module is exactly its <code>pub</code> items, and that surface is the module's contract.</p>
+<div class="codeWrap"><pre><code>mod secret {                // private: invisible outside this crate
+    pub fn hidden() -&gt; i32 { 1 }
+}
+
+pub mod math {
+    pub fn double(x: i32) -&gt; i32 { x * 2 }
+    fn helper(x: i32) -&gt; i32 { x + 1 }   // private to math
+}
+
+fn main() {
+    // use mylib::math::double; // OK (a sibling crate)
+    // use mylib::secret;       // ERROR: module `secret` is private
+    println!("{}", math::double(21));    // 42
+    // println!("{}", math::helper(1));  // ERROR: private function
+}</code></pre></div>
+
+<h4 id="ch6-1-use">use, as, and re-exports</h4>
+<p><code>use</code> brings a path into scope; <code>as</code> renames it to avoid collisions or shorten it; <code>pub use</code> imports <em>and re-exports</em> — the classic pattern of a library exposing its façade: <code>pub use db::pool::Pool;</code> lets users write <code>my_lib::Pool</code> and keeps the internal path private. The prelude is a fixed set of <code>use</code>s the compiler applies to every file, which is why <code>Option</code>, <code>Result</code>, <code>String</code> and <code>Vec</code> need no import.</p>
+<div class="codeWrap"><pre><code>use std::collections::HashMap as Map;   // rename on import
+
+fn main() {
+    let mut m = Map::new();
+    m.insert("k", 1);
+    println!("{}", m.len());
+}
+
+// re-export (typically in src/lib.rs):
+//   pub use db::pool::Pool;
+// then users write Pool, never the private full path.</code></pre></div>
+
+<h3 id="ch6-2" data-toc>6.2 impl blocks: methods and associated functions</h3>
+<p class="topic-desc">An <code>impl</code> block attaches functions to a type. Methods take <code>self</code> in one of three forms; associated functions take no <code>self</code> and are called on the type itself.</p>
+
+<h4 id="ch6-2-method">Methods take self</h4>
+<p>A method is a function whose first parameter is <code>self</code>, and Rust's method-call syntax <code>r.area()</code> automatically borrows or moves the receiver to match the <code>self</code> form. Methods live in the <code>impl</code> block, so the type's behaviour is written next to its data. The <code>&amp;self</code> receiver is the common case: the method reads the instance and leaves it in place.</p>
+<div class="codeWrap"><pre><code>struct Rectangle {
+    w: f64,
+    h: f64,
+}
+
+impl Rectangle {
+    fn area(&amp;self) -&gt; f64 {          // &amp;self: read-only method
+        self.w * self.h
+    }
+
+    fn scale(&amp;mut self, factor: f64) {   // &amp;mut self: mutating method
+        self.w *= factor;
+        self.h *= factor;
+    }
+}
+
+fn main() {
+    let mut r = Rectangle { w: 3.0, h: 4.0 };
+    println!("{}", r.area());       // 12
+    r.scale(2.0);
+    println!("{}", r.area());       // 48
+}</code></pre></div>
+
+<h4 id="ch6-2-assoc">Associated functions: new and Self</h4>
+<p>An associated function has no <code>self</code> and is called on the type: <code>Circle::new(2.0)</code>. The conventional one is <code>new</code>, a constructor that returns <code>Self</code> — the type name spelled generically, so it stays correct if the type is renamed. <code>Self</code> in an <code>impl</code> block always means "the type this block is for".</p>
+<div class="codeWrap"><pre><code>struct Circle {
+    r: f64,
+}
+
+impl Circle {
+    fn new(r: f64) -&gt; Self {        // constructor: no self
+        Circle { r }
+    }
+
+    fn pi() -&gt; f64 {
+        std::f64::consts::PI
+    }
+}
+
+fn main() {
+    let c = Circle::new(2.0);
+    println!("r={} area={}", c.r, Circle::pi() * c.r * c.r);
+}</code></pre></div>
+
+<h4 id="ch6-2-self">self, &amp;self and &amp;mut self</h4>
+<p>The three receivers encode the effect on the instance: <code>&amp;self</code> reads, <code>&amp;mut self</code> mutates in place, <code>self</code> consumes — the method takes ownership and the instance is gone afterwards, which is how builders and <code>into_*</code> conversions work. Choosing the receiver is part of the API design: a consuming method is a promise that the caller will not need the value again.</p>
+<div class="codeWrap"><pre><code>struct Counter {
+    n: i32,
+}
+
+impl Counter {
+    fn new() -&gt; Self { Counter { n: 0 } }
+    fn get(&amp;self) -&gt; i32 { self.n }         // read
+    fn bump(&amp;mut self) { self.n += 1; }     // write in place
+    fn into_parts(self) -&gt; i32 { self.n }   // consume
+}
+
+fn main() {
+    let mut c = Counter::new();
+    c.bump();
+    c.bump();
+    println!("{}", c.get());        // 2
+    let n = c.into_parts();         // c is moved, gone for good
+    println!("{n}");
+}</code></pre></div>
+<h3 id="ch6-3" data-toc>6.3 Traits: definition and implementation</h3>
+<p class="topic-desc">A trait is a collection of methods that a type can implement — shared behaviour without a base class. A type can implement any number of traits, and a trait can require other traits.</p>
+
+<h4 id="ch6-3-define">Defining a trait, with defaults</h4>
+<p>A trait declaration lists the method signatures implementors must provide. Methods with a body are <em>defaults</em>: implementors inherit them and may override. This is how a library ships one canonical behaviour while letting specialised types replace it. Trait methods take <code>&amp;self</code> like regular methods, which is what lets them read the implementing instance.</p>
+<div class="codeWrap"><pre><code>// A trait is a contract: implementors must provide these methods.
+trait Draw {
+    fn draw(&amp;self);
+
+    // A default implementation: implementors may inherit or override.
+    fn bounding_box(&amp;self) -&gt; (f64, f64, f64, f64) {
+        (0.0, 0.0, 100.0, 100.0)
+    }
+}</code></pre></div>
+
+<h4 id="ch6-3-impl">Implementing a trait for your type</h4>
+<p><code>impl Draw for Circle</code> is explicit: there is no implicit trait satisfaction like Go's interfaces — a type is opted in by writing the block. The compiler checks the signatures against the trait declaration, so a wrong parameter type is a compile error at the <code>impl</code>, not a surprise at the call site. A type can implement many traits, and overriding only the methods that need customising is fine — the rest stay default.</p>
+<div class="codeWrap"><pre><code>struct Circle {
+    x: f64,
+    y: f64,
+    r: f64,
+}
+
+impl Draw for Circle {
+    fn draw(&amp;self) {
+        println!("circle at ({}, {}) radius {}", self.x, self.y, self.r);
+    }
+    // bounding_box stays default
+}
+
+fn main() {
+    let c = Circle { x: 1.0, y: 1.0, r: 5.0 };
+    c.draw();
+}</code></pre></div>
+
+<h4 id="ch6-3-orphan">The orphan rule and the newtype wrapper</h4>
+<p>You may implement <em>your</em> trait for <em>their</em> type, or <em>their</em> trait for <em>your</em> type — but not their trait for their type, because then two crates could implement the same pair differently and the compiler could not choose. The workaround for "I want <code>Display</code> on <code>Vec&lt;i32&gt;</code>" is the newtype: a one-field struct that wraps the foreign type, making it yours. The wrapper costs nothing at runtime; the field access <code>self.0</code> is the price you pay.</p>
+<div class="codeWrap"><pre><code>// The orphan rule: YOUR trait for THEIR type, or THEIR trait for
+// YOUR type — but never their trait for their type.
+//
+// impl std::fmt::Display for Vec&lt;i32&gt;   // ERROR: both foreign
+//
+// The newtype wrapper makes a foreign type YOUR type:
+struct MyVec(Vec&lt;i32&gt;);
+
+impl std::fmt::Display for MyVec {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) -&gt; std::fmt::Result {
+        let inner = self.0
+            .iter()
+            .map(|x| x.to_string())
+            .collect::&lt;Vec&lt;_&gt;&gt;()
+            .join(", ");
+        write!(f, "[{inner}]")
+    }
+}
+
+fn main() {
+    println!("{}", MyVec(vec![1, 2, 3]));   // [1, 2, 3]
+}</code></pre></div>
+
+<h3 id="ch6-4" data-toc>6.4 Generic bounds and trait objects</h3>
+<p class="topic-desc">A generic function with a trait bound is monomorphised at compile time — one specialised copy per concrete type, no runtime cost. <code>dyn Trait</code> is the dynamically dispatched alternative, stored behind a pointer, for when the concrete types cannot be known in advance.</p>
+
+<h4 id="ch6-4-bound">Generic functions with trait bounds</h4>
+<p><code>fn render&lt;T: Draw&gt;(item: &amp;T)</code> accepts any type that implements <code>Draw</code>. The compiler generates a specialised version for each type that satisfies the bound — <code>render(&amp;circle)</code> becomes <code>render_Circle</code> with <code>Circle::draw</code> inlined — which is why generics have no runtime overhead. The cost is code size: <code>N</code> concrete types mean <code>N</code> specialised copies of the function. For closed sets of types, generics are always the right call.</p>
+<div class="codeWrap"><pre><code>fn render&lt;T: Draw&gt;(item: &amp;T) {
+    item.draw();
+}
+
+fn main() {
+    let c = Circle { x: 0.0, y: 0.0, r: 2.0 };
+    render(&amp;c);   // monomorphised to render_Circle
+}</code></pre></div>
+<div class="tip">Prefer generics with bounds for closed sets of types (you know every implementor) and <code>dyn Trait</code> for open sets (plugins, user-registered types). A generic version is always faster because it is monomorphised.</div>
+
+<h4 id="ch6-4-where">where clauses keep readable bounds</h4>
+<p>Multiple bounds quickly overflow the signature line — <code>&lt;T: Clone + Debug + PartialEq, U: Display&gt;</code> is hard to scan. A <code>where</code> clause moves the bounds below the signature, lines them up, and reads like a constraint list, which is exactly what it is. The compiler treats both spellings identically; the choice is readability.</p>
+<div class="codeWrap"><pre><code>use std::fmt::Display;
+
+fn announce&lt;T&gt;(msg: &amp;str, value: &amp;T)
+where
+    T: Display,
+{
+    println!("{msg}: {value}");
+}
+
+fn main() {
+    announce("score", &amp;99_u32);
+    announce("name", &amp;String::from("Amin"));
+}</code></pre></div>
+
+<h4 id="ch6-4-dyn">dyn Trait: the trait object</h4>
+<p>Sometimes the concrete types genuinely cannot be a closed set — a collection of shapes, a registry of handlers — and the answer is a trait object: a pointer to a value plus a pointer to its implementation's method table. <code>&amp;dyn Draw</code> borrows one; <code>Box&lt;dyn Draw&gt;</code> owns one. A trait object can only hold the methods of <em>one</em> trait, so the collection needs the trait, not the type — and the price of the flexibility is a virtual call per method plus an allocation for the <code>Box</code>.</p>
+<div class="codeWrap"><pre><code>fn describe(item: &amp;dyn Draw) {
+    item.draw();
+    println!("box: {:?}", item.bounding_box());
+}
+
+fn main() {
+    // different concrete types behind one trait-object type
+    let shapes: Vec&lt;Box&lt;dyn Draw&gt;&gt; = vec![
+        Box::new(Circle { x: 0.0, y: 0.0, r: 1.0 }),
+        Box::new(Circle { x: 3.0, y: 0.0, r: 2.0 }),
+    ];
+    for s in &amp;shapes {
+        describe(s.as_ref());
+    }
+}
+
+// Without the Box the compiler says "the size for values of type
+// `dyn Draw` cannot be known at compile time" — that is the error
+// that tells you to put the trait object behind a pointer.</code></pre></div>
+<div class="warn">A <code>Vec&lt;dyn Draw&gt;</code> without <code>Box</code> is the trait-object beginner error: trait objects have unknown size, so they must live behind a pointer. The compiler's message names exactly that — read the whole diagnostic before reacting.</div></section>
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Concurrency, Testing and the Ecosystem</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 7 ▸ Concurrency, Testing and the Ecosystem</button><div class="ch-toc-list"><a href="#ch7-1">7.1 Threads</a><a href="#ch7-2">7.2 Channels and shared state</a><a href="#ch7-3">7.3 Send and Sync</a><a href="#ch7-4">7.4 Unit and integration tests</a><a href="#ch7-5">7.5 The ecosystem: serde, clap, tokio and cargo tooling</a></div></div>
+<p class="topic-desc">The last chapter ties the language to the real world: threads and the data-race guarantees around them, channels and shared state, the <code>Send</code>/<code>Sync</code> marker traits, the testing set-up that ships with cargo, and the ecosystem crates — serde, clap, tokio — plus the cargo tooling that makes a Rust project shippable.</p>
+
+<h3 id="ch7-1" data-toc>7.1 Threads</h3>
+<p class="topic-desc">Rust's threads are OS threads — no green threading by default — and the borrow checker applies across thread boundaries, which is the whole safety story: a data race is a compile error, not a heisenbug.</p>
+
+<h4 id="ch7-1-spawn">thread::spawn and the move closure</h4>
+<p><code>std::thread::spawn</code> takes a closure and runs it on a new OS thread. The closure must own everything it uses — the thread may outlive the caller's scope — which is why <code>move</code> appears on almost every spawn: it forces the captured values inside the closure. The spawned thread runs concurrently with the caller, and there is no automatic wait; if the main thread ends first, the process exits and the spawned threads are cut off.</p>
+<div class="codeWrap"><pre><code>use std::thread;
+
+fn main() {
+    let handle = thread::spawn(|| {
+        for i in 1..=5 {
+            println!("worker: {i}");
+        }
+    });
+    for i in 1..=3 {
+        println!("main: {i}");
+    }
+    handle.join().unwrap();   // wait for the worker to finish
+}</code></pre></div>
+
+<h4 id="ch7-1-join">join returns the thread's result</h4>
+<p><code>handle.join()</code> blocks until the thread completes and returns <code>Result&lt;T&gt;</code> — the closure's return value, or an <code>Err</code> if the thread panicked. So a thread is not just fire-and-forget; it is a unit of work with a result you collect. Moving an owned vector in and getting a computed total back is the canonical pattern: values cross the thread boundary in both directions, with the move guaranteeing no aliasing on the way.</p>
+<div class="codeWrap"><pre><code>use std::thread;
+
+fn main() {
+    let v = vec![10, 20, 30];           // the closure must own v
+    let handle = thread::spawn(move || {
+        v.into_iter().sum::&lt;i32&gt;()      // the thread's return value
+    });
+    let total = handle.join().unwrap(); // join hands it back
+    println!("total: {total}");
+}</code></pre></div>
+
+<h4 id="ch7-1-scoped">Scoped threads borrow instead of moving</h4>
+<p>When the threads are guaranteed to finish before the caller continues — the common case in parallel processing — <code>thread::scope</code> is the better tool: its threads may <em>borrow</em> surrounding variables, and the scope joins all of them before returning. That removes the <code>move</code> and the <code>Arc</code> boilerplate entirely. If your threads only need to read shared data, start here.</p>
+<div class="codeWrap"><pre><code>use std::thread;
+
+fn main() {
+    let s = String::from("hello");
+    thread::scope(|scope| {
+        // scoped threads may BORROW surrounding variables
+        scope.spawn(|| println!("len: {}", s.len()));
+        scope.spawn(|| println!("{s}"));
+    });                       // all threads joined before scope ends
+    println!("{s}");          // still ours afterwards
+}</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 Channels and shared state</h3>
+<p class="topic-desc">Threads communicate two ways: message passing through channels, or shared state behind a mutex. Rust's standard library ships both — <code>mpsc</code> for channels, <code>Mutex</code> for shared state.</p>
+
+<h4 id="ch7-2-channel">mpsc: multiple producers, one consumer</h4>
+<p><code>mpsc::channel()</code> returns a sender and a receiver. The sender's <code>send</code> places a value into the channel; the receiver's <code>recv</code> blocks until a value arrives, and iterating the receiver yields values until every sender is dropped — the channel closes when its last sender goes away. Multiple threads can hold cloned senders; only the receiver side is single. This is the actor-style pattern: workers send results back to one coordinator.</p>
+<div class="codeWrap"><pre><code>use std::sync::mpsc;
+use std::thread;
+
+fn main() {
+    let (tx, rx) = mpsc::channel();
+    for i in 0..3 {
+        let tx = tx.clone();          // a sender clone per thread
+        thread::spawn(move || {
+            tx.send(i * 10).unwrap();
+        });
+    }
+    drop(tx);                          // close the ORIGINAL sender
+    for received in rx {               // ends when all senders drop
+        println!("{received}");
+    }
+}</code></pre></div>
+
+<h4 id="ch7-2-mutex">Mutex: interior mutability with a lock</h4>
+<p><code>Mutex&lt;T&gt;</code> gives safe mutation of a <code>T</code> shared through a reference: <code>lock()</code> returns a guard that derefs to <code>&amp;mut T</code>, and the lock is released when the guard drops — automatically, even if the scope exits early. The guard is the token of permission: while it lives, no other thread can touch the value. A second thread calling <code>lock()</code> blocks until the first releases. The price of this safety is the lock itself, which is why the guard scope should be as short as possible.</p>
+<div class="codeWrap"><pre><code>use std::sync::Mutex;
+
+fn main() {
+    let m = Mutex::new(0);
+    {
+        let mut guard = m.lock().unwrap();
+        *guard += 1;                 // deref through the guard
+    }                                // guard dropped: lock released
+    println!("{:?}", m);             // Mutex { data: 1 }
+}</code></pre></div>
+
+<h4 id="ch7-2-arc">Arc&lt;Mutex&lt;T&gt;&gt;: share across threads</h4>
+<p>The combination that actually gets shared between threads is <code>Arc&lt;Mutex&lt;T&gt;&gt;</code>: <code>Arc</code> gives each thread a reference-counted handle (atomics included, unlike <code>Rc</code>), and the <code>Mutex</code> inside serialises access to the <code>T</code>. Ten threads each incrementing one counter is the hello-world of shared state — and the answer to why <code>Rc</code> will not do: its count is not atomic, so two threads cloning it would race on the refcount itself.</p>
+<div class="codeWrap"><pre><code>use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let c = Arc::clone(&amp;counter);
+        handles.push(thread::spawn(move || {
+            let mut n = c.lock().unwrap();
+            *n += 1;
+        }));
+    }
+
+    for h in handles {
+        h.join().unwrap();
+    }
+    println!("counter = {}", *counter.lock().unwrap());   // 10
+}</code></pre></div>
+<div class="warn">Holding a <code>MutexGuard</code> across a blocking call or an <code>await</code> is a dead-lock and a performance bug respectively: the lock stays held while other threads wait. Scope the guard tightly — acquire, mutate, drop.</div>
+<h3 id="ch7-3" data-toc>7.3 Send and Sync</h3>
+<p class="topic-desc"><code>Send</code> and <code>Sync</code> are the marker traits that encode thread-safety into the type system: <code>Send</code> means the value may move to another thread, <code>Sync</code> means <code>&amp;T</code> may be shared across threads. The compiler derives them automatically, so most types are both without you writing anything.</p>
+
+<h4 id="ch7-3-send">Send: the value may cross threads</h4>
+<p>A type is <code>Send</code> if moving it to another thread cannot cause unsafety. <code>String</code>, <code>Vec</code>, numbers, <code>Arc</code> are all <code>Send</code>; <code>Rc</code> is not, because its reference count is a plain integer that two threads would race. <code>thread::spawn`</code> requires its closure to be <code>Send</code>, so trying to move an <code>Rc</code> into a thread is a compile error with the exact type in the message — the check happens before the race can. The fix is either <code>Arc</code> (atomic counting) or not sharing at all.</p>
+<div class="codeWrap"><pre><code>use std::rc::Rc;
+
+fn main() {
+    let rc = Rc::new(5);         // reference-counted, thread-UNSAFE
+    // thread::spawn(move || println!("{rc}"));
+    // ERROR: `Rc&lt;i32&gt;` cannot be sent between threads safely
+    //        (Rc counts refs without atomics; another thread could
+    //         race the count). Use Arc, or move an owned value.
+    println!("{rc}");
+}</code></pre></div>
+
+<h4 id="ch7-3-sync">Sync: &amp;T may be shared across threads</h4>
+<p><code>Sync</code> means a shared reference to the type can be sent between threads, which is what lets several threads read one value safely. <code>Arc&lt;String&gt;</code> is <code>Send</code> and <code>Sync</code>, so cloning the handle in each thread and printing through it is safe — every <code>Arc::clone</code> bumps an atomic count, and each thread reads through its own <code>Arc</code>. The rule of thumb: a type is <code>Sync</code> when <code>&amp;T</code> cannot observe mutation; interior mutability types like <code>Mutex&lt;T&gt;</code> are <code>Sync</code> precisely because they make mutation exclusive.</p>
+<div class="codeWrap"><pre><code>use std::sync::Arc;
+use std::thread;
+
+fn main() {
+    let name = Arc::new(String::from("shared"));
+    let mut handles = vec![];
+    for _ in 0..4 {
+        let n = Arc::clone(&amp;name);     // atomic refcount bump
+        handles.push(thread::spawn(move || println!("{n}")));
+    }
+    for h in handles {
+        h.join().unwrap();
+    }
+    // Arc&lt;String&gt; is Send + Sync: sharing reads is safe by design
+}</code></pre></div>
+
+<h3 id="ch7-4" data-toc>7.4 Unit and integration tests</h3>
+<p class="topic-desc">Testing ships with cargo: unit tests beside the code, integration tests in <code>tests/</code>, and documentation tests inside doc comments — all run by the one command <code>cargo test</code>.</p>
+
+<h4 id="ch7-4-unit">Unit tests with #[cfg(test)]</h4>
+<p>A unit test is a <code>#[test]</code>-marked function in a <code>mod tests</code> block annotated <code>#[cfg(test)]</code>. The attribute means the module compiles only when testing, so the test helpers never ship. <code>assert!</code> and <code>assert_eq!</code> fail the test with the differing values; <code>#[should_panic]</code> asserts that a panic happens — the way you test a contract violation. <code>cargo test</code> runs them, and the convention of <code>use super::*;</code> imports the module under test.</p>
+<div class="codeWrap"><pre><code>pub fn add(a: i32, b: i32) -&gt; i32 {
+    a + b
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn adds_two_numbers() {
+        assert_eq!(add(2, 3), 5);
+    }
+
+    #[test]
+    fn addition_is_commutative() {
+        assert_eq!(add(3, 2), add(2, 3));
+    }
+
+    #[test]
+    #[should_panic(expected = "assertion failed")]
+    fn failing_assert_panics() {
+        assert!(add(1, 1) == 3);
+    }
+}
+
+fn main() {
+    println!("{}", add(1, 2));
+}</code></pre></div>
+
+<h4 id="ch7-4-integration">Integration tests in tests/</h4>
+<p>Integration tests live in <code>tests/</code>, outside <code>src/</code>, and each file compiles as its own crate that links the library — so they can only use the public API, exactly like a real consumer. That is their whole job: to fail if the public surface is broken or the pieces do not fit together, even when every unit test passes. A binary crate cannot be integration-tested this way without also having a library, which is why the pattern is a thin <code>src/main.rs</code> over a fat <code>src/lib.rs</code>.</p>
+<div class="codeWrap"><pre><code>// tests/cli.rs — integration tests live in tests/, can touch only
+// the crate's PUBLIC API — exactly what a real user sees.
+use mylib::parse_port;
+
+#[test]
+fn parses_a_valid_port() {
+    assert_eq!(parse_port("8080").unwrap(), 8080);
+}
+
+#[test]
+fn rejects_an_out_of_range_port() {
+    assert!(parse_port("99999").is_err());
+}
+
+// src/lib.rs must expose it:
+//   pub fn parse_port(s: &amp;str) -&gt; Result&lt;u16, std::num::ParseIntError&gt; {
+//       s.parse()
+//   }</code></pre></div>
+
+<h4 id="ch7-4-doc">Doc tests: examples that cannot lie</h4>
+<p>Code fences inside <code>///</code> doc comments are compiled and executed by <code>cargo test</code>. A doc example that no longer compiles, or whose assertions fail, fails the test run — so the documentation cannot drift from the code. This is the most undervalued testing surface in the language: every example you write for humans is also a running test, and <code>#[should_panic]</code>-style expectations work there too via the <code>should_panic</code> attribute in the fence.</p>
+<div class="codeWrap"><pre><code>/// Adds two numbers together.
+///
+/// # Examples
+///
+/// ```
+/// let n = mylib::add(1, 2);
+/// assert_eq!(n, 3);
+/// ```
+pub fn add(a: i32, b: i32) -&gt; i32 {
+    a + b
+}
+
+// The `rust` fence above is compiled and RUN by `cargo test`.
+// A doc example that lies about the API is a failing test.</code></pre></div>
+
+<h3 id="ch7-5" data-toc>7.5 The ecosystem: serde, clap, tokio and cargo tooling</h3>
+<p class="topic-desc">Three crates carry a large share of real Rust programs: <code>serde</code> for serialisation, <code>clap</code> for command-line parsing, and <code>tokio</code> for asynchronous I/O. Around them, the cargo tooling — linting, formatting, docs, dependency inspection — is what makes a project shippable.</p>
+
+<h4 id="ch7-5-serde">serde: serialise and deserialise anything</h4>
+<p><code>serde</code> is a framework: derive <code>Serialize</code>/<code>Deserialize</code> on your struct, and a companion crate (<code>serde_json</code>, <code>toml</code>, <code>yaml</code>, <code>bincode</code>…) moves it in and out of that format. Field names become keys by default; <code>#[serde(rename = "...")]</code> and <code>#[serde(default)]</code> bend it to match existing schemas. Because the derive is checked at compile time, a struct with a field <code>serde</code> cannot serialise is a compile error, not a runtime surprise.</p>
+<div class="codeWrap"><pre><code>use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Server {
+    host: String,
+    port: u16,
+    tls: bool,
+}
+
+fn main() {
+    let server = Server {
+        host: "db.internal".into(),
+        port: 5432,
+        tls: true,
+    };
+
+    let json = serde_json::to_string(&amp;server).unwrap();
+    println!("{json}");
+
+    let back: Server = serde_json::from_str(&amp;json).unwrap();
+    println!("{}:{}", back.host, back.port);
+}</code></pre></div>
+
+<h4 id="ch7-5-clap">clap: command-line parsing from a struct</h4>
+<p><code>clap</code>'s derive mode turns a struct into your CLI: fields are arguments, doc comments become help text, <code>#[arg(short, long)]</code> toggles flags, and <code>--version</code>/<code>--help</code> come from the <code>#[command]</code> attribute. <code>Args::parse()</code> reads <code>std::env::args()</code>, validates types and requiredness, and prints usage and exits on a bad invocation — which is exactly the behaviour a well-behaved tool should have, and a dozen lines of hand-written parsing you no longer maintain.</p>
+<div class="codeWrap"><pre><code>use clap::Parser;
+
+/// Count lines in a file.
+#[derive(Parser)]
+#[command(version, about = "counts lines in files")]
+struct Args {
+    /// the file to read
+    path: String,
+
+    /// print extra diagnostics
+    #[arg(short, long)]
+    verbose: bool,
+}
+
+fn main() {
+    let args = Args::parse();          // parses std::env::args()
+    let text = std::fs::read_to_string(&amp;args.path).unwrap();
+    println!("{} lines", text.lines().count());
+    if args.verbose {
+        println!("reading {}", args.path);
+    }
+}</code></pre></div>
+
+<h4 id="ch7-5-tokio">tokio: the async runtime</h4>
+<p><code>async fn</code> returns a future, and a future does nothing until it is awaited — the compiler turns each <code>async</code> body into a state machine with one struct per await point, which is why an unawaited future costs nothing. <code>tokio</code> is the executor that polls futures: an async runtime with a multithreaded work-stealing scheduler and OS-level I/O events (epoll on Linux, kqueue on macOS, IOCP on Windows). <code>#[tokio::main]</code> initialises it, <code>tokio::spawn</code> runs tasks concurrently, and <code>tokio::join!</code> awaits several futures at once. Three failures dominate beginners' async: holding a <code>std::sync::MutexGuard</code> across an <code>await</code> (not <code>Send</code> — the compiler rejects it), calling a blocking function inside async (it freezes the executor thread — use <code>tokio::time::sleep</code>), and never awaiting a future at all.</p>
+<div class="codeWrap"><pre><code>use tokio::time::{Duration, sleep};
+
+// async fn returns a Future: the body does nothing until awaited.
+async fn wait_and_say(secs: u64, msg: &amp;str) {
+    sleep(Duration::from_secs(secs)).await;
+    println!("{msg}");
+}
+
+#[tokio::main]
+async fn main() {
+    // sequential awaits would take 3 seconds; join! runs concurrently
+    tokio::join!(
+        wait_and_say(1, "first done"),
+        wait_and_say(2, "second done"),
+    );
+}
+
+// The three async pitfalls:
+//   1. a std::sync::MutexGuard held across .await is not Send —
+//      the compiler rejects it; use tokio::sync::Mutex
+//   2. std::thread::sleep inside async blocks the executor thread —
+//      use tokio::time::sleep
+//   3. a future never awaited is just a value — silently inert</code></pre></div>
+
+<h4 id="ch7-5-tools">Cargo tooling and the pre-merge checklist</h4>
+<p>The command set that turns working code into shippable code: <code>cargo fmt</code> reformats, <code>cargo clippy</code> adds several hundred lints over rustc's, <code>cargo test --release</code> runs the suite with optimisations and without the debug-only checks (the profile that matters), <code>cargo doc</code> builds the docs, <code>cargo tree</code> answers "why is this dependency here" transitively, and <code>cargo audit</code> scans the resolved tree for known vulnerabilities. Wire the first three into CI with <code>-- --check</code> / <code>-D warnings</code> and formatting drift, lint regressions and release-only failures all stop arriving by pull request.</p>
+<div class="codeWrap"><pre><code># The pre-merge checklist, in order:
+$ cargo fmt -- --check       # fail CI on unformatted code
+$ cargo clippy -- -D warnings
+$ cargo test
+$ cargo test --release       # debug assertions are off out there
+$ cargo doc --open           # docs for the version you are shipping
+$ cargo tree -i tokio        # who pulls tokio in, transitively?
+$ cargo add serde_json       # dependencies are a one-line command
+$ cargo audit                # known-vulnerability scan of the tree</code></pre></div>
+<div class="note">Async is not faster than threads by magic: it overlaps I/O waits. CPU-bound work gains nothing from <code>async</code> — keep that on plain threads, and use tokio for the I/O-heavy service in between.</div></section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Rust Programming.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

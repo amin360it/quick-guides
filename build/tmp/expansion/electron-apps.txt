@@ -1,0 +1,1109 @@
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation · What Electron Is</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Electron is the framework behind VS Code, Slack and Discord: a Chromium browser engine and a full Node.js runtime fused into one runtime, so one codebase produces a native desktop window with filesystem, network and OS access. This chapter establishes the process model you will live inside for the rest of the guide, and when the framework earns its cost.</p>
+
+<h3 id="ch1-1" data-toc>1.1 Electron's anatomy: Chromium plus Node</h3>
+<p class="topic-desc">An Electron app is literally two runtimes sharing one process tree. Knowing which runtime is answering a given call explains most of the framework's behaviour.</p>
+
+<h4 id="ch1-1-runtimes">Two runtimes, one binary</h4>
+<p>The main process runs Node.js — the same V8-based runtime you use on a server — while each window runs a Chromium tab. Electron rebases its bundled Node against the exact V8 version Chromium ships, so you get one V8, not two. That matters because native modules (<code>.node</code> files) are compiled against the ABI of that V8; a mismatch is why modules break after an Electron upgrade. <code>process.versions</code> in the main process reports all four versions at once.</p>
+
+<div class="codeWrap"><pre><code>const { app } = require('electron');
+
+app.whenReady().then(() => {
+  console.log('Electron :', process.versions.electron);
+  console.log('Chromium :', process.versions.chrome);
+  console.log('Node     :', process.versions.node);
+  console.log('V8       :', process.versions.v8);
+});
+</code></pre></div>
+
+<h4 id="ch1-1-native">The capabilities a browser tab cannot have</h4>
+<p>Because the main process is Node, it can read and write arbitrary files, bind sockets, spawn processes and call native operating-system APIs. These are the operations you never hand to page code: the renderer sees screens, the main process sees the machine. The classic first example is enumerating the machine the app is running on, which is unremarkable from Node and impossible from a browser.</p>
+
+<div class="codeWrap"><pre><code>const { app } = require('electron');
+const os = require('os');
+
+app.whenReady().then(() => {
+  console.log('Platform :', process.platform);   // win32 | darwin | linux
+  console.log('CPU cores:', os.cpus().length);
+  console.log('userData :', app.getPath('userData'));
+});
+</code></pre></div>
+
+<h3 id="ch1-2" data-toc>1.2 Main, renderer and preload processes</h3>
+<p class="topic-desc">Electron draws a hard line between three worlds. Where a line of JavaScript runs decides which APIs it is allowed to touch, and the file that blurs that line — the preload script — is the most security-sensitive file you will write.</p>
+
+<h4 id="ch1-2-three">Three process kinds with different privileges</h4>
+<p>The <strong>main process</strong> is the entry script in <code>package.json</code>; it owns the app lifecycle and every window. Each <code>BrowserWindow</code> hosts a <strong>renderer process</strong>, which is a Chromium tab: full DOM, Canvas, WebGL and fetch, but no Node. The <strong>preload script</strong> runs before the page's own scripts in an isolated world, and is the only renderer-side code that may <code>require()</code> a narrow slice of Electron. <code>process.type</code> tells a shared file where it is running, which is how one utility module can serve all three worlds.</p>
+
+<div class="codeWrap"><pre><code>// Run this same file from main, a preload and a page script.
+if (process.type === 'browser') {
+  console.log('Main process: full Node.js here.');
+} else if (process.type === 'renderer') {
+  console.log('Renderer: a web page without Node.');
+}
+</code></pre></div>
+
+<h4 id="ch1-2-preload">The preload bridge</h4>
+<p>With <code>contextIsolation: true</code>, the preload and the page run in two separate JavaScript worlds that share a DOM but do not share globals. The preload's job is to decide exactly what the page may reach — typically nothing more than a handful of named functions. Exposing the <code>ipcRenderer</code> object itself is the classic mistake; expose capabilities, never transport.</p>
+
+<div class="codeWrap"><pre><code>// preload.js — runs before the page in an isolated world.
+const { contextBridge } = require('electron');
+
+contextBridge.exposeInMainWorld('env', {
+  platform: process.platform,
+});
+</code></pre></div>
+
+<h3 id="ch1-3" data-toc>1.3 Why the process split exists</h3>
+<p class="topic-desc">The split is not an accident of history; it is the framework's two design bets: untrusted content must never reach Node, and no single renderer's crash should take the application down.</p>
+
+<h4 id="ch1-3-security">Untrusted content stays away from Node</h4>
+<p>A web page is a hostile environment by default — third-party scripts, injected ads, one bad <code>innerHTML</code>. If a renderer had Node, one cross-site scripting bug becomes remote code execution on the user's machine. That is why <code>nodeIntegration</code> has defaulted to <code>false</code> since Electron 5, and why the hardened configuration keeps the renderer sandboxed, with the preload as the only Node-touching entry point.</p>
+
+<div class="codeWrap"><pre><code>const { BrowserWindow } = require('electron');
+const path = require('path');
+
+const win = new BrowserWindow({
+  webPreferences: {
+    contextIsolation: true,   // separate the page world from the preload world
+    nodeIntegration: false,   // page scripts must never see require()
+    sandbox: true,            // renderer runs as a sandboxed Chromium tab
+    preload: path.join(__dirname, 'preload.js'),
+  },
+});
+</code></pre></div>
+
+<h4 id="ch1-3-crash">A crashed tab should not take the app down</h4>
+<p>Because each window is a separate OS process, a renderer that dies — the page ran out of memory, threw somewhere unrecoverable, or was killed by the OS — takes only its tab with it. The main process and every other window survive. The <code>render-process-gone</code> event on <code>app</code> is how you learn about the death and respond by reloading the window or logging diagnostics, rather than losing the whole service.</p>
+
+<div class="codeWrap"><pre><code>const { app } = require('electron');
+
+app.on('render-process-gone', (event, webContents, details) => {
+  if (details.reason !== 'clean-exit') {
+    console.error(`renderer gone: ${details.reason} (code ${details.exitCode})`);
+  }
+});
+</code></pre></div>
+
+<h3 id="ch1-4" data-toc>1.4 When Electron fits — and when it does not</h3>
+<p class="topic-desc">Electron is a desktop-UI framework with service features, not a service runtime wearing a costume. Matching the tool to the job saves you the two most expensive failure modes: a 200 MB tray icon, and a headless daemon holding a full Chromium in memory for no reason.</p>
+
+<h4 id="ch1-4-fits">The right tool for a web-based desktop UI</h4>
+<p>Choose Electron when the value is a rich, interactive desktop interface built by people who already know web tech, deployed to Windows, macOS and Linux from one codebase. Code editors, chat clients, DevOps dashboards and internal admin consoles are its home turf: the UI needs the whole web platform, and the app needs filesystem, <code>child_process</code> and native dialogs around it. Before you commit, check what a minimal build actually weighs on disk — the embedded Chromium is not optional, and pretending otherwise only delays the discovery.</p>
+
+<div class="codeWrap"><pre><code># Inspect what a build really ships before calling it small.
+du -sh dist/
+du -sh node_modules/
+</code></pre></div>
+
+<h4 id="ch1-4-not">Where it strains</h4>
+<p>Skip Electron for tray-only utilities, pure background daemons and anything whose cardinal virtue is a 10 MB footprint — a windowless main process still boots Node, and any window you create boots a tab. For headless services, plain Node with <code>node-windows</code> or a systemd unit is a fraction of the size. If you do run Electron in a service-ish mode, make the window creation conditional so a daemon start never materialises a hidden browser.</p>
+
+<div class="codeWrap"><pre><code>const { app } = require('electron');
+
+// A service-flavoured main: no window unless the user asks for one.
+app.whenReady().then(() => {
+  if (process.env.SERVICE_MODE === '1') {
+    startBackgroundJob();      // headless: no Chromium tab at all
+  } else {
+    createMainWindow();
+  }
+});
+</code></pre></div>
+
+<div class="warn">A windowless Electron process is still around 80–150 MB on disk and boots Node plus part of Chromium. If the deployment target is a true background service — Windows Service or systemd unit with no UI ever — writing it in plain Node typically halves the memory and removes the Chromium attack surface entirely.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Project Setup and App Lifecycle</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">An Electron project is an npm project whose <code>main</code> field points at a Node script. This chapter walks the scaffold, the <code>app</code> lifecycle events, and the window ownership discipline that stops a healthy-looking app from quitting or leaking silently.</p>
+
+<h3 id="ch2-1" data-toc>2.1 Scaffolding with npm</h3>
+<p class="topic-desc">Electron ships as a normal dev-dependency, and the entire build pipeline hangs off npm scripts — no bespoke toolchain required.</p>
+
+<h4 id="ch2-1-init">A bare scaffold in four commands</h4>
+<p>Install <code>electron</code> as a <em>dev</em> dependency: the npm package is a launcher that downloads the platform's prebuilt Chromium+Node binary, so the runtime is not something you require at runtime — it <em>is</em> the runtime. The download comes from GitHub releases by default; teams behind firewalls set the <code>ELECTRON_MIRROR</code> environment variable to an internal mirror. <code>npx electron --version</code> confirms both the install and the binary download completed.</p>
+
+<div class="codeWrap"><pre><code>mkdir electron-service-app
+cd electron-service-app
+npm init -y
+npm install --save-dev electron
+npx electron --version
+</code></pre></div>
+
+<h4 id="ch2-1-layout">The minimal file layout</h4>
+<p>Three files carry the whole application: <code>main.js</code> (main process), <code>preload.js</code> (the bridge), and a renderer directory that holds the window UI. Keep the renderer in its own folder from day one — a <code>file://</code> window resolves relative asset paths from the HTML file's own directory, and a flat root gets confusing the moment you add CSS, images or a second page.</p>
+
+<div class="codeWrap"><pre><code>electron-service-app/
+├── package.json
+├── main.js
+├── preload.js
+└── renderer/
+    ├── index.html
+    └── renderer.js
+</code></pre></div>
+
+<h3 id="ch2-2" data-toc>2.2 package.json main and starting Electron</h3>
+<p class="topic-desc">The <code>main</code> field names the entry script, and the launch flags you reach for during development are worth knowing before your first bug hunt.</p>
+
+<h4 id="ch2-2-main">The main field names the entry script</h4>
+<p>Running <code>electron .</code> makes the CLI read the current directory's <code>package.json</code>, take the <code>main</code> path, and execute it as the main process. If <code>main</code> is missing or mistyped the app opens with a default window and an error in the console — the framework happily shows you a shell even though your code never ran. Put <code>start</code> in scripts so contributors — and CI — never have to remember the incantation.</p>
+
+<div class="codeWrap"><pre><code>{
+  "name": "electron-service-app",
+  "version": "1.0.0",
+  "description": "A background service with a control window",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --inspect=5858"
+  }
+}
+</code></pre></div>
+
+<h4 id="ch2-2-flags">Flags you will use in practice</h4>
+<p>Three flags pay for themselves quickly: <code>--no-sandbox</code> for Linux CI and root environments where the Chromium sandbox cannot start (development only — never shipped); <code>--inspect=5858</code> to attach the Chrome DevTools Protocol to the <em>main</em> process, which otherwise has no console you can open; and <code>ELECTRON_ENABLE_LOGGING=1</code> to surface Chromium's own logging on stderr, which is where a white window's real error message is hiding.</p>
+
+<div class="codeWrap"><pre><code>npm start                        # runs: electron .
+npx electron . --no-sandbox      # some Linux CI and root environments need this
+ELECTRON_ENABLE_LOGGING=1 npm start
+</code></pre></div>
+
+<h3 id="ch2-3" data-toc>2.3 The ready lifecycle</h3>
+<p class="topic-desc">The <code>app</code> object is a state machine, and <code>ready</code> is the gate: anything that touches windows, menus, trays or the OS must wait for it.</p>
+
+<h4 id="ch2-3-sequence">The boot order</h4>
+<p>At launch the framework finishes its own bootstrap — loading Node, starting the browser process — and only then fires <code>ready</code>. Creating a <code>BrowserWindow</code> before <code>ready</code> throws on some platforms and misbehaves silently on others, so every guide's canonical shape is the same: <code>app.whenReady().then(createWindow)</code>. On macOS, <code>will-finish-launching</code> fires earlier and is the right place to register Apple Event handlers, but window creation still waits for <code>ready</code>.</p>
+
+<div class="codeWrap"><pre><code>const { app, BrowserWindow } = require('electron');
+
+let mainWindow = null;
+app.whenReady().then(() => {
+  mainWindow = new BrowserWindow({ width: 900, height: 640 });
+  mainWindow.loadFile('renderer/index.html');
+});
+</code></pre></div>
+
+<h4 id="ch2-3-promise">whenReady returns a promise</h4>
+<p>You are not forced into callbacks: <code>app.whenReady()</code> returns a Promise that resolves exactly once, so it is safe to <code>await</code> from an async bootstrap. The pattern earns its keep in a service app where startup must load configuration, open a database or bind a port <em>before</em> the first window paints — a sequence of <code>await</code>s reads in order and fails loudly on the first rejection.</p>
+
+<div class="codeWrap"><pre><code>const { app, BrowserWindow } = require('electron');
+
+async function bootstrap() {
+  await app.whenReady();
+  const win = new BrowserWindow({ show: false });
+  await win.loadFile('renderer/index.html');
+  win.show();
+}
+
+bootstrap();
+</code></pre></div>
+
+<div class="note">Never create a <code>BrowserWindow</code> at module scope. The top of <code>main.js</code> runs before <code>ready</code>, and a window created there races the browser process bootstrap on every platform.</div>
+
+<h3 id="ch2-4" data-toc>2.4 Window management with BrowserWindow</h3>
+<p class="topic-desc">A <code>BrowserWindow</code> is a real, resizable OS window backed by a Chromium tab. How you create it and hold onto it decides whether the app flashes white at startup or silently leaks windows.</p>
+
+<h4 id="ch2-4-create">Creating and painting a window</h4>
+<p>Two options remove the classic white flash: <code>show: false</code> plus a <code>backgroundColor</code>, then reveal in <code>ready-to-show</code>. The window is fully constructed at that point — the page has rendered its first frame — so users see content, not a blank rectangle. Loading always follows creation, and either <code>loadFile</code> for packaged local content or <code>loadURL</code> for a dev server.</p>
+
+<div class="codeWrap"><pre><code>const { BrowserWindow } = require('electron');
+const path = require('path');
+
+const win = new BrowserWindow({
+  width: 1024,
+  height: 700,
+  show: false,
+  backgroundColor: '#021336',
+  webPreferences: {
+    preload: path.join(__dirname, 'preload.js'),
+  },
+});
+
+win.once('ready-to-show', () => win.show());
+win.loadFile('renderer/index.html');
+</code></pre></div>
+
+<h4 id="ch2-4-refs">Keep a reference, drop it on close</h4>
+<p>JavaScript cannot garbage-collect an object it can still reach, and a closed window you never null out keeps the renderer process alive without any visible window — a classic leak in an app that opens and closes many windows. Hold the window in a module-level variable and assign <code>null</code> in <code>closed</code>. Note that <code>closed</code> fires only after the window is gone, while <code>close</code> fires before, which is where you veto or persist.</p>
+
+<div class="codeWrap"><pre><code>let mainWindow = null;
+
+function createMainWindow() {
+  mainWindow = new BrowserWindow({ width: 900, height: 640 });
+  mainWindow.loadFile('renderer/index.html');
+  mainWindow.on('closed', () => {
+    mainWindow = null;          // release so GC can collect the window
+  });
+}
+</code></pre></div>
+
+<h3 id="ch2-5" data-toc>2.5 Quit and activate conventions</h3>
+<p class="topic-desc">Electron apps must treat "the app is done" differently on macOS than elsewhere. Get this wrong and your app either refuses to die on Windows or becomes unopenable on macOS.</p>
+
+<h4 id="ch2-5-cross">The macOS conventions</h4>
+<p>On Windows and Linux, closing the last window should quit the app; on macOS, convention says the app keeps running with no windows, and clicking the dock icon recreates one. The canonical pair is <code>window-all-closed</code> (quit unless <code>darwin</code>) plus <code>activate</code> (recreate a window if none exists). The <code>activate</code> handler matters because macOS fires it on every dock click, not just the first.</p>
+
+<div class="codeWrap"><pre><code>const { app, BrowserWindow } = require('electron');
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createMainWindow();
+  }
+});
+</code></pre></div>
+
+<h4 id="ch2-5-order">The quit order, and vetoing it</h4>
+<p>Quitting is a three-stage event: <code>before-quit</code> → <code>will-quit</code> → <code>quit</code>. Calling <code>event.preventDefault()</code> in <code>before-quit</code> cancels the quit for that pass — the classic use is flushing state or confirming an unsaved job before actually leaving — and a later <code>app.quit()</code> re-enters the flow. Guard the re-entry with a flag or your save logic runs twice.</p>
+
+<div class="codeWrap"><pre><code>let stateSaved = false;
+
+app.on('before-quit', (event) => {
+  if (!stateSaved) {
+    event.preventDefault();               // cancel this quit pass
+    saveState().then(() => {
+      stateSaved = true;
+      app.quit();                         // re-enter the quit flow
+    });
+  }
+});
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ The Main Process in Depth</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Everything a service app does that a web page cannot — native dialogs, application menus, spawning jobs, owning windows — happens in the main process. This chapter goes beyond the ten-line template and covers the options, events and process-spawning APIs you will actually reach for.</p>
+
+<h3 id="ch3-1" data-toc>3.1 BrowserWindow options in detail</h3>
+<p class="topic-desc">The <code>BrowserWindow</code> constructor takes one options object, and the fifty-odd keys split naturally into geometry, chrome and rendering behaviour.</p>
+
+<h4 id="ch3-1-layout">Geometry and window chrome</h4>
+<p>Size, position and chrome are plain numbers and booleans, but two deserve attention. <code>autoHideMenuBar: true</code> hides the default application menu until Alt is pressed — normally what a service UI wants — and <code>titleBarStyle: 'hiddenInset'</code> on macOS keeps the traffic lights with a decorated title bar. Remember <code>minWidth</code>/<code>minHeight</code> or a user can shrink a control panel into unusability; remember to persist <code>getBounds()</code> on resize rather than hard-coding <code>x</code>/<code>y</code>.</p>
+
+<div class="codeWrap"><pre><code>const win = new BrowserWindow({
+  width: 1024,
+  height: 700,
+  minWidth: 640,
+  minHeight: 480,
+  x: 80,
+  y: 80,
+  resizable: true,
+  maximizable: true,
+  fullscreenable: false,
+  autoHideMenuBar: true,
+});
+</code></pre></div>
+
+<h4 id="ch3-1-paint">Show timing and painting</h4>
+<p>The paint pipeline is: construct → load → first paint → <code>ready-to-show</code> → <code>show()</code>. Two knobs control the visible result. <code>show: false</code> keeps the window off screen until it has something to paint, and <code>backgroundColor</code> paints behind the page while it parses, so a dark app does not flash white even before the first frame. Together they eliminate the single most reported "ugly" behaviour in Electron apps.</p>
+
+<div class="codeWrap"><pre><code>const win = new BrowserWindow({
+  show: false,
+  backgroundColor: '#021336',
+});
+
+win.once('ready-to-show', () => {
+  win.show();
+  win.focus();
+});
+</code></pre></div>
+
+<div class="note">Set <code>backgroundColor</code> to match the page's own background colour. On a slow disk the window is visible for the full parse time, and a mismatched colour jars for the whole load.</div>
+
+<h3 id="ch3-2" data-toc>3.2 Loading URLs versus local files</h3>
+<p class="topic-desc">A window's content comes from either the packaged <code>file://</code> tree or an HTTP URL. Each has its own rules, and the difference is where most "why is my page broken" mysteries begin.</p>
+
+<h4 id="ch3-2-local">loadFile and the file:// protocol</h4>
+<p><code>loadFile</code> resolves relative to the app root, not the process working directory — a window launched from <code>dist/</code> vs <code>src/</code> must not load different files. Always build the path with <code>path.join(__dirname, ...)</code>. Under <code>file://</code>, fetch() to other files works in modern Electron, but module scripts and some APIs behave differently than over HTTP; a common shim is loading the same UI from a dev server during development and from disk in production.</p>
+
+<div class="codeWrap"><pre><code>const path = require('path');
+
+// Local content: resolve against __dirname, never the cwd.
+mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+
+// During development a bundler serves the same UI over HTTP:
+// mainWindow.loadURL('http://localhost:5173');
+</code></pre></div>
+
+<h4 id="ch3-2-remote">loadURL and keeping navigation on a leash</h4>
+<p>Loading a remote URL is fine when the URL is yours; the danger is where the window can <em>go</em> afterwards. A link, a redirect or a compromised page can navigate the whole window to an attacker's site — complete with your preload bridge attached. Two handlers contain it: <code>will-navigate</code> vetoes main-frame navigations away from your origin, and <code>setWindowOpenHandler</code> intercepts every <code>window.open</code> and <code>target="_blank"</code>, where the sane default is denying the popup and handing the URL to the real browser.</p>
+
+<div class="codeWrap"><pre><code>const { shell } = require('electron');
+
+mainWindow.webContents.on('will-navigate', (event, url) => {
+  if (!url.startsWith('https://app.example.com/')) {
+    event.preventDefault();
+  }
+});
+
+mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+  if (url.startsWith('https://')) shell.openExternal(url);
+  return { action: 'deny' };
+});
+</code></pre></div>
+
+<h3 id="ch3-3" data-toc>3.3 Window and app lifecycle events</h3>
+<p class="topic-desc">Event names on <code>BrowserWindow</code> and <code>app</code> cover the two senses of "lifecycle": the visible life of one window, and the orchestrated life of the whole process.</p>
+
+<h4 id="ch3-3-window">Window-granular events</h4>
+<p>Focus, blur, resize, maximize and close are the events a service UI actually listens to: pause heavy work on <code>blur</code>, resume on <code>focus</code>, persist bounds on <code>resize</code>, update menu state on <code>maximize</code>. <code>close</code> fires before destruction and may be prevented; <code>closed</code> fires after, when it is too late to veto and the window object is dead. Most handlers are one-liners that call into your own state helpers.</p>
+
+<div class="codeWrap"><pre><code>mainWindow.on('focus', () => { pauseHeavyWork(false); });
+mainWindow.on('blur', () => { pauseHeavyWork(true); });
+mainWindow.on('resize', () => persistBounds(mainWindow.getBounds()));
+mainWindow.on('maximize', () => badge('maximised'));
+mainWindow.on('closed', () => { mainWindow = null; });
+</code></pre></div>
+
+<h4 id="ch3-3-app">App-level orchestration events</h4>
+<p>Alongside the quit trio from chapter 2, <code>app</code> fires <code>browser-window-created</code> for every new window — useful for applying a common policy (same preload, same minimum size) in one place — and <code>web-contents-created</code> for every web contents instance including iframes. A service app that must log its whole life can hook all of them; the ordering is deterministic, which makes the log a reliable chronology.</p>
+
+<div class="codeWrap"><pre><code>app.on('browser-window-created', (event, win) => {
+  console.log(`window ${win.id} created`);
+});
+app.on('before-quit', () => console.log('before-quit'));
+app.on('will-quit', () => console.log('will-quit'));
+app.on('quit', (event, exitCode) => console.log(`quit ${exitCode}`));
+</code></pre></div>
+
+<h3 id="ch3-4" data-toc>3.4 Native dialogs and menus</h3>
+<p class="topic-desc">Dialogs and menus are two main-process APIs that give a window genuine operating-system presence: a real file picker and a real application menu bar.</p>
+
+<h4 id="ch3-4-dialog">The native dialog API</h4>
+<p><code>dialog.showOpenDialog</code> returns a Promise resolving to <code>{ canceled, filePaths }</code> and always checks <code>canceled</code> before touching the paths. <code>properties</code> is where the behaviour is set — <code>'openFile'</code>, <code>'multiSelections'</code>, <code>'openDirectory'</code>, <code>'createDirectory'</code> — and if you pass a window as the first argument the dialog becomes modal to it, which is what prevents the user from clicking the same window twice. The synchronous variants (<code>showMessageBoxSync</code>) exist for the moments you cannot await, such as the middle of a quit.</p>
+
+<div class="codeWrap"><pre><code>const { dialog } = require('electron');
+
+async function pickLog() {
+  const result = await dialog.showOpenDialog({
+    title: 'Choose a log file',
+    properties: ['openFile', 'multiSelections'],
+    filters: [{ name: 'Logs', extensions: ['log', 'txt'] }],
+  });
+  if (!result.canceled) return result.filePaths;
+  return [];
+}
+</code></pre></div>
+
+<h4 id="ch3-4-menu">Building an application menu from a template</h4>
+<p><code>Menu.buildFromTemplate</code> takes a declarative array and produces the native menu. Roles (<code>role: 'quit'</code>, <code>role: 'copy'</code>, …) are the correct way to get standard behaviour — they bind the right accelerator for each platform and exist on macOS only for their Apple menu. Build one template and call <code>Menu.setApplicationMenu</code> once; on Linux the menu is per-window and can be set from <code>browser-window-created</code>.</p>
+
+<div class="codeWrap"><pre><code>const { app, Menu } = require('electron');
+
+const template = [
+  { label: app.name, submenu: [
+      { role: 'about' }, { type: 'separator' }, { role: 'quit' },
+  ]},
+  { label: 'Edit', submenu: [
+      { role: 'undo' }, { role: 'redo' }, { type: 'separator' },
+      { role: 'cut' }, { role: 'copy' }, { role: 'paste' },
+  ]},
+];
+
+Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+</code></pre></div>
+
+<div class="warn">Not every <code>role</code> exists on every platform. <code>role: 'about'</code> is macOS-only; on Windows and Linux use a click handler with <code>dialog.showMessageBox</code>. Test the built menu on all three targets, or a standard action silently vanishes.</div>
+
+<h3 id="ch3-5" data-toc>3.5 Spawning child processes</h3>
+<p class="topic-desc">The main process is the only place a service app should spawn external programs. Everything you need is the <code>child_process</code> module you already know from Node, with two Electron-specific habits bolted on.</p>
+
+<h4 id="ch3-5-spawn">spawn with detachment</h4>
+<p>Long-running jobs — transcoders, backups, report generators — want <code>detached: true</code> (the child becomes its own process group leader and outlives the app if it crashes) and <code>stdio: 'ignore'</code> unless you are capturing output. The pairing to remember is <code>detached</code> with <code>unref()</code>: without <code>unref()</code> the parent's event loop stays alive waiting for the child, which is exactly what a service app that should exit quietly must not do.</p>
+
+<div class="codeWrap"><pre><code>const { spawn } = require('child_process');
+
+const job = spawn('ffmpeg', ['-i', 'in.mp4', '-c:v', 'libx264', 'out.mp4'], {
+  detached: true,
+  stdio: 'ignore',
+});
+job.unref();   // do not keep the app alive just for this child
+</code></pre></div>
+
+<h4 id="ch3-5-stream">Streaming output back to a renderer</h4>
+<p>A job's stdout is a stream, and the renderer wants a live view of it. The clean pattern is <code>ipcMain.handle</code> around the spawn that resolves with the exit code, plus <code>event.sender.send</code> for each stdout chunk so the control panel updates in real time. Keep the stream wiring inside the Promise — the command's <code>error</code> event and its <code>close</code> event are distinct, and only <code>error</code> covers "the binary does not exist".</p>
+
+<div class="codeWrap"><pre><code>const { ipcMain } = require('electron');
+const { spawn } = require('child_process');
+
+ipcMain.handle('script:run', (event, scriptPath) => {
+  return new Promise((resolve, reject) => {
+    const child = spawn('node', [scriptPath]);
+    child.stdout.on('data', (chunk) => {
+      event.sender.send('script:output', chunk.toString());
+    });
+    child.on('close', (code) => resolve({ code }));
+    child.on('error', reject);
+  });
+});
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ IPC and Context Isolation</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Everything a window knows about the machine arrives over IPC — the framework's message bus between renderer and main. This chapter covers the two messaging styles, the preload bridge that gates them, and the security checklist that keeps a web vulnerability from becoming a code-execution one.</p>
+
+<h3 id="ch4-1" data-toc>4.1 Channels: ipcMain and ipcRenderer</h3>
+<p class="topic-desc">IPC in Electron is a pair of event emitters joined by a channel name. Getting the two styles right — fire-and-forget versus request–response — determines how readable your wiring is.</p>
+
+<h4 id="ch4-1-fire">Fire-and-forget messages</h4>
+<p><code>ipcRenderer.send('channel', payload)</code> ships a message to the main process, where <code>ipcMain.on('channel', handler)</code> receives it. The payload is structured-clone serialised, so plain objects, arrays and dates travel fine but functions do not. Fire-and-forget is right for logging, progress ticks and anything where no answer is needed; the moment you want a return value you switch to <code>invoke</code> (section 4.2). In production the renderer never imports <code>electron</code> at all — it calls a bridge function (section 4.3) — shown directly here only to make the transport visible.</p>
+
+<div class="codeWrap"><pre><code>// main.js
+const { ipcMain } = require('electron');
+
+ipcMain.on('service:log', (event, payload) => {
+  console.log(`renderer said: ${JSON.stringify(payload)}`);
+});
+</code></pre></div>
+
+<div class="codeWrap"><pre><code>// page script — in practice reached through the preload bridge
+const { ipcRenderer } = require('electron');
+
+ipcRenderer.send('service:log', { text: 'hello from the window' });
+</code></pre></div>
+
+<h4 id="ch4-1-hygiene">Channel hygiene</h4>
+<p>Channel names are global strings, and a collision silently routes messages to the wrong handler. Adopt a namespaced convention — <code>service:log</code>, <code>store:read</code>, <code>job:run</code> — and keep every channel in one shared constant module so both sides cannot drift. For long-lived listeners, <code>ipcMain</code> keeps the receiving function referenced forever, so remove listeners you no longer need rather than piling handlers on each event.</p>
+
+<div class="codeWrap"><pre><code>const onLog = (event, payload) => {
+  console.log('log:', payload);
+};
+
+ipcMain.on('service:log', onLog);
+
+app.on('will-quit', () => {
+  ipcMain.removeListener('service:log', onLog);
+});
+</code></pre></div>
+
+<h3 id="ch4-2" data-toc>4.2 Request–response with invoke and handle</h3>
+<p class="topic-desc">When the renderer needs an answer — a file's contents, a computed value, success or failure — <code>invoke</code>/<code>handle</code> turns IPC into a promise call.</p>
+
+<h4 id="ch4-2-invoke">Promises across the boundary</h4>
+<p><code>ipcMain.handle('channel', asyncFn)</code> registers a handler whose resolved value is returned to the renderer's <code>ipcRenderer.invoke('channel', …)</code> as a promise resolution. The handler and the call are still message-passing under the hood, but to both sides it reads like a normal asynchronous function call — which is exactly why it is the dominant pattern in real apps. It is safe to have the renderer await it; the main-process handler runs on the main thread, so keep it off heavy synchronous work.</p>
+
+<div class="codeWrap"><pre><code>// main.js
+const { app, ipcMain } = require('electron');
+const fs = require('fs/promises');
+const path = require('path');
+
+ipcMain.handle('store:read', async (event, key) => {
+  const file = path.join(app.getPath('userData'), `${key}.json`);
+  const raw = await fs.readFile(file, 'utf8');
+  return JSON.parse(raw);
+});
+</code></pre></div>
+
+<div class="codeWrap"><pre><code>// renderer (main world), through the preload bridge:
+const settings = await window.api.readStored('settings');
+console.log(settings.intervalMs);
+</code></pre></div>
+
+<h4 id="ch4-2-errors">Errors cross the bridge sanitised</h4>
+<p>A thrown <code>Error</code> in an <code>ipcMain.handle</code> rejection reaches the renderer as an <em>"Error invoking remote method"</em> string — Electron strips the stack trace and only the message survives, serialised. Two consequences: never rely on a renderer seeing a full stack (log the real error in main with <code>console.error</code>), and wrap failures in messages that a user-facing panel can actually display. A raw <code>Error: ENOENT</code> is engineering data; <code>could not write "settings"</code> is a sentence.</p>
+
+<div class="codeWrap"><pre><code>ipcMain.handle('store:write', async (event, key, value) => {
+  try {
+    const file = path.join(app.getPath('userData'), `${key}.json`);
+    await fs.writeFile(file, JSON.stringify(value));
+    return { ok: true };
+  } catch (error) {
+    // Only this message crosses the bridge; the stack stays in main.
+    throw new Error(`could not write "${key}"`);
+  }
+});
+</code></pre></div>
+
+<h3 id="ch4-3" data-toc>4.3 Preload scripts and contextBridge</h3>
+<p class="topic-desc">The preload runs before the page in an isolated world, and <code>contextBridge</code> is how you hand the page a controlled API — this is the hinge between "renderer is a web page" and "renderer is a privileged shell".</p>
+
+<h4 id="ch4-3-bridge">exposeInMainWorld</h4>
+<p><code>contextBridge.exposeInMainWorld('api', factory)</code> adds an object to the page's <code>window</code> whose values are snapshot copies — functions are proxied, everything else is frozen. The object should wrap <code>ipcRenderer</code> calls behind intention-named functions and never expose the <code>ipcRenderer</code> object itself, which would let page code send arbitrary channels. For subscriptions, return an unsubscribe function from the exposed API so page code can clean up after itself without touching <code>removeListener</code>.</p>
+
+<div class="codeWrap"><pre><code>// preload.js
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('api', {
+  readStored: (key) => ipcRenderer.invoke('store:read', key),
+  onJobState: (callback) => {
+    const listener = (event, state) => callback(state);
+    ipcRenderer.on('job:state', listener);
+    return () => ipcRenderer.removeListener('job:state', listener);
+  },
+});
+</code></pre></div>
+
+<h4 id="ch4-3-use">Using the bridge from page scripts</h4>
+<p>On the page side the bridge is just a global: <code>window.api.readStored('settings')</code>. The API shape is yours to design — keep it small, promise-returning and JSON-shaped, and you can swap the whole main-process implementation without ever touching the UI. The bridge is also the seam where you can unit-test: a fake <code>window.api</code> with the same shape drives the renderer in isolation.</p>
+
+<div class="codeWrap"><pre><code>// renderer.js — the page world, which has no require().
+const settings = await window.api.readStored('settings');
+
+const unsubscribe = window.api.onJobState((state) => {
+  document.querySelector('#job-state').textContent = state;
+});
+</code></pre></div>
+
+<h3 id="ch4-4" data-toc>4.4 contextIsolation and nodeIntegration</h3>
+<p class="topic-desc">These two <code>webPreferences</code> flags are the entire security posture of a renderer. Their defaults are sane only if you never flipped them off to make an old tutorial work.</p>
+
+<h4 id="ch4-4-flags">Two flags, four combinations</h4>
+<p><code>nodeIntegration: false</code> removes <code>require</code>, <code>process</code> and friends from the page's world; <code>contextIsolation: true</code> keeps the preload and page worlds separate even though they share a DOM. The two together are the modern default and the only combination you should ship. The dangerous pair is <code>nodeIntegration: true</code> — any XSS in your UI, from a bad <code>innerHTML</code> to an injected ad, becomes arbitrary code execution on the user's machine. There is no mitigation that makes that pairing safe.</p>
+
+<div class="codeWrap"><pre><code>const win = new BrowserWindow({
+  webPreferences: {
+    nodeIntegration: false,   // page scripts must never see require()
+    contextIsolation: true,   // preload world and page world stay separate
+    sandbox: true,            // renderer without Node, worker or GUI access
+    preload: path.join(__dirname, 'preload.js'),
+  },
+});
+</code></pre></div>
+
+<h4 id="ch4-4-sandbox">What sandbox: true changes</h4>
+<p>With <code>sandbox: true</code> the renderer runs as a true Chromium sandbox (no Node, no <code>process</code>, no GUI), and the preload script loses access to Node APIs beyond a small allow-list: the <code>electron</code> modules (<code>contextBridge</code>, <code>ipcRenderer</code>), and a handful of Node builtins like <code>events</code> and <code>timers</code>. IPC still works, which covers nearly every real preload. If a preload truly needs <code>fs</code> or <code>path</code>, that is the signal the logic belongs in the main process behind an IPC channel.</p>
+
+<div class="codeWrap"><pre><code>// preload.js with sandbox: true — only a limited require() exists.
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('api', {
+  ping: () => ipcRenderer.invoke('svc:ping'),
+});
+</code></pre></div>
+
+<div class="warn">Never set <code>nodeIntegration: true</code> for a window that loads remote or user-provided content. The browser process already treats every renderer as hostile; re-arming Node hands that hostility the keys to the machine.</div>
+
+<h3 id="ch4-5" data-toc>4.5 The security checklist</h3>
+<p class="topic-desc">The concerns above collapse into a short audit list. Run it against every window factory and every IPC handler before you package anything.</p>
+
+<h4 id="ch4-5-list">The window factory you audit</h4>
+<p>Route every window through one factory so the hardened defaults apply to windows you forgot about. The checklist: <code>contextIsolation: true</code>; <code>nodeIntegration: false</code>; <code>sandbox: true</code>; <code>webSecurity: true</code> (never disable it for CORS convenience); <code>allowRunningInsecureContent: false</code>; a preload that exposes only named functions; and navigation/window-open handlers from section 3.2 on every <code>webContents</code>. Centralising means the audit is one function, not a scavenger hunt.</p>
+
+<div class="codeWrap"><pre><code>function createHardenedWindow(options = {}) {
+  const win = new BrowserWindow({
+    ...options,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      webSecurity: true,
+      allowRunningInsecureContent: false,
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
+  return win;
+}
+</code></pre></div>
+
+<h4 id="ch4-5-sender">Validate who is talking to you</h4>
+<p>Any frame in the window can send on a channel — including a compromised iframe. <code>event.senderFrame.url</code> tells you the actual origin of the message; a handler that accepts a channel from any URL at all is a trust decision you did not mean to make. Gate privileged channels behind an allow-list of the frames you own, and log rejections: a blocked sender at 3 a.m. is far kinder to debug than a mystery backdoor.</p>
+
+<div class="codeWrap"><pre><code>const APP_ORIGIN = 'https://app.example.com/';
+
+ipcMain.on('admin:deploy', (event, payload) => {
+  const url = event.senderFrame.url;
+  const allowed = url.startsWith('file://') || url.startsWith(APP_ORIGIN);
+  if (!allowed) {
+    console.warn(`blocked IPC from ${url}`);
+    return;
+  }
+  runDeploy(payload);
+});
+</code></pre></div>
+
+<div class="tip">Treat IPC like a public HTTP API: every channel is a route, every handler validates its payload shape before trusting it, and privileged routes check the caller. The disciplines you already know from server code are the right mental model.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ The Renderer · Building the Control UI</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">The renderer is a full web page with a job: be the readable face of the service. It builds from plain HTML, CSS and JavaScript, constrained to the web platform, and uses the bridge (chapter 4) for everything privileged. This chapter covers the UI itself, remote-content discipline, external links and notifications.</p>
+
+<h3 id="ch5-1" data-toc>5.1 The control UI from plain web tech</h3>
+<p class="topic-desc">No framework required — a service control panel is often fewer than a hundred lines of HTML, CSS and vanilla JS.</p>
+
+<h4 id="ch5-1-stack">A minimal index.html</h4>
+<p>The page is ordinary HTML with one addition that is easy to forget: a <code>Content-Security-Policy</code> meta tag. On <code>file://</code> there is no server to send headers, so the meta tag is the only way the renderer gets a policy at all. Start with <code>default-src 'self'</code> — it blocks remote scripts immediately — and add back exactly what you need. Everything else in this file is unremarkable web work.</p>
+
+<div class="codeWrap"><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'"&gt;
+  &lt;title&gt;Service Control&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Service Control&lt;/h1&gt;
+  &lt;button id="start"&gt;Start job&lt;/button&gt;
+  &lt;pre id="status"&gt;idle&lt;/pre&gt;
+  &lt;script src="renderer.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div>
+
+<h4 id="ch5-1-csp">CSP rules that matter offline</h4>
+<p>Two policy details bite most Electron renderers. <code>'unsafe-inline'</code> is frequently unavoidable for styles but should stay off <code>script-src</code> — move handlers out of attributes into <code>addEventListener</code>. And <code>connect-src</code> governs fetch/WebSocket; a renderer that talks to a local agent over <code>http://127.0.0.1</code> must list that origin explicitly or every request is silently blocked. Read the warning in the console — Chromium prints the exact directive that rejected the request.</p>
+
+<div class="codeWrap"><pre><code>&lt;meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self';
+               connect-src http://127.0.0.1:4100;
+               style-src 'self' 'unsafe-inline'"&gt;
+</code></pre></div>
+
+<h3 id="ch5-2" data-toc>5.2 Constraints of the sandboxed renderer</h3>
+<p class="topic-desc">The renderer is the web platform, full stop — which is liberating or frustrating depending on what you try to do.</p>
+
+<h4 id="ch5-2-webonly">The web platform only</h4>
+<p>Everything a modern browser page has — DOM, fetch, Canvas, WebSockets, the Notification API, service workers — works. Everything Node has does not: no <code>require</code>, no <code>process</code>, no <code>fs</code>. The correct response to "I want to read that file in the renderer" is never re-enabling Node; it is a bridge function. Feature-detect with <code>in</code> checks exactly as you would in a browser; the window you get half-way through feature detection is the honest one.</p>
+
+<div class="codeWrap"><pre><code>// The sandboxed renderer exposes the web platform only.
+if ('Notification' in window) console.log('notifications available');
+if (!('require' in window)) console.log('no Node: as designed');
+
+// This would throw — the page has no require().
+// const fs = require('fs');
+</code></pre></div>
+
+<h4 id="ch5-2-bridge">Route privileged work through the bridge</h4>
+<p>The shape of a well-behaved renderer is: UI reads/writes state via <code>window.api</code> functions, and everything else is presentation. Because the bridge returns promises, the page code stays async and readable, and the same UI can run against a mock <code>window.api</code> in a browser during development. The main process holds the actual logic, and the renderer never learns where files live or which port the agent binds.</p>
+
+<div class="codeWrap"><pre><code>const result = await window.api.readStored('job');
+if (result) {
+  renderJobCard(result);
+} else {
+  renderEmptyState();
+}
+</code></pre></div>
+
+<h3 id="ch5-3" data-toc>5.3 Remote content at arm's length</h3>
+<p class="topic-desc">A renderer that can wander the internet is a renderer that can be turned against you. The rule: your window may load your content, and everything else ends up in the system browser.</p>
+
+<h4 id="ch5-3-nav">Navigation and window.open handling, app-wide</h4>
+<p>Instead of wiring every window, attach the handlers once in <code>web-contents-created</code> so they apply to windows and iframes alike. <code>setWindowOpenHandler</code> answers every <code>window.open</code> and <code>target="_blank"</code> — return <code>{ action: 'deny' }</code> and the popup never exists — and <code>will-navigate</code> vetoes main-frame navigations that are not already the current URL (a redirect or a link). Both check the URL scheme before touching <code>shell</code>.</p>
+
+<div class="codeWrap"><pre><code>const { app, shell } = require('electron');
+
+app.on('web-contents-created', (event, contents) => {
+  contents.setWindowOpenHandler(({ url }) => {
+    if (/^https:\/\//.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
+  contents.on('will-navigate', (event, url) => {
+    if (url !== contents.getURL()) event.preventDefault();
+  });
+});
+</code></pre></div>
+
+<h4 id="ch5-3-iframe">Sandboxing embedded content</h4>
+<p>If a feature genuinely needs third-party content inside the window — a widget, a dashboard iframe — the iframe <code>sandbox</code> attribute is the leather leash: without <code>allow-scripts</code> the frame's scripts do not run, and without <code>allow-same-origin</code> it cannot read the parent's DOM. The two flags together are the maximal trust next to no trust at all, so the pair should never appear together for content you do not fully control.</p>
+
+<div class="codeWrap"><pre><code>&lt;iframe src="https://stats.example.com/dashboard"
+        sandbox="allow-scripts allow-same-origin"&gt;&lt;/iframe&gt;
+</code></pre></div>
+
+<h3 id="ch5-4" data-toc>5.4 Opening external links safely</h3>
+<p class="topic-desc">A service UI inevitably shows links — documentation, dashboards, your pricing page. Opening them in the user's real browser is the correct behaviour; doing it safely is a scheme check.</p>
+
+<h4 id="ch5-4-open">shell.openExternal behind an IPC handler</h4>
+<p><code>shell.openExternal(url)</code> hands a URL to the operating system's default handler — which means, unguarded, it can hand <code>file:///C:/...something.exe</code> or a custom protocol to whatever registered for it. The handler must validate the scheme before calling out. An <code>/^https?:\/\//</code> test is the entire gate: it admits only what a browser would sensibly open and rejects <code>file:</code>, <code>smb:</code>, and any typosquatted protocol.</p>
+
+<div class="codeWrap"><pre><code>const { ipcMain, shell } = require('electron');
+
+const SAFE = /^https?:\/\//;
+
+ipcMain.handle('link:open', (event, rawUrl) => {
+  if (!SAFE.test(rawUrl)) {
+    throw new Error('only http(s) URLs may be opened');
+  }
+  return shell.openExternal(rawUrl);
+});
+</code></pre></div>
+
+<h4 id="ch5-4-client">The renderer side</h4>
+<p>In the page, mark external links with a class or <code>data-</code> attribute and intercept them. Prevent the default navigation — otherwise target-less links would replace your own window's content — then hand the href to the bridge and let validation happen in main. If the open fails (no default browser configured), reflecting the failure on the link itself beats a silent dead click.</p>
+
+<div class="codeWrap"><pre><code>document.querySelectorAll('a[data-external]').forEach((link) => {
+  link.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const opened = await window.api.openExternal(link.href);
+    link.classList.toggle('failed', !opened);
+  });
+});
+</code></pre></div>
+
+<div class="warn">Never concatenate user input into a URL before <code>openExternal</code>. A value beginning with <code>file://</code> or a scheme like <code>ms-</code>/<code>itms-</code> can launch arbitrary registered handlers; validate the completed string, not the user's contribution to it.</div>
+
+<h3 id="ch5-5" data-toc>5.5 Desktop notifications</h3>
+<p class="topic-desc">A service running in the background should be allowed to say "done" — and both the renderer and the main process can raise a native notification.</p>
+
+<h4 id="ch5-5-web">The HTML5 Notification API in the renderer</h4>
+<p>The renderer uses the standard browser API: check support, request permission (a user gesture like a settings toggle is the honest way, not on load), then construct <code>new Notification(title, { body })</code>. Electron routes these to the operating system's notification centre. The permission state persists per origin — here, your <code>file://</code> or <code>app://</code> origin — so reflect it in the UI after the first request.</p>
+
+<div class="codeWrap"><pre><code>async function notify(title, body) {
+  if (!('Notification' in window)) return;
+
+  if (Notification.permission === 'default') {
+    const choice = await Notification.requestPermission();
+    if (choice !== 'granted') return;
+  }
+  if (Notification.permission === 'granted') {
+    new Notification(title, { body });
+  }
+}
+</code></pre></div>
+
+<h4 id="ch5-5-main">Notifications from the main process</h4>
+<p>Background jobs finish in the main process, so the main process frequently raises the notification itself. Electron's <code>Notification</code> class works there too; check <code>Notification.isSupported()</code> first (some Linux desktops lack a notification daemon), and on Windows call <code>app.setAppUserModelId</code> once — without a matching AppUserModelID, Windows silently drops notifications from your app.</p>
+
+<div class="codeWrap"><pre><code>const { app, Notification } = require('electron');
+
+app.setAppUserModelId('com.example.service-app');
+
+if (Notification.isSupported()) {
+  new Notification({ title: 'Job finished', body: 'The export completed.' }).show();
+}
+</code></pre></div>
+
+<div class="tip">Store the AppUserModelID in the same constant the packaging config uses — Windows matches notifications to installed apps by that exact string, and a mismatch means "works in dev, silent when packaged".</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Services and System Integration</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Beyond the window, a service app owns a presence: a tray icon, global shortcuts, autostart, power-awareness and single-instance behaviour. These are the APIs that make the app feel like part of the operating system rather than a web page in a chrome.</p>
+
+<h3 id="ch6-1" data-toc>6.1 The tray</h3>
+<p class="topic-desc">A tray icon keeps the service reachable when every window is closed — the canonical "background with a control panel" pattern.</p>
+
+<h4 id="ch6-1-basic">Tray icon and context menu</h4>
+<p>Construct a <code>Tray</code> with an image path (16×16 or 32×32 PNG; on Windows a multi-resolution <code>.ico</code> is better), then attach a context menu built from the same template API as the application menu. Keep the tray in a module-level variable — it is an object like any other, and garbage collection silently removes the icon while the app keeps running. <code>role: 'quit'</code> in the menu handles the exit path users expect.</p>
+
+<div class="codeWrap"><pre><code>const { Tray, Menu, nativeImage } = require('electron');
+
+const tray = new Tray(nativeImage.createFromPath('assets/tray.png'));
+tray.setToolTip('Service App');
+
+tray.setContextMenu(Menu.buildFromTemplate([
+  { label: 'Open Control', click: () => showMainWindow() },
+  { type: 'separator' },
+  { label: 'Paused', type: 'checkbox', checked: false },
+  { type: 'separator' },
+  { label: 'Quit', role: 'quit' },
+]));
+</code></pre></div>
+
+<div class="warn">Store the <code>Tray</code> in a module-level variable. A tray that goes out of scope is garbage-collected and disappears from the system tray while the app runs on — the classic "my icon vanished" bug.</div>
+
+<h4 id="ch6-1-behav">Click behaviour and live state</h4>
+<p>Left-click behaviour differs by platform: on Windows and Linux the <code>click</code> event fires, on macOS it only opens the menu — so if you support single-click-to-open, remember it will not work on mac. The tray should reflect live state: <code>setToolTip</code> for hover text, and rebuild or toggle menu items (the checkbox above) when the service pauses, resumes or faults. For macOS, use a template image (filename ending in <code>Template</code>) so the icon adapts to dark mode automatically.</p>
+
+<div class="codeWrap"><pre><code>tray.on('click', () => showMainWindow());
+
+function updateTray(statusText) {
+  tray.setToolTip(`Service App — ${statusText}`);
+}
+</code></pre></div>
+
+<h3 id="ch6-2" data-toc>6.2 Global shortcuts</h3>
+<p class="topic-desc">Global shortcuts trigger your app from anywhere on the desktop — a summon key for a service window deserves exactly that.</p>
+
+<h4 id="ch6-2-register">Registering a system-wide accelerator</h4>
+<p><code>globalShortcut.register(accelerator, callback)</code> works system-wide, unlike in-window accelerators. Use <code>CommandOrControl</code> (not a hard-coded <code>Ctrl</code> or <code>Cmd</code>) so the same accelerator string is right on Windows/Linux and macOS. Registration returns <code>false</code> when the combination is taken by another application — check it, and offer a settings UI rather than silently failing. Call register only after <code>ready</code>: the module needs the browser process up.</p>
+
+<div class="codeWrap"><pre><code>const { globalShortcut } = require('electron');
+
+app.whenReady().then(() => {
+  const ok = globalShortcut.register('CommandOrControl+Alt+S', () => {
+    toggleServiceWindow();
+  });
+  if (!ok) console.warn('shortcut taken by another app');
+});
+</code></pre></div>
+
+<h4 id="ch6-2-cleanup">Releasing them on quit</h4>
+<p>A registered global shortcut stays registered until it is unregistered — the OS keeps dispensing those key presses to a process that may have forgotten about them. The clean habit is <code>globalShortcut.unregisterAll()</code> in <code>will-quit</code>; for finer control, <code>unregister(accelerator)</code> replaces one at a time (for example, when the user rebinds a key in settings).</p>
+
+<div class="codeWrap"><pre><code>const { globalShortcut } = require('electron');
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+});
+</code></pre></div>
+
+<h3 id="ch6-3" data-toc>6.3 Autostart at login</h3>
+<p class="topic-desc">A service that must be running when the machine boots needs to start with the session. Electron covers Windows and macOS natively; Linux is a config file you write.</p>
+
+<h4 id="ch6-3-login">setLoginItemSettings on Windows and macOS</h4>
+<p><code>app.setLoginItemSettings({ openAtLogin })</code> registers or deregisters the app as a login item, and <code>openAsHidden</code> on Windows starts it without a window — exactly right for a background service. Re-read <code>getLoginItemSettings()</code> to render the current state back into the settings UI; the OS owns the truth and the user may have toggled it elsewhere. There is no Linux equivalent API.</p>
+
+<div class="codeWrap"><pre><code>const { app } = require('electron');
+
+function setAutostart(enabled) {
+  if (process.platform === 'win32' || process.platform === 'darwin') {
+    app.setLoginItemSettings({
+      openAtLogin: enabled,
+      openAsHidden: enabled,
+      args: ['--hidden'],
+    });
+  }
+}
+</code></pre></div>
+
+<h4 id="ch6-3-linux">Linux: an autostart desktop entry</h4>
+<p>On Linux, "start at login" means writing a freedesktop <code>.desktop</code> file into <code>~/.config/autostart/</code>. The <code>Exec</code> line points at the installed binary (which your package manager installs to e.g. <code>/opt/service-app/</code>), and <code>X-GNOME-Autostart-enabled=true</code> makes it visible in the session's autostart preferences. Writing the file from the main process with <code>fs</code> is fine; keep it to one file, recreated on enable and removed on disable.</p>
+
+<div class="codeWrap"><pre><code>[Desktop Entry]
+Type=Application
+Name=Service App
+Exec=/opt/service-app/service-app --hidden
+X-GNOME-Autostart-enabled=true
+</code></pre></div>
+
+<div class="note">On macOS, a login item registered before the app is in <code>/Applications</code> (running from a build output folder) can silently fail after the user moves the app. Offer the autostart toggle in a packaged build's settings screen, and call it after the app is installed to its final location.</div>
+
+<h3 id="ch6-4" data-toc>6.4 powerMonitor events</h3>
+<p class="topic-desc">Laptops sleep, lock and run from battery. A service that ignores the power state loses work on suspend and drains batteries on standby.</p>
+
+<h4 id="ch6-4-events">Suspend, resume and lock</h4>
+<p><code>powerMonitor</code> emits <code>suspend</code> (about to sleep — flush pending work, nothing survives RAM loss), <code>resume</code> (cancel timers that assumed the machine never slept), <code>lock-screen</code> and <code>unlock-screen</code> (seal or restore secrets in the UI). The classic failure is a job timer set before suspend firing hours late on resume — arriving "on time" only from the sleeping machine's point of view.</p>
+
+<div class="codeWrap"><pre><code>const { powerMonitor } = require('electron');
+
+powerMonitor.on('suspend', () => flushPendingWork());
+powerMonitor.on('resume', () => rescheduleJobs());
+powerMonitor.on('lock-screen', () => sealSession());
+powerMonitor.on('unlock-screen', () => refreshWindows());
+</code></pre></div>
+
+<h4 id="ch6-4-battery">Battery- and idle-aware scheduling</h4>
+<p>Heavy maintenance — indexing, backups, telemetry replay — belongs on desktop power, not on battery. <code>powerMonitor.isOnBatteryPower()</code> plus <code>getSystemIdleTime()</code> (seconds since the last user input) give a two-condition gate: run the expensive pass only when plugged in and idle. Because the idleness signal changes continuously, poll with a modest interval rather than trying to subscribe to state changes.</p>
+
+<div class="codeWrap"><pre><code>setInterval(() => {
+  const idleSeconds = powerMonitor.getSystemIdleTime();
+  const onBattery = powerMonitor.isOnBatteryPower();
+
+  if (idleSeconds > 300 &amp;&amp; !onBattery) {
+    runHeavyMaintenance();
+  } else {
+    delayHeavyMaintenance();
+  }
+}, 60_000);
+</code></pre></div>
+
+<h3 id="ch6-5" data-toc>6.5 The single-instance lock</h3>
+<p class="topic-desc">A service app is, by definition, one app. The single-instance lock makes a second launch a request to the first.</p>
+
+<h4 id="ch6-5-lock">requestSingleInstanceLock</h4>
+<p><code>app.requestSingleInstanceLock()</code> returns <code>true</code> for the first process and <code>false</code> for every later one. The loser's correct move is <code>app.quit()</code> immediately — before creating anything — and the survivor listens for <code>second-instance</code>, which carries the second launch's <code>argv</code> and working directory. Called before <code>ready</code>, this is the oldest recommended ordering in the Electron docs, and for good reason.</p>
+
+<div class="codeWrap"><pre><code>const { app } = require('electron');
+
+const gotLock = app.requestSingleInstanceLock();
+
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => showMainWindow());
+  app.whenReady().then(createMainWindow);
+}
+</code></pre></div>
+
+<h4 id="ch6-5-restore">Acting on the second launch</h4>
+<p>The best single-instance behaviour turns the second launch into an intent: the user double-clicked a file or a URL and the running app should handle it. <code>second-instance</code> gives you <code>argv</code>, so find the file argument, queue it, and focus the existing window — restore it if minimised, focus if buried. A second launch that does nothing is a bug report; a second launch that opens your control panel is a feature.</p>
+
+<div class="codeWrap"><pre><code>app.on('second-instance', (event, argv) => {
+  const fileArg = argv.find((arg) => arg.endsWith('.job'));
+  if (fileArg) queueJob(fileArg);
+
+  if (mainWindow &amp;&amp; !mainWindow.isDestroyed()) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+});
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Persistence, Packaging and Updates</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">A service app that cannot remember state, cannot be distributed and cannot update itself has not actually shipped. This chapter covers where data lives, how the app becomes an installer, how it updates, and how you debug all of it.</p>
+
+<h3 id="ch7-1" data-toc>7.1 Storing data in userData</h3>
+<p class="topic-desc">User data belongs in <code>app.getPath('userData')</code> — the one directory the OS guarantees your app may write, and that survives upgrades.</p>
+
+<h4 id="ch7-1-path">Where persistent files belong</h4>
+<p><code>app.getPath('userData')</code> resolves to <code>%APPDATA%</code> on Windows, <code>~/Library/Application Support</code> on macOS and <code>~/.config</code> on Linux, joined with the app name — and the same call always returns the same place, so your code never guesses. The directory may not exist on a first run after a fresh install, so <code>mkdir(..., { recursive: true })</code> before writing. Never write into the app's install directory: it is read-only when packaged (on macOS, the app bundle is sealed), and anything there is wiped by the next upgrade.</p>
+
+<div class="codeWrap"><pre><code>const { app } = require('electron');
+const fs = require('fs/promises');
+const path = require('path');
+
+async function ensureDataDir() {
+  const dir = app.getPath('userData');
+  await fs.mkdir(dir, { recursive: true });
+  return dir;
+}
+</code></pre></div>
+
+<h4 id="ch7-1-store">The electron-store pattern</h4>
+<p>The <code>electron-store</code> npm package formalises a pattern you can also write by hand: one JSON file per store, read once into memory, written through a temporary file and atomically renamed so a crash mid-write never leaves a truncated store. <code>rename</code> within the same volume is atomic, which is the whole trick. Debounce writes in a real app; the synchronous version below is the readable core.</p>
+
+<div class="codeWrap"><pre><code>const fs = require('fs');
+const path = require('path');
+const { app } = require('electron');
+
+class Store {
+  constructor(filename) {
+    this.file = path.join(app.getPath('userData'), `${filename}.json`);
+    try {
+      this.data = JSON.parse(fs.readFileSync(this.file, 'utf8'));
+    } catch {
+      this.data = {};   // missing or corrupt file: start empty
+    }
+  }
+
+  get(key, fallback) {
+    return this.data[key] ?? fallback;
+  }
+
+  set(key, value) {
+    this.data[key] = value;
+    const tmp = `${this.file}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(this.data, null, 2));
+    fs.renameSync(tmp, this.file);   // atomic replace
+  }
+}
+</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 Packaging with electron-builder and Forge</h3>
+<p class="topic-desc">Distribution is where "it runs on my machine" becomes an installer for three platforms. Two mainstream tools do the heavy lifting; the choice is which workflow you prefer.</p>
+
+<h4 id="ch7-2-builder">electron-builder targets and config</h4>
+<p><code>electron-builder</code> reads a <code>build</code> section in <code>package.json</code> and produces installers: NSIS on Windows, DMG and ZIP on macOS, AppImage and DEB on Linux. The same <code>files</code> allow-list both trims the package (never ship tests or <code>build/</code>) and is an implicit audit of what leaves your machine. <code>appId</code> must be globally unique — it is the identity Windows and the updater use. Run with <code>--publish never</code> until you are genuinely ready to publish.</p>
+
+<div class="codeWrap"><pre><code>{
+  "scripts": { "dist": "electron-builder --publish never" },
+  "build": {
+    "appId": "com.example.serviceapp",
+    "productName": "Service App",
+    "files": ["main.js", "preload.js", "renderer/**", "assets/**"],
+    "win": { "target": "nsis" },
+    "mac": { "target": ["dmg", "zip"], "category": "public.app-category.utilities" },
+    "linux": { "target": ["AppImage", "deb"], "category": "Utility" }
+  }
+}
+</code></pre></div>
+
+<h4 id="ch7-2-forge">electron-forge as the alternative</h4>
+<p><code>electron-forge</code> is the Electron team's integrated toolchain: <code>electron-forge make</code> runs packagers (called makers) for each target you declare. Its config lives in <code>forge.config.js</code>; note <code>packagerConfig.asar: true</code> — <code>asar</code> packs your source into a single archive (more on this below). Pick one tool per project; maintainers who swap mid-flight tend to lose their signing and update wiring.</p>
+
+<div class="codeWrap"><pre><code>module.exports = {
+  packagerConfig: { asar: true },
+  makers: [
+    { name: '@electron-forge/maker-squirrel', config: {} },
+    { name: '@electron-forge/maker-zip', platforms: ['darwin'] },
+    { name: '@electron-forge/maker-deb', config: {} },
+  ],
+};
+</code></pre></div>
+
+<div class="note">Package your source into <code>app.asar</code> by default. It is not encryption — the archive format is documented — but it keeps your <code>main.js</code> and renderer out of an unbundled folder tree where users trip over them, and it is the format both packagers expect.</div>
+
+<h3 id="ch7-3" data-toc>7.3 Updates and code signing</h3>
+<p class="topic-desc">Auto-update is the difference between "users run an old, buggy build forever" and "everyone converges on the fix". Signing makes that possible.</p>
+
+<h4 id="ch7-3-updater">autoUpdater with a feed URL</h4>
+<p><code>autoUpdater</code> polls a feed URL for a newer build; when one downloads you ask the user, then <code>quitAndInstall()</code>. The remote side matters as much as the code: the feed must be implemented against the same tool's update server (electron-builder's generic provider, or Forge's S3/GitHub releases), or <code>checkForUpdates</code> fails with a hard-to-read error. Check for updates after <code>ready</code>, not before, and never auto-restart over unsaved work without asking first.</p>
+
+<div class="codeWrap"><pre><code>const { app, autoUpdater, dialog } = require('electron');
+
+autoUpdater.setFeedURL({ url: 'https://updates.example.com/ServiceApp' });
+
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+  const choice = dialog.showMessageBoxSync({
+    type: 'info',
+    buttons: ['Restart now', 'Later'],
+    message: `Version ${releaseName} is ready to install.`,
+  });
+  if (choice === 0) autoUpdater.quitAndInstall();
+});
+
+app.whenReady().then(() => autoUpdater.checkForUpdates());
+</code></pre></div>
+
+<h4 id="ch7-3-sign">Updates require signed binaries</h4>
+<p>On macOS, an unsigned app triggers Gatekeeper and autoUpdate silently; on Windows, SmartScreen flags it. Signing configuration lives in the same <code>build</code> block: macOS needs a Developer ID application certificate plus <code>hardenedRuntime: true</code> and notarisation (Team ID in <code>notarize</code>), Windows a code-signing certificate. Keep the private key out of the repo — electron-builder reads the certificate path at build time and the password from the <code>CSC_KEY_PASSWORD</code> environment variable, not from source control.</p>
+
+<div class="codeWrap"><pre><code>{
+  "build": {
+    "mac": {
+      "hardenedRuntime": true,
+      "identity": "Developer ID Application: Example Ltd (ABCDE12345)",
+      "notarize": { "teamId": "ABCDE12345" }
+    },
+    "win": {
+      "certificateFile": "C:/certs/example.pfx"
+    }
+  }
+}
+</code></pre></div>
+
+<div class="warn">An unsigned <code>autoUpdater</code> build is not merely untrusted — on macOS the update check quietly refuses to apply, which reads as "the updater is broken" in every bug report. Sign and notarise your first release; retrofitting it later means re-distributing everything you shipped before.</div>
+
+<h3 id="ch7-4" data-toc>7.4 Testing and debugging</h3>
+<p class="topic-desc">Electron's debugging split confuses newcomers more than any other feature: the renderer has DevTools, and the main process needs its own attach ritual.</p>
+
+<h4 id="ch7-4-main">DevTools and main-process logs</h4>
+<p>For the renderer, <code>webContents.openDevTools()</code> opens the normal Chromium DevTools. The main process has no DevTools button, so you either pass <code>--inspect=5858</code> at launch and attach a Chrome DevTools frontend (<code>chrome://inspect</code>), or read its <code>console.log</code> on the terminal where the app started. <code>--inspect-brk</code> pauses on the first line of main — the reliable way to catch a startup crash before it exits. In packaged builds the terminal is gone, so write main-process logs to a file in <code>userData</code>.</p>
+
+<div class="codeWrap"><pre><code># Attach the Chrome DevTools Protocol to the main process:
+npx electron . --inspect=5858
+
+# Pause on the very first line of main:
+npx electron . --inspect-brk=5858
+</code></pre></div>
+
+<div class="codeWrap"><pre><code>const { app } = require('electron');
+
+app.whenReady().then(() => {
+  const win = createMainWindow();
+  if (!app.isPackaged) {
+    win.webContents.openDevTools({ mode: 'detach' });
+    win.webContents.on('console-message', (event, level, message) => {
+      console.log(`[renderer] ${message}`);
+    });
+  }
+});
+</code></pre></div>
+
+<h4 id="ch7-4-tests">Automated tests with Playwright</h4>
+<p>Playwright's Electron support launches your <code>package.json</code> entry as the target and drives windows with the same selectors API as browser tests — the cheapest way to verify "window opens, IPC answers, state renders". Keep fragile timing out of it: <code>toContainText</code> waits instead of sleeping, which is what makes the suite stable. The same tests run in CI on the Electron binary downloaded by the install step.</p>
+
+<div class="codeWrap"><pre><code>const { test, expect, _electron: electron } = require('@playwright/test');
+
+test('control window loads and starts a job', async () => {
+  const app = await electron.launch({ args: ['.'] });
+  const win = await app.firstWindow();
+
+  await win.click('#start');
+  await expect(win.locator('#status')).toContainText('running');
+
+  await app.close();
+});
+</code></pre></div>
+
+<div class="tip">Extract main-process logic that deserves tests — the job runner, the store, the scheduling rules — into plain modules that do not require Electron, and unit-test those directly in Node. The Electron-specific layer then becomes a thin shell around logic you have already proven.</div>
+</section>

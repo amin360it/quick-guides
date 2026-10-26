@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building Service Apps with Electron</title>
+<meta name="description" content="An Electron service app is an application built with the Electron framework — the same framework as VS Code…. 1 chapters, 2 topics and 2 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/electron-apps.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Building Service Apps with Electron">
+<meta property="og:description" content="An Electron service app is an application built with the Electron framework — the same framework as VS Code…. 1 chapters, 2 topics and 2 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/electron-apps.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Building Service Apps with Electron">
+<meta name="twitter:description" content="An Electron service app is an application built with the Electron framework — the same framework as VS Code…. 1 chapters, 2 topics and 2 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/electron-apps.html#article","headline":"Building Service Apps with Electron","name":"Building Service Apps with Electron","description":"An Electron service app is an application built with the Electron framework — the same framework as VS Code…. 1 chapters, 2 topics and 2 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/electron-apps.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/electron-apps.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Building Service Apps with Electron","item":"https://amin360it.github.io/quick-guides/electron-apps.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome · Electron Service Apps</a><ul>
+<li><a href="#orientation-why" data-target="orientation-why">0.1 What an Electron service app is, and the four deployment targets</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Building Service Apps with Electron</span>
+      <span class="am-band-s">1 chapters &middot; 2 topics &middot; 2 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="orientation" data-toc>Welcome · Electron Service Apps</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; Welcome · Electron Service Apps</button><div class="ch-toc-list"><a href="#orientation-why">0.1 What an Electron service app is, and the four deployment targets</a></div></div>
+<h3 id="orientation-why" data-toc>0.1 What an Electron service app is, and the four deployment targets</h3>
+
+<p class="topic-desc">An Electron service app is an application built with the Electron framework — the same framework as VS Code, Slack, and Discord — and deployed to one of four targets: a Linux desktop application, a Windows Service (a background process managed by the Service Control Manager), a Linux Service (a background systemd unit), or a Linux CLI tool.</p>
+<h4 id="orientation-why--section">Why Electron, and what it costs</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p><strong>Electron bundles the Chromium rendering engine and the Node.js runtime</strong> into one process. The result is an app that can render a web UI and access the local filesystem, network, and native OS APIs — the same technology as a browser tab, with access that a browser cannot have. Then <strong>the four deployment targets,</strong> and each is a different package. <strong>Linux GUI,</strong> — a .desktop entry pointing at an Electron-built binary wrapped in a shell script. <strong>Windows Service,</strong> — a Win32 Service registered with the Service Control Manager via a native module or the node-windows library. <strong>Linux Service,</strong> — a systemd unit file pointing at the Electron-built binary. <strong>Linux CLI,</strong> — the same Electron process with a --headless flag, or a plain Node.js script compiled with electron-builder. Then <strong>the three things Electron costs you.</strong> <strong>At minimum, the Electron binary is 150 MB,</strong> because it embeds Chromium. A <strong>simple app can easily become 200 MB on disk.</strong> <strong>Memory is similarly large,</strong> because the Chromium renderer in each window is a full browser tab. Then <strong>the two practices.</strong> <strong>Minimise the renderer process footprint</strong> — use a single renderer window and embed the heavier UI elements in the main process when possible. <strong>Use electron-builder for deployment artifacts</strong> — it produces the .deb for Linux, the .msi for Windows, and the .dmg for macOS by reading the package.json's build section. Then <strong>the one security rule.</strong> <strong>Never enable nodeIntegration in a renderer exposed to untrusted content,</strong> because it gives the renderer, and any injected script inside it, the ability to write files and spawn processes. Use a preload script with contextBridge to expose only the specific APIs the renderer needs.</p>
+<div class="codeWrap"><pre><code>/* Electron main process: index.js.
+   IMPORTANT: the main process is the only one that can use the
+   full Node.js API and the BrowserWindow. All other windows and
+   web pages are renderer processes — they get a subset. */
+
+const { app, BrowserWindow, ipcMain } = require('electron');
+
+let mainWindow;
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      // SECURITY: keep nodeIntegration off and use a preload script
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: './preload.js',
+      sandbox: true,
+    },
+  });
+
+  mainWindow.loadFile('index.html');
+}
+
+app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+</code></pre></div>
+<div class="codeWrap"><pre><code>/* package.json build config for electron-builder.
+   This is the part that makes the binaries downloadable. */
+
+{
+  "name": "my-service-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish=never"
+  },
+  "build": {
+    "appId": "com.mycompany.serviceapp",
+    "productName": "Service App",
+    "linux": {
+      "target": "AppImage"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    }
+  }
+}
+
+/* electron-builder reads this section and produces:
+   dist/Service App-1.0.0.AppImage  (Linux portable)
+   dist/Setup Service App 1.0.0.exe (Windows installer)
+   dist/Service App-1.0.0.dmg       (macOS disk image)
+   Run: npm run dist */
+</code></pre></div>
+
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Electron Apps.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

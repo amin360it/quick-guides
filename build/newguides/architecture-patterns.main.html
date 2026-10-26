@@ -1,0 +1,1361 @@
+<section class="chapter">
+<h2 id="ch1" data-toc>1 · The architectural landscape</h2>
+
+<h3 id="ch1-1" data-toc>What architecture actually means</h3>
+
+<p>Architecture is the set of decisions that are expensive to reverse. Languages, libraries, and frameworks are cheap; the shape of the system is not. When two teams cannot deploy independently, when a change in the billing module forces a redeploy of the catalogue, when the database schema cannot be understood by any single person — those are architectural facts, not implementation details. They were made, usually by accretion, long before anyone called them a decision.</p>
+
+<p>The word gets misused. "Architecture" is not the name of the diagram in the pitch deck, and it is not a synonym for "microservices." It is the collection of structural choices that determine how the system behaves under load, how it fails, how fast it can change, and how many people can work on it at once. Every system has an architecture; the only question is whether it was chosen or whether it happened.</p>
+
+<h4 id="ch1-1-a">The four questions that matter</h4>
+
+<p>Before adopting any pattern, answer four questions honestly, in writing. First: what does the system need to do under peak load — what is the throughput, the latency budget, and the consistency requirement? Second: how does it need to evolve — how many teams work on it, how often do requirements change, which parts change together? Third: what is the failure domain — is a degraded checkout acceptable for five minutes, is a lost measurement acceptable forever? Fourth: what is the team's operational reality — who is on call, what can they actually run at 3 a.m.? An architecture that is correct for Amazon is frequently wrong for a team of eight, and pretending otherwise is the most expensive mistake in the discipline.</p>
+
+<p>These answers are not decoration. They are the input to every trade-off in this guide. A system that must be globally consistent and serves ten thousand writes per second has a fundamentally different shape from one that can tolerate eventual consistency and serves ten writes per minute. Neither is better; they are answers to different questions.</p>
+
+<div class="codeWrap"><pre><code># An architecture decision record — the minimum viable artefact
+# adr/0001-use-eventual-consistency-for-inventory.md
+Status: Accepted
+Context: Inventory counts are read 100x more often than they are written;
+         a 1-second lag on the displayed count is invisible to customers.
+Decision: Accept read-your-writes only for the shopping cart, not the
+          catalogue. Recompute counts asynchronously from the write stream.
+Consequences: + No distributed lock on the hot path.
+               - Displayed stock can be briefly wrong; document it.
+               - Returns and refunds must reconcile against the stream.</code></pre></div>
+
+<p>Write the decision down. The reasoning that leads to a choice decays far faster than the choice itself, and a team that cannot explain why the system is shaped this way will either defend a bad shape forever or change it for no reason at all.</p>
+
+<h4 id="ch1-1-b">The axes of architectural choice</h4>
+
+<p>Architectural styles differ along a handful of axes, and every pattern in this guide is a point in that space. <strong>Structural coupling</strong> — are modules linked at compile time, called across a process boundary, or connected only through events? <strong>Data consistency</strong> — does every read see the latest write, or can reads lag? <strong>Deployment independence</strong> — can one part ship without coordinating a release across the whole? <strong>Failure isolation</strong> — does a fault in one area take down the rest, or is it contained? <strong>Operational complexity</strong> — what must be monitored, deployed, and reasoned about? Every move along these axes trades one property for another; there is no free lunch, only different prices.</p>
+
+<div class="codeWrap"><pre><code># The trade-off in one table (rows are properties, columns are styles)
+#                 Monolith  ModularMono  Microservices
+# Structural coupling   tight      loose      none
+# Data consistency     strong     strong     eventual
+# Deployment indep.     none       partial    full
+# Failure isolation     poor       moderate   good
+# Operational complexity  low     low        high</code></pre></div>
+
+<p>Read the table as a set of prices, not a ranking. A modular monolith gives you loose coupling and strong consistency at low operational cost; you give up independent deployment of individual modules. Microservices give you full deployment independence and failure isolation; you give up transactions, you take on distributed-systems failure modes, and you must invest in observability before you need it. Choosing is pricing, not preferring.</p>
+
+<div class="note">If you cannot fill in the table for your own system, you do not yet know your system well enough to choose an architecture. The measurement — load tests, failure drills, change-lead-time tracking — comes before the style.</div>
+
+<h3 id="ch1-2" data-toc>Evolution, not revolution</h3>
+
+<p>The history of most working systems is not a sequence of deliberate architectural decisions. It is a monolith that worked, then strained, then had modules carved out of it under pressure, and either became a set of coherent services or became a distributed monolith that paid all the costs and kept none of the benefits. The pattern repeats because the failure is predictable: teams adopt a target architecture instead of a migration path.</p>
+
+<p>Evolutionary architecture starts from the current state and asks what the next step must buy. The first step is rarely "adopt microservices." It is usually "stop the monolith from getting worse" — enforce boundaries, split the database logically, get the build fast enough that small changes are cheap. Those steps are reversible, they buy breathing room, and they are prerequisites for any larger move. A system with no module boundaries cannot be decomposed; it can only be rewritten, and rewrites fail at a rate the industry has measured and nobody likes to repeat.</p>
+
+<h4 id="ch1-2-a">The rhythm of change</h4>
+
+<p>A useful heuristic: the right architecture is the one that matches the rate at which the parts of the system change. If the notification subsystem changes weekly and the tax calculation changes yearly, they have no business being the same deployable unit, the same data model, or the same team's cognitive load. Architecture is partly sociology — Conway's law is not a curiosity but a design constraint — and the structure that ignores how the organisation actually communicates will be circumvented by it.</p>
+
+<p>Measure the rhythm before you design for it. Count commits per module over a quarter. Record which modules are in the same pull requests. Note which database tables are always migrated together. The coupling that shows up in the data is the coupling you must address; the coupling that exists only in someone's head is a documentation problem, not an architecture problem.</p>
+
+<div class="codeWrap"><pre><code># Finding real coupling from git history — run per candidate module
+# Which files change together more often than chance?
+git log --name-only --pretty=format: | grep -v '^$' | \
+  xargs -I{} sh -c 'echo {}' | sort | uniq -c | sort -rn | head -20
+# Then pair: for the top 20 files, count commits touching both.
+# A pair with &gt; 70% co-change rate is one module, however the
+# code is currently laid out.</code></pre></div>
+
+<p>Co-change analysis is cheap, quantitative, and immune to the "we all know it's coupled" storytelling that substitutes for evidence in design reviews. Run it before drawing boxes.</p>
+
+<h4 id="ch1-2-b">The three viable stopping points</h4>
+
+<p>For most organisations there are exactly three shapes worth building deliberately: the monolith, the modular monolith, and the service-oriented system (microservices being the fully realised extreme). The monolith for a small team and a domain that changes slowly; the modular monolith when the team has grown past the codebase's ability to stay coherent; services when independent deployment or independent scaling is a demonstrated, measured necessity — not an aspiration. Everything between these points is a transition, and transitions should be walked through, not camped in.</p>
+
+<div class="codeWrap"><pre><code># A crude but honest readiness scorecard (1 = no, 5 = yes)
+# Do we have automated tests that run in under 10 minutes?  ___
+# Can we deploy in under 30 minutes without a coordinated window?  ___
+# Is every external integration behind an interface we own?  ___
+# Do we have structured logs, metrics, and traces in production?  ___
+# Is on-call sustainable — no page storms, runbooks that work?  ___
+# Score under 15: fix the foundations before distributing the system.</code></pre></div>
+
+<p>The scorecard is not a gate set in stone; it is a way to stop "we should do microservices" from being decided by magazine articles. Distribution multiplies every operational weakness by the number of services. Weak foundations do not disappear; they get replicated.</p>
+
+<div class="warn">The most common architectural failure is not picking the wrong style. It is picking a style for a system the team cannot yet operate at the monolith stage, then distributing the chaos.</div>
+
+<h3 id="ch1-3" data-toc>Reading a system before judging it</h3>
+
+<p>Before proposing any change to a system you inherited, learn to read it. The reading has a fixed order because each layer explains the next: entry points, then data flow, then state, then failure modes. Skipping ahead is how you propose a "simplification" that quietly removes the one load-shedding valve someone added at 2 a.m. three years ago.</p>
+
+<p>Start at the edges. What accepts traffic — a web front door, a message consumer, a scheduled job? What is the system's real API, including the undocumented queue topic that three other teams publish to? The edges define the system's obligations; everything inside exists to honour them.</p>
+
+<h4 id="ch1-3-a">The reading order</h4>
+
+<p>First, enumerate entry points and their producers and consumers. Second, trace one request end to end, noting every hop, every cache, every synchronous call. Third, inventory state: every database, every queue, every file — who owns each, and who may read it directly. Fourth, find the fail-open and fail-closed paths: what happens when each dependency is slow, unavailable, or returning garbage. Fifth, read the deployment topology: what runs where, what is shared, what is single-threaded by convention. This five-step read takes a focused week on a mid-sized system and pays for itself the first time it prevents a bad proposal.</p>
+
+<div class="codeWrap"><pre><code># Minimal trace of one request, by hand — do this before any tooling
+# 1. Browser POST /orders  →  2. API gateway  →  3. Order service
+# 4. Order service → PostgreSQL (tx)  →  5. publishes OrderCreated
+# 6. Inventory consumer → stock decrement  →  7. shipping consumer
+# Note at each hop: timeout, retry, idempotency key, cache, owner.
+# A system you can trace on one page is a system you can change.</code></pre></div>
+
+<p>The hand trace matters more than it looks. Tooling shows you what is instrumented; the hand trace shows you what exists. The undocumented cron job that reconciles payments at midnight will never appear in a metrics dashboard, and it will surprise you exactly once.</p>
+
+<h4 id="ch1-3-b">The archaeology layer</h4>
+
+<p>Every inherited system carries archaeology: the feature that was built for one client and kept, the table with no writer, the service that duplicates another service's logic because the two teams do not speak. Archaeology is not a defect to be cleaned up eagerly; it is the system's actual behaviour, often load-bearing in ways nobody remembers. Log it, date it, and leave it alone until you have both the evidence and the budget to remove it safely.</p>
+
+<div class="codeWrap"><pre><code># archaeology/log.md — living register of suspicious components
+# | component      | first seen | behaviour | suspected why      | action          |
+# | legacy-tax-svc | 2019       | duplicates tax-engine | acquisition, never retired | quarantine: route reads, shadow-write, then cut |
+# | reconcile-cron  | 2021       | nightly job | one-off fix that stayed | document; candidate for deletion |
+# Rule: no archaeology item is deleted from the code until it is
+# deleted from this log, and the log entry outlives the removal.</code></pre></div>
+
+<p>Treat the log as part of the architecture, not a side artefact. When the next architect reads the system, the log is what turns a six-week archaeology dig into a twenty-minute read, and it is the difference between informed change and superstition.</p>
+
+<div class="tip">Reading order, again, because it is skipped constantly: entry points, data flow, state, failure modes, deployment topology. A proposal made before the fifth step is a guess wearing the costume of a plan.</div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 · The monolith: structure and limits</h2>
+
+<h3 id="ch2-1" data-toc>Anatomy of the working monolith</h3>
+
+<p>A monolith is a single deployable unit: one build, one artifact, one process (or a small cluster of identical processes) that owns the entire domain. The appeal is not nostalgia; it is that the monolith makes the three hardest problems in software — transactions, consistency, and debugging — trivial by default. A function call is a function call. A database commit is a database commit. A stack trace is one stack trace, end to end, no trace IDs required.</p>
+
+<p>The trap is that these properties decay silently. The monolith does not fail on the day it becomes unmaintainable; it fails slowly, as build times stretch from minutes to hours, as every deploy becomes a coordinated event, as a change in one module breaks an unrelated module through a shared table nobody owns. The failure is invisible in metrics because it shows up as organisational drag: longer lead times, more coordination meetings, more fear of deploy day.</p>
+
+<h4 id="ch2-1-a">The anatomy that matters</h4>
+
+<p>Look inside any long-lived monolith and you will find the same layers, regardless of language. At the top, the delivery layer: controllers, handlers, or endpoints that translate the outside world into internal calls. Beneath it, the domain layer: the business rules, the invariants, the reason the system exists. Beneath that, the data layer: repositories, DAOs, ORMs, and the schema that defines what state is even expressible. The interesting question is never whether these layers exist — they always do — but whether the dependencies point only downward. The monolith's health is measured by the direction of its imports, not by the names of its packages.</p>
+
+<div class="codeWrap"><pre><code># The healthy monolith: dependencies point down, always
+# delivery/  →  domain/  →  data/  →  (external services via interfaces)
+# data/ must never import domain/ — that is the line that, once crossed,
+# turns a layered system into a tangle where nothing can be tested alone.
+# A 5-line CI check kills the disease at birth:
+#   grep -rn "import.*data.*domain" src/ &amp;&amp; exit 1</code></pre></div>
+
+<p>The single most valuable habit in a monolith is the architectural test — an executable check that fails the build when a forbidden dependency appears. It costs almost nothing, it runs in seconds, and it converts "we should keep the layers clean" from a code-review aspiration into a machine-enforced invariant.</p>
+
+<h4 id="ch2-1-b">Where monoliths genuinely win</h4>
+
+<p>Be honest about the monolith's advantages, because they are real and they are the reason most systems should stay monoliths. Transactions are local: a transfer that debits one account and credits another either commits or rolls back as one unit. Joins are possible, which means reporting and ad-hoc analysis do not require a data-platform team. Testing is fast: one process, one database, no network partitions to simulate. Deployment is one artifact — there is no distributed transaction to reason about, no eventual-consistency surprise waiting in production. For a team under twenty and a domain under active exploration, these advantages outweigh every scaling argument ever made about services.</p>
+
+<div class="codeWrap"><pre><code>BEGIN;
+  UPDATE accounts SET balance = balance - 100 WHERE id = 7;
+  UPDATE accounts SET balance = balance + 100 WHERE id = 42;
+  INSERT INTO ledger_entries (debit_account, credit_account, amount)
+  VALUES (7, 42, 100);
+COMMIT;
+-- In a microservices world, this 6-line transaction becomes a saga,
+-- a compensating action, and an open question about what "done" means.
+-- In the monolith, it is just correct.</code></pre></div>
+
+<p>The transaction example is not a toy; it is the canonical case. Any domain where money, inventory, or state transitions must be atomic is a domain where distribution is a tax you pay deliberately, not a benefit you receive automatically.</p>
+
+<h3 id="ch2-2" data-toc>The five failure modes</h3>
+
+<p>Monoliths do not die of old age; they die of five specific diseases, and each has an early signal you can measure before it becomes a crisis. Recognising the signal early is the difference between a controlled refactor and a panicked rewrite.</p>
+
+<h4 id="ch2-2-a">Cognitive overload</h4>
+
+<p>The first disease is cognitive: the codebase grows past what any one person can hold in their head, and onboarding stretches from days to months. The signal is measurable — time-to-first-contribution for new engineers, and the number of files a typical change touches. When the average pull request stops being reviewable in one sitting, the monolith has crossed the size where individual reasoning about the whole is possible. The remedy is not distribution; it is modularisation and documentation of the seams, which is the subject of chapter 3.</p>
+
+<div class="codeWrap"><pre><code># Measuring cognitive load from git history
+# Average files changed per pull request over the last 6 months:
+git log --merges --pretty=format: --name-only | grep -v '^$' | wc -l
+# Average lines changed per PR:
+git log --no-merges --shortstat --pretty=format: | grep 'file' | \
+  awk '{ins+=$4; del+=$6} END {print ins" insertions, "del" deletions"}'
+# If a typical PR touches &gt; 15 files, reviewers are skimming, not reviewing.</code></pre></div>
+
+<p>The numbers do not lie the way intentions do. A team that believes "we review carefully" but has 25-file pull requests is not reviewing carefully; it is rubber-stamping, and the defects that slip through are the interest on the loan.</p>
+
+<h4 id="ch2-2-b">Deploy coupling and the long build</h4>
+
+<p>The second disease is deployment coupling: because everything ships together, nothing ships alone. The signal is build and deploy duration. When the build takes longer than the coffee break it interrupts, and when deploys require a coordinator to sequence them, the monolith has become a release train that nobody controls. The deploy queue forms, batching makes each release bigger, and bigger releases are riskier releases — a vicious cycle that ends in "we deploy on Tuesdays only."</p>
+
+<div class="codeWrap"><pre><code># The deploy-queue feedback loop (and how to break it)
+# symptom:  build=45min, deploy window=Tuesday, rollback=hour
+# break it at the cheapest point:
+#   1. split the build: unit (5min) / integration (15min) / e2e (nightly)
+#   2. deploy on green, not on a schedule — every day is deploy day
+#   3. feature flags decouple deploy from release:
+#      - deploy code dark, enable for 1%, then 10%, then 100%
+#   4. measure: changes in production per week, mean time to rollback</code></pre></div>
+
+<p>The goal is not to deploy more often for its own sake. It is to make each deploy small enough that the person who wrote the change can hold the entire change in their head, because that person is the one most likely to notice when it goes wrong.</p>
+
+<h4 id="ch2-2-c">The shared database</h4>
+
+<p>The third disease, and the one that kills the most migration plans, is the shared database. Not sharing between services — that comes later — but sharing between modules inside the monolith. When the order module and the shipping module both write to the orders table, they are not modules; they are two halves of one program with a pretence of separation. The signal is schema migration conflicts and cross-module queries that join across what were meant to be boundaries.</p>
+
+<div class="codeWrap"><pre><code># The tell-tale query — a join that crosses a module boundary
+SELECT o.id, o.total, s.tracking_number
+FROM orders o
+JOIN shipping_records s ON s.order_id = o.id
+WHERE o.status = 'FULFILLING';
+-- This query means order logic and shipping logic share a schema.
+-- When you split the services, this join must become an API call or a
+-- local read model. The query is the boundary, drawn in SQL.</code></pre></div>
+
+<p>The shared database is the hardest disease to cure because the cure — giving each module its own tables, its own schema, its own migration path — must happen while the monolith is still running. It is never done in a quarter; it is done one table at a time, over years, which is why starting early matters more than finishing quickly.</p>
+
+<h4 id="ch2-2-d">Scaling ceilings</h4>
+
+<p>The fourth disease is the scaling ceiling. A monolith scales vertically — bigger machines — until bigger machines stop being cost-effective, then horizontally, by running identical copies behind a load balancer. Horizontal scaling works beautifully until the state that cannot be replicated cheaply: in-memory caches, sticky sessions, file uploads, WebSocket connections. The signal is cost per transaction rising faster than throughput.</p>
+
+<div class="codeWrap"><pre><code># The scaling cost curve, in one equation:
+# monolith:  cost = N * (big machine price) + (stateful workloads)
+# services:  cost = sum(small machines) + (distributed systems tax)
+# The monolith curve is linear and predictable.
+# The services curve is higher, flatter, and full of cliffs.
+# Do not switch curves until you have measured your position on the first.</code></pre></div>
+
+<p>Most teams hit the scaling ceiling far later than they fear, and most teams hit the cognitive ceiling far earlier than they admit. The order matters: fix the team-scaling problem first, because it is the one that hurts now.</p>
+
+<h4 id="ch2-2-e">Technology lock-in</h4>
+
+<p>The fifth disease is technology lock-in: the monolith is written in one language, one framework, one era. That is not a defect — it is a feature, until it is not. The signal is that new requirements would be trivially expressible in a different stack, or that the framework's release cadence has become a burden. The remedy is strangulation, not rewrites: new capabilities get built outside the monolith, and old capabilities are only rewritten when they are extracted.</p>
+
+<div class="codeWrap"><pre><code># The lock-in escape hatch, in one diagram
+#             ┌─────────────────────┐
+#             │   monolith (Java)   │
+#             └──────┬──────────────┘
+#                    │ strangler facade routes by path/tenant
+#         ┌──────────┼──────────┐
+#         ▼          ▼          ▼
+#   [search:Go]  [billing:Rust]  [exports:Elixir]
+#   New capabilities in the right tool; old ones only
+#   rewritten at extraction time. Nothing is free.</code></pre></div>
+
+<p>Lock-in is a slow-acting poison, not an acute illness. The healthy response is not panic; it is keeping the edges of the system (the parts that talk to the outside world) abstracted behind interfaces, so that the edges can be re-implemented without the core noticing.</p>
+
+<div class="warn">The monolith is not the enemy. The monolith is the default that works until specific, measured pressures say otherwise. The enemy is the monolith that has been left to rot past the point where any option is cheap.</div>
+
+<h3 id="ch2-3" data-toc>When to leave the monolith</h3>
+
+<p>The decision to leave is not a technical one alone; it is an organisational one wearing technical clothes. The honest test is whether the monolith's constraints are costing more than the distributed-systems tax would cost. That is a calculable comparison, and calculating it beats vibes every time.</p>
+
+<h4 id="ch2-3-a">The cost of staying</h4>
+
+<p>Quantify what the monolith costs today, in hours and risk. Measure: build and deploy time per week, the number of engineers blocked per deploy, the mean time to roll back, the number of production incidents attributable to deploy-size, and the opportunity cost of features that were not built because the system could not absorb them. These numbers are uncomfortable to collect and impossible to argue with once collected.</p>
+
+<div class="codeWrap"><pre><code># The staying-cost ledger — fill it in honestly, per quarter
+# | cost category                | hours/quarter | incidents | risk |
+# | build+deploy wait             |      180      |     -     |  low   |
+# | blocked engineers per deploy  |       90      |     -     |  med   |
+# | deploy-caused incidents       |      40       |     6     |  high  |
+# | features not built (estimate) |     400       |     -     |  high  |
+# Total: 710 hours/quarter. That is your budget for a migration.
+# If the migration would cost more than 2 quarters of that, stay.</code></pre></div>
+
+<p>The ledger turns "the monolith is killing us" from a feeling into a number, and the number either justifies the migration or it does not. If it does not, the right answer is to fix the monolith — faster builds, better tests, stricter module boundaries — and revisit the question next year.</p>
+
+<h4 id="ch2-3-b">The cost of leaving</h4>
+
+<p>Now quantify what distribution will cost, and be brutally honest because these costs are systematically underestimated. Every synchronous call becomes a network call with a failure mode. Every transaction becomes a question. Every deploy becomes a coordination problem. Every developer needs to understand caching, eventual consistency, and distributed tracing. Add the infrastructure: service discovery, message brokers, observability stacks, CI pipelines per service, security review per API. The operational tax is real, recurring, and it compounds with the number of services.</p>
+
+<div class="codeWrap"><pre><code># The leaving-cost ledger — the other half of the comparison
+# | new capability               | first-year cost       |
+# | distributed tracing          | 2 engineers × 3 months |
+# | service mesh / observability | 3 engineers × 6 months |
+# | CI/CD per-service pipeline   | 1 engineer × 4 months |
+# | saga / consistency patterns  | ongoing, per service  |
+# | on-call complexity           | +N pages per night    |
+# Rule of thumb: 5 services is where the tax exceeds the benefit
+# for any team under 15. Below that, modular monolith wins.</code></pre></div>
+
+<p>The two ledgers together form the decision. If staying costs 710 hours a quarter and leaving costs a one-time 2,000 hours plus a permanent 10% operational overhead, the arithmetic is simple and it is not close. The migration pays for itself in four quarters and saves 400 hours every quarter thereafter.</p>
+
+<div class="tip">The decision rule, in one sentence: distribute only when the monolith's constraints are measurably costing more than the distributed tax will cost, and never distribute to look modern, because modernity is not a return on investment.</div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 · The modular monolith</h2>
+
+<h3 id="ch3-1" data-toc>Modules before services</h3>
+
+<p>The modular monolith is the most underrated architecture in the industry: a single deployable with enforced internal boundaries. Each module owns its data, exposes a public interface, and cannot reach into another module's internals. You get the operational simplicity of one process and the organisational scalability of separate codebases. For most teams, between the naive monolith and full microservices, this is the sweet spot.</p>
+
+<p>The critical word is "enforced." A modular monolith without architectural tests is just a monolith with aspirational package names. Boundaries that are documented in a wiki and not checked in CI will be violated within a month, and the violations will be justified each time ("just this once," "the deadline," "the other team was slow"). Enforcement is what turns a convention into an architecture.</p>
+
+<h4 id="ch3-1-a">Defining module boundaries</h4>
+
+<p>Start from business capabilities, not technical layers. A module should correspond to something the business recognises: Orders, Inventory, Shipping, Billing — not "controllers," "services," and "repositories." Each module gets its own namespace, its own database schema (or at minimum its own tables), and a public API that other modules call. The public API is a contract: versioned, documented, and the only way in.</p>
+
+<div class="codeWrap"><pre><code># Enforced module boundaries in Java — ArchUnit test
+@Test
+void modulesMustNotDependOnEachOtherInternally() {
+    noClasses().that().resideInAnyPackage("..orders..")
+        .should().dependOnClassesThat()
+        .resideInAnyPackage("..inventory.internal..", "..shipping.internal..")
+        .check(importedClasses);
+}
+// The test runs in CI, takes 3 seconds, and kills boundary violations
+// at the moment they are introduced — not at the next review.</code></pre></div>
+
+<p>ArchUnit is Java-specific, but the pattern transfers: any language can express "package A may not import package B" as a test. Python has import-linter, TypeScript has ESLint's no-restricted-imports, Rust has module visibility. The tool matters less than the rule: the build fails on violation.</p>
+
+<h4 id="ch3-1-b">Module communication patterns</h4>
+
+<p>Inside a modular monolith, modules communicate through their public APIs — function calls within the same process, not HTTP. This is fast, synchronous, and transactional when needed. But design the interfaces as if they were remote: explicit contracts, versioned request/response objects, no shared mutable state. Why? Because the day you need to extract a module into a service, the interface is already a valid RPC contract. You swap the implementation from a local call to an HTTP call and nothing else changes.</p>
+
+<div class="codeWrap"><pre><code>// Module interface — designed as if it were remote
+public interface OrderService {
+    OrderResult placeOrder(PlaceOrderCommand cmd);
+    Order getOrder(OrderId id);
+    // Commands are explicit; no ORM entities leak across the boundary
+}
+
+// Local implementation in the same process
+@Service
+class OrderServiceImpl implements OrderService { ... }
+
+// Later: swap to an RPC client without touching callers
+@FeignClient("orders-service")
+class OrderServiceClient implements OrderService { ... }</code></pre></div>
+
+<p>The interface-first design is the entire strategy of the modular monolith: you pay a small abstraction cost today to keep the extraction option open forever. Teams that skip this step find that their "modular" monolith is actually a distributed monolith in disguise — coupled through shared database tables, not through clean interfaces.</p>
+
+<h3 id="ch3-2" data-toc>Database separation within one deployable</h3>
+
+<p>The hardest part of modular monoliths is the database. True separation means each module owns its tables and no other module writes to them. Reads can be relaxed (with caution), but writes must be exclusive. This is what makes future extraction possible: when you split the service out, you move the tables with it.</p>
+
+<p>Full separation is a journey, not a flip. Start with separate schemas (PostgreSQL) or separate table prefixes with strict ownership rules. A module may only write to its own schema; reads across schemas are allowed through views or materialised read models, never through direct table access that bypasses the owning module's logic.</p>
+
+<h4 id="ch3-2-a">Schema-per-module in PostgreSQL</h4>
+
+<p>PostgreSQL schemas are the cleanest way to enforce data ownership inside one database. Each module gets its own schema, and database roles can enforce access at the lowest level. A breach of module boundaries then requires an explicit GRANT to succeed — it cannot happen by accident.</p>
+
+<div class="codeWrap"><pre><code>CREATE SCHEMA orders;
+CREATE SCHEMA inventory;
+CREATE SCHEMA billing;
+
+-- Each module connects as its own role
+CREATE ROLE orders_app LOGIN PASSWORD 'xxx';
+CREATE ROLE inventory_app LOGIN PASSWORD 'xxx';
+
+-- Orders can write only to its own schema
+GRANT ALL ON SCHEMA orders TO orders_app;
+GRANT USAGE ON SCHEMA inventory TO orders_app;  -- read-only via views
+REVOKE ALL ON SCHEMA inventory FROM orders_app;
+
+-- The inventory module cannot touch orders at all
+-- (no GRANT = no access, PostgreSQL default-deny)</code></pre></div>
+
+<p>Default-deny is the key discipline. In a shared-schema monolith, every table is writable by every module until someone notices. In a schema-per-module setup, access is impossible until explicitly granted, and the grant is visible in version-controlled migration files.</p>
+
+<h4 id="ch3-2-b">Read models for cross-module queries</h4>
+
+<p>Reporting and UI will eventually need data from multiple modules. The answer is not cross-schema joins; it is read models. Each module publishes events (chapter 7) and subscribes to the events it needs, maintaining its own materialised views. The billing module keeps a denormalised order-summary table updated by order events; it never queries the orders schema directly.</p>
+
+<div class="codeWrap"><pre><code>-- Billing's read model of orders — updated by event consumers
+CREATE TABLE billing.order_summary (
+    order_id        UUID PRIMARY KEY,
+    customer_id     UUID NOT NULL,
+    total_cents     INTEGER NOT NULL,
+    currency        CHAR(3) NOT NULL,
+    placed_at       TIMESTAMPTZ NOT NULL,
+    status          TEXT NOT NULL
+);
+-- Billing can query this freely; it owns this table completely.
+-- Orders never knows this table exists. Coupling is one-way.</code></pre></div>
+
+<p>Read models trade consistency for autonomy: the order summary may lag the canonical order by milliseconds to seconds. For almost all reporting and UI purposes, that lag is invisible. For the rare case where it is not, the read model is not the right tool — the canonical module's API is, at the cost of a synchronous call.</p>
+
+<h3 id="ch3-3" data-toc>When to extract a module</h3>
+
+<p>The modular monolith is not the destination; it is the platform for a future decision. The extraction decision — pull this module out as a service — should be made against specific, measured triggers, not architectural aesthetics.</p>
+
+<h4 id="ch3-3-a">The extraction triggers</h4>
+
+<p>Extract a module when one of four conditions is met, and document which one fired. First: independent scaling — the module has a load profile radically different from the rest and cannot be scaled within the monolith's process. Second: independent deployment — the module changes on a different cadence and forces unrelated deploys. Third: team ownership — a separate team needs full autonomy over the module's code and release schedule. Fourth: technology divergence — the module genuinely needs a different runtime, language, or storage engine. If none of these fire, the module stays in the monolith, and that is a success, not a failure.</p>
+
+<div class="codeWrap"><pre><code># The extraction trigger checklist — answer all four
+# 1. Does this module have a distinct load profile?     [ ] yes [ ] no
+# 2. Does this module need to deploy independently?     [ ] yes [ ] no
+# 3. Does a separate team need ownership?              [ ] yes [ ] no
+# 4. Does this module need different technology?        [ ] yes [ ] no
+# Rule: extract on "yes" for #2 or #3; #1 and #4 are supporting
+# evidence. Extraction without a team or deploy reason is premature.</code></pre></div>
+
+<p>The checklist exists because extraction for its own sake is a failure mode. A module extracted without a pressing reason becomes a distributed monolith: all the operational cost of services, none of the independence, plus a network boundary that makes local reasoning impossible.</p>
+
+<h4 id="ch3-3-b">The extraction procedure</h4>
+
+<p>When extraction fires, the procedure is mechanical — that is the payoff of doing the modular monolith work. Move the module's code to a new repository, move its schema to a new database, replace the in-process interface calls with HTTP/gRPC calls, move the events from in-process to a message broker, and run both in parallel (shadow mode) until parity is proven. Then cut over, then delete the old module. Each step is reversible until the deletion.</p>
+
+<div class="codeWrap"><pre><code># Extraction procedure — 6 steps, each reversible until the last
+# 1. Extract code to new repo (interface unchanged)
+# 2. Move schema to new database (old tables kept, dual-written)
+# 3. Replace interface calls with HTTP clients (feature-flagged)
+# 4. Move in-process events to message broker (shadow mode: both fire)
+# 5. Shadow-run for 2 weeks; compare outputs, errors, latency
+# 6. Cut traffic over; delete old module code
+# Steps 1-5 can roll back in hours. Step 6 is the point of no return.</code></pre></div>
+
+<p>The shadow-run step is the one teams skip and regret. Two weeks of parallel operation reveals the differences in failure modes, latency, and data consistency that no amount of testing catches. It is also cheap — the new service runs with no user-facing traffic — which makes skipping it pure false economy.</p>
+
+<div class="tip">The modular monolith is the highest-return-per-effort architecture in this guide: bounded modules, enforced by tests, communicating through service-ready interfaces, with a database separation plan that makes extraction mechanical. If you only implement one idea from this chapter, implement this one.</div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 · Microservices and service decomposition</h2>
+
+<h3 id="ch4-1" data-toc>Decomposition strategies</h3>
+
+<p>Decomposition is the act of drawing boundaries — deciding what is a service and what is not — and it is the single decision that determines whether a microservices architecture succeeds or collapses into a distributed monolith. The strategies fall into three families, and the choice between them is domain-driven, not technology-driven.</p>
+
+<p>The first strategy is decomposition by business capability: each service owns one thing the business does (payments, shipping, search). The second is decomposition by subdomain from domain-driven design: each service owns a bounded context (chapter 5). The third is decomposition by change rate: components that change together live together. In practice, successful decompositions use business capability as the primary axis and use the others as tie-breakers.</p>
+
+<h4 id="ch4-1-a">The walk-and-talk method</h4>
+
+<p>Before drawing any diagrams, gather the people who know the domain and do a structured walk-through: take a core user journey — placing an order, shipping a product, resolving a refund — and list every step, every system touched, every human decision. The points where the walk changes hands between teams, changes systems, or requires a phone call are your candidate service boundaries. Boundaries that survive this exercise are real; ones that only exist in the slide deck are not.</p>
+
+<div class="codeWrap"><pre><code># Service boundary candidates from a walk-and-talk
+# Journey: customer places an order
+# 1. Cart checkout        →  Orders context     (team A)
+# 2. Payment processing   →  Payments context  (team B)
+# 3. Inventory check      →  Inventory context (team A)
+# 4. Fulfilment routing  →  Shipping context  (team C)
+# Boundaries at the team-handoff points. Orders and Inventory stay
+# together because team A owns both and they change together.</code></pre></div>
+
+<p>The walk-and-talk output is not a final architecture; it is a hypothesis to be tested against code and data. Services that look clean on whiteboard often dissolve when you discover that two "capabilities" share a database table that is updated by triggers from a third.</p>
+
+<h4 id="ch4-1-b">The database test</h4>
+
+<p>The most reliable decomposition test is the database: if two candidate services cannot own separate schemas, they are not separate services. Draw a diagram of every table and which parts of the code write to it. A table written by two modules is a coupling point; either the modules merge, or the table must be split with an event-driven reconciliation process. This test is mechanical, objective, and it kills more bad decompositions than any methodology.</p>
+
+<div class="codeWrap"><pre><code># The database coupling test — run before drawing service boxes
+# For each table, list writers:
+#   orders           → [OrdersService, ShippingService]  ← SPLIT
+#   payments         → [PaymentsService]                ← CLEAN
+#   inventory_stock  → [InventoryService]               ← CLEAN
+#   users            → [IdentityService, OrdersService]  ← SPLIT
+# "SPLIT" rows are where your service boundaries must go,
+# or where you must accept an explicit shared-kernel compromise.</code></pre></div>
+
+<p>The database test produces uncomfortable results more often than not. A monolith's schema is a accretion of years of shortcuts, and forcing services to respect it produces services that are coupled through shared tables. The alternative — a schema redesign before decomposition — is expensive and slow. Most teams choose a middle path: decompose around the tables that are already clean, and leave the coupled tables for a later phase.</p>
+
+<h3 id="ch4-2" data-toc>Service granularity: the two-pizza trap</h3>
+
+<p>Microservices orthodoxy says services should be small enough that a team of two pizzas can build and operate one. The interpretation is wrong: "two pizzas" describes the team size, not the service count, and the goal is autonomy, not minimisation. A service is the right size when a small team can build, deploy, and operate it independently — no other service's release schedule, schema change, or on-call rotation can block it.</p>
+
+<p>Granularity has two failure modes, both expensive. Too fine — nano-services — and you have a distributed system where every business operation is a five-service choreography, debugging requires a PhD in distributed tracing, and deployment is a dependency-resolution puzzle. Too coarse — macro-services — and you have a distributed monolith: services that must deploy in lockstep, share databases, and are really just modules with network overhead. The sweet spot is the service that maps to one bounded context and one team.</p>
+
+<h4 id="ch4-2-a">Signs of wrong granularity</h4>
+
+<p>There are measurable signals that granularity is wrong. If a single user operation calls more than three services synchronously, the choreography is too fine. If two services are always deployed together — every release note mentions both — they are not independent and should be merged. If a service cannot be taken down for maintenance without taking down two others, there is a hidden coupling. If the team operating a service needs to understand the internals of three other services to do their job, the boundaries are wrong.</p>
+
+<div class="codeWrap"><pre><code># Granularity red flags — measure, don't guess
+# 1. Average services called per user request &gt; 3 → too fine
+# 2. Deploy coupling: P(service A and service B in same release) &gt; 0.7 → merge
+# 3. Blast radius: taking down service X takes down &gt; 1 other service → decouple
+# 4. Cross-service knowledge: &gt; 3 services to understand one operation → too fine
+# Each is measurable from tracing, deploy logs, and team interviews.</code></pre></div>
+
+<p>The deploy-coupling metric is the most reliable: pull your CI/CD data and measure the co-occurrence of services in deployments. Services that always deploy together are one service wearing a trenchcoat.</p>
+
+<h4 id="ch4-2-b">The extractor's dilemma</h4>
+
+<p>When extracting from a modular monolith, the granularity question becomes concrete: you have modules, and you need services. The rule is one bounded context = one service, no more. A module that maps to a bounded context becomes a service. Two modules that together form one bounded context stay together as one service with two internal modules. A module that spans two bounded contexts must be split along the context boundary, not kept whole for convenience.</p>
+
+<div class="codeWrap"><pre><code># Module-to-service mapping
+# Module: OrderManagement  →  BoundedContext: Orders     →  Service: orders
+# Module: OrderShipping    →  BoundedContext: Shipping   →  Service: shipping
+# Module: OrderBilling     →  BoundedContext: Billing   →  Service: billing
+# Module: FraudDetection   →  spans Orders+Payments     →  SPLIT FIRST, then extract
+# The FraudDetection split is the hard case: it must be decomposed into
+# fraud-orders and fraud-payments before either can be a clean service.</code></pre></div>
+
+<p>The FraudDetection case is the common one: a module that grew across boundaries and now straddles two contexts. Resist the urge to extract it as one service — that creates a distributed monolith. Split it first, accept the temporary duplication, and extract the pieces separately. The duplication is cheaper than the coupling it prevents.</p>
+
+<h3 id="ch4-3" data-toc>The distributed monolith trap</h3>
+
+<p>The distributed monolith is the failure mode that consumes more engineering budget than any other: a system that pays all the costs of microservices — network calls, distributed transactions, observability overhead, deployment coordination — while gaining none of the benefits, because the services are coupled through shared databases, synchronous call chains, and coordinated releases. It is worse than a monolith because it is harder to debug and harder to change.</p>
+
+<p>The trap is seductive because it looks like progress. You have services. You have containers. You have a service mesh. But the services cannot deploy independently — a schema change in service A requires a coordinated deploy of services B, C, and D. You have built a distributed system with the coupling of a monolith and the operational complexity of a service mesh.</p>
+
+<h4 id="ch4-3-a">Recognising the trap</h4>
+
+<p>The recognition test is the deploy-independence test: can you deploy service A without deploying anything else? In a true microservices architecture, the answer is always yes. In a distributed monolith, the answer is "yes, but the database migration has to go first" or "yes, but service B needs to be running the new version first." Those qualifications are the tell. Deploy independence is binary: either the services are independent or they are not.</p>
+
+<div class="codeWrap"><pre><code># Deploy independence test — run it on every service pair
+# For each service A:
+#   1. Roll back service B to its previous version
+#   2. Deploy service A's new version
+#   3. Does anything break?
+# If yes → A and B are coupled → either merge them or break the coupling
+# Run this quarterly; coupling creeps in through "temporary" compatibility shims.</code></pre></div>
+
+<p>The quarterly test matters because coupling arrives gradually. A "temporary" backward-compatibility shim introduced during a migration becomes permanent. A shared library for "common" DTOs becomes a distributed coupling point. The deploy-independence test catches each increment before it calcifies.</p>
+
+<h4 id="ch4-3-b">Escaping the trap</h4>
+
+<p>Escape is a deliberate project, not a side effect of normal work. The steps are: identify the coupling (database, synchronous calls, shared libraries, deploy ordering), choose the decoupling strategy (database ownership, async events, versioned contracts, interface extraction), execute the decoupling in small reversible steps, and only then consider the services decoupled. Each step is a normal-sized engineering task; the error is treating the whole escape as a "rewrite" and trying to do it in one quarter.</p>
+
+<div class="codeWrap"><pre><code># Escape plan template — one coupling at a time
+# Coupling: orders and shipping share the orders table
+# Step 1: shipping creates its own shipping_orders table (dual-write via events)
+# Step 2: shipping stops reading orders.orders (read from its own table)
+# Step 3: orders stops reading shipping tables (already clean)
+# Step 4: drop the shared table access
+# Timeline: 3 months, each step independently deployable and reversible</code></pre></div>
+
+<p>The timeline is honest: decoupling is measured in quarters, not sprints. Anyone promising a faster escape is either underestimating the coupling or planning a rewrite in disguise. Rewrite in the distributed monolith context means rewriting the services while keeping the coupling — producing a new distributed monolith with better code.</p>
+
+<div class="warn">The distributed monolith is the default outcome of a naive microservices adoption. The only reliable prevention is the deploy-independence test, run quarterly, with the discipline to merge services that fail it. Splitting services is easy; merging them is hard; doing both is architecture.</div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 · Bounded contexts and domain-driven design</h2>
+
+<h3 id="ch5-1" data-toc>Contexts, ubiquitous language, and models</h3>
+
+<p>A bounded context is a linguistic boundary: inside it, every term has exactly one meaning, and that meaning is expressed in a ubiquitous language shared by the code, the team, and the domain experts. The order that the customer places, the order that the warehouse fulfils, and the order that the carrier ships are three different concepts in three different contexts — not one "Order" entity that gets overloaded with three sets of fields. Getting this right is the highest-leverage design decision in a distributed system because it determines what can vary independently.</p>
+
+<p>The practical test is simple: if two teams use the same word to mean different things, you have two bounded contexts. If one team uses two different words for the same thing, you have a communication problem, not a boundary. Most "architecture disagreements" are actually language disagreements wearing a technical costume — resolving them requires a dictionary, not a diagram.</p>
+
+<h4 id="ch5-1-a">Mapping contexts to code</h4>
+
+<p>In code, a bounded context maps to a deployable unit or a module with strict internal cohesion. The entities, value objects, and domain services inside a context are named in the ubiquitous language; the same concept in a different context gets a different name and different fields. The mapping is one context = one team = one service or module, and the team owns the language inside that boundary. No cross-context "shared kernel" is needed unless both contexts explicitly agree to it.</p>
+
+<div class="codeWrap"><pre><code>// Orders context — the customer's order
+class Order {
+    OrderId id;              // order identity in the Orders context
+    CustomerId customerId;    // reference, not a full Customer entity
+    List&lt;OrderLine> lines;
+    OrderStatus status;      // PLACED, CONFIRMED, FULFILLING
+}
+
+// Shipping context — the shipment, a different concept
+class Shipment {
+    ShipmentId id;           // different identity, different context
+    OrderId orderId;         // reference by ID, not a shared entity
+    List&lt;Package&gt; packages;
+    ShipmentStatus status;   // PENDING, PICKED_UP, IN_TRANSIT</code></pre></div>
+
+<p>Notice what is absent: no shared Order entity that both contexts load and save. Each context has its own model, its own table, its own lifecycle. The two contexts communicate through events and APIs, not through a shared schema. This is the difference between a bounded context and a database view.</p>
+
+<h4 id="ch5-1-b">Context mapping patterns</h4>
+
+<p>When contexts must interact, the relationship is explicit and named. A <strong>customer/supplier</strong> relationship means one context's output is another's input, and the supplier team has an obligation to the customer. A <strong>conformist</strong> relationship means one context adopts another's model wholesale — a last resort that eliminates local autonomy. A <strong>anti-corruption layer</strong> translates between models so that a legacy context's concepts do not leak into a new one. Choosing the relationship is a negotiation, not a technical decision, and the negotiation outcome should be documented in the context map.</p>
+
+<div class="codeWrap"><pre><code># Context map — the relationships between bounded contexts
+# Orders → Shipping : customer/supplier (orders publishes OrderConfirmed;
+#                    shipping consumes and fulfils)
+# Payments → Orders  : anti-corruption layer (payments has its own
+#                    transaction model; orders never sees payment internals)
+# Search  → Orders  : conformist (search reads orders' published events
+#                    and builds its own read model; no reverse dependency)
+# Each relationship is one-directional and documented. No cycles.</code></pre></div>
+
+<p>The context map is a living document, not a wiki page that dies at the diagram's birthday. Review it quarterly against the deploy-independence test from chapter 4: if two contexts have a cycle in the map, they have a coupling in the code, and the cycle must be broken.</p>
+
+<h3 id="ch5-2" data-toc>Aggregates, invariants, and consistency</h3>
+
+<p>Inside a bounded context, the aggregate is the consistency boundary: a cluster of entities and value objects that must be consistent with each other at all times. An aggregate is modified only through its root entity, and invariants — the business rules that must always hold — are enforced inside the aggregate. The order aggregate enforces "total = sum of lines"; the shipment aggregate enforces "a package cannot be assigned to two shipments." These invariants are the reason the aggregate exists: they protect the business rules from being scattered across services.</p>
+
+<p>The aggregate is also the transaction boundary. One transaction modifies one aggregate instance. Cross-aggregate and cross-context consistency is eventual, achieved through events and sagas (chapter 7). This is not a limitation to work around; it is the core mechanism that lets bounded contexts stay autonomous.</p>
+
+<h4 id="ch5-2-a">Designing aggregates</h4>
+
+<p>The design heuristic is small aggregates, modified by reference. An aggregate should contain only what must be consistent together — if two entities can be consistent without each other, they are separate aggregates. The root is loaded and saved by a repository that enforces optimistic concurrency: a version column that conflicts when two transactions try to modify the same aggregate concurrently. Small aggregates reduce contention; large aggregates create it.</p>
+
+<div class="codeWrap"><pre><code>@Entity
+class Order {
+    @Id OrderId id;
+    @Version Long version;           // optimistic concurrency
+    CustomerId customerId;
+    List&lt;OrderLine&gt; lines;
+    OrderStatus status;
+
+    void addLine(ProductId product, int qty, Money price) {
+        // Invariant enforced inside the aggregate
+        if (status != OrderStatus.PLACED)
+            throw new OrderNotModifiableException(id);
+        lines.add(new OrderLine(product, qty, price));
+    }
+    // No setters exposed; all mutations go through behaviour methods</code></pre></div>
+
+<p>The version column is the concurrency mechanism: two concurrent loads of the same order, one commit wins, the other gets an OptimisticLockException and must retry at a higher level. It is simple, it works, and it avoids the distributed lock that would couple services.</p>
+
+<h4 id="ch5-2-b">Eventual consistency across contexts</h4>
+
+<p>Cross-context consistency is achieved through domain events: an aggregate publishes an event when something meaningful happens, and other contexts consume it to update their own state. The event is a fact, not a command: "OrderConfirmed," not "please reserve inventory." Facts are unambiguous, they can be replayed, and they decouple the publisher from the consumers. The consumer's consistency is eventual — it may lag by milliseconds — and that lag is the price of autonomy.</p>
+
+<div class="codeWrap"><pre><code># Domain event schema — a fact, not a command
+{
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "type": "OrderConfirmed",
+  "occurredAt": "2026-10-15T10:32:00Z",
+  "aggregateId": "order-12345",
+  "data": {
+    "customerId": "cust-987",
+    "totalCents": 14999,
+    "currency": "USD"
+  }
+}
+# Every event has a unique ID, a timestamp, and an aggregate ID.
+# Consumers can deduplicate, replay, and audit. Commands cannot.</code></pre></div>
+
+<p>Eventual consistency is not a defect to be hidden; it is a property to be surfaced. The UI that shows "order confirmed, preparing shipment" is honest about the lag. The UI that shows "order confirmed, shipped" while the shipment event has not been processed yet is a lie that will be punished in production.</p>
+
+<h3 id="ch5-3" data-toc>DDD in the trenches</h3>
+
+<p>Domain-driven design is often presented as a set of patterns — entities, value objects, aggregates, repositories, domain services — and then criticised as academic when the patterns do not survive contact with a legacy database or a third-party API. The criticism is misplaced. The patterns are not the point; the strategic design — bounded contexts, context mapping, ubiquitous language — is. The tactical patterns are tools to use when they fit and ignore when they do not.</p>
+
+<p>A pragmatic adoption order: first, find the bounded contexts (chapter 4's walk-and-talk and database test). Second, define the ubiquitous language per context and put it in the code. Third, draw the context map and choose relationship patterns. Fourth, introduce aggregates where the invariants are real. Fifth, use repositories and domain services as needed, not as decoration. This order puts the strategic work first and lets the tactical patterns earn their place.</p>
+
+<h4 id="ch5-3-a">The legacy database problem</h4>
+
+<p>The most common DDD obstacle is a legacy schema that does not respect context boundaries. The temptation is to build the new bounded context directly on top of the legacy tables, importing the legacy model as-is. The result is a conformist context that inherits every wart of the legacy system and cannot evolve. The better path is an anti-corruption layer: the new context has its own model, and a translation layer maps between the new model and the legacy schema. The translation layer is expensive but bounded — it only exists at the boundary, and the legacy system can be retired behind it.</p>
+
+<div class="codeWrap"><pre><code># Anti-corruption layer — the translation boundary
+# Legacy schema: one giant "orders" table with 80 columns,
+# mixed customer/payment/shipping data, no clear ownership.
+# New Orders context: clean Order aggregate, own schema.
+# ACL: OrderLegacyRepository translates between them.
+class OrderLegacyRepository {
+    Order findById(OrderId id) {
+        LegacyOrderRow row = legacyDb.query("SELECT * FROM orders WHERE id = ?", id);
+        return OrderMapper.toDomain(row);   // translate to the domain model
+    }
+    // The domain never sees LegacyOrderRow. The ACL is the only place
+    # that knows the legacy schema exists.</code></pre></div>
+
+<p>The ACL is also the migration path: once the new context's schema is stable and the legacy system's other consumers have moved, the legacy tables can be dropped. The ACL makes that deletion a configuration change, not a code change.</p>
+
+<h4 id="ch5-3-b">When DDD is overkill</h4>
+
+<p>DDD is not free, and for some systems it is the wrong tool. A CRUD application with no business rules — a simple content management system, a basic reporting dashboard — does not need bounded contexts, aggregates, or an ubiquitous language. The test is whether the domain has invariants worth protecting. If the system is mostly create-read-update-delete with no rules beyond "field X is required," the domain model is an anaemic wrapper around the database, and DDD's overhead is not buying anything. Use the patterns where the domain is complex; use CRUD where it is not.</p>
+
+<div class="codeWrap"><pre><code># The DDD applicability test
+# 1. Does the domain have business invariants that must always hold?  [Y/N]
+# 2. Do multiple teams work on different parts of the domain?          [Y/N]
+# 3. Will the system evolve over years, not months?                     [Y/N]
+# 4. Is the domain language ambiguous or overloaded?                   [Y/N]
+# If you answered Y to 1 and 2, DDD's strategic design pays off.
+# If you answered N to 1, skip the tactical patterns and use CRUD.</code></pre></div>
+
+<p>The test prevents two errors: applying DDD to a simple system (over-engineering) and ignoring it in a complex one (under-engineering). The middle is a judgement call, and the test makes the judgement explicit and revisable.</p>
+
+<div class="tip">Bounded contexts are not a technical pattern; they are an organisational boundary that happens to align with service boundaries. If the team structure and the context map disagree, one of them is wrong — usually the context map, because reorganising teams is harder than redrawing diagrams, but not always.</div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 · Communication: synchronous and asynchronous</h2>
+
+<h3 id="ch6-1" data-toc>Synchronous vs asynchronous</h3>
+
+<p>Every inter-service communication is either synchronous — the caller waits for a response — or asynchronous — the caller publishes a message and continues. The choice is not a technical detail; it determines the coupling, the failure modes, and the consistency model of the system. Synchronous calls are simple to reason about but create temporal coupling: the caller cannot proceed without the callee, and the callee's slowness or failure becomes the caller's problem. Asynchronous messages decouple in time but introduce eventual consistency and the operational complexity of a message broker.</p>
+
+<p>The industry default has shifted toward asynchronous-first, and the shift is correct for most systems, but the reasoning matters more than the trend. Asynchronous communication is the right choice when the caller does not need the result immediately, when the callee's latency is unpredictable, or when multiple consumers need to react to the same event. Synchronous is the right choice when the caller needs the result to proceed, when the callee is fast and reliable, or when the conversation is naturally request-response (a search query, a login check).</p>
+
+<h4 id="ch6-1-a">The coupling spectrum</h4>
+
+<p>Synchronous calls create three couplings: temporal (both must be available at the same time), semantic (the caller must understand the callee's interface), and failure (the callee's failure propagates to the caller). Asynchronous messages remove the temporal coupling and soften the failure coupling, but they do not remove semantic coupling — the consumer still must understand the message schema. What they add is a new coupling: the message contract, which must be versioned and evolved carefully because both sides are deployed independently.</p>
+
+<div class="codeWrap"><pre><code># Coupling comparison, side by side
+# Synchronous (REST/gRPC):
+#   temporal:    caller blocks until callee responds
+#   failure:     callee down → caller fails (or circuit-breaks)
+#   versioning:  coordinated deploy or strict backward compatibility
+# Asynchronous (message broker):
+#   temporal:    caller publishes and continues
+#   failure:     callee down → messages queue, replay on recovery
+#   versioning:  schema registry, forward/backward compatible changes
+# Neither eliminates coupling; they trade one set for another.</code></pre></div>
+
+<p>The temporal decoupling is the most underrated benefit: a slow consumer does not slow the producer. In a synchronous chain of five services, the end-to-end latency is the sum of all five; in an asynchronous system, the producer's latency is just its own. The cost is that the producer cannot know whether the message was ever processed, which is why observability (chapter 11) is not optional in asynchronous systems.</p>
+
+<h4 id="ch6-1-b">The synchronous fallacy</h4>
+
+<p>The most common communication anti-pattern is the synchronous call chain: a user request triggers a REST call from the API gateway to service A, which calls service B synchronously, which calls service C. The end-to-end latency is the sum, the availability is the product (if each service is 99.9% available, the chain is 99.7%), and a slow downstream service blocks all upstream threads. The fix is not "make services faster"; it is to break the synchronous chain with asynchronous events or a cache.</p>
+
+<div class="codeWrap"><pre><code># The synchronous chain, and its asynchronous replacement
+# BEFORE: API → Orders → Inventory → Shipping → Notification
+#   (4 serial calls, 4 failure points, sum of all latencies)
+# AFTER:  API → Orders (sync, fast path)
+#         Orders publishes OrderConfirmed (async)
+#         Inventory consumes → reserves stock
+#         Shipping consumes → schedules fulfilment
+#         Notification consumes → sends email
+#   (1 sync call, 3 parallel async consumers, 1 failure domain)</code></pre></div>
+
+<p>The replacement is not free — it requires idempotency (a message may be delivered twice), ordering guarantees (a consumer may see events out of order), and dead-letter handling (a message that cannot be processed must go somewhere visible). But those are solved problems with standard patterns, and the payoff is a system that scales and fails gracefully.</p>
+
+<h3 id="ch6-2" data-toc>Messaging patterns</h3>
+
+<p>Asynchronous communication is implemented through message brokers, and the patterns that govern their use are well-established. The two foundational patterns are publish/subscribe (one message, many consumers) and point-to-point (one message, one consumer from a group). Everything else — event sourcing, CQRS, sagas, process managers — is built on these two.</p>
+
+<p>Choose publish/subscribe when multiple contexts need to react independently to the same event: OrderConfirmed should trigger inventory reservation, shipping scheduling, and email notification, and none of them knows about the others. Choose point-to-point when a workload must be distributed across competing consumers: 10,000 image-resizing jobs need to be processed by a pool of workers, each job exactly once.</p>
+
+<h4 id="ch6-2-a">Message delivery semantics</h4>
+
+<p>Every message system promises one of three delivery guarantees: at-most-once (messages may be lost, never duplicated), at-least-once (messages may be duplicated, never lost), and exactly-once (the holy grail that is not practically achievable in a distributed system — systems that claim it are either using transactions that don't scale or lying). The honest choice is at-least-once with idempotent consumers, and the design must assume duplicates and out-of-order delivery from day one.</p>
+
+<div class="codeWrap"><pre><code># Idempotent consumer pattern — the only correct way
+class OrderConfirmedConsumer {
+    void handle(OrderConfirmed event) {
+        if (processedEventIds.contains(event.eventId)) {
+            return;  // duplicate delivery — already handled, skip
+        }
+        reserveInventory(event.aggregateId, event.data.items);
+        processedEventIds.add(event.eventId);
+        // If the process crashes between the two operations,
+        // the message is redelivered, the dedup check catches it.
+    }
+}
+// The dedup store is per consumer group, durable, and survives restarts.</code></pre></div>
+
+<p>The deduplication store is the price of at-least-once delivery. It can be a database table, a Redis key with TTL, or a log — the mechanism matters less than the guarantee: the consumer must be able to answer "have I already processed this event?" before doing anything with side effects.</p>
+
+<h4 id="ch6-2-b">Schema evolution</h4>
+
+<p>Message schemas evolve, and the evolution is harder than API evolution because consumers are not coordinated with producers. A schema registry (Confluent Schema Registry, AWS Glue, or a simple versioned JSON schema in a repo) enforces compatibility rules: adding an optional field is safe (backward compatible), removing a field or changing a type is breaking. The registry blocks incompatible publishes at produce time, which is the only enforcement that works — post-hoc compatibility is a hope, not a strategy.</p>
+
+<div class="codeWrap"><pre><code># Schema evolution rules — enforced by the registry
+# BACKWARD compatible: old consumers can read new messages
+#   - add optional field with default     ✓
+#   - add new record type                 ✓
+# FORWARD compatible: new consumers can read old messages
+#   - remove optional field               ✓
+#   - remove field with default           ✓
+# BREAKING: neither direction works
+#   - remove required field               ✗
+#   - change field type                   ✗
+#   - rename field                        ✗
+# Rule: only make backward+forward compatible changes. Ever.</code></pre></div>
+
+<p>The "ever" is not rhetorical. A breaking schema change in a microservices system requires coordinating every consumer's deploy, which defeats the entire purpose of independent deployment. The registry is the tool that makes "ever" enforceable.</p>
+
+<h3 id="ch6-3" data-toc>API contracts and versioning</h3>
+
+<p>Synchronous APIs are contracts, and contracts need versioning. The industry has converged on a simple rule: never break a published contract; add new ones instead. A v1 endpoint and a v2 endpoint coexist, v1 is deprecated with a sunset date, and consumers migrate at their own pace. The alternative — change the response shape of a running endpoint and hope nobody noticed — is a production incident generator.</p>
+
+<p>Contract versioning is not just about fields; it is about semantics. If v1's "status" field means "payment status" and v2's means "fulfilment status," that is a breaking change even if the type is the same. Document the semantics, version the semantics, and test the contracts with consumer-driven contract tests (Pact, Spring Cloud Contract) that fail the build when a producer change breaks a consumer's expectations.</p>
+
+<h4 id="ch6-3-a">Consumer-driven contracts</h4>
+
+<p>Consumer-driven contracts invert the testing responsibility: each consumer declares what it expects from the provider in a machine-readable contract, and the provider's CI verifies that it satisfies every contract. The provider cannot change a response shape, remove a field, or alter a semantic without a test failing. This is the enforcement mechanism that makes independent deployment safe — without it, independent deployment is just independent breakage.</p>
+
+<div class="codeWrap"><pre><code># Consumer-driven contract — Pact example (simplified)
+# Consumer side: checkout-service expects from orders-service
+{
+  "description": "GET /orders/{id}",
+  "request": { "method": "GET", "path": "/orders/123" },
+  "response": {
+    "status": 200,
+    "body": {
+      "id": "123",
+      "status": "CONFIRMED",
+      "totalCents": 14999,
+      "currency": "USD"
+    },
+    "headers": { "Content-Type": "application/json" }
+  }
+}
+# Provider CI: replay every consumer's contract against the build.
+# Any field removal, type change, or new required field → build fails.</code></pre></div>
+
+<p>The contract tests run in CI on both sides: the consumer's contract is verified against the provider's latest build, and the provider's build is verified against all consumers' contracts. The feedback loop is measured in minutes, not in production incident post-mortems.</p>
+
+<h4 id="ch6-3-b">The versioning endgame</h4>
+
+<p>Versioned APIs accumulate. Three years of v1, v2, v3 endpoints with overlapping semantics and different deprecation dates is a maintenance burden and a security risk (old versions get less scrutiny). The discipline is a sunset policy: every versioned endpoint has a documented end-of-life date, the date is enforced with a runtime deprecation header, and the old version is removed on schedule. No exceptions, no extensions — the policy is what keeps the API surface manageable.</p>
+
+<div class="codeWrap"><pre><code># API sunset policy — the rules that keep versions bounded
+# 1. Every new API version ships with a sunset header:
+#    Deprecation: true
+#    Sunset: Sat, 01 Jan 2027 00:00:00 GMT
+# 2. Deprecated endpoints log a warning and emit a metric.
+# 3. On the sunset date, the endpoint returns 410 Gone.
+# 4. Consumers are notified at creation, 6 months before, 3 months before.
+# 5. No sunset extension without an architecture review.
+# Result: at most 2-3 versions of any endpoint exist at once.</code></pre></div>
+
+<p>The sunset policy is an architectural decision, not a support ticket. Without it, the API surface grows without bound, every consumer is on a different version, and the provider team spends more time maintaining old contracts than building new capabilities.</p>
+
+<div class="tip">The communication decision, in one sentence: use synchronous for questions that need an answer now, use asynchronous for facts that others should know about, and never use synchronous as the default because it is easier to debug — debugging ease is not a system property.</div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 · Data ownership and database-per-service</h2>
+
+<h3 id="ch7-1" data-toc>Ownership and autonomy</h3>
+
+<p>Database-per-service is the invariant that makes microservices more than a deployment topology: each service owns its data exclusively, and no other service may read or write its tables directly. Access goes through the owning service's API. This is the hardest rule to enforce, the most frequently violated, and the one whose violation causes the most pain — because a shared database is a distributed monolith's foundation.</p>
+
+<p>The reason is consistency. When two services write to the same table, they must agree on the schema, the constraints, and the migration schedule. Every schema change becomes a cross-team coordination event, every migration is a deploy risk, and the two services are coupled at the deepest possible level. Database-per-service eliminates that coupling: each service's schema is private, changes are internal, and the API is the only contract.</p>
+
+<h4 id="ch7-1-a">The ownership rule in practice</h4>
+
+<p>Enforcement starts with infrastructure: separate database instances or at minimum separate schemas with distinct credentials. Each service's credentials only have access to its own schema; a cross-schema query is a permission error, not a slow query. Then the rule is enforced in code review: any join across service schemas is rejected. Finally, it is enforced in tests: an architectural test that fails the build when a service's data layer references another service's tables.</p>
+
+<div class="codeWrap"><pre><code># PostgreSQL: enforce database-per-service at the credential level
+CREATE DATABASE orders_db;
+CREATE DATABASE shipping_db;
+
+CREATE ROLE orders_svc LOGIN PASSWORD 'xxx';
+CREATE ROLE shipping_svc LOGIN PASSWORD 'xxx';
+
+-- orders_svc can only touch orders_db
+GRANT ALL ON DATABASE orders_db TO orders_svc;
+REVOKE ALL ON DATABASE shipping_db FROM orders_svc;
+
+-- The application connects as the service role.
+-- Cross-service access is impossible — not prohibited, impossible.
+-- Enforcement at the database level beats every code-review policy.</code></pre></div>
+
+<p>The database-level enforcement is worth the operational overhead because it cannot be bypassed by a tired engineer at 4 p.m. on a Friday. Policies can be bypassed; permission errors cannot.</p>
+
+<h4 id="ch7-1-b">The read-model exception</h4>
+
+<p>The ownership rule has one sanctioned exception: read models. A service may maintain a denormalised copy of another service's data for query performance, updated by consuming events. The copy is owned by the reading service, updated asynchronously, and can be rebuilt from the event stream at any time. The key is that the copy is not shared — it is a private projection, not a shared table. If the projection is stale, the reading service's behaviour degrades, but the owning service is unaffected.</p>
+
+<div class="codeWrap"><pre><code># Shipping service maintains a read model of orders
+CREATE TABLE shipping.order_projection (
+    order_id        UUID PRIMARY KEY,
+    customer_name   TEXT NOT NULL,        -- denormalised, read-only
+    address         JSONB NOT NULL,       -- snapshot at order time
+    placed_at       TIMESTAMPTZ NOT NULL
+);
+-- Updated by OrderConfirmed and OrderUpdated consumers.
+-- Shipping owns this table. Orders does not know it exists.
+-- If the projection is dropped, it is rebuilt from the event stream.
+-- This is the exception that proves the rule: private copies, never shared state.</code></pre></div>
+
+<p>The rebuildability is the safety net. A read model that cannot be rebuilt from the source event stream is a second source of truth, and two sources of truth are worse than none — they disagree, and the disagreement is discovered by customers.</p>
+
+<h3 id="ch7-2" data-toc>Sagas and distributed transactions</h3>
+
+<p>Without a shared database, there is no distributed transaction. A business operation that spans services — place an order, reserve inventory, charge the card, schedule shipping — must be orchestrated as a saga: a sequence of local transactions, each with a compensating action that undoes it if a later step fails. The saga is the mechanism that replaces the ACID transaction with eventual consistency across services.</p>
+
+<p>The two saga choreography styles are orchestration (a central coordinator tells each service what to do) and choreography (each service emits events that trigger the next step). Orchestration is easier to reason about and debug; choreography is more decoupled but harder to trace. The choice depends on complexity: under five steps, choreography is fine; over five, or with complex compensation logic, an orchestrator is worth its operational cost.</p>
+
+<h4 id="ch7-2-a">The saga pattern, step by step</h4>
+
+<p>Each step in a saga is a local transaction in one service, paired with a compensating action that semantically undoes it. Reserve inventory → compensate by releasing the reservation. Charge the card → compensate by refunding. The compensation is not a database rollback; it is a business operation that must itself be idempotent and retryable. If the compensating action fails, the saga is in an inconsistent state and requires human intervention — which is why the saga log must be queryable and the compensation must be automated wherever possible.</p>
+
+<div class="codeWrap"><pre><code># Order placement saga — orchestration style
+class OrderSagaOrchestrator {
+    SagaResult placeOrder(PlaceOrderCommand cmd) {
+        saga.log(STEP_START, "reserve_inventory");
+        inventory.reserve(cmd.items);          // local tx in Inventory
+        saga.log(STEP_DONE, "reserve_inventory");
+        try {
+            saga.log(STEP_START, "charge_card");
+            payments.charge(cmd.payment);     // local tx in Payments
+            saga.log(STEP_DONE, "charge_card");
+        } catch (PaymentFailed e) {
+            inventory.release(cmd.items);      // compensate
+            saga.log(STEP_COMPENSATED, "reserve_inventory");
+            return SagaResult.failed(e);
+        }
+        return SagaResult.ok();
+    }
+    // Every step is logged. The log is the saga's source of truth.</code></pre></div>
+
+<p>The saga log is not optional infrastructure; it is the mechanism that makes the saga debuggable and recoverable. Without it, a partially completed saga is a mystery that requires querying five services' databases to reconstruct.</p>
+
+<h4 id="ch7-2-b">Idempotency and the outbox pattern</h4>
+
+<p>The hardest problem in sagas is the dual write: a service must update its database and publish an event, but the two operations are not atomic. If the database commits and the event publish fails, the saga continues without knowing. The outbox pattern solves it: the event is written to an outbox table in the same database transaction as the state change, and a separate relay process publishes events from the outbox to the message broker. The event is guaranteed to be published exactly once (at-least-once with idempotent consumers).</p>
+
+<div class="codeWrap"><pre><code># The outbox pattern — atomic state change + event
+BEGIN;
+    UPDATE orders SET status = 'CONFIRMED' WHERE id = 'ord-123';
+    INSERT INTO outbox (event_type, aggregate_id, payload)
+    VALUES ('OrderConfirmed', 'ord-123', '{"totalCents": 14999}');
+COMMIT;
+-- A relay process polls the outbox and publishes to the broker.
+-- If the relay crashes, the event is still in the outbox and will be
+-- published on restart. No dual write, no lost events.</code></pre></div>
+
+<p>The outbox pattern is the single most important implementation detail in asynchronous microservices. Without it, every event publication is a potential inconsistency between the service's state and the system's behaviour.</p>
+
+<h3 id="ch7-3" data-toc>Event sourcing and projections</h3>
+
+<p>Event sourcing takes the outbox idea to its logical conclusion: instead of storing the current state of an aggregate, store the sequence of events that produced it. The current state is a projection — a read model built by replaying events. Event sourcing gives a complete audit log, temporal querying (what was the state at time T?), and the ability to rebuild any projection from the event stream. The cost is complexity: every read is a projection, schema evolution requires event upcasting, and the event store is a permanent, append-only commitment.</p>
+
+<p>Event sourcing is not a default choice; it is a specialist tool for domains where the history matters as much as the current state — financial ledgers, audit-heavy regulatory domains, and systems where temporal queries are a core requirement. For most CRUD-shaped services, a state-based store with an outbox is simpler and sufficient.</p>
+
+<h4 id="ch7-3-a">The event store and projections</h4>
+
+<p>The event store is an append-only log of immutable events, each tagged with a sequence number and a stream identifier. Projections are functions that fold the event stream into a read model; they can be rebuilt at any time by replaying the stream from the beginning. The projection builder is a separate process from the write path, which means read models can be rebuilt without affecting writes, and new projections can be added retroactively by replaying history.</p>
+
+<div class="codeWrap"><pre><code># Event sourcing — the write path and the read path
+# WRITE: append events to the store
+eventStore.append("order-123", [
+    new OrderPlaced("order-123", "cust-987", 14999),
+    new OrderConfirmed("order-123", "2026-10-15T10:32:00Z")
+]);
+# READ: project events into a queryable model
+OrderReadModel projection = project(
+    eventStore.readStream("order-123"),
+    new OrderProjection()
+);
+// The projection is disposable — rebuildable from the stream.
+// The events are the source of truth. The projection is a cache.</code></pre></div>
+
+<p>The disposable projection is the key insight: in event sourcing, the read model is a derived artefact that can be thrown away and rebuilt. This is the opposite of a state-based database, where the stored state is the source of truth and the log is disposable. The choice between them is a choice about what you consider the system's memory.</p>
+
+<h4 id="ch7-3-b">The cost ledger</h4>
+
+<p>Event sourcing has a real cost ledger that must be written before adopting it. The event store is a permanent storage commitment — events are never deleted, which means storage grows forever and GDPR-style "right to be forgotten" requires cryptographic erasure or a tombstone pattern. Schema evolution requires upcasting — a function that translates old event versions to new ones at read time. And every read is a projection, which means read performance depends on projection caching and rebuild strategies. For domains where these costs are acceptable, event sourcing is powerful; for domains where they are not, it is expensive ceremony.</p>
+
+<div class="codeWrap"><pre><code># Event sourcing cost ledger — fill it in before adopting
+# | cost                          | one-time | recurring | mitigation                    |
+# | event storage growth          |    -     |  high    | snapshot + TTL on projections|
+# | schema evolution (upcasting)   |  medium  |  medium  | versioned events, upcast fns |
+# | temporal query complexity      |  high    |   low    | only where history is needed |
+# | audit/compliance benefit       |    -     |  high    | regulatory requirement?       |
+# | team experience with ES        |  high    |   low    | training, tooling, patience    |
+# If the benefit row is empty, you are adopting event sourcing for
+# aesthetic reasons. Don't.</code></pre></div>
+
+<p>The aesthetic reason is more common than admitted. Event sourcing is intellectually elegant, and elegance is a poor justification for a permanent storage commitment. The honest question is whether the domain's requirements — audit, temporal queries, event-driven rebuilding — are real and recurring. If they are, event sourcing pays for itself. If they are hypothetical, it is a very beautiful burden.</p>
+
+<div class="tip">Database-per-service is not a preference; it is the invariant that makes independent deployment possible. Every violation of it is a step back toward the distributed monolith, and the step is invisible until the day a schema migration requires a five-team coordinated deploy.</div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch8" data-toc>8 · Enterprise integration patterns</h2>
+
+<h3 id="ch8-1" data-toc>The pattern catalog and when to use it</h3>
+
+<p>Enterprise integration patterns are the tried-and-true vocabulary for connecting systems that were not designed to work together. The catalog —路由、消息通道、转换器、聚合器、分解器 — gives teams a shared language for integration problems. The value is not in the patterns themselves but in the shared vocabulary: when an architect says "we need a content-based router," every engineer in the room knows the shape of the solution without a diagram.</p>
+
+<p>The catalog matters most at the edges of the system: where the modern services meet the legacy ERPs, the partner APIs, the mainframe extracts, and the SaaS platforms. Inside a well-designed microservices system, communication is straightforward — events over a broker, REST/gRPC for queries. The interesting integration problems are at the boundary, where the external system's semantics, reliability, and lifecycle are not under your control.</p>
+
+<h4 id="ch8-1-a">The six patterns that cover 90% of cases</h4>
+
+<p>You do not need to memorise the full catalog. Six patterns cover the overwhelming majority of integration problems. <strong>Message channel</strong>: a named pipe that decouples sender from receiver. <strong>Content-based router</strong>: routes a message to different handlers based on its content. <strong>Translator/transformer</strong>: converts between different message formats and schemas. <strong>Aggregator</strong>: collects multiple related messages and combines them into one. <strong>Scatter-gather</strong>: sends one request to multiple systems and collects their responses. <strong>Dead-letter channel</strong>: receives messages that cannot be processed, with the metadata needed to diagnose why. Learn these six deeply; the rest of the catalog is a reference for the exceptions.</p>
+
+<div class="codeWrap"><pre><code># The six patterns, mapped to the problems they solve
+# Channel        — "how do we connect these systems?"     → pub/sub topic
+# Router         — "which system handles this message?"  → switch on payload
+# Translator     — "their format is not our format"     → mapping layer
+# Aggregator     — "one event is split across messages"  → window + combine
+# Scatter-gather — "we need data from three systems"     → fan-out + join
+# Dead-letter    — "this message failed and we don't know why" → DLQ + alert
+# If your integration problem is not one of these six, it is probably
+# a misunderstanding of the domain, not an integration pattern problem.</code></pre></div>
+
+<p>The dead-letter channel is the one pattern that is mandatory in every integration. Messages will fail — schema mismatches, network timeouts, downstream outages — and a message that fails silently is a data loss event. The dead-letter channel is the system's honesty mechanism: it says "this message could not be processed, and here is why," and it makes the failure visible and retryable.</p>
+
+<h4 id="ch8-1-b">The canonical data model</h4>
+
+<p>In a system with multiple integrations, each external system has its own data model, and the temptation is to translate between each pair directly — a combinatorial explosion of N×N translators. The answer is a canonical data model: an internal format that all external formats translate to and from. Each external system has exactly one translator to and from the canonical model, reducing the integration surface from N×N to 2N. The canonical model becomes the system's lingua franca, and new integrations are added by writing one new translator.</p>
+
+<div class="codeWrap"><pre><code># The canonical data model — the hub, not the spokes
+# WITHOUT canonical model:
+#   SAP ←→ translator ←→ Orders
+#   Salesforce ←→ translator ←→ Orders
+#   Partner API ←→ translator ←→ Orders
+#   3 systems × 2 directions = 6 translators, each a maintenance burden.
+# WITH canonical model:
+#   SAP ←→ translator ←→ CANONICAL ←→ translator ←→ Orders
+#   Salesforce ←→ translator ←→ CANONICAL ←→ translator ←→ Orders
+#   Partner API ←→ translator ←→ CANONICAL ←→ translator ←→ Orders
+#   6 translators still, but each is simple, single-purpose, and testable.
+#   The canonical model is owned by the integration team, versioned,
+#   and never leaks into the domain services.</code></pre></div>
+
+<p>The canonical model is not a silver bullet — it adds a translation layer and a schema that must be maintained — but it is the only approach that scales beyond three external systems. Below three, point-to-point translators are simpler and the overhead is not justified.</p>
+
+<h3 id="ch8-2" data-toc>ESB vs API gateway vs mesh</h3>
+
+<p>The integration infrastructure decision — how messages actually flow between systems — has three main options, and the choice is a trade-off between centralisation and distribution. An Enterprise Service Bus (ESB) is a centralised broker that handles routing, transformation, and protocol conversion. An API gateway is a centralised entry point for synchronous requests. A service mesh is a distributed layer that handles service-to-service communication transparently.</p>
+
+<p>The ESB was the dominant pattern in the 2000s and is now correctly viewed with suspicion: it becomes a central point of failure, a central point of coupling, and a monolith in its own right. The modern preference is for smart endpoints and dumb pipes — the integration logic lives in the services, and the pipe is just a message broker. But the ESB is not universally wrong: in a system with many legacy systems and limited development capacity, a centralised integration layer that one team owns is pragmatic and humane.</p>
+
+<h4 id="ch8-2-a">The smart endpoints, dumb pipes principle</h4>
+
+<p>The principle is simple: the message broker should be as dumb as possible — a reliable pipe that delivers bytes from one end to the other. All routing, transformation, and business logic lives in the endpoints (the services). A dumb pipe is cheap to operate, easy to scale, and cannot become a bottleneck for business logic. A smart pipe is a liability: it is a distributed system that runs business logic, and distributed business logic is the hardest logic to debug and evolve.</p>
+
+<div class="codeWrap"><pre><code># Smart endpoints, dumb pipes — the division of labour
+# DUMB PIPE (message broker):
+#   - deliver messages reliably
+#   - guarantee ordering within a partition
+#   - replay messages on failure
+#   - that is all. No routing rules, no transformations, no business logic.
+# SMART ENDPOINTS (services):
+#   - decide what messages to publish and consume
+#   - transform their own data to/from the canonical format
+#   - handle their own retry, compensation, and dead-letter logic
+# The broker is a utility; the services are the system.</code></pre></div>
+
+<p>The dumb-pipe principle is a design constraint that pays for itself in operational simplicity. When the broker is dumb, a message flow failure is always traceable to a service, and the service's logs are the only place you need to look. When the broker is smart, the broker's logs are a black box that no one on the team fully understands.</p>
+
+<h4 id="ch8-2-b">API gateway: the edge traffic controller</h4>
+
+<p>The API gateway is the entry point for all external synchronous traffic: authentication, rate limiting, request routing, and protocol translation. It is a necessary component in a microservices system, but it must be kept thin. The gateway's job is to be a traffic cop, not a business logic engine. Any business rule in the gateway is a coupling point and a deployment dependency: a gateway change requires a gateway deploy, and if the gateway deploy is a coordinated event, the gateway has become a distributed monolith in miniature.</p>
+
+<div class="codeWrap"><pre><code># API gateway: the thin edge
+# DO: authentication, rate limiting, routing, request/response logging
+# DO NOT: business logic, data aggregation across services, transformations
+# A thin gateway config (Envoy / Kong / AWS API Gateway):
+route:
+  - match: { prefix: "/orders/" }
+    route: { cluster: orders-service }
+  - match: { prefix: "/shipping/" }
+    route: { cluster: shipping-service }
+# That is 20 lines of config. If your gateway config is 200 lines,
+# you have built an ESB wearing a gateway costume.</code></pre></div>
+
+<p>The gateway is also the place where cross-cutting concerns live — but only the ones that are genuinely cross-cutting. Authentication, rate limiting, and observability are cross-cutting. Business rules, data transformations, and service orchestration are not, and they belong in the services.</p>
+
+<h3 id="ch8-3" data-toc>Contracts, schemas, and the boundary discipline</h3>
+
+<p>Integration is fundamentally a contract negotiation between two systems that do not fully trust each other. The contract is the shared understanding of the message format, the semantics, the delivery guarantees, and the failure behaviour. The discipline is treating the contract as a first-class artefact: versioned, tested, and owned by the team that publishes it.</p>
+
+<p>The most common integration failure is not a technical failure; it is a contract failure. The producer changes the schema without telling the consumer. The consumer assumes a field is always present; the producer makes it optional. The producer's "status" field means something different from the consumer's "status" field. These failures are silent — the system keeps running, but the data is wrong, and the wrongness is discovered by a customer or an accountant, not by a test.</p>
+
+<h4 id="ch8-3-a">Contract-first integration</h4>
+
+<p>The discipline is contract-first: before any integration code is written, the contract is defined, reviewed, and published. The contract specifies the message schema, the field semantics (not just the types — the meanings), the required vs optional fields, the delivery guarantees, and the error contract. Both parties sign off, and the contract is stored in a version-controlled registry. The code is then generated from the contract where possible, so that the contract and the implementation cannot drift.</p>
+
+<div class="codeWrap"><pre><code># Contract-first: the schema is the source of truth
+# order-contract.yaml
+type: object
+required: [orderId, customerId, totalCents, currency, items]
+properties:
+  orderId:    { type: string, format: uuid }
+  customerId: { type: string, format: uuid }
+  totalCents: { type: integer, minimum: 0 }
+  currency:   { type: string, enum: [USD, EUR, GBP] }
+  items:
+    type: array
+    items:
+      type: object
+      required: [productId, quantity, unitPriceCents]
+# Both producer and consumer generate their types from this file.
+# A contract test verifies both sides conform. The contract is the truth.</code></pre></div>
+
+<p>The schema registry is the enforcement mechanism: a producer cannot publish a message that violates the registered schema, and a consumer can verify that a message it receives conforms to the schema it expects. The registry is the integration's immune system — it rejects incompatible changes at the boundary, before they enter the system.</p>
+
+<h4 id="ch8-3-b">The idempotency contract</h4>
+
+<p>Every integration must specify its idempotency contract: what it means for the consumer to process a message exactly once, and what happens on redelivery. The consumer's deduplication strategy — usually a unique message ID checked against a store — must be documented in the contract, because the producer needs to know whether redelivery is safe. A contract that does not specify idempotency is an invitation to duplicate charges, duplicate shipments, and duplicate emails.</p>
+
+<div class="codeWrap"><pre><code># The idempotency contract — the clause that prevents disasters
+# Producer guarantees:
+#   - Every message has a globally unique message ID
+#   - Redelivery uses the same ID
+#   - The message is idempotent: processing it twice has the same
+#     effect as processing it once.
+# Consumer guarantees:
+#   - Deduplicates by message ID (store: Redis/DB, TTL: 7 days)
+#   - Returns 200 OK for duplicate IDs
+#   - Never processes the same ID twice concurrently
+# This clause is worth more than the entire schema definition.
+# Get the schema wrong and you get a parse error. Get idempotency
+# wrong and you get a financial incident.</code></pre></div>
+
+<p>The idempotency contract is the integration's most important clause, and it is the one most often omitted because it is awkward to specify and easy to assume. The assumption — "our messages will never be redelivered" — is false in every system that has ever run in production.</p>
+
+<div class="tip">Enterprise integration is not about the patterns; it is about the contracts. The patterns are well-known and well-documented; the contracts are specific to your systems, your data, and your failure modes. A system with strong contracts and boring patterns will outlive a system with exotic patterns and no contracts.</div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch9" data-toc>9 · Scalability: caching, CQRS and sharding</h2>
+
+<h3 id="ch9-1" data-toc>Caching strategies</h3>
+
+<Caching is the highest-leverage scalability technique: a well-placed cache can absorb 99% of read traffic and reduce database load by orders of magnitude. But caching is also the highest-risk scalability technique: a stale cache is a correctness bug, and a cache that fails open (falls through to the database on every miss) is a load amplifier. The discipline is in the invalidation strategy and the failure behaviour, not in the cache itself.</p>
+
+<p>The two foundational caching patterns are cache-aside (the application checks the cache, then the database, then populates the cache) and write-through (writes go to the cache and the database synchronously). Cache-aside is simpler and more common; write-through is more consistent but slower. The choice depends on the consistency requirement: if reads can tolerate seconds of staleness, cache-aside with a TTL is correct; if reads must be immediately consistent after a write, write-through or write-behind is required.</p>
+
+<h4 id="ch9-1-a">Cache-aside: the workhorse pattern</h4>
+
+<p>Cache-aside is the default caching pattern for read-heavy workloads. The application reads from the cache; on a miss, it reads from the database and populates the cache. The cache entry has a TTL; when it expires, the next read repopulates it. The pattern is simple, but its correctness depends on two details: the TTL must be chosen so that the maximum staleness is acceptable, and concurrent misses must be prevented from thundering-herding the database (a cache stampede).</p>
+
+<div class="codeWrap"><pre><code># Cache-aside with stampede prevention (pseudocode)
+func getOrder(id OrderId) -&gt; Order {
+    cached := cache.get("order:" + id)
+    if cached != nil:
+        return cached
+    // Single-flight: only one request per key repopulates the cache
+    lock := redlock.acquire("lock:order:" + id, 5 * time.Second)
+    defer lock.release()
+    // Re-check after acquiring the lock
+    cached = cache.get("order:" + id)
+    if cached != nil:
+        return cached
+    order := db.getOrder(id)
+    cache.set("order:" + id, order, 30 * time.Second)  // TTL = 30s
+    return order
+}
+// The lock prevents 10,000 concurrent misses from hitting the DB.
+// Without it, a cache expiry on a hot key is a DB outage.</code></pre></div>
+
+<p>The single-flight lock is the detail that separates a cache that works from a cache that causes incidents. Without it, a hot key expiring under load becomes a database query storm, and the database becomes the bottleneck it was meant to avoid. With it, the cache degrades gracefully: the first request waits, the rest wait on the lock, and the database sees one query.</p>
+
+<h4 id="ch9-1-b">Cache invalidation: the hard part</h4>
+
+<p>Cache invalidation is the named hard problem, and the reason is that the cache and the database are two separate state stores with no transactional link. The strategies fall on a spectrum from lazy (TTL expiry only) to eager (explicit invalidation on write). Lazy is simple but allows staleness up to the TTL; eager is consistent but requires every write path to know which cache keys to invalidate. The pragmatic answer is a hybrid: TTL as a safety net, plus explicit invalidation for the writes that must be immediately visible.</p>
+
+<div class="codeWrap"><pre><code># Hybrid invalidation: TTL + explicit invalidation
+# On write: update DB, then invalidate cache
+func updateOrder(order Order) {
+    db.updateOrder(order)
+    cache.delete("order:" + order.id)
+    cache.delete("order:customer:" + order.customerId)  // list cache
+}
+# On read: cache-aside with TTL as safety net
+# The TTL (30s) bounds the worst-case staleness if invalidation fails.
+# The explicit invalidation makes the common case immediate.
+# Both are required: TTL alone is stale, invalidation alone is fragile.</code></pre></div>
+
+<p>The list-cache invalidation is the subtle part: when an order is written, the "orders for customer X" list is also stale, and invalidating it requires knowing the key pattern. The solution is to version the list key or to store the list as a set of IDs, so that invalidating the individual entries invalidates the list. The alternative — invalidating on every write — is a cache that misses constantly, which is worse than no cache.</p>
+
+<h3 id="ch9-2" data-toc>CQRS: separating reads from writes</h3>
+
+<p>CQRS (Command Query Responsibility Segregation) is the pattern of using different models for reads and writes. The write model enforces invariants and business rules; the read model is optimised for queries, often denormalised and pre-joined. The two models can be in the same database (different tables) or different databases entirely. The pattern is not a default; it is a solution to a specific problem: when the read and write workloads have different shapes, different consistency requirements, or different scaling profiles.</p>
+
+<p>The most common justification for CQRS is query complexity: the write model is a normalised aggregate store, but the queries need joins across multiple aggregates that are expensive or impossible in the write model. The read model is built by consuming events from the write model, so it can be a wide, denormalised table optimised for a specific query. The cost is eventual consistency: the read model lags the write model by the event processing time, which is usually milliseconds but can be seconds under load.</p>
+
+<h4 id="ch9-2-a">When CQRS pays for itself</h4>
+
+<p>CQRS is worth its complexity when the read and write workloads are genuinely different. A product catalogue with 1,000 writes per second and 100,000 reads per second, where the reads are complex filtered searches across multiple dimensions — that is a CQRS problem. A simple CRUD application with straightforward queries — that is not, and CQRS would be ceremony without benefit. The test is whether the query shape is fundamentally different from the write shape, and whether the performance difference justifies the consistency lag.</p>
+
+<div class="codeWrap"><pre><code># CQRS decision test — answer honestly
+# 1. Are read and write workloads different by &gt; 10x in volume?  [Y/N]
+# 2. Are queries complex (joins, aggregations, full-text)?        [Y/N]
+# 3. Can reads tolerate seconds of staleness?                     [Y/N]
+# 4. Do reads and writes scale independently?                    [Y/N]
+# 5. Is the team comfortable with eventual consistency?          [Y/N]
+# Y to 3+ including #3: CQRS is justified.
+# N to #3: CQRS will cause more problems than it solves.</code></pre></div>
+
+<p>The eventual-consistency tolerance is the deciding factor. If the business requires that a read immediately reflects a write — a bank balance, a seat reservation — CQRS is not the right tool without careful design (read-your-writes consistency via a write-through cache or a synchronous read-model update). If the business can tolerate a lag — a product search, a recommendation feed, an analytics dashboard — CQRS is a clean fit.</p>
+
+<h4 id="ch9-2-b">The read model as a projection</h4>
+
+<p>The read model in CQRS is a projection of the write model's events, maintained by an event consumer. The consumer is idempotent and can be rebuilt from the event stream, which means the read model is disposable — a derived artefact that can be thrown away and recreated. This is the same principle as event sourcing's projections (chapter 7), and it means the read model can be optimised for any query shape without affecting the write model.</p>
+
+<div class="codeWrap"><pre><code># The read model projection — a consumer that builds a query-optimised table
+class ProductSearchProjection {
+    void handle(ProductCreated e) {
+        searchIndex.index(e.productId, e.name, e.description, e.category);
+    }
+    void handle(ProductPriceChanged e) {
+        searchIndex.updatePrice(e.productId, e.newPrice);
+    }
+    void handle(ProductDiscontinued e) {
+        searchIndex.remove(e.productId);
+    }
+    // The search index is a projection. It can be rebuilt from the event
+    // stream at any time. The write model (product aggregate) is unaffected.
+    // Queries hit the search index; commands hit the product aggregate.</code></pre></div>
+
+<p>The rebuildability is the operational safety net: if the search index is corrupted or a new query shape is needed, the projection is rebuilt from the event stream without downtime and without affecting writes. This is the property that makes CQRS operationally viable — the read model is a cache that can be invalidated and rebuilt at will.</p>
+
+<h3 id="ch9-3" data-toc>Sharding and partitioning</h3>
+
+<p>Sharding is the last-resort scaling technique: when a single database cannot handle the write throughput or the data volume, the data is partitioned across multiple databases by a shard key. Each shard is an independent database with a subset of the data, and the application routes each query to the correct shard. Sharding is powerful and dangerous — it solves the scaling problem but introduces a new class of problems: cross-shard queries, shard rebalancing, and the permanent commitment to the shard key.</p>
+
+<p>The shard key is the most important decision in a sharded system, and it is permanent. A poor shard key — one that creates hot spots (most queries hit one shard) or that makes common queries cross-shard — cannot be changed without a full data migration. The shard key should be chosen so that queries are served by a single shard, and the data is evenly distributed. For a multi-tenant system, the tenant ID is usually the right shard key; for a global system, a geographic or time-based key may work.</p>
+
+<h4 id="ch9-3-a">Choosing the shard key</h4>
+
+<p>The shard key selection is a three-criteria decision: even distribution (no shard has more than its share of data or traffic), query locality (most queries can be served by one shard), and operational simplicity (the key is stable and predictable). The tenant ID scores well on all three for multi-tenant systems: tenants are roughly equal in size, most queries are scoped to a tenant, and a tenant ID never changes. A product ID scores poorly: a viral product creates a hot shard, and many queries span products.</p>
+
+<div class="codeWrap"><pre><code># Shard key evaluation — the three tests
+# Key candidate: tenantId
+#   Even distribution?    Yes (tenants are similar in size)
+#   Query locality?      Yes (most queries filter by tenant)
+#   Operational simplicity? Yes (tenant ID is stable)
+#   Verdict: SHARD BY TENANT
+# Key candidate: productId
+#   Even distribution?    No (viral products create hot shards)
+#   Query locality?      No (search queries span products)
+#   Operational simplicity? Yes
+#   Verdict: DO NOT SHARD BY PRODUCT
+# The shard key decision is permanent. Test it with real data distributions
+# before committing.</code></pre></div>
+
+<p>The permanence is the reason to be conservative. A shard key change requires a full data migration — every row must be re-keyed and moved — which is a multi-month project with significant risk. Choosing the wrong shard key is not a mistake you can fix in a sprint; it is a mistake you live with for years.</p>
+
+<h4 id="ch9-3-b">Cross-shard operations</h4>
+
+<p>Cross-shard queries and transactions are the hard problems of sharded systems. A cross-shard query — "find all orders over $10,000 across all tenants" — must query every shard and merge the results, which is slow and complex. A cross-shard transaction — "transfer money between two accounts in different shards" — has no ACID guarantee and requires a saga (chapter 7). The discipline is to design the shard key and the query patterns so that cross-shard operations are the exception, not the rule, and to make them explicit and auditable when they occur.</p>
+
+<div class="codeWrap"><pre><code># Cross-shard operation policy — make them visible
+# 1. Design for single-shard operations (tenant-scoped queries)
+# 2. Cross-shard queries must be:
+#    - async (not on the user's critical path)
+#    - batched (not real-time)
+#    - auditable (logged with the shard list and result count)
+# 3. Cross-shard transactions must be sagas with compensating actions
+# 4. Report the cross-shard operation count as a metric — if it grows,
+#    the shard key or the schema is wrong.
+# Cross-shard operations are a smell. A few are normal; many are a bug.</code></pre></div>
+
+<p>The metric is the early warning system: if the number of cross-shard operations is growing month over month, the shard key is wrong or the data model has drifted. The fix is not to optimise the cross-shard query; it is to revisit the shard key choice before the growth becomes a migration project.</p>
+
+<div class="tip">Scalability is a sequence, not a single decision: cache first (absorbs 99% of read load), then CQRS (separates read and write scaling), then shards (scales writes beyond one database). Each step is only justified when the previous one is exhausted, and each step adds permanent complexity that must be paid for every day.</div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch10" data-toc>10 · Resilience: circuit breakers, bulkheads and retries</h2>
+
+<h3 id="ch10-1" data-toc>The resilience triad</h3>
+
+<p>Resilience is the property that a system continues to function — perhaps degraded, perhaps slow, but functioning — when parts of it fail. In a distributed system, failure is not an exception; it is the normal operating condition. Every external call can fail, every database can be slow, every network partition is a matter of when, not if. Resilience engineering is the discipline of designing for that reality instead of hoping against it.</p>
+
+<p>The three foundational patterns are the circuit breaker (stop calling a failing dependency), the bulkhead (isolate failures to a limited resource pool), and the retry with backoff (retry failed operations with increasing delays). Together they form the resilience triad: retries handle transient failures, circuit breakers handle persistent failures, and bulkheads prevent failures from cascading. None of them is optional in a system that serves real users.</p>
+
+<h4 id="ch10-1-a">Failure modes and the triad</h4>
+
+<p>Every dependency failure is one of three types: transient (a network blip, a timeout that succeeds on retry), persistent (the dependency is down, a bug that always fails), and slow (the dependency is responding, but too slowly to be useful). The triad maps to the failure modes: retries absorb transient failures, circuit breakers absorb persistent failures, and bulkheads absorb slow failures by isolating the thread pool. The mapping is not accidental — it is the reason the three patterns are a triad and not three independent tricks.</p>
+
+<div class="codeWrap"><pre><code># The resilience triad, mapped to failure modes
+# Transient failure (network blip, 50% of failures):
+#   → Retry with exponential backoff: 100ms, 200ms, 400ms, give up
+# Persistent failure (dependency is down, 30% of failures):
+#   → Circuit breaker: open after 5 consecutive failures, half-open
+#     after 30s, close on success. Fails fast while open.
+# Slow failure (dependency is 10x slower than normal, 20% of failures):
+#   → Bulkhead: limit concurrent calls to the dependency; excess
+#     requests fail fast rather than queue and cascade.
+# The triad covers 100% of failure modes. Anything else is a bug
+# in your failure detection, not a missing pattern.</code></pre></div>
+
+<p>The percentages are illustrative but the point is exact: in production systems, the vast majority of failures are transient, and a well-tuned retry policy eliminates most of them without any user-visible impact. The circuit breaker and bulkhead handle the rest.</p>
+
+<h4 id="ch10-1-b">The cascade and how it kills systems</h4>
+
+<p>The cascade is the failure mode that turns a small problem into an outage: service A calls service B, service B calls service C, service C is slow. Service B's threads block waiting for C, then service A's threads block waiting for B, then the load balancer's health checks fail, and the entire system is down. The cascade is not a bug in any single service; it is a property of the system's failure behaviour, and it is prevented by the triad, not by any individual service's quality.</p>
+
+<div class="codeWrap"><pre><code># The cascade, step by step — and where the triad intervenes
+# 1. Service C is slow (10s response time)
+# 2. Service B's thread pool fills with blocked calls to C
+# 3. B stops responding to health checks → load balancer marks B down
+# 4. Service A's calls to B fail → A's retry logic amplifies the load
+# 5. A's thread pool fills → A is down
+# 6. The whole system is down because one service was slow.
+# TRIAD INTERVENTIONS:
+#   Circuit breaker on B→C: B stops calling C after 5 failures, fails fast
+#   Bulkhead on B→C: B limits concurrent calls to C; excess fail fast
+#   Retry with cap on A→B: A retries 3 times, then gives up
+# Result: C is slow, B and A return errors, system stays up.</code></pre></div>
+
+<p>The cascade prevention is the reason the triad is non-negotiable. A single slow dependency without a circuit breaker can take down an entire system, and the blast radius is the entire call graph upstream of the slow dependency.</p>
+
+<h3 id="ch10-2" data-toc>Circuit breakers</h3>
+
+<p>The circuit breaker is the pattern that stops a failing dependency from consuming all of a service's resources. It has three states: closed (calls pass through normally), open (calls fail fast without hitting the dependency), and half-open (after a timeout, a single trial call is allowed; success closes the breaker, failure reopens it). The breaker is the difference between a dependency that is slow and a dependency that is catastrophic.</p>
+
+<p>The breaker's thresholds — failure count, timeout duration, half-open probe interval — are not universal constants; they are tuned per dependency based on the dependency's normal latency and failure rate. A breaker that is too sensitive (opens on a single failure) causes false positives; one that is too insensitive (opens after 100 failures) allows a failing dependency to consume resources for too long. The tuning is empirical: start with conservative thresholds, measure the false-positive and false-negative rates, and adjust.</p>
+
+<h4 id="ch10-2-a">Circuit breaker configuration</h4>
+
+<p>The configuration that works for most services: open after 5 consecutive failures or a 50% failure rate over 10 seconds, stay open for 30 seconds, then allow one half-open probe. These numbers are a starting point, not a universal truth, and they must be validated against the dependency's behaviour. The key insight is that the breaker's state must be shared across all instances of the calling service — a per-instance breaker that opens on one instance and not the others is not protecting the system.</p>
+
+<div class="codeWrap"><pre><code># Circuit breaker configuration (Resilijience4j-style)
+circuitBreaker:
+  failureRateThreshold: 50        # open if &gt;50% of calls fail
+  slowCallRateThreshold: 50       # open if &gt;50% of calls are slow
+  slowCallDurationThreshold: 2s   # "slow" = slower than 2 seconds
+  waitDurationInOpenState: 30s    # stay open for 30s
+  permittedNumberOfCallsInHalfOpenState: 1
+  minimumNumberOfCalls: 10        # need 10 calls before evaluating
+  slidingWindowSize: 10           # evaluate over last 10 calls
+# The breaker is stateful and shared across all service instances
+# (backed by Redis or similar). A per-instance breaker is a bug.</code></pre></div>
+
+<p>The shared-state requirement is the operational detail that is frequently missed. A circuit breaker that lives in one instance's memory protects only that instance; the other instances keep calling the failing dependency. The breaker must be a distributed state, which means it needs a shared store — Redis, Consul, or a similar coordination service.</p>
+
+<h4 id="ch10-2-b">Fallbacks and the degraded path</h4>
+
+<p>When the circuit is open, the caller must have a fallback: a cached value, a default response, a simplified result, or an explicit error. The fallback is the degraded path — the system is still serving requests, just with reduced functionality. The fallback is not an afterthought; it is a first-class part of the service's design, and it must be tested explicitly (a fallback that fails is worse than no fallback, because it hides the circuit breaker's state).</p>
+
+<div class="codeWrap"><pre><code># The fallback is a design decision, not a rescue
+class OrderServiceClient {
+    Order getOrder(OrderId id) {
+        try {
+            return circuitBreaker.executeSupplier(() -&gt; httpClient.getOrder(id));
+        } catch (CallNotPermittedException e) {
+            // Circuit is open — serve from cache, explicitly
+            Order cached = orderCache.get(id);
+            if (cached != null) {
+                metrics.increment("order.get.cached");
+                return cached;  // stale but available
+            }
+            throw new ServiceUnavailableException("orders");
+        }
+    }
+}
+// The fallback is tested: when the circuit is open, the service
+// returns cached data. The test verifies this path, not just the happy path.</code></pre></div>
+
+<p>The fallback test is the one that is skipped and regretted. A fallback that returns null when the cache is empty, or that throws a different exception than the caller expects, is a latent bug that only manifests when the circuit opens — which is exactly when the system is already under stress.</p>
+
+<h3 id="ch10-3" data-toc>Retries, timeouts, and idempotency</h3>
+
+<p>The retry pattern is the simplest resilience mechanism and the most frequently misused. A retry without a cap and without backoff is a load amplifier: every failed call is retried immediately, doubling the load on an already struggling dependency. A retry with a cap and exponential backoff with jitter is a resilience mechanism: it absorbs transient failures while backing off from persistent ones. The difference is entirely in the configuration and the discipline.</p>
+
+<p>The idempotency requirement is the non-negotiable precondition for retries. A retry that re-executes a non-idempotent operation — a charge, a shipment, a notification — is a correctness bug. Every retried operation must be idempotent: either naturally idempotent (a read, a delete by ID) or made idempotent through a client-supplied idempotency key. The key must be stable across retries — the same operation retried must use the same key, or the server cannot deduplicate.</p>
+
+<h4 id="ch10-3-a">Retry configuration that works</h4>
+
+<p>The retry configuration that balances resilience and load: exponential backoff with jitter, a maximum of 3-5 retries, a total timeout budget, and retries only on idempotent operations. The jitter is critical — without it, 10,000 retrying clients all retry at the same instant, creating a thundering herd that overwhelms the recovering dependency. With jitter, the retries are spread out, giving the dependency time to recover between waves.</p>
+
+<div class="codeWrap"><pre><code># Retry configuration — the four required parameters
+retry:
+  maxAttempts: 4                  # initial + 3 retries
+  backoff: exponential            # 100ms, 200ms, 400ms, 800ms
+  jitter: full                    # 0-100% of the backoff interval
+  timeout: 5s                     # total budget for all attempts
+  retryOn: [TimeoutException, IOException]  # transient failures only
+  doNotRetryOn: [AuthenticationException, NotFoundException]  # permanent
+# The timeout budget is the cap that prevents a slow dependency
+# from consuming the caller's entire latency budget.
+# The retryOn/doNotRetryOn split is what prevents retrying a 404.</code></pre></div>
+
+<p>The doNotRetryOn list is the detail that prevents the most embarrassing incident: retrying a permanent failure (a 400 Bad Request, an authentication failure) not only wastes resources, it can also trigger rate-limiting or account-lockout mechanisms on the remote system. The list must be explicit and must be reviewed whenever a new error type is added to the API.</p>
+
+<h4 id="ch10-3-b">The idempotency key pattern</h4>
+
+<p>The idempotency key is the client-generated unique identifier for an operation, sent with every attempt. The server stores the key with the result of the first successful execution and returns the stored result for any subsequent attempt with the same key. The key must be unique per operation, stable across retries, and expirable (the server cannot store keys forever). The pattern is simple, and it is the only safe way to retry a write operation.</p>
+
+<div class="codeWrap"><pre><code># Idempotency key pattern — the safe way to retry writes
+class PaymentClient {
+    PaymentResult charge(ChargeRequest req) {
+        // Generate the key once, outside the retry loop
+        String idempotencyKey = UUID.randomUUID().toString();
+        for (int attempt = 0; attempt &lt; 4; attempt++) {
+            try {
+                return httpClient.post("/charges", req, idempotencyKey);
+            } catch (TransientException e) {
+                sleep(backoff(attempt));  // 100ms, 200ms, 400ms
+            }
+        }
+        throw new PaymentFailedException();
+    }
+}
+// Server side: if the key exists, return the stored result.
+// The key is stored for 24-48 hours, then expired.
+// This is why retries are safe: the same key deduplicates.</code></pre></div>
+
+<p>The idempotency key must be generated outside the retry loop — a key generated inside the loop is a new key on every retry, which defeats the entire purpose. The key is part of the operation's identity, not of the attempt.</p>
+
+<div class="tip">Resilience is not a feature you add; it is a property you design for. The triad — circuit breakers, bulkheads, retries — is the minimum viable resilience for any service that calls another service. Without them, every dependency is a potential outage, and the outage will happen on your busiest day.</div>
+
+</section>
+
+<!--APPEND-->

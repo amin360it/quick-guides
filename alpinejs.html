@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpine.js - Lightweight Interactivity Guide</title>
+<meta name="description" content="This opening section explains how to work through the guide most effectively. It sets the expectation that…. 12 chapters, 63 topics and 43 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/alpinejs.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Alpine.js - Lightweight Interactivity Guide">
+<meta property="og:description" content="This opening section explains how to work through the guide most effectively. It sets the expectation that…. 12 chapters, 63 topics and 43 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/alpinejs.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Alpine.js - Lightweight Interactivity Guide">
+<meta name="twitter:description" content="This opening section explains how to work through the guide most effectively. It sets the expectation that…. 12 chapters, 63 topics and 43 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/alpinejs.html#article","headline":"Alpine.js - Lightweight Interactivity Guide","name":"Alpine.js - Lightweight Interactivity Guide","description":"This opening section explains how to work through the guide most effectively. It sets the expectation that…. 12 chapters, 63 topics and 43 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/alpinejs.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/alpinejs.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Alpine.js - Lightweight Interactivity Guide","item":"https://amin360it.github.io/quick-guides/alpinejs.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Alpine.js</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This Alpine.js Guide</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use all course long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Alpine Fundamentals &amp; Setup</a><ul><li><a href="#ch1-what" data-target="ch1-what">1.1 What Alpine is and where it came from</a></li><li><a href="#ch1-install" data-target="ch1-install">1.2 Installing Alpine with one script tag</a></li><li><a href="#ch1-xdata" data-target="ch1-xdata">1.3 Your first x-data component</a></li><li><a href="#ch1-compare" data-target="ch1-compare">1.4 Alpine vs Vue, jQuery, and when to use it</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · State with x-data</a><ul><li><a href="#ch2-declare" data-target="ch2-declare">2.1 Declaring state as an object</a></li><li><a href="#ch2-nested" data-target="ch2-nested">2.2 Nested components and scope</a></li><li><a href="#ch2-methods" data-target="ch2-methods">2.3 Getters and methods</a></li><li><a href="#ch2-data" data-target="ch2-data">2.4 Reusable components with Alpine.data</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Core Directives</a><ul><li><a href="#ch3-conditionals" data-target="ch3-conditionals">3.1 Conditionals: x-show and x-if</a></li><li><a href="#ch3-for" data-target="ch3-for">3.2 Loops with x-for and :key</a></li><li><a href="#ch3-bind" data-target="ch3-bind">3.3 Binding attributes with x-bind</a></li><li><a href="#ch3-on" data-target="ch3-on">3.4 Events, text and HTML with x-on, x-text, x-html</a></li><li><a href="#ch3-model" data-target="ch3-model">3.5 Two-way binding with x-model and its modifiers</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Reactivity &amp; Watchers</a><ul><li><a href="#ch4-effect" data-target="ch4-effect">4.1 Reacting with x-effect</a></li><li><a href="#ch4-watch" data-target="ch4-watch">4.2 Watching state with $watch and $nextTick</a></li><li><a href="#ch4-caveats" data-target="ch4-caveats">4.3 Reactivity caveats: mutating vs replacing</a></li><li><a href="#ch4-ignore" data-target="ch4-ignore">4.4 Skipping work with x-ignore</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Magics, DOM Access &amp; Lifecycle</a><ul><li><a href="#ch5-magics" data-target="ch5-magics">5.1 Meet the magics: $el, $root and $data</a></li><li><a href="#ch5-refs" data-target="ch5-refs">5.2 Grabbing elements with $refs and x-ref</a></li><li><a href="#ch5-dispatch" data-target="ch5-dispatch">5.3 Talking upwards with $dispatch</a></li><li><a href="#ch5-init" data-target="ch5-init">5.4 Running code at boot with x-init</a></li><li><a href="#ch5-cloak" data-target="ch5-cloak">5.5 Hiding the pre-javascript flash with x-cloak</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Data Fetching &amp; Async</a><ul><li><a href="#ch6-fetch" data-target="ch6-fetch">6.1 One-line JSON with $fetch</a></li><li><a href="#ch6-loading" data-target="ch6-loading">6.2 Loading, success and error states</a></li><li><a href="#ch6-forms" data-target="ch6-forms">6.3 Submitting forms with x-model and fetch</a></li><li><a href="#ch6-json" data-target="ch6-json">6.4 Composing requests against JSON APIs</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Stores, Components &amp; Communication</a><ul><li><a href="#ch7-store" data-target="ch7-store">7.1 Global state with Alpine.store</a></li><li><a href="#ch7-components" data-target="ch7-components">7.2 Reusable components with Alpine.data</a></li><li><a href="#ch7-communication" data-target="ch7-communication">7.3 Communicating between components with events</a></li><li><a href="#ch7-persist" data-target="ch7-persist">7.4 Cross-component state and persistence</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · The Plugin Fleet</a><ul><li><a href="#ch8-register" data-target="ch8-register">8.1 Registering the plugin fleet</a></li><li><a href="#ch8-mask" data-target="ch8-mask">8.2 Entering formatted input with mask</a></li><li><a href="#ch8-persist" data-target="ch8-persist">8.3 Remembering state with persist</a></li><li><a href="#ch8-ux" data-target="ch8-ux">8.4 Animating and trapping with collapse and focus</a></li><li><a href="#ch8-rest" data-target="ch8-rest">8.5 Intersect, resize, sort and anchor</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Alpine in Server-Rendered Apps</a><ul><li><a href="#ch9-blade" data-target="ch9-blade">9.1 Progressive enhancement in Laravel Blade</a></li><li><a href="#ch9-django" data-target="ch9-django">9.2 The same trick in Django and Rails</a></li><li><a href="#ch9-csrf" data-target="ch9-csrf">9.3 CSRF-safe POST and PUT with the right headers</a></li><li><a href="#ch9-conflicts" data-target="ch9-conflicts">9.4 Avoiding hydration conflicts and staying fast</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Best Practices &amp; Testing</a><ul><li><a href="#ch10-state" data-target="ch10-state">10.1 Keeping state small and readable</a></li><li><a href="#ch10-a11y" data-target="ch10-a11y">10.2 Accessibility and flash prevention</a></li><li><a href="#ch10-debug" data-target="ch10-debug">10.3 Debugging Alpine components</a></li><li><a href="#ch10-testing" data-target="ch10-testing">10.4 Testing Alpine with Playwright and Cypress</a></li><li><a href="#ch10-grow" data-target="ch10-grow">10.5 Growing out of Alpine: Vue and Svelte</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Quick Reference &amp; Glossary</a><ul><li><a href="#app-directives" data-target="app-directives">A.1 Directive quick reference</a></li><li><a href="#app-magics" data-target="app-magics">A.2 Magics and utilities</a></li><li><a href="#app-modifiers" data-target="app-modifiers">A.3 Modifiers and plugins at a glance</a></li><li><a href="#app-glossary" data-target="app-glossary">A.4 Glossary</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Alpine.js</span>
+      <span class="am-band-s">12 chapters &middot; 63 topics &middot; 43 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This Alpine.js Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This Alpine.js Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The right mindset</a><a href="#orientation-tools">Tools you will use all course long</a></div></div>
+    <p class="topic-desc">This opening section explains how to work through the guide most effectively. It sets the expectation that you should move chapter by chapter and type every snippet yourself rather than skim. The goal is a practical, hands-on grounding in Alpine.js so the concepts become automatic as you build.</p>
+    <p>Alpine.js is a tiny JavaScript framework for adding behaviour directly to your HTML. Everything in this guide runs in a single HTML file — no internet, no build step, no dependencies beyond a CDN script tag. Progress lives in your browser.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">Describes the three-part structure of the guide spanning ten chapters, hands-on exercises, and a reference appendix. Chapters build one idea on top of another, and each ends with code snippets you should type out yourself. Knowing the path lets you locate any topic quickly and revisit the appendix for lookup tables.</p>
+    <ul>
+      <li><strong>Part I (Ch. 1–5)</strong> — the core: what Alpine is, state with <code>x-data</code>, the core directives, reactivity, and the magics that reach into the DOM.</li>
+      <li><strong>Part II (Ch. 6–8)</strong> — real apps: fetching data, components and stores, and the official plugin fleet.</li>
+      <li><strong>Part III (Ch. 9–10)</strong> — shipping: Alpine inside server-rendered apps such as Laravel Blade, Django and Rails, plus best practices and testing.</li>
+      <li>The appendix consolidates quick-reference tables for directives, magics, plugins and modifiers. Keep it open while you build.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset</h3>
+    <p class="topic-desc">Covers the philosophy that sets Alpine apart: behaviour lives in your markup rather than in a separate JavaScript layer. You write declarative expressions directly in attributes and let Alpine handle the imperative work. Thinking in terms of state and its reactions keeps components small and obvious.</p>
+    <p>Alpine is often called "the Tailwind of JavaScript": it borrows Tailwind’s philosophy of small, composable utilities living in your markup. You write <code>x-show</code>, <code>x-bind</code> and <code>x-on</code> as attributes directly on elements — there is no separate controller file, no virtual DOM, and no build step.</p>
+    <div class="tip"><p>There is no state fetched from a server and no node list to reconcile: Alpine reads your attributes, sees the state you declared, and updates the DOM when that state changes. Type the snippets rather than pasting them — muscle memory matters.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will use all course long</h3>
+    <p class="topic-desc">Lists the free, offline tools you will use throughout the course, starting with the CDN script tag that loads Alpine. Beyond the browser you use the devtools console and the Alpine DevTools extension for inspecting components. Nothing here costs money or requires a server.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Any modern browser</td><td>Runs Alpine; open the console and elements panel via F12</td></tr>
+      <tr><td>CDN script tag</td><td>The entire installation — one <code>&lt;script defer&gt;</code> line in the head</td></tr>
+      <tr><td>Alpine DevTools</td><td>Browser extension to inspect components, state and stores</td></tr>
+      <tr><td>A plain text editor</td><td>Write the HTML snippets; no bundler or node_modules required</td></tr>
+      <tr><td>Optional: Tailwind CSS</td><td>The natural styling partner for the same markup</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Alpine Fundamentals &amp; Setup</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Alpine Fundamentals &amp; Setup</button><div class="ch-toc-list"><a href="#ch1-what">1.1 What Alpine is and where it came from</a><a href="#ch1-install">1.2 Installing Alpine with one script tag</a><a href="#ch1-xdata">1.3 Your first x-data component</a><a href="#ch1-compare">1.4 Alpine vs Vue, jQuery, and when to use it</a></div></div>
+    <p class="topic-desc">Introduces Alpine.js, how to load it via CDN, and how to build a first component with x-data. You create state and wire it to the page with directives to produce a working interactive element. By the end you can read Alpine markup fluently and understand the vocabulary used throughout the rest of the guide.</p>
+    <p>Alpine is a collection of attributes that turn ordinary HTML into reactive UI, weighing about 16 KB minified. This chapter establishes the baseline: where it came from, how to install it, and the single entry point everything else hangs off — <code>x-data</code>.</p>
+    <h3 id="ch1-what" data-toc>1.1 What Alpine is and where it came from</h3>
+    <p class="topic-desc">Places Alpine in the history of frontend tooling, tracing the ideas that run from jQuery through Vue and into Alpine’s deliberately small footprint. Alpine is an enhancement layer that sprinkles behaviour onto your existing HTML rather than an application framework. You add directives where you need them and leave the rest of the page alone.</p>
+    <p>Alpine was created by <strong>Caleb Porzio</strong>, the author of Tailwind CSS, as an answer to "how do I add a splash of interactivity without pulling in Vue or React?" Each directive does one small thing, and complex UI is composed from simple attribute combinations rather than a component tree backed by a diffing engine.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- Compare: the same button in vanilla JS and in Alpine --&gt;
+&lt;!-- Vanilla: find the node, attach a listener, mutate the DOM --&gt;
+&lt;button id="btn"&gt;Click&lt;/button&gt;
+&lt;script&gt;
+  let clicks = 0;
+  document.getElementById('btn').addEventListener('click', () =&gt; {
+    clicks++;
+    document.getElementById('btn').textContent = 'Clicked ' + clicks;
+  });
+&lt;/script&gt;
+
+&lt;!-- Alpine: declare the state and what should happen --&gt;
+&lt;div x-data="{ clicks: 0 }"&gt;
+  &lt;button @click="clicks++" x-text="'Clicked ' + clicks"&gt;Click&lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Alpine keeps the state and the event logic inside the markup itself, so a reader sees the whole behaviour in one small block instead of code scattered across a script tag.</p>
+    <h3 id="ch1-install" data-toc>1.2 Installing Alpine with one script tag</h3>
+    <p class="topic-desc">Shows the one-tag CDN installation used by most projects, with the defer attribute so the script boots after the DOM is ready. You verify Alpine actually loaded, usually by checking that an x-data component reacts. This single script tag is the entire installation for typical work.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- Put this in the &lt;head&gt; of every page that needs Alpine --&gt;
+&lt;script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Verify it booted: open the console and evaluate --&gt;
+// typeof Alpine  →  "object" if the script loaded correctly
+document.querySelectorAll('[x-data]').length;   // count of live components</code></pre></div>
+    <p class="code-note">The defer attribute makes the browser download Alpine while it parses the page and run it only after the DOM is ready, so Alpine sees every element it needs to initialise.</p>
+    <p>With the script in place, any element carrying an <code>x-data</code> attribute becomes a live component. If you already use a bundler, the same package also installs through npm — the CDN is simply the fastest path.</p>
+    <h3 id="ch1-xdata" data-toc>1.3 Your first x-data component</h3>
+    <p class="topic-desc">Builds the classic toggle component, which introduces the three ideas that cover most UI. One x-data attribute declares the state, an x-on handler responds to a click, and x-show or x-text reflects that state in the page. Combining declare, respond, and reflect is the core mental model.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ open: false }"&gt;                &lt;!-- state object --&gt;
+  &lt;button @click="open = !open"&gt;Toggle&lt;/button&gt; &lt;!-- flip it --&gt;
+  &lt;p x-show="open"&gt;Hello from Alpine!&lt;/p&gt;      &lt;!-- react to it --&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">x-data creates a component owning the open property, @click assigns a new value, and x-show hides or shows the paragraph whenever open changes.</p>
+    <p>Compare this with the mindset from 1.1: the state, the trigger and the effect sit on the same three lines. There is no request, no reload, and nothing to re-render by hand.</p>
+    <h3 id="ch1-compare" data-toc>1.4 Alpine vs Vue, jQuery, and when to use it</h3>
+    <p class="topic-desc">Weighs Alpine against Vue and jQuery while also judging when neither is the right call. Alpine trades the full power of a framework for a dramatically smaller mental load, making it best for server-rendered pages that want interactivity. The comparison helps you recognise when plain JavaScript or a full framework is the better tool.</p>
+    <table>
+      <tr><th>Option</th><th>Best for</th><th>Trade-off</th></tr>
+      <tr><td>Plain JS / jQuery</td><td>Tiny one-off interactions</td><td>State management is manual and easy to get wrong</td></tr>
+      <tr><td>Alpine</td><td>Declarative widgets on server-rendered pages</td><td>Not built for complex component trees</td></tr>
+      <tr><td>Vue / React / Svelte</td><td>SPAs with rich client-side state</td><td>Build step, tooling, and a steeper learning curve</td></tr>
+    </table>
+    <p>The rule of thumb: if a page is mostly server-rendered and needs <em>a pinch</em> of interactivity — menus, toggles, filters, inline forms — Alpine is the sweet spot. If you find yourself writing dozens of components with a cross-cutting data model, move up to Vue, Svelte or React (chapter 10).</p>
+    <div class="ex"><h4 id="ch1-compare--exercises-1">Exercises 1</h4><ol>
+      <li>Add Alpine via CDN to a throwaway page and verify it boots in the console.</li>
+      <li>Build an <code>x-data</code> counter with an increment and a reset button.</li>
+      <li>Rewrite a tiny dropdown you have lying around using <code>x-show</code> and <code>@click</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · State with x-data</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · State with x-data</button><div class="ch-toc-list"><a href="#ch2-declare">2.1 Declaring state as an object</a><a href="#ch2-nested">2.2 Nested components and scope</a><a href="#ch2-methods">2.3 Getters and methods</a><a href="#ch2-data">2.4 Reusable components with Alpine.data</a></div></div>
+    <p class="topic-desc">Treats x-data as the single most important concept in Alpine, the place where all state is declared, scoped, and structured. The rest of the framework is essentially a reaction layer over this data: directives read it, events change it, and the DOM updates to match. Getting state right makes everything else fall into place.</p>
+    <p>In Alpine, <code>x-data</code> is the entry point of every component. Its value is a JavaScript object (or an expression returning one), and every property in that object is reactive state available to the directives inside the element. Master this chapter and the rest of the guide becomes vocabulary.</p>
+    <h3 id="ch2-declare" data-toc>2.1 Declaring state as an object</h3>
+    <p class="topic-desc">Shows how to declare primitives, strings, and booleans inside an x-data expression and bind them to the page with x-text and x-model. The resulting object is readable by every directive nested below the component. Keeping the data flat and obvious makes expressions easy to reason about.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ count: 0, name: 'Ada', ready: false }"&gt;
+  &lt;p x-text="count"&gt;&lt;/p&gt;                      &lt;!-- renders the current value --&gt;
+  &lt;button @click="count++"&gt;Increment&lt;/button&gt;
+  &lt;input x-model="name"&gt;                     &lt;!-- two-way binding to state --&gt;
+  &lt;p x-show="ready"&gt;Ready when the box is checked&lt;/p&gt;
+  &lt;input type="checkbox" x-model="ready"&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">The component state object lives in x-data; x-text renders a value, x-model reads and writes it, and @click mutates it through a small expression.</p>
+    <h3 id="ch2-nested" data-toc>2.2 Nested components and scope</h3>
+    <p class="topic-desc">Explains how x-data components can nest, creating a scope chain of parent and child objects. A child scope can read a parent’s properties but should write to its own, reserving a mutable piece of state for each level. Scoping keeps collisions and unintended coupling under control.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ saved: false }"&gt;                        &lt;!-- parent scope --&gt;
+  &lt;form x-data="{ email: '' }" @submit="saved = true"&gt;  &lt;!-- child reads parent --&gt;
+    &lt;input x-model="email"&gt;
+    &lt;button type="submit"&gt;Save&lt;/button&gt;
+  &lt;/form&gt;
+  &lt;p x-show="saved"&gt;Saved. Child scopes can see parent properties.&lt;/p&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">The inner form adds its own email property while still reading and writing saved from the parent, because an expression resolves up the scope chain until it finds a property.</p>
+    <p>This scope chain is one of Alpine’s most used features — it is how a list of items and each item’s own state (such as an open menu) live together on one page.</p>
+    <h3 id="ch2-methods" data-toc>2.3 Getters and methods</h3>
+    <p class="topic-desc">Shows how to add computed values and functions to the x-data object. Getters produce derived values that update when their dependencies change, while methods execute in expressions and event handlers. Moving logic into named methods keeps directives short and makes behaviour reusable across the component.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  items: [3, 7, 9],
+  total() {
+    return this.items.reduce((sum, n) =&gt; sum + n, 0);
+  },
+  label: 'Total',
+  summary() {
+    return this.label + ': ' + this.total();
+  }
+}"&gt;
+  &lt;p x-text="summary()"&gt;&lt;/p&gt;                    &lt;!-- prints "Total: 19" --&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Functions defined in state act like methods: this refers to the component, so total() and summary() are called from directives just like any other helper.</p>
+    <div class="tip"><p>Because x-data is plain JavaScript, everything you already know — array methods, destructuring, ternaries — works inside it. Reach for a method once an expression grows longer than one line.</p></div>
+    <h3 id="ch2-data" data-toc>2.4 Reusable components with Alpine.data</h3>
+    <p class="topic-desc">Introduces Alpine.data as the mechanism for defining a named, reusable data factory. You register a function under a name and instantiate it with x-data, and each instance receives its own fresh state. One definition can therefore power many independent widgets on the same page.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  document.addEventListener('alpine:init', () =&gt; {   // fires once, before components boot
+    Alpine.data('counter', () =&gt; ({
+      count: 0,
+      inc() { this.count++; },
+      dec() { this.count--; },
+    }));
+  });
+&lt;/script&gt;
+
+&lt;div x-data="counter"&gt;                             &lt;!-- a fresh instance --&gt;
+  &lt;button @click="dec()"&gt;-&lt;/button&gt;
+  &lt;span x-text="count"&gt;&lt;/span&gt;
+  &lt;button @click="inc()"&gt;+&lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Alpine.data registers the counter factory on the alpine:init event, and x-data="counter" instantiates it with a fresh state object — two counters on the page never share state.</p>
+    <div class="ex"><h4 id="ch2-data--exercises-2">Exercises 2</h4><ol>
+      <li>Build a component with a name, a toggle, and a list of items rendered with <code>x-text</code>.</li>
+      <li>Nest a child <code>x-data</code> scope that reads a parent property.</li>
+      <li>Extract a reusable <code>Alpine.data</code> factory and use it twice on one page.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Core Directives</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Core Directives</button><div class="ch-toc-list"><a href="#ch3-conditionals">3.1 Conditionals: x-show and x-if</a><a href="#ch3-for">3.2 Loops with x-for and :key</a><a href="#ch3-bind">3.3 Binding attributes with x-bind</a><a href="#ch3-on">3.4 Events, text and HTML with x-on, x-text, x-html</a><a href="#ch3-model">3.5 Two-way binding with x-model and its modifiers</a></div></div>
+    <p class="topic-desc">Covers the core directives that express almost any UI behaviour: conditionals, loops, attribute binding, events, text binding, and two-way form binding. Each directive is a small declarative tool, and most interactions combine a few of them together. Mastering this chapter gives you a complete toolkit for day-to-day markup.</p>
+    <p>Directives are Alpine’s verbs. They share one shape — <code>x-directive:modifier="expression"</code> — and they all react to state changes. This chapter works through them one by one, from the commonest to the most specialised.</p>
+    <h3 id="ch3-conditionals" data-toc>3.1 Conditionals: x-show and x-if</h3>
+    <p class="topic-desc">Explains the difference between x-show and x-if for conditional rendering. x-show toggles the display style and leaves the element permanently in the DOM, which is fast for frequent toggling, while x-if destroys and recreates the subtree and must live on a template tag. Choose based on whether the element’s presence matters.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ open: false }"&gt;
+  &lt;button @click="open = !open"&gt;Menu&lt;/button&gt;
+  &lt;nav x-show="open" x-transition&gt;        &lt;!-- fade + slide while toggling --&gt;
+    &lt;a href="#"&gt;Home&lt;/a&gt;
+    &lt;a href="#"&gt;About&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">x-show flips between display:none and the element’s natural display, so the nav keeps its state and layout; x-transition adds a smooth fade and slide.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ loading: true, posts: [] }"&gt;
+  &lt;template x-if="loading"&gt;                     &lt;!-- branch disappears when false --&gt;
+    &lt;p&gt;Loading posts…&lt;/p&gt;
+  &lt;/template&gt;
+  &lt;template x-if="!loading &amp;&amp; posts.length === 0"&gt;
+    &lt;p&gt;No posts yet.&lt;/p&gt;
+  &lt;/template&gt;
+  &lt;template x-if="posts.length &gt; 0"&gt;
+    &lt;ul&gt;&lt;template x-for="p in posts" :key="p.id"&gt;&lt;li x-text="p.title"&gt;&lt;/li&gt;&lt;/template&gt;&lt;/ul&gt;
+  &lt;/template&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">x-if must wrap its content in a template tag and fully removes or inserts the subtree, which is right for expensive branches that should not exist until needed.</p>
+    <h3 id="ch3-for" data-toc>3.2 Loops with x-for and :key</h3>
+    <p class="topic-desc">Shows how to iterate over arrays and objects with x-for, binding a stable key through the :key attribute. Keys let Alpine track which items moved, were added, or were removed, so the DOM updates efficiently and correctly. Without a stable key, reordering rows can produce wrong data binding.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  todos: [
+    { id: 1, text: 'Write the guide' },
+    { id: 2, text: 'Escape angle brackets' }
+  ]
+}"&gt;
+  &lt;ul&gt;
+    &lt;template x-for="todo in todos" :key="todo.id"&gt;
+      &lt;li x-text="todo.text"&gt;&lt;/li&gt;
+    &lt;/template&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">x-for also lives on a template element; :key binds a unique identifier per item so Alpine patches lists correctly when items are reordered.</p>
+    <p>Bind a key whenever your list items can change order or identity. A static list works without one, but the habit keeps lists predictable when they grow.</p>
+    <h3 id="ch3-bind" data-toc>3.3 Binding attributes with x-bind</h3>
+    <p class="topic-desc">Covers x-bind and its : shorthand for setting attributes, classes, and styles from state. Beyond plain values, class and style accept object and array syntax, so you can toggle individual classes based on conditions. Binding keeps the DOM in sync without imperative DOM manipulation.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ disabled: true, theme: 'dark', id: 7 }"&gt;
+  &lt;button :disabled="disabled"&gt;Save&lt;/button&gt;
+  &lt;img :src="'photos/' + id + '.jpg'" alt="Preview"&gt;
+  &lt;div :class="{ 'bg-black': theme === 'dark', 'bg-white': theme !== 'dark' }"&gt;...&lt;/div&gt;
+  &lt;div :style="{ color: theme === 'dark' ? 'white' : 'black' }"&gt;Themed text&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">:src builds an attribute from an expression, while :class and :style accept object syntax where each key applies only when its boolean value is true.</p>
+    <div class="tip"><p>A bare <code>disabled="..."</code> attribute is always treated as present and truthy in HTML. Bind it as <code>:disabled="false"</code> to actually remove it from the element.</p></div>
+    <h3 id="ch3-on" data-toc>3.4 Events, text and HTML with x-on, x-text, x-html</h3>
+    <p class="topic-desc">Explains x-on and its @ shorthand for listening to events, with modifiers for stopping propagation, preventing default, and running once. It also contrasts x-text with x-html for filling element content: x-text always escapes its input and is the safe default, while x-html renders raw HTML and should be used rarely.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ count: 0, html: '&lt;strong&gt;bold text&lt;/strong&gt;' }"&gt;
+  &lt;button @click="count++"&gt;Clicked &lt;span x-text="count"&gt;&lt;/span&gt; time(s)&lt;/button&gt;
+  &lt;button @mouseenter.once="count = 0"&gt;Reset (only on first hover)&lt;/button&gt;
+  &lt;p x-text="count"&gt;&lt;/p&gt;            &lt;!-- text is always escaped --&gt;
+  &lt;p x-html="html"&gt;&lt;/p&gt;             &lt;!-- renders real HTML --&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">@ handles events and modifiers like .once, while x-text writes text safely and x-html injects raw markup — use x-html only with content you control or trust.</p>
+    <div class="warn"><p>x-html injects whatever the expression produces into the page. Never point it at user input — that is how XSS happens. Default to <code>x-text</code>.</p></div>
+    <h3 id="ch3-model" data-toc>3.5 Two-way binding with x-model and its modifiers</h3>
+    <p class="topic-desc">Covers x-model for two-way binding on inputs, selects, and textareas, syncing the element’s value with component state in both directions. Modifiers tune when and how values sync, such as number conversion, trimming whitespace, or lazy updates on change instead of input. Most forms are built with this single directive.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ q: '', agree: false, tags: [], age: '' }"&gt;
+  &lt;input x-model="q" placeholder="Search"&gt;                 &lt;!-- text --&gt;
+  &lt;input type="checkbox" x-model="agree"&gt;                  &lt;!-- boolean --&gt;
+  &lt;select x-model="tags" multiple&gt;                          &lt;!-- multi-select array --&gt;
+    &lt;option&gt;html&lt;/option&gt;&lt;option&gt;css&lt;/option&gt;&lt;option&gt;js&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;input x-model.number="age"&gt;                             &lt;!-- coerces to a number --&gt;
+  &lt;input x-model.lazy="q"&gt;                                 &lt;!-- syncs on change, not input --&gt;
+  &lt;input x-model.debounce.300ms="q"&gt;                       &lt;!-- waits 300ms of quiet --&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">x-model reads the element type — text, checkbox, select, radio — and writes the matching kind of value, while .number, .lazy and .debounce adjust coercion and sync timing.</p>
+    <div class="ex"><h4 id="ch3-model--exercises-3">Exercises 3</h4><ol>
+      <li>Build a tab set with <code>x-show</code> and an active tab stored in state.</li>
+      <li>Render a list from an array with <code>x-for</code> and a stable <code>:key</code>.</li>
+      <li>Create a search input with <code>x-model.debounce.300ms</code> that filters a rendered list.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Reactivity &amp; Watchers</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Reactivity &amp; Watchers</button><div class="ch-toc-list"><a href="#ch4-effect">4.1 Reacting with x-effect</a><a href="#ch4-watch">4.2 Watching state with $watch and $nextTick</a><a href="#ch4-caveats">4.3 Reactivity caveats: mutating vs replacing</a><a href="#ch4-ignore">4.4 Skipping work with x-ignore</a></div></div>
+    <p class="topic-desc">Explains the automatic reactivity engine that powers the whole framework. When state referenced inside directives or effects changes, Alpine re-runs the affected parts of the page automatically. The chapter teaches you to declare effects, watch specific properties, and avoid the small set of caveats that catch newcomers.</p>
+    <p>Reactivity is the property that makes directives fire automatically when state changes. Alpine 3 implements it with JavaScript <strong>Proxies</strong>: when a directive reads a property, Alpine notes the dependency; when that property later changes, only the affected directives re-run.</p>
+    <h3 id="ch4-effect" data-toc>4.1 Reacting with x-effect</h3>
+    <p class="topic-desc">Introduces x-effect for registering a side effect that runs whenever any of its dependencies change. The directive evaluates its expression once immediately on boot, then re-runs it each time a referenced property updates. It is the foundation for anything that must react without a button or event.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ count: 0 }" x-effect="console.log('count is now', count)"&gt;
+  &lt;button @click="count++"&gt;Increment&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- console output on load:  count is now 0 --&gt;
+&lt;!-- then after clicks:       count is now 1, 2, 3, ... --&gt;</code></pre></div>
+    <p class="code-note">x-effect records count as a dependency during its first run and re-executes only when that property changes — a tiny, declarative version of an observer.</p>
+    <h3 id="ch4-watch" data-toc>4.2 Watching state with $watch and $nextTick</h3>
+    <p class="topic-desc">Shows how to react to a single property changing using the $watch magic, and how to coordinate with the DOM using $nextTick. $watch fires a callback whenever the chosen expression changes, while $nextTick runs code after Alpine has applied the latest DOM update. Together they give you precise control over timing.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  query: '',
+  menuOpen: false,
+  init() {
+    this.$watch('query', (value) =&gt; console.log('search:', value));
+  },
+  focus() {
+    this.menuOpen = true;
+    this.$nextTick(() =&gt; this.$refs.input.focus());  // wait for the DOM to update
+  }
+}"&gt;
+  &lt;input x-model="query" x-ref="input"&gt;
+  &lt;button @click="focus()"&gt;Edit&lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">$watch subscribes to one property and hands you its new value, while $nextTick defers a callback until Alpine has applied the pending DOM changes.</p>
+    <h3 id="ch4-caveats" data-toc>4.3 Reactivity caveats: mutating vs replacing</h3>
+    <p class="topic-desc">Explains the one case where reactivity is not automatic: mutating arrays and objects in place is not always tracked. The safe pattern is to replace the value with a fresh reference, assigning a new array or object instead of pushing or modifying properties. This simple habit prevents the majority of stale-UI bugs.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  user: { name: 'Ada', hits: 0 },
+  items: [1, 2, 3]
+}"&gt;
+  &lt;p x-text="user.hits"&gt;&lt;/p&gt;
+
+  &lt;!-- Replace with a new object (spread keeps it immutable and obvious) --&gt;
+  &lt;button @click="user = { ...user, hits: user.hits + 1 }"&gt;Increment hit&lt;/button&gt;
+
+  &lt;!-- Reassign the array with a new array each time --&gt;
+  &lt;button @click="items = [...items, 4]"&gt;Append 4&lt;/button&gt;
+
+  &lt;!-- Filter into a fresh array to remove items reactively --&gt;
+  &lt;button @click="items = items.filter(n =&gt; n !== 4)"&gt;Remove 4s&lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Replacing the object or array with a fresh reference is the pattern Alpine documents for certainty: every directive that read the property re-evaluates against the new value.</p>
+    <p>Alpine 3's Proxy also makes <em>adding</em> a brand-new property later fully reactive — a real upgrade over Alpine 2. The remaining caveat is timing: assign the whole new reference when you want a change to be unmistakable, and reach for <code>$nextTick</code> when code must run after the DOM reflects state.</p>
+    <h3 id="ch4-ignore" data-toc>4.4 Skipping work with x-ignore</h3>
+    <p class="topic-desc">Shows x-ignore, which tells Alpine to skip a whole subtree and never initialise or re-render the components inside it. Use it around third-party embeds and any pre-rendered content that must be left untouched. The ignored region stays exactly as the server wrote it.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data&gt;
+  &lt;!-- Everything between the x-ignore markers stays untouched by Alpine --&gt;
+  &lt;div x-ignore&gt;
+    &lt;!-- A widget injected by a third-party script that manages its own DOM --&gt;
+    &lt;div id="chat-embed"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;p x-text="new Date().toLocaleTimeString()"&gt;&lt;/p&gt;  &lt;!-- still reactive --&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">x-ignore stops Alpine from initialising or re-rendering anything inside the element, protecting third-party widgets that would otherwise fight Alpine’s updates.</p>
+    <div class="ex"><h4 id="ch4-ignore--exercises-4">Exercises 4</h4><ol>
+      <li>Add <code>x-effect</code> that logs a search term as it changes.</li>
+      <li>Use <code>$watch</code> on a counter and <code>$nextTick</code> to focus an element that just appeared.</li>
+      <li>Rewrite a load operation to reassign the whole array instead of mutating it.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Magics, DOM Access &amp; Lifecycle</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Magics, DOM Access &amp; Lifecycle</button><div class="ch-toc-list"><a href="#ch5-magics">5.1 Meet the magics: $el, $root and $data</a><a href="#ch5-refs">5.2 Grabbing elements with $refs and x-ref</a><a href="#ch5-dispatch">5.3 Talking upwards with $dispatch</a><a href="#ch5-init">5.4 Running code at boot with x-init</a><a href="#ch5-cloak">5.5 Hiding the pre-javascript flash with x-cloak</a></div></div>
+    <p class="topic-desc">Covers the $ magics that reach outside the component into the browser, along with the setup attributes that tie components together. Magics expose the current element, the root, raw data, refs, events, timing, and the store, while x-init, x-cloak, and x-ref wire up lifecycle and structure. Together they handle almost every escape hatch you need.</p>
+    <p>Magics are properties prefixed with <code>$</code> that Alpine exposes inside expressions, such as <code>$refs</code> or <code>$nextTick</code>. They are the bridge between your declarative state and the imperative browser around you.</p>
+    <h3 id="ch5-magics" data-toc>5.1 Meet the magics: $el, $root and $data</h3>
+    <p class="topic-desc">Introduces the main introspection magics: $el points at the current element, $root at the outermost component element, and $data at the raw state object. These are invaluable for inspecting values during development and for the occasional imperative tweak. Reading them never creates a new dependency, so using them in expressions is always safe.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ name: 'Alpine' }" data-id="root-1"&gt;
+  &lt;!-- $el is the element the expression lives on --&gt;
+  &lt;p x-text="$el.tagName + ' (my tag)'"&gt;&lt;/p&gt;
+  &lt;!-- $root is the nearest x-data element --&gt;
+  &lt;p x-text="$root.dataset.id"&gt;&lt;/p&gt;
+  &lt;!-- $data is the raw component state --&gt;
+  &lt;pre x-text="JSON.stringify($data, null, 2)"&gt;&lt;/pre&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">$el, $root and $data give expressions a mirror of the live DOM and state around them, handy for logging, measuring or reading arbitrary attributes.</p>
+    <h3 id="ch5-refs" data-toc>5.2 Grabbing elements with $refs and x-ref</h3>
+    <p class="topic-desc">Shows how to name elements with x-ref and then reach them from anywhere in the same component using $refs. This is the reliable way to focus an input or measure a node’s dimensions when directives alone are not enough. The ref lookup is scoped to the current component’s subtree.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  open: false,
+  focusNote() {
+    this.open = true;
+    this.$nextTick(() =&gt; this.$refs.note.focus());
+  }
+}"&gt;
+  &lt;textarea x-show="open" x-ref="note"&gt;&lt;/textarea&gt;
+  &lt;button @click="focusNote()"&gt;Write a note&lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">x-ref tags the textarea with the name note, and $refs.note returns it after $nextTick guarantees the element is visible and laid out.</p>
+    <h3 id="ch5-dispatch" data-toc>5.3 Talking upwards with $dispatch</h3>
+    <p class="topic-desc">Explains how to communicate upwards using custom events created with $dispatch. The method fires an event on the current element, parents listen with the x-on shorthand such as @name, and the payload arrives in $event.detail. It is the Alpine-native alternative to calling parent methods directly.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ total: 0 }" @add-to-cart="total += $event.detail.qty"&gt;
+  &lt;p x-text="'Cart: ' + total"&gt;&lt;/p&gt;
+  &lt;button @click="$dispatch('add-to-cart', { qty: 2 })"&gt;Add 2&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- The event bubbles to the window by default, so siblings can listen too:
+&lt;script&gt;
+  window.addEventListener('add-to-cart', (e) =&gt; console.log(e.detail.qty));
+&lt;/script&gt; --&gt;</code></pre></div>
+    <p class="code-note">$dispatch fires a custom DOM event carrying a payload; the parent picks it up with @add-to-cart and reads $event.detail, and bubbling lets unrelated code listen on window.</p>
+    <h3 id="ch5-init" data-toc>5.4 Running code at boot with x-init</h3>
+    <p class="topic-desc">Shows the two ways to run code when a component boots: the x-init attribute and the init() method inside the data object. The chapter covers the boot order and when the DOM is considered ready so initialisation can safely measure or query elements. Knowing this timing prevents the classic cannot-read-document errors on load.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  posts: [],
+  init() {                     // runs once, before children initialise
+    this.posts = ['first'];
+  }
+}"&gt;
+  &lt;p x-text="'Loaded ' + posts.length + ' post(s)'"&gt;&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- Equivalent single-expression form for small components --&gt;
+&lt;div x-data="{ ready: false }" x-init="ready = true"&gt;...&lt;/div&gt;</code></pre></div>
+    <p class="code-note">An init() method on the state object runs once when the component boots, and x-init is the attribute shortcut; both run before child components, so $nextTick is how you wait for the whole DOM.</p>
+    <h3 id="ch5-cloak" data-toc>5.5 Hiding the pre-javascript flash with x-cloak</h3>
+    <p class="topic-desc">Covers x-cloak, the standard guard against a visible flash of uninitialised markup before Alpine loads. Combined with one CSS rule that hides any element carrying the attribute until Alpine removes it, the fix costs a single attribute and a few lines of style. It is an essential polish for any public page.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ open: false }" x-cloak&gt;
+  &lt;button @click="open = !open"&gt;Toggle&lt;/button&gt;
+  &lt;p x-show="open"&gt;This content never flashes before Alpine boots.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- Add this one rule to your own stylesheet, not inside the page: --&gt;
+/* [x-cloak] { display: none; } */</code></pre></div>
+    <p class="code-note">x-cloak hides the element until Alpine initialises it and removes the attribute, so users never see raw, unreacted markup during the script-load window.</p>
+    <div class="ex"><h4 id="ch5-cloak--exercises-5">Exercises 5</h4><ol>
+      <li>Log <code>$root</code>, <code>$el</code> and <code>$data</code> from an <code>x-effect</code> on a small component.</li>
+      <li>Use <code>x-ref</code> with <code>$nextTick</code> to focus a revealed input.</li>
+      <li>Add <code>x-cloak</code> to a slow page and verify no flash in the network-throttled view.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Data Fetching &amp; Async</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Data Fetching &amp; Async</button><div class="ch-toc-list"><a href="#ch6-fetch">6.1 One-line JSON with $fetch</a><a href="#ch6-loading">6.2 Loading, success and error states</a><a href="#ch6-forms">6.3 Submitting forms with x-model and fetch</a><a href="#ch6-json">6.4 Composing requests against JSON APIs</a></div></div>
+    <p class="topic-desc">Teaches everything needed to talk to a backend from Alpine components. It introduces $fetch for one-line JSON reads, async initialisers for work at load time, a repeated three-phase pattern for loading and error states, and full form submission without a page refresh. The chapter keeps network requests explicit and readable.</p>
+    <p>Alpine components often need live data — search results, comments, dashboards. Alpine gives you async/await everywhere, and the <code>$fetch</code> magic removes the ceremony around reading JSON.</p>
+    <h3 id="ch6-fetch" data-toc>6.1 One-line JSON with $fetch</h3>
+    <p class="topic-desc">Introduces $fetch, a thin convenience wrapper around the native fetch API that resolves to parsed JSON. It turns the usual fetch boilerplate into a single expression you can assign directly to state. For anything beyond a simple JSON read, the plain fetch API remains available.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  posts: [],
+  async init() {
+    this.posts = await $fetch('/api/posts');   // fetch + .json() in one call
+  }
+}"&gt;
+  &lt;template x-for="post in posts" :key="post.id"&gt;
+    &lt;article&gt;
+      &lt;h2 x-text="post.title"&gt;&lt;/h2&gt;
+      &lt;p x-text="post.body"&gt;&lt;/p&gt;
+    &lt;/article&gt;
+  &lt;/template&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">$fetch('/api/posts') replaces the usual fetch().then(r =&gt; r.json()) pair, so the init method resolves directly to the array of posts.</p>
+    <h3 id="ch6-loading" data-toc>6.2 Loading, success and error states</h3>
+    <p class="topic-desc">Shows the three-phase async pattern used every time you load remote data: a loading flag that drives an indicator, a results slot for the success case, and an error branch for failures. You set the flag before the request and flip it in the then and catch handlers. Reaching for this shape consistently keeps every request understandable.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  posts: [],
+  loading: true,
+  error: null,
+  async load() {
+    try {
+      this.posts = await $fetch('/api/posts');
+    } catch (err) {
+      this.error = 'Could not load posts';
+    } finally {
+      this.loading = false;
+    }
+  }
+}" x-init="load()"&gt;
+  &lt;p x-show="loading"&gt;Loading…&lt;/p&gt;
+  &lt;p x-show="error" x-text="error"&gt;&lt;/p&gt;
+  &lt;ul x-show="!loading &amp;&amp; !error"&gt;
+    &lt;template x-for="post in posts" :key="post.id"&gt;
+      &lt;li x-text="post.title"&gt;&lt;/li&gt;
+    &lt;/template&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">load() runs from x-init, and the finally block clears the spinner whether the call succeeded or failed, leaving error to choose the message shown.</p>
+    <h3 id="ch6-forms" data-toc>6.3 Submitting forms with x-model and fetch</h3>
+    <p class="topic-desc">Builds a form whose field values live in component state through x-model and are submitted with an Alpine fetch call. The @submit.prevent modifier blocks the browser’s default page reload and lets your handler take over. The response is then written back into the page with standard binding.</p>
+    <div class="codeWrap"><pre><code>&lt;form x-data="{
+  data: { name: '', email: '' },
+  sent: false,
+  async submit() {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(this.data)
+    });
+    if (res.ok) this.sent = true;
+  }
+}" @submit.prevent="submit()"&gt;
+  &lt;input x-model="data.name" placeholder="Name"&gt;
+  &lt;input type="email" x-model="data.email" placeholder="Email"&gt;
+  &lt;button type="submit"&gt;Send&lt;/button&gt;
+  &lt;p x-show="sent"&gt;Thanks — we will reply shortly.&lt;/p&gt;
+&lt;/form&gt;</code></pre></div>
+    <p class="code-note">The form’s inputs live in the reactive data object, and @submit.prevent stops the native reload so submit() can send JSON and flip the sent flag on success.</p>
+    <h3 id="ch6-json" data-toc>6.4 Composing requests against JSON APIs</h3>
+    <p class="topic-desc">Covers composing requests against JSON APIs, including running parallel calls with Promise.all and caching fetched results in component state. $fetch is a shortcut, and the plain fetch API is always there when you need headers, methods, or custom handling. This section shows how to stay in control of the network layer.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  stats: { users: 0, posts: 0 },
+  async init() {
+    const [users, posts] = await Promise.all([
+      $fetch('/api/stats/users'),
+      $fetch('/api/stats/posts')
+    ]);
+    this.stats = { users, posts };
+  }
+}"&gt;
+  &lt;p&gt;Users: &lt;span x-text="stats.users"&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;p&gt;Posts: &lt;span x-text="stats.posts"&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Promise.all runs both requests concurrently, and the whole batch is reassigned to stats at once so the two figures render together.</p>
+    <div class="tip"><p>When you need headers, credentials, aborting or error status codes, fall back to the native fetch() call — $fetch stays a convenience layer, not a replacement for fetch.</p></div>
+    <div class="ex"><h4 id="ch6-json--exercises-6">Exercises 6</h4><ol>
+      <li>Load a list of posts with <code>$fetch</code> in an <code>async init()</code>.</li>
+      <li>Add a loading message, an error message and a retry button to that list.</li>
+      <li>Submit a form with <code>@submit.prevent</code> and show a success state only when <code>res.ok</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Stores, Components &amp; Communication</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Stores, Components &amp; Communication</button><div class="ch-toc-list"><a href="#ch7-store">7.1 Global state with Alpine.store</a><a href="#ch7-components">7.2 Reusable components with Alpine.data</a><a href="#ch7-communication">7.3 Communicating between components with events</a><a href="#ch7-persist">7.4 Cross-component state and persistence</a></div></div>
+    <p class="topic-desc">Moves from isolated components to a whole application: global stores for shared state, reusable Alpine.data factories for repeated widgets, and event-driven communication that connects them. It also covers persisting that state across reloads. The result is a repeatable architecture rather than a pile of independent pieces.</p>
+    <p>Single components are fine for a widget, but real pages have a header, a cart, a search box and a footer that must stay in sync. This chapter introduces the two Alpine primitives that make shared state and reuse painless.</p>
+    <h3 id="ch7-store" data-toc>7.1 Global state with Alpine.store</h3>
+    <p class="topic-desc">Introduces Alpine.store for global state shared by every component on the page. You register a store once and any component reads and writes it through the $store magic, giving you cross-component data without prop drilling or long event chains. Stores stay reactive, so updates re-render every component that observes them.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  document.addEventListener('alpine:init', () =&gt; {
+    Alpine.store('cart', {
+      items: [],
+      total() { return this.items.reduce((s, i) =&gt; s + i.price, 0); },
+      add(item) { this.items.push(item); }
+    });
+  });
+&lt;/script&gt;
+
+&lt;!-- Header reads the store --&gt;
+&lt;p x-text="'Items: ' + $store.cart.items.length"&gt;&lt;/p&gt;
+
+&lt;!-- Any component writes to it --&gt;
+&lt;button @click="$store.cart.add({ name: 'Guide', price: 19 })"&gt;Buy the guide&lt;/button&gt;</code></pre></div>
+    <p class="code-note">Alpine.store creates a global reactive singleton; $store.cart works in every component on the page, and its methods and total are reactive just like local state.</p>
+    <h3 id="ch7-components" data-toc>7.2 Reusable components with Alpine.data</h3>
+    <p class="topic-desc">Deepens the Alpine.data pattern introduced in chapter 2, covering parameters, scope isolation, and organising factories across the codebase. Treating each factory as a tiny class for one UI widget keeps definitions small and reusable. Parameters let the same factory be configured differently at each usage site.</p>
+    <div class="codeWrap"><pre><code>&lt;script&gt;
+  document.addEventListener('alpine:init', () =&gt; {
+    Alpine.data('dropdown', (label = 'Menu') =&gt; ({
+      label,
+      open: false,
+      toggle() { this.open = !this.open; },
+      close() { this.open = false; }
+    }));
+  });
+&lt;/script&gt;
+
+&lt;div x-data="dropdown('Options')"&gt;
+  &lt;button @click="toggle()" x-text="label"&gt;&lt;/button&gt;
+  &lt;ul x-show="open" @click.outside="close()"&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Edit&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Delete&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">The dropdown factory accepts a label parameter and returns fresh state per instance, and @click.outside closes the menu when the user clicks anywhere else.</p>
+    <h3 id="ch7-communication" data-toc>7.3 Communicating between components with events</h3>
+    <p class="topic-desc">Shows the event pattern for communicating between nested and sibling components. Components bubble custom events upwards with $dispatch, parents listen with the @ shorthand, and the payload is read from $event.detail. For components that share no ancestor relationship, window-level listeners provide loose coupling.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ cart: 0 }" @bought="cart += $event.detail.qty"&gt;
+  &lt;p x-text="'Cart total: ' + cart"&gt;&lt;/p&gt;
+
+  &lt;div x-data&gt;                                  &lt;!-- an unrelated subtree --&gt;
+    &lt;button @click="$dispatch('bought', { qty: 1 })"&gt;Buy one&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Loose coupling to anything on the page:
+&lt;script&gt;
+  window.addEventListener('bought', (e) =&gt; console.log(e.detail.qty));
+&lt;/script&gt; --&gt;</code></pre></div>
+    <p class="code-note">The inner button dispatches a bought event that bubbles up to the parent’s @bought listener, and window-level listeners let entirely separate components collaborate.</p>
+    <h3 id="ch7-persist" data-toc>7.4 Cross-component state and persistence</h3>
+    <p class="topic-desc">Combines Alpine.store and Alpine.data components into a single coherent pattern, then adds the persist plugin so shared state survives page reloads. The store remains the single source of truth while components act as the visual faces over it. Reloading the page restores saved values instantly.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- Start from store registered in 7.1: Alpine.store('cart', { count: 0 }) --&gt;
+&lt;p x-data x-text="'Count in store: ' + $store.cart.count"&gt;&lt;/p&gt;
+&lt;button x-data @click="$store.cart.count++"&gt;Increment global count&lt;/button&gt;
+
+&lt;!-- Persist a component property across reloads (needs the persist plugin) --&gt;
+&lt;div x-data="{ theme: Alpine.$persist('light') }"&gt;
+  &lt;select x-model="theme"&gt;
+    &lt;option value="light"&gt;Light&lt;/option&gt;
+    &lt;option value="dark"&gt;Dark&lt;/option&gt;
+  &lt;/select&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Every component reads and writes the same reactive store, while Alpine.$persist keeps the theme in localStorage so the choice survives a page reload.</p>
+    <div class="ex"><h4 id="ch7-persist--exercises-7">Exercises 7</h4><ol>
+      <li>Create a <code>user</code> store with a name and a logout method used by three components.</li>
+      <li>Register an <code>Alpine.data</code> toast component with a message parameter.</li>
+      <li>Make a cart total live in a store and dispatch cart events from a product list.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · The Plugin Fleet</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · The Plugin Fleet</button><div class="ch-toc-list"><a href="#ch8-register">8.1 Registering the plugin fleet</a><a href="#ch8-mask">8.2 Entering formatted input with mask</a><a href="#ch8-persist">8.3 Remembering state with persist</a><a href="#ch8-ux">8.4 Animating and trapping with collapse and focus</a><a href="#ch8-rest">8.5 Intersect, resize, sort and anchor</a></div></div>
+    <p class="topic-desc">Covers the eight official plugins: mask, persist, collapse, focus, intersect, resize, sort, and anchor. Each adds either a directive or a helper, and the chapter explains how to register them and when each earns its place. Loading plugins independently keeps the core lean.</p>
+    <p>Plugins extend Alpine with new directives and magics. Each ships as its own script loaded after the core script, and each is entirely optional. This chapter is the tour.</p>
+    <h3 id="ch8-register" data-toc>8.1 Registering the plugin fleet</h3>
+    <p class="topic-desc">Shows the CDN registration pattern shared by all eight plugins: one additional defer script tag per plugin, loaded after Alpine itself. You register only the plugins you actually use rather than pulling the whole fleet, which keeps the page lean. The same pattern works regardless of which plugin you add.</p>
+    <table>
+      <tr><th>Plugin</th><th>Adds</th><th>CDN package</th></tr>
+      <tr><td>mask</td><td><code>x-mask</code> input masks</td><td>@alpinejs/mask</td></tr>
+      <tr><td>persist</td><td><code>Alpine.$persist</code></td><td>@alpinejs/persist</td></tr>
+      <tr><td>collapse</td><td><code>x-collapse</code> height animation</td><td>@alpinejs/collapse</td></tr>
+      <tr><td>focus</td><td><code>x-trap</code> focus trapping</td><td>@alpinejs/focus</td></tr>
+      <tr><td>intersect</td><td><code>x-intersect</code> scroll visibility</td><td>@alpinejs/intersect</td></tr>
+      <tr><td>resize</td><td><code>x-resize</code> element size events</td><td>@alpinejs/resize</td></tr>
+      <tr><td>sort</td><td><code>x-sort</code> drag-and-drop sorting</td><td>@alpinejs/sort</td></tr>
+      <tr><td>anchor</td><td><code>x-anchor</code> positioning</td><td>@alpinejs/anchor</td></tr>
+    </table>
+    <div class="codeWrap"><pre><code>&lt;!-- core first, then as many plugins as you need --&gt;
+&lt;script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"&gt;&lt;/script&gt;
+&lt;script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"&gt;&lt;/script&gt;
+&lt;script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"&gt;&lt;/script&gt;
+&lt;script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.x.x/dist/cdn.min.js"&gt;&lt;/script&gt;
+&lt;!-- each plugin registers its directives automatically when loaded --&gt;</code></pre></div>
+    <p class="code-note">Loading a plugin’s CDN script after the core script registers its directives and magics automatically, so you only load what a page actually uses.</p>
+    <h3 id="ch8-mask" data-toc>8.2 Entering formatted input with mask</h3>
+    <p class="topic-desc">Shows x-mask for formatting input as the user types, supporting fixed patterns such as phone numbers and dynamic masks such as money values. The stored value stays plain while the display is formatted, so the backend still receives raw digits or numbers. Masking reduces validation errors without altering your data.</p>
+    <div class="codeWrap"><pre><code>&lt;form x-data&gt;
+  &lt;!-- Fixed pattern: parens, space and dash are inserted as you type --&gt;
+  &lt;input x-mask="(99) 999-9999" placeholder="(555) 123-4567"&gt;
+
+  &lt;!-- Dynamic mask: changes shape based on what you type --&gt;
+  &lt;input x-mask:dynamic="$money($input, ',', 2)" placeholder="0,00"&gt;
+&lt;/form&gt;</code></pre></div>
+    <p class="code-note">Static masks force a fixed pattern, while x-mask:dynamic re-selects the mask as input grows and the $money helper formats a currency value live.</p>
+    <h3 id="ch8-persist" data-toc>8.3 Remembering state with persist</h3>
+    <p class="topic-desc">Covers the persist plugin’s Alpine.$persist helper for backing a property with localStorage. A single function call makes a property survive page reloads, with options for custom keys and for persisting whole objects. Restoring happens automatically so state feels continuous across sessions.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{
+  count: Alpine.$persist(0),
+  prefs: Alpine.$persist({ theme: 'light' })
+}"&gt;
+  &lt;button @click="count++"&gt;Visits: &lt;span x-text="count"&gt;&lt;/span&gt;&lt;/button&gt;
+  &lt;select x-model="prefs.theme"&gt;
+    &lt;option value="light"&gt;Light&lt;/option&gt;
+    &lt;option value="dark"&gt;Dark&lt;/option&gt;
+  &lt;/select&gt;
+&lt;/div&gt;
+
+&lt;!-- Custom storage key, so the value does not collide with another --&gt;
+&lt;div x-data="{ colour: Alpine.$persist('blue').as('preferred-colour') }"&gt;
+  &lt;input type="color" x-model="colour"&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Alpine.$persist wraps a property so every change writes to localStorage and every page load restores the saved value; .as('key') customises the storage slot.</p>
+    <h3 id="ch8-ux" data-toc>8.4 Animating and trapping with collapse and focus</h3>
+    <p class="topic-desc">Pairs x-collapse, which animates height smoothly when an element is shown or hidden, with x-trap, which captures keyboard focus inside a modal or menu. The combination makes accessible expandable panels and dialogs straightforward to build. Both react to the element’s current state rather than fighting it.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ expanded: false }"&gt;
+  &lt;button @click="expanded = !expanded"&gt;Toggle&lt;/button&gt;
+  &lt;div x-show="expanded" x-collapse&gt;
+    &lt;p&gt;This panel animates open and closed; x-collapse measures the height for you.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div x-data="{ open: false }"&gt;
+  &lt;button @click="open = true"&gt;Open dialog&lt;/button&gt;
+  &lt;div x-show="open" x-trap="open" role="dialog" aria-modal="true"&gt;
+    &lt;input placeholder="Tab stays inside the dialog"&gt;
+    &lt;button @click="open = false"&gt;Close&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">x-collapse animates the height transition for you, while x-trap locks keyboard focus inside the dialog until open is false again — modal accessibility in two attributes.</p>
+    <h3 id="ch8-rest" data-toc>8.5 Intersect, resize, sort and anchor</h3>
+    <p class="topic-desc">Covers the remaining four plugins. x-intersect fires when an element scrolls into view, x-resize watches an element’s size, x-sort enables drag-and-drop reordering of a list, and x-anchor positions a floating element relative to its trigger. Each handles a common interactive need that would otherwise become custom JavaScript.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- intersect: run once when an element scrolls into view --&gt;
+&lt;div x-data="{ seen: false }"
+     x-intersect.once="seen = true"
+     x-text="seen ? 'Now visible' : 'Scroll down'"&gt;
+&lt;/div&gt;
+
+&lt;!-- resize: react when the element's size changes --&gt;
+&lt;div x-data="{ w: 0 }" x-resize="w = $event.detail.width" x-text="w + 'px wide'"&gt;&lt;/div&gt;
+
+&lt;!-- sort: drag-and-drop reordering of a list --&gt;
+&lt;ul x-data="{ todos: ['a', 'b', 'c'] }" x-sort:group="todos"&gt;
+  &lt;template x-for="t in todos" :key="t"&gt;
+    &lt;li x-sort:item x-text="t"&gt;&lt;/li&gt;
+  &lt;/template&gt;
+&lt;/ul&gt;
+
+&lt;!-- anchor: keep a popover pinned to its button --&gt;
+&lt;div x-data="{ open: false }"&gt;
+  &lt;button @click="open = !open" x-ref="trigger"&gt;Actions&lt;/button&gt;
+  &lt;div x-show="open" x-anchor="$refs.trigger"&gt;A positioned popover&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Each plugin contributes one focused capability: intersect for scroll reveals, resize for layout-dependent UI, sort for drag reordering, and anchor for popover placement.</p>
+    <div class="ex"><h4 id="ch8-rest--exercises-8">Exercises 8</h4><ol>
+      <li>Mask a credit-card-style field with a fixed pattern.</li>
+      <li>Persist a sidebar’s collapsed state across reloads.</li>
+      <li>Make a modal with <code>x-trap</code> that closes on Escape, and a list sorted by dragging.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Alpine in Server-Rendered Apps</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Alpine in Server-Rendered Apps</button><div class="ch-toc-list"><a href="#ch9-blade">9.1 Progressive enhancement in Laravel Blade</a><a href="#ch9-django">9.2 The same trick in Django and Rails</a><a href="#ch9-csrf">9.3 CSRF-safe POST and PUT with the right headers</a><a href="#ch9-conflicts">9.4 Avoiding hydration conflicts and staying fast</a></div></div>
+    <p class="topic-desc">Shows how Alpine extends pages that a backend already rendered, whether Laravel Blade, Django, or Rails. The chapter covers progressive enhancement, carrying CSRF tokens into fetch calls, and avoiding hydration conflicts. The goal is interactivity layered on server markup without turning the stack into a single-page application.</p>
+    <p>Alpine’s sweet spot is server-rendered apps. The backend builds the HTML; Alpine sprinkles behaviour onto it. That division of labour respects the islands architecture and keeps first paint fast.</p>
+    <h3 id="ch9-blade" data-toc>9.1 Progressive enhancement in Laravel Blade</h3>
+    <p class="topic-desc">Shows a Blade nav component that works as a plain menu before Alpine loads and gains toggle behaviour the moment it boots. Because the link markup is always present, the content stays crawlable and usable without JavaScript. Alpine only wires the enhancement over what the server already outputs.</p>
+    <div class="codeWrap"><pre><code>{{-- resources/views/components/nav.blade.php --}}
+&lt;nav x-data="{ open: false }"&gt;
+  &lt;button @click="open = !open" aria-expanded="false"&gt;Menu&lt;/button&gt;
+  &lt;ul x-show="open" @click.outside="open = false"&gt;
+    &lt;li&gt;&lt;a href="{{ route('home') }}"&gt;Home&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="{{ route('posts.index') }}"&gt;Posts&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+
+{{-- layouts/app.blade.php — load Alpine once, in the head --}}
+&lt;script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"&gt;&lt;/script&gt;</code></pre></div>
+    <p class="code-note">Blade renders the menu links server-side and Alpine adds the toggle; a default closed state keeps the page orderly even if JavaScript never loads.</p>
+    <h3 id="ch9-django" data-toc>9.2 The same trick in Django and Rails</h3>
+    <p class="topic-desc">Repeats the progressive-enhancement pattern with Django template tags and a Rails helper. The idiom is identical in every framework: the server renders the full markup and Alpine adds behaviour on top. Knowing this shape once lets you apply it anywhere.</p>
+    <div class="codeWrap"><pre><code>{# Django template #}
+&lt;div x-data="{ q: '' }"&gt;
+  &lt;input x-model="q" placeholder="Filter posts"&gt;
+  &lt;ul&gt;
+    {% for post in posts %}
+      &lt;li x-show="!q || '{{ post.title|lower }}'.includes(q.toLowerCase())"&gt;
+        {{ post.title }}
+      &lt;/li&gt;
+    {% endfor %}
+  &lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;!-- Rails — the same Alpine, served by an ERB helper in the layout --&gt;
+&lt;%= javascript_include_tag "https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js", defer: true %&gt;</code></pre></div>
+    <p class="code-note">The Django filter box embeds each server-rendered title into an Alpine expression, and the Rails helper adds the same Alpine script to every page.</p>
+    <h3 id="ch9-csrf" data-toc>9.3 CSRF-safe POST and PUT with the right headers</h3>
+    <p class="topic-desc">Shows how to carry the CSRF token from your server-rendered template into Alpine fetch calls. Because every modern framework double-submits the token, you must match its exact shape and expected header name. A small inline value or data attribute supplies the token to your request headers.</p>
+    <div class="codeWrap"><pre><code>{{-- Laravel: publish a token your JavaScript can read --}}
+&lt;meta name="csrf-token" content="{{ csrf_token() }}"&gt;
+
+&lt;form x-data="{
+  body: '',
+  async submit() {
+    const res = await fetch('/comments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+      },
+      body: JSON.stringify({ body: this.body })
+    });
+    if (res.ok) this.$root.reset();
+  }
+}" @submit.prevent="submit()"&gt;
+  &lt;textarea x-model="body"&gt;&lt;/textarea&gt;
+  &lt;button&gt;Post comment&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;!-- Django reads the token from the csrftoken cookie instead of a meta tag:
+// headers: { 'X-CSRFToken': getCookie('csrftoken') } --&gt;</code></pre></div>
+    <p class="code-note">The server’s CSRF token travels from Blade into a meta tag, and Alpine’s fetch sends it back in the X-CSRF-TOKEN header so the request passes the middleware.</p>
+    <h3 id="ch9-conflicts" data-toc>9.4 Avoiding hydration conflicts and staying fast</h3>
+    <p class="topic-desc">Lists the gotchas that appear when Alpine meets server markup, such as duplicate element ids, re-rendered third-party embeds, and oversized x-data objects. The fixes are cheap once known: namespace ids, wrap embeds in x-ignore, and keep data factories small. Avoiding these upfront keeps server-rendered pages fast.</p>
+    <ul>
+      <li><strong>No duplicate ids.</strong> Alpine does not virtualise the DOM; a repeated <code>id</code> confuses getElementById and your CSS selectors.</li>
+      <li><strong>Let the server render once.</strong> If the backend already printed a list, do not also loop it with <code>x-for</code> — pick one source of truth.</li>
+      <li><strong>Isolate third-party widgets</strong> with <code>x-ignore</code> so their scripts do not fight Alpine’s DOM updates.</li>
+      <li><strong>Keep islands small.</strong> A page with fifty small <code>x-data</code> islands is fine; one island holding thousands of rows is not.</li>
+      <li><strong>Load Alpine with defer</strong> and stream the HTML first — first paint stays server-fast.</li>
+    </ul>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ expanded: false }"&gt;
+  &lt;button @click="expanded = !expanded" aria-expanded="false"&gt;
+    Reveal the server-printed body
+  &lt;/button&gt;
+  &lt;p x-show="expanded"&gt;{{ $post-&gt;body }}&lt;/p&gt;   &lt;!-- the server already printed the body --&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">The server owns the markup and Alpine only wires one toggle per element — no x-for, no duplicate render, and the fully rendered HTML arrives before any JavaScript runs.</p>
+    <div class="ex"><h4 id="ch9-conflicts--exercises-9">Exercises 9</h4><ol>
+      <li>Add a collapsible server-rendered section to a Blade view using <code>x-show</code>.</li>
+      <li>Send an Alpine fetch with the correct CSRF header for the framework you use.</li>
+      <li>Audit a page: find one duplicated input or list rendered by both server and <code>x-for</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Best Practices &amp; Testing</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Best Practices &amp; Testing</button><div class="ch-toc-list"><a href="#ch10-state">10.1 Keeping state small and readable</a><a href="#ch10-a11y">10.2 Accessibility and flash prevention</a><a href="#ch10-debug">10.3 Debugging Alpine components</a><a href="#ch10-testing">10.4 Testing Alpine with Playwright and Cypress</a><a href="#ch10-grow">10.5 Growing out of Alpine: Vue and Svelte</a></div></div>
+    <p class="topic-desc">Covers the habits that keep Alpine applications maintainable, accessible, and tested, plus a calm strategy for growing out of the framework. The chapter shows how to keep state readable, bake in accessibility defaults, debug efficiently, and drive components with browser automation. Each habit pays off long before a project gets large.</p>
+    <p>Alpine apps start small but they grow. This chapter is the maintenance manual: naming, accessibility defaults, debugging techniques, browser-based tests, and the honest exit plan to Vue or Svelte.</p>
+    <h3 id="ch10-state" data-toc>10.1 Keeping state small and readable</h3>
+    <p class="topic-desc">Shows the refactoring pattern for oversized x-data objects: split definitions into named Alpine.data factories, extract small methods, and keep the remaining state obvious. Complexity hides in unusable one-line objects filled with co-opted expression logic. Readable state makes every later change safer.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- Messy: one giant object with duplicated logic --&gt;
+&lt;div x-data="{ a: 0, b: 0, total() { return this.a + this.b; }, ... }"&gt;...&lt;/div&gt;
+
+&lt;!-- Clean: a named component that reads like a class --&gt;
+&lt;div x-data="calculator"&gt;
+  &lt;input type="number" x-model.number="a"&gt;
+  &lt;input type="number" x-model.number="b"&gt;
+  &lt;p x-text="'Sum: ' + total()"&gt;&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+  document.addEventListener('alpine:init', () =&gt; {
+    Alpine.data('calculator', () =&gt; ({
+      a: 0, b: 0,
+      total() { return this.a + this.b; }
+    }));
+  });
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">Extracting the same logic into Alpine.data keeps the markup declarative and the behaviour testable, which is exactly where maintainability comes from.</p>
+    <h3 id="ch10-a11y" data-toc>10.2 Accessibility and flash prevention</h3>
+    <p class="topic-desc">Covers the accessibility defaults to bake in from the start: aria-expanded and aria-controls on toggles, sensible focus behaviour for menus and dialogs, and full keyboard support. It also stresses x-cloak so nobody sees unstyled pre-boot markup. Small consistent choices cover most audit requirements.</p>
+    <div class="codeWrap"><pre><code>&lt;div x-data="{ open: false }" x-cloak&gt;
+  &lt;button
+    @click="open = !open"
+    :aria-expanded="open"
+    aria-controls="menu"
+    id="menu-btn"
+  &gt;Menu&lt;/button&gt;
+
+  &lt;ul id="menu" role="menu"
+      x-show="open"
+      @click.outside="open = false"
+      @keydown.escape="open = false"&gt;
+    &lt;li&gt;&lt;a href="#" role="menuitem"&gt;Item one&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#" role="menuitem"&gt;Item two&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">aria-expanded and aria-controls describe the toggle to screen readers, Escape and @click.outside close the menu by keyboard and mouse, and x-cloak hides it until Alpine boots.</p>
+    <h3 id="ch10-debug" data-toc>10.3 Debugging Alpine components</h3>
+    <p class="topic-desc">Shows the fastest debugging loop for a stale or silent component. Temporary x-effect logging surfaces what changes, the $watch magic traces a single property, and the Alpine DevTools extension inspects live state and the DOM. When a directive silently ignores you, check scope first, then how your expressions were written.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- Tune in to the component's state changes --&gt;
+&lt;div x-data="{ count: 0 }" x-effect="console.log({ count })"&gt;...&lt;/div&gt;
+
+&lt;!-- Watch a specific property from init --&gt;
+&lt;div x-data="{
+  q: '',
+  init() { this.$watch('q', (v) =&gt; console.log('q changed to', v)); }
+}"&gt;
+  &lt;input x-model="q"&gt;
+&lt;/div&gt;
+
+&lt;!-- In the browser devtools --&gt;
+// typeof Alpine    →  "object" means the CDN script loaded
+// Alpine.store('cart')   prints a store you registered
+// x-text showing nothing usually means a misspelled property name</code></pre></div>
+    <p class="code-note">x-effect and $watch turn invisible reactivity into logged history, and a one-line typeof check confirms Alpine booted — the routine that solves most "nothing happens" puzzles.</p>
+    <div class="tip"><p>Install the Alpine DevTools browser extension: it lists every component on the page and lets you edit its state live while the page stays interactive.</p></div>
+    <h3 id="ch10-testing" data-toc>10.4 Testing Alpine with Playwright and Cypress</h3>
+    <p class="topic-desc">Shows end-to-end tests using Playwright or Cypress that drive a real browser against your components. Because Alpine lives in the DOM, browser automation is the natural test harness rather than unit-level mocks. Tests click, type, and assert on visible markup exactly as a user would.</p>
+    <div class="codeWrap"><pre><code>// Playwright test — menu opens on click and closes on Escape
+await page.goto('/');
+await page.getByRole('button', { name: 'Menu' }).click();
+await expect(page.getByRole('menu')).toBeVisible();
+
+// Cypress test — counter increments after each click
+cy.visit('/');
+cy.contains('button', '+1').click();
+cy.contains('p', 'Count: 1').should('be.visible');
+cy.contains('button', '+1').click();
+cy.contains('p', 'Count: 2').should('be.visible');</code></pre></div>
+    <p class="code-note">Both tools click real DOM nodes and assert on real rendered text, which is exactly what matters for interactivity built from attributes rather than a framework API.</p>
+    <div class="tip"><p>For remote data, wait for the network response — page.waitForResponse in Playwright or cy.intercept in Cypress — so assertions run after your Alpine fetch settles, not before.</p></div>
+    <h3 id="ch10-grow" data-toc>10.5 Growing out of Alpine: Vue and Svelte</h3>
+    <p class="topic-desc">Gives an honest exit strategy for when a project outgrows Alpine. It lists the warning signs, such as deeply nested cross-component state or heavy custom plumbing, and recommends the successor with the smallest behavioural jump. Because Alpine markup already reads almost like Vue templates, Vue is often the cleanest step.</p>
+    <table>
+      <tr><th>Signal to grow</th><th>What it looks like</th></tr>
+      <tr><td>Shared data everywhere</td><td>You lean on <code>$store</code> plus events for logic that wants a state library</td></tr>
+      <tr><td>Deep component trees</td><td>Twenty nested <code>x-data</code> scopes instead of composed components</td></tr>
+      <tr><td>Heavy client rendering</td><td>Most of the page now renders from state rather than from the server</td></tr>
+      <tr><td>A team of many</td><td>Markup-in-attributes stops scaling past two or three developers</td></tr>
+    </table>
+    <p>Vue is the gentlest climb: directives like <code>v-if</code>, <code>v-for</code> and <code>v-model</code> map almost one-to-one onto Alpine’s <code>x-*</code>. Svelte fits if you value reactivity by assignment and compile-time size. Either way, the components you wrote in chapters 1–8 carry over as mental models.</p>
+    <div class="ex"><h4 id="ch10-grow--exercises-10">Exercises 10</h4><ol>
+      <li>Refactor an inline <code>x-data</code> blob into an <code>Alpine.data</code> factory.</li>
+      <li>Add <code>aria-expanded</code>, Escape-close and <code>x-cloak</code> to a menu you built earlier.</li>
+      <li>Write a Playwright test that opens a menu, clicks a counter, and waits for a fetch.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Quick Reference &amp; Glossary</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Quick Reference &amp; Glossary</button><div class="ch-toc-list"><a href="#app-directives">A.1 Directive quick reference</a><a href="#app-magics">A.2 Magics and utilities</a><a href="#app-modifiers">A.3 Modifiers and plugins at a glance</a><a href="#app-glossary">A.4 Glossary</a></div></div>
+    <p class="topic-desc">Bundles every directive, magic, plugin, and modifier into lookup tables, then adds a short glossary of the terms used through the guide. It is designed to stay open while you build, answering which attribute does what and what that term meant in one glance. Keep this chapter bookmarked.</p>
+    <h3 id="app-directives" data-toc>A.1 Directive quick reference</h3>
+    <p class="topic-desc">Lists the core directives alongside what each one acts on, from x-data to x-for, x-bind, x-on, and x-model. The table lets you find the right attribute in one glance without rereading a full chapter. Each entry includes a terse summary of behaviour.</p>
+    <table>
+      <tr><th>Directive</th><th>Purpose</th></tr>
+      <tr><td><code>x-data</code></td><td>Declares the component’s reactive state object</td></tr>
+      <tr><td><code>x-show</code></td><td>Toggles visibility; element stays in the DOM</td></tr>
+      <tr><td><code>x-if</code></td><td>Adds or removes a subtree; needs a template tag</td></tr>
+      <tr><td><code>x-for</code></td><td>Loops over arrays and objects; pair with :key</td></tr>
+      <tr><td><code>x-bind</code> / <code>:</code></td><td>Binds an attribute, class or style to state</td></tr>
+      <tr><td><code>x-on</code> / <code>@</code></td><td>Attaches an event listener with an expression</td></tr>
+      <tr><td><code>x-text</code></td><td>Sets textContent; always escapes</td></tr>
+      <tr><td><code>x-html</code></td><td>Sets innerHTML; only for trusted content</td></tr>
+      <tr><td><code>x-model</code></td><td>Two-way binding for inputs, selects, radios</td></tr>
+      <tr><td><code>x-effect</code></td><td>Runs a side effect when its dependencies change</td></tr>
+      <tr><td><code>x-init</code></td><td>Runs an expression once at boot</td></tr>
+      <tr><td><code>x-ref</code></td><td>Labels an element for use via $refs</td></tr>
+      <tr><td><code>x-cloak</code></td><td>Hides an element until Alpine initialises it</td></tr>
+      <tr><td><code>x-ignore</code></td><td>Leaves a subtree completely untouched</td></tr>
+    </table>
+    <h3 id="app-magics" data-toc>A.2 Magics and utilities</h3>
+    <p class="topic-desc">Lists the $ values available inside expressions, such as $el, $root, $data, $refs, $store, $watch, and $nextTick, alongside the main Alpine global methods. These are the escape hatches from markup into the browser. Use the table to see what a magic returns and when it is allowed.</p>
+    <table>
+      <tr><th>Magic / API</th><th>What it gives you</th></tr>
+      <tr><td><code>$el</code></td><td>The element the expression lives on</td></tr>
+      <tr><td><code>$root</code></td><td>The nearest x-data root element</td></tr>
+      <tr><td><code>$data</code></td><td>The component’s raw state object</td></tr>
+      <tr><td><code>$refs</code></td><td>Named elements tagged with x-ref</td></tr>
+      <tr><td><code>$store</code></td><td>Global state registered with Alpine.store</td></tr>
+      <tr><td><code>$dispatch</code></td><td>Fires a custom DOM event with a payload</td></tr>
+      <tr><td><code>$watch</code></td><td>Runs a callback when a property changes</td></tr>
+      <tr><td><code>$nextTick</code></td><td>Runs after the DOM reflects pending changes</td></tr>
+      <tr><td><code>$fetch</code></td><td>fetch plus JSON parsing in one call</td></tr>
+      <tr><td><code>$persist</code></td><td>localStorage-backed state (persist plugin)</td></tr>
+      <tr><td><code>Alpine.data()</code></td><td>Registers a reusable component factory</td></tr>
+      <tr><td><code>Alpine.store()</code></td><td>Registers or reads a global store</td></tr>
+    </table>
+    <h3 id="app-modifiers" data-toc>A.3 Modifiers and plugins at a glance</h3>
+    <p class="topic-desc">Collects the common modifiers for events, models, and bindings, plus the directives that each plugin CDN script adds. Modifiers tune things like propagation, polling, or value conversion with a single dot-suffix. The glance table shows which plugin to load when you need a particular behaviour.</p>
+    <table>
+      <tr><th>Modifier</th><th>Applies to</th><th>Effect</th></tr>
+      <tr><td><code>.prevent</code> <code>.stop</code></td><td>events</td><td>Calls preventDefault / stopPropagation</td></tr>
+      <tr><td><code>.once</code></td><td>events</td><td>Fires at most once</td></tr>
+      <tr><td><code>.outside</code></td><td>events</td><td>Fires when clicking outside the element</td></tr>
+      <tr><td><code>.window</code> <code>.document</code></td><td>events</td><td>Listens on window or document instead</td></tr>
+      <tr><td><code>.key.enter</code> <code>.key.escape</code></td><td>events</td><td>Runs only when that key is pressed</td></tr>
+      <tr><td><code>.lazy</code></td><td><code>x-model</code></td><td>Syncs on change, not on every input</td></tr>
+      <tr><td><code>.debounce.300ms</code></td><td><code>x-model</code></td><td>Syncs after a quiet interval</td></tr>
+      <tr><td><code>.number</code> <code>.trim</code></td><td><code>x-model</code></td><td>Coerces to number / trims whitespace</td></tr>
+      <tr><td><code>.camel</code></td><td><code>x-bind</code></td><td>Converts attribute names to camelCase</td></tr>
+    </table>
+    <table>
+      <tr><th>Plugin</th><th>Directive / magic it adds</th></tr>
+      <tr><td>mask</td><td><code>x-mask</code>, <code>x-mask:dynamic</code> with <code>$money</code> and <code>$number</code></td></tr>
+      <tr><td>persist</td><td><code>$persist</code></td></tr>
+      <tr><td>collapse</td><td><code>x-collapse</code></td></tr>
+      <tr><td>focus</td><td><code>x-trap</code></td></tr>
+      <tr><td>intersect</td><td><code>x-intersect</code> (with .once and other modifiers)</td></tr>
+      <tr><td>resize</td><td><code>x-resize</code></td></tr>
+      <tr><td>sort</td><td><code>x-sort:group</code>, <code>x-sort:item</code></td></tr>
+      <tr><td>anchor</td><td><code>x-anchor</code> (with positioning modifiers)</td></tr>
+    </table>
+    <h3 id="app-glossary" data-toc>A.4 Glossary</h3>
+    <p class="topic-desc">Defines the vocabulary used through the guide in one place, from directives and magics to stores and plugins. Skim it before asking how to express an idea, because the term you are looking for usually sits here. Entries are short and cross-referenced.</p>
+    <ul>
+      <li><strong>Component</strong> — one x-data element plus everything its value scopes over.</li>
+      <li><strong>Directive</strong> — an <code>x-</code> attribute that attaches behaviour, such as <code>x-show</code> or <code>x-for</code>.</li>
+      <li><strong>Magic</strong> — a <code>$</code> property available in expressions, like <code>$refs</code> or <code>$nextTick</code>.</li>
+      <li><strong>State</strong> — the reactive object declared by x-data that directives read and write.</li>
+      <li><strong>Reactivity</strong> — the mechanism that re-runs a directive when a property it read changes.</li>
+      <li><strong>Scope</strong> — the set of properties available to expressions, chained up through nested x-data.</li>
+      <li><strong>Store</strong> — global reactive state shared across components via Alpine.store.</li>
+      <li><strong>Plugin</strong> — a separate script that adds directives or magics to Alpine.</li>
+      <li><strong>Islands architecture</strong> — server-rendered HTML with small interactive regions around it.</li>
+      <li><strong>Progressive enhancement</strong> — behaviour layered on markup that works without JavaScript.</li>
+      <li><strong>Hydration conflict</strong> — a fight between server markup and client re-rendering, avoided with <code>x-ignore</code>.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Alpine.js — Lightweight Interactivity Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

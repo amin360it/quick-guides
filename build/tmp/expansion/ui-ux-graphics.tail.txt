@@ -1,0 +1,378 @@
+<h3 id="ch7-4" data-toc>7.4 Iterating from findings</h3>
+<p class="topic-desc">A test that produces no change is a test that was not worth running. The closing loop of the process is triage: turn findings into an issue log, severity-rank them against the pass bars, fix, and re-test the changed tasks so the loop provably closed.</p>
+<h4 id="ch7-4-log">The issue log: findings, not feelings</h4>
+<p>Every finding gets a row with the evidence — the task, the frequency, the observed behaviour — so the fix can be argued against the data rather than against the moderator's memory. The discipline is the same as synthesis in ch2-5: a finding without the session, the task and the frequency attached is a claim without evidence.</p>
+<div class="codeWrap"><pre><code>// issue log — one row per finding, evidence attached
+ID  FINDING                                   SEVERITY  FREQUENCY/SOURCE
+A   export link sits below the fold           P1        2 of 5 failed T3
+B   "Cancel" looks like a ghost button,       P1        every session,
+    users click it by accident                          missed in T4
+C   error text contradicts the field label    P2        rare, survey note
+D   primary CTA competes with the hero image  P3        opinion, check T1
+
+// log rules
+- one finding per row; a row with two findings is two rows
+- the source is the session or task, never "I noticed"
+- severity is assigned against the pass bars, not the pain felt:
+  P1 blocks a pass bar, P2 wastes time but the task passes,
+  P3 is polish and judgement</code></pre></div>
+<h4 id="ch7-4-severity">Severity against the pass bar, not against feelings</h4>
+<p>Rank findings by what they did to the metrics you pre-registered (ch7-3): a failed pass bar is P1 whatever the stakeholder's emotional reaction, and a cosmetic note is P3 even if it was mentioned first. The triage table is the bridge between the test and the sprint board — every row has an owner, a fix and a verification task, so "we tested it" ends in a signed-off change rather than a shared feeling.</p>
+<div class="codeWrap"><pre><code>// triage: severity, fix, verification — one row per finding
+ID  SEVERITY  FIX                             VERIFY
+A   P1        move export above the fold      retest T3: 4 of 5 pass
+B   P1        give Cancel a bordered variant  retest T4: confirm step
+C   P2        rewrite the error text          lint strings against the
+                                             label wording
+D   P3        add a scrim behind the hero     visual QA, no metric
+
+// the rule of three for a test round
+[ ] every P1 has a fix and a retest in the same iteration
+[ ] the retest runs the SAME task, so the metric is comparable
+[ ] findings without a fix are re-opened, not forgotten</code></pre></div>
+<h4 id="ch7-4-loop">Fix, re-test, close the loop</h4>
+<p>Iteration is not a correction, it is the method: a prototype is a falsifiable hypothesis (ch1-2), and the retest is what falsifies it. Re-run the exact task that failed, against the exact pass bar, so the result is comparable to the first round — changing the design and the test at the same time tells you nothing. When the pass bar clears, close the row and record what changed in the design system (ch8), so the fix outlives the sprint.</p>
+<div class="codeWrap"><pre><code># the closing loop, per round
+1. run the round                -> issue log with evidence (7.4 above)
+2. triage P1/P2/P3              -> fixes with owners
+3. fix the design               -> update the prototype AND the spec
+4. retest the SAME tasks        -> same scenarios, same pass bars
+5. pass bars clear              -> close the row, note the design-system
+                                  change in the ch8 documentation
+# count the cost honestly
+#   round cost  = sessions + fixes + retest time
+#   round value = pass bars cleared + P1s kept out of production
+# if value is not bigger than cost, the test plan is testing the
+# wrong things — a testing problem, not a budget problem.</code></pre></div>
+<div class="tip"><p>The cheapest way to make iteration fast is to keep the prototype's spec beside the tokens in the repo (ch8-2). A test finding then becomes a one-line change to a spec file rather than a round trip through a design tool, and the retest can start the same afternoon.</p></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch8" data-toc>8 ▸ Accessibility, Design Systems and Delivery</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">The final chapter closes the loop: the accessibility rules that turn a usable design into an accessible one, the tokens and component libraries that keep a hundred screens coherent, and the hand-off that delivers it all to engineering in a form that survives contact with a codebase.</p>
+
+<h3 id="ch8-1" data-toc>8.1 WCAG essentials: the designer's checklist</h3>
+<p class="topic-desc">WCAG 2.2 is organised around four principles — perceivable, operable, understandable, robust — and only a handful of its criteria are the designer's to own. Learn those criteria by number, because the numbers are the vocabulary of an accessibility audit and of the bug reports that follow.</p>
+<h4 id="ch8-1-pour">The four principles, and the criteria that are yours</h4>
+<p>POUR is the frame: perceivable (can it be sensed?), operable (can it be used?), understandable (does it make sense?), robust (does it survive assistive technology and time?). Within it, a designer owns a specific short list: 1.1.1 non-text content, 1.4.3 text contrast, 1.4.11 non-text contrast, 1.4.10 reflow, 2.4.7 focus visible, 2.5.8 target-size minimum (new in WCAG 2.2), and 3.3.1/3.3.3 error identification and suggestion. Learning the numbers turns "make the button accessible" into a checklist with a pass and a fail for each.</p>
+<div class="codeWrap"><pre><code>// the designer's WCAG 2.2 criteria, with the number and the rule
+1.1.1    every non-text element has a text alternative (ch5-5)
+1.4.3    text contrast at least 4.5:1 (3:1 for large text) (ch5-2)
+1.4.10   reflow: content works at 320px without scrolling both ways
+1.4.11   non-text contrast at least 3:1: icons, boundaries, states
+2.4.7    a visible focus indicator on every interactive element
+2.5.8    target size at least 24x24 CSS px (44x44, ch4-5, is the
+         comfortable floor)
+3.3.1    errors are identified and described in text (ch6-2)
+3.3.3    the error suggests a fix ("Enter a valid email, like ...")
+
+// audit one screen, both themes, one pass per criterion
+SCREEN:      checkout
+CRITERION    LIGHT   DARK    NOTE
+1.4.3        pass    pass    body 8.9:1, muted 4.8:1
+1.4.11       pass    fail    spinner icon 2.2:1 on its chip, dark only
+2.4.7        pass    pass    ring visible on all four inputs
+2.5.8        fail    fail    the "remove" X is 20x20 with no padding
+1.4.10       pass    pass    320px reflow tested on a real phone</code></pre></div>
+<div class="note"><p>Reflow (1.4.10) is the requirement behind the 320px viewport test: at 320 CSS pixels of width there must be no horizontal scrolling, which means a fixed 1248px grid from ch4-3 has to genuinely collapse rather than shrink. Test it at 320px, at 200% zoom, and in forced-colours mode.</p></div>
+<h4 id="ch8-1-keyboard">The keyboard audit</h4>
+<p>The keyboard is not an optional input method for a small minority; it is what screen-reader users, power users and people with motor impairments rely on, and it is cheap to test by hand. The audit is a walking list: Tab order follows visual order, every interactive element is reachable, nothing traps focus, a skip link exists, and dialogs wrap focus but close on Esc. If you only run one accessibility test, run this one — it finds more avoidable defects per minute than any other.</p>
+<div class="codeWrap"><pre><code>// skip link — the first focusable element on the page
+&lt;a class="skip-link" href="#main"&gt;Skip to content&lt;/a&gt;
+// .skip-link is visually hidden until it receives focus, then it
+// appears top-left; every long page inherits the pattern.
+
+// the keyboard audit, one pass, both themes
+[ ] Tab from the top: order matches the visual order on screen
+[ ] every link, button and input is reachable (no tabindex="-1"
+    traps left behind)
+[ ] the focus ring is visible at every stop (ch6-1)
+[ ] dialogs: focus enters, wraps, and Esc closes; focus returns
+[ ] custom controls answer with the right role and arrow keys
+    (tabs, ch6-5)
+[ ] 200% zoom plus keyboard only: the whole primary flow completes</code></pre></div>
+<h4 id="ch8-1-headings">Headings, landmarks and a reading order that comes free</h4>
+<p>Much of accessibility is agreeing with the browser instead of fighting it: one <code>h1</code> per page, heading levels that step down without skipping, and real landmarks — <code>header</code>, <code>nav</code>, <code>main</code>, <code>footer</code> — instead of divs with class names. Screen-reader users navigate by exactly these two systems, and a page whose visual structure and markup structure disagree forces them to read everything to find anything. The designer's job is to make sure the two structures are the same structure.</p>
+<div class="codeWrap"><pre><code>&lt;!-- the accessible skeleton: landmarks plus one h1 --&gt;
+&lt;header&gt;...&lt;/header&gt;
+&lt;nav aria-label="Main"&gt;...&lt;/nav&gt;
+&lt;main id="main"&gt;
+  &lt;h1&gt;Checkout&lt;/h1&gt;
+  &lt;h2&gt;1. Delivery&lt;/h2&gt;      &lt;!-- h2 under h1, never a skipped rung --&gt;
+  &lt;h3&gt;Contact details&lt;/h3&gt;
+&lt;/main&gt;
+&lt;footer&gt;...&lt;/footer&gt;
+
+// heading audit
+[ ] exactly one h1 per page
+[ ] levels step by one: h1 then h2 then h3, no skipped rungs
+[ ] the headings, read alone, tell the story of the page
+[ ] landmarks exist and are not empty; main holds the page's purpose</code></pre></div>
+
+<h3 id="ch8-2" data-toc>8.2 Design tokens: one file, both themes</h3>
+<p class="topic-desc">Design tokens are what the whole system reduces to: primitives at the bottom, semantic roles in the middle, component tokens only where a real exception exists. One file, checked into the repo, drives both themes and feeds the contrast check.</p>
+<h4 id="ch8-2-layers">The three layers, and what each is for</h4>
+<p>Recap the pattern from ch5-1 with its full weight: primitives are the named colours on the ramp, never used directly by components; semantic tokens say what a colour does (bg, surface, text, accent, status); component tokens exist only where a component genuinely needs its own value. The contract is that components consume the semantic layer, so re-theming is a token swap and a component cannot misuse a role even by mistake.</p>
+<div class="codeWrap"><pre><code>// the three layers — where each hex value is allowed to live
+LAYER       EXAMPLE                     WHO USES IT
+primitives  --blue-500, --slate-100     the token file only
+semantic    --color-bg, --color-accent  every component, every state
+component   --button-bg                 only a real exception
+
+// a violation to recognise in review
+.button-danger { background: var(--blue-500); }
+// the component reached past the semantic layer. if the brand
+// changes, this one button silently keeps the old blue.</code></pre></div>
+<h4 id="ch8-2-file">A working token file, both themes</h4>
+<p>The whole system as one JSON file: the primitives, then a semantic block per theme. The two blocks are deliberately hand-written, not derived — dark mode is a re-design (ch5-2), and the differences are decisions, not transforms. Note the small asymmetries that carry the meaning: surface stays lighter than bg in both themes, accent is lighter and less saturated in dark, and text-muted moves down the ramp so it stays readable on dark surfaces.</p>
+<div class="codeWrap"><pre><code>// tokens/color.json
+{
+  "primitives": {
+    "slate": { "50": "#f8fafc", "100": "#f1f5f9", "200": "#e2e8f0",
+               "300": "#cbd5e1", "400": "#94a3b8", "500": "#64748b",
+               "600": "#475569", "700": "#334155", "800": "#1e293b",
+               "900": "#0f172a", "950": "#020617" },
+    "blue":  { "50": "#eff6ff", "100": "#dbeafe", "500": "#3b82f6",
+               "600": "#2563eb", "700": "#1d4ed8" },
+    "red":   { "50": "#fef2f2", "500": "#ef4444", "700": "#b91c1c" },
+    "green": { "50": "#f0fdf4", "500": "#22c55e", "700": "#15803d" },
+    "amber": { "50": "#fffbeb", "500": "#f59e0b", "700": "#b45309" }
+  },
+  "semantic": {
+    "light": {
+      "bg":          "{slate.50}",
+      "surface":     "#ffffff",
+      "surface-sunk":"{slate.100}",
+      "text":        "{slate.900}",
+      "text-muted":  "{slate.600}",
+      "text-disabled":"{slate.400}",
+      "on-accent":   "#ffffff",
+      "border":      "{slate.200}",
+      "border-strong":"{slate.300}",
+      "accent":      "{blue.600}",
+      "accent-hover":"{blue.700}",
+      "accent-subtle":"{blue.50}",
+      "success":     "{green.700}",
+      "warning":     "{amber.700}",
+      "error":       "{red.700}"
+    },
+    "dark": {
+      "bg":          "{slate.950}",
+      "surface":     "#111827",
+      "surface-sunk":"{slate.900}",
+      "text":        "{slate.100}",
+      "text-muted":  "{slate.400}",
+      "text-disabled":"{slate.600}",
+      "on-accent":   "{slate.950}",
+      "border":      "{slate.800}",
+      "border-strong":"{slate.700}",
+      "accent":      "{blue.500}",
+      "accent-hover":"{blue.400}",
+      "accent-subtle":"{blue.950}",
+      "success":     "{green.500}",
+      "warning":     "{amber.500}",
+      "error":       "{red.500}"
+    }
+  }
+}
+
+// what the dark block does differently, and why
+//   surface is LIGHTER than bg      (elevation still reads)
+//   text is LIGHTER but not pure white   (less glare)
+//   accent is LIGHTER and less saturated  (less bloom)
+//   status colours are LIGHTER         (they need to pop on dark)
+//   text-muted goes from 600 to 400    (600 is unreadable on dark)</code></pre></div>
+<h4 id="ch8-2-generate">From JSON to CSS, with the contrast check attached</h4>
+<p>The token file is the authoring format; the build turns it into CSS custom properties so the browser can use it. Because the file is data, the contrast calculation from ch5-2 can run over the same pairs where they are defined — in both themes, before they ever reach a screen. The check is attached to the source, not scattered across individual usages.</p>
+<div class="codeWrap"><pre><code>// generated into CSS — the build emits exactly this shape
+:root {
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-accent: #2563eb;
+  --color-text: #0f172a;
+  /* ...one custom property per semantic token... */
+}
+[data-theme="dark"] {
+  --color-bg: #020617;
+  --color-surface: #111827;
+  --color-accent: #3b82f6;
+  /* ... */
+}
+
+// and the CI check that runs over the file, not the CSS
+//   node contrast-check.js tokens/color.json
+for each theme, for each (foreground, background) pair declared:
+  text pairs     -> require at least 4.5:1
+  ui pairs       -> require at least 3:1
+  on failure     -> exit 1, name the token and the measured ratio
+// the pairs are verified where they are defined rather than where
+// they are used — which is how a 6pm regression gets caught.</code></pre></div>
+<div class="tip"><p>Commit the token file beside the code (ch1-3) and let the build derive the CSS from it — never hand-sync. A designer edits one JSON, the developer gets one generated stylesheet, and the diff is a single line with a comment: "colour token: accent 600 to 500".</p></div>
+
+<h3 id="ch8-3" data-toc>8.3 Component libraries</h3>
+<p class="topic-desc">A component library is a spec plus a governance process: what every component is, in every state, with the tokens it consumes — and a rule for how new components get in. Without the second half, the library is a folder of pictures.</p>
+<h4 id="ch8-3-spec">The spec: states, tokens, properties</h4>
+<p>The unit of library work is the component spec, and it is written before the artwork: the states the component admits (from the state map in ch6-1), the tokens it consumes (never a hex literal), and the properties that are allowed to vary plus the values they may take. A spec that cannot be expressed as a table is a component that is not finished being designed.</p>
+<div class="codeWrap"><pre><code>// component spec — the button, as a table the build can check
+PROPERTY   VALUES                              DEFAULT
+variant    primary | secondary | ghost         primary
+size       sm (36px) | md (44px) | lg (52px)   md
+states     default, hover, active, focus,      all required
+           disabled, busy
+tokens     bg / content / border per state     --accent / --on-accent
+radius     var(--radius)                       fixed, never overridden
+spacing    padding-inline per size             16px / 20px / 24px
+
+// the same spec as JSON the library can validate
+{
+  "name": "button",
+  "variants": ["primary", "secondary", "ghost"],
+  "sizes": { "sm": 36, "md": 44, "lg": 52 },
+  "states": ["default", "hover", "active", "focus", "disabled", "busy"],
+  "tokens": { "default": { "bg": "--color-accent" } }
+}</code></pre></div>
+<h4 id="ch8-3-variants">Variants, exclusions and the half-designed state</h4>
+<p>Two kinds of component addition fail predictably. The first is a variant that is really a new component wearing a flag — "button with an icon" is a property, "button that is a link" is a different component. The second is the half-designed state: the variant ships with default and hover drawn, and disabled, focus and busy inherit whatever the parent had — which is how a library produces components that fail the keyboard audit in ch8-1. The rule is that a variant is not done until every state in the spec has a value.</p>
+<div class="codeWrap"><pre><code>// exclusions: named, so nobody reinvents them
+button:
+  - no custom border-radius (the corner scale owns it, ch4-5)
+  - no new colour literal (the semantic layer owns the palette)
+  - no shadow outside the shadow tokens (ch5-2 dark-mode rule)
+  - no hover-only feedback (every state must survive motion off)
+
+// the half-designed variant, recognised in review
+"secondary button" ships with:
+  default  drawn   hover  drawn   focus  INHERITED  disabled  INHERITED
+// fix: a variant is done when every spec state has a value,
+// and the tokens are named, not picked.</code></pre></div>
+<h4 id="ch8-3-govern">Admission and retirement: the library is a process</h4>
+<p>A library without admission rules fills with one-off components, and a library without retirement rules keeps them forever. Admission is a review: the component must be used in two or more places (one place is a page's private CSS, not a system), the spec must be complete, and the tokens must come from the semantic layer. Retirement is the same review in reverse: a component drops below two usages, its consumers migrate, and it is removed in a version bump — not left as a deprecated twin that two teams each believe is canonical.</p>
+<div class="codeWrap"><pre><code>// admission checklist for a proposed component
+[ ] used by 2+ screens or teams (one usage stays in the page)
+[ ] spec table complete: variants, sizes, states, tokens
+[ ] states include focus, disabled and busy (ch6-1)
+[ ] tokens only from the semantic layer (ch8-2)
+[ ] an owner is named; docs exist (ch8-5)
+[ ] existing components were checked first — is this a variant?
+
+// retirement, deliberately the same shape
+[ ] fewer than 2 usages after the migration work
+[ ] consumers migrated to the replacement in this version
+[ ] removed in a major or minor bump, announced in the changelog</code></pre></div>
+
+<h3 id="ch8-4" data-toc>8.4 Developer hand-off</h3>
+<p class="topic-desc">A hand-off is complete when the developer stops needing to infer. Every value a developer has to guess is a design decision that ships by accident; the checklist below is the difference between handing over screens and handing over a specification.</p>
+<h4 id="ch8-4-check">What a complete hand-off contains</h4>
+<p>Type scale in rem, spacing scale, colour roles in both themes, radius and shadow tokens, the states of every interactive component, and the breakpoints with a reason for each. If a developer has to measure padding off a screenshot, the design is not finished. The checklist lives in the repo beside the tokens and is the same list the developer signs off against — hand-off is a two-party agreement, not a transfer.</p>
+<div class="codeWrap"><pre><code>// hand-off checklist — every value a developer needs to build it
+[ ] type scale in rem, with line heights (ch5-3)
+[ ] spacing scale, named not numbered (ch4-5)
+[ ] colour roles, both themes, as tokens (ch8-2)
+[ ] radius and shadow from the scales, no literals
+[ ] component states for every interactive component (ch6-1)
+[ ] breakpoints with a reason each: content, not device widths
+[ ] icons as SVG files, currentColor, on the set grid (ch5-5)
+[ ] empty, error and loading states for every list (ch3-5)
+[ ] motion tokens: durations, easing, reduced-motion block (ch6-3)</code></pre></div>
+<h4 id="ch8-4-redline">Redlines for the risky screens only</h4>
+<p>Redlines — annotated measurements — are expensive to keep honest, so spend them where the risk is: screens with tight spacing, optical adjustments, or alignment that cannot be inferred from the grid. A redline names the token or the exception; a screen that matches the grid and tokens gets no redlines at all. The test of a good redline is that a developer who deletes it and measures the screen arrives at the same numbers.</p>
+<div class="codeWrap"><pre><code>// redline — only where the grid cannot answer
+SCREEN: checkout, "payment summary" card
+
+  +---------------------------------------------+
+  |  Payment summary                     &lt;- 24px padding
+  |                                       (token: space-24)
+  |  subtotal         EUR 42.00                |
+  |  VAT (21%)        EUR  8.82     &lt;- column: numbers right-
+  |  ---------------------------------          aligned, tabular-nums
+  |  total            EUR 50.82                |
+  +---------------------------------------------+
+
+  // exceptions called out, not left to inference
+  - the divider is 1px var(--color-border), NOT the shadow scale
+  - the "total" row uses space-32 above it, not space-24
+  - the card is 4 columns on desktop, 11 columns on mobile
+// a redline that repeats the grid is noise. keep the exceptions.</code></pre></div>
+<h4 id="ch8-4-gaps">The gaps developers fill with guesses</h4>
+<p>The hand-off failures that ship as bugs all have the same shape: a value the design never specified, filled in with the nearest available one. Text that truncates with an ellipsis instead of wrapping to a second line; a hover state that darkens a token that was never meant to darken; a loading state invented on the spot. The fix is a short ambiguity log maintained during design: every time you notice a "what happens when" you cannot yet answer, write it down, and nothing ships until the log is empty.</p>
+<div class="codeWrap"><pre><code>// ambiguity log — every open question that would otherwise be
+// answered by whoever happens to build the screen
+OPEN                            ANSWERED WHEN
+button with a very long label   wrap to two lines, centred,
+                                min-height keeps the 44px hit area
+hierarchy on a 320px table      the 12-col grid collapses; heading
+                                scales with the fluid type (ch5-4)
+how does the summary card       a 160ms ease-out entrance, and the
+enter the screen?               reduced-motion block collapses it
+                                to 0.01ms (ch6-3)
+dark-mode icon colour           icons use currentColor and inherit
+                                their label's colour (ch5-5)
+
+// rule
+[ ] every OPEN row has an owner and a decided answer before the
+    hand-off checklist is signed
+[ ] decided answers become tokens, specs or docs — never a
+    developer's memory</code></pre></div>
+
+<h3 id="ch8-5" data-toc>8.5 Documentation and governance</h3>
+<p class="topic-desc">A design system is only as good as its documentation and the process that keeps it true. Documentation covers usage, not just appearance; versioning makes change safe; and a decision log keeps the reasons the system looks the way it does.</p>
+<h4 id="ch8-5-docs">Document usage, not just appearance</h4>
+<p>A component page shows the spec, the states, and — the part most libraries miss — how to use it: when to choose this component over its neighbours, a do-and-don't pair, and the accessibility notes that came free with the markup. Documentation is the mechanism that stops the same mistake being made twice in different teams, which is the entire economic argument for a library.</p>
+<div class="codeWrap"><pre><code># component docs skeleton — markdown, in the repo beside the spec
+# button.md
+
+## When to use
+Primary for the one action per screen; secondary for the runner-up;
+ghost when the action must not compete (ch4-1 hierarchy levels).
+
+## States (all required, ch6-1)
+default, hover, active, focus, disabled, busy — tokens in the table.
+
+## Do / Don't
+DO   one primary action per view; make it the exit (ch4-4)
+DON'T stack two primary buttons
+DON'T disable with no reason — a read-only value with an
+      explanation beats a disabled mystery (ch6-4)
+
+## Accessibility
+- focus ring from the shared rule (ch8-1)
+- hover is never the only signal (ch5-2)
+- disabled text holds 3:1 even though WCAG exempts it
+
+## Tokens
+variant to bg / content / border per state, from tokens/color.json</code></pre></div>
+<h4 id="ch8-5-version">Versioning tokens and components</h4>
+<p>Treat the design system like a dependency, because it is one: semver for tokens and components, a changelog that names what changed and why, and a deprecation path instead of silent replacement. A token re-colour is a minor bump; removing a component is a major one. The discipline that makes it work is that every bump is paired with a changelog line referencing the decision log, so a consumer can answer "why is the button bigger now?" in one hop.</p>
+<div class="codeWrap"><pre><code>// changelog — the design system as a dependency
+## 2.1.0 (2026-10-02)
+- added: `space-28` token (optical override, ch4-5, see DEC-407)
+- changed: `--color-accent` light from blue-700 to blue-600
+  (contrast on tinted surfaces, DEC-409)
+- changed: button min-height 40px to 44px (target size, WCAG 2.2)
+- deprecated: `surface/overlay` — use `surface/raised` + scrim
+
+## 2.0.0 (2026-09-04)
+- removed: `alert-banner` component — consumers migrated to `banner`
+
+// decision log — the reason behind the change, one entry per bump
+DEC-409: accent moved one step lighter because the 700 hue failed
+1.4.11 against the raised surface in dark mode (measured 2.6:1,
+both themes, on the token file).</code></pre></div>
+<h4 id="ch8-5-process">The review loop that keeps the system true</h4>
+<p>Documentation dies unless a process keeps it honest: a named owner per component, a review for every admission and retirement (ch8-3), and the loop from ch7-4 wired into the system — a test finding that changes a component must change the spec, the docs and the changelog in the same change. The final measure of the whole guide is brutal and simple: a new designer on the team can ship a screen that looks like the product, passes the audits of ch8-1, and needs no hex values, no 13px spacing, and no imported opinions.</p>
+<div class="codeWrap"><pre><code># the governance loop, per change
+1. change requested (bug, test finding, brand update)
+2. owner updates spec + tokens + docs together — one commit
+3. review: semantic layer only? states complete? docs updated?
+4. changelog entry plus a decision-log reference
+5. version bump per semver; consumers see a diff, not a surprise
+
+# the loop closes into the earlier chapters
+- tokens come from ch8-2, states from ch6-1
+- docs restate the do-and-don'ts of ch4, ch5 and ch6
+- test findings enter through the issue log of ch7-4
+// and the loop is the point: research to design to test to ship
+// (ch1-2) ends where it started — with the next round of evidence.</code></pre></div>
+<div class="note"><p>The definition of done for the whole system: a screen built on the tokens and components of ch8-2 and ch8-3 passes the audits of ch8-1 without a single new decision. When that is true, design has become maintenance — which is what a design system is for.</p></div>
+</section>

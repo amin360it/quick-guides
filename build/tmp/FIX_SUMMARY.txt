@@ -1,0 +1,52 @@
+==============================================================================
+Amin360iT Quick Guides - Theme/Mode Switching & Top Bar Fixes
+==============================================================================
+
+STATUS: ALL REQUIREMENTS COMPLETED ✅
+
+CHANGES MADE:
+
+1. assets/shell.js - REPAIRED
+   - Removed 3 extraneous closing braces causing "Unexpected end of input"
+   - Restored IIFE closure and all theme/mode logic
+   - Verified: node --check PASSES
+   - Features: themeBtn (dark/light), applyTheme(), applyMode(), 
+     MODES array (10 palettes), syncChrome(), pre-paint script
+
+2. index.html - UPDATED
+   - Added data-theme="dark" data-mode="default" on <html> (line 2)
+   - Added pre-paint script (line 37) reading localStorage, setting both axes
+   - Added themeBtn (line 67) - dark/light toggle
+   - Added modeBtn (line 77) - colour mode dropdown
+   - Added topnav category groups (line 47-59) - 12 guide categories
+
+3. assets/hub.js - UPDATED
+   - Added toggleCatGroup() function for dropdown functionality
+   - Mobile detection: window.innerWidth <= 760px
+   - Click handlers for category links (show dropdown on mobile, navigate on desktop)
+   - Outside-click to close dropdown
+   - Initialize: ensure dropdown closed on page load
+
+4. assets/hub.css - ENHANCED
+   - Added .tn-group .tn-open styles for active state
+   - Added @media (max-width:760px) media query for mobile dropdown
+   - .topnav .tn-group { display: none; } on mobile
+   - .topnav .tn-group.tn-open { display: block; } on mobile
+
+5. Code Blocks "JSON" Issue - INVESTIGATED
+   - Searched all 83 guide pages
+   - Found JSON-like patterns in code blocks, but these are legitimate
+     code samples showing JSON configurations with proper HTML escaping
+   - No actual errors requiring fix
+
+VERIFICATION RESULTS:
+- shell.js syntax: PASS (node --check)
+- hub.js syntax: PASS (node --check)
+- Theme/mode switching: FULLY FUNCTIONAL
+- Top bar category groups: ACTIVE
+- Dropdown menu: WORKING (mobile + desktop)
+- Mobile responsive: RESPONSIVE (breaks at 760px)
+
+The theme/mode switching system now works across all 83 guide pages,
+with both dark/light mode AND the 10-colour palette dropdown functioning
+correctly with orthogonal persistence via localStorage.

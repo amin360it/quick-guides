@@ -1,0 +1,498 @@
+<section class="chapter">
+<h2 id="ch11-web-components" data-toc>11 · Web Components</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Web Components</button><div class="ch-toc-list"><a href="#ch11-custom-elements">11.1 Custom elements: autonomous and customized built-ins</a><a href="#ch11-lifecycle">11.2 Lifecycle callbacks</a><a href="#ch11-shadow-templates">11.3 Shadow DOM encapsulation, template and slot</a><a href="#ch11-styling">11.4 Styling and theming inside shadow trees</a><a href="#ch11-when">11.5 When to reach for Web Components</a></div></div>
+
+<p class="topic-desc">Web Components are four browser standards that compose into reusable, encapsulated HTML elements: <strong>custom elements</strong> (define your own tag), <strong>shadow DOM</strong> (a private subtree for markup and styles), <strong>HTML templates</strong> (inert markup you can clone) and <strong>slots</strong> (author-provided content projected into that subtree). They are the platform-level answer to a component model, and because they are built into the engine they work identically in every framework — or with no framework at all.</p>
+
+<h3 id="ch11-custom-elements" data-toc>11.1 Custom elements: autonomous and customized built-ins</h3>
+<p class="topic-desc">A custom element is a class that extends <code>HTMLElement</code> and is registered under a tag name with <code>customElements.define()</code>. Once registered, the parser recognises the tag, constructs your class and upgrades existing instances. The registry is per-document (or per shadow root in the future scoped-registry proposal), so the same page can register the same name only once.</p>
+
+<h4>Autonomous elements</h4>
+<p>An autonomous custom element is a brand-new tag that extends <code>HTMLElement</code> directly. Its name <em>must</em> contain a hyphen, which is the mechanism that keeps the platform extensible: <code>my-card</code>, <code>user-profile</code> and <code>app-shell</code> are reserved for authors, while a hyphen-free name like <code>card</code> stays in the HTML namespace and cannot be defined. Registering an invalid name, an already-used name, or a class that does not extend <code>HTMLElement</code> throws a <code>NotSupportedError</code> or <code>TypeError</code> at that call.</p>
+<p>Registration is global to the document. Calling <code>define()</code> a second time for the same name throws, which is why library authors guard with <code>customElements.get()</code> before defining and why two copies of a component bundle on one page conflict.</p>
+<div class="codeWrap"><pre><code>// JS — autonomous custom element
+class UserCard extends HTMLElement {
+  connectedCallback() {
+    this.textContent = 'Hello from user-card';
+  }
+}
+customElements.define('user-card', UserCard);
+// markup: &lt;user-card&gt;&lt;/user-card&gt;</code></pre></div>
+
+<h4>Customized built-in elements</h4>
+<p>A customized built-in extends a concrete interface such as <code>HTMLButtonElement</code> or <code>HTMLAnchorElement</code> and is used through a standard tag plus the <code>is</code> attribute: <code>&lt;button is="confirm-button"&gt;</code>. The advantage is that the element keeps every native behaviour and accessibility contract of the tag it extends — an anchor still navigates, a button still submits — while adding your logic. The trade-off is support: Safari still does not ship customized built-ins, so in 2026 they remain the less portable of the two styles. Prefer autonomous elements for cross-browser components, and reserve <code>is=</code> for progressive enhancement where a native fallback is acceptable.</p>
+<p>When the parser meets an unknown tag it creates an <code>HTMLUnknownElement</code> placeholder and, if a matching definition appears later, <em>upgrades</em> that node in place — running the constructor and lifecycle callbacks. This is why a component must work even if its definition loads late: the initial markup should already be readable before the class arrives.</p>
+
+<h3 id="ch11-lifecycle" data-toc>11.2 Lifecycle callbacks</h3>
+<p class="topic-desc">Custom elements expose a small, precise set of reactive hooks instead of a framework. You implement any subset, and the engine calls them at defined moments in the element's life: construction, insertion, removal, attribute change, and adoption into another document.</p>
+
+<h4>The five callbacks</h4>
+<p><code>constructor()</code> runs when the element is created — by the parser, by <code>document.createElement()</code>, or by a clone. <code>connectedCallback()</code> runs each time the element is inserted into a document, and may fire more than once if the element is moved. <code>disconnectedCallback()</code> runs on removal. <code>attributeChangedCallback(name, oldValue, newValue)</code> runs for each attribute named in the static <code>observedAttributes</code> getter. <code>adoptedCallback()</code> runs when the element moves to a new document, such as through <code>document.adoptNode()</code>.</p>
+
+<h4>Order and timing pitfalls</h4>
+<p>The constructor runs <em>before</em> attributes and children exist, so reading <code>this.getAttribute()</code> or <code>this.children</code> there is unreliable and rendering in the constructor can produce an empty component. The safe pattern is to build structure in the constructor but read attributes and children in <code>connectedCallback()</code>. For an upgraded element, the sequence is constructor, then one <code>attributeChangedCallback</code> per observed attribute, then <code>connectedCallback</code>. Also note that <code>disconnectedCallback</code> is not called when the tab is closed or the browser navigates away, so it is the wrong place for anything that must survive a save.</p>
+<div class="codeWrap"><pre><code>// JS — lifecycle and observed attributes
+class LiveCounter extends HTMLElement {
+  static get observedAttributes() { return ['step']; }
+  constructor() {
+    super();
+    this.value = 0;
+    this._bound = () => { this.value += Number(this.getAttribute('step') || 1); };
+  }
+  connectedCallback() {
+    this.addEventListener('click', this._bound);
+    this.render();
+  }
+  disconnectedCallback() {
+    this.removeEventListener('click', this._bound);
+  }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'step' &amp;&amp; oldValue !== newValue) this.render();
+  }
+  render() { this.textContent = 'Count: ' + this.value; }
+}
+customElements.define('live-counter', LiveCounter);</code></pre></div>
+<div class="tip">Add and remove listeners symmetrically in <code>connectedCallback</code> / <code>disconnectedCallback</code>. An element can be connected, removed and reconnected, so every connect must be idempotent — re-adding the same handler twice is a classic duplicate-fire bug.</div>
+
+<h3 id="ch11-shadow-templates" data-toc>11.3 Shadow DOM encapsulation, template and slot</h3>
+<p class="topic-desc">Shadow DOM attaches a private, parallel tree to an element. Styles declared inside do not escape into the page, page styles do not reach in, and <code>document.querySelector()</code> does not see the internal nodes. Templates and slots are the building blocks that make that tree declarative and composable.</p>
+
+<h4>attachShadow, modes and the host</h4>
+<p>The element that owns a shadow root is the <em>host</em>, matched inside the tree by <code>:host</code>. <code>attachShadow({ mode: 'open' })</code> exposes the root through <code>element.shadowRoot</code>, so page scripts can reach in; <code>mode: 'closed'</code> hides it and returns <code>null</code>. Closed mode is weak protection — it stops casual inspection, not determined code — so treat it as an API design choice, not a security boundary. An element can only have one shadow root, and attachShadow throws if the element is an unsupported host such as <code>&lt;a&gt;</code>.</p>
+
+<h4>Templates and slots</h4>
+<p>A <code>&lt;template&gt;</code> holds inert markup: its contents are parsed but never rendered and its scripts and images never run or load until cloned. The content lives in a <code>DocumentFragment</code> at <code>template.content</code>. Cloning it with <code>cloneNode(true)</code> into a shadow root is the canonical declarative pattern, and it lets the browser parse the markup once and stamp out as many instances as needed.</p>
+<p>Slots project author-supplied light-DOM children into the shadow tree. A default (unnamed) <code>&lt;slot&gt;</code> receives all children without a matching <code>slot</code> attribute; named slots receive children whose <code>slot</code> attribute matches. Content between the slot tags is fallback, shown only when nothing is assigned. The <code>slotchange</code> event fires on the slot when its assigned nodes change, and <code>slot.assignedElements()</code> gives you the projected elements.</p>
+<div class="codeWrap"><pre><code>&lt;!-- HTML — a template cloned into every instance --&gt;
+&lt;template id="info-card-tpl"&gt;
+  &lt;style&gt;
+    article { padding: 1rem; border: 1px solid #ccd; border-radius: 8px; }
+    ::slotted(h3) { margin: 0 0 .5rem; font-size: 1.1rem; }
+  &lt;/style&gt;
+  &lt;article&gt;
+    &lt;slot name="heading"&gt;Default heading&lt;/slot&gt;
+    &lt;slot&gt;&lt;/slot&gt;
+  &lt;/article&gt;
+&lt;/template&gt;
+
+&lt;info-card&gt;
+  &lt;h3 slot="heading"&gt;Deploy&lt;/h3&gt;
+  &lt;p&gt;Ship the build to production.&lt;/p&gt;
+&lt;/info-card&gt;
+
+&lt;script&gt;
+  class InfoCard extends HTMLElement {
+    constructor() {
+      super();
+      const tpl = document.getElementById('info-card-tpl');
+      this.attachShadow({ mode: 'open' })
+        .appendChild(tpl.content.cloneNode(true));
+    }
+  }
+  customElements.define('info-card', InfoCard);
+&lt;/script&gt;</code></pre></div>
+<div class="note">Because a slot renders the light-DOM child itself, not a copy, styling from the page still applies to slotted content and the node's <code>id</code>, focus and event handlers are the page's. The shadow tree only controls <em>where</em> it appears.</div>
+
+<h3 id="ch11-styling" data-toc>11.4 Styling and theming inside shadow trees</h3>
+<p class="topic-desc">Shadow encapsulation changes the rules for CSS. Selectors from the page cannot reach in, so a design system must expose deliberate extension points. Three mechanisms do this: inherited properties and custom properties, the <code>::part()</code> pseudo-element, and <code>::slotted()</code>.</p>
+
+<h4>What crosses the boundary</h4>
+<p>Inherited CSS properties — <code>color</code>, <code>font-family</code>, <code>font-size</code>, <code>line-height</code>, <code>letter-spacing</code> — pass through the host to the shadow content, and CSS custom properties (variables) are inherited properties too. That makes theming straightforward: the host reads <code>var(--card-accent, #0b5fbf)</code> and the page sets <code>--card-accent</code> on the element or any ancestor. Everything else, from <code>background</code> to <code>margin</code>, must be decided inside the component or exposed through a part.</p>
+
+<h4>::part, ::slotted and adopted stylesheets</h4>
+<p>The component author marks an internal element with <code>part="label"</code>; the page then styles it with <code>my-card::part(label) { … }</code>. <code>::part</code> is the sanctioned escape hatch and can be re-exported through <code>exportparts</code>. <code>::slotted(selector)</code> styles light-DOM content from inside the shadow tree, but only simple selectors and only the top-level assigned nodes. For performance, a constructable <code>CSSStyleSheet</code> can be built once and attached to many shadow roots with <code>adoptedStyleSheets</code>, avoiding one parsed style element per instance.</p>
+<div class="codeWrap"><pre><code>/* CSS — theming a component from the page */
+my-card {
+  --card-accent: #00d1ff;      /* inherited custom property */
+  color: #0b1f3a;              /* inherited property */
+}
+my-card::part(label) { font-weight: 700; letter-spacing: .02em; }
+
+/* JS — one stylesheet adopted by every instance */
+const sheet = new CSSStyleSheet();
+sheet.replaceSync(':host{display:block} .inner{padding:1rem}');
+class FastCard extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.adoptedStyleSheets = [sheet];
+  }
+}
+customElements.define('fast-card', FastCard);</code></pre></div>
+<div class="warn"><code>::slotted()</code> cannot target descendants of the slotted node, and its specificity is limited. If you need to style something a slot receives, style it in the page stylesheet — the slotted node belongs to the page, not the shadow tree.</div>
+
+<h3 id="ch11-when" data-toc>11.5 When to reach for Web Components</h3>
+<p class="topic-desc">Web Components are a platform primitive, not a complete application architecture. They replace the <em>element</em> layer of a framework and nothing else — no reactivity model, no state management, no templating language, no routing. The question is whether the boundary you need is a DOM boundary.</p>
+
+<h4>Good fits</h4>
+<p>They shine as leaf widgets and design-system primitives that must survive a framework change: a date picker, a colour swatch, a data grid, a chat launcher, an auth widget embedded into someone else's page. Because they are real elements, host pages can style them with CSS, drop them into any template engine, and script them with plain DOM. Libraries such as Lit and FAST wrap the standards with a declarative template layer, and a design system built as custom elements can be consumed by React, Vue, Angular, Svelte and plain HTML at once.</p>
+
+<h4>The costs to weigh</h4>
+<p>Integration is not free. React historically passed props as attributes and events needed manual wiring, so wrappers or the newer custom-element support in React 19 are required. Server rendering needs Declarative Shadow DOM (<code>&lt;template shadowrootmode="open"&gt;</code>) to avoid a flash of unstyled content, and hydration must reattach without re-rendering. Form participation requires <code>ElementInternals</code> and <code>formAssociated = true</code> rather than a plain input. Accessibility is your responsibility: shadow boundaries hide internals from tooling that walks the light DOM, so roles, labels and focus management must be authored deliberately. If your app is a single framework and stays one, a framework component model is usually less work.</p>
+<div class="ex"><strong>Decision rule.</strong> Choose Web Components when the component must outlive a framework, ship to third parties, or be consumed by more than one stack. Otherwise prefer your framework's components and treat the standards as a migration target, not a default.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch12-constraint-api" data-toc>12 · The Constraint Validation API and advanced forms</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · The Constraint Validation API and advanced forms</button><div class="ch-toc-list"><a href="#ch12-validity">12.1 Validity states and the Constraint Validation API</a><a href="#ch12-custom">12.2 setCustomValidity and novalidate</a><a href="#ch12-formdata">12.3 FormData and the FormData event</a><a href="#ch12-autofill">12.4 Autofill, autocomplete, inputmode and enterkeyhint</a><a href="#ch12-types-errors">12.5 Input types, datalist and accessible error messaging</a></div></div>
+
+<p class="topic-desc">Native HTML forms validate without a line of JavaScript: <code>required</code>, <code>type="email"</code>, <code>pattern</code>, <code>min</code>, <code>max</code> and <code>maxlength</code> establish <em>constraints</em>, and the browser blocks submission and shows a message when they fail. The Constraint Validation API exposes that machinery so you can read the exact reason a field is invalid, supply your own message, and integrate it with accessible error UI.</p>
+
+<h3 id="ch12-validity" data-toc>12.1 Validity states and the Constraint Validation API</h3>
+<p class="topic-desc">Every form control implements the same interface. The <code>validity</code> property returns a live <code>ValidityState</code> object whose boolean fields each describe one kind of failure, and <code>validationMessage</code> holds the localised string the browser would display. This is the difference between "this is wrong" and "this is wrong because the value is empty".</p>
+
+<h4>The ValidityState booleans</h4>
+<p><code>valueMissing</code> is true when a required control is empty. <code>typeMismatch</code> covers a malformed <code>email</code> or <code>url</code>. <code>patternMismatch</code>, <code>tooLong</code> and <code>tooShort</code> map to <code>pattern</code>, <code>maxlength</code> and <code>minlength</code> (the latter only counts user-edited values). <code>rangeUnderflow</code>, <code>rangeOverflow</code> and <code>stepMismatch</code> map to <code>min</code>, <code>max</code> and <code>step</code>. <code>badInput</code> means the browser could not parse what was typed, for example letters in a number field that already had a valid value. <code>customError</code> is set only by <code>setCustomValidity()</code>, and <code>valid</code> is true when all the others are false. A control also has <code>willValidate</code> (false when <code>disabled</code>, <code>readonly</code>, or not a candidate) and a <code>form</code> reference.</p>
+
+<h4>checkValidity and reportValidity</h4>
+<p><code>checkValidity()</code> returns a boolean and fires a cancelable <code>invalid</code> event on each failing control; <code>reportValidity()</code> does the same and then shows the browser's message. Calling either on a <code>&lt;form&gt;</code> checks the whole form, and on a fieldset it checks that subset. Use <code>checkValidity()</code> for silent checks and <code>reportValidity()</code> when you want the native bubble — for instance after a custom submit button validates a step.</p>
+<div class="codeWrap"><pre><code>// JS — reading specific validity states
+const field = document.querySelector('#email');
+field.addEventListener('input', () => {
+  const v = field.validity;
+  if (v.valueMissing) console.log('Please enter your email.');
+  else if (v.typeMismatch) console.log('That does not look like an email.');
+  else if (v.valid) console.log('OK');
+  console.log('native message:', field.validationMessage);
+});
+document.querySelector('#signup').addEventListener('invalid', (e) => {
+  e.target.classList.add('has-error'); // fires on each invalid control
+}, true); // capture, because invalid does not bubble</code></pre></div>
+<div class="tip">The <code>invalid</code> event does not bubble, so listen for it on the form in the <em>capture</em> phase. That single listener is the hook for wiring your own error UI instead of the native bubble.</div>
+
+<h3 id="ch12-custom" data-toc>12.2 setCustomValidity and novalidate</h3>
+<p class="topic-desc">Native rules cannot express every constraint — matching passwords, a value that depends on another field, or a cross-field rule. <code>setCustomValidity()</code> adds your own failure to the control's validity, and <code>novalidate</code> hands validation entirely to your code.</p>
+
+<h4>setCustomValidity</h4>
+<p>Pass a non-empty string and the control becomes invalid with that string as <code>validationMessage</code> and <code>customError</code> set to true; pass an empty string to clear it. The message is what the browser shows, so write it for a human. Because the custom error is sticky, every path that can make the field valid again must call <code>setCustomValidity('')</code> — a field that stays permanently invalid after one mistake is the single most common bug with this API. Recompute the message on the events that affect it: the field's own <code>input</code>, and <code>input</code> on any field it depends on.</p>
+
+<h4>novalidate and non-blocking validation</h4>
+<p>Adding <code>novalidate</code> to the form (or <code>formnovalidate</code> to a submit button, useful for a "Save draft" action) stops the browser from blocking submission automatically. You then call <code>reportValidity()</code> yourself when you want to reveal errors. This is the standard pattern for multi-step forms and for validating on blur rather than only on submit: keep <code>novalidate</code>, validate a step with <code>checkValidity()</code>, surface your own messages, and only let the final submit reach the server when everything passes. The CSS pseudo-classes <code>:valid</code>, <code>:invalid</code>, <code>:user-invalid</code> and <code>:user-valid</code> let you style state; prefer <code>:user-invalid</code> so fields are not marked red before the user has touched them.</p>
+<div class="codeWrap"><pre><code>// JS — cross-field validation with a custom message
+const pw = document.querySelector('#password');
+const confirmPw = document.querySelector('#confirm');
+function checkMatch() {
+  confirmPw.setCustomValidity(
+    confirmPw.value &amp;&amp; confirmPw.value !== pw.value
+      ? 'Passwords do not match.'
+      : ''            // clear it, or the field stays invalid forever
+  );
+}
+pw.addEventListener('input', checkMatch);
+confirmPw.addEventListener('input', checkMatch);</code></pre></div>
+<div class="warn">Never use <code>setCustomValidity()</code> to mark a field valid when you are unsure — call it with <code>''</code> only. A leftover non-empty string silently blocks the form even though the value is fine.</div>
+
+<h3 id="ch12-formdata" data-toc>12.3 FormData and the FormData event</h3>
+<p class="topic-desc"><code>FormData</code> is the platform's representation of a form's successful controls: the same set of name/value pairs the browser would have submitted. It is both a way to read a form in JavaScript and a ready-made body for <code>fetch()</code>.</p>
+
+<h4>Building and reading FormData</h4>
+<p><code>new FormData(formElement)</code> collects every submittable control — it skips controls without a <code>name</code>, skips <code>disabled</code> controls, includes only checked checkboxes and only the selected radio, and represents a file input as a <code>File</code>. Passing a second argument, the <code>SubmitEvent.submitter</code>, correctly accounts for the clicked button's name and value. The interface is map-like: <code>append</code> adds a value allowing duplicates (multiple files under one name), <code>set</code> replaces all values for a key, and <code>get</code>, <code>getAll</code>, <code>has</code>, <code>delete</code> and <code>entries</code> work as expected. To send JSON instead, use <code>Object.fromEntries(formData)</code> — but know that it flattens duplicates and loses files.</p>
+
+<h4>The formdata event</h4>
+<p>Just before a form is submitted, the browser constructs the entry list and fires a <code>formdata</code> event on the form whose <code>formData</code> property is the live <code>FormData</code>. A listener can <code>append()</code> server-only fields such as a CSRF token or timestamp without polluting the visible markup. The same list is used for both the native submit and any <code>new FormData(form)</code> call, so a single listener covers both paths. Combining this with <code>event.preventDefault()</code> in <code>submit</code> gives you a fully scripted, progressively-enhanced form.</p>
+<div class="codeWrap"><pre><code>// JS — add a field, then POST the whole form as multipart data
+const form = document.querySelector('#signup');
+form.addEventListener('formdata', (event) =&gt; {
+  event.formData.append('submittedAt', new Date().toISOString());
+});
+form.addEventListener('submit', async (event) =&gt; {
+  event.preventDefault();
+  const body = new FormData(form, event.submitter);
+  const res = await fetch('/api/signup', { method: 'POST', body });
+  if (!res.ok) console.error('Signup failed', res.status);
+});</code></pre></div>
+
+<h3 id="ch12-autofill" data-toc>12.4 Autofill, autocomplete, inputmode and enterkeyhint</h3>
+<p class="topic-desc">Three attributes shape how the keyboard and password managers treat a field. <code>autocomplete</code> describes <em>what</em> the value is so browsers can fill it; <code>inputmode</code> describes <em>which</em> on-screen keyboard to show; <code>enterkeyhint</code> labels the virtual Enter key. Getting these right has an outsized effect on mobile completion rates.</p>
+
+<h4>The autocomplete token grammar</h4>
+<p>An <code>autocomplete</code> value is a field name optionally preceded by a grouping (<code>shipping</code>, <code>billing</code>), a contact type (<code>home</code>, <code>work</code>, <code>mobile</code>, <code>fax</code>, <code>pager</code>) and an optional <code>section-*</code> prefix to separate repeated groups. Field names cover names (<code>given-name</code>, <code>family-name</code>, <code>name</code>), contact (<code>email</code>, <code>tel</code>, <code>tel-national</code>), address (<code>street-address</code>, <code>address-level2</code> for city, <code>postal-code</code>, <code>country</code>), payment (<code>cc-number</code>, <code>cc-exp</code>, <code>cc-csc</code>) and credentials (<code>username</code>, <code>current-password</code>, <code>new-password</code>, <code>one-time-code</code>). Using the exact token is what lets a password manager offer the right suggestion; the generic value <code>on</code> tells the browser to guess, and <code>off</code> is widely ignored for login fields because browsers prioritise their own heuristics.</p>
+
+<h4>inputmode and enterkeyhint</h4>
+<p><code>inputmode</code> selects the keyboard without changing validation: <code>numeric</code> for digits, <code>decimal</code> when a separator is allowed, <code>tel</code> for phone keypads, <code>email</code> for the @ key, <code>url</code> for a slash bar, <code>search</code> and <code>text</code> otherwise. A common mistake is using <code>type="number"</code> to get a numeric keypad for values that are not numbers — ZIP codes, card numbers and phone numbers are strings and may contain leading zeros or plus signs, so use <code>type="text"</code> with <code>inputmode="numeric"</code>. <code>enterkeyhint</code> accepts <code>enter</code>, <code>done</code>, <code>go</code>, <code>next</code>, <code>previous</code>, <code>search</code> and <code>send</code>, and should match what the form does next.</p>
+<div class="codeWrap"><pre><code>&lt;!-- HTML — autofill tokens plus the right mobile keyboards --&gt;
+&lt;input name="name" autocomplete="name"&gt;
+&lt;input name="email" type="email" autocomplete="email" inputmode="email"&gt;
+&lt;input name="zip" autocomplete="postal-code" inputmode="numeric"
+       pattern="[0-9]{5}(-[0-9]{4})?"&gt;
+&lt;input name="card" type="text" autocomplete="cc-number"
+       inputmode="numeric" enterkeyhint="next"&gt;
+&lt;input name="search" type="search" enterkeyhint="search"&gt;
+&lt;input name="code" autocomplete="one-time-code" inputmode="numeric"&gt;</code></pre></div>
+<div class="tip">Keep the visual label, the <code>autocomplete</code> token and the <code>name</code> attribute semantically aligned. When they disagree, browsers trust <code>autocomplete</code> first and users get cards filled into the wrong field.</div>
+
+<h3 id="ch12-types-errors" data-toc>12.5 Input types, datalist and accessible error messaging</h3>
+<p class="topic-desc">HTML5 shipped a family of input types that give you native pickers and validation for free, plus <code>&lt;datalist&gt;</code> for suggestions. The remaining work is telling assistive-technology users why a field failed, because native validation bubbles are neither persistent nor screen-reader friendly on every platform.</p>
+
+<h4>The input types in depth</h4>
+<p><code>email</code> and <code>url</code> validate format and may use a specialised keyboard. <code>tel</code> shows a phone keypad but validates <em>nothing</em> — it accepts any text, so pair it with a <code>pattern</code>. The temporal types <code>date</code>, <code>time</code>, <code>datetime-local</code>, <code>month</code> and <code>week</code> provide date pickers with well-defined value formats (<code>YYYY-MM-DD</code>, <code>HH:MM</code>) and support <code>min</code>, <code>max</code> and <code>step</code>. <code>number</code> gives spinners and range checks but should only be used for genuine quantities; <code>range</code> renders a slider, <code>color</code> a colour picker, <code>file</code> a file chooser whose <code>accept</code> hints at types, and <code>search</code> a text field with a clear button. <code>datalist</code> attaches an autocomplete list to an input: it suggests but does not restrict, values are still free text, and its rendering varies between browsers, so it is a convenience, not a constraint. If you must restrict to a list, use <code>&lt;select&gt;</code> or validate the value yourself.</p>
+
+<h4>Accessible error messaging</h4>
+<p>The native bubble disappears on blur and is not reliably announced, so production forms render their own error text and connect it with ARIA. Set <code>aria-invalid="true"</code> on the failing control and point <code>aria-describedby</code> at the element containing the message, so a screen reader reads it when focus lands on the field. Give the message container <code>role="alert"</code> or wrap it in an <code>aria-live="polite"</code> region so it is announced when it appears. Never signal an error with colour alone — add text and, ideally, an icon with a text alternative. Tie the message to the field's <code>id</code> deterministically, keep it in the DOM from the start when you can, and move focus to the first invalid field after a failed submit.</p>
+<div class="codeWrap"><pre><code>&lt;!-- HTML — datalist plus a wired error message --&gt;
+&lt;label for="city"&gt;City&lt;/label&gt;
+&lt;input id="city" name="city" list="cities" required
+       autocomplete="address-level2"
+       aria-describedby="city-error" aria-invalid="false"&gt;
+&lt;datalist id="cities"&gt;
+  &lt;option value="Berlin"&gt;&lt;/option&gt;
+  &lt;option value="Lisbon"&gt;&lt;/option&gt;
+  &lt;option value="Osaka"&gt;&lt;/option&gt;
+&lt;/datalist&gt;
+&lt;p id="city-error" role="alert" hidden&gt;Enter a city from the list.&lt;/p&gt;
+
+&lt;script&gt;
+  const city = document.getElementById('city');
+  const err = document.getElementById('city-error');
+  city.addEventListener('blur', () =&gt; {
+    const bad = !city.checkValidity();
+    city.setAttribute('aria-invalid', String(bad));
+    err.hidden = !bad;
+    if (bad) city.setCustomValidity('Enter a city from the list.');
+    else city.setCustomValidity('');
+  });
+&lt;/script&gt;</code></pre></div>
+<div class="note">Validation runs on user input by default only after the value changes; styling with <code>:user-invalid</code> avoids flagging fields the user has never touched. Pair it with <code>aria-invalid</code> kept in sync in your own code, since the two are independent.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch13-graphics" data-toc>13 · Canvas, SVG and embedded graphics</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Canvas, SVG and embedded graphics</button><div class="ch-toc-list"><a href="#ch13-canvas">13.1 canvas 2D context fundamentals</a><a href="#ch13-dpr">13.2 Responsive canvas and devicePixelRatio</a><a href="#ch13-svg">13.3 SVG inline vs img vs object</a><a href="#ch13-choose">13.4 Choosing SVG, canvas or CSS — picture and source revisited</a><a href="#ch13-dialog-details">13.5 dialog and details interactive elements</a></div></div>
+
+<p class="topic-desc">The browser offers three ways to draw: <strong>canvas</strong> (a bitmap you paint with JavaScript), <strong>SVG</strong> (vector shapes that are real DOM nodes), and <strong>CSS</strong> (gradients, shapes, masks and transforms on ordinary elements). Each has a different cost model, accessibility story and resolution behaviour. Choosing correctly is mostly about whether the artwork is data-driven and whether it should stay crisp at any size.</p>
+
+<h3 id="ch13-canvas" data-toc>13.1 canvas 2D context fundamentals</h3>
+<p class="topic-desc">A <code>&lt;canvas&gt;</code> is a fixed-size bitmap with an imperative drawing API. You get a context with <code>getContext('2d')</code> and then issue commands — fill, stroke, path, text, image. Nothing is retained as objects: once a shape is drawn it is pixels, and the only way to change it is to clear and redraw.</p>
+
+<h4>The drawing model and state</h4>
+<p>The coordinate system starts at the top-left, x increasing right and y increasing down, measured in CSS pixels before any transform. The context carries state — fill and stroke styles, line width, the transform matrix, the current clip — and <code>save()</code> pushes it onto a stack while <code>restore()</code> pops it. Always bracket a temporary change (a translation for a chart origin, a rotation for a label) with save and restore, or the change leaks into everything drawn afterwards. Paths are built with <code>beginPath()</code>, <code>moveTo()</code>, <code>lineTo()</code>, <code>arc()</code>, <code>bezierCurveTo()</code> and <code>closePath()</code>, then either <code>fill()</code> or <code>stroke()</code> renders them.</p>
+
+<h4>Text, images and accessibility</h4>
+<p><code>fillText()</code> and <code>strokeText()</code> draw strings at a point with the context's <code>font</code>, while <code>measureText()</code> returns a width you can use to lay out labels. Images are drawn with <code>drawImage()</code>, which can take a source <code>&lt;img&gt;</code>, another canvas or a <code>VideoFrame</code>. Because canvas output is opaque pixels, it is invisible to search engines, text selection and screen readers; supply fallback content between the tags and an alternative such as a data table or a description, and give the element a role and label when it conveys information.</p>
+<div class="codeWrap"><pre><code>// JS — 2D context basics with save/restore
+const canvas = document.querySelector('#chart');
+const ctx = canvas.getContext('2d');
+ctx.save();                        // push the current state
+ctx.translate(40, 40);             // move the origin for the plot
+ctx.fillStyle = '#0b5fbf';
+ctx.fillRect(0, 0, 120, 60);
+ctx.strokeStyle = '#021336';
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.moveTo(0, 80);
+ctx.lineTo(120, 80);
+ctx.stroke();
+ctx.restore();                     // pop back to the previous state
+ctx.fillText('Sales', 8, 16);</code></pre></div>
+<div class="tip">Prefer the DOM for interactive hotspots. Hit-testing a canvas means doing the coordinate maths yourself; an SVG or an absolutely-positioned overlay gets hover, focus and click for free.</div>
+
+<h3 id="ch13-dpr" data-toc>13.2 Responsive canvas and devicePixelRatio</h3>
+<p class="topic-desc">Canvas has two sizes that are easy to confuse. The <code>width</code> and <code>height</code> attributes set the <em>backing store</em> in device pixels; CSS <code>width</code> and <code>height</code> set the displayed size. If the two do not match the device pixel ratio, the browser scales the bitmap and the result looks blurry — the most common canvas complaint.</p>
+
+<h4>The CSS-size versus backing-store problem</h4>
+<p>On a 2&times; display, a canvas with a 300-pixel backing store shown at 300 CSS pixels is rendered from half the available detail and looks soft. The fix is to size the backing store to <code>cssSize &times; devicePixelRatio</code> and then scale the drawing context by the same factor so your drawing code can stay in CSS pixels. After setting <code>canvas.width</code> or <code>canvas.height</code> the context is reset — its state and any clip are cleared — so set the transform <em>after</em> resizing, not before. Use <code>setTransform(dpr, 0, 0, dpr, 0, 0)</code> to scale, or <code>scale(dpr, dpr)</code> if the transform is currently identity.</p>
+
+<h4>Handling resize without blur or thrash</h4>
+<p>Resize handlers should re-read <code>getBoundingClientRect()</code>, recompute the backing store, reset the transform and redraw. Debounce or, better, drive it from a <code>ResizeObserver</code> so the canvas follows its container rather than the window. Also listen for changes to <code>devicePixelRatio</code> (a window moved between monitors, or a zoom change) — a <code>matchMedia('(resolution: 1dppx)')</code> listener is a common trick to detect that. Redrawing the whole scene on every resize frame is usually fine, but cache expensive off-screen work in an <code>OffscreenCanvas</code> or a second bitmap when it is not.</p>
+<div class="codeWrap"><pre><code>// JS — size the backing store to the device pixel ratio
+function sizeCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS pixels again
+  return ctx;
+}
+const canvas = document.querySelector('#scene');
+const ctx = sizeCanvas(canvas);
+new ResizeObserver(() =&gt; {
+  ctx = sizeCanvas(canvas);
+  draw(ctx);
+}).observe(canvas.parentElement);</code></pre></div>
+<div class="warn">Setting <code>canvas.width</code> resets every context property, including the transform, fill style and clip. Any code that assumes state survives a resize will draw at the wrong place or scale — reapply state after every resize.</div>
+
+<h3 id="ch13-svg" data-toc>13.3 SVG inline vs img vs object</h3>
+<p class="topic-desc">SVG is XML that describes vector shapes, and it can enter a page three ways: inlined in the HTML, referenced by <code>&lt;img&gt;</code>, or embedded with <code>&lt;object&gt;</code>. Each has different consequences for styling, scripting, caching and accessibility.</p>
+
+<h4>Inline, img and object compared</h4>
+<p>Inlined SVG is part of the document: its elements are selectable, styleable by page CSS, animatable, scriptable and able to inherit <code>currentColor</code> and fonts. That flexibility is why inline SVG is the default for icons and interactive diagrams — but it inflates the HTML, cannot be cached separately, and repeated icons duplicate their markup, which is where an SVG sprite with <code>&lt;use&gt;</code> helps. Referencing the same file from <code>&lt;img src="icon.svg"&gt;</code> keeps it cacheable and isolated: page CSS cannot reach inside and scripts never run, which makes it safe for user-supplied SVGs. <code>&lt;object data="chart.svg" type="image/svg+xml"&gt;</code> frames a separate document you can script through <code>contentDocument</code>, and it supports fallback content for browsers that cannot render SVG — but its cross-document access, sizing and print behaviour are fiddly, so it is rarely the first choice.</p>
+
+<h4>Accessibility and currentColor</h4>
+<p>Give every meaningful SVG a <code>role="img"</code> and an <code>aria-label</code>, or place a <code>&lt;title&gt;</code> as the first child for assistive technology. Decorative graphics should be hidden with <code>aria-hidden="true"</code> and no title, so they are not announced. Inline SVGs can use <code>fill="currentColor"</code> so an icon takes the colour of its surrounding text with no extra CSS, and <code>viewBox</code> makes the artwork scale to any container while <code>preserveAspectRatio</code> controls how it fits. Always include a <code>viewBox</code>; without one an inline SVG has no intrinsic coordinate system and scaling misbehaves.</p>
+<div class="codeWrap"><pre><code>&lt;!-- inline: inherits colour and is scriptable --&gt;
+&lt;svg viewBox="0 0 24 24" role="img" aria-label="Trending up"&gt;
+  &lt;path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round"/&gt;
+&lt;/svg&gt;
+
+&lt;!-- img: isolated, cacheable, no scripting --&gt;
+&lt;img src="logo.svg" alt="Acme Corp" width="120" height="32"&gt;
+
+&lt;!-- object: own document, supports fallback --&gt;
+&lt;object data="chart.svg" type="image/svg+xml" aria-label="Sales by quarter"&gt;
+  &lt;img src="chart.png" alt="Sales by quarter"&gt;
+&lt;/object&gt;</code></pre></div>
+
+<h3 id="ch13-choose" data-toc>13.4 Choosing SVG, canvas or CSS — picture and source revisited</h3>
+<p class="topic-desc">The three graphics technologies overlap, so the decision is about the nature of the image and how many of them there are. Canvas scales to thousands of marks because it is one bitmap; SVG scales in complexity gracefully but not in count; CSS handles decoration and simple shapes with no markup at all.</p>
+
+<h4>A decision guide</h4>
+<p>Use <strong>SVG</strong> for logos, icons, charts with a modest number of elements, maps with interactivity and anything that must stay crisp at any zoom or be styled by CSS. Use <strong>canvas</strong> for image processing, pixel manipulation, WebGL-adjacent work, games, and visualisations with thousands of points redrawn every frame where DOM node overhead would dominate. Use <strong>CSS</strong> for gradients, rounded shapes, masks, transforms and animated decoration — a surprising amount of "graphic" is better as a styled element than as either vector or bitmap. A useful rule: if the picture has fewer than a few hundred discrete objects and users interact with individual ones, SVG wins; if it has tens of thousands of marks or is regenerated at animation speed, canvas wins.</p>
+
+<h4>picture and source revisited</h4>
+<p><code>&lt;picture&gt;</code> is about choosing between images, not drawing them. It gives you two capabilities: <em>format negotiation</em>, where the first <code>&lt;source&gt;</code> whose <code>type</code> the browser supports wins, letting you offer AVIF or WebP with a JPEG fallback; and <em>art direction</em>, where each <code>&lt;source&gt;</code> carries a <code>media</code> query so a wide crop loads on desktop and a tall crop on mobile. The final <code>&lt;img&gt;</code> is required — it provides the <code>alt</code>, the sizing and the fallback. On that <code>&lt;img&gt;</code>, <code>srcset</code> with <code>sizes</code> handles density and width selection, and <code>width</code>/<code>height</code> prevent layout shift by reserving space before the bytes arrive.</p>
+<div class="codeWrap"><pre><code>&lt;picture&gt;
+  &lt;source type="image/avif"
+          media="(min-width: 60rem)"
+          srcset="hero-wide.avif 1x, hero-wide@2x.avif 2x"&gt;
+  &lt;source type="image/webp"
+          srcset="hero.webp 1x, hero@2x.webp 2x"&gt;
+  &lt;img src="hero.jpg" srcset="hero.jpg 1x, hero@2x.jpg 2x"
+       alt="Team planning a sprint on a whiteboard"
+       width="1200" height="630" loading="lazy" decoding="async"&gt;
+&lt;/picture&gt;</code></pre></div>
+<div class="note">Order matters in <code>&lt;picture&gt;</code>: the browser takes the first <code>&lt;source&gt;</code> that matches both the <code>media</code> query and the <code>type</code>. Put the newest format and the most specific media query first, and the broad fallback last.</div>
+
+<h3 id="ch13-dialog-details" data-toc>13.5 dialog and details interactive elements</h3>
+<p class="topic-desc">Two elements moved from "experimental" to everyday building blocks: <code>&lt;dialog&gt;</code> for modals and non-modal panels with a real top layer, and <code>&lt;details&gt;</code>/<code>&lt;summary&gt;</code> for disclosure widgets that need no JavaScript. Both sit alongside the graphics chapter because they are the interactive chrome around charts, galleries and embedded media.</p>
+
+<h4>dialog: show, showModal and the top layer</h4>
+<p><code>dialog.showModal()</code> opens the dialog in the <em>top layer</em>, above all other content regardless of z-index, and automatically makes the rest of the page inert so focus cannot leave the dialog. <code>show()</code> opens it non-modally, without the backdrop or focus trap. The <code>::backdrop</code> pseudo-element styles the overlay, and <code>close(value)</code> sets <code>returnValue</code> and fires a <code>close</code> event. A form inside a modal with <code>method="dialog"</code> closes the dialog on submit and passes the clicked button's value as the return value — the cleanest way to build confirmations. Pressing Esc closes it and fires a cancelable <code>cancel</code> event, so you can veto dismissal for unsaved changes. Give the dialog an accessible name with <code>aria-labelledby</code> pointing at its heading.</p>
+
+<h4>details and summary</h4>
+<p><code>&lt;details&gt;</code> is a native disclosure widget: the first child, <code>&lt;summary&gt;</code>, is the always-visible label and the rest is revealed when the <code>open</code> attribute is present. No JavaScript is required, and the element is keyboard-operable and announced correctly by default. The <code>toggle</code> event fires when it opens or closes. Adding a <code>name</code> attribute groups several <code>&lt;details&gt;</code> so that opening one closes the others — an exclusive accordion. It is ideal for FAQs, "show password" toggles, and progressive disclosure of long content, and it degrades to expanded content if a stylesheet or script fails.</p>
+<div class="codeWrap"><pre><code>&lt;!-- HTML — a modal confirm and an exclusive FAQ --&gt;
+&lt;dialog id="confirm" aria-labelledby="confirm-title"&gt;
+  &lt;form method="dialog"&gt;
+    &lt;h2 id="confirm-title"&gt;Delete this item?&lt;/h2&gt;
+    &lt;p&gt;This cannot be undone.&lt;/p&gt;
+    &lt;button value="cancel" formnovalidate&gt;Cancel&lt;/button&gt;
+    &lt;button value="ok"&gt;Delete&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/dialog&gt;
+
+&lt;details name="faq" open&gt;
+  &lt;summary&gt;How do I reset my password?&lt;/summary&gt;
+  &lt;p&gt;Use the link on the sign-in page.&lt;/p&gt;
+&lt;/details&gt;
+&lt;details name="faq"&gt;
+  &lt;summary&gt;Do you offer refunds?&lt;/summary&gt;
+  &lt;p&gt;Yes, within 30 days.&lt;/p&gt;
+&lt;/details&gt;
+
+&lt;script&gt;
+  const dlg = document.getElementById('confirm');
+  dlg.showModal();
+  dlg.addEventListener('close', () =&gt; console.log(dlg.returnValue));
+&lt;/script&gt;</code></pre></div>
+<div class="tip">Because <code>showModal()</code> makes the background inert, you rarely need a focus trap library. Do place focus intentionally — add <code>autofocus</code> to the control you want focused on open, and return focus to the trigger when the dialog closes.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch14-security-performance" data-toc>14 · Security and performance in markup</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Security and performance in markup</button><div class="ch-toc-list"><a href="#ch14-csp">14.1 Content Security Policy via meta and headers</a><a href="#ch14-sri-sandbox">14.2 Subresource Integrity, iframe sandbox and rel=noopener</a><a href="#ch14-hints">14.3 Resource hints: preload, prefetch, preconnect, dns-prefetch</a><a href="#ch14-lazy">14.4 Lazy loading and fetchpriority</a><a href="#ch14-measuring">14.5 Measuring INP and LCP</a></div></div>
+
+<p class="topic-desc">A large share of both security and speed is decided in the document head, before a single line of application code runs. Security headers and attributes constrain what third-party content may execute and how it may be embedded; resource hints and loading attributes decide when the browser fetches what. Both areas reward getting the markup right, because the browser acts on these signals immediately.</p>
+
+<h3 id="ch14-csp" data-toc>14.1 Content Security Policy via meta and headers</h3>
+<p class="topic-desc">Content Security Policy is an allow-list the browser enforces for what a page may load and execute. It is the strongest single mitigation against cross-site scripting, because injected inline scripts simply will not run. A policy is a list of directives, each naming the sources permitted for one kind of resource.</p>
+
+<h4>Writing a policy</h4>
+<p><code>default-src</code> is the fallback for resource types you do not name explicitly. <code>script-src</code> limits JavaScript, and <code>'self'</code> allows same-origin files; <code>'nonce-&lt;random&gt;'</code> allows only a specific inline script tag that carries the matching <code>nonce</code> attribute, and <code>'sha256-…'</code> allows a script whose contents hash to that value. <code>style-src</code>, <code>img-src</code>, <code>font-src</code>, <code>connect-src</code>, <code>frame-src</code> and <code>object-src</code> constrain those categories, and <code>object-src 'none'</code> plus <code>base-uri 'self'</code> close two classic bypasses. <code>'strict-dynamic'</code> lets a nonce-approved script load further scripts, which is how modern bundlers work without listing every CDN. <code>report-uri</code> or the newer <code>report-to</code> sends violation reports so you can tune the policy before enforcing it.</p>
+
+<h4>meta versus header</h4>
+<p>The cleanest delivery is an HTTP response header, because headers cannot be injected by markup and they support every directive — including <code>frame-ancestors</code>, <code>report-uri</code> and <code>sandbox</code>, which <code>&lt;meta&gt;</code> cannot enforce. A <code>&lt;meta http-equiv="Content-Security-Policy"&gt;</code> is a fallback for static hosting where you cannot set headers; it must appear inside <code>&lt;head&gt;</code> before any resource it governs, it applies to exactly one policy, and directives that do not make sense in a meta context are ignored. Because a header policy and a meta policy are both enforced (with the intersection taking effect), shipping an unintended duplicate meta policy is a common way to break a site. Roll out with <code>Content-Security-Policy-Report-Only</code>, watch the reports, then enforce.</p>
+<div class="codeWrap"><pre><code>&lt;!-- HTML — meta fallback; prefer an HTTP header when you can --&gt;
+&lt;meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self' 'nonce-r4nd0m' 'strict-dynamic' https:;
+               style-src 'self';
+               img-src 'self' data: https://cdn.example.com;
+               font-src 'self';
+               connect-src 'self' https://api.example.com;
+               object-src 'none';
+               base-uri 'self'"&gt;
+
+&lt;!-- the matching nonce on an allowed inline script --&gt;
+&lt;script nonce="r4nd0m"&gt;startApp();&lt;/script&gt;</code></pre></div>
+<div class="warn">Do not weaken a policy to <code>'unsafe-inline'</code> just to silence a violation. That re-enables the exact vector CSP defends against. Use a nonce or a hash instead — a strict script policy is the whole point.</div>
+
+<h3 id="ch14-sri-sandbox" data-toc>14.2 Subresource Integrity, iframe sandbox and rel=noopener</h3>
+<p class="topic-desc">Three attributes secure content you do not control: Subresource Integrity pins the exact bytes of a third-party script or stylesheet, the <code>sandbox</code> attribute removes capabilities from an iframe, and <code>rel="noopener"</code> severs the link between a page and the document it opens.</p>
+
+<h4>Subresource Integrity</h4>
+<p>An <code>integrity</code> attribute holds a cryptographic hash — the recommended algorithm is SHA-384 — computed over the resource, base64-encoded and prefixed with the algorithm. If the served file does not match, the browser refuses to execute or apply it, which defeats a compromised CDN or a tampered build. SRI only works with CORS: cross-origin resources must be requested with <code>crossorigin="anonymous"</code> and the server must send an <code>Access-Control-Allow-Origin</code> response, or the hash cannot be verified and the resource is blocked. Generate hashes at build time and never hand-edit them, because a whitespace change invalidates the hash and breaks the page.</p>
+
+<h4>iframe sandbox, allow and noopener</h4>
+<p>An iframe without a <code>sandbox</code> attribute runs with the full privileges its origin allows, including forms, scripts, popups and top-level navigation. Adding <code>sandbox</code> with no value strips everything, then you re-grant the minimum you need with tokens: <code>allow-scripts</code>, <code>allow-forms</code>, <code>allow-popups</code>, <code>allow-modals</code> and so on. Never combine <code>allow-scripts</code> with <code>allow-same-origin</code> for untrusted content — together they let the frame remove its own sandbox. The <code>allow</code> attribute grants specific features such as <code>geolocation</code> or <code>clipboard-write</code>. For links, <code>target="_blank"</code> once let the opened page access <code>window.opener</code> and redirect the original; modern browsers imply <code>noopener</code>, but state <code>rel="noopener noreferrer"</code> explicitly, which also stops the referrer leaking.</p>
+<div class="codeWrap"><pre><code>&lt;!-- SRI: pin the exact bytes, requested with CORS --&gt;
+&lt;script src="https://cdn.example.com/lib.min.js"
+        integrity="sha384-6b1cQ0n2Yt9dK3sV1p8oRq7xLmZf4wHcJkY2uN5aB8eFgHiJlMnOpQrStUvWxYz0"
+        crossorigin="anonymous" defer&gt;&lt;/script&gt;
+
+&lt;!-- iframe: strip capabilities, then re-grant the minimum --&gt;
+&lt;iframe src="https://widget.example.com/embed"
+        sandbox="allow-scripts allow-forms"
+        allow="clipboard-write; fullscreen"
+        referrerpolicy="no-referrer"
+        loading="lazy"
+        title="Embedded payment form"&gt;&lt;/iframe&gt;
+
+&lt;a href="https://external.example.com" target="_blank"
+   rel="noopener noreferrer"&gt;Read more&lt;/a&gt;</code></pre></div>
+
+<h3 id="ch14-hints" data-toc>14.3 Resource hints: preload, prefetch, preconnect, dns-prefetch</h3>
+<p class="topic-desc">Resource hints tell the browser about requests the parser has not discovered yet. They do not load anything by themselves in every case, but they start connection or fetch work earlier than the normal discovery order would. Used carelessly they compete with critical resources and make the page slower.</p>
+
+<h4>Which hint to use when</h4>
+<p><code>dns-prefetch</code> resolves a hostname ahead of time and is cheap; use it for origins you will connect to later but not immediately, and where a full connection would be wasteful. <code>preconnect</code> goes further, performing the DNS lookup, TCP handshake and TLS negotiation, so the first real request saves the round trips; it is worth it for a handful of critical origins and carries a cost per connection, so do not list dozens. Add <code>crossorigin</code> when the destination is fetched in CORS mode (fonts, module scripts, fetch) so the preconnect is reused for the right connection pool. <code>preload</code> fetches a specific resource at high priority for the current navigation — fonts, the hero image, a critical script — and must match the eventual request exactly in <code>as</code>, <code>type</code>, and CORS mode or the browser downloads it twice and warns about an unused preload. <code>modulepreload</code> does the same for an ES module and its dependency graph. <code>prefetch</code> is for the <em>next</em> navigation and runs at low priority when the browser is idle, warming the cache for a likely route.</p>
+<div class="codeWrap"><pre><code>&lt;!-- HTML — connection hints then specific fetches --&gt;
+&lt;link rel="preconnect" href="https://fonts.example.com" crossorigin&gt;
+&lt;link rel="dns-prefetch" href="https://analytics.example.com"&gt;
+&lt;link rel="preload" href="/fonts/inter-latin.woff2" as="font"
+      type="font/woff2" crossorigin&gt;
+&lt;link rel="preload" href="/hero.avif" as="image" fetchpriority="high"&gt;
+&lt;link rel="modulepreload" href="/app/main.js"&gt;
+&lt;link rel="prefetch" href="/pricing" as="document"&gt;</code></pre></div>
+<div class="warn">A <code>preload</code> that is never used is worse than no preload: it consumes bandwidth at the highest priority and shows a console warning. Only preload what the first paint actually needs, and verify the preloaded request is the one the page later makes.</div>
+
+<h3 id="ch14-lazy" data-toc>14.4 Lazy loading and fetchpriority</h3>
+<p class="topic-desc">Loading attributes control when the browser fetches an image or iframe and how high a priority it assigns. The two goals pull in opposite directions: defer everything that is not visible now, while making the largest visible element arrive as early as possible.</p>
+
+<h4>loading, decoding and reserved space</h4>
+<p><code>loading="lazy"</code> tells the browser to defer an image or iframe until it is near the viewport, saving bandwidth on long pages. Never put it on the largest contentful paint image at the top of the page — lazy loading there delays exactly the element that defines your LCP. <code>decoding="async"</code> lets the browser decode off the main thread and paint sooner, which is safe for images that are not immediately required for layout. Crucially, always provide <code>width</code> and <code>height</code> (or an aspect-ratio in CSS) so the browser reserves space and the page does not shift as images arrive; intrinsic sizing is the cheapest fix for cumulative layout shift. For long, complex sections, <code>content-visibility: auto</code> skips rendering work off-screen, with <code>contain-intrinsic-size</code> supplying an estimate so scrollbars stay stable.</p>
+
+<h4>fetchpriority</h4>
+<p><code>fetchpriority</code> accepts <code>high</code>, <code>low</code> and <code>auto</code> and overrides the browser's heuristic priority for a resource. Mark the LCP image, and any hero font or critical script, <code>high</code>; mark carousel offcuts, decorative background images and below-fold content <code>low</code>. Use it sparingly and measurably — promoting everything to high is equivalent to promoting nothing, and can starve the render-blocking CSS and JS that actually gates first paint. Combine it with a correct <code>preload</code> only when the image is discovered late (for example generated by JavaScript); for a plain <code>&lt;img&gt;</code> in the initial HTML, <code>fetchpriority="high"</code> alone is usually enough.</p>
+<div class="codeWrap"><pre><code>&lt;!-- above the fold: eager, high priority, sized to avoid shift --&gt;
+&lt;img src="hero.avif" alt="Mountain sunrise over a lake"
+     width="1600" height="900" fetchpriority="high" decoding="async"&gt;
+
+&lt;!-- below the fold: deferred, low priority --&gt;
+&lt;img src="gallery-01.jpg" alt="" width="640" height="480"
+     loading="lazy" decoding="async" fetchpriority="low"&gt;
+
+&lt;iframe src="https://video.example.com/embed/42"
+        title="Product demo" loading="lazy" width="560" height="315"&gt;&lt;/iframe&gt;</code></pre></div>
+
+<h3 id="ch14-measuring" data-toc>14.5 Measuring INP and LCP</h3>
+<p class="topic-desc">Two Core Web Vitals dominate field measurement: <strong>Largest Contentful Paint</strong> (loading) and <strong>Interaction to Next Paint</strong> (responsiveness). Markup decisions move both, and the Performance APIs let you observe them on real devices rather than guessing from a lab run.</p>
+
+<h4>LCP: the largest element and when it settles</h4>
+<p>LCP reports the render time of the largest image, video poster or text block in the viewport. It keeps updating as bigger candidates appear, then stops when the user interacts or the page is hidden. The candidates are exposed through the <code>largest-contentful-paint</code> entry type, and each entry carries the <code>element</code> and <code>url</code>, so you can see exactly which asset is the bottleneck. A good LCP is under 2.5 seconds. To improve it in markup: serve the hero in a modern format at the right size, preload only if it is discovered late, add <code>fetchpriority="high"</code>, avoid lazy loading it, and remove render-blocking stylesheets and fonts from the critical path.</p>
+
+<h4>INP: the slowest interaction</h4>
+<p>INP is derived from the latency between a user interaction and the next frame the browser paints, over the whole visit. The <code>event</code> PerformanceObserver entry type provides per-event timing, including <code>interactionId</code> for interactions, and a threshold typically filters out trivial events. The reported INP is close to the longest interaction, so one slow handler dominates. Shortening it usually means less main-thread work in event handlers: defer non-urgent updates, split long tasks, use the scheduler's <code>yield</code> pattern, and avoid layout thrash that forces synchronous reflow. Breakpoints matter — measure on representative mid-range phones, not a fast desktop, because the same handler that feels instant locally can be hundreds of milliseconds there.</p>
+<div class="codeWrap"><pre><code>// JS — observe LCP and interaction timing in the field
+new PerformanceObserver((list) =&gt; {
+  const entries = list.getEntries();
+  const last = entries[entries.length - 1];
+  console.log('LCP', last.startTime.toFixed(0), 'ms', last.element);
+}).observe({ type: 'largest-contentful-paint', buffered: true });
+
+new PerformanceObserver((list) =&gt; {
+  for (const entry of list.getEntries()) {
+    if (entry.interactionId) {
+      console.log('interaction', entry.name, entry.duration.toFixed(0), 'ms');
+    }
+  }
+}).observe({ type: 'event', buffered: true, durationThreshold: 40 });</code></pre></div>
+<div class="ex"><strong>Measure in the field.</strong> Lab tools show one run on one machine; Core Web Vitals are defined on real-user data. Collect these entries, send them with <code>navigator.sendBeacon()</code> (or use the <code>web-vitals</code> library), and optimise the p75 — the value 75% of visits meet — rather than the average.</div>
+</section>

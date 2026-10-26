@@ -1,0 +1,1422 @@
+<section class="chapter">
+<h2 id="ch1" data-toc>1 · The Android application model</h2>
+
+<h3 id="ch1-components" data-toc>1.1 The four component types</h3>
+<p class="topic-desc">Android's architecture is built on four component types, each with a distinct lifecycle and activation mechanism. Understanding what each one is for — and more importantly, what each one is not for — is the foundation of every architectural decision you will make.</p>
+
+<h4 id="ch1-components-philosophy">Everything is a component, and the system owns the lifecycle</h4>
+<p>Android does not have a <code>main()</code> method that you control from start to finish. Instead, the system instantiates components in response to <code>Intent</code> objects and manages their lifecycles according to the device's needs. An <strong>Activity</strong> is a single screen with a user interface. A <strong>Service</strong> is a component that runs in the background without a UI. A <strong>BroadcastReceiver</strong> responds to system-wide broadcast announcements. A <strong>ContentProvider</strong> manages a structured set of app data that can be shared with other apps. Each is declared in the manifest, and each can be activated independently of the others — the system can start your Service while your Activity is destroyed, or deliver a broadcast to a Receiver in a process that was killed an hour ago. This is the fundamental inversion of control that trips up developers coming from desktop or server frameworks: your code is a collection of entry points that the system calls, not a program that runs top to bottom.</p>
+
+<h4 id="ch1-components-manifest">The manifest as component registry</h4>
+<p>The <code>AndroidManifest.xml</code> is not just a configuration file — it is the registry the system uses to discover and instantiate your components. Every Activity, Service, BroadcastReceiver, and ContentProvider must be declared there with a <code>&lt;activity&gt;</code>, <code>&lt;service&gt;</code>, <code>&lt;receiver&gt;</code>, or <code>&lt;provider&gt;</code> element. The system reads this manifest at install time and builds an internal catalogue; when an <code>Intent</code> naming one of your components arrives, the system knows which process to start and which class to instantiate. The <code>android:name</code> attribute points to the fully-qualified class name. The <code>android:exported</code> attribute (required for all components in targetSdk 31+) controls whether other apps can activate the component. An Activity with <code>android:exported="true"</code> and an <code>&lt;intent-filter&gt;</code> for <code>MAIN</code>/<code>LAUNCHER</code> is the entry point the launcher icon activates. A Service with no intent-filter and <code>exported="false"</code> can only be started by your own app. Getting the exported attribute wrong is both a security vulnerability and a crash waiting to happen.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- android/app/src/main/AndroidManifest.xml --&gt;
+&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"&gt;
+
+    &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+    &lt;uses-permission android:name="android.permission.POST_NOTIFICATIONS" /&gt;
+
+    &lt;application
+        android:name=".MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.MyApp"&gt;
+
+        &lt;activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"&gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name="android.intent.action.MAIN" /&gt;
+                &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/activity&gt;
+
+        &lt;service
+            android:name=".service.SyncService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" /&gt;
+
+        &lt;receiver
+            android:name=".receiver.BootReceiver"
+            android:exported="true"&gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name="android.intent.action.BOOT_COMPLETED" /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/receiver&gt;
+
+    &lt;/application&gt;
+&lt;/manifest&gt;</code></pre></div>
+
+<h4 id="ch1-components-intents">Intent-based activation and the decoupling it buys</h4>
+<p>An <code>Intent</code> is a message object that requests an action from a component. Explicit intents name the target component directly (<code>Intent(this, DetailActivity::class.java)</code>) and are used for internal navigation. Implicit intents declare an action and let the system resolve the best component (<code>Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com"))</code>) and are used for inter-app communication. The decoupling is the point: your app does not need to know which app handles the intent, and the sending app does not need to know the internals of the receiver. When you start a Service with <code>startService(Intent(this, SyncService::class.java))</code>, you are not calling a method — you are handing a message to the system, which will instantiate your Service (starting its process if necessary) and deliver the intent to <code>onStartCommand</code>. The practical consequence is that your component must be able to start fresh at any time, with no in-memory state from a previous run, because the system may have killed and recreated the process between invocations.</p>
+
+<div class="codeWrap"><pre><code>// Starting an explicit intent to another activity in the same app
+val intent = Intent(this, DetailActivity::class.java).apply {
+    putExtra("item_id", itemId)
+    putExtra("item_title", title)
+}
+startActivity(intent)
+
+// Starting a service with work to do
+val serviceIntent = Intent(this, SyncService::class.java).apply {
+    putExtra("sync_type", SyncService.SYNC_FULL)
+}
+ContextCompat.startForegroundService(this, serviceIntent)
+
+// Sending an implicit intent and letting the system resolve it
+val viewIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com"))
+if (viewIntent.resolveActivity(packageManager) != null) {
+    startActivity(viewIntent)
+} else {
+    // No browser installed — handle gracefully
+    Toast.makeText(this, "No browser available", Toast.LENGTH_SHORT).show()
+}</code></pre></div>
+
+<div class="warn"><p>The <code>android:exported</code> attribute is mandatory on every component with an intent-filter when targeting API 31+. The build will fail without it. More importantly, leaving a component <code>exported="true"</code> when it should be <code>"false"</code>" is a security hole — any app on the device can activate it. Default to <code>exported="false"</code> and only set <code>"true"</code> when you have a specific reason.</p></div>
+
+<h3 id="ch1-lifecycle" data-toc>1.2 The activity lifecycle in depth</h3>
+<p class="topic-desc">The activity lifecycle is the most important concept in Android development, and the one most often misunderstood. It is not just a set of callback methods — it is the system's contract for managing memory, resources, and user expectations across configuration changes and process death.</p>
+
+<h4 id="ch1-lifecycle-callbacks">The seven callbacks and what each one is for</h4>
+<p>An Activity's lifecycle flows through seven primary callbacks: <code>onCreate</code>, <code>onStart</code>, <code>onResume</code>, <code>onPause</code>, <code>onStop</code>, <code>onRestart</code>, and <code>onDestroy</code>. The flow is not strictly linear — an Activity can move from <code>onResume</code> to <code>onPause</code> and back multiple times (when a dialog appears, when the screen turns off, when the user switches apps). The critical insight is the distinction between <strong>visible</strong> and <strong>foreground</strong>: <code>onStart</code>/<code>onStop</code> bracket the period when the Activity is visible on screen (even if another activity is on top in multi-window mode), while <code>onResume</code>/<code>onPause</code> bracket the period when the Activity is in the foreground and interactive. Heavy resources — camera, location updates, animation loops — should be acquired in <code>onResume</code> and released in <code>onPause</code>, because those are the callbacks that bound the interactive period. One-time setup that does not need to happen again on every resume — view binding, repository initialisation — belongs in <code>onCreate</code>.</p>
+
+<div class="codeWrap"><pre><code>class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+    private var locationCallback: LocationCallback? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Restore transient UI state after process death
+        savedInstanceState?.let {
+            val query = it.getString("search_query")
+            binding.searchInput.setText(query)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Start location updates — this is when the user can see the map
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                updateMapPosition(result.lastLocation)
+            }
+        }
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback!!,
+            Looper.getMainLooper()
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Stop location updates — the user can no longer see the map
+        locationCallback?.let { fusedLocationClient.removeLocationUpdates(it) }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Save transient UI state for process death or config change
+        outState.putString("search_query", binding.searchInput.text.toString())
+    }
+}</code></pre></div>
+
+<h4 id="ch1-lifecycle-death">Process death, configuration changes and the saved state bundle</h4>
+<p>The single most important distinction in Android development is between a <strong>configuration change</strong> (rotation, locale change, dark mode toggle, font scale change) and <strong>process death</strong> (the system kills your process to reclaim memory). Both destroy and recreate the Activity, but for different reasons and with different guarantees. A configuration change happens while the user is watching — the system destroys the Activity and immediately recreates it, so <code>onSaveInstanceState</code> is called and the saved state Bundle is available in the new instance's <code>onCreate</code>. Process death happens when the app is in the background — the Activity is destroyed and its state saved, but recreation is deferred until the user navigates back, which may be hours later and may be triggered by a different entry point entirely. The <code>onSaveInstanceState</code> Bundle is not a serialisation mechanism — it is a small, transient store (limited to roughly 1 MB across all saved state) intended for UI state, not for data that belongs in a database or ViewModel. The rule is: if the data can be re-fetched from a repository, let the ViewModel re-fetch it; only save what cannot be reconstructed.</p>
+
+<div class="codeWrap"><pre><code>// In a ViewModel — survives configuration changes, dies with the process
+class SearchViewModel(
+    private val repository: ArticleRepository
+) : ViewModel() {
+
+    private val _results = MutableStateFlow&lt;List&lt;Article&gt;&gt;(emptyList())
+    val results: StateFlow&lt;List&lt;Article&gt;&gt; = _results.asStateFlow()
+
+    private var searchJob: Job? = null
+
+    fun search(query: String) {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            // This survives rotation: the ViewModel is retained
+            _results.value = repository.search(query)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        searchJob?.cancel()
+    }
+}
+
+// The ViewModel is scoped to the Activity, so it survives
+// configuration changes but not process death
+class SearchActivity : AppCompatActivity() {
+    private val viewModel: SearchViewModel by viewModels {
+        SearchViewModel.Factory(repository)
+    }
+}</code></pre></div>
+
+<div class="tip"><p>Test process death with the "Don't keep activities" developer option. Enable it in Settings → Developer options, then navigate away from your activity and back. If your UI state does not survive, you have a bug. This single setting catches more lifecycle bugs than any unit test.</p></div>
+
+<h3 id="ch1-process" data-toc>1.3 Processes, tasks and the back stack</h3>
+<p class="topic-desc">Android's process and task model governs how your app appears on screen, how the system reclaims memory, and how the back button behaves. Misunderstanding this model is the root cause of duplicate activities, leaked windows, and the infamous "back button exits the app instead of going back."</p>
+
+<h4 id="ch1-process-model">Process priority and the oom_adj scale</h4>
+<p>Linux gives every process an OOM (out-of-memory) adjustment score; Android layers its own priority system on top. A <strong>foreground process</strong> (one with a visible Activity in the foreground, or a foreground Service, or a Service bound by a foreground Activity) is the last to be killed. A <strong>visible process</strong> (one with an Activity that is visible but not in the foreground — behind a dialog or in multi-window) is killed only under extreme memory pressure. A <strong>service process</strong> (one hosting a background Service) has lower priority, and a <strong>cached process</strong> (one with no active components, kept around for faster relaunch) is the first to be killed. This is why your Activity's <code>onStop</code> is the signal to release heavy resources: the moment your Activity leaves the foreground, the process drops in priority and becomes eligible for killing. The system does not guarantee that <code>onDestroy</code> will ever be called — under memory pressure, the process is killed outright. Anything that must survive must be persisted in <code>onStop</code> or earlier.</p>
+
+<div class="codeWrap"><pre><code>class MainActivity : AppCompatActivity() {
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            // The user is actually interacting — resume video playback,
+            // re-enable sensors, restart animations
+            videoView.start()
+        } else {
+            // Another window (dialog, notification shade, split-screen)
+            // has taken focus — pause playback to save battery
+            videoView.pause()
+        }
+    }
+
+    // The four launch modes control task membership:
+    //
+    // standard      — default; a new instance is created every time
+    // singleTop     — if an instance is already at the top of the task,
+    //                 reuse it instead of creating a new one
+    // singleTask    — only one instance exists in the entire system;
+    //                 clears activities above it when activated
+    // singleInstance— like singleTask but the task holds only this
+    //                 activity; other activities started from it go
+    //                 to a different task
+}</code></pre></div>
+
+<h4 id="ch1-process-tasks">Tasks, task affinity and the back stack</h4>
+<p>A <strong>task</strong> is a collection of activities that the user interacts with when performing a certain job — browsing an article, composing an email, checking out. The user perceives a task as an "app," but a task can contain activities from multiple apps. The back stack is the stack of activities within a task, and the back button pops from that stack. When your app starts an Activity, it goes into the task associated with the calling Activity's <code>taskAffinity</code> (by default, the app's package name) unless <code>FLAG_ACTIVITY_NEW_TASK</code> is set, in which case the system finds or creates a matching task. The most common launch-mode bug is using <code>singleTask</code> on a main activity to prevent duplicate instances, not realising that it clears the entire back stack above it — pressing back from a <code>singleTask</code> activity exits the app rather than returning to the previous activity. The fix is almost always to use <code>singleTop</code> instead, which reuses the existing instance at the top of the stack without clearing what is below it.</p>
+
+<div class="codeWrap"><pre><code>// The correct way to handle "open this screen" without duplicates
+// is singleTop, not singleTask:
+//
+// AndroidManifest.xml
+// &lt;activity
+//     android:name=".DetailActivity"
+//     android:launchMode="singleTop" /&gt;
+
+// singleTop means: if DetailActivity is already at the top of the
+// current task, deliver a new intent to it via onNewIntent instead
+// of creating a second instance.
+
+class DetailActivity : AppCompatActivity() {
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)  // Replace the activity's intent
+        val newId = intent.getStringExtra("article_id")
+        viewModel.loadArticle(newId)
+    }
+}
+
+// FLAG_ACTIVITY_NEW_TASK is needed when starting an activity from
+// a non-activity context (Service, BroadcastReceiver, Application):
+val intent = Intent(this, DetailActivity::class.java).apply {
+    putExtra("article_id", id)
+    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+}
+startActivity(intent)</code></pre></pre></div>
+
+<h3 id="ch1-project" data-toc>1.4 Project structure, Gradle and build variants</h3>
+<p class="topic-desc">A well-structured Android project is not just about file organisation — it is about making the build system, the IDE, and the runtime all agree on where things live. The Gradle build configuration is the contract that ties it all together.</p>
+
+<h4 id="ch1-project-layout">The module layout and source sets</h4>
+<p>A typical Android project has at least one module: <code>app</code>. The module directory contains <code>src/main/</code> (production code), <code>src/test/</code> (unit tests that run on the JVM), and <code>src/androidTest/</code> (instrumentation tests that run on a device). The <code>src/main/</code> directory holds <code>java/</code> (or <code>kotlin/</code>) for source, <code>res/</code> for resources (layouts, drawables, strings, themes), and <code>AndroidManifest.xml</code> for the module manifest. The manifest merger combines the module manifest with library manifests at build time — this is how a library can contribute a required permission or a Service without the app developer knowing about it. The <code>build.gradle.kts</code> file at the module root declares the Android plugin, SDK versions, dependencies, and build types. For larger projects, feature modules (<code>feature:search</code>, <code>feature:profile</code>) and library modules (<code>core:network</code>, <code>core:ui</code>) break the codebase into independently buildable units with enforced dependency directions.</p>
+
+<div class="codeWrap"><pre><code>// android/app/build.gradle.kts
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
+    id("com.google.devtools.ksp")
+}
+
+android {
+    namespace = "com.acme.app"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.acme.app"
+        minSdk = 24
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Build-time fields accessible from code
+        buildConfigField("String", "API_BASE_URL", "\"https://api.acme.com/v1/\"")
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            buildConfigField("String", "API_BASE_URL", "\"https://staging-api.acme.com/v1/\"")
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+dependencies {
+    implementation(platform("androidx.compose:compose-bom:2024.02.00"))
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.activity:activity-ktx:1.8.2")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+}</code></pre></div>
+
+<h4 id="ch1-project-minsdk">Why minSdk, targetSdk and compileSdk are three different numbers</h4>
+<p><code>compileSdk</code> is the API level your code compiles against — it determines which classes and methods are available at compile time. <code>targetSdk</code> is the API level you have tested against and whose behaviour you opt into — the system uses it to decide whether to apply compatibility behaviours. <code>minSdk</code> is the oldest API level you support — the system will not install your app on a device below it. These three numbers serve completely different purposes and should not be the same. A common mistake is setting <code>compileSdk = 34</code> and <code>targetSdk = 34</code> but leaving <code>minSdk = 21</code>, then calling an API introduced in API 26 without a version check — the code compiles fine and crashes on every API 25 device. The rule is: guard every call to an API introduced after your <code>minSdk</code> with <code>if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O)</code>, or use the AndroidX backport (which is why the AndroidX libraries exist — <code>NotificationCompat</code>, <code>ContextCompat</code>, and <code>ActivityCompat</code> all handle version checks internally).</p>
+
+<div class="codeWrap"><pre><code>// The version-guard pattern
+fun setupNotificationChannel(context: Context) {
+    if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Sync notifications",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Shows progress of background sync"
+            setShowBadge(false)
+        }
+        val manager = context.getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(channel)
+    }
+    // Below API 26, channels do not exist — notifications are managed
+    // at the app level, so there is nothing to set up.
+}
+
+// The AndroidX backport pattern — no version check needed
+val intent = Intent(this, DetailActivity::class.java)
+// ActivityCompat and ContextCompat handle the version differences
+// internally, so you call them unconditionally:
+ActivityCompat.startActivity(this, intent, null)
+val permission = Manifest.permission.ACCESS_FINE_LOCATION
+ActivityCompat.requestPermissions(this, arrayOf(permission), REQUEST_CODE)</code></pre></div>
+
+<h3 id="ch1-context" data-toc>1.5 Context: the god object</h3>
+<p class="topic-desc"><code>Context</code> is the most-used and most-misused class in Android. It is the gateway to system services, resources, and the application environment — and passing the wrong one is the leading cause of memory leaks and unexpected crashes.</p>
+
+<h4 id="ch1-context-types">The four Context types and what each one can do</h4>
+<p><code>Context</code> is an abstract class; the concrete implementations are <code>Application</code>, <code>Activity</code>, <code>Service</code>, and <code>BroadcastReceiver</code> (which receives a restricted <code>ContextWrapper</code>). The <strong>Application context</strong> lives for the lifetime of the process and is accessible via <code>applicationContext</code> from any component. The <strong>Activity context</strong> lives for the lifetime of the Activity and carries the theme, the window, and the task affinity. The <strong>Service context</strong> is similar to the Application context but is tied to the Service's lifecycle. The critical rule is: <strong>use the narrowest Context that works</strong>. If you need a system service (<code>getSystemService</code>), a resource, or a database path, the Application context is sufficient and safe — it cannot leak an Activity because it outlives every Activity. If you need to start an Activity, show a dialog, or inflate a layout with the correct theme, you need the Activity context — the Application context cannot start activities (it throws <code>Calling startActivity() from outside of an Activity context requires FLAG_ACTIVITY_NEW_TASK</code>) and does not carry the Activity's theme.</p>
+
+<div class="codeWrap"><pre><code>// The leak: storing an Activity context in a long-lived object
+class BadRepository(private val context: Context) {
+    // If 'context' is an Activity, the Activity cannot be garbage
+    // collected even after it is destroyed — the Repository holds
+    // a reference to it for the lifetime of the process.
+    fun getDb(): SQLiteDatabase {
+        return openDatabase(context.getDatabasePath("app.db"))
+    }
+}
+
+// The fix: use the Application context for anything long-lived
+class GoodRepository(private val appContext: Context) {
+    // appContext is the Application singleton — it lives as long
+    // as the process, so nothing is leaked.
+    fun getDb(): SQLiteDatabase {
+        return openDatabase(appContext.getDatabasePath("app.db"))
+    }
+}
+
+// In a ViewModel, inject the Application context via
+// AndroidViewModel:
+class MyViewModel(application: Application) : AndroidViewModel(application) {
+    private val appContext: Context = getApplication&lt;Application&gt;.applicationContext
+    // Use appContext for repositories, system services, databases.
+    // Never store an Activity reference here.
+}
+
+// In an Activity, use 'this' (the Activity context) only for
+// UI work — starting activities, showing dialogs, inflating
+// layouts with the Activity theme:
+class MyActivity : AppCompatActivity() {
+    fun showDialog() {
+        MaterialAlertDialogBuilder(this)  // needs Activity context
+            .setTitle("Confirm")
+            .setMessage("Are you sure?")
+            .setPositiveButton("Yes") { _, _ -> deleteItem() }
+            .show()
+    }
+}</code></pre></div>
+
+<h4 id="ch1-context-wrapper">ContextWrapper and the delegation chain</h4>
+<p><code>ContextWrapper</code> delegates all method calls to a wrapped <code>Context</code> instance. <code>Activity</code>, <code>Service</code>, and <code>ThemeWrapper</code> all extend <code>ContextWrapper</code>. This is why you can wrap a Context to modify its behaviour — <code>ContextThemeWrapper</code> applies a different theme, and <code>MutableContextWrapper</code> allows the base context to be replaced. The practical implication is that when you pass a Context around, you may be passing a wrapper that adds behaviour (the Activity's theme, the Service's task affinity) or restricts it (a BroadcastReceiver's Context does not support starting activities). The <code>Context.createPackageContext()</code> method creates a Context for a different package — used to access another app's resources when you have the right permissions. The <code>Context.createConfigurationContext()</code> creates a Context with an overridden configuration (locale, font scale) — used to display content in a language different from the system default without changing the system settings.</p>
+
+<div class="tip"><p>A quick heuristic: if you are writing a class that outlives the current screen (Repository, database helper, network client), take the Application context. If you are writing UI code in an Activity or Fragment, use the Activity context. If you are in a Service, use the Service context. When in doubt, pass the Application context and wrap it in a <code>ContextThemeWrapper</code> when you need a theme for inflation.</p></div>
+
+<div class="codeWrap"><pre><code>// ContextThemeWrapper: apply a specific theme without an Activity
+fun createThemedContext(context: Context, themeResId: Int): Context {
+    return ContextThemeWrapper(context, themeResId)
+}
+
+// createConfigurationContext: override the locale
+fun createLocalizedContext(context: Context, locale: Locale): Context {
+    val config = Configuration(context.resources.configuration)
+    config.setLocale(locale)
+    return context.createConfigurationContext(config)
+}
+
+// Usage: inflate a layout with a custom theme
+val themedContext = createThemedContext(appContext, R.style.Theme_MyApp_Dialog)
+val themedView = LayoutInflater.from(themedContext)
+    .inflate(R.layout.dialog_custom, parent, false)
+
+// Usage: create a notification with a specific locale
+val localizedContext = createLocalizedContext(appContext, Locale("ar"))
+val localizedTitle = localizedContext.getString(R.string.notification_title)</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 · Building the user interface</h2>
+
+<h3 id="ch2-views" data-toc>2.1 Views, layouts and the ViewGroup tree</h3>
+<p class="topic-desc">The Android UI toolkit is a tree of <code>View</code> objects. Understanding how that tree is measured, laid out, and drawn — and why the three-pass system matters for performance — separates developers who ship smooth apps from developers who ship janky ones.</p>
+
+<h4 id="ch2-views-tree">The View/ViewGroup hierarchy and the three-pass system</h4>
+<p>Every pixel on an Android screen is drawn by a <code>View</code>. A <code>ViewGroup</code> is a View that contains other Views — it is the container that defines the layout structure. The tree is rooted at a <code>DecorView</code> (the top-level window view), which contains the system UI (status bar background, navigation bar) and a <code>FrameLayout</code> (the <code>android.R.id.content</code> frame) that holds your activity's content view. When the system needs to draw the screen, it calls <code>measure()</code> on the root view, which recursively measures each child; then <code>layout()</code>, which positions each child; then <code>draw()</code>, which renders to the canvas. The measure pass is the expensive one: each <code>ViewGroup</code> must negotiate constraints with its children (via <code>MeasureSpec</code>) and compute its own size. A deeply nested ViewGroup tree means more measure calls, more layout calls, and more chances for a child to trigger a full re-measure of its parent. This is why ConstraintLayout (a flat hierarchy) outperforms nested LinearLayouts (a deep hierarchy) — fewer nodes means fewer measure passes.</p>
+
+<div class="codeWrap"><pre><code>// The three-pass system in a custom view
+class StatusBarView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : View(context, attrs) {
+
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    // Pass 1: measure — how big do we want to be?
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val desiredHeight = dp(48)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+
+        val height = when (heightMode) {
+            MeasureSpec.EXACTLY -> heightSize
+            MeasureSpec.AT_MOST -> minOf(desiredHeight, heightSize)
+            else -> desiredHeight  // UNSPECIFIED
+        }
+        setMeasuredDimension(
+            resolveSize(dp(360), widthMeasureSpec),
+            height
+        )
+    }
+
+    // Pass 2: layout — where do our children go?
+    // (A leaf view has no children, so this is trivial.)
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        // Leaf view — nothing to layout.
+    }
+
+    // Pass 3: draw — render to the canvas
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        paint.color = Color.parseColor("#0D47A1")
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+    }
+
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density).toInt()
+}</code></pre></div>
+
+<h4 id="ch2-views-invalidate">requestLayout vs invalidate: two different invalidations</h4>
+<p><code>requestLayout()</code> triggers a full measure and layout pass on the view and its ancestors — it is expensive and must be called when the view's size or position might have changed (text content updated, a child added, a constraint changed). <code>invalidate()</code> triggers only a redraw of the view's own bounds — it is cheap and must be called when the view's appearance changed but its size did not (colour, alpha, a progress indicator ticking). The common bug is calling <code>requestLayout()</code> when only <code>invalidate()</code> was needed, forcing the entire tree to re-measure for a colour change. The other common bug is calling <code>invalidate()</code> from a background thread — UI operations must happen on the main thread, and <code>invalidate()</code> is no exception. Use <code>postInvalidate()</code> from a non-UI thread, which posts the invalidation to the main thread's message queue. A <code>View</code> that is not attached to a window (not in the hierarchy) can safely have <code>invalidate()</code> called on it, but the invalidation will be lost — it does not accumulate.</p>
+
+<div class="codeWrap"><pre><code>class ProgressCircleView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : View(context, attrs) {
+
+    private var progress: Float = 0f  // 0.0 to 1.0
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 8f
+        strokeCap = Paint.Cap.ROUND
+        color = Color.parseColor("#1565C0")
+    }
+
+    // Called when the progress value changes — the view's size
+    // does NOT change, so we only need to redraw, not re-measure.
+    fun setProgress(value: Float) {
+        progress = value.coerceIn(0f, 1f)
+        invalidate()  // cheap: just redraw
+    }
+
+    // Called when the stroke width changes — this might affect
+    // the view's measured size if it has wrap_content, so we
+    // need a full re-measure.
+    fun setStrokeWidth(widthDp: Int) {
+        paint.strokeWidth = widthDp * resources.displayMetrics.density
+        requestLayout()  // expensive: re-measure and re-layout
+        invalidate()     // also redraw, since appearance changed
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        val padding = paint.strokeWidth / 2
+        val rect = RectF(
+            padding, padding,
+            width - padding, height - padding
+        )
+        canvas.drawArc(rect, -90f, 360f * progress, false, paint)
+    }
+}</code></pre></div>
+
+<div class="warn"><p>Never call <code>requestLayout()</code> from within <code>onMeasure</code>, <code>onLayout</code>, or <code>onDraw</code> — it will cause an infinite loop. If you need to trigger a layout change from a layout callback, post it to the next frame with <code>view.post { view.requestLayout() }</code>.</p></div>
+
+<h3 id="ch2-xml" data-toc>2.2 XML layouts and the resource system</h3>
+<p class="topic-desc">XML is the declarative language of Android UI. It is not just a convenience — it is the mechanism by which the resource qualifier system adapts your UI to different screen sizes, orientations, and configurations without code changes.</p>
+
+<h4 id="ch2-xml-inflate">LayoutInflater and how XML becomes a View tree</h4>
+<p>XML layouts are not parsed at runtime from the APK — they are pre-compiled into a binary format at build time and stored in the res/ compiled resources. <code>LayoutInflater.inflate()</code> reads this binary XML and instantiates the corresponding <code>View</code> objects by reflection, calling the two-argument constructor (<code>Context, AttributeSet</code>) for each element. This is why every custom View you define must have that constructor — without it, inflation crashes with <code>InflateException</code>. The <code>attachToRoot</code> parameter controls whether the inflated view is added to the parent ViewGroup immediately (<code>true</code>) or returned for manual addition (<code>false</code>). In practice, <code>ViewBinding</code> replaces manual inflation: it generates a binding class from your layout XML at compile time, giving you type-safe, null-safe references to every view with an <code>android:id</code>. The generated <code>inflate(layoutInflater)</code> method handles the inflation and returns a binding object — no <code>findViewById</code>, no casting, no null checks.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- res/layout/activity_main.xml --&gt;
+&lt;androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"&gt;
+
+    &lt;com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/emailLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/email_hint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"&gt;
+
+        &lt;com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/emailInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:maxLines="1" /&gt;
+
+    &lt;/com.google.android.material.textfield.TextInputLayout&gt;
+
+    &lt;com.google.android.material.button.MaterialButton
+        android:id="@+id/submitButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/submit"
+        app:layout_constraintEnd_toEndOf="@id/emailLayout"
+        app:layout_constraintStart_toStartOf="@id/emailLayout"
+        app:layout_constraintTop_toBottomOf="@id/emailLayout" /&gt;
+
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</code></pre></div>
+
+<div class="codeWrap"><pre><code>// With ViewBinding — no findViewById, no casting
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.submitButton.setOnClickListener { submitForm() }
+    }
+
+    private fun submitForm() {
+        val email = binding.emailInput.text.toString()
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.emailLayout.error = getString(R.string.invalid_email)
+        } else {
+            binding.emailLayout.error = null
+            viewModel.submit(email)
+        }
+    }
+}</code></pre></div>
+
+<h4 id="ch2-xml-qualifiers">Resource qualifiers and adaptive UI</h4>
+<p>The resource system selects the best-matching resource at runtime based on the device's configuration. Qualifiers are suffixes on resource directory names: <code>layout-land/</code> for landscape, <code>layout-sw600dp/</code> for screens with a smallest width of 600dp (tablets), <code>values-night/</code> for dark mode, <code>drawable-xhdpi/</code> for extra-high-density screens. The system matches the device's configuration against all available resource directories and picks the closest match, falling back to the default (no suffix) if nothing matches. This is how one APK serves phones, tablets, foldables, and Chromebooks with a different UI for each form factor. The <code>smallestWidth</code> qualifier (<code>sw&lt;n&gt;dp</code>) is the most reliable for form-factor adaptation because it is based on the smaller screen dimension regardless of orientation — a phone in landscape still has a smallest width of ~360dp, so <code>layout-sw600dp/</code> will not incorrectly match it.</p>
+
+<div class="codeWrap"><pre><code>// res/layout/activity_detail.xml — phone layout
+// res/layout-sw600dp/activity_detail.xml — tablet layout
+// res/layout-land/activity_detail.xml — landscape layout
+// res/values/dimens.xml — default dimensions
+// res/values-sw600dp/dimens.xml — tablet dimensions
+
+// In code, detect the form factor programmatically:
+fun isTablet(context: Context): Boolean {
+    return context.resources.configuration.smallestScreenWidthDp &gt;= 600
+}
+
+// Or use WindowSizeClass (from the material-window-size-class library)
+// which categorises screens into compact, medium, and expanded:
+class MyActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val windowSizeClass = calculateWindowSizeClass(this)
+        val layoutRes = when (windowSizeClass.widthSizeClass) {
+            WindowWidthSizeClass.Compact -> R.layout.activity_main
+            WindowWidthSizeClass.Medium,
+            WindowWidthSizeClass.Expanded -> R.layout.activity_main_twopane
+        }
+        setContentView(layoutRes)
+    }
+}</code></pre></div>
+
+<h3 id="ch2-recycler" data-toc>2.3 RecyclerView: lists done properly</h3>
+<p class="topic-desc"><code>RecyclerView</code> is the most performance-critical widget in Android. It is not just a list — it is a recycling engine that manages view creation, binding, and reuse for datasets that can be arbitrarily large. Getting it right means the difference between 60fps scrolling and a janky mess.</p>
+
+<h4 id="ch2-recycler-adapter">The ViewHolder pattern and why it matters</h4>
+<p><code>ListView</code> recycled views, but it forced every row to have the same structure and gave the developer no control over when views were created versus bound. <code>RecyclerView</code> separates the concerns: the <code>RecyclerView</code> owns the recycling pool and decides when to create a new <code>ViewHolder</code> (via <code>onCreateViewHolder</code>) versus reuse an existing one (via <code>onBindViewHolder</code>). The <code>ViewHolder</code> is a cache of view references — it holds the inflated row layout's child views so that <code>findViewById</code> is called once at creation time, not every time a row scrolls on screen. This is the single most important performance pattern in Android UI: without it, a list of 1000 items would call <code>findViewById</code> 1000 times per frame as the user scrolls. The <code>RecyclerView</code> also supports multiple view types (headers, footers, section dividers) through <code>getItemViewType</code>, which creates separate recycling pools for each type.</p>
+
+<div class="codeWrap"><pre><code>class ArticleAdapter(
+    private val onClick: (Article) -&gt; Unit
+) : ListAdapter&lt;Article, ArticleAdapter.ViewHolder&gt;(DiffCallback) {
+
+    // DiffUtil computes the difference between the old and new
+    // list and dispatches the minimal set of change notifications.
+    // This is far more efficient than notifyDataSetChanged(),
+    // which forces a full rebind of every visible row.
+    companion object : DiffUtil.ItemCallback&lt;Article&gt;() {
+        override fun areItemsTheSame(oldItem: Article, newItem: Article) =
+            oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: Article, newItem: Article) =
+            oldItem == newItem
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemArticleBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return ViewHolder(binding, onClick)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
+
+    class ViewHolder(
+        private val binding: ItemArticleBinding,
+        private val onClick: (Article) -&gt; Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(article: Article) {
+            binding.title.text = article.title
+            binding.summary.text = article.summary
+            binding.date.text = formatDate(article.publishedAt)
+            // The entire row is clickable — set the listener once
+            // in the ViewHolder, not in onBindViewHolder.
+            binding.root.setOnClickListener { onClick(article) }
+        }
+    }
+}</code></pre></div>
+
+<h4 id="ch2-recycler-diffutil">ListAdapter, DiffUtil and the diffing pipeline</h4>
+<p><code>ListAdapter</code> (from <code>androidx.recyclerview:recyclerview</code>) wraps <code>AsyncListDiffer</code>, which runs <code>DiffUtil.calculateDiff</code> on a background thread by default. When you submit a new list with <code>submitList(newList)</code>, the differ compares it to the current list, computes the minimal set of insertions, deletions, moves, and changes, and dispatches them to the adapter on the main thread. This means you never call <code>notifyDataSetChanged()</code> — the diffing engine handles updates incrementally, which enables item animations (add, remove, move, change) for free. The critical contract is that your <code>DiffUtil.ItemCallback</code> must correctly identify when two items are the same (identity, usually a database ID) and when their contents are equal (for change detection). If <code>areItemsTheSame</code> returns false for items that are actually the same, the adapter will treat them as a removal plus an insertion, losing the view's state and causing flicker.</p>
+
+<div class="codeWrap"><pre><code>// Wiring up the RecyclerView with ListAdapter
+class ArticleListFragment : Fragment() {
+
+    private val viewModel: ArticleListViewModel by viewModels()
+    private lateinit var adapter: ArticleAdapter
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        adapter = ArticleAdapter { article -&gt;
+            findNavController().navigate(
+                ArticleListFragmentDirections.toDetail(article.id)
+            )
+        }
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@ArticleListFragment.adapter
+            addItemDecoration(DividerItemDecoration(
+                requireContext(), DividerItemDecoration.VERTICAL
+            ))
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.articles.collect { articles -&gt;
+                adapter.submitList(articles)
+            }
+        }
+    }
+}
+
+// Grid layout with a span size lookup for headers
+val gridLayoutManager = GridLayoutManager(context, 2)
+gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+    override fun getSpanSize(position: Int): Int {
+        return when (adapter.getItemViewType(position)) {
+            TYPE_HEADER -> 2  // Header spans both columns
+            else -> 1
+        }
+    }
+}</code></pre></div>
+
+<h3 id="ch2-material" data-toc>2.4 Material Components and theming</h3>
+<p class="topic-desc">Material Design 3 (Material You) is Google's design system, and the Material Components library is its Android implementation. It is not just a set of pretty widgets — it is a complete theming system that adapts to the user's dynamic colour preferences on Android 12+.</p>
+
+<h4 id="ch2-material-theme">Theme inheritance and the attribute cascade</h4>
+<p>Material theming works through a hierarchy of XML theme attributes. Your app theme inherits from <code>Theme.Material3.DayNight.NoActionBar</code> (or <code>Theme.Material3.Light.NoActionBar</code> for light-only). The theme defines colour attributes: <code>colorPrimary</code> (brand colour for app bars, buttons, active states), <code>colorOnPrimary</code> (text/icons on primary), <code>colorSurface</code> (background of cards, sheets, menus), <code>colorOnSurface</code> (primary text), <code>colorError</code> (error states), and the <code>*Variant</code> counterparts for secondary emphasis. Every Material widget reads these attributes at inflation time — <code>MaterialButton</code> uses <code>colorPrimary</code> for its fill, <code>MaterialCardView</code> uses <code>colorSurface</code> for its background, <code>MaterialTextView</code> uses <code>colorOnSurface</code> for its text. This means you change the entire app's appearance by modifying a handful of attributes in <code>values/themes.xml</code> — no widget-level overrides needed. On Android 12+, the system can override your brand colours with the user's wallpaper-derived palette (dynamic colour), and your app should use <code>?attr/colorPrimary</code> references rather than hardcoded colours to participate.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- res/values/themes.xml --&gt;
+&lt;resources&gt;
+    &lt;style name="Theme.MyApp" parent="Theme.Material3.DayNight.NoActionBar"&gt;
+        &lt;!-- Brand colours --&gt;
+        &lt;item name="colorPrimary"&gt;#0D47A1&lt;/item&gt;
+        &lt;item name="colorOnPrimary"&gt;#FFFFFF&lt;/item&gt;
+        &lt;item name="colorPrimaryContainer"&gt;#D1E4FF&lt;/item&gt;
+        &lt;item name="colorOnPrimaryContainer"&gt;#001D36&lt;/item&gt;
+
+        &lt;item name="colorSecondary"&gt;#535F70&lt;/item&gt;
+        &lt;item name="colorOnSecondary"&gt;#FFFFFF&lt;/item&gt;
+
+        &lt;item name="colorSurface"&gt;#FDFBFF&lt;/item&gt;
+        &lt;item name="colorOnSurface"&gt;#1A1C1E&lt;/item&gt;
+        &lt;item name="colorSurfaceVariant"&gt;#DFE2EB&lt;/item&gt;
+        &lt;item name="colorOnSurfaceVariant"&gt;#43474E&lt;/item&gt;
+
+        &lt;item name="colorError"&gt;#BA1A1A&lt;/item&gt;
+        &lt;item name="colorOnError"&gt;#FFFFFF&lt;/item&gt;
+
+        &lt;!-- Typography --&gt;
+        &lt;item name="textAppearanceDisplayLarge"&gt;@style/TextAppearance.MyApp.DisplayLarge&lt;/item&gt;
+        &lt;item name="textAppearanceTitleMedium"&gt;@style/TextAppearance.MyApp.TitleMedium&lt;/item&gt;
+
+        &lt;!-- Shape --&gt;
+        &lt;item name="shapeAppearanceSmallComponent"&gt;@style/ShapeAppearance.MyApp.SmallComponent&lt;/item&gt;
+        &lt;item name="shapeAppearanceMediumComponent"&gt;@style/ShapeAppearance.MyApp.MediumComponent&lt;/item&gt;
+    &lt;/style&gt;
+&lt;/resources&gt;
+
+&lt;!-- res/values-night/themes.xml --&gt;
+&lt;resources&gt;
+    &lt;style name="Theme.MyApp" parent="Theme.Material3.DayNight.NoActionBar"&gt;
+        &lt;item name="colorPrimary"&gt;#A8C8FF&lt;/item&gt;
+        &lt;item name="colorOnPrimary"&gt;#003258&lt;/item&gt;
+        &lt;item name="colorSurface"&gt;#1A1C1E&lt;/item&gt;
+        &lt;item name="colorOnSurface"&gt;#E2E2E6&lt;/item&gt;
+    &lt;/style&gt;
+&lt;/resources&gt;</code></pre></div>
+
+<div class="codeWrap"><pre><code>// Using Material components in a layout
+&lt;com.google.android.material.appbar.MaterialToolbar
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    app:title="@string/app_name"
+    app:navigationIcon="@drawable/ic_back" /&gt;
+
+// MaterialAlertDialogBuilder respects the theme colours
+MaterialAlertDialogBuilder(requireContext())
+    .setTitle(R.string.delete_confirmation)
+    .setMessage(R.string.delete_confirmation_message)
+    .setPositiveButton(R.string.delete) { _, _ -&gt; viewModel.delete() }
+    .setNegativeButton(R.string.cancel, null)
+    .show()
+
+// MaterialCardView with elevation and shape
+&lt;com.google.android.material.card.MaterialCardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="12dp"
+    app:strokeWidth="0dp"&gt;
+    &lt;!-- card content --&gt;
+&lt;/com.google.android.material.card.MaterialCardView&gt;</code></pre></div>
+
+<h3 id="ch2-constraint" data-toc>2.5 ConstraintLayout in depth</h3>
+<p class="topic-desc">ConstraintLayout is the most powerful layout in Android — and the most misunderstood. It is not just a replacement for nested layouts; it is a constraint solver that computes positions from relationships, enabling flat hierarchies that would be impossible with LinearLayout or RelativeLayout.</p>
+
+<h4 id="ch2-constraint-basics">Constraints as relationships, not positions</h4>
+<p>In a LinearLayout, you express layout as nesting — a vertical LinearLayout inside a horizontal LinearLayout inside a FrameLayout. In ConstraintLayout, you express layout as constraints — each view declares its relationship to its siblings and the parent. A constraint is a connection: "this view's start edge aligns with that view's end edge, with 16dp margin." The ConstraintLayout solver takes all constraints, builds a system of linear equations, and solves for the positions that satisfy all of them. This means you can express "this view is centred between those two views" or "these two views share the top edge with a 1dp gap between them" — relationships that would require multiple nested containers in LinearLayout. The performance benefit is the flat hierarchy: a ConstraintLayout with 20 views and 40 constraints has one measure pass, whereas the equivalent nested LinearLayout might have 5 levels of nesting and 5 measure passes.</p>
+
+<div class="codeWrap"><pre><code>&lt;androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
+
+    &lt;ImageView
+        android:id="@+id/avatar"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" /&gt;
+
+    &lt;TextView
+        android:id="@+id/name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintStart_toEndOf="@id/avatar"
+        app:layout_constraintTop_toTopOf="@id/avatar"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;TextView
+        android:id="@+id/bio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintStart_toEndOf="@id/avatar"
+        app:layout_constraintTop_toBottomOf="@id/name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/avatar" /&gt;
+
+    &lt;com.google.android.material.button.MaterialButton
+        android:id="@+id/followButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="@id/bio"
+        app:layout_constraintTop_toBottomOf="@id/bio" /&gt;
+
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</code></pre></div>
+
+<h4 id="ch2-constraint-advanced">Chains, barriers and guidelines</h4>
+<p>Chains are a set of views linked bidirectionally — each view constrains to the next, and the first and last constrain to the parent. A horizontal chain of three buttons with <code>layout_constraintHorizontal_chainStyle="spread"</code> distributes them evenly across the available space. A packed chain groups them together; a weighted chain assigns proportional widths. Barriers solve a specific problem: aligning a view to the edge of a group of views whose sizes vary at runtime. A barrier references a set of views and computes the maximum (or minimum) edge among them at layout time. Guidelines are invisible positioning aids — vertical or horizontal lines at a fixed position or percentage — that views can constrain to. The common mistake is using ConstraintLayout for simple layouts that would be clearer as a LinearLayout (a single row of equally-weighted views, a vertical stack with no inter-view relationships). ConstraintLayout shines when views have complex, multi-directional relationships; for simple stacks, a LinearLayout with weights is more readable and equally performant.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- A chain of three buttons, evenly distributed --&gt;
+&lt;com.google.android.material.button.MaterialButton
+    android:id="@+id/btnCancel"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toStartOf="@id/btnNeutral"
+    app:layout_constraintHorizontal_chainStyle="spread" /&gt;
+
+&lt;com.google.android.material.button.MaterialButton
+    android:id="@+id/btnNeutral"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    app:layout_constraintStart_toEndOf="@id/btnCancel"
+    app:layout_constraintEnd_toStartOf="@id/btnConfirm" /&gt;
+
+&lt;com.google.android.material.button.MaterialButton
+    android:id="@+id/btnConfirm"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    app:layout_constraintStart_toEndOf="@id/btnNeutral"
+    app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+&lt;!-- A barrier that aligns to the widest of two text views --&gt;
+&lt;androidx.constraintlayout.widget.Barrier
+    android:id="@+id/textBarrier"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:barrierDirection="end"
+    app:constraint_referenced_ids="firstName,lastName" /&gt;
+
+&lt;TextView
+    android:id="@+id/fullName"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:layout_constraintStart_toEndOf="@id/textBarrier" /&gt;
+
+&lt;!-- A vertical guideline at 30% of the parent width --&gt;
+&lt;androidx.constraintlayout.widget.Guideline
+    android:id="@+id/guideline"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:layout_constraintGuide_percent="0.3" /&gt;</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 · Activities, fragments and navigation</h2>
+
+<h3 id="ch3-fragments" data-toc>3.1 Fragments and their lifecycle</h3>
+<p class="topic-desc">Fragments are reusable UI components that live inside an Activity. They were introduced to support tablet layouts, but their real value is in lifecycle-aware UI modules that can be combined and rearranged. The fragment lifecycle is the subtlest in Android because it is tied to both the Activity lifecycle and the fragment's own view lifecycle.</p>
+
+<h4 id="ch3-fragments-lifecycle">The fragment lifecycle and the view lifecycle split</h4>
+<p>A fragment has two parallel lifecycles: the <strong>fragment lifecycle</strong> (onAttach → onCreate → onCreateView → onViewCreated → onStart → onResume → onPause → onStop → onDestroyView → onDestroy → onDetach) and the <strong>view lifecycle</strong> (onCreateView → onViewCreated → onDestroyView). The critical insight is that <code>onDestroyView</code> is called before <code>onDestroy</code> — the fragment's view is destroyed when the fragment is placed on the back stack (not when the fragment is destroyed). This means you must null out view references in <code>onDestroyView</code>, not <code>onDestroy</code>, and you must not access views after <code>onDestroyView</code> is called. The fragment object itself survives a back-stack transaction; only its view is recreated. The <code>FragmentManager</code> manages the back stack, transactions (add, remove, replace, hide, show), and the fragment result API. A fragment transaction is not executed immediately — it is scheduled via <code>commit()</code> (or <code>commitNow()</code> for synchronous execution, which cannot be used for back-stack transactions).</p>
+
+<div class="codeWrap"><pre><code>class ProfileFragment : Fragment() {
+
+    private var _binding: FragmentProfileBinding? = null
+    // This getter survives the view lifecycle — it returns null
+    // when the view is destroyed (fragment on back stack).
+    private val binding get() = _binding!!
+
+    private val viewModel: ProfileViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Safe to access views here — the view exists.
+        binding.followButton.setOnClickListener { viewModel.toggleFollow() }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.user.collect { user -&gt;
+                binding.name.text = user.name
+                binding.bio.text = user.bio
+            }
+        }
+    }
+
+    // CRITICAL: null out the view binding here, not in onDestroy.
+    // The fragment object survives; only the view is destroyed.
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}</code></pre></div>
+
+<h4 id="ch3-fragments-manager">FragmentManager, back stacks and the transaction API</h4>
+<p>The <code>FragmentManager</code> is the engine that drives fragment transactions. A transaction is a set of operations (add, remove, replace, hide, show) applied atomically. When you call <code>commit()</code>, the transaction is posted to the main thread's message queue and executed after the current batch of input events and animations. This is why you cannot access the fragment's view immediately after <code>commit()</code> — the transaction has not been executed yet. The back stack is a stack of transactions that the user can reverse with the back button. <code>addToBackStack(null)</code> adds the transaction to the back stack; without it, the back button pops the Activity (exits the app) instead of reversing the transaction. The <code>childFragmentManager</code> is a separate manager for fragments nested inside a fragment — it has its own back stack and lifecycle. The common crash "Fragment already added" happens when you add a fragment in <code>onCreate</code> without checking <code>savedInstanceState == null</code>, causing a duplicate after process death.</p>
+
+<div class="codeWrap"><pre><code>class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Only add the initial fragment on first creation —
+        // after process death, the FragmentManager restores it.
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                replace(R.id.fragmentContainer, HomeFragment())
+                // No addToBackStack — the back button should exit
+                // the app from the home screen, not pop a transaction.
+            }
+        }
+    }
+
+    fun navigateToDetail(articleId: String) {
+        supportFragmentManager.commit {
+            replace(R.id.fragmentContainer, DetailFragment.newInstance(articleId))
+            addToBackStack(null)  // back button reverses this navigation
+            setReorderingAllowed(true)  // optimises the transition
+        }
+    }
+
+    // A child fragment inside another fragment uses
+    // childFragmentManager, not supportFragmentManager:
+    fun ProfileFragment.openSettings() {
+        childFragmentManager.commit {
+            replace(R.id.profileContainer, SettingsFragment())
+            addToBackStack("settings")
+        }
+    }
+}</code></pre></div>
+
+<h3 id="ch3-nav" data-toc>3.2 The Navigation component</h3>
+<p class="topic-desc">The Navigation component is a library that manages fragment transactions, back stacks, and argument passing through a declarative graph. It replaces manual fragment management with a single source of truth — the navigation graph XML — and eliminates the most common sources of navigation bugs.</p>
+
+<h4 id="ch3-nav-graph">The navigation graph and NavController</h4>
+<p>The navigation graph is an XML file (<code>res/navigation/nav_graph.xml</code>) that declares every destination (fragment, activity, or nested graph) and every action (a named transition between destinations). The <code>NavHostFragment</code> is a special fragment that hosts the navigation graph — it inflates a <code>FragmentManager</code> and a <code>NavController</code>. The <code>NavController</code> is the runtime API: <code>navigate(actionId)</code> performs a transition, <code>popBackStack()</code> reverses one, and <code>currentBackStackEntry</code> gives access to the current destination's arguments. The single-activity pattern — one Activity hosting all fragments via the Navigation component — has become the recommended architecture because it simplifies shared element transitions, deep linking, and the back stack. The NavController manages the fragment back stack automatically: <code>navigate()</code> adds to the back stack, and the back button pops it. You never call <code>FragmentManager.commit()</code> directly.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- res/navigation/nav_graph.xml --&gt;
+&lt;navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment"&gt;
+
+    &lt;fragment
+        android:id="@+id/homeFragment"
+        android:name="com.acme.app.ui.home.HomeFragment"&gt;
+        &lt;action
+            android:id="@+id/action_home_to_detail"
+            app:destination="@id/detailFragment" /&gt;
+    &lt;/fragment&gt;
+
+    &lt;fragment
+        android:id="@+id/detailFragment"
+        android:name="com.acme.app.ui.detail.DetailFragment"&gt;
+        &lt;argument
+            android:name="articleId"
+            app:argType="string" /&gt;
+        &lt;action
+            android:id="@+id/action_detail_to_comments"
+            app:destination="@id/commentsFragment" /&gt;
+    &lt;/fragment&gt;
+
+    &lt;fragment
+        android:id="@+id/commentsFragment"
+        android:name="com.acme.app.ui.comments.CommentsFragment"&gt;
+        &lt;argument
+            android:name="articleId"
+            app:argType="string" /&gt;
+    &lt;/fragment&gt;
+
+&lt;/navigation&gt;</code></pre></div>
+
+<div class="codeWrap"><pre><code>// In the Activity: a single NavHostFragment hosts the graph
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        // The NavHostFragment is declared in the layout XML:
+        // &lt;androidx.fragment.app.FragmentContainerView
+        //     android:name="androidx.navigation.fragment.NavHostFragment"
+        //     app:navGraph="@navigation/nav_graph" /&gt;
+    }
+}
+
+// In a fragment: navigate via the action ID (type-safe with safe args)
+class HomeFragment : Fragment() {
+    fun onArticleClick(articleId: String) {
+        val action = HomeFragmentDirections.actionHomeToDetail(articleId)
+        findNavController().navigate(action)
+    }
+}
+
+// In the destination: retrieve the argument (type-safe)
+class DetailFragment : Fragment() {
+    private val args: DetailFragmentArgs by navArgs()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val articleId = args.articleId  // String, not a Bundle lookup
+        viewModel.loadArticle(articleId)
+    }
+}</code></pre></div>
+
+<h3 id="ch3-results" data-toc>3.3 Passing data between screens</h3>
+<p class="topic-desc">Navigation requires data to flow between destinations. Android provides three mechanisms — Intent extras, the Fragment Result API, and shared ViewModels — each with a specific scope and lifetime. Choosing the wrong one leads to type-unsafe Bundle lookups, leaked listeners, or state that survives its owner.</p>
+
+<h4 id="ch3-results-shared">Shared ViewModels: the scope-based approach</h4>
+<p>A shared ViewModel is scoped to a navigation destination's parent — typically the Activity or a parent fragment. When two fragments share the same ViewModelStoreOwner (the Activity), they get the same ViewModel instance and can observe the same state. This is the recommended pattern for passing data between a master and a detail screen: the master fragment writes the selected item ID to the shared ViewModel, and the detail fragment observes it. The ViewModel survives configuration changes but is cleared when the store owner is finished (the Activity is destroyed). The critical rule is that the ViewModel must never hold a reference to a View, Fragment, or Activity context — it holds data and exposes it via LiveData or StateFlow. The <code>by activityViewModels()</code> delegate scopes the ViewModel to the Activity; <code>by viewModels()</code> scopes it to the fragment.</p>
+
+<div class="codeWrap"><pre><code>// Shared ViewModel scoped to the Activity
+class SharedEditorViewModel : ViewModel() {
+    private val _selectedItem = MutableStateFlow&lt;Item?&gt;(null)
+    val selectedItem: StateFlow&lt;Item?&gt; = _selectedItem.asStateFlow()
+
+    fun select(item: Item) {
+        _selectedItem.value = item
+    }
+}
+
+// Master fragment: writes to the shared ViewModel
+class MasterFragment : Fragment() {
+    private val sharedViewModel: SharedEditorViewModel by activityViewModels()
+
+    fun onItemClick(item: Item) {
+        sharedViewModel.select(item)
+        findNavController().navigate(R.id.action_master_to_detail)
+    }
+}
+
+// Detail fragment: observes the shared ViewModel
+class DetailFragment : Fragment() {
+    private val sharedViewModel: SharedEditorViewModel by activityViewModels()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewLifecycleOwner.lifecycleScope.launch {
+            sharedViewModel.selectedItem
+                .filterNotNull()
+                .collect { item -&gt;
+                    binding.title.text = item.title
+                    binding.content.text = item.content
+                }
+        }
+    }
+}</code></pre></div>
+
+<h4 id="ch3-results-fragment">The Fragment Result API: the event-based approach</h4>
+<p>The Fragment Result API (<code>setFragmentResultListener</code>) is the mechanism for a child fragment to send data back to its parent without a shared ViewModel or a direct reference. The parent registers a listener with a string key; the child sets a result with the same key; the system delivers it via a <code>Bundle</code>. The listener is lifecycle-aware — it is removed automatically when the fragment's view is destroyed, so there is no leak. This is the right pattern for a dialog fragment returning a value (a date picker returning a selected date, a filter dialog returning filter criteria). The Bundle is not type-safe — the key is a string and the value must be a <code>Parcelable</code> or <code>Serializable</code> — so the convention is to define the keys as constants and to validate the types when reading.</p>
+
+<div class="codeWrap"><pre><code>// Parent fragment: register a listener
+class ParentFragment : Fragment() {
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        childFragmentManager.setFragmentResultListener(
+            DatePickerFragment.KEY_DATE, viewLifecycleOwner
+        ) { _, bundle -&gt;
+            val timestamp = bundle.getLong(DatePickerFragment.RESULT_TIMESTAMP)
+            val selectedDate = Date(timestamp)
+            viewModel.onDateSelected(selectedDate)
+        }
+    }
+
+    fun openDatePicker() {
+        DatePickerFragment().show(childFragmentManager, "datePicker")
+    }
+}
+
+// Child (dialog) fragment: set a result and dismiss
+class DatePickerFragment : DialogFragment() {
+
+    companion object {
+        const val KEY_DATE = "date_request"
+        const val RESULT_TIMESTAMP = "timestamp"
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val calendar = Calendar.getInstance()
+        return MaterialDatePicker.Builder.datePicker()
+            .setSelection(calendar.timeInMillis)
+            .build()
+            .apply {
+                addOnPositiveButtonClickListener { timestamp -&gt;
+                    val result = Bundle().apply {
+                        putLong(RESULT_TIMESTAMP, timestamp)
+                    }
+                    parentFragmentManager.setFragmentResult(KEY_DATE, result)
+                    dismiss()
+                }
+            }.createDialog(requireActivity(), null)
+    }
+}</code></pre></div>
+
+<h3 id="ch3-dialogs" data-toc>3.4 Dialogs, sheets and transient UI</h3>
+<p class="topic-desc">Not every UI interaction is a screen. Dialogs, bottom sheets, and transient overlays are components that float above the content, and each has a lifecycle and a set of constraints that differ from a full Activity.</p>
+
+<h4 id="ch3-dialogs-fragment">DialogFragment and why it replaces AlertDialog</h4>
+<p>A <code>DialogFragment</code> is a Fragment that displays a dialog window. It exists because a plain <code>AlertDialog</code> cannot survive a configuration change — when the device rotates, the Activity is destroyed and recreated, and the dialog is lost (or worse, leaks the old Activity's window). A <code>DialogFragment</code> is managed by the FragmentManager, so it is retained across configuration changes and its lifecycle is tied to the host Activity. The dialog's window is a separate window (with its own <code>WindowManager.LayoutParams</code>) that is attached to the Activity's window token — this is why the dialog dismisses automatically when the Activity is destroyed. The <code>MaterialAlertDialogBuilder</code> provides Material-styled dialogs, and <code>BottomSheetDialogFragment</code> provides a Material bottom sheet (a panel that slides up from the bottom of the screen). The <code>dismiss()</code> method removes the dialog; <code>dismissAllowingStateLoss()</code> is the variant that does not throw if called after <code>onSaveInstanceState</code> (needed when the dialog is dismissed from a background callback).</p>
+
+<div class="codeWrap"><pre><code>class ConfirmDeleteDialog : DialogFragment() {
+
+    // Use the factory pattern — never put arguments in a constructor
+    companion object {
+        fun newInstance(itemId: String) = ConfirmDeleteDialog().apply {
+            arguments = Bundle().apply { putString("item_id", itemId) }
+        }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val itemId = requireArguments().getString("item_id")!!
+        return MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.delete_confirmation)
+            .setMessage(getString(R.string.delete_confirmation_message, itemId))
+            .setPositiveButton(R.string.delete) { _, _ -&gt;
+                // Send the result back to the parent
+                parentFragmentManager.setFragmentResult(
+                    "delete_request",
+                    Bundle().apply { putString("item_id", itemId) }
+                )
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .create()
+    }
+}
+
+// Usage from a parent fragment
+class ItemListFragment : Fragment() {
+    fun onDeleteClick(itemId: String) {
+        ConfirmDeleteDialog.newInstance(itemId)
+            .show(childFragmentManager, "confirm_delete")
+    }
+}</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 · Services and background work</h2>
+
+<h3 id="ch4-types" data-toc>4.1 Service types: started vs bound</h3>
+<p class="topic-desc">Services are Android's mechanism for work that must continue when the user is not looking at the screen. The two service types — started and bound — have fundamentally different lifecycles and guarantees, and choosing the wrong type is the most common background-work mistake.</p>
+
+<h4 id="ch4-types-started">Started services: fire and forget</h4>
+<p>A started service is created by <code>startService(intent)</code>. Once started, it runs indefinitely until it stops itself with <code>stopSelf()</code> or the system stops it. The component that started the service has no further connection to it — the service runs in the background even if the starting Activity is destroyed. The <code>onStartCommand</code> method is called every time <code>startService</code> is called, and its return value controls what happens when the system kills the service under memory pressure: <code>START_STICKY</code> means the system will recreate the service (with a null intent) when memory is available, <code>START_NOT_STICKY</code> means it will not, and <code>START_REDELIVER_INTENT</code> means it will recreate the service and redeliver the last intent. On API 26+, a started service that is not a foreground service is subject to background execution limits: after a few minutes in the background, the system stops it. In practice, this means a started service is only appropriate for short-lived work (a few minutes) or for work that must be a foreground service (a music player, a file download with a notification).</p>
+
+<div class="codeWrap"><pre><code>class DownloadService : Service() {
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val url = intent?.getStringExtra("download_url") ?: return START_NOT_STICKY
+
+        // Promote to a foreground service — required on API 26+
+        startForeground(NOTIFICATION_ID, createNotification())
+
+        // Do the work on a background thread
+        Thread {
+            try {
+                downloadFile(url)
+                // Stop the service when done — this is the contract
+                stopSelf(startId)
+            } catch (e: IOException) {
+                // Notify the user of the failure
+                showErrorNotification(url, e)
+                stopSelf(startId)
+            }
+        }.start()
+
+        // If the system kills us, redeliver the intent so the
+        // download can be retried.
+        return START_REDELIVER_INTENT
+    }
+
+    private fun downloadFile(url: String) {
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.connect()
+        val input = BufferedInputStream(connection.inputStream)
+        val output = FileOutputStream(getExternalFilesDir(null).resolve("download.zip"))
+        input.copyTo(output)
+        output.close()
+        input.close()
+    }
+
+    companion object {
+        const val NOTIFICATION_ID = 1001
+    }
+}</code></pre></div>
+
+<h4 id="ch4-types-bound">Bound services: a client-server connection</h4>
+<p>A bound service is created by <code>bindService(intent, connection, flags)</code>. It provides a client-server interface — the service exposes an <code>IBinder</code> that clients use to call methods on the service. The service lives exactly as long as at least one client is bound: when the first client binds, <code>onBind</code> is called and the service starts; when the last client unbinds, <code>onUnbind</code> is called and the service is destroyed (unless it was also started with <code>startService</code>). The bound service pattern is appropriate for a music player that needs to be controlled by multiple components (the Activity, a notification, a widget) — the Activity binds to control playback, and the notification binds to display the current track. The <code>Binder</code> subclass is the simplest form: it returns the service instance directly, allowing clients to call public methods. For cross-process communication (AIDL), the <code>Messenger</code> or AIDL interfaces are needed, but in-process binding is far more common.</p>
+
+<div class="codeWrap"><pre><code>class MusicService : Service() {
+
+    private val binder = MusicBinder()
+    private var mediaPlayer: MediaPlayer? = null
+
+    inner class MusicBinder : Binder() {
+        fun getService(): MusicService = this@MusicService
+    }
+
+    override fun onBind(intent: Intent?): IBinder = binder
+
+    fun play(trackUri: Uri) {
+        mediaPlayer?.release()
+        mediaPlayer = MediaPlayer().apply {
+            setDataSource(this@MusicService, trackUri)
+            prepare()
+            start()
+        }
+    }
+
+    fun pause() { mediaPlayer?.pause() }
+    fun seekTo(position: Int) { mediaPlayer?.seekTo(position) }
+    fun getCurrentPosition(): Int = mediaPlayer?.currentPosition ?: 0
+    fun isPlaying(): Boolean = mediaPlayer?.isPlaying ?: false
+}
+
+// In the Activity:
+class PlayerActivity : AppCompatActivity() {
+
+    private var musicService: MusicService? = null
+    private var bound = false
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MusicService.MusicBinder
+            musicService = binder.getService()
+            bound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            bound = false
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Intent(this, MusicService::class.java).also { intent -&gt;
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (bound) {
+            unbindService(connection)
+            bound = false
+        }
+    }
+}</code></pre></div>
+
+<h3 id="ch4-foreground" data-toc>4.2 Foreground services</h3>
+<p class="topic-desc">A foreground service is a service the user is actively aware of — it must display a persistent notification. This is the only legitimate way to run long-running background work on modern Android, and the system enforces the contract strictly.</p>
+
+<h4 id="ch4-foreground-contract">The foreground service contract</h4>
+<p>When you call <code>startForeground(id, notification)</code>, you make a promise to the user: "this notification accurately represents the work being done, and it goes away when the work stops." The system enforces this in three ways. First, on API 26+, you must call <code>startForeground</code> within 5 seconds of <code>startForegroundService</code> or the system kills the app with an <code>ANR</code> (Application Not Responding). Second, the notification must be on a notification channel with <code>IMPORTANCE_LOW</code> or higher (low importance is required for the notification to not make a sound). Third, the notification cannot be dismissed while the service is running — the user can only swipe it away if the service is stopped. The <code>foregroundServiceType</code> attribute in the manifest (required on API 34+) declares what the service does: <code>mediaPlayback</code>, <code>dataSync</code>, <code>location</code>, <code>phoneCall</code>, <code>camera</code>, <code>microphone</code>, and others. The type determines which permissions the service needs and what the system allows it to do in the background.</p>
+
+<div class="codeWrap"><pre><code>class LocationTrackingService : Service() {
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationCallback: LocationCallback
+
+    override fun onCreate() {
+        super.onCreate()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                val location = result.lastLocation ?: return
+                updateNotification(location)
+                broadcastLocation(location)
+            }
+        }
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // MUST call startForeground within 5 seconds
+        startForeground(NOTIFICATION_ID, buildNotification("Starting..."))
+
+        val request = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY, 10_000L
+        ).build()
+
+        fusedLocationClient.requestLocationUpdates(
+            request, locationCallback, Looper.getMainLooper()
+        )
+        return START_STICKY
+    }
+
+    private fun buildNotification(status: String): Notification {
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Tracking your run")
+            .setContentText(status)
+            .setSmallIcon(R.drawable.ic_location)
+            .setOngoing(true)  // cannot be dismissed by the user
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+            .build()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    companion object {
+        const val NOTIFICATION_ID = 2001
+        const val CHANNEL_ID = "location_tracking"
+    }
+}</code></pre></div>
+
+<h4 id="ch4-foreground-types">Foreground service types and their constraints</h4>
+<p>The <code>foregroundServiceType</code> is not just a declaration — it is a contract with the system about what the service is allowed to do. A <code>dataSync</code> type service (file upload, database sync) is allowed to run for a limited time in the background on API 28+ — the system gives it a grace period after the app leaves the foreground, then stops it. A <code>mediaPlayback</code> type service (music, podcast playback) can run indefinitely while playing audio. A <code>location</code> type service (fitness tracking, navigation) can access location in the background, but only if the user has granted <code>ACCESS_FINE_LOCATION</code> or <code>ACCESS_COARSE_LOCATION</code> and the app has a valid use case. A <code>camera</code> type service (video calls) can access the camera while in the foreground. The system enforces these constraints at runtime: if a <code>dataSync</code> service tries to access location, the system throws a <code>SecurityException</code>. On API 34+, you must declare all types the service uses, separated by pipes: <code>android:foregroundServiceType="location|microphone"</code>.</p>
+
+<div class="warn"><p>Foreground services are the most abused API on Android. The Play Store has strict policies: a foreground service must be user-initiated (the user starts it, not the app), it must show a notification that accurately reflects the work, and it must stop when the work is done. Using a foreground service to keep the app alive or to run invisible work is a policy violation that can get your app removed from the Play Store.</p></div>
+
+<h3 id="ch4-alarm" data-toc>4.3 AlarmManager and exact alarms</h3>
+<p class="topic-desc"><code>AlarmManager</code> is the system service that schedules work to run at a specific time, even if the app is not running. It is the right tool for calendar reminders, medication alarms, and time-sensitive notifications — and the wrong tool for everything else.</p>
+
+<h4 id="ch4-alarm-exact">Exact vs inexact alarms and the battery tradeoff</h4>
+<p>An inexact alarm (<code>set</code>, <code>setWindow</code>) is delivered within a time window, and the system batches alarms from multiple apps to minimise wake-ups — this is the battery-friendly option. An exact alarm (<code>setExact</code>, <code>setExactAndAllowWhileIdle</code>) is delivered at the precise millisecond, and on API 31+ requires the <code>SCHEDULE_EXACT_ALARM</code> permission (which the user can revoke at any time) or the <code>USE_EXACT_ALARM</code> permission (which is granted only to apps whose core function is alarms — clocks, calendars, reminders). The battery cost of an exact alarm is real: it wakes the device from Doze mode, and each wake-up costs roughly 30 seconds of battery life. The rule is: use inexact alarms for everything except time-sensitive user-facing actions (a medication reminder that must fire at 8:00 AM, a timer that must beep at exactly 60 seconds). For periodic background work, use WorkManager instead — it batches, respects Doze, and survives process death.</p>
+
+<div class="codeWrap"><pre><code>// Scheduling a one-time inexact alarm
+val alarmManager = getSystemService(AlarmManager::class.java)
+
+val pendingIntent = PendingIntent.getBroadcast(
+    this,
+    REQUEST_CODE,
+    Intent(this, ReminderReceiver::class.java).apply {
+        putExtra("reminder_id", reminderId)
+    },
+    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+)
+
+// Inexact — the system batches it with other alarms
+alarmManager.set(
+    AlarmManager.RTC_WAKEUP,
+    triggerTimeMillis,
+    pendingIntent
+)
+
+// Exact — requires SCHEDULE_EXACT_ALARM permission on API 31+
+if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.S) {
+    if (alarmManager.canScheduleExactAlarms()) {
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            triggerTimeMillis,
+            pendingIntent
+        )
+    } else {
+        // Direct the user to the settings screen to grant the permission
+        startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+    }
+} else {
+    alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent)
+}
+
+// Cancel a scheduled alarm — always cancel in onDestroy
+// or when the reminder is dismissed
+alarmManager.cancel(pendingIntent)</code></pre></div>
+
+<h3 id="ch4-doze" data-toc>4.4 Doze, App Standby and battery optimisation</h3>
+<p class="topic-desc">Doze and App Standby are the system's battery-saving mechanisms. They restrict network access, defer jobs, and limit wake locks when the device is idle. Understanding them is essential for any app that needs to do background work reliably.</p>
+
+<h4 id="ch4-doze-behaviour">How Doze works and what it restricts</h4>
+<p>Doze mode activates when the device is stationary, unplugged, and the screen is off for a period of time (typically 30 minutes to several hours). Once in Doze, the system defers all network access, ignores wake locks, defers standard <code>AlarmManager</code> alarms (but allows <code>setExactAndAllowWhileIdle</code>), and restricts <code>JobScheduler</code> and <code>WorkManager</code> jobs to brief "maintenance windows" (a few minutes every few hours). The device periodically exits Doze for a maintenance window, during which all deferred work is flushed. App Standby is a separate but related mechanism: when the user has not interacted with an app for several days, the app is put on standby — its network access is suspended, its jobs are deferred, and its push messages are deprioritised (still delivered, but may be delayed). The key insight for developers is that <strong>no background mechanism works reliably in Doze</strong>. The only guaranteed way to deliver a time-critical message is a high-priority FCM push (which wakes the app briefly) or an exact alarm (which the user must permit).</p>
+
+<div class="codeWrap"><pre><code>// Testing Doze mode from the command line:
+// adb shell dumpsys battery unplug
+// adb shell am set-inactive com.acme.app true
+// adb shell dumpsys deviceidle force-idle
+// (wait for Doze to activate)
+// adb shell am set-inactive com.acme.app false
+// adb shell dumpsys battery reset
+
+// Requesting a Doze whitelist — only for apps whose core
+// function requires background execution (VOIP, home automation)
+if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) {
+    val powerManager = getSystemService(PowerManager::class.java)
+    if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+        val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+        intent.data = Uri.parse("package:$packageName")
+        startActivity(intent)
+    }
+}
+
+// Checking if the app is exempt from battery optimisations
+fun isBatteryOptimisationIgnored(context: Context): Boolean {
+    val powerManager = context.getSystemService(PowerManager::class.java)
+    return powerManager.isIgnoringBatteryOptimizations(context.packageName)
+}</code></pre></div>
+
+<div class="note"><p>The battery optimisation whitelist is not a Get Out of Doze Free card. Apps on the whitelist still have their background work restricted in Doze — the whitelist only exempts the app from App Standby. And the Play Store policy explicitly restricts whitelist requests to apps with a legitimate need (home automation, VOIP, accessibility). Most apps should not request it.</p></div>
+</section>

@@ -1,0 +1,90 @@
+with open(r'C:\Users\user\repo\learn-software-engineering\capacitor.html', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Current exact old string based on what we see
+old = '''<h3 id="ch1-webdir" data-toc>1.5 webDir and the asset contract</h3>
+    <p class="topic-desc">The one configuration value that breaks more builds than any other, and the rules for making it reliable.</p>
+    <p>Capacitor copies exactly one folder from your project into the native app. That folder is set by <code>webDir</code> in the config file. It must be a path to a directory of <strong>built</strong> output, not your source.</p>
+    <div class="codeWrap"><pre><code>// capacitor.config.ts
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.example.app',
+  appName: 'My App',
+  webDir: 'dist',            // <- the BUILT folder, relative to project root
+};
+
+export default config;</code></pre></div>
+    <div class="warn"><p>If <code>webDir</code> poi'''
+
+new = '''<h3 id="ch1-webdir" data-toc>1.5 webDir and the asset contract</h3>
+    <p class="topic-desc">The one configuration value that breaks more builds than any other, and the rules for making it reliable.</p>
+    <h4 id="ch1-webdir-built">Built output vs source folder</h4>
+    <p>Capacitor's <code>webDir</code> configuration must point at a folder of <em>built</em> output — the static files emitted by your Vite, Rollup, or webpack build. It must never point at your source directory (<code>src/</code>, <code>www/</code>, or the root of your project). If <code>webDir</code> points at source, the native app will load uncompiled TypeScript, unbundled CSS, and development-only meta files, resulting in missing globals, broken hot-module-replacement, and runtime errors that are difficult to debug. The configured folder is copied into the native project: on Android under <code>android/app/src/main/assets/public/</code>, on iOS under <code>ios/App/App/public/</code>. Any time you change your build configuration or add a new output directory, run <code>npx cap sync</code> to refresh both native projects.</p>
+    <div class="codeWrap"><pre><code>// capacitor.config.ts - always point at the build output
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.acme.myapp',
+  appName: 'My App',
+  webDir: 'dist',           // relative to project root, must be built output
+};
+
+export default config;</code></pre></div>
+
+    <h4 id="ch1-webdir-development">Development and live reload workflow</h4>
+    <p>During development, Capacitor can point the web view at your local development server instead of the packaged assets. This is configured via the <code>server.url</code> field in <code>capacitor.config.ts</code>, which overrides <code>webDir</code> for the current session. The typical workflow is: <code>npm run dev</code> starts Vite, <code>npx cap run android --livereload --external</code> launches the app pointing at <code>http://192.168.1.50:5173</code>. Edits to source files are instantly reflected in the running app because the web view loads from the dev server, not from the copied assets. This loop — edit, save, see change immediately — is the primary productivity flow when building Capacitor apps.</p>
+    <div class="codeWrap"><pre><code>// capacitor.config.ts - development server configuration
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.acme.myapp',
+  appName: 'My App',
+  webDir: 'dist',
+  server: {
+    url: 'http://192.168.1.50:5173',   // LAN IP of dev machine
+    cleartext: true,                  // allow http:// on Android 9+
+    androidScheme: 'http',
+  },
+};
+
+export default config;</code></pre></div>
+
+    <h4 id="ch1-webdir-common-pitfalls">Common pitfalls and debugging</h4>
+    <p>The most frequent failure mode is running <code>npx cap add android</code> before the first build, which results in an empty <code>assets/public/</code> folder and a blank white screen on app launch. The second frequent failure is changing <code>webDir</code> after platforms have been added, which requires a full <code>npx cap sync</code> to take effect. A third, more subtle issue is having <code>webDir</code> point at a relative path that resolves differently on different machines — always use a path relative to the project root, and avoid symlinks or absolute paths unless absolutely required.</p>
+    <div class="codeWrap"><pre><code># Debugging a blank screen on app launch
+
+# 1. Verify the build produced output
+ls -R dist/                                    # *nix
+dir /s dist/                                   # Windows
+
+# 2. Verify the assets were synced
+npx cap sync                                   # copy assets to native projects
+adb shell ls     android/app/src/main/assets/public/   # Android
+# or
+idevicesync2 -l                                # iOS (alternative to Xcode sync)
+
+# 3. Check the web view origin
+adb shell "window.location.origin"             # shows the loaded origin
+
+# Common causes and fixes:
+# - webDir points at source: change to 'dist' or your build output folder
+# - Forgot to run npx cap sync after changing webDir: run it now
+# - webDir path is relative to wrong directory: ensure CWD is the project root
+# - Assets folder is empty after sync: check that the build actually emitted files</code></pre></div>
+</section>
+
+<h3 id="ch1-limits" data-toc>1.4 What Capacitor is genuinely bad at</h3>'''
+
+if old in content:
+    content = content.replace(old, new)
+    with open(r'C:\Users\user\repo\learn-software-engineering\capacitor.html', 'w', encoding='utf-8') as f:
+        f.write(content)
+    print('Replacement successful for ch1-webdir')
+else:
+    print('Old string NOT found for ch1-webdir')
+    # Debug: print first 300 chars
+    idx = content.find('<h3 id="ch1-webdir"')
+    if idx >= 0:
+        print('Found h3 at', idx)
+        print('Context:', repr(content[idx:idx+200]))

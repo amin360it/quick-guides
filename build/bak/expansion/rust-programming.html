@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rust</title>
+<meta name="description" content="Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage…. 3 chapters, 9 topics and 12 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/rust-programming.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Rust">
+<meta property="og:description" content="Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage…. 3 chapters, 9 topics and 12 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/rust-programming.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Rust">
+<meta name="twitter:description" content="Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage…. 3 chapters, 9 topics and 12 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/rust-programming.html#article","headline":"Rust","name":"Rust","description":"Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage…. 3 chapters, 9 topics and 12 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/rust-programming.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/rust-programming.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Rust","item":"https://amin360it.github.io/quick-guides/rust-programming.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">WordPress Plugin</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome · Rust</a><ul>
+<li><a href="#orientation-why" data-target="orientation-why">0.1 Why Rust, and what it guarantees</a></li>
+<li><a href="#orientation-toolchain" data-target="orientation-toolchain">0.2 The toolchain: cargo, rustc, and the edition system</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Ownership, Borrowing and Lifetimes</a><ul>
+<li><a href="#ch1-ownership" data-target="ch1-ownership">1.1 Ownership: the three rules every Rust type obeys</a></li>
+<li><a href="#ch1-lifetime" data-target="ch1-lifetime">1.2 Lifetimes: the annotation that proves a reference is valid</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Traits, Generics and Concurrency</a><ul>
+<li><a href="#ch2-trait" data-target="ch2-trait">2.1 Traits: shared behaviour without inheritance</a></li>
+<li><a href="#ch2-async" data-target="ch2-async">2.2 Async: the future, the executor, and the await point</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Rust</span>
+      <span class="am-band-s">3 chapters &middot; 9 topics &middot; 12 code samples &middot; works offline</span>
+    </h1>
+<section class="chapter">
+<h2 id="orientation" data-toc>Welcome · Rust</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; Welcome · Rust</button><div class="ch-toc-list"><a href="#orientation-why">0.1 Why Rust, and what it guarantees</a><a href="#orientation-toolchain">0.2 The toolchain: cargo, rustc, and the edition system</a></div></div>
+<h3 id="orientation-why" data-toc>0.1 Why Rust, and what it guarantees</h3>
+
+<p class="topic-desc">Rust is a systems language that guarantees memory safety and thread safety at compile time, without a garbage collector, by enforcing ownership rules in the type system.</p>
+<h4 id="orientation-why--section">The three pillars</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p><strong>Ownership</strong> means every value has exactly one owner, and the value is dropped when that owner goes out of scope. <strong>Borrowing</strong> means you can pass a reference to a value without giving up ownership, but the reference cannot outlive the owner. <strong>Lifetimes</strong> are the compile-time proof that borrowing is safe.</p>
+<h4 id="orientation-why--section-2">What Rust cannot do for you</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p>Rust will not stop you from leaking memory explicitly with <code>std::mem::forget</code>, and it will not stop logical errors: you can still return the wrong sum, or dead-lock a mutex. The guarantee is narrow and strong: no dangling pointers, no use-after-free, no data races, no buffer overflows.</p>
+<h4 id="orientation-why--section-3">A minimal safe function</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<div class="codeWrap"><pre><code>fn sum(xs: &amp;[i32]) -> i32 {
+    xs.iter().sum()
+}
+
+fn main() {
+    let xs = vec![1, 2, 3];
+    println!("{}", sum(&amp;xs)); // 6
+}
+</code></pre></div>
+<h4 id="orientation-why--section-4">Shared ownership with Rc and Arc</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<div class="codeWrap"><pre><code>use std::rc::Rc;
+let a = Rc::new(vec![1, 2, 3]);
+let b = a.clone();
+println!("a and b share: {:?}", a);
+</code></pre></div>
+
+
+<h3 id="orientation-toolchain" data-toc>0.2 The toolchain: cargo, rustc, and the edition system</h3>
+<p class="topic-desc">Rust's toolchain is two programs and one file. <code>cargo</code> builds, tests, documents, publishes and resolves dependencies; <code>rustc</code> is the compiler underneath; and <code>Cargo.toml</code> is where the package's identity, its edition and its dependency versions live. Nearly every confusing thing about a Rust project traces back to a value in that file.</p>
+
+<h4 id="orientation-toolchain-verbs">Six verbs, and what each guarantees</h4>
+<p><code>cargo new</code> creates a project with a standard layout. <code>cargo build</code> compiles; adding <code>--release</code> turns on optimisation and is the difference between a development binary and a production one. <code>cargo run</code> builds and runs in one step. <code>cargo test</code> compiles and runs the unit tests, the integration tests and the documentation tests. <code>cargo clippy</code> is the linter. <code>cargo fmt</code> rewrites the source to one canonical form.</p>
+
+<div class="codeWrap"><pre><code>$ cargo new hello
+$ cd hello
+$ cargo build            # debug profile: fast to build, slow to run
+$ cargo build --release  # optimised. THIS is what you deploy
+$ cargo run
+$ cargo test
+$ cargo clippy
+$ cargo fmt
+$ cargo doc --open
+$ cargo add serde        # adds a dependency and edits Cargo.toml
+$ cargo tree             # the full dependency graph, transitive
+</code></pre></div>
+
+<h4 id="orientation-toolchain-edition">Why the edition matters more than it looks</h4>
+<p>An edition is a set of language rules versioned separately from the compiler. A crate declaring <code>edition = "2018"</code> compiles with today's rustc under 2018 semantics, so it keeps working when the language changes underneath it. Omitting the field defaults to 2015, which disables every post-2015 feature in your code. Editions in order are 2015, 2018 (module system rework, <code>async</code>/<code>await</code>, <code>dyn Trait</code>), 2021 (closures capturing disjoint fields, prelude additions) and 2024.</p>
+
+<div class="codeWrap"><pre><code># Cargo.toml
+[package]
+name    = "billing"
+version = "1.4.0"
+edition = "2021"     # NEVER omit this. The 2015 default disables
+                     # async, dyn, the 2018 module paths, and more.
+
+[dependencies]
+serde      = { version = "1", features = ["derive"] }
+tokio      = { version = "1", features = ["full"] }
+anyhow     = "1"
+
+[dev-dependencies]
+criterion  = "0.5"   # only for tests, not in the shipped binary
+
+[profile.release]
+lto         = true   # link-time optimisation
+codegen-units = 1
+opt-level   = 3
+panic       = "abort"  # smaller binary, no unwinding. NOT if you
+                       # catch panics for a graceful shutdown
+</code></pre></div>
+
+<h4 id="orientation-toolchain-profiles">The profiles, and why a debug binary is not just slower</h4>
+<p>Cargo has four built-in profiles and they differ in more than speed. The debug profile enables <code>debug_assertions</code> and integer overflow checks, both of which are <em>removed</em> in release — so an arithmetic bug that panics in development silently wraps in production. It also generates no inlining and no optimisation, so debug timings are meaningless. This is the single most common way a Rust service passes its tests and fails in production, and the fix is a test suite that also runs against a release build.</p>
+
+<div class="codeWrap"><pre><code>fn main() {
+    let x: u8 = 255;
+    println!("{}", x + 1);   // debug: panics. overflow detected.
+                             // release: prints 0. wraps silently.
+}
+
+// catch it in CI, not in production:
+$ cargo test                                    # debug only
+$ cargo test --release                          # the one that matters
+$ cargo clippy -- -D warnings
+$ cargo fmt -- --check                          # fails if unformatted
+</code></pre></div>
+
+<h4 id="orientation-toolchain-musl">Cross-compilation and musl</h4>
+<p>Cross-compiling needs no toolchain packages, because rustc is the whole compiler. The target is selected by <code>--target</code>, and for Linux you will almost always want <code>x86_64-unknown-linux-musl</code> rather than the gnu target, because musl produces a statically linked binary with no glibc version dependency — which is what makes a single artifact portable across distributions and inside a minimal container.</p>
+
+<div class="codeWrap"><pre><code>$ rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
+
+$ cargo build --release --target x86_64-unknown-linux-musl
+$ file target/x86_64-unknown-linux-musl/release/billing
+# ELF 64-bit LSB pie executable, x86-64, statically linked
+
+$ ls -lh target/*/release/billing
+# one binary per target, no separate runtime, no shared libraries
+# to install. Copy it to the host and run it.
+</code></pre></div>
+
+<h4 id="orientation-toolchain-rustup">What rustup manages, and what cargo does not</h4>
+<p>There are two tools and the division is easy to state. <code>rustup</code> manages toolchains: which compiler versions are installed, which is the default, and which targets are available for each. <code>cargo</code> manages one project: its dependencies, its profiles, its build script, and its output. A common confusion is looking for <code>cargo</code> subcommands that are actually rustup commands — installing a toolchain is <code>rustup toolchain install nightly</code>, not a cargo operation at all.</p>
+
+<div class="codeWrap"><pre><code>$ rustup show                       # active toolchain and targets
+active toolchain
+stable-x86_64-pc-windows-msvc (default)
+stable-x86_64-unknown-linux-gnu
+stable-x86_64-unknown-linux-musl
+
+$ rustup toolchain install 1.78.0
+$ cargo +1.78.0 build               # build with that specific toolchain
+$ rustup component add clippy rustfmt
+$ rustup default nightly             # a team should pin ONE version
+</code></pre></div>
+
+<p>Three disciplines: <strong>always set <code>edition</code> in Cargo.toml,</strong> because the 2015 default silently disables most of the language and produces error messages that assume you know things you have no way to know; <strong>run <code>cargo test --release</code> as well as the debug suite,</strong> because debug assertions and overflow checks are removed in release and the bug they catch is the one that reaches users; and <strong>build Linux binaries against musl,</strong> because a statically linked artifact is the difference between one file and a dependency on the host's glibc version.</p>
+</section>
+
+<section class="chapter">
+<h2 id="ch1" data-toc>1 · Ownership, Borrowing and Lifetimes</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 · Ownership, Borrowing and Lifetimes</button><div class="ch-toc-list"><a href="#ch1-ownership">1.1 Ownership: the three rules every Rust type obeys</a><a href="#ch1-lifetime">1.2 Lifetimes: the annotation that proves a reference is valid</a></div></div>
+<h3 id="ch1-ownership" data-toc>1.1 Ownership: the three rules every Rust type obeys</h3>
+
+<p class="topic-desc">Every value in Rust is owned by exactly one variable, and when that variable goes out of scope the value is dropped. Assignment moves ownership; no other language has this exact semantics.</p>
+<h4 id="ch1-ownership--section">What move means, and what clone means</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p><strong>Move is the default for heap types</strong> — String, Vec, Box, Rc. <strong>Clone is deep and explicit</strong> — <code>s.clone()</code> copies the buffer. <strong>Copy types are bitwise-copied</strong> — integers, bools, chars, tuples of Copy types. Then <strong>the four rules that follow,</strong> and each is a requirement. <strong>A function parameter of type <code>String</code> consumes the string,</strong> so the caller loses the value. <strong>Returning a value moves ownership back to the caller,</strong> so a function can hand back what it took. <strong>A struct's fields are moved independently,</strong> so you can move one field out of a struct and keep the others. And <strong>Destructuring a value moves all of its fields</strong> — which is why pattern matching on a String is destructive unless you borrow first. Then <strong>the three things that go wrong,</strong> and each is a mechanism. <strong>Using a value after passing it to a function,</strong> which is the move error. <strong>Forgetting that reborrowing a mutable reference splits it,</strong> so both the old and new reference cannot be used. And <strong>Cloning in a hot loop to satisfy the borrow checker,</strong> which allocates every iteration when a restructure would have cost nothing. Then <strong>the two practices,</strong> and both are disciplines. <strong>Design ownership so that lifetimes are scopes, not scopes with exceptions,</strong> because the compiler proves it from the braces. And <strong>Prefer reading the ownership docs over fighting the borrow checker,</strong> because it is always right about the mechanics if not always about the ergonomics.</p>
+<div class="codeWrap"><pre><code>/* OWNERSHIP IS TREE-STRUCTURED. One owner, and every value is a
+   node in the tree that gets dropped when its owner drops.
+   This is why Rust can deallocate memory automatically without
+   a garbage collector: the drop order is deterministic from the
+   scopes. */
+
+fn ownership() {
+    let s1 = String::from("hello");  // s1 owns the heap buffer
+    let s2 = s1;                      // s1's ownership MOVES to s2
+    // println!("{}", s1);           // ERROR: use of moved value
+    println!("{}", s2);               // OK: s2 is the owner now
+}
+
+fn clone_needed() {
+    let s1 = String::from("hello");
+    let s2 = s1.clone();              // DEEP copy: allocates new
+    println!("{} {}", s1, s2);        // both valid, both own theirs
+}
+
+/* Copy types: integers, bools, chars, fixed-size arrays of Copy,
+   tuples of Copy types. Assigning them SHAlLOWS: both variables
+   remain valid because both have their own copy. */
+
+fn copy_types() {
+    let x = 42;
+    let y = x;                        // x is COPIED, not moved
+    println!("{} {}", x, y);          // both valid
+}
+
+/* Which types are Copy? Ask the compiler:
+   std::mem::needs_drop::&lt;T&gt;() tells you if Drop is needed.
+   std::mem::size_of::&lt;T&gt;() tells you the stack size.
+   A type without Drop and without interior pointers is Copy. */
+
+fn works() {
+    let s = String::from("hello");
+    let len = calculate_length(&amp;s);     // BORROW: pass a reference
+    println!("{} has {} chars", s, len);  // s is still valid
+}
+
+fn calculate_length(s: &amp;String) -> usize {
+    s.len()                             // reads through the ref
+}
+
+/* A function taking &amp;String does NOT consume the string.
+   The reference is a borrow, the function promises not to
+   keep it past the call, and the caller keeps ownership. */
+</code></pre></div>
+<div class="codeWrap"><pre><code>/* THE THREE FAILURES, each invisible in C++ and caught in Rust.
+
+   1. Use after move:
+      let s = String::from("hi");
+      let t = s;
+      println!("{}", s);   // ERROR: use of moved value
+
+   2. A reference that outlives its referent:
+      let r;
+      {
+          let s = String::from("hi");
+          r = &amp;s;           // s dies here, r is dangling
+      }
+      println!("{}", r);   // ERROR: borrowed value does not live
+                            // long enough
+
+   3. Mutating while borrowing immutably:
+      let mut v = vec![1, 2, 3];
+      let first = &amp;v[0];
+      v.push(4);            // ERROR: cannot borrow as mutable
+      println!("{}", first);
+
+/* THE TWO DISCIPLINES.
+   1. If the borrow checker says no, restructure. Do not reach
+      for unsafe, Rc<RefCell<>>, or a clone in a loop as the
+      first response. Usually the right move is passing an index
+      or a key rather than a reference, so the borrow is released
+      before the mutation.
+   2. Use &amp;mut for mutating parameters and &amp;T for read-only. The
+      signature is the documentation: a &amp;mut parameter promises
+      the function will change the value, and the caller is
+      prepared for that. */</code></pre></div>
+
+
+<h3 id="ch1-lifetime" data-toc>1.2 Lifetimes: the annotation that proves a reference is valid</h3>
+
+<p class="topic-desc">A lifetime is a name for the scope a reference is valid, and the compiler infers lifetimes in most cases — but when a function returns a reference derived from a parameter, the compiler needs an annotation to know which parameter's lifetime the result inherits.</p>
+<h4 id="ch1-lifetime--section">When the compiler needs you to say it</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p><strong>Lifetime elision covers most cases,</strong> so a function taking one reference parameter and returning a reference has its lifetime inferred. <strong>But if a function takes two reference parameters,</strong> the compiler cannot know which one the result borrows from, so you must annotate it. Then <strong>the two rules that follow,</strong> and each is a requirement. <strong>The result of a function that returns a reference must be valid for at least as long as every input reference it borrows from,</strong> and the lifetime parameter links them. <strong>A struct holding a reference must carry the same lifetime.</strong> Then <strong>the three things that go wrong,</strong> and each is a mechanism. <strong>Omitting lifetimes on a struct with a reference field,</strong> which the compiler rejects. <strong>Using a shared reference after a mutable one exists,</strong> which is a compile error. And <strong>Returning a reference to a temporary,</strong> which is the most common lifetime error and the one the compiler explains well: "borrowed value does not live long enough". Then <strong>the two practices,</strong> and both are disciplines. <strong>Name the lifetime for what it is,</strong> — <code>'buffer</code>, <code>'row</code>, <code>'text</code> — rather than <code>'a</code>, <code>'b</code>. And <strong>If you find yourself fighting to make the lifetimes work,</strong> the fix is usually to restructure so the reference is not returned — return an owned value, an index, or a key.</p>
+<div class="codeWrap"><pre><code>/* Lifetime elision rules, in order:
+   1. Each reference parameter gets its own lifetime.
+   2. If there is exactly one input lifetime, it is given to all
+      output references.
+   3. If there are multiple input lifetimes but one is &amp;self or
+      &amp;mut self, the output gets self's lifetime.
+
+   When none of these apply, the compiler requires an annotation.
+   This happens when a function takes two reference parameters and
+   returns a reference. */
+
+// ELIDED: one input, one output — the compiler infers.
+fn longest(x: &amp;str) -> &amp;str {
+    x   // elided lifetime: &amp;str with the same lifetime as x
+}
+
+// ANNOTATION REQUIRED: two inputs, the compiler cannot decide.
+fn longest_annotated<'a>(x: &amp;'a str, y: &amp;'a str) -> &amp;'a str {
+    if x.len() > y.len() { x } else { y }
+}   // The 'a means: the returned reference is valid for at most
+   // as long as BOTH x and y are valid.
+
+/* A struct holding a reference MUST declare the lifetime:
+   struct ImportantExcerpt<'a> {
+       part: &amp;'a str,
+   }
+   The 'a is a promise: ImportantExcerpt does not outlive the
+   string it borrows from.                                   */
+
+/* The most common lifetime error: returning a reference to a
+   temporary. */
+fn bad() -> &amp;String {
+    let s = String::from("hello");
+    &amp;s                    // ERROR: borrowed value does not live
+}                         // long enough — s drops here, &amp;s dangles
+
+/* The fix: return the owned value. The caller does not need a
+   reference into your locals. */
+fn good() -> String {
+    String::from("hello")   // moved to caller, alive there
+}</code></pre></div>
+<div class="codeWrap"><pre><code>/* THE THREE FAILURES, restated.
+   1. Struct holding a reference without a lifetime parameter:
+      struct Bad { part: &amp;str }   // ERROR: missing lifetime
+   2. A shared borrow after a mutable borrow exists:
+      let r1 = &amp;mut x;
+      let r2 = &amp;x;                // ERROR: cannot borrow as immutable
+   3. Returning a reference to a local:
+      fn bad() -> &amp;T { &amp;T{} }      // ERROR
+
+/* THE TWO DISCIPLINES.
+   1. Name the lifetime for its role, not its position:
+      fn parse<'input>(text: &amp;'input str) -> &amp;'input str { ... }
+      fn first<'buffer>(b: &amp;'buffer Buffer) -> &amp;'buffer Row { ... }
+   2. If the lifetimes are fighting you, restructure. The typical
+      fixes, in order of how often they work:
+      - return an owned value (clone)
+      - return an index or key instead of a reference
+      - take the reference as a parameter and write through it
+      - split the function so the reference does not cross the
+        function boundary                             */</code></pre></div>
+
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 · Traits, Generics and Concurrency</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 · Traits, Generics and Concurrency</button><div class="ch-toc-list"><a href="#ch2-trait">2.1 Traits: shared behaviour without inheritance</a><a href="#ch2-async">2.2 Async: the future, the executor, and the await point</a></div></div>
+<h3 id="ch2-trait" data-toc>2.1 Traits: shared behaviour without inheritance</h3>
+
+<p class="topic-desc">A trait in Rust is a collection of methods that a type can implement, and it is the mechanism for polymorphism without a base class. A type can implement any number of traits, and a trait can require other traits.</p>
+<h4 id="ch2-trait--section">What a trait is, and what dyn Trait is</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p><strong>A trait defines a set of methods that a type must provide,</strong> and a type can implement many traits. <strong><code>impl Trait for Type</code> is explicit,</strong> — there is no implicit trait satisfaction like Go's interfaces. <strong>A generic function with a trait bound is monomorphized at compile time,</strong> — the compiler generates a specialised version for each type that satisfies the bound, which is why it has no runtime cost. <strong><code>dyn Trait</code> is the dynamically-dispatched version,</strong> stored behind a pointer, and it exists when you need to hold several different implementations of the same trait in one collection. Then <strong>the three rules that follow,</strong> and each is a requirement. <strong>A trait object — <code>Box&lt;dyn Trait&gt;</code> — can only hold the methods of one trait,</strong> so a collection needs the trait, not the type. <strong>Implementing a trait for a type you do not own requires a wrapper,</strong> unless the trait is one you define — the orphan rule. And <strong>A <code>where</code> clause keeps complex bounds readable,</strong> and it is not optional once you have more than two bounds. Then <strong>the three things that go wrong,</strong> and each is a mechanism. <strong>Forgetting the <code>dyn</code> keyword and trying to store a trait in a Vec,</strong> which the compiler rejects. <strong>Not implementing Send or Sync on a type used across threads,</strong> which the compiler rejects when you spawn a thread. And <strong>Using a <code>where</code> clause with <code>Self</code> in the bound,</strong> which the compiler sometimes cannot resolve and which usually means the bound should be on the function's generics rather than the trait. Then <strong>the two practices,</strong> and both are disciplines. <strong>Define traits in the module that owns the behaviour,</strong> not in the module that implements it, so the dependency arrow points from the implementer to the trait. And <strong>Use <code>dyn Trait</code> only when the set of types is genuinely open,</strong> and generics when it is not.</p>
+<div class="codeWrap"><pre><code>/* A TRAIT is like a Go interface but explicit: a type says it
+   implements a trait, and the compiler checks. */
+
+trait Draw {
+    fn draw(&amp;self);
+    fn bounding_box(&amp;self) -> (f64, f64, f64, f64) {
+        // default method: implementors may override
+        (0.0, 0.0, 100.0, 100.0)
+    }
+}
+
+struct Circle { x: f64, y: f64, r: f64 }
+
+impl Draw for Circle {
+    fn draw(&amp;self) {
+        println!("Drawing a circle at ({}, {}) with radius {}", self.x, self.y, self.r);
+    }
+}
+
+/* GENERIC with a trait bound: monomorphized per type. */
+fn render&amp;lt;T: Draw&amp;gt;(item: &amp;T) {
+    item.draw();
+}
+
+/* DYNAMIC with dyn Trait: stored behind a pointer. */
+fn render_dyn(item: &amp;dyn Draw) {
+    item.draw();
+}
+
+/* Why monomorphization matters:
+   render(&amp;circle)  →  the compiler generates fn render_Circle() with
+                      Circle's draw() inlined. No virtual table, no
+                      indirection. The cost is code size: N types
+                      → N specialised copies of the function.  */
+
+/* The orphan rule: you can implement YOUR trait for THEIR type, or
+   THEIR trait for YOUR type, but NOT their trait for their type.
+   fn impl Display for Vec&amp;lt;i32&amp;gt;  →  ERROR: Display and Vec are
+   both foreign. The workaround is a newtype: */
+struct MyVec(Vec&amp;lt;i32&amp;gt;);
+impl std::fmt::Display for MyVec {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
+    }
+}</code></pre></div>
+<div class="codeWrap"><pre><code>/* THE THREE FAILURES.
+   1. Vec&amp;lt;Box&amp;lt;dyn Draw&amp;gt;&amp;gt; without Box: the compiler says "the size
+      of dyn Draw cannot be known at compile time", and a Box is
+      the usual fix.
+   2. Spawning a thread with a non-Send closure:
+      std::thread::spawn(|| { let rc = Rc::new(5); });
+      // ERROR: Rc&amp;lt;i32&amp;gt; is not Send.
+      Use Arc&amp;lt;Mutex&amp;lt;T&amp;gt;&amp;gt; instead.
+   3. A trait bound with Self where the compiler cannot infer it.
+
+/* THE TWO DISCIPLINES.
+   1. Define the trait where the BEHAVIOUR lives, not where the
+      TYPE lives. Otherwise the dependency arrow goes backwards.
+   2. Use generics with trait bounds for closed sets of types,
+      dyn Trait for open sets. A generic version is always faster
+      because it is monomorphized. */</code></pre></div>
+
+
+<h3 id="ch2-async" data-toc>2.2 Async: the future, the executor, and the await point</h3>
+
+<p class="topic-desc">Async Rust uses the async keyword to mark functions that return futures, an executor to poll those futures, and the await keyword to yield control at points where the result is not ready.</p>
+<h4 id="ch2-async--section">The three pieces</h4>
+<p>Every shortcoming in this area comes from one of two places: the tool being used makes a promise it does not keep, or the surrounding process is not checking that promise at the boundary. Both are the same mistake in different clothes — treating a silent tool as an honest one. Fix the silence first, and the debugging gets much quieter.</p>
+<p><strong><code>async fn</code> returns a <code>Future</code>,</strong> and the future does nothing until it is awaited. <strong>An executor polls futures,</strong> — tokio is the most common one — and spawns tasks that map onto OS threads. <strong><code>await</code> is the yield point,</strong> where the task gives up its thread and the executor runs another ready task. Then <strong>the three rules that follow,</strong> and each is a requirement. <strong>Hold no non-Send data across an await,</strong> because the task may move to a different thread. <strong>Use <code>tokio::spawn</code> for concurrent work and <code>tokio::join!</code> for waiting on both,</strong> because a sequential await is a blocking await. <strong>Never call a blocking function inside an async block,</strong> because it blocks the executor thread for every other task on that thread. Then <strong>the three things that go wrong,</strong> and each is a mechanism. <strong>A lock guard held across an await,</strong> which is not Send and which the compiler rejects. <strong>Calling <code>std::thread::sleep</code> inside an async function,</strong> which blocks the executor. And <strong>Not awaiting a future,</strong> which means it never runs. Then <strong>the one discipline.</strong> <strong>The executor is what makes async real,</strong> and without one the futures are a pile of state machines that never get polled. Tokio is the standard choice, and its runtime must be initialised with <code>#[tokio::main]</code>.</p>
+<div class="codeWrap"><pre><code>/* async fn returns an impl Future. The function body does NOT
+   execute until awaited. */
+
+async fn fetch_data(url: &amp;str) -> Result&amp;lt;String, std::io::Error&amp;gt; {
+    let resp = reqwest::get(url).await?;
+    resp.text().await
+}
+
+/* The compiler transforms this into a state machine:
+   - initial state: not started
+   - after first await: waiting on reqwest::get
+   - after second await: waiting on resp.text
+   - final: done, returns Result
+  
+   Each state is a struct. The enum of states becomes the Future.
+   This is WHY Rust async has no runtime cost when not awaited:
+   polling an unpolled future is just a match on the state. */
+
+/* The three pieces:
+   1. async fn     → returns Future
+   2. executor     → polls Future (tokio)
+   3. await        → yield point
+   
+   #[tokio::main] initialises the runtime. */
+
+#[tokio::main]
+async fn main() {
+    let data = fetch_data("https://example.com").await;
+    match data {
+        Ok(text) => println!("{}", text),
+        Err(e) => eprintln!("Error: {}", e),
+    }
+}
+
+/* The three rules.
+   1. HOLD NO NON-SEND ACROSS await. This is not a suggestion:
+      the compiler rejects it. A MutexGuard is the classic case.
+   2. tokio::spawn for concurrent, tokio::join! for both. */
+use tokio;
+async fn concurrent() {
+    let fut1 = fetch_data("url1");
+    let fut2 = fetch_data("url2");
+
+    // BAD: sequential — awaits one, then the other
+    let r1 = fut1.await;
+    let r2 = fut2.await;
+
+    // GOOD: concurrent — both run, await waits for both
+    let (r1, r2) = tokio::join!(fut1, fut2);
+}
+/* 3. NEVER BLOCK INSIDE ASYNC. std::thread::sleep blocks the
+   executor thread, freezing every other task on that thread.
+   Use tokio::time::sleep instead: it yields the executor on
+   await. */</code></pre></div>
+<div class="codeWrap"><pre><code>/* THE THREE FAILURES.
+   1. MutexGuard held across await:
+      let mut guard = mutex.lock().unwrap();
+      some_async_fn().await;     // ERROR: guard is not Send
+      drop(guard);
+   Fix: drop the guard BEFORE the await, or use tokio::sync::Mutex.
+
+   2. Blocking inside async:
+      async fn bad() {
+          std::thread::sleep(Duration::from_secs(1));  // blocks
+      }
+   Use tokio::time::sleep(Duration::from_secs(1)).await.
+
+   3. Not awaiting a future:
+      fetch_data("url");      // future never polled, never runs
+   The compiler does not warn because futures are just values.
+   Use let _ = or await it.
+
+/* THE DISCIPLINE.
+   An executor makes async real. Tokio is the convention. The
+   runtime initialises with #[tokio::main], spawns tasks with
+   tokio::spawn, and its reactor maps I/O events to futures via
+   epoll (Linux), kqueue (macOS), IOCP (Windows). */</code></pre></div>
+
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Rust Programming.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

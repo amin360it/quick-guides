@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript - Types to Patterns Guide</title>
+<meta name="description" content="This guide is a complete, offline introduction to TypeScript, moving you from your first .ts file to advanced…. 13 chapters, 72 topics and 50 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/typescript.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="TypeScript - Types to Patterns Guide">
+<meta property="og:description" content="This guide is a complete, offline introduction to TypeScript, moving you from your first .ts file to advanced…. 13 chapters, 72 topics and 50 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/typescript.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="TypeScript - Types to Patterns Guide">
+<meta name="twitter:description" content="This guide is a complete, offline introduction to TypeScript, moving you from your first .ts file to advanced…. 13 chapters, 72 topics and 50 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/typescript.html#article","headline":"TypeScript - Types to Patterns Guide","name":"TypeScript - Types to Patterns Guide","description":"This guide is a complete, offline introduction to TypeScript, moving you from your first .ts file to advanced…. 13 chapters, 72 topics and 50 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/typescript.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/typescript.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"TypeScript - Types to Patterns Guide","item":"https://amin360it.github.io/quick-guides/typescript.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">TypeScript</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This TypeScript Guide</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use all course long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Why TypeScript &amp; Project Setup</a><ul><li><a href="#ch1-problems" data-target="ch1-problems">1.1 The problems TypeScript solves</a></li><li><a href="#ch1-typed" data-target="ch1-typed">1.2 Static versus dynamic typing</a></li><li><a href="#ch1-install" data-target="ch1-install">1.3 Installing and compiling</a></li><li><a href="#ch1-first" data-target="ch1-first">1.4 Your first file: compile versus run</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Basic Types, Inference &amp; Assertions</a><ul><li><a href="#ch2-primitives" data-target="ch2-primitives">2.1 Primitives and arrays</a></li><li><a href="#ch2-tuples" data-target="ch2-tuples">2.2 Tuples and the special types</a></li><li><a href="#ch2-inference" data-target="ch2-inference">2.3 Inference versus annotations</a></li><li><a href="#ch2-assertion" data-target="ch2-assertion">2.4 Type assertions and satisfies</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Functions, Overloads &amp; this</a><ul><li><a href="#ch3-signatures" data-target="ch3-signatures">3.1 Parameter and return types</a></li><li><a href="#ch3-params" data-target="ch3-params">3.2 Optional, default and rest parameters</a></li><li><a href="#ch3-arrows" data-target="ch3-arrows">3.3 Arrow functions and higher-order types</a></li><li><a href="#ch3-overloads" data-target="ch3-overloads">3.4 Function overloads</a></li><li><a href="#ch3-this" data-target="ch3-this">3.5 Typing this in functions</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Objects, Interfaces &amp; Type Aliases</a><ul><li><a href="#ch4-inline" data-target="ch4-inline">4.1 Object types, inline and named</a></li><li><a href="#ch4-iftype" data-target="ch4-iftype">4.2 Interface versus type alias</a></li><li><a href="#ch4-optional" data-target="ch4-optional">4.3 Optional, readonly and index signatures</a></li><li><a href="#ch4-extends" data-target="ch4-extends">4.4 Extending and declaration merging</a></li><li><a href="#ch4-excess" data-target="ch4-excess">4.5 Excess property checks</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Unions, Intersections &amp; Narrowing</a><ul><li><a href="#ch5-unions" data-target="ch5-unions">5.1 Union and intersection types</a></li><li><a href="#ch5-narrowing" data-target="ch5-narrowing">5.2 Narrowing with typeof, instanceof and in</a></li><li><a href="#ch5-discriminated" data-target="ch5-discriminated">5.3 Discriminated unions</a></li><li><a href="#ch5-guards" data-target="ch5-guards">5.4 Type guards and assertion functions</a></li><li><a href="#ch5-exhaustive" data-target="ch5-exhaustive">5.5 Exhaustiveness with never</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Generics</a><ul><li><a href="#ch6-functions" data-target="ch6-functions">6.1 Generic functions</a></li><li><a href="#ch6-constraints" data-target="ch6-constraints">6.2 Constraints and multiple type parameters</a></li><li><a href="#ch6-interfaces" data-target="ch6-interfaces">6.3 Generic interfaces and classes</a></li><li><a href="#ch6-keyof" data-target="ch6-keyof">6.4 Default type parameters and keyof</a></li><li><a href="#ch6-patterns" data-target="ch6-patterns">6.5 Common generic patterns</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Classes, Access Modifiers &amp; Decorators</a><ul><li><a href="#ch7-classes" data-target="ch7-classes">7.1 Typing a class</a></li><li><a href="#ch7-modifiers" data-target="ch7-modifiers">7.2 Access modifiers and readonly</a></li><li><a href="#ch7-abstract" data-target="ch7-abstract">7.3 Abstract classes and implements</a></li><li><a href="#ch7-params" data-target="ch7-params">7.4 Parameter properties and static members</a></li><li><a href="#ch7-decorators" data-target="ch7-decorators">7.5 Decorators overview</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Modules, Declaration Files &amp; @types</a><ul><li><a href="#ch8-modules" data-target="ch8-modules">8.1 ES module syntax</a></li><li><a href="#ch8-typeonly" data-target="ch8-typeonly">8.2 Type-only imports and exports</a></li><li><a href="#ch8-dts" data-target="ch8-dts">8.3 Declaration files and DefinitelyTyped</a></li><li><a href="#ch8-ambient" data-target="ch8-ambient">8.4 Ambient declarations and augmentation</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Advanced Types</a><ul><li><a href="#ch9-mapped" data-target="ch9-mapped">9.1 Mapped types</a></li><li><a href="#ch9-conditional" data-target="ch9-conditional">9.2 Conditional types and infer</a></li><li><a href="#ch9-template" data-target="ch9-template">9.3 Template literal types and key remapping</a></li><li><a href="#ch9-utility" data-target="ch9-utility">9.4 The built-in utility types</a></li><li><a href="#ch9-readonly" data-target="ch9-readonly">9.5 Readonly arrays and tuples</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · TypeScript with Frameworks</a><ul><li><a href="#ch10-react" data-target="ch10-react">10.1 Typing React props and hooks</a></li><li><a href="#ch10-vue" data-target="ch10-vue">10.2 Typing Vue props and emits</a></li><li><a href="#ch10-node" data-target="ch10-node">10.3 Typing Node and Express handlers</a></li><li><a href="#ch10-zod" data-target="ch10-zod">10.4 Runtime validation with Zod</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · Tooling &amp; Migration</a><ul><li><a href="#ch11-tsconfig" data-target="ch11-tsconfig">11.1 The tsconfig options that matter</a></li><li><a href="#ch11-build" data-target="ch11-build">11.2 Building: tsc, esbuild and swc</a></li><li><a href="#ch11-eslint" data-target="ch11-eslint">11.3 ESLint and Prettier</a></li><li><a href="#ch11-migrate" data-target="ch11-migrate">11.4 Migrating JavaScript incrementally</a></li><li><a href="#ch11-declaration" data-target="ch11-declaration">11.5 Emitting declarations for libraries</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Quick Reference &amp; Glossary</a><ul><li><a href="#app-basic" data-target="app-basic">A.1 Basic types cheat sheet</a></li><li><a href="#app-utility" data-target="app-utility">A.2 Utility types cheat sheet</a></li><li><a href="#app-tsconfig" data-target="app-tsconfig">A.3 tsconfig options cheat sheet</a></li><li><a href="#app-narrowing" data-target="app-narrowing">A.4 Narrowing operators cheat sheet</a></li><li><a href="#app-glossary" data-target="app-glossary">A.5 Glossary</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">TypeScript</span>
+      <span class="am-band-s">13 chapters &middot; 72 topics &middot; 50 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This TypeScript Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This TypeScript Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The right mindset</a><a href="#orientation-tools">Tools you will use all course long</a></div></div>
+    <p class="topic-desc">This guide is a complete, offline introduction to TypeScript, moving you from your first .ts file to advanced type patterns. You work through eleven chapters and exercises in order, typing each chapter’s copy-ready code yourself so the syntax becomes muscle memory. Take it chapter by chapter and rebuild the examples by hand.</p>
+    <p>This is a complete, self-paced path through <strong>TypeScript</strong>, from static typing fundamentals to advanced types, framework integration and migration. Everything runs in a single HTML file — no internet required, progress is saved in your browser.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">The guide is organised into three parts across eleven chapters, followed by exercises and an appendix. Each chapter ends with copy-ready code that you should type out by hand rather than paste. Work sequentially because later chapters build directly on the types introduced earlier, and keep the appendix open for a quick reference.</p>
+    <ul>
+      <li><strong>Part I (Ch. 1–3)</strong> — foundations: setup, basic types, inference, and functions.</li>
+      <li><strong>Part II (Ch. 4–9)</strong> — the type system: objects, unions, generics, classes, modules and advanced types.</li>
+      <li><strong>Part III (Ch. 10–11)</strong> — real projects: frameworks, tooling, and migrating JavaScript.</li>
+      <li>Every chapter ends with exercises. Code is copy-ready; type it rather than pasting to build muscle memory.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset</h3>
+    <p class="topic-desc">Adopt the mindset that types are documentation the compiler enforces on your behalf. Rather than treating type errors as annoyances, see them as TypeScript catching mistakes you would otherwise ship. Let the compiler act as your safety net so runtime bugs surface as compile-time messages before anything reaches users.</p>
+    <p>Think of TypeScript as <em>documentation that the compiler enforces</em>. The type you write on a function tells every future reader what it accepts and returns — and the compiler checks that the code honours it. The type system is the point, not the syntax.</p>
+    <div class="tip"><p>Keep the official docs open beside this guide at <code>typescriptlang.org/docs</code>. This guide explains the why and the sequence; the docs are the exhaustive reference.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will use all course long</h3>
+    <p class="topic-desc">Lists the tools you will use all course long, starting with Node.js to run JavaScript, the tsc compiler for type checking and output, and your editor’s IntelliSense for instant feedback. Install them once at the start and the same setup carries you through every chapter. npm manages TypeScript itself and any packages you add.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Node.js 18+</td><td>Runtime for running compiled JavaScript</td></tr>
+      <tr><td>TypeScript (tsc)</td><td>The compiler and type checker (<code>npm i -g typescript</code>)</td></tr>
+      <tr><td>tsx / ts-node</td><td>Run .ts files directly during development</td></tr>
+      <tr><td>Editor (VS Code)</td><td>IntelliSense, refactoring and inline errors</td></tr>
+      <tr><td>npm</td><td>Package and dependency management</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Why TypeScript &amp; Project Setup</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Why TypeScript &amp; Project Setup</button><div class="ch-toc-list"><a href="#ch1-problems">1.1 The problems TypeScript solves</a><a href="#ch1-typed">1.2 Static versus dynamic typing</a><a href="#ch1-install">1.3 Installing and compiling</a><a href="#ch1-first">1.4 Your first file: compile versus run</a></div></div>
+    <p class="topic-desc">Explains the problems TypeScript solves and gets a compiling project running on your machine. You install TypeScript, create a tsconfig.json, and write your first typed .ts file. You finish with a working build command that compiles your file to JavaScript you can actually run with Node.</p>
+    <p>JavaScript is a dynamic language: anything can hold anything, and mistakes surface at runtime, often in production. TypeScript adds a compile-time type system that catches whole classes of bugs before they ship, while emitting the same JavaScript you already know.</p>
+    <h3 id="ch1-problems" data-toc>1.1 The problems TypeScript solves</h3>
+    <p class="topic-desc">Shows the runtime errors that static typing catches before deployment. The most common bugs are renamed properties, wrong data shapes, and missing null checks, all of which a compiler can detect. Annotating your data and enabling strict null checks turns these silent failures into loud compile-time errors.</p>
+    <div class="codeWrap"><pre><code>// plain JS — fails at runtime, on a real user's machine
+function greet(user) {
+    return user.firstName;          // TypeError if user is null or misspelled
+}
+greet(undefined);
+
+// TypeScript — same idea, error at compile time
+function greet(user: { firstName: string }) {
+    return user.firstName;
+}
+greet(undefined);                   // Error: undefined not assignable to the shape</code></pre></div>
+    <p class="code-note">The JavaScript version crashes when it runs; TypeScript flags the same mistake the moment you type it, before anything reaches a user.</p>
+    <h3 id="ch1-typed" data-toc>1.2 Static versus dynamic typing</h3>
+    <p class="topic-desc">Contrasts static type checking at compile time with dynamic checking at run time. Dynamic languages verify values while the program runs, but static typing checks before anything executes. Because the checks happen ahead of deployment, errors surface earlier and the compiled output carries no runtime cost.</p>
+    <table>
+      <tr><th>Property</th><th>Dynamic (plain JS)</th><th>Static (TypeScript)</th></tr>
+      <tr><td>When errors appear</td><td>At run time</td><td>At compile time</td></tr>
+      <tr><td>Runtime overhead</td><td>None</td><td>None — types are erased</td></tr>
+      <tr><td>Autocomplete</td><td>Heuristic</td><td>Exact, from your code</td></tr>
+      <tr><td>Files ship as</td><td>.js</td><td>.js (types erased)</td></tr>
+    </table>
+    <h3 id="ch1-install" data-toc>1.3 Installing and compiling</h3>
+    <p class="topic-desc">Installs TypeScript in a project with npm, then uses the tsc command to compile a folder of files into JavaScript. A single tsconfig.json file controls the whole toolchain, including the target version, the output directory, and strictness. The same configuration drives every build command you run.</p>
+    <div class="codeWrap"><pre><code>npm install -g typescript
+tsc --version           # v5.x
+
+mkdir hello &amp;&amp; cd hello
+npm init -y
+npm install --save-dev typescript @types/node
+npx tsc --init          # generates tsconfig.json</code></pre></div>
+    <p class="code-note">Installing TypeScript gives you the tsc compiler, and npx tsc --init writes a default tsconfig.json that controls how your project compiles.</p>
+    <h3 id="ch1-first" data-toc>1.4 Your first file: compile versus run</h3>
+    <p class="topic-desc">Writes a typed .ts file and compiles it to JavaScript, then runs the output with Node. Browser and Node never see your types because tsc erases them during compilation. The source you edit is TypeScript; the code you ship and run is plain JavaScript.</p>
+    <div class="codeWrap"><pre><code>// greet.ts
+const name: string = 'Aria';
+const visits: number = 42;
+console.log(`Hello ${name}, visit ${visits}`);
+
+// terminal
+npx tsc greet.ts            # emits greet.js
+node greet.js               # Hello Aria, visit 42
+
+// dev loop — run .ts directly, no emit step
+npm install tsx
+npx tsx greet.ts            # executes the file with no compile step</code></pre></div>
+    <p class="code-note">tsc emits plain JavaScript that Node runs; tsx skips the emit step and executes .ts directly, which keeps the inner dev loop fast.</p>
+    <div class="ex"><h4 id="ch1-first--exercises-1">Exercises 1</h4><ol>
+      <li>Install TypeScript and print <code>tsc --version</code>.</li>
+      <li>Create a tsconfig.json with <code>npx tsc --init</code>.</li>
+      <li>Write a few typed constants, compile them, and run the output with node.</li>
+      <li>Recompile after assigning a string to a number-typed variable and read the error.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Basic Types, Inference &amp; Assertions</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Basic Types, Inference &amp; Assertions</button><div class="ch-toc-list"><a href="#ch2-primitives">2.1 Primitives and arrays</a><a href="#ch2-tuples">2.2 Tuples and the special types</a><a href="#ch2-inference">2.3 Inference versus annotations</a><a href="#ch2-assertion">2.4 Type assertions and satisfies</a></div></div>
+    <p class="topic-desc">Covers every built-in primitive type, how TypeScript infers types from values, and the escapes of type assertions and the satisfies keyword. These form the atoms that every larger type is built from. Master these fundamentals because all later chapters compose them into structures, functions, and generics.</p>
+    <p>Before shapes, unions and generics comes the alphabet: strings, numbers, booleans, arrays and a handful of special types. Learn which type means what, and the rest of the type system reads like prose.</p>
+    <h3 id="ch2-primitives" data-toc>2.1 Primitives and arrays</h3>
+    <p class="topic-desc">Shows the core types: string for text, number for numeric values, boolean for true and false, and arrays written like string[] with an element type followed by brackets. Annotations read left to right and match how you describe a value in English, so string[] is an array of strings.</p>
+    <div class="codeWrap"><pre><code>const title: string = 'TypeScript';   // any text
+const count: number = 12;             // integers and floats share one type
+const active: boolean = true;
+
+const tags: string[] = ['ts', 'guide'];        // array of strings
+const matrix: number[][] = [[1, 2], [3, 4]];   // array of array of numbers
+const mixed: (string | number)[] = ['a', 1];   // array that can hold either</code></pre></div>
+    <p class="code-note">Primitives use lowercase names, arrays append [], and parentheses group unions so the brackets type every element rather than one position.</p>
+    <h3 id="ch2-tuples" data-toc>2.2 Tuples and the special types</h3>
+    <p class="topic-desc">Explains fixed-size tuples written like [string, number], where order and length are part of the type, plus the special types any, unknown, never, void, null and undefined. Each special type exists for exactly one precise job, so use them deliberately and prefer unknown over any for untyped data.</p>
+    <div class="codeWrap"><pre><code>const point: [number, number] = [10, 20];   // tuple: fixed length and positions
+const named: [string, number?] = ['Aria'];  // trailing element may be absent
+
+let anything: any = 42;          // opts out of checking — avoid in new code
+let data: unknown = JSON.parse(text);   // any value, must narrow before use
+function fail(): never { throw new Error('boom'); }   // never returns
+function log(): void { console.log('no return value'); }  // returns undefined
+const maybe: string | null = null;   // null is an ordinary value</code></pre></div>
+    <p class="code-note">Tuples fix length and position, any turns checking off, unknown says the value exists but its type is unknown, never marks unreachable code, and void means no return value.</p>
+    <h3 id="ch2-inference" data-toc>2.3 Inference versus annotations</h3>
+    <p class="topic-desc">Shows when TypeScript infers types for you and when to write them explicitly. Inference is the default, so variables take their type from their initial value. Reserve explicit annotations for the contracts at your boundaries, such as function parameters, return types, and exported APIs.</p>
+    <div class="codeWrap"><pre><code>let score = 100;         // inferred as number — no annotation needed
+score = 'high';          // Error: string is not assignable to number
+
+const settings = { theme: 'dark', open: true };   // inferred object shape
+
+// annotate the boundary: what a function accepts and what it returns
+function double(n: number): number {
+    return n * 2;
+}</code></pre></div>
+    <p class="code-note">Let the compiler infer locals, and write annotations at the boundaries of your program — function parameters and returns — where the contract matters.</p>
+    <h3 id="ch2-assertion" data-toc>2.4 Type assertions and satisfies</h3>
+    <p class="topic-desc">Covers the as keyword for type assertions, the non-null operator written as a trailing exclamation mark, and the satisfies keyword for checking a shape without widening the inferred type. Assertions override the compiler’s judgment, so use them sparingly. Prefer satisfies when you want validation without losing inference.</p>
+    <div class="codeWrap"><pre><code>const input = document.getElementById('name') as HTMLInputElement;  // I know better
+const el = document.getElementById('name')!;   // non-null: it definitely exists
+
+// satisfies: check a shape WITHOUT changing its inferred literal types
+const config = {
+    port: 3000,          // inferred literal type 3000, not any number
+} satisfies Record&lt;string, number | string&gt;;
+
+config.port.toFixed(1);   // still 3000, so the number method remains available</code></pre></div>
+    <p class="code-note">as overrides the compiler when you know more than it does, ! strips null, and satisfies validates a shape while preserving the specific inferred types.</p>
+    <div class="ex"><h4 id="ch2-assertion--exercises-2">Exercises 2</h4><ol>
+      <li>Type a <code>[string, number]</code> tuple and read each element.</li>
+      <li>Take an <code>unknown</code> value from JSON and narrow it before printing it.</li>
+      <li>Use <code>satisfies</code> to validate an object while keeping one literal property.</li>
+      <li>Explain when a type assertion is justified versus a way to hide errors.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Functions, Overloads &amp; this</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Functions, Overloads &amp; this</button><div class="ch-toc-list"><a href="#ch3-signatures">3.1 Parameter and return types</a><a href="#ch3-params">3.2 Optional, default and rest parameters</a><a href="#ch3-arrows">3.3 Arrow functions and higher-order types</a><a href="#ch3-overloads">3.4 Function overloads</a><a href="#ch3-this">3.5 Typing this in functions</a></div></div>
+    <p class="topic-desc">Covers everything about typing functions: parameters, return types, arrow functions, overloads, and the this keyword. Functions are where most real contracts live in a codebase, because every call site is checked against the declared signature. Getting these annotations right types the rest of your program.</p>
+    <p>A function signature is a promise the compiler checks on both sides: it verifies callers pass the right arguments and that the body returns what it advertised. Learn to read and write these signatures and you can type any codebase.</p>
+    <h3 id="ch3-signatures" data-toc>3.1 Parameter and return types</h3>
+    <p class="topic-desc">Shows the basic function signature: typed parameters followed by a typed return value, written with the return type after the parameter list. Every annotation is checked on every call, so passing the wrong argument or expecting the wrong result is caught at compile time. Leave annotations off where inference can fill them.</p>
+    <div class="codeWrap"><pre><code>function total(items: number[], discount: number): number {
+    const sum = items.reduce((a, b) =&gt; a + b, 0);
+    return sum * (1 - discount);
+}
+total([10, 20], 0.1);       // 27 — number array, number, returns number
+total([10, 20], '10%');     // Error: string is not assignable to number</code></pre></div>
+    <p class="code-note">The signature advertises what callers may pass and what comes back; passing the wrong kind of discount is rejected before it reaches the arithmetic.</p>
+    <h3 id="ch3-params" data-toc>3.2 Optional, default and rest parameters</h3>
+    <p class="topic-desc">Shows the three ways parameters become flexible: optional parameters with a trailing question mark, default values with an equals sign, and rest parameters with three dots that gather remaining arguments into an array. Defaults and optionals overlap in effect, so prefer defaults since they also supply a value.</p>
+    <div class="codeWrap"><pre><code>function greet(name: string, punctuation = '!', excited?: boolean): string {
+    const mark = excited ? punctuation.toUpperCase() : punctuation;
+    return `Hello, ${name}${mark}`;
+}
+
+function joinAll(separator: string, ...parts: string[]): string {
+    return parts.join(separator);
+}
+joinAll('-', 'a', 'b', 'c');   // 'a-b-c' — rest collects the remaining arguments</code></pre></div>
+    <p class="code-note">Defaults make a parameter optional with a value, ? makes it optional and possibly undefined, and rest gathers the remaining arguments into a typed array.</p>
+    <h3 id="ch3-arrows" data-toc>3.3 Arrow functions and higher-order types</h3>
+    <p class="topic-desc">Types arrow functions inline and names callable types. A function type reads parameters, then a fat arrow, then the return type, so the signature describes exactly what the function takes and produces. A named type alias or interface makes that signature reusable across many variables and parameters.</p>
+    <div class="codeWrap"><pre><code>const square = (n: number): number =&gt; n * n;
+
+type Transformer&lt;T&gt; = (value: T) =&gt; T;      // a named function type
+const upper: Transformer&lt;string&gt; = (s) =&gt; s.toUpperCase();
+
+function applyTwice(fn: Transformer&lt;number&gt;, n: number): number {
+    return fn(fn(n));
+}
+applyTwice((x) =&gt; x + 1, 5);                  // 7</code></pre></div>
+    <p class="code-note">A callable type like Transformer&lt;T&gt; describes a whole family of functions, and higher-order functions pass them around like any other value.</p>
+    <h3 id="ch3-overloads" data-toc>3.4 Function overloads</h3>
+    <p class="topic-desc">Declares several call signatures for one function so the return type matches the arguments you pass. The header lists the overloads the caller may use, and the body is the broadest implementation that has to satisfy every one of them. This pattern is ideal for functions whose result depends on input shape.</p>
+    <div class="codeWrap"><pre><code>function format(input: string): string;
+function format(input: number, places: number): string;
+function format(input: string | number, places?: number): string {
+    return typeof input === 'string' ? input.trim() : input.toFixed(places);
+}
+
+format('  hi  ');       // string overload — trims and returns a string
+format(3.14159, 2);     // number overload — "3.14"</code></pre></div>
+    <p class="code-note">Overloads tell the compiler exactly what each call shape returns, while one implementation underneath handles every declared case.</p>
+    <h3 id="ch3-this" data-toc>3.5 Typing this in functions</h3>
+    <p class="topic-desc">Shows how to type the this parameter and how it drifts in callbacks. In methods this refers to the receiver, but plain callbacks can lose that binding. Timers and event handlers often need arrow functions or bind to keep this pointing exactly where you expect.</p>
+    <div class="codeWrap"><pre><code>interface Counter {
+    count: number;
+    step(this: Counter, amount: number): void;   // the caller must provide this
+}
+
+const c: Counter = {
+    count: 0,
+    step(this: Counter, amount: number) {
+        this.count += amount;
+    },
+};
+c.step(2);                       // this is c
+setInterval(() =&gt; c.step(1), 1000);   // arrow captures c, so this still works</code></pre></div>
+    <p class="code-note">Declaring this as a first fake parameter makes the compiler enforce the call-site context, and arrows or bind keep that context alive inside callbacks.</p>
+    <div class="ex"><h4 id="ch3-this--exercises-3">Exercises 3</h4><ol>
+      <li>Write a function with a default and a rest parameter, and call it two ways.</li>
+      <li>Define a <code>Transformer</code> type and a higher-order function that uses it.</li>
+      <li>Add overloads so <code>format</code> returns a trimmed string or a fixed number correctly.</li>
+      <li>Type <code>this</code> on an object method that is also used in a timer callback.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Objects, Interfaces &amp; Type Aliases</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Objects, Interfaces &amp; Type Aliases</button><div class="ch-toc-list"><a href="#ch4-inline">4.1 Object types, inline and named</a><a href="#ch4-iftype">4.2 Interface versus type alias</a><a href="#ch4-optional">4.3 Optional, readonly and index signatures</a><a href="#ch4-extends">4.4 Extending and declaration merging</a><a href="#ch4-excess">4.5 Excess property checks</a></div></div>
+    <p class="topic-desc">Shapes data with object types, interfaces and type aliases. This chapter provides the vocabulary for describing most real-world data, from configuration objects to API responses. Use interfaces for objects and public APIs, and type aliases for unions, tuples, and computed shapes.</p>
+    <p>Almost every meaningful value in a program is an object, so object typing is where the type system earns its keep. TypeScript checks objects <em>structurally</em>: what matters is the shape you have, not the name it was declared under.</p>
+    <h3 id="ch4-inline" data-toc>4.1 Object types, inline and named</h3>
+    <p class="topic-desc">Writes an object type in place and then with a name. Annotating a parameter is enough for the compiler to check every property access against the declared shape. Inline objects suit one-off uses, while a named interface or alias becomes reusable across your whole codebase.</p>
+    <div class="codeWrap"><pre><code>function printUser(user: { id: number; name: string }) {
+    console.log(user.id, user.name);
+}
+
+// named with a type alias, reusable in many places
+type User = { id: number; name: string };
+type Users = User[];   // an array of the same shape
+
+printUser({ id: 1, name: 'Aria' });</code></pre></div>
+    <p class="code-note">An inline object type works for a single signature; giving the shape a name lets every function and data structure reuse it consistently.</p>
+    <h3 id="ch4-iftype" data-toc>4.2 Interface versus type alias</h3>
+    <p class="topic-desc">Shows interfaces and type aliases doing the same job in different ways. Interfaces support extends and declaration merging and are preferred for objects and public APIs. Type aliases handle unions, tuples, and computed shapes, and can alias any type expression at all.</p>
+    <div class="codeWrap"><pre><code>interface Animal {
+    name: string;
+}
+type AnimalAlias = { name: string };   // functionally identical for a plain object
+
+// both extend, with different syntax
+interface Dog extends Animal {
+    breed: string;
+}
+type DogAlias = Animal &amp; { breed: string };   // intersection
+
+// only a type alias can name a union or a tuple
+type Status = 'idle' | 'running' | 'done';
+type Pair = [string, number];</code></pre></div>
+    <p class="code-note">For plain objects the two are largely interchangeable, but interfaces extend and merge while type aliases can name unions, tuples and computed shapes.</p>
+    <h3 id="ch4-optional" data-toc>4.3 Optional, readonly and index signatures</h3>
+    <p class="topic-desc">Adds optional and readonly markers, plus index signatures for dictionary objects. A question mark after a property name makes it optional, readonly forbids reassignment of that member, and an index signature like [key: string]: number types any key the object might hold.</p>
+    <div class="codeWrap"><pre><code>interface Config {
+    host: string;
+    port?: number;               // optional — may be omitted
+    readonly apiKey: string;     // cannot be reassigned after creation
+}
+
+type Lookup = { [key: string]: number };   // index signature: any string key
+const counts: Lookup = { apples: 3, pears: 5 };
+counts.apples = 4;               // fine — values are numbers
+counts.apples = 'x';             // Error: must be a number</code></pre></div>
+    <p class="code-note">? marks an optional field, readonly freezes the property, and an index signature types dictionary objects whose keys are only known at runtime.</p>
+    <h3 id="ch4-extends" data-toc>4.4 Extending and declaration merging</h3>
+    <p class="topic-desc">Shows interface inheritance with the extends keyword and the unique interface trait of declaration merging. One interface can extend another to add properties, and two interfaces with the same name in the same scope combine automatically. Type aliases can intersect but cannot merge like this.</p>
+    <div class="codeWrap"><pre><code>interface BaseAnimal { name: string; }
+interface Pet extends BaseAnimal { owner: string; }
+interface Pet { age: number; }            // merging: Pet now has owner AND age
+
+const pet: Pet = { name: 'Rex', owner: 'Aria', age: 3 };
+
+// declaration merging in the wild: augment framework globals
+declare global {
+    interface Window { analyticsEnabled: boolean; }
+}</code></pre></div>
+    <p class="code-note">Interfaces extend other interfaces and merge when declared twice, which is exactly how libraries and your own code augment global types like Window.</p>
+    <h3 id="ch4-excess" data-toc>4.5 Excess property checks</h3>
+    <p class="topic-desc">Explains why object literals get stricter checking than variables. A fresh literal passed directly reports extra keys it was not declared to have, catching typos such as misspelled properties. An existing variable that merely has the same shape does not trigger that check.</p>
+    <div class="codeWrap"><pre><code>interface User { id: number; name: string; }
+
+function save(user: User) {}
+
+save({ id: 1, name: 'Aria', admin: true });   // Error: 'admin' does not exist
+
+const realUser = { id: 1, name: 'Aria', admin: true };   // no error
+save(realUser);   // extra props are fine — the required shape still matches</code></pre></div>
+    <p class="code-note">Fresh object literals are checked for extra keys — a typo magnet — while variables are checked structurally, so the same extra property passes silently.</p>
+    <div class="tip"><p>This is <strong>structural typing</strong>: TypeScript asks "does the value have the shape?", not "is it an instance of X?". That is why plain objects satisfy interfaces.</p></div>
+    <div class="ex"><h4 id="ch4-excess--exercises-4">Exercises 4</h4><ol>
+      <li>Model a <code>Post</code> interface with optional and readonly fields.</li>
+      <li>Extend an interface and merge a second declaration onto it.</li>
+      <li>Trigger an excess property error, then silence it via a variable.</li>
+      <li>Write an index signature for a string-to-number key/value store.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Unions, Intersections &amp; Narrowing</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Unions, Intersections &amp; Narrowing</button><div class="ch-toc-list"><a href="#ch5-unions">5.1 Union and intersection types</a><a href="#ch5-narrowing">5.2 Narrowing with typeof, instanceof and in</a><a href="#ch5-discriminated">5.3 Discriminated unions</a><a href="#ch5-guards">5.4 Type guards and assertion functions</a><a href="#ch5-exhaustive">5.5 Exhaustiveness with never</a></div></div>
+    <p class="topic-desc">Combines types into unions and intersections, then narrows the possibilities down to one at runtime. Union means or and intersection means and, giving you either free choice or a combined shape. Narrowing is the skill that makes unions safe and practical, with the compiler verifying every case you handle.</p>
+    <p>A value often legitimately has several possible shapes: a form field is a string or a number, a fetch result is success or failure. Unions describe "one of these", and narrowing — shrinking to one branch with checks — is how the compiler lets you handle each possibility safely.</p>
+    <h3 id="ch5-unions" data-toc>5.1 Union and intersection types</h3>
+    <p class="topic-desc">Defines unions of alternatives with the pipe operator and intersections that require everything with the ampersand operator. Union is or, so the value satisfies at least one member. Intersection is and, so the value satisfies all members at once and carries every property of each.</p>
+    <div class="codeWrap"><pre><code>type Admin = { name: string; permissions: string[] };
+type Employee = { name: string; team: string };
+type AdminEmployee = Admin &amp; Employee;   // intersection: both shapes at once
+
+const who: AdminEmployee = {
+    name: 'Aria',
+    permissions: ['read'],
+    team: 'platform',
+};
+
+type Id = string | number;   // union: exactly one of these
+function printId(id: Id): string { return typeof id === 'number' ? String(id) : id; }</code></pre></div>
+    <p class="code-note">A union says the value is any one of the listed types; an intersection demands every shape at once. Both are checked structurally, not by name.</p>
+    <h3 id="ch5-narrowing" data-toc>5.2 Narrowing with typeof, instanceof and in</h3>
+    <p class="topic-desc">Shows the three built-in ways to narrow a union: typeof for primitives, instanceof for classes, and the in operator for object members. Control flow analysis shrinks the type as you write the checks, so after each guard the compiler knows exactly which branch you are in.</p>
+    <div class="codeWrap"><pre><code>function describe(x: string | number | Date): string {
+    if (typeof x === 'string') return x.toUpperCase();
+    if (typeof x === 'number') return x.toFixed(2);
+    if (x instanceof Date) return x.toISOString();
+    return 'unknown';
+}
+
+function move(obj: { x: number } | { speed: number }) {
+    if ('speed' in obj) return obj.speed;   // narrows to the speed member
+    return obj.x;                           // only the other alternative remains
+}</code></pre></div>
+    <p class="code-note">typeof, instanceof and in each look at a different kind of evidence, and after the check TypeScript swears to the narrowed branch only.</p>
+    <h3 id="ch5-discriminated" data-toc>5.3 Discriminated unions</h3>
+    <p class="topic-desc">Uses a literal tag field so every branch of a union is provably distinct. Each member carries a unique literal property, and checking that tag narrows the whole object at once. A discriminated union is the standard pattern for actions, results, and state machines.</p>
+    <div class="codeWrap"><pre><code>type UiEvent =
+    | { type: 'click'; x: number; y: number }
+    | { type: 'key'; key: string }
+    | { type: 'blur' };
+
+function handle(e: UiEvent) {
+    switch (e.type) {
+        case 'click': return `clicked at ${e.x},${e.y}`;
+        case 'key':   return `pressed ${e.key}`;
+        case 'blur':  return 'left the field';
+    }
+}</code></pre></div>
+    <p class="code-note">The literal type field is the discriminator: switching on it narrows e to exactly one variant, and each case sees only its own fields.</p>
+    <h3 id="ch5-guards" data-toc>5.4 Type guards and assertion functions</h3>
+    <p class="topic-desc">Writes user-defined guards with type predicates that test a custom shape, and assertion functions that throw on bad input instead of returning a boolean. A predicate such as value is string teaches the compiler to narrow custom types that the built-in operators cannot handle.</p>
+    <div class="codeWrap"><pre><code>function isFish(pet: Animal): pet is Fish {
+    return 'swim' in pet;
+}
+
+type User = { name: string; email?: string };
+function assertHasEmail(user: User): asserts user is User &amp; { email: string } {
+    if (!user.email) throw new Error('Email is required');
+}
+
+const u: User = loadUser();
+assertHasEmail(u);         // from here on, u.email is a plain string
+u.email.toUpperCase();     // no narrowing dance needed</code></pre></div>
+    <p class="code-note">A type predicate says when isFish is true the value is a Fish; an assertion function throws unless its claim holds, then permanently narrows the rest of the scope.</p>
+    <h3 id="ch5-exhaustive" data-toc>5.5 Exhaustiveness with never</h3>
+    <p class="topic-desc">Uses the never type to make the compiler complain when a new union member is forgotten. Every branch narrows away its own case, and the default branch becomes a compile-time tripwire that flags anything missed. This forces you to handle each possibility or update the code deliberately.</p>
+    <div class="codeWrap"><pre><code>function assertNever(value: never): never {
+    throw new Error(`Unhandled case: ${JSON.stringify(value)}`);
+}
+
+function reactor(e: UiEvent): string {
+    switch (e.type) {
+        case 'click': return 'click';
+        case 'key':   return 'key';
+        default:      return assertNever(e);   // Error when a new variant appears
+    }
+}</code></pre></div>
+    <p class="code-note">If someone adds a fourth UiEvent variant, e narrows to it in the default branch and the compiler rejects passing it to assertNever — the missing case fails the build.</p>
+    <div class="tip"><p>Wide union, narrow fast. Keep unions broad where data arrives and narrow as early as possible; every branch you remove makes the rest of the code simpler.</p></div>
+    <div class="ex"><h4 id="ch5-exhaustive--exercises-5">Exercises 5</h4><ol>
+      <li>Write a <code>string | number</code> union and narrow it with <code>typeof</code>.</li>
+      <li>Model a logging system as a discriminated union with three kinds and a <code>switch</code>.</li>
+      <li>Create a type predicate and use it both in an <code>if</code> and in a filter.</li>
+      <li>Add a fourth variant to the union and watch the exhaustiveness error fire.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Generics</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Generics</button><div class="ch-toc-list"><a href="#ch6-functions">6.1 Generic functions</a><a href="#ch6-constraints">6.2 Constraints and multiple type parameters</a><a href="#ch6-interfaces">6.3 Generic interfaces and classes</a><a href="#ch6-keyof">6.4 Default type parameters and keyof</a><a href="#ch6-patterns">6.5 Common generic patterns</a></div></div>
+    <p class="topic-desc">Makes functions and types work for any type while keeping relationships straight. A type parameter acts as a placeholder that is filled in at the call site. Generics are how you write one function, typed for everything, without losing the connection between the input and output types.</p>
+    <p>The first array helper you ever wrote probably worked for any element type. Generics formalise that: a type parameter stands in for the real type, the compiler figures it out at each call site, and — crucially — it keeps related types glued together.</p>
+    <h3 id="ch6-functions" data-toc>6.1 Generic functions</h3>
+    <p class="topic-desc">Adds a type parameter to a function so the same function works for strings, numbers, or your own types. The type parameter is a placeholder that inference, plus optional explicit arguments at the call site, fills in. The compiler then checks each call against the specific type supplied.</p>
+    <div class="codeWrap"><pre><code>function first&lt;T&gt;(items: T[]): T | undefined {
+    return items[0];
+}
+
+first([1, 2, 3]);          // T infers as number — returns number
+first(['a', 'b']);         // T infers as string — returns string
+const x = first([1, 2]);   // x: number — T was pinned by the argument</code></pre></div>
+    <p class="code-note">The single type parameter T is inferred from the argument, and every T in the signature stays glued together — the return type always matches the element type.</p>
+    <h3 id="ch6-constraints" data-toc>6.2 Constraints and multiple type parameters</h3>
+    <p class="topic-desc">Limits type parameters with the extends keyword so a generic only accepts shapes with a required minimum, and coordinates several type parameters that reference each other. Constraints promise the smallest shape a type must have. They let you access those promised members safely inside the generic body.</p>
+    <div class="codeWrap"><pre><code>function longest&lt;T extends { length: number }&gt;(a: T, b: T): T {
+    return a.length &gt;= b.length ? a : b;
+}
+longest('cat', 'elephant');        // strings have .length — works
+longest([1, 2], [3, 4, 5, 6]);     // arrays have .length — works
+
+function pair&lt;K, V&gt;(key: K, value: V): [K, V] {
+    return [key, value];
+}
+pair(1, 'one');   // [number, string] — two independent type parameters</code></pre></div>
+    <p class="code-note">The extends constraint admits only types with a length property, while the two-parameter pair function keeps the key type and value type independent yet connected.</p>
+    <h3 id="ch6-interfaces" data-toc>6.3 Generic interfaces and classes</h3>
+    <p class="topic-desc">Builds reusable structures with type parameters on interfaces and classes. A generic box or stack stores whatever element type you supply while preserving its identity. Instantiate it with a concrete type argument and every method and property reflects that specific element.</p>
+    <div class="codeWrap"><pre><code>interface Box&lt;T&gt; {
+    value: T;
+    set(value: T): void;
+}
+
+class Stack&lt;T&gt; {
+    private items: T[] = [];
+    push(item: T): void { this.items.push(item); }
+    pop(): T | undefined { return this.items.pop(); }
+    get size(): number { return this.items.length; }
+}
+
+const numbers = new Stack&lt;number&gt;();
+numbers.push(7);
+numbers.push('oops');   // Error: string is not assignable to number</code></pre></div>
+    <p class="code-note">A generic interface or class parameterizes its members, so a Stack&lt;number&gt; stores numbers and rejects anything else at compile time.</p>
+    <h3 id="ch6-keyof" data-toc>6.4 Default type parameters and keyof</h3>
+    <p class="topic-desc">Shows default type parameters and the keyof operator, which turns an object’s keys into a union of literal strings. Combine them to build typed getters and pickers that accept only real keys. A default makes a type parameter optional for the caller.</p>
+    <div class="codeWrap"><pre><code>function getValue&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K] {
+    return obj[key];
+}
+
+type Point = { x: number; y: number; label: string };
+getValue({ x: 1, y: 2, label: 'p' }, 'x');     // number
+getValue({ x: 1, y: 2, label: 'p' }, 'z');     // Error: 'z' is not in keyof Point
+
+function makeList&lt;T = string&gt;(): T[] { return []; }   // default: T = string
+makeList&lt;number&gt;().push(1);   // T overridden to number at the call site</code></pre></div>
+    <p class="code-note">keyof collects the object’s keys into a literal union, so getValue accepts only real keys and returns the exact value type at that key; defaults cover the omitted parameter.</p>
+    <h3 id="ch6-patterns" data-toc>6.5 Common generic patterns</h3>
+    <p class="topic-desc">Collects the generic patterns you will see daily: typed fetch wrappers that know the response shape, identity helpers that preserve a type, and generic caches keyed by type. Each pattern is the same placeholder logic applied to a different domain. Learn to read these and generics become ordinary.</p>
+    <div class="codeWrap"><pre><code>async function getJSON&lt;T&gt;(url: string): Promise&lt;T&gt; {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.statusText);
+    return res.json() as T;
+}
+getJSON&lt;{ id: number; title: string }&gt;('/posts/1');   // typed response
+
+function identity&lt;T&gt;(value: T): T { return value; }
+
+function cache&lt;T&gt;(): { get: () =&gt; T | undefined; put: (v: T) =&gt; void } {
+    let slot: T | undefined;
+    return {
+        get: () =&gt; slot,
+        put: (v) =&gt; { slot = v; },
+    };
+}</code></pre></div>
+    <p class="code-note">A generic fetch wrapper types the JSON response at the call site, identity passes a type through untouched, and a generic cache closure keeps one consistent element type.</p>
+    <div class="warn"><p>Generics can be over-used. If a type parameter appears once and only once, you usually do not need it — you are handwriting a specific type, not a pattern.</p></div>
+    <div class="ex"><h4 id="ch6-patterns--exercises-6">Exercises 6</h4><ol>
+      <li>Write a generic <code>last</code> function and call it with three different types.</li>
+      <li>Constrain a generic so it only accepts objects with an <code>id</code> field.</li>
+      <li>Build a generic <code>Stack</code> and prove a wrong push is rejected.</li>
+      <li>Use <code>keyof</code> to write a typed <code>pick</code> helper that returns one property.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Classes, Access Modifiers &amp; Decorators</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Classes, Access Modifiers &amp; Decorators</button><div class="ch-toc-list"><a href="#ch7-classes">7.1 Typing a class</a><a href="#ch7-modifiers">7.2 Access modifiers and readonly</a><a href="#ch7-abstract">7.3 Abstract classes and implements</a><a href="#ch7-params">7.4 Parameter properties and static members</a><a href="#ch7-decorators">7.5 Decorators overview</a></div></div>
+    <p class="topic-desc">Types classes, controls the visibility of members, and meets experimental decorators. Classes blend runtime behaviour with compile-time shape checking, and the class name works as both a value and a type. Modifiers like private and protected are enforced by the compiler, not at run time.</p>
+    <p>Classes are where TypeScript feels most like a typed language: fields carry types, modifiers set visibility, and the class name works as both a constructor and a type. Modern code increasingly favours functions, but classes remain the backbone of frameworks and domain models.</p>
+    <h3 id="ch7-classes" data-toc>7.1 Typing a class</h3>
+    <p class="topic-desc">Writes a class and lets it serve as both a value and a type. In a type position, the class name refers to the shape of its instances, so any object with the same members is assignable to it. This duality lets you type variables without naming a separate interface.</p>
+    <div class="codeWrap"><pre><code>class Rectangle {
+    width: number;
+    height: number;
+
+    constructor(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+    }
+
+    area(): number { return this.width * this.height; }
+}
+
+const rect: Rectangle = new Rectangle(3, 4);   // Rectangle also names a type
+function printArea(r: Rectangle): void {
+    console.log(r.area());
+}
+printArea(rect);   // 12</code></pre></div>
+    <p class="code-note">A class both constructs values and names the type of its instances, so variables and parameters can be typed with the class name directly.</p>
+    <h3 id="ch7-modifiers" data-toc>7.2 Access modifiers and readonly</h3>
+    <p class="topic-desc">Shows public, private, protected, and readonly modifiers on class members. The access modifiers control who may read or write each member, with private restricting access to the class itself. These defaults are enforced at compile time, so they affect checks but not the emitted JavaScript.</p>
+    <div class="codeWrap"><pre><code>class BankAccount {
+    public owner: string;              // visible everywhere (the default)
+    private balance = 0;               // only inside this class
+    protected history = [];            // class and its subclasses only
+    readonly id: number = Math.random();
+
+    deposit(amount: number): void { this.balance += amount; }
+    getBalance(): number { return this.balance; }
+}
+
+const acc = new BankAccount('Aria');
+acc.balance;         // Error: property 'balance' is private
+acc.deposit(50);     // fine — deposit is public
+acc.id = 4;          // Error: readonly property cannot be assigned</code></pre></div>
+    <p class="code-note">public, private and protected gate each member’s visibility, and readonly freezes the property after construction — all enforced while compiling, not at runtime.</p>
+    <h3 id="ch7-abstract" data-toc>7.3 Abstract classes and implements</h3>
+    <p class="topic-desc">Uses abstract classes as templates and the implements keyword to satisfy interfaces. An abstract class can declare abstract methods that force subclasses to fill in the blanks before they can be instantiated. implements checks that a class matches a shape without inheriting any of its implementation.</p>
+    <div class="codeWrap"><pre><code>abstract class Shape {
+    abstract area(): number;          // subclasses MUST implement this
+    describe(): string { return `Shape of area ${this.area()}`; }
+}
+
+class Circle extends Shape {
+    constructor(private radius: number) { super(); }
+    area(): number { return Math.PI * this.radius ** 2; }
+}
+
+interface Describable { describe(): string; }
+const thing: Describable = new Circle(2);   // satisfies the interface shape</code></pre></div>
+    <p class="code-note">abstract declares methods the subclass must provide, while the implements-free structural check still accepts Circle as Describable because it has describe().</p>
+    <h3 id="ch7-params" data-toc>7.4 Parameter properties and static members</h3>
+    <p class="topic-desc">Declares fields directly in constructor parameters and adds class-level statics. Parameter properties, such as a private readonly string in the constructor, collapse the field declaration and assignment into one line. Static members live on the class itself rather than on individual instances.</p>
+    <div class="codeWrap"><pre><code>class User {
+    static defaultRole = 'viewer';   // class-level, no instance needed
+
+    constructor(
+        public name: string,
+        private id: number,
+        readonly createdAt: Date = new Date(),
+    ) {}                              // all three become fields automatically
+}
+
+User.defaultRole;                     // 'viewer' — no new instance
+const u = new User('Aria', 7);
+u.name;            // public — fine
+u.id;              // Error: private
+u.createdAt;       // public readonly — fine</code></pre></div>
+    <p class="code-note">Constructor parameters prefixed with a modifier create the field, its type and its visibility in one declaration; static members live on the class itself.</p>
+    <h3 id="ch7-decorators" data-toc>7.5 Decorators overview</h3>
+    <p class="topic-desc">Surveys decorators for classes, methods, accessors, and parameters. Decorators are functions that wrap or modify behaviour at definition time, before any instance exists. Classic targets are logging, dependency registration, and validation, and the feature requires enabling the experimental decorators compiler option.</p>
+    <div class="codeWrap"><pre><code>// tsconfig.json: { "experimentalDecorators": true }
+function logCall(target: any, key: string, descriptor: PropertyDescriptor) {
+    const original = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+        console.log(`calling ${key} with`, args);
+        return original.apply(this, args);
+    };
+}
+
+class Service {
+    @logCall
+    run(input: string): string { return `ran ${input}`; }
+}
+new Service().run('job');   // logs: calling run with ["job"]</code></pre></div>
+    <p class="code-note">The decorator wraps the method’s descriptor, adding logging without touching the method body — the pattern behind routing, dependency injection and validation libraries.</p>
+    <div class="ex"><h4 id="ch7-decorators--exercises-7">Exercises 7</h4><ol>
+      <li>Write a class with one private and one readonly field and trigger both errors.</li>
+      <li>Create an abstract class and two subclasses implementing its abstract method.</li>
+      <li>Rewrite a class’s constructor using parameter properties.</li>
+      <li>Write a method decorator that logs how long the call took.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Modules, Declaration Files &amp; @types</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Modules, Declaration Files &amp; @types</button><div class="ch-toc-list"><a href="#ch8-modules">8.1 ES module syntax</a><a href="#ch8-typeonly">8.2 Type-only imports and exports</a><a href="#ch8-dts">8.3 Declaration files and DefinitelyTyped</a><a href="#ch8-ambient">8.4 Ambient declarations and augmentation</a></div></div>
+    <p class="topic-desc">Organises code into modules and explains how TypeScript finds types for libraries. Declaration files with a .d.ts extension describe the shapes of JavaScript code. They are the bridge that lets a plain JavaScript package provide types, either hand-written or supplied by DefinitelyTyped, to a typed codebase.</p>
+    <p>A real project lives across dozens of files, and TypeScript needs to know how they connect. Modules are the same ES import/export syntax you already use — TypeScript only adds type-aware variants and the machinery that types untyped libraries.</p>
+    <h3 id="ch8-modules" data-toc>8.1 ES module syntax</h3>
+    <p class="topic-desc">Imports and exports values across files with ES module syntax. Every file with an import or export is a module, not a script, so its top-level declarations stay scoped to that file. Named and default exports give you precise control over what consumers can obtain.</p>
+    <div class="codeWrap"><pre><code>// math.ts
+export const PI = 3.14159;
+export function circleArea(r: number): number { return PI * r * r; }
+export default function hello(msg: string): string { return `hello ${msg}`; }
+
+// app.ts
+import hello, { PI, circleArea } from './math';
+console.log(circleArea(2));   // imports the named and the default together
+
+// re-export to build a clean public surface
+export * from './math';
+export { User } from './user';</code></pre></div>
+    <p class="code-note">Named exports, one default export and re-exports compose modules; import picks them up with matching syntax, and the whole module graph is type-aware.</p>
+    <h3 id="ch8-typeonly" data-toc>8.2 Type-only imports and exports</h3>
+    <p class="topic-desc">Separates types from values with import type and export type statements. Marking an import as type-only lets compilers and bundlers erase it completely, so no runtime dependency is created. Use the same marker on re-exports to keep the type intent explicit.</p>
+    <div class="codeWrap"><pre><code>// types.ts
+export interface User { id: number; name: string }
+export const seed: User = { id: 1, name: 'Aria' };
+
+// service.ts
+import type { User } from './types';   // type-only — fully erased at build time
+import { seed } from './types';        // value import — stays in the output
+
+const other: User = seed;</code></pre></div>
+    <p class="code-note">import type erases the import entirely from the emitted JavaScript, while the plain import keeps seed because it is a real runtime value.</p>
+    <h3 id="ch8-dts" data-toc>8.3 Declaration files and DefinitelyTyped</h3>
+    <p class="topic-desc">Explains what .d.ts files are and how to install @types packages for plain JavaScript libraries. When a library ships no types of its own, DefinitelyTyped usually provides community-authored declarations. The compiler and your editor read those files to give you IntelliSense and type checking without loading any runtime code.</p>
+    <div class="codeWrap"><pre><code>npm install lodash
+npm install --save-dev @types/lodash   // types live on DefinitelyTyped
+
+// a minimal hand-written declaration file: mylib.d.ts
+declare module 'mylib' {
+    export function transform(value: string): string;
+    export const version: string;
+}</code></pre></div>
+    <p class="code-note">@types packages ship hand-written declarations for libraries that do not, and a small declare module block types a private package without touching its source.</p>
+    <h3 id="ch8-ambient" data-toc>8.4 Ambient declarations and augmentation</h3>
+    <p class="topic-desc">Declares global shapes and augments existing modules. Ambient declarations describe values that the environment already provides, so the compiler knows they exist without seeing their implementation. Declaration augmentation lets you add members to existing types from the outside.</p>
+    <div class="codeWrap"><pre><code>// globals.d.ts
+declare const APP_VERSION: string;       // a global value the bundler injects
+interface Window { appName: string }     // merge a field into Window
+
+// augment a library's types from your own code
+import 'express';
+declare module 'express' {
+    interface Request {
+        userId?: string;                 // now req.userId exists everywhere
+    }
+}</code></pre></div>
+    <p class="code-note">Ambient declarations tell TypeScript about values and globals that exist at runtime, and module augmentation adds fields to a library’s types from outside it.</p>
+    <div class="ex"><h4 id="ch8-ambient--exercises-8">Exercises 8</h4><ol>
+      <li>Split a small program into two modules with named and default exports.</li>
+      <li>Refactor the type exports to <code>import type</code> and confirm they erase from output.</li>
+      <li>Install a package without types and add the matching <code>@types</code> package.</li>
+      <li>Augment a framework interface with a field your middleware adds.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Advanced Types</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Advanced Types</button><div class="ch-toc-list"><a href="#ch9-mapped">9.1 Mapped types</a><a href="#ch9-conditional">9.2 Conditional types and infer</a><a href="#ch9-template">9.3 Template literal types and key remapping</a><a href="#ch9-utility">9.4 The built-in utility types</a><a href="#ch9-readonly">9.5 Readonly arrays and tuples</a></div></div>
+    <p class="topic-desc">Builds new types from old ones with mapped, conditional, and template literal types. These operate on types the way functions operate on values, taking inputs and deriving outputs. They are the power tools behind every framework’s public API, transforming input shapes into strict, derived output types.</p>
+    <p>Everything so far named a type. Advanced types <em>compute</em> a type from another type: iterate its keys, test its structure, or build strings from it. These are the tools that frameworks use to give you magically precise IntelliSense.</p>
+    <h3 id="ch9-mapped" data-toc>9.1 Mapped types</h3>
+    <p class="topic-desc">Walks a union of keys and produces a new object type property by property. A mapped type iterates over keys, optionally transforming each with modifiers such as readonly or optional. This transforms shapes in bulk instead of writing each property out by hand.</p>
+    <div class="codeWrap"><pre><code>type Flags&lt;T&gt; = { [K in keyof T]: boolean };
+type Draft&lt;T&gt; = { [K in keyof T]?: T[K] };   // every field becomes optional
+
+interface User { id: number; name: string }
+type UserFlags = Flags&lt;User&gt;;     // { id: boolean; name: boolean }
+type DraftUser = Draft&lt;User&gt;;     // { id?: number; name?: string }
+
+function startDraft(d: DraftUser): void {}
+startDraft({});                    // no fields needed — all optional</code></pre></div>
+    <p class="code-note">The mapped type iterates keyof T and, for each key, decides the value type — here every field becomes boolean or optional — producing a whole new shape.</p>
+    <h3 id="ch9-conditional" data-toc>9.2 Conditional types and infer</h3>
+    <p class="topic-desc">Chooses between two types with a ternary-style expression and extracts inner types with the infer keyword. Conditional types read like type-level functions, taking inputs and producing a result. Infer lets you pull a type out of a larger structure, such as the return type of a function.</p>
+    <div class="codeWrap"><pre><code>type IsArray&lt;T&gt; = T extends unknown[] ? true : false;
+type A = IsArray&lt;string[]&gt;;   // true
+type B = IsArray&lt;number&gt;;     // false
+
+type ElementOf&lt;T&gt; = T extends (infer E)[] ? E : never;   // pull out the element
+type C = ElementOf&lt;(string | number)[]&gt;;   // string | number
+type D = ReturnType&lt;typeof fetch&gt;;   // built-in conditional + infer on a function</code></pre></div>
+    <p class="code-note">A conditional type tests a relationship and picks one arm, and infer declares a type variable to capture — here the element type of an array.</p>
+    <h3 id="ch9-template" data-toc>9.3 Template literal types and key remapping</h3>
+    <p class="topic-desc">Builds string unions from patterns and renames keys while mapping. Template literal types interpolate other types into strings so you can express exact string contracts. Key remapping with as inside a mapped type lets you transform each key as you build the new shape.</p>
+    <div class="codeWrap"><pre><code>type EventName = `on${Capitalize&lt;'click' | 'hover'&gt;}`;   // 'onClick' | 'onHover'
+type Size = 'small' | 'large';
+type Label = `${Size}-label`;                            // 'small-label' | 'large-label'
+
+// key remapping: transform the keys while you map
+type Getters&lt;T&gt; = {
+    [K in keyof T as `get${Capitalize&lt;string &amp; K&gt;}`]: () =&gt; T[K];
+};
+type G = Getters&lt;{ name: string }&gt;;   // { getName: () =&gt; string }</code></pre></div>
+    <p class="code-note">Template literal types build every matching string union, and remapped keys with Capitalize rewrite the keys themselves while producing value types from the originals.</p>
+    <h3 id="ch9-utility" data-toc>9.4 The built-in utility types</h3>
+    <p class="topic-desc">Lists the utility types you will use daily, including Partial, Required, Pick, Omit, Record, and Extract. Most are exactly the mapped and conditional types you just wrote, shipped built in. Use them to transform existing shapes quickly instead of writing the transformation yourself.</p>
+    <div class="codeWrap"><pre><code>interface Todo { title: string; done: boolean; due?: Date }
+
+type P      = Partial&lt;Todo&gt;;      // every field optional
+type R      = Required&lt;Todo&gt;;     // every field mandatory
+type PickT  = Pick&lt;Todo, 'title' | 'done'&gt;;   // keep only these keys
+type OmitT  = Omit&lt;Todo, 'due'&gt;; // drop these keys
+type Exc    = Exclude&lt;'a' | 'b' | 'c', 'a'&gt;;  // remove one union member
+type Ext    = Extract&lt;'a' | 'b', 'a' | 'd'&gt;;  // keep the overlap
+type Rec    = Record&lt;'left' | 'right', number&gt;;   // map keys to a value type
+type Ret    = ReturnType&lt;() =&gt; string&gt;;      // string — the return type
+type Params = Parameters&lt;(a: number, b: string) =&gt; void&gt;;  // [number, string]</code></pre></div>
+    <p class="code-note">Each utility type is a small transform over a shape or union — Partial makes everything optional, Omit drops keys, and ReturnType and Parameters read a function signature.</p>
+    <h3 id="ch9-readonly" data-toc>9.5 Readonly arrays and tuples</h3>
+    <p class="topic-desc">Frees arrays from mutation with as const and the ReadonlyArray type. as const narrows a literal to readonly types, producing exact readonly tuples that preserve literal values. Frozen data is safer to share across code and gives you immutability that the compiler enforces.</p>
+    <div class="codeWrap"><pre><code>const roles = ['admin', 'editor'] as const;    // readonly tuple of literals
+type Roles = typeof roles[number];             // 'admin' | 'editor'
+
+const points: readonly number[] = [1, 2, 3];
+points.push(4);   // Error: property 'push' does not exist on readonly array
+
+function sumAll(values: readonly number[]): number {
+    return values.reduce((a, b) =&gt; a + b, 0);
+}</code></pre></div>
+    <p class="code-note">as const pins values into literal tuples and typeof roles[number] lifts that into a union, while readonly arrays reject mutating calls at compile time.</p>
+    <div class="tip"><p>Write the transform as a question first — "make everything optional", "get the element out" — then reach for the mapped or conditional type that answers it.</p></div>
+    <div class="ex"><h4 id="ch9-readonly--exercises-9">Exercises 9</h4><ol>
+      <li>Map an interface to a readonly version of itself.</li>
+      <li>Write a conditional type that unwraps <code>Promise&lt;T&gt;</code> to T.</li>
+      <li>Remap keys to <code>onChange</code>-style names with template literals.</li>
+      <li>Recreate <code>Omit</code> using <code>Pick</code> and <code>Exclude</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · TypeScript with Frameworks</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · TypeScript with Frameworks</button><div class="ch-toc-list"><a href="#ch10-react">10.1 Typing React props and hooks</a><a href="#ch10-vue">10.2 Typing Vue props and emits</a><a href="#ch10-node">10.3 Typing Node and Express handlers</a><a href="#ch10-zod">10.4 Runtime validation with Zod</a></div></div>
+    <p class="topic-desc">Applies the type system to real frameworks: React, Vue, Node, and Zod. Framework types are mostly the patterns from previous chapters wearing different names, with props as interfaces, events as unions, and schemas doubling as types. The same skills transfer directly to any typed framework.</p>
+    <p>Framework APIs live or die on their types. React’s props, Vue’s emits, and Express handlers are all just interfaces, unions and generics once you know how to look at them — and a runtime validator like Zod plugs the one gap TypeScript cannot close.</p>
+    <h3 id="ch10-react" data-toc>10.1 Typing React props and hooks</h3>
+    <p class="topic-desc">Types a React component’s props and a couple of standard hooks. Component props are defined as an interface or type alias, and events use the built-in synthetic event types. Hooks like useState infer their state type from the initial value or accept an explicit type argument.</p>
+    <div class="codeWrap"><pre><code>type ButtonProps = {
+    label: string;
+    onClick: (event: React.MouseEvent) =&gt; void;   // callback function type
+    variant?: 'primary' | 'ghost';               // restricted union
+};
+
+function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
+    return &lt;button className={variant} onClick={onClick}&gt;{label}&lt;/button&gt;;
+}
+
+// hooks take generic parameters
+const [count, setCount] = useState&lt;number&gt;(0);
+const ref = useRef&lt;HTMLInputElement&gt;(null);</code></pre></div>
+    <p class="code-note">Props become an interface or type checked at every call site, events use the precise React.MouseEvent type, and hooks infer state types from their generics.</p>
+    <h3 id="ch10-vue" data-toc>10.2 Typing Vue props and emits</h3>
+    <p class="topic-desc">Types Vue components with defineProps and defineEmits inside script setup blocks. These compiler macros infer types from the arguments you pass or from TypeScript interfaces. The compiler then checks every prop and emit against both the template and the parent component.</p>
+    <div class="codeWrap"><pre><code>&lt;script setup lang="ts"&gt;
+type Props = {
+    title: string;
+    level?: 1 | 2 | 3;                // a restricted heading level
+};
+const props = defineProps&lt;Props&gt;();   // props is now the typed object
+
+const emit = defineEmits&lt;{
+    (e: 'update', id: number): void;  // event signature like a callable type
+}&gt;();
+emit('update', 42);
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">defineProps and defineEmits take generics from your own types, so templates and parent components get full checking on the data flowing in and out.</p>
+    <h3 id="ch10-node" data-toc>10.3 Typing Node and Express handlers</h3>
+    <p class="topic-desc">Types request handlers, route parameters, and request bodies in Node and Express. Handler parameters carry the full HTTP signature, so request and response objects arrive pre-typed. Validation libraries narrow the body type so what you typed matches what actually arrived over the wire.</p>
+    <div class="codeWrap"><pre><code>import express, { Request, Response } from 'express';
+const app = express();
+app.use(express.json());
+
+type CreateTodoBody = { title: string };
+
+app.post('/todos', (req: Request, res: Response) =&gt; {
+    const body: CreateTodoBody = req.body;     // assert the shape at the boundary
+    if (typeof body.title !== 'string') {
+        res.status(400).json({ error: 'title required' });
+        return;
+    }
+    res.status(201).json({ created: body.title });
+});</code></pre></div>
+    <p class="code-note">The handler types its Request and Response, and a runtime check at the boundary narrows the untyped req.body into the shape the rest of the code trusts.</p>
+    <h3 id="ch10-zod" data-toc>10.4 Runtime validation with Zod</h3>
+    <p class="topic-desc">Introduces Zod schemas as runtime parsers that also produce types. Because TypeScript types are erased at runtime, Zod keeps the contract alive after compilation. Parse untrusted input once at the boundary and the parsed value carries the exact type the schema describes.</p>
+    <div class="codeWrap"><pre><code>npm install zod
+
+import { z } from 'zod';
+
+const UserSchema = z.object({
+    id: z.number(),
+    email: z.string().email(),
+    role: z.enum(['admin', 'user']),
+});
+type User = z.infer&lt;typeof UserSchema&gt;;   // the schema's derived type
+
+const parsed = UserSchema.parse(rawApiData);   // throws if the shape is wrong
+parsed.email.toUpperCase();                    // data AND type both guaranteed</code></pre></div>
+    <p class="code-note">zod defines one schema that both validates untrusted input at runtime and, via z.infer, yields the matching TypeScript type — a single source of truth.</p>
+    <div class="warn"><p>TypeScript types do not exist at runtime. Any value that crossed a network or a form boundary must be validated again in code — schemas like zod make that pleasant.</p></div>
+    <div class="ex"><h4 id="ch10-zod--exercises-10">Exercises 10</h4><ol>
+      <li>Type a component with a union prop and a callback prop.</li>
+      <li>Validate a JSON request body in Express with a runtime check.</li>
+      <li>Define a zod schema and read back its inferred type with <code>z.infer</code>.</li>
+      <li>Parse a deliberately bad record and read the error message.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · Tooling &amp; Migration</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Tooling &amp; Migration</button><div class="ch-toc-list"><a href="#ch11-tsconfig">11.1 The tsconfig options that matter</a><a href="#ch11-build">11.2 Building: tsc, esbuild and swc</a><a href="#ch11-eslint">11.3 ESLint and Prettier</a><a href="#ch11-migrate">11.4 Migrating JavaScript incrementally</a><a href="#ch11-declaration">11.5 Emitting declarations for libraries</a></div></div>
+    <p class="topic-desc">Configures the compiler for strictness and speed, wires linting and formatting, and moves a JavaScript codebase over without a big-bang rewrite. You learn which tsconfig options matter, how tsc compares with esbuild and swc, and how to migrate file by file. The result is a codebase checked and formatted automatically.</p>
+    <p>The compiler is just the start. Strictness flags, fast transpilers, lint rules and a staged migration plan are what make TypeScript pleasant on a real team — and they all flow from the tsconfig.json you will now understand.</p>
+    <h3 id="ch11-tsconfig" data-toc>11.1 The tsconfig options that matter</h3>
+    <p class="topic-desc">Shows the handful of tsconfig.json settings that define strictness and module output, including target, module, strict, and noEmit. Turning on strict enables the full family of null and implicit checking flags at once. Most other options are fine on their defaults, so you tune only a few.</p>
+    <div class="codeWrap"><pre><code>{
+    "compilerOptions": {
+        "target": "es2022",              // JS language level in the output
+        "module": "esnext",              // module system in the emitted code
+        "moduleResolution": "bundler",   // how import paths resolve
+        "strict": true,                  // master switch for all strict flags
+        "strictNullChecks": true,        // null and undefined are real values
+        "outDir": "dist",                // where compiled JS goes
+        "rootDir": "src",
+        "types": ["node"],               // which @types load globally
+        "paths": { "@/*": ["./src/*"] }  // import alias for clean paths
+    },
+    "include": ["src"]
+}</code></pre></div>
+    <p class="code-note">target and module control emit, strict turns on the whole safety family, and paths gives tidy import aliases — most projects run fine on these alone.</p>
+    <h3 id="ch11-build" data-toc>11.2 Building: tsc, esbuild and swc</h3>
+    <p class="topic-desc">Compares tsc with the faster transpilers esbuild and swc. tsc both checks types and emits JavaScript, while esbuild and swc only transpile and skip type errors. The common setup checks types with tsc and emits with a bundler, giving you fast incremental builds.</p>
+    <div class="codeWrap"><pre><code>npx tsc --noEmit           # type-check only, fast feedback
+npx tsc -p .               # check and emit to dist
+
+# esbuild: transpile only, very fast, reports no type errors
+npm install -D esbuild
+npx esbuild src/main.ts --bundle --outfile=dist/main.js
+
+# swc: a drop-in Rust-based transpiler
+npx swc src -d dist</code></pre></div>
+    <p class="code-note">Use tsc --noEmit as the type gate and a fast transpiler like esbuild or swc for emit; that split gives you correctness plus speed.</p>
+    <h3 id="ch11-eslint" data-toc>11.3 ESLint and Prettier</h3>
+    <p class="topic-desc">Wires ESLint for rules and Prettier for formatting. tsc checks types, while ESLint enforces style and suspicious patterns and Prettier handles consistent formatting. Together they run in editors and in CI, so problems surface before code ships.</p>
+    <div class="codeWrap"><pre><code>npm install -D eslint typescript-eslint prettier
+
+// eslint.config.js
+import tseslint from 'typescript-eslint';
+export default tseslint.config(
+    tseslint.configs.recommended,
+    { ignores: ['dist'] },
+);
+
+npx eslint src              # run lint
+npx prettier --write .      # format everything</code></pre></div>
+    <p class="code-note">typescript-eslint adds type-aware lint rules on top of tsc, and Prettier handles formatting so reviewers argue about logic, never whitespace.</p>
+    <h3 id="ch11-migrate" data-toc>11.4 Migrating JavaScript incrementally</h3>
+    <p class="topic-desc">Moves a JavaScript codebase to TypeScript file by file using allowJs, checkJs, and gradual strictness ramps. Start with the most valuable files and raise strictness as you convert. Migration is a journey, not a rewrite weekend, and each converted file pays off immediately.</p>
+    <div class="codeWrap"><pre><code>npm install -D typescript
+npx tsc --init
+# tsconfig tweaks for a staged migration
+#   "allowJs": true      — keep existing .js files compiling
+#   "checkJs": false     — do not type-check them yet
+#   "strict": false      — relax first, then tighten module by module
+
+# move files one at a time: copy.js -&gt; migrate.ts
+# the big three errors to fix first (in order):
+#   1. implicit any on parameters
+#   2. possibly-undefined access after narrowing
+#   3. non-existent properties on your own objects</code></pre></div>
+    <p class="code-note">allowJs lets new .ts files import old .js files, so you migrate one file at a time and ratchet strictness up as the any pile shrinks.</p>
+    <h3 id="ch11-declaration" data-toc>11.5 Emitting declarations for libraries</h3>
+    <p class="topic-desc">Publishes .d.ts declaration files alongside JavaScript so consumers get types. The declaration and declarationDir compiler options make tsc emit them automatically during the build. Declaration emit is how libraries ship their API contract while still running as plain JavaScript.</p>
+    <div class="codeWrap"><pre><code>// tsconfig build profile for a library
+{
+    "compilerOptions": {
+        "declaration": true,        // emit .d.ts files
+        "declarationMap": true,     // go-to-definition maps for consumers
+        "outDir": "dist",
+        "rootDir": "src"
+    }
+}
+npm publish   // dist now contains index.js AND index.d.ts
+// package.json: "types": "dist/index.d.ts"</code></pre></div>
+    <p class="code-note">declaration: true emits a .d.ts file per source file, so consumers get IntelliSense and type checking from your library without ever seeing its source.</p>
+    <div class="tip"><p>For a brand-new project, turn <code>strict</code> on from day one. Fixing strict errors on a clean build is cheap; retrofitting them onto a large codebase is a project in itself.</p></div>
+    <div class="ex"><h4 id="ch11-declaration--exercises-11">Exercises 11</h4><ol>
+      <li>Turn on <code>strict</code> in a project and fix the errors it surfaces.</li>
+      <li>Add one typescript-eslint rule and run it on your src folder.</li>
+      <li>Set up a tsconfig with a path alias and import through it.</li>
+      <li>Compile a small library with <code>declaration</code> and inspect the .d.ts output.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Quick Reference &amp; Glossary</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Quick Reference &amp; Glossary</button><div class="ch-toc-list"><a href="#app-basic">A.1 Basic types cheat sheet</a><a href="#app-utility">A.2 Utility types cheat sheet</a><a href="#app-tsconfig">A.3 tsconfig options cheat sheet</a><a href="#app-narrowing">A.4 Narrowing operators cheat sheet</a><a href="#app-glossary">A.5 Glossary</a></div></div>
+    <p class="topic-desc">Bundles cheat sheets and a glossary into one offline reference for quick scanning. It covers basic and utility types, tsconfig options, and narrowing operators at a glance. Skim it whenever you forget a type name, a compiler option, or the meaning of a repeated term.</p>
+    <h3 id="app-basic" data-toc>A.1 Basic types cheat sheet</h3>
+    <p class="topic-desc">Lists the primitive and structural types at a glance, from string, number, and boolean to arrays, tuples, and object types. Each entry pairs the syntax with a small example of how you write it. Keep it open while you build so you can confirm a signature without hunting through chapters.</p>
+    <table>
+      <tr><th>Type</th><th>Example</th><th>Notes</th></tr>
+      <tr><td><code>string</code></td><td><code>'hello'</code></td><td>Text</td></tr>
+      <tr><td><code>number</code></td><td><code>3.14</code></td><td>Integers and floats share one type</td></tr>
+      <tr><td><code>boolean</code></td><td><code>true</code></td><td>True or false</td></tr>
+      <tr><td><code>T[]</code></td><td><code>number[]</code></td><td>Array of T</td></tr>
+      <tr><td><code>[A, B]</code></td><td><code>[string, number]</code></td><td>Fixed-length tuple</td></tr>
+      <tr><td><code>A | B</code></td><td><code>string | null</code></td><td>Union — either</td></tr>
+      <tr><td><code>A &amp; B</code></td><td><code>Admin &amp; Employee</code></td><td>Intersection — both</td></tr>
+      <tr><td><code>unknown</code></td><td><code>JSON.parse(x)</code></td><td>Any value; narrow before use</td></tr>
+      <tr><td><code>never</code></td><td><code>throw new Error()</code></td><td>Unreachable</td></tr>
+      <tr><td><code>null</code> / <code>undefined</code></td><td><code>null</code></td><td>The absence of a value</td></tr>
+    </table>
+    <h3 id="app-utility" data-toc>A.2 Utility types cheat sheet</h3>
+    <p class="topic-desc">Summarizes the built-in transforms for shaping types, such as Partial, Pick, Omit, and Record. Each row shows one operation on a type and the resulting shape it produces. It works as a quick lookup when you need a transform but forget the exact name.</p>
+    <table>
+      <tr><th>Utility</th><th>Result</th></tr>
+      <tr><td><code>Partial&lt;T&gt;</code></td><td>Every field optional</td></tr>
+      <tr><td><code>Required&lt;T&gt;</code></td><td>Every field mandatory</td></tr>
+      <tr><td><code>Pick&lt;T, K&gt;</code></td><td>Keep only keys K</td></tr>
+      <tr><td><code>Omit&lt;T, K&gt;</code></td><td>Drop keys K</td></tr>
+      <tr><td><code>Record&lt;K, V&gt;</code></td><td>Object with keys K and values V</td></tr>
+      <tr><td><code>Exclude&lt;A, B&gt;</code></td><td>A minus the members of B</td></tr>
+      <tr><td><code>Extract&lt;A, B&gt;</code></td><td>Only the overlap of A and B</td></tr>
+      <tr><td><code>ReturnType&lt;F&gt;</code></td><td>What F returns</td></tr>
+      <tr><td><code>Parameters&lt;F&gt;</code></td><td>F’s parameters as a tuple</td></tr>
+    </table>
+    <h3 id="app-tsconfig" data-toc>A.3 tsconfig options cheat sheet</h3>
+    <p class="topic-desc">Lists the compiler options that shape most real builds, from target and module to strict and outDir. A short annotation explains each flag’s effect on output or checking. Start with strict mode enabled and relax options only with a concrete reason.</p>
+    <table>
+      <tr><th>Option</th><th>Does</th></tr>
+      <tr><td><code>strict</code></td><td>Enables the full strict flag family</td></tr>
+      <tr><td><code>strictNullChecks</code></td><td>Treats null and undefined as distinct values</td></tr>
+      <tr><td><code>target</code></td><td>The JS language level emitted</td></tr>
+      <tr><td><code>module</code></td><td>Module system in emitted code</td></tr>
+      <tr><td><code>noEmit</code></td><td>Type-check only, emit nothing</td></tr>
+      <tr><td><code>declaration</code></td><td>Emit .d.ts files</td></tr>
+      <tr><td><code>outDir</code> / <code>rootDir</code></td><td>Where output goes and starts from</td></tr>
+      <tr><td><code>paths</code></td><td>Import alias mapping</td></tr>
+      <tr><td><code>allowJs</code></td><td>Include .js files (for migration)</td></tr>
+    </table>
+    <h3 id="app-narrowing" data-toc>A.4 Narrowing operators cheat sheet</h3>
+    <p class="topic-desc">Collects the checks that shrink a union down to one branch, from typeof and instanceof to the in operator and user-defined type guards. Each narrows along a different axis, whether a primitive kind, a class instance, or a shaped object. Use it to pick the right guard for the union you face.</p>
+    <table>
+      <tr><th>Check</th><th>Narrows</th></tr>
+      <tr><td><code>typeof x === 'string'</code></td><td>Primitive unions</td></tr>
+      <tr><td><code>x instanceof Date</code></td><td>Class unions</td></tr>
+      <tr><td><code>'key' in obj</code></td><td>Object member unions</td></tr>
+      <tr><td><code>switch (x.type)</code></td><td>Discriminated unions</td></tr>
+      <tr><td><code>x is Fish</code> (guard)</td><td>Custom shapes</td></tr>
+      <tr><td><code>asserts x is T</code></td><td>Throw-or-narrow helpers</td></tr>
+    </table>
+    <h3 id="app-glossary" data-toc>A.5 Glossary</h3>
+    <p class="topic-desc">Defines the terms used across the guide in one place, from primitives and generics to declaration files and utility types. Look here when a word repeats but its meaning blurs. Every entry is short, plain, and points to where the guide first explains it.</p>
+    <ul>
+      <li><strong>Type annotation</strong> — the explicit <code>: Type</code> on a variable or parameter.</li>
+      <li><strong>Type inference</strong> — the compiler working a type out from the value.</li>
+      <li><strong>Narrowing</strong> — shrinking a union to fewer possibilities inside a branch.</li>
+      <li><strong>Type guard</strong> — a predicate function that teaches the compiler to narrow.</li>
+      <li><strong>Assertion function</strong> — throws unless a claim holds, then narrows permanently.</li>
+      <li><strong>Discriminated union</strong> — a union separated by one literal tag field.</li>
+      <li><strong>Generic</strong> — a type parameter that keeps relationships between types.</li>
+      <li><strong>Mapped type</strong> — a new object shape built key by key from another.</li>
+      <li><strong>Conditional type</strong> — a type-level if/else, often with <code>infer</code>.</li>
+      <li><strong>Declaration file</strong> — a <code>.d.ts</code> describing the types of plain JS.</li>
+      <li><strong>Module augmentation</strong> — adding types to an existing module from outside.</li>
+      <li><strong>Excess property check</strong> — rejecting unknown keys on fresh literals.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>TypeScript — Types to Patterns Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Types and Pattern Matching</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Rust's type system is where most of its safety lives. This chapter covers the scalar primitives, the two workhorse composite types — structs and enums — the <code>Option</code> and <code>Result</code> types that replace null and exceptions, pattern matching with <code>match</code>, and the conversion traits that move data between representations.</p>
+
+<h3 id="ch3-1" data-toc>3.1 Primitives and scalar types</h3>
+<p class="topic-desc">The scalar types are integers, floats, booleans, characters and the unit type. Their sizes are explicit in the type name, and — unlike C — Rust never chooses a width for you silently.</p>
+
+<h4 id="ch3-1-int">Integer widths and the default</h4>
+<p>Every integer type names its width and signedness: <code>u8</code>, <code>i8</code>, <code>u16</code>, <code>i32</code>, <code>u64</code>, <code>i64</code>, <code>u128</code>, <code>isize</code> and <code>usize</code>. The default for an unsuffixed literal is <code>i32</code> — the deliberate choice of a size that fits the common case. Underscores in literals (<code>1_000_000</code>) are purely visual; overflow panics in debug builds and wraps in release, so pick a width that cannot overflow rather than relying on the wrap.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let a: u8 = 255;                  // unsigned, 0..=255
+    let b: i8 = -128;                 // signed, -128..=127
+    let big: u64 = 18_446_744_073_709_551_615;  // max u64
+    let x = 42;                       // inferred as i32
+    println!("{a} {b} {big} {x}");
+}</code></pre></div>
+
+<h4 id="ch3-1-float">Floats, bool and char</h4>
+<p>There are two float types, <code>f32</code> and <code>f64</code>, and the default is <code>f64</code> — double precision, matching the IEEE 754 double. <code>bool</code> is <code>true</code> or <code>false</code>, and in arithmetic contexts it is not a number; conversions are explicit. <code>char</code> is a Unicode scalar value: four bytes wide, able to hold any single code point, and never half a character — which is why string indexing uses bytes and why <code>char</code> cannot be used to split a string by position blindly.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let pi: f64 = 3.141_592_653_589_793;
+    let e: f32 = 2.718_282;
+    let done = true;                  // bool
+    let heart = '♥';                  // char: a Unicode scalar value
+    println!("{pi} {e} {done} {heart}");
+}</code></pre></div>
+
+<h4 id="ch3-1-tuple">Tuples, arrays and the unit</h4>
+<p>A tuple groups values of any types — <code>("rust", 2024)</code> is a <code>(&amp;str, i32)</code> — and destructures positionally. An array is a fixed-length run of one type, sized at compile time; the vector in chapter 5 is the growable version. The unit type <code>()</code> is the type with exactly one value, and it is the return type of functions that return nothing — which, in Rust, means they return <code>()</code>.</p>
+<div class="codeWrap"><pre><code>fn main() {
+    let pair = ("rust", 2024);        // a tuple of (&amp;str, i32)
+    let (name, year) = pair;          // destructure positionally
+    println!("{name} {year}");
+
+    let xs = [1, 2, 3, 4, 5];         // array: fixed length, one type
+    println!("{} items", xs.len());
+
+    let unit = ();                    // the unit type: "no value here"
+    println!("{unit:?}");
+}</code></pre></div>
+
+<h3 id="ch3-2" data-toc>3.2 Structs and enums</h3>
+<p class="topic-desc">Structs group named fields into one type; enums enumerate a closed set of variants, each of which may carry its own data. Together they give Rust algebraic data types: composition by naming, and choice by exhaustion.</p>
+
+<h4 id="ch3-2-struct">Structs: named fields</h4>
+<p>A struct is declared with <code>struct</code> and constructed with field names, so field order never matters and a missing field is a compile error. Fields are independently mutable through the owning variable, and the struct update syntax <code>..u</code> copies the untouched fields from another instance. A struct without fields is a unit struct — useful as a marker for traits- and type-level dispatch.</p>
+<div class="codeWrap"><pre><code>#[derive(Debug)]
+struct User {
+    name: String,
+    age: u8,
+    active: bool,
+}
+
+fn main() {
+    let mut u = User {
+        name: String::from("Amin"),
+        age: 30,
+        active: true,
+    };
+    u.active = false;                      // fields are independently mutable
+
+    let younger = User { age: 29, ..u };   // struct update syntax
+    println!("{:?}", younger);
+}</code></pre></div>
+
+<h4 id="ch3-2-enum">Enums: closed sets of variants</h4>
+<p>An enum declares every value the type can hold, and the compiler knows all of them — that is what makes exhaustiveness checking possible. Each variant can carry different data: <code>V4(u8, u8, u8, u8)</code> carries four octets, <code>V6(String)</code> carries one string. This is how Rust models things that other languages model with class hierarchies or tagged unions, and the matching code is forced to handle every case.</p>
+<div class="codeWrap"><pre><code>// An enum is a closed set: the compiler knows every possible value.
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+fn main() {
+    let home = IpAddr::V4(127, 0, 0, 1);
+    match home {
+        IpAddr::V4(a, b, c, d) =&gt; println!("{a}.{b}.{c}.{d}"),
+        IpAddr::V6(addr) =&gt; println!("{addr}"),
+    }
+}</code></pre></div>
+
+<h4 id="ch3-2-derive">Deriving behaviour instead of writing it</h4>
+<p>Traits like <code>Debug</code>, <code>Clone</code> and <code>PartialEq</code> have one canonical implementation per type, so the compiler generates it on request via <code>#[derive(...)]</code>. Deriving is not magic — a macro writes the same <code>impl</code> you would — but it is the difference between one line and twenty, and it is the fastest way to get printing, cloning and equality on your own types before you write the traits that are genuinely yours.</p>
+<div class="codeWrap"><pre><code>#[derive(Debug, Clone, PartialEq)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let a = Point { x: 1, y: 2 };
+    let b = a.clone();           // from Clone
+    println!("{:?}", a);         // from Debug
+    assert_eq!(a, b);            // from PartialEq
+}</code></pre></div>

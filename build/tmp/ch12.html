@@ -1,0 +1,230 @@
+  <section class="chapter">
+<h2 id="ch12" data-toc>12 · Memoisation, Done Properly</h2>
+    <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Memoisation, done properly</button><div class="ch-toc-list"><a href="#ch12-when">Measure first, memo second</a><a href="#ch12-memo">React.memo and the props comparison</a><a href="#ch12-hooks">useMemo and honest dependency arrays</a><a href="#ch12-compiler">The React 19 compiler</a><a href="#ch12-cost">When memoisation makes things worse</a></div></div>
+    <p class="topic-desc">Memoisation is a trade: memory and comparison cost bought with skipped renders. This chapter covers when the trade pays, what each of the three mechanisms actually guarantees, how the React 19 compiler changes the default, and the failure modes — stale values, dishonest dependency arrays and memoised trees that cost more than they save.</p>
+    <h3 id="ch12-when" data-toc>Measure first, memo second</h3>
+    <p>React gives you three memoisation tools and one that arrived with the compiler, and the single most common mistake is applying them in the order the API happens to suggest rather than in the order the profiler justifies. A component that renders 200 microseconds and never appears high in a ranked chart does not need to be skipped; wrapping it in <code>memo</code> adds a shallow comparison on every parent render and a cache entry for a result nobody was waiting on. Memoisation pays when three conditions hold together: the component re-renders often, rendering it is measurably expensive, and its props are usually unchanged between renders. Drop any one condition and the trade goes the other way.</p>
+    <p>The order of operations is therefore: profile the interaction that feels slow; identify whether the cost is render-phase or commit-phase, because memo only removes render-phase work; check whether the component re-renders for a reason — a parent state change it does not read — and if so, whether that reason can be removed structurally instead. Lifting state down, splitting a component, or moving an unstable value out of render are all fixes that reduce work for everyone. Memoisation does not reduce work; it moves the cost from rendering to comparing and hoping. Sometimes that is exactly right, and the rest of this chapter is about telling the two situations apart.</p>
+    <div class="codeWrap"><pre><code>// the decision, written down, in order
+//
+// 1. does the component render at all, often?        -&gt; no: stop here
+// 2. is rendering it expensive? (profiler, not vibes) -&gt; no: stop here
+// 3. are its props usually identical between renders? -&gt; no: memo fails, stop
+// 4. can the re-render be removed by moving state?    -&gt; yes: do that instead
+// 5. only now: React.memo, and re-measure
+//
+// steps 1-3 take ten minutes. step 4 takes an hour and usually wins.
+
+export function shouldMemoise(componentName, profile) {
+  const c = profile.components[componentName];
+  if (!c.renderCount || c.renderCount &lt; 5) return 'infrequent';
+  if (c.avgDurationMs &lt; 1) return 'cheap';
+  if (c.propStability &lt; 0.5) return 'props-always-change';
+  return 'memoise';
+}</code></pre></div>
+    <p>There is also a structural signal that costs nothing to check. If the expensive component sits under a parent whose state changes on every keystroke of an unrelated input, the right fix is almost always to move that state — a context, a store, or a split component — so the expensive subtree stops being in the render path at all. Chapter 10's split-fast-slow context and chapter 11's trigger analysis are the upstream versions of this fix. Memoisation downstream of a badly-placed state is a patch on a patch: it works, but every new child of the same parent must remember to apply it too.</p>
+    <div class="codeWrap"><pre><code>// structural fix beats memo: the expensive subtree is not in the path
+function Page() {
+  const [query, setQuery] = useState('');       // changes per keystroke
+  return (
+    &lt;div&gt;
+      &lt;SearchInput value={query} onChange={setQuery} /&gt;
+      &lt;ExpensiveReport /&gt;      {/* re-renders per keystroke - memo hides it */}
+    &lt;/div&gt;
+  );
+}
+
+// BETTER: split so the keystroke state lives where it is used
+function Page() {
+  return (
+    &lt;div&gt;
+      &lt;SearchPanel /&gt;          {/* owns query and SearchInput */}
+      &lt;ExpensiveReport /&gt;      {/* renders once unless its props change */}
+    &lt;/div&gt;
+  );
+}</code></pre></div>
+    <h4>The profiler-before-memo ritual</h4>
+    <p>Make it a habit with a fixed sequence: record the interaction, note the top three components by actual duration, check their render counts in the same session, and only then decide. Writing the numbers down before the change is what lets you prove afterwards that the change helped — and occasionally you will prove it did not, which is the more valuable outcome, because undoing a wrong memo early is far cheaper than inheriting it later.</p>
+    <div class="note"><p>Memoisation is not free even when it works: the previous props are retained for comparison, so a tree of memoised components holding large objects pins those objects in memory across renders. On long-lived pages with big data structures, that retention shows up as a slow leak that no render profile will reveal.</p></div>
+    <h3 id="ch12-memo" data-toc>React.memo and the props comparison</h3>
+    <p><code>React.memo</code> wraps a component so that React skips re-rendering it when its props are shallowly equal to the previous ones. Shallow means one level: each prop is compared with <code>Object.is</code>, nested objects are compared by reference, and children — unless you pass a custom comparator — are compared as the <code>children</code> prop like anything else. The comparison runs on every parent render for every memoised child, so a memoised component whose props are new objects on every render pays the comparison and gets no skip: the worst of both worlds, and the most common outcome in codebases where memo was applied before the props were stabilised.</p>
+    <p>The children case deserves its own rule, because it subverts the usual advice. A memoised component given JSX children re-renders whenever the parent re-renders, since JSX creates new element objects each time and elements are props. The escape hatch is that React treats the children slot specially when you pass them as props from a parent that itself did not re-render — but that parent usually did re-render. The practical pattern is to hoist the JSX for the memoised subtree into a memoised value, or to accept that the boundary belongs higher up the tree, around a component whose props genuinely do not change.</p>
+    <div class="codeWrap"><pre><code>// memo with default shallow comparison: what it actually guarantees
+const UserCard = memo(function UserCard({ user, onSelect }) {
+  return &lt;button onClick={() =&gt; onSelect(user.id)}&gt;{user.name}&lt;/button&gt;;
+});
+
+// user and onSelect are both new per parent render - memo NEVER skips.
+// stabilise both, or the wrapper is pure overhead:
+const UserCard = memo(function UserCard({ userId, name, onSelect }) {
+  return &lt;button onClick={onSelect} data-id={userId}&gt;{name}&lt;/button&gt;;
+});
+// now: primitives compare by value, and onSelect is a stable dispatch or a
+// useCallback from chapter 12's hooks section - the skip can actually fire.
+
+function List({ users, onSelect }) {
+  return users.map((u) =&gt; (
+    &lt;UserCard key={u.id} userId={u.id} name={u.name} onSelect={onSelect} /&gt;
+  ));
+}</code></pre></div>
+    <p>The custom comparator parameter — <code>React.memo(Component, areEqual)</code> — is a sharp tool that should stay in its sheath almost always. A comparator that only checks one prop is faster than a full shallow compare, but it silently desynchronises from the component's real inputs: add a second prop later and the component will not re-render when it changes, producing a bug whose symptom is a stale view with no error. If you genuinely need a narrowed comparison, the honest move is to narrow the component's props instead — pass the one value it uses, not the object containing it.</p>
+    <div class="codeWrap"><pre><code>// custom comparator: correct today, a stale-render bug waiting for prop 2
+const Chart = memo(function Chart({ data, theme }) { /* ... */ },
+  (prev, next) =&gt; prev.data === next.data   // ignores theme!
+);
+// theme changes -&gt; Chart does not re-render -&gt; wrong colours, no error thrown.
+
+// the honest version: make the props match the comparison
+const Chart = memo(function Chart({ data, accent }) {
+  /* accent is the only visual input I read */
+});
+
+// if you must compare deeply, compare the derived value, not the object:
+const Chart = memo(function Chart({ data, themeMode }) { /* ... */ },
+  (prev, next) =&gt; prev.data === next.data &amp;&amp; prev.themeMode === next.themeMode
+);</code></pre></div>
+    <h4>Where memo boundaries belong</h4>
+    <p>Put the boundary at the point where a genuinely stable, expensive subtree hangs off an unstable parent — a chart under a form, a read-only table under a toolbar, a static sidebar under page state. Boundaries placed on every leaf of a hot tree turn rendering into a distributed systems problem: thirty shallow comparisons per parent render, each one a place where a future prop can quietly defeat the optimisation. One boundary at a well-chosen seam, with primitive props crossing it, is worth more than thirty with objects crossing them.</p>
+    <div class="tip"><p>Pass primitives across memo boundaries whenever the shape allows it — ids and primitives compare by value and never defeat the check. If the component needs the whole object, pass the object and drop the memo: a boundary that cannot reliably skip is noise in the profile and in the code review.</p></div>
+    <h3 id="ch12-hooks" data-toc>useMemo and honest dependency arrays</h3>
+    <p><code>useMemo</code> caches the result of a computation between renders; <code>useCallback</code> caches a function itself — <code>useCallback(fn, deps)</code> is exactly <code>useMemo(() =&gt; fn, deps)</code>. Both take a dependency array whose contract is precise: React compares it element by element on every render with <code>Object.is</code>, and if anything differs it discards the cache and runs the factory again. There is no deep comparison, no lint-level guarantee that the array is complete, and no consequence for listing a dependency the value does not use beyond extra recomputation. The array is a cache key you write by hand, and honest keys are the entire skill.</p>
+    <p>Three dishonest shapes cause most bugs. Omitting a dependency, so the memo returns last render's value built from this render's inputs — the classic stale closure, usually surfacing as an effect that "does not update". Listing a dependency that is a new object or function every render, so the cache never hits and the memo does nothing but allocate. And deriving values that could be computed during render without any memo at all — a <code>.filter</code> over a 200-item array costs microseconds, and caching it buys nothing while adding a correctness surface. Use <code>useMemo</code> for genuinely expensive computations and for reference stability other memoisation depends on; skip it for cheap work.</p>
+    <div class="codeWrap"><pre><code>// dishonest: omitted dependency, stale value escapes the memo
+function SearchResults({ query, filters }) {
+  const results = useMemo(() =&gt; filterItems(query, filters), [query]);
+  // filters changed -&gt; cache HIT -&gt; stale results, no error, no warning
+  return &lt;List items={results} /&gt;;
+}
+
+// honest: every input the computation reads, in the order it reads them
+function SearchResults({ query, filters }) {
+  const results = useMemo(() =&gt; filterItems(query, filters), [query, filters]);
+  return &lt;List items={results} /&gt;;
+}
+
+// honest AND unnecessary: cheap work, just do it
+function SearchResults({ query, filters }) {
+  const results = filterItems(query, filters);   // ~50us over 200 items
+  return &lt;List items={results} /&gt;;               // render cost is elsewhere
+}</code></pre></div>
+    <p>Dependencies that are themselves functions or objects defeat the memo even when the list is honest, because the identity changes per render. The fix is not a deep comparator — it is to make the value stable: hoist literals out of the component, obtain callbacks from a stable dispatcher like <code>useDispatch</code>, or rebuild the object inside the memo so the cache key is the primitives and the output is the structure. Every stable identity you create is also one that a child wrapped in <code>memo</code> can compare successfully, so the two techniques compound.</p>
+    <div class="codeWrap"><pre><code>// unstable dependency: the array is correct, the cache never hits
+function Report({ rows }) {
+  const summary = useMemo(() =&gt; {
+    const config = { currency: 'EUR', locale: 'de-DE' };  // new object... but
+    return buildSummary(rows, config);                     // built INSIDE, fine
+  }, [rows]);                                              // rows is the only key
+
+  const onExport = useCallback(() =&gt; exportSummary(summary), [summary]);
+  return &lt;SummaryView summary={summary} onExport={onExport} /&gt;;
+}
+
+// unstable callback dependency: derived from fresh props every render
+function Editor({ doc, onSave }) {
+  const save = useCallback(() =&gt; onSave(doc.id, editorState), [doc, onSave]);
+  // doc is usually a new object from the cache lib per fetch - pass doc.id
+  const save2 = useCallback(() =&gt; onSave(doc.id, editorState), [doc.id, onSave, editorState]);
+}</code></pre></div>
+    <h4>Rules of thumb that survive contact with real code</h4>
+    <p>Compute during render; add <code>useMemo</code> only when a measurement says the computation is expensive or when a child's <code>memo</code> needs a stable reference. Keep dependency arrays complete rather than clever — a memo that recomputes when it should is a performance note, while one that does not recompute when it should is a bug, and the two are never worth trading. Let the exhaustive-deps lint rule run as an error in CI and treat every suppression comment as a reviewable decision with a written reason next to it.</p>
+    <div class="warn"><p>Suppressing <code>exhaustive-deps</code> and marking the array "correct as-is" is the most common way stale closures reach production. If the rule is genuinely wrong for a case — a stable-by-construction ref, a dispatch — the fix is to make the stability visible in the code, such as an explicit <code>useRef</code> or an eslint-disable with the invariant named, not to silence it silently.</p></div>
+    <h3 id="ch12-compiler" data-toc>The React 19 compiler</h3>
+    <p>The React compiler — formerly React Forget — memoises for you at build time. It analyses each component and hook, works out which values it reads, and inserts cache-and-invalidate logic so that a component skips rendering when its inputs are unchanged, without you writing <code>memo</code>, <code>useMemo</code> or <code>useCallback</code> anywhere. The mental model it rewards is the one the guide has been building since chapter 1: components as pure functions of their props and state. The compiler can only skip a render it can prove is unnecessary, and it can only prove that when the component does not do things it cannot see.</p>
+    <p>Two consequences follow for your codebase. First, the manual memoisation tax drops — <code>useCallback</code> wrappers around handlers, <code>useMemo</code> around trivial object literals, <code>memo</code> on leaves — because the compiler emits equivalent or better output and keeps it correct as dependencies change. Second, the correctness rules harden: components must not mutate props or state, must not read write-only values during render, and must keep side effects out of the render body, because these are precisely the patterns that make "did this render need to happen" unanswerable. The compiler is a forcing function for the purity discipline the rest of the guide teaches anyway.</p>
+    <div class="codeWrap"><pre><code>// before the compiler: memoisation you maintain by hand
+const TodoItem = memo(function TodoItem({ todo, onToggle }) {
+  const label = useMemo(() =&gt; formatLabel(todo), [todo]);
+  const handle = useCallback(() =&gt; onToggle(todo.id), [onToggle, todo.id]);
+  return (
+    &lt;li&gt;
+      &lt;input type="checkbox" checked={todo.done} onChange={handle} /&gt;
+      {label}
+    &lt;/li&gt;
+  );
+});
+
+// after the compiler: the same component, no memo vocabulary at all.
+// the compiler caches label on todo, the handler on onToggle + todo.id,
+// and skips the render when both are unchanged.
+function TodoItem({ todo, onToggle }) {
+  const label = formatLabel(todo);
+  const handle = () =&gt; onToggle(todo.id);
+  return (
+    &lt;li&gt;
+      &lt;input type="checkbox" checked={todo.done} onChange={handle} /&gt;
+      {label}
+    &lt;/li&gt;
+  );
+}</code></pre></div>
+    <p>Adoption is a build-plugin change — a Babel or SWC plugin — with an eslint rule set that flags the patterns the compiler cannot optimise. The recommended migration is incremental: enable the plugin, run the compiler's output analysis to see how many components it already handles, fix the blockers the lint rules report, and only then remove hand-written memoisation where the compiler now covers it. Components it cannot optimise are not broken; they simply behave exactly as they did before, which makes partial adoption safe.</p>
+    <div class="codeWrap"><pre><code>// eslint-plugin-react-hooks: the compiler-facing rules, enabled as errors
+// .eslintrc.cjs excerpt (structure only - see your plugin version's docs)
+module.exports = {
+  overrides: [
+    {
+      files: ['src/**/*.{ts,tsx}'],
+      plugins: ['react-hooks'],
+      rules: {
+        // the two classics, both errors now that the compiler depends on them
+        'react-hooks/rules-of-hooks': 'error',
+        'react-hooks/exhaustive-deps': 'error',
+        // the compiler-era rules: impure reads and mutations during render
+        'react-hooks/purity': 'error',
+        'react-hooks/set-state-in-render': 'error',
+        'react-hooks/static-components': 'error',
+      },
+    },
+  ],
+};</code></pre></div>
+    <h4>What the compiler does not do</h4>
+    <p>It does not fix a bad component boundary — if a component re-renders because its parent passes new children JSX, the compiler can memoise the render but cannot stop the elements from being created. It does not help the commit phase: skipped renders save JavaScript, not DOM writes. And it does not make impure code safe; a component reading <code>Date.now()</code> during render can be skipped at the wrong moment and show the user a stale timestamp. The compiler raises the floor for render-phase cost, and chapters 11, 14 and 18 still own everything downstream of it.</p>
+    <div class="tip"><p>Enable the compiler in development first and keep the render-count tests from chapter 11 running throughout. They are the cheapest way to see whether the compiler is actually skipping the renders you expected — the build succeeds either way, and a silently unoptimised component looks identical to an optimised one in a passing test suite.</p></div>
+    <h3 id="ch12-cost" data-toc>When memoisation makes things worse</h3>
+    <p>Every memo is a standing bet that comparison is cheaper than re-rendering. The bet loses in three recurring situations. A memoised component whose props change on most renders pays a full shallow comparison every parent render and still renders — pure overhead added to the hot path. A deeply memoised tree where most comparisons fail early wastes time walking props structures that were never stable, turning a flat render into a tree of partial ones. And memoised closures and objects extend the lifetime of their captured values, which on a long-lived page with large data means memory that a plain re-render would have released with the old tree.</p>
+    <p>The diagnostic for a losing bet is the same one used everywhere in this chapter: profile with the memo, profile without it, on the real interaction. The ranked chart makes the result legible — if total actual duration is unchanged or worse with the wrapper present, the comparison is not buying anything. There is also a code-level smell worth recognising: a component wrapped in <code>memo</code> whose props are documented as "unstable" or "new object each render" is an optimisation that provably never fires, and the honest fix is to delete it and address the props, not to add a custom comparator and hope.</p>
+    <div class="codeWrap"><pre><code>// a memo that cannot fire: props are rebuilt every render
+function Toolbar({ view, onAction, meta }) {
+  const actions = { onAction, meta };        // new object each render
+  return &lt;MemoBar view={view} actions={actions} /&gt;;
+}
+const MemoBar = memo(Bar);
+
+// deleting the wrapper is correct here - then make the child cheap instead
+function Toolbar({ view, onAction, meta }) {
+  return &lt;Bar view={view} onAction={onAction} meta={meta} /&gt;;
+}
+// Bar is a thin shell; its children are memoised where they earn it.
+
+// the real optimisation: stable primitives + stable handlers at the source
+function Toolbar({ view, dispatch, metaId }) {
+  const onAction = useCallback((a) =&gt; dispatch({ type: a, metaId }), [dispatch, metaId]);
+  return &lt;MemoBar view={view} onAction={onAction} /&gt;;   // now it can fire
+}</code></pre></div>
+    <p>The second failure mode is subtler: memoised components in a list where the key or the props shuffle cause almost all comparisons to fail, so you get the comparison cost for zero skips while the render order churns. This is common with sorted lists — every sort swaps identities, and identity-based comparison correctly concludes that everything changed. Here the structural fix is to memoise the sort itself (chapter 11's derivation rule) so the array of rows is stable between renders, letting the per-row comparisons succeed rather than sorting inside the parent on every keystroke.</p>
+    <div class="codeWrap"><pre><code>// comparison churn: the sort rebuilds every prop, memo skips nothing
+function ListView({ items, query }) {
+  const sorted = [...items].sort(byScore);           // new array identity
+  return sorted.map((it) =&gt; &lt;Row key={it.id} item={it} query={query} /&gt;);
+}
+const Row = memo(RowImpl);
+// query changes per keystroke -&gt; every Row re-renders AND every Row is
+// compared. memo added cost, removed nothing.
+
+// stabilise the expensive input first, then the comparisons succeed
+function ListView({ items, query }) {
+  const sorted = useMemo(() =&gt; [...items].sort(byScore), [items]);
+  return sorted.map((it) =&gt; &lt;Row key={it.id} item={it} query={query} /&gt;);
+}
+// rows still re-render on query (they display it), but only the render that
+// changed query does work - unrelated commits now skip the whole list.</code></pre></div>
+    <h4>Deleting memoisation is a valid optimisation</h4>
+    <p>In a compiler-enabled codebase, hand-written memoisation is legacy surface: it must be kept correct as props evolve, it hides the real dependency structure behind wrappers, and it occasionally blocks a compiler improvement by wrapping a component in a way the analysis cannot see through. Treat removal as a change to be measured like any other — delete, run the render-count tests, compare profiles, keep the deletion if the numbers hold. Optimisation is a practice, not a possession; code that once earned its place can outlive it.</p>
+    <div class="warn"><p>Never add a custom <code>React.memo</code> comparator to "fix" a memo that is not firing without first asking why the props change. The comparator hides the identity churn from React but not from the code that produces it — and the moment a genuinely new prop arrives, the component will not re-render while its siblings do, which is a data-freshness bug that no test will catch unless you wrote one for exactly that prop.</p></div>
+    <div class="ex"><h4>Exercises 12</h4><ol>
+      <li>Find five calls to <code>React.memo</code>, <code>useMemo</code> and <code>useCallback</code> in your codebase. For each, write down the render count and prop stability that would justify it, then check the profiler. Delete the ones that cannot fire.</li>
+      <li>Take a component with a suppressed <code>exhaustive-deps</code> warning. Either fix the dependencies or make the stability explicit in code with a comment naming the invariant. Record which of the two it was and why.</li>
+      <li>Enable the React compiler on a branch. Record how many components it optimised, fix the lint errors it reports, and compare render counts in the chapter 11 test before and after.</li>
+      <li>Build the churn case: a sorted list under a keystroke state. Measure with memo on the rows, then memoise the sort instead of the rows, and compare total actual duration across ten simulated keystrokes.</li>
+      <li>Write one paragraph in your team's docs stating the house rule for memoisation — measure first, primitives across boundaries, complete dependency arrays — and attach the profile that justified it.</li>
+    </ol></div>
+  </section>

@@ -1,0 +1,308 @@
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation and the Design Process</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">This guide is the bridge between designing an interface and building it. It assumes you can already design something you like, and covers the part where a design meets HTML, CSS, a component library, a browser on a slow phone, and a screen reader — and has to survive all of it. Eight chapters take you from the research that decides what to build, through the flows, visuals and interactions that define how it behaves, to the accessibility, design systems and hand-off that keep it right once it ships.</p>
+
+<h3 id="ch1-1" data-toc>1.1 What UI/UX design is</h3>
+<p class="topic-desc">Interface design and experience design are different jobs that ship as one artefact. You will be responsible for both, so the first thing to learn is which question each one answers.</p>
+<h4 id="ch1-1-split">The two halves of the discipline</h4>
+<p><strong>User interface design</strong> is the surface: layout, typography, colour, components, spacing, and how a screen reads at a glance. <strong>User experience design</strong> is everything around that surface: who the users are, what they are trying to do, what happens when they fail, and whether the whole journey — the email, the invoice, the error message, the phone call they make when it breaks — holds together. A page can win on one and lose on the other: a beautiful checkout that asks for the same address twice is a UX failure rendered in UI polish.</p>
+<div class="codeWrap"><pre><code>// the two questions, side by side
+UI asks:   does this screen look right, read right, feel right?
+UX asks:   can the user achieve their goal with this product?
+
+// the same task, and what each discipline contributes
+TASK: reset a forgotten password
+UI:   the call-to-action is findable, the field is labelled,
+      the error message is legible
+UX:   the reset email arrives, the link works once, the new
+      password is accepted, and the user is signed in afterwards
+
+// almost every "nobody uses this feature" report is a UX problem
+// wearing a UI costume. the button was visible; the journey was not.</code></pre></div>
+<h4 id="ch1-1-spec">A design is a specification, not a picture</h4>
+<p>The mindset shift worth making early: a design is not a picture of a screen. It is a <em>specification</em> for behaviour under conditions you cannot fully control. Every value you choose has to survive a 320 px viewport, 200% browser zoom, a colour-blind user, a slow network, a screen reader, and a user who has turned your animations off in the OS settings. If a choice cannot justify itself against that list, it is decoration, and decoration ships at its own risk.</p>
+<div class="codeWrap"><pre><code>// the design has to survive all of these, at once
+the design has to survive:
+  - a 320px viewport
+  - 200% browser zoom
+  - a colour-vision-deficient user (1 in 12 men)
+  - a slow network: 3G, fonts not loaded yet
+  - a screen reader announcing every element in order
+  - the OS "reduce motion" setting switched on
+
+// and a brief must say what it means, not what it hopes
+GOOD: "Raise the contrast of the secondary text to at least 4.5:1,
+      use the 16px type scale, and give the primary action a 44px
+      hit area."
+BAD:  "Make the landing page pop a bit more."
+// a brief you can hand to a developer with no follow-up questions
+// is a design decision. anything else is an intention.</code></pre></div>
+<div class="note"><p>You need three things to work like this: a vocabulary precise enough to brief a developer ("make it pop" is not actionable; "raise the contrast of the secondary text to 4.5:1" is), a grip on the constraints so you design inside them (font rendering differs, users override colours, zoom is a feature, and not everyone sees colour the way you do), and a system so a hundred screens stay coherent (tokens and components, not one-off decisions).</p></div>
+
+<h3 id="ch1-2" data-toc>1.2 The design process: research, design, test, ship</h3>
+<p class="topic-desc">Design work is a loop, not a waterfall. Each pass reduces a different risk: research reduces the risk of building the wrong thing, testing reduces the risk of building the right thing wrong, and shipping turns the loop from a prototype into a product.</p>
+<h4 id="ch1-2-loop">Four stages, four questions</h4>
+<p>The loop has four named stages, and each one answers a question the stage before it could not. The output of each stage is the input of the next, so nothing is thrown away — the insight from research becomes the persona that drives the flow that becomes the prototype that the test plan checks.</p>
+<div class="codeWrap"><pre><code>// the loop, and the question each stage answers
+STAGE     QUESTION IT ANSWERS              ACTIVITIES                    OUTPUT
+research  are we building the right thing? interviews, surveys,          insights,
+                                          analytics, competitive        personas,
+                                          review                         journey maps
+design    can we build it?                flows, wireframes,            prototype,
+                                          content, hi-fi mockups        spec
+test      did we build it right?          usability tests, expert       findings,
+                                          review, 5-second tests        fixes
+ship      does it stay right?             analytics, support,           release,
+                                          QA against the spec           follow-up
+// each pass tightens the loop. a release is the start of the next
+// research pass, not the end of the work.</code></pre></div>
+<h4 id="ch1-2-artifacts">The loop in one line</h4>
+<p>A stage's output is only worth anything if the next stage consumes it. A persona nobody puts in front of a flow is a slide in a deck; a test finding nobody feeds back into the design is a report in a drawer. The practical version of the loop is short enough to hold in your head, and every artifact on it is something you will see again in the chapters ahead.</p>
+<div class="codeWrap"><pre><code>research -&gt; synthesize -&gt; design -&gt; prototype -&gt; test -&gt; iterate -&gt; ship
+   |            |           |           |             |
+ personas    journey    user      wireframes    test plan,
+             maps       flows,    and hi-fi     findings
+                        site map
+
+// carry forward is the whole point
+//  personas  -&gt; drive the user flows      (ch2, ch3)
+//  flows     -&gt; shape the layout         (ch3, ch4)
+//  prototype -&gt; gets tested              (ch7)
+//  findings  -&gt; update personas + the design system (ch2, ch8)</code></pre></div>
+<div class="tip"><p>Iteration is not a correction, it is the method. A prototype is a falsifiable hypothesis: "if the user can find it in under a minute, the layout works." Test it cheaply, learn, and change the design. The designers who ship fastest are the ones who make their assumptions cheap to disprove.</p></div>
+
+<h3 id="ch1-3" data-toc>1.3 Tools, and how the guide is organised</h3>
+<p class="topic-desc">Nothing in this guide depends on a specific application. Figma is the most common design tool and is used for examples; Sketch, Adobe XD, Penpot and a text editor in your repository all work. The deliverables that matter are tool-independent and live beside the code.</p>
+<h4 id="ch1-3-tools">Tool-independent deliverables</h4>
+<p>Because design tools change and codebases do not, the artifacts that last are the ones a build step can read. A token file diffs in code review, an SVG can be committed, and a written state list survives the designer leaving. If a deliverable can only be opened in the tool that created it, treat it as a draft, not a source of truth.</p>
+<div class="codeWrap"><pre><code>// deliverables that matter, and where they live
+[ ] design tokens: colours, type, spacing, radius, shadows
+    - as JSON in the repo, next to the code that consumes them
+[ ] flow and site maps        - text or diagram files, committed
+[ ] SVGs                     - minified, colour via currentColor
+[ ] component states          - one line per state, written down
+[ ] redlines                 - for the screens that carry risk only
+
+// a Figma library is a good authoring tool and a poor source of
+// truth, because it is not readable by the build and does not diff.</code></pre></div>
+<h4 id="ch1-3-map">How the eight chapters fit together</h4>
+<p>Chapters 2 and 3 build the evidence you design from — who the users are and how they move through the product. Chapters 4 and 5 are the visual systems: layout, colour and type. Chapter 6 turns those systems into behaviour, chapter 7 tests it, and chapter 8 makes it accessible, systematised and shippable. You can open any chapter on its own; each section is self-contained, and the roadmap below says where it sits.</p>
+<div class="codeWrap"><pre><code># the arc: understand, design, behave, ship
+ 1 orientation and process     what this work is, the loop
+ 2 research and synthesis      interviews, personas, journeys, tests
+ 3 information architecture    maps, flows, navigation, search
+ 4 visual design principles    hierarchy, grid, balance, whitespace
+ 5 colour, type, imagery       the three visual systems
+ 6 interaction and components  states, feedback, motion, forms
+ 7 prototyping and testing     wireframes to hi-fi, testing methods
+ 8 accessibility and delivery  WCAG, tokens, libraries, hand-off</code></pre></div>
+<div class="tip"><p>Design tokens in version control beat any tool's export. A single JSON or YAML file of colour, type, spacing and radius values, committed beside the code, is the thing that actually prevents drift. It can be read by a designer, a developer, and a build step, and it diffs properly. A Figma library is a good authoring tool and a poor source of truth.</p></div>
+
+<h3 id="ch1-4" data-toc>1.4 The one rule that matters most</h3>
+<p class="topic-desc">If you remember one thing from this guide, remember this: contrast is a hard requirement, not a preference. It is the single check that separates a design that looks finished from one that fails the moment it ships.</p>
+<h4 id="ch1-4-ratios">The ratios that are law</h4>
+<p>WCAG defines the numbers, and they are small enough to internalise. Normal text needs 4.5:1, large text and UI boundaries need 3:1, and AAA text needs 7:1. You will meet these numbers again in chapters 5 and 8; for now, learn to read this block as the spine of the whole guide.</p>
+<div class="codeWrap"><pre><code>// Contrast is a hard requirement, not a preference.
+//
+//   4.5:1  normal text              (WCAG AA)
+//   3:1    large text, 18.66px+ bold or 24px+ regular   (WCAG AA)
+//   3:1    UI components and their boundaries           (WCAG 1.4.11)
+//   7:1    normal text              (WCAG AAA)
+//
+// check EVERY pair you ship, in EVERY state, in BOTH themes, with
+// real content, not placeholder. Grey-on-grey is the single most common
+// defect in a "beautiful" design that fails the moment it ships.</code></pre></div>
+<h4 id="ch1-4-check">Where the rule breaks first</h4>
+<p>The pairs that fail are not the ones you think about — they are the ones you never tested. Text on a tinted card is checked against the page and passes, then sits on the card and fails. Placeholder text inherits a browser opacity. Text on the accent colour only exists in one theme in the file. Build the habit of listing the hard pairs up front, and the chapters on colour (ch5) and accessibility (ch8) will give you the machinery to check them properly.</p>
+<div class="codeWrap"><pre><code>// the five pairs that fail most often, in order of damage
+1. muted text on tinted cards       (check against the card, not the page)
+2. placeholder text                 (browsers render it at ~54% opacity)
+3. text on the accent colour        (buttons; check BOTH themes)
+4. disabled text                    (3:1 floor even though WCAG exempts it)
+5. icons that carry meaning         (3:1 as non-text contrast)
+// rule: check every pair, in every state, in both themes, with real
+// content. an automated pass at build time is the only reliable way.</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ UX Research and Synthesis</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Research is how you replace assumptions with evidence. A week of interviews and a few usability tests cost less than one redesign of a launched feature, and the material they produce — personas, journey maps, insights — is what every later decision in this guide gets checked against.</p>
+
+<h3 id="ch2-1" data-toc>2.1 Interviews and surveys</h3>
+<p class="topic-desc">Interviews tell you why people behave the way they do; surveys tell you how many people behave that way. They answer different questions, so they are designed differently and their results must not be confused.</p>
+<h4 id="ch2-1-interview">The interview that finds the truth</h4>
+<p>Five to eight interviews is a working number for most products — past that, the same stories recur and you are paying for confirmation. The interview is a guided conversation, not a questionnaire: open with the consent and the frame, ask them to walk through a real past task (the "grand tour"), and follow the surprises. The most valuable minutes are the ones where the participant tells you what you were not asking about.</p>
+<div class="codeWrap"><pre><code># interview script — 45 minutes, one guest, no script-sticking
+00:00  consent, recording on, "there are no wrong answers" frame
+00:03  grand tour: "walk me through your last [task], start to finish"
+00:12  "what surprised you?"     # follow the surprise, not the next question
+00:25  "the last time something went wrong"
+00:35  "what would you change if you could?"
+00:42  "who else should I talk to?"   # recruits the next participant
+
+# the facilitator's refrains
+"tell me more about that"        # instead of leading
+"what did you expect to happen?" # instead of explaining
+"and then what?"                 # instead of moving on</code></pre></div>
+<h4 id="ch2-1-survey">Writing questions that measure behaviour</h4>
+<p>A survey is useless if the items cannot be answered honestly. Ask about a specific past behaviour, not an opinion ("when did you last reset a password?" beats "is password reset useful?"), test one construct per item, and pilot the whole thing on two colleagues before you spend anyone's time on it. The checklist below catches the failures that kill data.</p>
+<div class="codeWrap"><pre><code>[ ] asks about a specific past behaviour, not an opinion
+    "when did you last reset a password?"  not  "is password reset useful?"
+[ ] one construct per item; split "and" questions
+[ ] no leading wording ("don't you think the search is slow?")
+[ ] options are exhaustive and mutually exclusive;
+    a "not applicable" option exists
+[ ] every respondent can answer every item; no compound traps
+[ ] piloted on two colleagues before fielding</code></pre></div>
+<div class="warn"><p>One interview is a story; forty answers is a statistic. Never draw a percentage from interview notes, and never quote a survey item as if it explained why. The interview gives you the mechanism, the survey gives you the scale — you need both, and they do not substitute for each other.</p></div>
+
+<h3 id="ch2-2" data-toc>2.2 Personas</h3>
+<p class="topic-desc">A persona is a synthesis artefact: the useful pattern of goals, frustrations and constraints found across your interviews and data, given a name so a room can talk about it. It is not a character sketch and it is not a requirements document.</p>
+<h4 id="ch2-2-artifact">A persona that earns its place</h4>
+<p>Three to five personas cover most products; more than that and they are preferences, not patterns. Every attribute in the persona must trace back to evidence — the interview, the survey segment, the support tickets — or it is fiction, and fiction has no veto power in a design review. Note what the persona is explicitly for, so it cannot be misused.</p>
+<div class="codeWrap"><pre><code>// persona as a working artefact — grounded, specific, evidence-linked
+{
+  "name": "Priya",
+  "context": "frontend lead at a 40-person agency",
+  "goals": [
+    "ship one design system across five client projects",
+    "cut design review cycles to under a week"
+  ],
+  "constraints": [
+    "works in a browser, on a 14-inch laptop",
+    "inherits legacy CSS she cannot refactor"
+  ],
+  "painPoints": [
+    "developers override design decisions late in the sprint",
+    "no single source of truth for colours and spacing"
+  ],
+  "evidence": [
+    "interviews 3 and 5 of 8, June",
+    "support-ticket analysis, May-June"
+  ],
+  "usedFor": "design reviews: 'would Priya understand this screen?'",
+  "neverUseFor": "feature requests — personas set context, not requirements"
+}</code></pre></div>
+<h4 id="ch2-2-use">Using personas without being fooled by them</h4>
+<p>Put the persona in front of every design review, and refresh it only when new evidence contradicts it. The failure modes are all versions of treating the persona as a fact: a persona invented to argue for a feature, a persona with no constraints (everyone is "tech-savvy and busy"), and a persona that outlives its evidence.</p>
+<div class="codeWrap"><pre><code># persona hygiene checklist
+[ ] every attribute traces to evidence, named in the file
+[ ] 3-5 personas; anything more is a preference list
+[ ] constraints recorded, not just goals
+[ ] reviewed against each new round of research
+[ ] retired when evidence no longer supports the pattern
+# anti-patterns
+  - "the primary user is anyone with an internet connection"
+  - a persona created to justify a feature the team already decided
+  - a persona whose frustrations are all the competitor's fault</code></pre></div>
+<div class="note"><p>Personas do not request features. A persona that "wants a dashboard" is not a requirement — it is a statement that the team has not yet done the task analysis. Use the persona to check comprehension and suitability, and use task analysis (next section) to decide what to build.</p></div>
+
+<h3 id="ch2-3" data-toc>2.3 Journey maps and task analysis</h3>
+<p class="topic-desc">A journey map follows a person across touchpoints and time and captures the emotional arc; task analysis zooms into one goal and scores every step. Together they are the picture and the microscope of the experience.</p>
+<h4 id="ch2-3-journey">Mapping the journey, not the screen</h4>
+<p>Build the map from research: stages across the top, the user's actions, thoughts and pains in each stage, and an opportunity in every row. Current-state maps describe what happens today and are the honest starting point; future-state maps are the design target. If a stage has no pain and no opportunity, it either does not belong or you have not looked hard enough.</p>
+<div class="codeWrap"><pre><code>STAGE      ACTION                  THOUGHT                 PAIN                     OPPORTUNITY
+Discover   searches "team billing" "which tool is real?"    five tabs, no baseline   show price early
+Compare    opens the pricing page  "can we trial it?"       trial link hidden        "Try it" above the fold
+Decide     invites a teammate      "will billing work?"     no seat preview          live seat calculator
+Adopt      sends first invoice     "did it save?"           no confirmation state    success screen, next step
+Advocate   mentions it to a peer   "it just worked"         recommendation           referral link in product
+
+// row rule: if a stage has no pain and no opportunity, you are
+// describing the map you hoped for, not the journey users have.</code></pre></div>
+<h4 id="ch2-3-task">Task analysis: scoring every step</h4>
+<p>Pick the tasks that matter (login, pay, export, reset) and break each into steps. Score every step for frequency, importance and difficulty — the friction column comes from tests and support tickets, not from opinion. Steps that are frequent, important and difficult are the ones worth redesigning; the rest are not.</p>
+<div class="codeWrap"><pre><code>TASK                          FREQUENCY   IMPORTANCE   DIFFICULTY   FRICTION
+reset a forgotten password    weekly      high         low          needs help text
+share a dashboard link        daily       high         medium       link is in a menu
+change the billing email      rarely      medium       high         form reloads twice
+export this week's report     weekly      high         high         toolbar hidden
+
+// the redesign order
+//   high frequency + high difficulty  -> fix now
+//   high importance  + high friction  -> fix now
+//   rare + easy                       -> leave alone, document it</code></pre></div>
+
+<h3 id="ch2-4" data-toc>2.4 Usability testing</h3>
+<p class="topic-desc">Usability testing is the fastest source of truth in the whole discipline: five participants will surface most of a flow's serious problems in a morning. The craft is in writing tasks that test goals rather than clicks, and in resisting the urge to rescue the participant.</p>
+<h4 id="ch2-4-plan">Tasks and metrics, written before the session</h4>
+<p>Each task must be a goal in the participant's language ("find the price for forty seats"), never a click-by-click instruction ("click the pricing link in the nav"), because the second one tests whether people can follow instructions, not whether the interface makes sense. Define the success metric and pass bar per task in advance — that is what turns a session into comparable data.</p>
+<div class="codeWrap"><pre><code>TASK  SCENARIO                         METRIC              PASS BAR
+T1    "sign up and create a project"   task success        80%+ completes unaided
+T2    "find the price for 40 seats"    time on task        under 90 seconds
+T3    "export this week's report"      errors per task     one or fewer
+T4    "cancel and confirm the change"  mis-clicks          none on destructive paths
+
+# facilitator rules
+- observe; do not teach. "what did you expect to happen?" not "try the toolbar"
+- the participant's wrong guess IS the data. do not fix it for them
+- think-aloud: "tell me what you're looking at and what you're deciding"</code></pre></div>
+<h4 id="ch2-4-metrics">Turning sessions into numbers</h4>
+<p>Raw notes are anecdotes until they are scored. Task success and time-on-task are the workhorses; the System Usability Scale adds a comparable 0–100 score in ten questions. The scoring rules are simple enough to do on paper in the debrief, and the SUS score gives you something to trend across rounds.</p>
+<div class="codeWrap"><pre><code>// per-task metrics
+function taskSuccess(completed, attempts) {
+  return completed / attempts;          // compare against the pass bar
+}
+function timeOnTask(seconds, baseline) {
+  return seconds &lt;= baseline ? "pass" : "fail";
+}
+
+// System Usability Scale (SUS) — 10 items, 5-point agree/disagree
+// odd items  (1,3,5,7,9):   item score = answer - 1
+// even items (2,4,6,8,10):  item score = 5 - answer
+// SUS = sum(item scores) * 2.5   ->   0 to 100
+// 68+ is above average; under 51 is a serious usability problem
+const answers = [4, 2, 5, 2, 4, 1, 4, 2, 3, 2];   // example row
+const score = answers.reduce((sum, a, i) =&gt;
+  sum + (i % 2 === 0 ? a - 1 : 5 - a), 0) * 2.5;
+console.log('SUS:', score);</code></pre></div>
+<h4 id="ch2-4-run">The moderator's three worst habits</h4>
+<p>Novice moderators turn a test into a demo in three specific ways, all of them well-meaning. Each one destroys the data it was meant to protect: answering for the participant hides their model of the UI, reassurance teaches them the "right" answer, and demonstrating turns observation into instruction. Silence, then the one question, is the whole technique.</p>
+<div class="codeWrap"><pre><code>// what not to do, and what to say instead
+[ ] answering for the participant         -> stay quiet, wait longer
+[ ] reassuring ("it's fine, everyone")    -> "there are no wrong answers"
+[ ] teaching ("try dragging instead")     -> "what did you expect to happen?"
+// if you explain more than twice in a session, your task was written
+// as instructions. rewrite it as a goal.
+// five participants finds most issues; three is the minimum to trust a
+// finding at all.</code></pre></div>
+
+<h3 id="ch2-5" data-toc>2.5 Synthesis: affinity mapping and insights</h3>
+<p class="topic-desc">Synthesis is where messy notes become decisions. Affinity mapping clusters observations into themes, and insight statements turn those themes into claims you can design against — and argue about, productively.</p>
+<h4 id="ch2-5-affinity">Affinity mapping that survives the room</h4>
+<p>Write one note per observation, phrased as a fact with its source attached, then group the notes on a wall by theme. Name each cluster in the participants' language, not yours ("I gave up and called support" becomes the cluster "support is the last resort"). Count clusters, not notes: five clusters of three notes outrank fifteen scattered ones.</p>
+<div class="codeWrap"><pre><code>// one note per observation, source attached
+{ "id": "n14", "person": "g4", "quote": "I gave up and called support",
+  "theme": "" }
+
+// clustering
+- drop every note onto the wall
+- move them in silence first; argue only about the disputed few
+- name each pile from the quotes, not from your vocabulary
+- a quote in two piles = the theme is real, split it into two
+
+// output check
+//   5 clusters of 3 notes each   -> a report you can design from
+//   15 notes, no clusters        -> you stored data, you did not synthesise</code></pre></div>
+<h4 id="ch2-5-insight">Insight statements, not observations</h4>
+<p>An observation is raw ("three users could not find the export link"); an insight explains the mechanism ("users call support instead because the toolbar appears only after a row is selected"). Insights are what you can design against, because they name the cause. If you cannot finish the sentence with evidence, you have an observation — which is fine, but it is not yet a finding.</p>
+<div class="codeWrap"><pre><code># insight template
+"When [context] happens, [user] does [behaviour] because [reason]."
+
+# observation   ->  insight
+users cannot find the export link
+              ->  "When the page has no rows selected, users look for
+                  the export action in the wrong toolbar, because the
+                  actions that matter are hidden until a row is
+                  selected."
+
+# test an insight before you trust it
+[ ] the mechanism is named (the "because" is filled in)
+[ ] evidence is attached (sessions, quotes, counts)
+[ ] it is falsifiable: a counter-example would change the design
+# an insight with no "because" and no evidence is a guess with
+# better punctuation.</code></pre></div>
+<div class="tip"><p>Synthesis is not a meeting about feelings. It is a machine with two outputs — clusters and insight statements — and you run it until both are done. If the team leaves the room with neither, run it again with a stricter rule: no insight enters the backlog without evidence attached.</p></div>
+</section>

@@ -1,0 +1,12 @@
+'use strict';
+const s = require('fs').readFileSync('build/tmp/expansion/r-programming.txt', 'utf8');
+const strip = (x) => x.replace(/<[^>]+>/g, '').trim();
+const h2 = [...s.matchAll(/<h2 id="([^"]+)"[^>]*>([\s\S]*?)<\/h2>/g)];
+console.log('H2 (' + h2.length + '):');
+for (const m of h2) console.log('  ' + m[1] + ' | ' + strip(m[2]));
+const h3 = [...s.matchAll(/<h3 id="([^"]+)"/g)].map((m) => m[1]);
+const h4 = [...s.matchAll(/<h4 id="([^"]+)"/g)].map((m) => m[1]);
+console.log('H3 (' + h3.length + '):');
+console.log('  ' + h3.join(', '));
+console.log('H4 (' + h4.length + '):');
+for (let i = 0; i < h4.length; i += 8) console.log('  ' + h4.slice(i, i + 8).join(', '));

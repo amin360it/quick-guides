@@ -1,0 +1,1455 @@
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation: a .NET object shell</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Orientation sets the mental model before you type anything clever. PowerShell is an object shell built on .NET: commands are <code>Verb-Noun</code> pairs that hand typed objects along a pipeline, and the same console runs scripts you write once and reuse. This chapter covers the hosts you will drive, the help system that answers your questions, and the execution policy that decides whether your scripts are allowed to run at all.</p>
+
+<h3 id="ch1-1" data-toc>1.1 What PowerShell is</h3>
+<p class="topic-desc">PowerShell 7 (<code>pwsh</code>) is a cross-platform command-line shell and scripting language built directly on .NET. Its single design decision — that commands emit typed objects rather than formatted text — is what separates it from <code>cmd.exe</code> and from every POSIX shell, and almost every practical difference follows from that one choice.</p>
+
+<h4 id="ch1-1-object-shell">Commands emit objects, not text</h4>
+<p><code>Get-Process</code> emits <code>System.Diagnostics.Process</code> instances carrying <code>Id</code>, <code>CPU</code>, <code>WorkingSet64</code> and <code>StartTime</code> as real typed properties. <code>Where-Object</code> tests <code>$_.CPU -gt 100</code> as a number rather than as a column of text it must first parse, so no script has to know which column is which. A property that is a <code>[datetime]</code> can be compared with <code>-gt</code> against a date, and property access survives changes in the cmdlet's output formatting — the single most common cause of breakage in a script written against a text pipeline.</p>
+
+<div class="codeWrap"><pre><code># One pipeline: objects in, typed at every stage, no column parsing.
+Get-Process -Name notepad | Where-Object { $_.WorkingSet64 -gt 20MB } |
+    Select-Object ProcessName, Id, @{N='RAM_MB'; E={[math]::Round($_.WorkingSet64/1MB,1)}}
+
+# A DateTime property compares like a date, not like a string column.
+Get-Service | Where-Object { $_.Status -eq 'Running' } |
+    Select-Object -First 3 Name, DisplayName
+</code></pre></div>
+
+<h4 id="ch1-1-get-member">Inspect the objects before you use them</h4>
+<p>The first move when a command returns something unexpected is <code>Get-Member</code>, which prints the type followed by every property and method it carries. It substitutes for a documentation lookup, and it is faster, because the answer is authoritative for the version installed rather than the version documented. Two companions are worth knowing: <code>Format-List *</code> shows every property with its value, and <code>Format-Table</code> with an explicit property list gives you the columns you want rather than the five the cmdlet's author chose.</p>
+
+<div class="codeWrap"><pre><code>Get-Process -Name notepad | Get-Member
+# TypeName: System.Diagnostics.Process
+# CPU     Property double  CPU
+# Id      Property int32   Id
+# Path    Property string  Path
+# Kill()  Method   void    Kill()
+
+# A custom view: every property visible, none guessed.
+Get-Process -Name notepad |
+    Format-List ProcessName, Id, StartTime, WorkingSet64
+</code></pre></div>
+
+<h4 id="ch1-1-providers">Every store is a drive</h4>
+<p>PowerShell drives the filesystem, the registry, the certificate store and the environment through one abstraction called a provider, and a drive prefix selects which one. <code>Get-ChildItem C:\Windows</code> lists files; <code>Get-ChildItem HKLM:\SOFTWARE</code> lists registry keys; <code>Get-ChildItem Cert:\CurrentUser\My</code> lists certificates — the cmdlet is identical in all three cases. The prefixes you will actually meet are the filesystem, <code>HKLM:</code> and <code>HKCU:</code> for the registry, <code>Cert:</code> for certificates, and <code>Env:</code> for environment variables.</p>
+
+<div class="codeWrap"><pre><code># The cmdlet is identical; only the drive prefix changes.
+Get-ChildItem C:\Windows | Select-Object -First 3 Name
+Get-ChildItem HKLM:\SOFTWARE\Microsoft | Select-Object -First 3 PSChildName
+Get-ChildItem Env: | Where-Object Name -EQ 'PATH'
+Get-ChildItem Cert:\CurrentUser\My | Format-Table Subject, NotAfter -AutoSize
+</code></pre></div>
+
+<h3 id="ch1-2" data-toc>1.2 Cmdlets, functions and scripts</h3>
+<p class="topic-desc">Reuse comes in three sizes. A cmdlet is a compiled .NET command, a function is a block defined in session memory, and a script is a <code>.ps1</code> file on disk. All three are invoked identically on the pipeline, which is why you can start with a one-liner, graduate it to a function, and finally ship it as a script without changing any caller.</p>
+
+<h4 id="ch1-2-verb-noun">Verb-Noun is the naming law</h4>
+<p>Every cmdlet is <code>Verb-Noun</code>, drawn from a fixed approved list that <code>Get-Verb</code> prints. The verbs worth knowing cold are <code>Get</code>, <code>Set</code>, <code>New</code>, <code>Remove</code>, <code>Test</code>, <code>Start</code>, <code>Stop</code>, <code>Invoke</code>, <code>Convert</code>, <code>Export</code> and <code>Import</code>. The naming is not decorative: a function that invents its own verb cannot be discovered by tab completion, cannot be found by <code>Get-Command -Verb</code>, and reads to the next person as amateur. It also explains the noun choices — <code>Test-Path</code> is a boolean test rather than a getter, and <code>Get-Content</code> is a getter whose noun is "Content", not "File".</p>
+
+<div class="codeWrap"><pre><code># Approved verbs are discoverable and finite.
+Get-Verb | Select-Object -ExpandProperty Verb | Sort-Object
+# Add Clear Close Copy Enter Exit Find Format Get Group Hide
+# Import Insert Join Lock Move New Open Remove Rename Reset
+# Select Set Show Skip Split Start Stop Test Update Wait Write
+</code></pre></div>
+
+<h4 id="ch1-2-reuse-ladder">Functions, scripts and aliases</h4>
+<p>A function lives in memory until the session ends; a script survives on disk and can take parameters. Dot-sourcing (<code>. .\file.ps1</code>) runs a script in the current scope and is how you load a library of helper functions into an interactive session. An alias is neither: <code>dir</code>, <code>ls</code>, <code>?</code> and <code>%</code> are pre-defined shortcuts to cmdlets, set with <code>Set-Alias</code> and listed with <code>Get-Alias</code>. A packaged, shareable collection of functions is a module (a <code>.psm1</code> file), covered in chapter 5.</p>
+
+<div class="codeWrap"><pre><code># A function, first; a script, once the logic earns a file.
+function Get-FreeDiskPercent {
+    param([string]$Drive = 'C:')
+    $p = Get-PSDrive -Name ($Drive.TrimEnd(':'))
+    [math]::Round((1 - $p.Free / ($p.Free + $p.Used)) * 100, 1)
+}
+Get-FreeDiskPercent 'C:'
+
+# Save the same body as disk.ps1, then run it as a script.
+./disk.ps1 -Drive 'D:'
+
+# Aliases are shortcuts, not separate commands.
+Get-Alias dir             # dir   -> Get-ChildItem
+Get-Alias ?               # ?     -> Where-Object
+Get-Alias %               # %     -> ForEach-Object
+</code></pre></div>
+
+<h3 id="ch1-3" data-toc>1.3 Hosts: two engines, three shells</h3>
+<p class="topic-desc">Two engines and several shells confuse newcomers more than anything else. Windows PowerShell 5.1 (<code>powershell.exe</code>) ships with Windows and is built on the .NET Framework; PowerShell 7 (<code>pwsh</code>) is the modern edition, built on .NET, installable on Windows, Linux and macOS. The ISE edits 5.1 only; VS Code and Windows Terminal are the current tools for both.</p>
+
+<h4 id="ch1-3-engines">5.1 and 7 are different engines</h4>
+<p><code>$PSVersionTable</code> tells you which edition you are in: PowerShell 7 reports <code>PSEdition = Core</code>, and 5.1 reports <code>Desktop</code>. Version 5.1 runs only on Windows, cannot be installed alongside a newer .NET, and will load modules written for Exchange or SharePoint that 7 has never heard of. 7 runs on Linux and macOS, handles UTF-8 sensibly, and has a faster engine — but it is a separate install (<code>winget install Microsoft.PowerShell</code>), so keep both when old modules are part of your week.</p>
+
+<div class="codeWrap"><pre><code># The engine tells you which edition you are running.
+$PSVersionTable
+# Name         Value
+# PSVersion    7.4.6
+# PSEdition    Core
+# OS           Microsoft Windows 10.0.26100
+# GitCommitId  7.4.6
+
+# Windows PowerShell 5.1 reports PSEdition 'Desktop' instead.
+# Install 7 next to it without removing anything:
+winget install --id Microsoft.PowerShell
+</code></pre></div>
+
+<h4 id="ch1-3-editors">ISE, VS Code and Windows Terminal</h4>
+<p>The ISE was the 5.1-era editor and is in maintenance mode — it cannot even run PowerShell 7. The modern workflow is VS Code with the PowerShell extension, which provides syntax highlighting, IntelliSense, debugging with breakpoints, and a script-formatting command. Windows Terminal replaces the old console host and runs <code>powershell.exe</code>, <code>pwsh</code>, <code>cmd</code> and WSL in separate tabs, so you can watch a 5.1 script and a 7 script side by side.</p>
+
+<div class="codeWrap"><pre><code># Install the extension once, then run script files with F5.
+code --install-extension ms-vscode.powershell
+
+# From a terminal: open the current folder in VS Code, edit, debug.
+cd C:\scripts
+code .
+</code></pre></div>
+
+<h3 id="ch1-4" data-toc>1.4 The help system</h3>
+<p class="topic-desc">The fastest documentation is the console's own. <code>Get-Help</code> reads the comment-based help attached to any command, <code>Get-Command</code> finds commands by name or verb, and <code>Get-Member</code> inspects the objects they return. Together these three answer almost every question without leaving the terminal.</p>
+
+<h4 id="ch1-4-get-help">Get-Help: the built-in manual</h4>
+<p><code>Get-Help</code> prints the synopsis, syntax, parameters and examples for a command. <code>-Examples</code> shows runnable samples, <code>-Full</code> adds parameter descriptions, and <code>-Online</code> opens the full article in a browser. Help is shipped per-module, so after installing a module (or when the offline copy is stale) run <code>Update-Help</code>. In PowerShell 7 help for the core modules is always available without an internet connection — which is what makes the offline library theme of this guide workable.</p>
+
+<div class="codeWrap"><pre><code># The manual, the examples, everything.
+Get-Help Get-Process
+Get-Help Get-Process -Examples
+Get-Help Get-Process -Full
+Get-Help Get-Process -Online     # opens the article in a browser
+
+# Refresh the local copies after installing or updating modules.
+Update-Help -Force
+</code></pre></div>
+
+<h4 id="ch1-4-get-command">Get-Command: discovery for the piped age</h4>
+<p><code>Get-Command</code> searches by command name with wildcards and can filter on the verb or the noun half of the name. It returns <code>CommandInfo</code> objects — cmdlet, function, alias or external application — so you can see at a glance whether the thing you are about to call is built-in, a function you dot-sourced, or an exe on the path. That distinction matters: the same name can resolve differently in two sessions.</p>
+
+<div class="codeWrap"><pre><code># Everything with 'service' in the name, across every source.
+Get-Command *service*
+# CommandType Name                 Version Source
+# Cmdlet      Get-Service          7.4.6   Microsoft.PowerShell.Management
+# Cmdlet      Set-Service          7.4.6   Microsoft.PowerShell.Management
+# Application services.msc         ...     C:\Windows\System32\services.msc
+
+# Filter by verb or noun; resolve what an alias actually points at.
+Get-Command -Verb Get -Noun *Item*
+Get-Command dir | Select-Object CommandType, Name, Definition
+</code></pre></div>
+
+<h3 id="ch1-5" data-toc>1.5 Execution policy and running scripts</h3>
+<p class="topic-desc">The execution policy is not a security boundary — Microsoft has said so in its own documentation. It is a guard against accidental execution. <code>Restricted</code>, the default for <code>powershell.exe</code>, runs nothing from a file; <code>RemoteSigned</code> allows local scripts and requires a signature only on downloaded ones; <code>AllSigned</code> demands a valid signature on everything; <code>Bypass</code> blocks nothing.</p>
+
+<h4 id="ch1-5-policy">What the policy actually restricts</h4>
+<p>The policy is looked up per scope, from machine policy down through user policy, process and current user to the local machine default; the most specific setting wins, which is what <code>Get-ExecutionPolicy -List</code> shows. <code>RemoteSigned -Scope CurrentUser</code> is the right setting for a developer machine because it needs no administrator rights and does not change the policy for anyone else. A downloaded script carries the Mark of the Web and will be refused until you run <code>Unblock-File</code> — that is the guard the policy is really providing.</p>
+
+<div class="codeWrap"><pre><code># Current user only: no administrator rights needed.
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Every scope, and which one wins.
+Get-ExecutionPolicy -List
+# Scope        ExecutionPolicy
+# MachinePolicy Undefined
+# UserPolicy    Undefined
+# Process       Undefined
+# CurrentUser   RemoteSigned
+# LocalMachine  Restricted
+</code></pre></div>
+
+<div class="warn">The policy stops accidental execution; it does not stop malware. A script you downloaded, read, and ran yourself is already past the guard. Treat <code>Bypass</code> as a one-off rescue, never as your default — and sign scripts that leave your machine.</div>
+
+<h4 id="ch1-5-run-and-sign">Calling scripts, then signing them</h4>
+<p>A script in the current folder is invoked with a path prefix, <code>./hello.ps1</code>, because PowerShell deliberately does not search the current directory for commands. Arguments are given as named parameters. When a script must run on a locked-down machine, <code>powershell -ExecutionPolicy Bypass -File ...</code> applies the policy only to that process. Under <code>AllSigned</code> every script needs a code-signing certificate, so the debugging loop becomes: check the signature you receive, run, and re-sign when you change the file.</p>
+
+<div class="codeWrap"><pre><code># Run your own script with parameters.
+./hello.ps1 -Name World -Times 2
+
+# One-off run that ignores the policy without changing it.
+powershell -ExecutionPolicy Bypass -File C:\scripts\hello.ps1 -Name World
+
+# Unblock a file that was downloaded from the internet.
+Unblock-File .\hello.ps1
+</code></pre></div>
+
+<div class="codeWrap"><pre><code># Under AllSigned, verify before you trust.
+Get-AuthenticodeSignature .\hello.ps1 | Format-List Status, StatusMessage
+
+# Sign with a code-signing certificate from your personal store.
+$cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert |
+    Select-Object -First 1
+Set-AuthenticodeSignature .\hello.ps1 -Certificate $cert
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Cmdlets and the pipeline</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">The pipeline is the heart of the language. A pipeline hands typed objects from one command to the next, so composition becomes a matter of naming the stages: filter, shape, order, format. This chapter covers the core pipeline cmdlets, how pipeline input binds to parameters, and when to filter at the source rather than after the data has been materialised.</p>
+
+<h3 id="ch2-1" data-toc>2.1 How objects flow through the pipe</h3>
+<p class="topic-desc">Every vertical bar passes the output objects of the left-hand command straight into the right-hand command. Nothing is formatted into text until a formatting cmdlet runs, so the pipeline carries the actual typed objects — full fidelity, including properties the default view never displays.</p>
+
+<h4 id="ch2-1-objects-not-text">Formatting is the last stage, not the default</h4>
+<p>The default table you see is produced by the formatter at the very end of the pipeline, and it has nothing to do with the data flowing through it. <code>Get-Process | Where-Object { $_.WorkingSet64 -gt 200MB }</code> compares numbers; the same filter written against the visible table would be parsing strings that include the comma thousands-separator. This distinction is why one canonical piece of advice exists: <strong>filter early, shape late</strong> — narrow the set of objects before you trim their properties.</p>
+
+<div class="codeWrap"><pre><code># Each stage passes objects on; nothing is text until the end.
+Get-Service |
+    Where-Object { $_.Status -eq 'Running' } |
+    Sort-Object Name |
+    Select-Object -First 5 Name, DisplayName
+
+# Properties you never see in the default view still survive the pipe.
+Get-Process -Id $PID | Select-Object ProcessName, Path, StartTime
+</code></pre></div>
+
+<h4 id="ch2-1-native-commands">Native commands leave the object world</h4>
+<p>An external program — <code>git</code>, <code>robocopy</code>, <code>mvn</code> — is a boundary in the pipeline: PowerShell sends it text arguments and receives lines of text back. Its success or failure arrives as an exit code in <code>$LASTEXITCODE</code>, not as an exception, so a script must check it explicitly. In PowerShell 7 a non-zero exit code does not throw unless you call <code>$PSNativeCommandUseErrorActionPreference = $true</code>.</p>
+
+<div class="codeWrap"><pre><code># Native output is text; the exit code is the contract.
+git status --porcelain
+if ($LASTEXITCODE -ne 0) { Write-Host 'git reported a failure' }
+
+# PowerShell 7 can promote a non-zero exit code to a terminating error.
+$PSNativeCommandUseErrorActionPreference = $true
+try {
+    git pull
+} catch {
+    Write-Host "git pull failed with $LASTEXITCODE"
+}
+</code></pre></div>
+
+<h3 id="ch2-2" data-toc>2.2 Filter, shape, order: the big three</h3>
+<p class="topic-desc"><code>Where-Object</code> filters, <code>Select-Object</code> shapes and slices, <code>Sort-Object</code> orders. Together they are the answer to "which of these, showing what, in what order" — and they appear in almost every pipeline longer than one command.</p>
+
+<h4 id="ch2-2-where-object">Where-Object: keep only what matches</h4>
+<p><code>Where-Object</code> runs a script block against every incoming object; <code>$_</code> (also written <code>$PSItem</code>) is the current object, and anything the block outputs that is truthy keeps the object. Since PowerShell 3 you may also write the simplified form, <code>Where-Object Name -EQ 'x'</code>, but with the script form you can chain several conditions and compare one property to another. A false or <code>$null</code> result drops the object; there is no "else" branch — for that you filter twice.</p>
+
+<div class="codeWrap"><pre><code># Script-block form: any expression decides each object.
+Get-Process | Where-Object { $_.WorkingSet64 -gt 200MB } |
+    Select-Object ProcessName, Id, WS
+
+# Conditions combine with -and / -or.
+Get-Service |
+    Where-Object { $_.Status -eq 'Stopped' -and $_.StartType -eq 'Automatic' }
+
+# The simplified form reads well for a single property.
+Get-Process | Where-Object ProcessName -EQ 'notepad'
+</code></pre></div>
+
+<h4 id="ch2-2-select-object">Select-Object: slice and build columns</h4>
+<p><code>Select-Object</code> chooses properties, trims to the first or last <code>N</code> items, removes duplicates with <code>-Unique</code>, and adds calculated columns written as hashtables with <code>N</code> (name) and <code>E</code> (expression) keys. The calculated column is where unit conversions belong — turning bytes into megabytes at the edge of the pipeline, not inside every filter that touches them. Note that <code>Select-Object -First 100</code> also stops pulling from the pipeline once it has its hundred, which can bail out of an expensive upstream command.</p>
+
+<div class="codeWrap"><pre><code># Choose properties; trim to the first few; deduplicate.
+Get-Process | Select-Object -First 3 -Property ProcessName, Id
+
+# A calculated column transforms bytes into megabytes.
+Get-Process | Select-Object ProcessName,
+    @{N='RAM_MB'; E={[math]::Round($_.WorkingSet64/1MB, 1)}},
+    @{N='CPU_s';  E={[math]::Round($_.CPU, 1)}}
+</code></pre></div>
+
+<h4 id="ch2-2-sort-object">Sort-Object: one property or several</h4>
+<p><code>Sort-Object</code> orders on one property or a list; each property can flip direction individually with a leading dash through <code>-Descending</code>. Sorting by more than one key is a tiebreak — sort by status, then by name, and the second key only decides equal rows. Sorting happens in memory, so leave it until after you have filtered; sorting a million objects just to keep fifty is work a <code>Where-Object</code> could have saved.</p>
+
+<div class="codeWrap"><pre><code># Biggest memory consumers first.
+Get-Process | Sort-Object WS -Descending |
+    Select-Object -First 5 ProcessName, WS
+
+# Two keys: status first, then name within each status.
+Get-Service | Sort-Object Status, Name |
+    Select-Object -First 5 Status, Name
+</code></pre></div>
+
+<h3 id="ch2-3" data-toc>2.3 Acting on every item</h3>
+<p class="topic-desc">Filtering and shaping select data; acting on it is <code>ForEach-Object</code>'s job. It runs a script block per incoming object, which is how you call a method, write a line, or hand each object to a command that does not accept pipeline input.</p>
+
+<h4 id="ch2-3-foreach-object">ForEach-Object and the current object</h4>
+<p><code>ForEach-Object</code> accepts a single script block (<code>{ }</code>) or three named blocks — <code>Begin</code>, <code>Process</code>, <code>End</code> — where <code>Process</code> runs once per object and the other two bookend it. <code>$_</code> is the current object, and any output the block produces flows on down the pipeline. Wrapped in parentheses, or collected into <code>$( )</code>, the result of a whole pipeline becomes a single value you can assign.</p>
+
+<div class="codeWrap"><pre><code># One block: map every item to something new.
+1..5 | ForEach-Object { $_ * $_ }        # squares: 1 4 9 16 25
+
+# Begin/Process/End: initialise once, act per item, report at the end.
+$total = 0
+Get-Process | ForEach-Object -Begin { $total = 0 } `
+    -Process { $total += $_.WorkingSet64 } `
+    -End { "combined RAM: $([math]::Round($total/1MB, 1)) MB" }
+
+# Collect the pipeline into a variable instead of streaming it.
+$names = (Get-Process | ForEach-Object { $_.ProcessName })
+$names.Count
+</code></pre></div>
+
+<h4 id="ch2-3-foreach-method">The .ForEach() and .Where() collection methods</h4>
+<p>Every collection in PowerShell carries <code>.ForEach()</code> and <code>.Where()</code> methods that behave like the pipeline cmdlets but skip the pipeline machinery entirely — noticeably faster in a loop that revisits the same data, and able to return early from <code>.Where()</code> with <code>'First'</code> or <code>'Last'</code> modes. They also support a <code>ScriptBlock</code>, a bare property name (a string), or a property-name-to-property-name mapping. They only exist once the collection is materialised in memory, so the pipeline form stays the right tool for streaming.</p>
+
+<div class="codeWrap"><pre><code># After the data is in memory, the methods are cheaper than the cmdlets.
+$procs = Get-Process
+$big   = $procs.Where({ $_.CPU -gt 5 })
+$first = $procs.Where({ $_.WorkingSet64 -gt 50MB }, 'First')
+$total = $procs.ForEach('WorkingSet64').Measure-Object -Sum |
+    Select-Object -ExpandProperty Sum
+
+# Strings work too: a property name, not a script block.
+$procs.ForEach('ProcessName') | Select-Object -First 3
+</code></pre></div>
+
+<h3 id="ch2-4" data-toc>2.4 Pipeline binding</h3>
+<p class="topic-desc">A command receives pipeline input through its parameters, and only when the parameter declares it: <code>ValueFromPipeline</code> binds the whole object, <code>ValueFromPipelineByPropertyName</code> binds one named property. Knowing which one a cmdlet expects tells you whether an upstream command's output will bind or be ignored.</p>
+
+<h4 id="ch2-4-byvalue">Binding by value: the whole object</h4>
+<p>A parameter decorated with <code>ValueFromPipeline = $true</code> accepts the incoming object as its value, converting it to the parameter's type when needed. <code>Stop-Process</code> takes <code>Process</code> objects, which is why <code>Get-Process notepad | Stop-Process</code> simply works. In a function, the binding is processed in the three blocks: <code>begin</code> once, <code>process</code> per object, <code>end</code> once — a function without a <code>process</code> block runs only once regardless of how many objects arrive.</p>
+
+<div class="codeWrap"><pre><code># ValueFromPipeline: the function receives each object whole.
+function Add-ToTotal {
+    param(
+        [Parameter(ValueFromPipeline = $true)]
+        [int]$Number
+    )
+    begin   { $total = 0 }
+    process { $total += $Number }
+    end     { $total }
+}
+1, 2, 3, 4 | Add-ToTotal          # 10
+</code></pre></div>
+
+<h4 id="ch2-4-bypropertyname">Binding by property name</h4>
+<p>A parameter decorated with <code>ValueFromPipelineByPropertyName</code> pulls one same-named property off each incoming object. The classic shape is a CSV file whose column names match a cmdlet's parameters: <code>Import-Csv machines.csv | Invoke-Command</code> works because the <code>ComputerName</code> column binds to the <code>-ComputerName</code> parameter. Property binding is case-insensitive and ignores nothing — the property must actually exist, which is where a quick <code>Get-Member</code> check earns its keep.</p>
+
+<div class="codeWrap"><pre><code># ByPropertyName: one named property becomes the parameter value.
+function Show-Machine {
+    param(
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [string]$ComputerName
+    )
+    process { "processing $ComputerName" }
+}
+
+[pscustomobject]@{ ComputerName = 'WEB01' } | Show-Machine
+# file with a ComputerName column binds the same way:
+Import-Csv .\machines.csv | Show-Machine
+</code></pre></div>
+
+<div class="tip">If your pipeline sends objects that a command silently ignores, the parameter almost certainly binds by a different name. Check with <code>Get-Help Stop-Process -Parameter *</code> — it lists every parameter's pipeline attributes explicitly.</div>
+
+<h3 id="ch2-5" data-toc>2.5 Filtering at the source</h3>
+<p class="topic-desc">The first question to ask before writing a <code>Where-Object</code> is whether the upstream command can filter for you. Provider-side filters run inside the data source, so they never materialise the rejected items at all — on a directory with a million files the difference is seconds versus minutes.</p>
+
+<h4 id="ch2-5-provider-filter">-Filter and its friends</h4>
+<p><code>Get-ChildItem -Filter '*.log'</code> pushes the wildcard into the filesystem provider, which can skip non-matching entries while enumerating. The <code>-Filter</code> pattern is a provider glob, not a regex: <code>*.log</code> works, <code>.+\.log$</code> does not. <code>-Include</code> and <code>-Exclude</code> apply only when the path itself contains wildcards or when <code>-Recurse</code> is set — a common source of "why did my include do nothing" confusion, because <code>Get-ChildItem C:\Logs -Include '*.log'</code> silently returns nothing at all.</p>
+
+<div class="codeWrap"><pre><code># -Filter is handled by the provider, before objects exist.
+Get-ChildItem C:\Logs -Filter '*.log'
+Get-ChildItem C:\Logs -Filter 'app-*.log' -Recurse
+
+# -Include needs a wildcard path or -Recurse; -Exclude refines a set.
+Get-ChildItem C:\Logs\* -Include '*.log', '*.txt'
+Get-ChildItem C:\Logs -Recurse -File -Exclude '*.tmp'
+</code></pre></div>
+
+<div class="note">The rule of thumb: use <code>-Filter</code> for name patterns at the source, <code>Where-Object</code> for anything that depends on a property you can only see once the item exists — size, date, content.</div>
+
+<h4 id="ch2-5-pass-through">-PassThru, -OutVariable and the golden rule</h4>
+<p>Most cmdlets return nothing by default. <code>Set-ItemProperty</code>, <code>Restart-Service</code> and their siblings report quietly, so the pipeline would end there — <code>-PassThru</code> makes them emit the object they changed, letting you chain or capture it. <code>-OutVariable</code> stores everything the command emits without interrupting the pipeline. The golden rule the two serve: a cmdlet either changes state and keeps quiet, or emits objects and changes nothing — never assume it does both.</p>
+
+<div class="codeWrap"><pre><code># -PassThru: the changed object continues down the pipe.
+Set-ItemProperty HKCU:\Software\Contoso -Name Installed -Value $true -PassThru | 
+    Select-Object PSPath, Installed
+
+# -OutVariable: capture without breaking the stream.
+Get-Process notepad -OutVariable np |
+    Select-Object -First 1 ProcessName
+"captured: $($np.Count) process object(s)"
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Variables, types and data structures</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Every value in PowerShell is a .NET object, and the language gives you short names for the types you will use daily. This chapter covers variables and their scopes, the type accelerators and casts that shape data at the boundary, and the three structures you will reach for constantly — arrays, hashtables and <code>PSCustomObject</code>.</p>
+
+<h3 id="ch3-1" data-toc>3.1 Variables and scope</h3>
+<p class="topic-desc">A variable is a name bound to a value; no declaration is required, and names are case-insensitive, so <code>$Name</code>, <code>$name</code> and <code>$NAME</code> are the same variable. Scope — where a write lands — is the part that surprises people coming from languages with global-by-default variables.</p>
+
+<h4 id="ch3-1-names">Names, assignment and the namespace prefixes</h4>
+<p>Assign with <code>$var = value</code>; assignment never fails, so a typo creates a brand-new empty variable instead of an error (that is what <code>Set-StrictMode</code> exists to fix in chapter 8). A variable whose name contains spaces is legal but requires braces — <code>${my var}</code> — and is rarely worth it. A variable can be removed with <code>Remove-Variable</code>; a scope prefix names the target explicitly: <code>$script:conf</code>, <code>$global:count</code>, <code>$env:PATH</code> is the environment namespace, and <code>$using:x</code> reaches into a local scope from a remote script block (chapter 8).</p>
+
+<div class="codeWrap"><pre><code># Assignment; the same name in any casing is the same variable.
+$name = 'Ada'
+Write-Host "hello $name"
+
+${name with spaces} = 'legal but unusual'    # braces allow it
+Get-Variable 'name with spaces' -ValueOnly
+
+# Namespaced variables write where they are told to.
+$script:counter = 0
+$global:hostname = 'web01'
+$env:EDITOR = 'code'
+</code></pre></div>
+
+<h4 id="ch3-1-scopes">Read is inherited, write is local</h4>
+<p>Any scope can read a variable from an enclosing scope — a function can see the script's <code>$answer</code>. But a plain assignment inside that function creates a <strong>new local variable</strong>; it does not update the outer one. The escape hatches are <code>$script:</code> for the script scope and <code>$global:</code> for the session, plus <code>Set-Variable -Scope</code> and <code>-Force</code> for programmatic control. Treating scope as read-inherit/write-local explains most "my function didn't change anything" bugs.</p>
+
+<div class="codeWrap"><pre><code># A function cannot change a script variable without a prefix.
+$answer = 42
+function Try-Change {
+    $answer = 0          # creates a LOCAL $answer
+    Write-Host "inner: $answer"
+}
+Try-Change
+Write-Host "outer: $answer"     # 42 -- untouched
+
+function Change-Real {
+    $script:answer = 0          # the explicit prefix reaches the script scope
+}
+Change-Real
+Write-Host "now: $answer"       # 0
+</code></pre></div>
+
+<h3 id="ch3-2" data-toc>3.2 Types and casts</h3>
+<p class="topic-desc">PowerShell is dynamically typed but sits on a strict .NET type system. The syntax <code>[type]value</code> is a cast, and a cast that cannot succeed throws a terminating error. The short names in square brackets are called type accelerators.</p>
+
+<h4 id="ch3-2-accelerators">Type accelerators you will use daily</h4>
+<p>The accelerators map to real .NET types: <code>[string]</code>, <code>[int]</code>, <code>[long]</code>, <code>[double]</code>, <code>[bool]</code>, <code>[datetime]</code>, <code>[array]</code>, <code>[hashtable]</code>, <code>[pscustomobject]</code>, <code>[xml]</code>, <code>[regex]</code> and <code>[scriptblock]</code>. A cast on a parameter declares the expected type; a cast on a literal converts here and now. <code>Get-TypeData</code> and <code>[psobject].Assembly</code> are the two inspection routes when you need to know exactly what a value is.</p>
+
+<div class="codeWrap"><pre><code># Accelerator names are short .NET types; each cast converts or throws.
+[int]$port    = 8080
+[datetime]$day = '2026-10-11'
+[bool]$ok     = 1
+[regex]$re    = '^[0-9]+$'
+[double]$ratio = 1 / 3
+
+# Ask what a value actually is.
+$value = 3.5
+$value.GetType().FullName          # System.Double
+</code></pre></div>
+
+<h4 id="ch3-2-cast-and-format">Converting values, formatting strings</h4>
+<p><code>[int]'42'</code> parses a numeric string; <code>[int]'4.9'</code> converts through a double and rounds. The .NET default rounding is banker's rounding — <code>[math]::Round(4.5)</code> is 4, not 5 — so business code that needs "always up" must pass <code>'AwayFromZero'</code>. A failed cast such as <code>[int]'abc'</code> stops the script with a terminating error, which is why untrusted input should be validated with <code>-match</code> or <code>[int]::TryParse</code> before casting. For strings, the <code>-f</code> format operator writes placeholder templates, and double-quoted strings interpolate <code>$var</code> and <code>$(expression)</code>.</p>
+
+<div class="codeWrap"><pre><code># Casting numbers; the rounding gotcha is real.
+[int]'42'                        # 42
+[int]'4.9'                       # 5
+[math]::Round(4.5)               # 4 -- banker's rounding, to even
+[math]::Round(4.5, 0, 'AwayFromZero')   # 5
+[int]'abc'                       # terminating error: cannot convert
+
+# Formatting: placeholders vs interpolation.
+'{0,-12} spent {1,8:N2}' -f 'total', 1234.5678
+$cpu = 37.5
+"CPU at $cpu percent"            # simple variable interpolation
+"CPU at $($cpu) percent"         # expression interpolation, same result
+</code></pre></div>
+
+<h3 id="ch3-3" data-toc>3.3 Arrays and collections</h3>
+<p class="topic-desc">An array is an ordered list indexed from 0. PowerShell's arrays are objects, so a scalar — a single string — also carries <code>.Count</code>, and knowing when you have an array versus one scalar is the difference between correct loops and silent bugs.</p>
+
+<h4 id="ch3-3-arrays">Building and indexing arrays</h4>
+<p>The comma operator builds an array: <code>'x', 'y', 'z'</code>. <code>@()</code> is the array subexpression — it wraps pipeline output or literals and guarantees an array result. Indexing takes <code>[0]</code>, ranges <code>[1..3]</code>, and negative indices count from the end (<code>[-1]</code> is the last element). <code>.Count</code> is the length; <code>.Length</code> is the same number on arrays and is what .NET's own libraries use.</p>
+
+<div class="codeWrap"><pre><code># Comma operator, @() and indexing.
+$a = 'x', 'y', 'z'
+$b = @()                         # an empty array, always an array
+$c = @('solo')                   # one element, still an array
+$a[0]      # x
+$a[-1]     # z
+$a[0..1]   # x, y
+$a.Count   # 3
+</code></pre></div>
+
+<h4 id="ch3-3-scalars">The scalar-versus-array gotcha</h4>
+<p>A single object has <code>.Count</code> of 1, and a pipeline that returned nothing gives you <code>$null</code>, whose <code>.Count</code> is 0. So <code>$result.Count</code> can read "1" when the command produced one item — which is honest — or "0" when it produced nothing at all. The trap is a collection-returning command that is occasionally empty: iteration code written for a list silently skips, and an indexing access <code>[0]</code> throws. The <code>@()</code> wrapper normalises both directions; apply it early and never reason about scalar counts.</p>
+
+<div class="codeWrap"><pre><code># A scalar claims Count 1; an empty result is $null with Count 0.
+$solo = Get-Process -Id $PID      # exactly one object
+$solo.Count                       # 1
+$none = Get-ChildItem C:\ -Filter '*.zzz'   # nothing returned
+$none.Count                       # 0
+
+# @() guarantees array semantics no matter which way it went.
+foreach ($f in @(Get-ChildItem C:\ -Filter '*.zzz')) {
+    'per item work'
+}
+</code></pre></div>
+
+<h4 id="ch3-3-growth">Growing collections the fast way</h4>
+<p>Arrays are fixed size, so <code>$arr += $item</code> allocates a whole new array and copies — quadratic time inside a loop. For appending you want <code>[System.Collections.Generic.List[T]]</code>, whose <code>.Add()</code> is amortised constant time and which still pipes object source the same way as an array. The generic list's introduction is the standard fix for "my loop over 50,000 rows takes minutes".</p>
+
+<div class="codeWrap"><pre><code># += copies the entire array every iteration: slow.
+$nums = @()
+foreach ($n in 1..10000) { $nums += $n }     # O(n^2) copying
+
+# A generic List&lt;int&gt; appends in place and is effectively linear.
+$list = [System.Collections.Generic.List[int]]::new()
+foreach ($n in 1..10000) { $list.Add($n) }
+$list.Count                                   # 10000
+</code></pre></div>
+
+<h3 id="ch3-4" data-toc>3.4 Hashtables and PSCustomObject</h3>
+<p class="topic-desc">Hashtables are unordered dictionaries of key/value pairs; <code>PSCustomObject</code> is a typed object with named properties. The first is for lookup and configuration, the second for rows and structures you want to pipe to a CSV, a table or JSON.</p>
+
+<h4 id="ch3-4-hashtable">Hashtables and ordered dictionaries</h4>
+<p>A hashtable literal is <code>@{} </code> with <code>key = value</code> pairs separated by semicolons or newlines. Access is property-style (<code>$cfg.Server</code>) or indexer-style (<code>$cfg['Port']</code>); keys are strings and values are any object. Plain hashtables do not promise order, so for anything where sequence matters — JSON serialisation, display, argument splatting — use <code>[ordered]@{} </code>, which keeps insertion order. Splatting (passing <code>@args</code> instead of typing every parameter) is a hashtable application every power user meets within a week.</p>
+
+<div class="codeWrap"><pre><code># A hashtable is a dictionary: lookup by key, property-style access.
+$cfg = @{
+    Server = 'db01'
+    Port   = 1433
+    Retry  = 3
+}
+$cfg.Server                # db01
+$cfg['Port']               # 1433
+$cfg.ContainsKey('Retry')  # True
+
+# [ordered] keeps insertion order for display and JSON.
+$row = [ordered]@{
+    Name = 'Ada'
+    Role = 'admin'
+}
+$row['Role'] = 'user'
+$row | ConvertTo-Json
+
+# Splatting: a hashtable becomes the argument list.
+$params = @{ Path = 'C:\Logs'; Filter = '*.log'; Recurse = $true }
+Get-ChildItem @params
+</code></pre></div>
+
+<h4 id="ch3-4-pscustomobject">PSCustomObject: named rows of data</h4>
+<p><code>[pscustomobject]@{ Name = 'Ada'; Id = 42 }</code> builds an object with exactly those properties. It is the natural unit for table-shaped output: an array of these pipes straight into <code>Export-Csv</code>, <code>Format-Table</code> or <code>ConvertTo-Json</code>, and the property names become the CSV headers. Unlike a hashtable it has no default enumerator of its own, so it does not flatten when you pipe it. Built inside a loop, it converts a diagnostic pass into a data file in one line.</p>
+
+<div class="codeWrap"><pre><code># An array of PSCustomObjects is a table.
+$users = 1..3 | ForEach-Object {
+    [pscustomobject]@{
+        Name   = "user$_"
+        Group  = if ($_ % 2) { 'a' } else { 'b' }
+        RamMB  = $null
+    }
+}
+$users | Export-Csv .\users.csv -NoTypeInformation
+Import-Csv .\users.csv | Select-Object -First 1 Name, Group
+</code></pre></div>
+
+<h3 id="ch3-5" data-toc>3.5 Environment, automatic and preference variables</h3>
+<p class="topic-desc">Beyond the variables you create, PowerShell seeds the session with namespaces and automatic variables. <code>$env:</code> wraps the process environment block, a handful of <code>$...</code> names are always defined, and preference variables control the engine's behaviour — error handling, progress, and formatting defaults.</p>
+
+<h4 id="ch3-5-env">The environment namespace</h4>
+<p><code>$env:PATH</code> reads the PATH environment variable; assignment writes the current process's copy, which disappears when the process exits. To persist a value for future sessions use the .NET API <code>[Environment]::SetEnvironmentVariable(name, value, 'User')</code>. The namespace is a provider, so <code>Get-ChildItem Env:</code> lists everything at once — the same pattern you saw for the registry and certificates in chapter 1.</p>
+
+<div class="codeWrap"><pre><code># Read; write (process-only); persist.
+$env:PATH
+$env:PSModulePath -split ';'
+
+$env:FOO = 'bar'     # only this process (and children it spawns) sees it
+[Environment]::SetEnvironmentVariable('FOO', 'bar', 'User')   # persists
+</code></pre></div>
+
+<h4 id="ch3-5-automatic">Automatic variables</h4>
+<p>The automatic variables are read-only seeds PowerShell defines for you. <code>$_</code> (<code>$PSItem</code>) is the current pipeline object; <code>$PSVersionTable</code> identifies the engine; <code>$PWD</code> is the current location; <code>$PID</code> is this process's id; <code>$Host</code> names the hosting program; <code>$MyInvocation</code> describes how the current script was called, including its own path; <code>$args</code> holds arguments a script received beyond its declared <code>param()</code> block; <code>$LASTEXITCODE</code> is the most recent native exit code. Preference variables are similar but assignable — <code>$ErrorActionPreference</code>, <code>$ProgressPreference</code>, <code>$ConfirmPreference</code>, <code>$VerbosePreference</code> — and <code>Get-Variable</code> lists the whole lot.</p>
+
+<div class="codeWrap"><pre><code># The ones you will touch in the first week.
+$_                    # current pipeline object (also $PSItem)
+$PSVersionTable       # engine edition and version
+$PWD                  # current location
+$PID                  # this process's id
+$LASTEXITCODE         # exit code of the last native command
+$MyInvocation.MyCommand.Name   # what script is running, and where
+
+# Preference variables are assignable engine settings.
+$VerbosePreference = 'Continue'
+$ConfirmPreference = 'High'
+</code></pre></div>
+
+<h4 id="ch3-5-profile">The profile and $PSHOME</h4>
+<p><code>$PROFILE</code> points at your per-host profile script, which runs every time a console starts — the traditional home for aliases, prompt tweaks and dot-sourced helpers. There are actually four profile paths (all users, current user, and per-host variants of both); <code>$PROFILE</code> is the current user's one, and the others live on <code>$PROFILE.AllUsersAllHosts</code> and friends. <code>$PSHOME</code> is where the engine itself is installed; never write your own files next to it.</p>
+
+<div class="codeWrap"><pre><code># Create a profile, then put aliases and helper functions in it.
+$PROFILE                              # full path of the current-user profile
+Test-Path $PROFILE
+New-Item -Path $PROFILE -ItemType File -Force | Out-Null
+code $PROFILE
+# Inside: Set-Alias g git, a custom prompt, dot-sourced .\helpers.ps1
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Control flow</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Scripts branch and repeat. This chapter covers the decision statements — <code>if</code> and <code>switch</code> — and the loops — <code>foreach</code>, <code>for</code>, <code>while</code> and <code>do</code> — plus the comparison operators that drive every condition and the <code>break</code>/<code>continue</code> controls that shape loop behaviour.</p>
+
+<h3 id="ch4-1" data-toc>4.1 Conditions: if, elseif, else</h3>
+<p class="topic-desc"><code>if</code> evaluates a single expression and runs the matching block. There is no switch-like fall-through here; each branch is exclusive, and the condition is whatever PowerShell can treat as true or false.</p>
+
+<h4 id="ch4-1-if">The if family</h4>
+<p>The condition is an expression — a comparison, a function call, a <code>Test-Path</code> — and PowerShell's truthiness rules apply: <code>$null</code>, <code>$false</code>, <code>0</code> and the empty string are false, almost everything else is true. Note that a non-terminating error is not false; if a command inside the condition fails, you still need <code>$ErrorActionPreference</code> in play to notice. Parenthesised operator chains read much better than bare <code>-and</code> chains when several conditions combine.</p>
+
+<div class="codeWrap"><pre><code># One decision, several outcomes.
+$free  = (Get-PSDrive C).Free
+if ($free -lt 10GB) {
+    Write-Host 'Low disk: act now'
+} elseif ($free -lt 50GB) {
+    Write-Host 'Getting low'
+} else {
+    Write-Host 'Plenty of space'
+}
+
+# Combined conditions read well inside parentheses.
+if (($free -gt 0) -and (Test-Path C:\Logs)) {
+    'both checks passed'
+}
+</code></pre></div>
+
+<h4 id="ch4-1-ternary">Ternary and null-coalescing</h4>
+<p>PowerShell 7 added the ternary operator <code>cond ? a : b</code> for value selection — not a statement-control device, so keep it for short assignments. The null-coalescing operator <code>??</code> returns the left operand unless it is <code>$null</code>, and <code>??=</code> assigns only when the variable is currently <code>$null</code>. Both are the idiomatic replacement for the old <code>if ($x) { $x } else { $y }</code> dance around optional parameters.</p>
+
+<div class="codeWrap"><pre><code># PS7 shorthand: a value chosen by a condition.
+$age   = 19
+$label = $age -ge 18 ? 'adult' : 'minor'
+
+# ?? supplies a default when the left side is null.
+$settings = $null
+$value = $settings ?? 'default'      # 'default'
+$settings ??= 'assigned'             # assigns only because it was null
+$settings; $value
+</code></pre></div>
+
+<h3 id="ch4-2" data-toc>4.2 switch</h3>
+<p class="topic-desc"><code>switch</code> tests one value against many cases without nested <code>if</code> chains. Unlike C-family switches it evaluates every case by default, and it can operate over a whole collection at once, making it the natural tool for dispatch tables.</p>
+
+<h4 id="ch4-2-basics">Matching values against cases</h4>
+<p>Each case is an expression compared with the tested value using the current comparison semantics — strings are case-insensitive by default. <code>default</code> runs when nothing else matched. Critically, switch evaluates <strong>all</strong> matching cases unless you say otherwise: use <code>break</code> after a case to stop evaluation, or <code>continue</code> to stop the whole switch (for a single value, <code>break</code> and <code>continue</code> have the same effect). The tested value can be a collection, in which case switch runs each element against the cases.</p>
+
+<div class="codeWrap"><pre><code># A value against many cases; default catches the rest.
+switch (7) {
+    1 { 'one' }
+    5 { 'five' }
+    7 { 'seven' }
+    default { "unexpected: $_" }
+}
+
+# A collection of inputs is processed element by element.
+switch ('web-prod-01', 'db01') {
+    'db01' { 'database host' }
+    default { 'generic host' }
+}
+</code></pre></div>
+
+<h4 id="ch4-2-modes">Case modes: -Regex, -Wildcard, -Exact</h4>
+<p>The mode flags change how each case's expression matches the input. <code>-Regex</code> treats cases as regular expressions; <code>-Wildcard</code> treats them as provider-style wildcards (<code>*</code>, <code>?</code>, <code>[a-z]</code>); <code>-Exact</code> forces literal equality, and <code>-CaseSensitive</code> flips the default casing. Combined with <code>break</code> per case, a Regex switch is one of the cleanest classifiers in the language — a mini parsing table in a single statement.</p>
+
+<div class="codeWrap"><pre><code># -Regex switches on patterns, case by case.
+$name = 'web-prod-01'
+switch -Regex ($name) {
+    '^web'     { 'a web host';  break }
+    '-prod-'   { 'production';  break }
+    '\d+$'     { 'ends with a number'; break }
+    default    { 'unknown shape' }
+}
+
+# -Wildcard matches the way -like does, but in a switch.
+switch -Wildcard ('C:\Users\ada\file.log') {
+    '*.log'  { 'a log file' }
+    default  { 'not a log' }
+}
+</code></pre></div>
+
+<h3 id="ch4-3" data-toc>4.3 Loops</h3>
+<p class="topic-desc">PowerShell offers four loop statements plus two loop-shaped accelerators. Which one you choose is mostly about what the termination condition is and whether you are iterating a collection or counting.</p>
+
+<h4 id="ch4-3-foreach">foreach: iteration over a collection</h4>
+<p>The <code>foreach</code> <em>statement</em> differs from the <code>ForEach-Object</code> cmdlet: it is a language construct, runs entirely in memory, and is noticeably faster than the piped cmdlet over an array you already hold. Inside the block, <code>$_</code> is the current element (PowerShell 7 also allows <code>$PSItem</code>). Anything the block writes to the output stream flows out of the statement, so assign the whole statement to a variable to capture the loop results.</p>
+
+<div class="codeWrap"><pre><code># foreach statement: iterate everything already in memory.
+foreach ($file in Get-ChildItem C:\Logs\*.log) {
+    if ($file.Length -gt 10MB) { "big: $($file.Name)" }
+}
+
+# An explicit counter when position matters as well as value.
+$i = 0
+foreach ($proc in (Get-Process | Select-Object -First 3)) {
+    '{0,2}: {1}' -f $i, $proc.ProcessName
+    $i++
+}
+</code></pre></div>
+
+<h4 id="ch4-3-counting">for, while, do-while, do-until</h4>
+<p><code>for</code> is the counting loop: initialiser, condition, step — evaluated before each pass. <code>while</code> tests the condition first, so a false condition skips the block entirely. The <code>do</code> variants test <em>after</em> each pass, so their body always runs at least once — <code>do { } while ($cond)</code> loops while the condition stays true, and <code>do { } until ($cond)</code> loops until it becomes true. The choice between them is purely "when is the first test allowed to happen".</p>
+
+<div class="codeWrap"><pre><code># for: counted iteration with an index.
+for ($i = 0; $i -lt 5; $i++) { "step $i" }
+
+# while: condition first -- may run zero times.
+$n = 3
+while ($n -gt 0) { "left: $n"; $n-- }
+
+# do: body first -- always runs at least once.
+do { 'at least once' } while ($false)
+$t = 0
+do { $t++ } until ($t -ge 3)     # runs until $t reaches 3
+</code></pre></div>
+
+<h3 id="ch4-4" data-toc>4.4 Comparison and string operators, break and continue</h3>
+<p class="topic-desc">Every condition in the language is built from comparison operators, and the string-mangling trio <code>-replace</code>, <code>-split</code> and <code>-join</code> does most of the text work. <code>break</code> and <code>continue</code> steer the loops themselves.</p>
+
+<h4 id="ch4-4-comparison">The -eq family</h4>
+<p>All comparison operators are dash-prefixed: <code>-eq</code> (equal), <code>-ne</code>, <code>-lt</code>, <code>-le</code>, <code>-gt</code>, <code>-ge</code>, plus the pattern operators <code>-like</code>/<code>-notlike</code> (wildcards) and <code>-match</code>/<code>-notmatch</code> (regex). String comparisons are case-insensitive unless the operator carries a <code>c</code> prefix (<code>-ceq</code>) — the reverse of C-family defaults. <code>-contains</code> and <code>-in</code> test membership: <code>$items -contains $x</code> and its mirror <code>$x -in $items</code>.</p>
+
+<div class="codeWrap"><pre><code># Equality, pattern and membership operators.
+'PowerShell' -eq 'powershell'         # True: case-insensitive by default
+'PowerShell' -ceq 'powershell'        # False: -c prefix = case-sensitive
+'abc' -like 'a*'                      # True: wildcard match
+'abc' -match '^a'                     # True: regex match
+10 -lt 5                             # False
+'db01' -in @('web01', 'db01')         # True: is it in the list?
+@('web01', 'db01') -contains 'db01'   # same test, written the other way
+</code></pre></div>
+
+<h4 id="ch4-4-string-ops">-replace, -split, -join</h4>
+<p><code>-replace</code> is regex-based on both sides and can reference capture groups as <code>$1</code> in the <em>single-quoted</em> replacement — double quotes would interpolate them away before the operator saw them. <code>-split</code> takes a string or a regex and returns an array; <code>-join</code> (applied to an array as <code>@('a','b') -join ';'</code>) rebuilds a flat string. The two are inverse operations across the array boundary.</p>
+
+<div class="codeWrap"><pre><code># -replace uses regex; quote the replacement so $1 survives.
+'cyclic-2026-10-11.log' -replace '-(\d{4})', '.$1'   # cyclic.2026-10-11.log
+
+# -split and -join are inverses across the array boundary.
+'a,b,c' -split ',' | ForEach-Object { "part: $_" }
+@('x', 'y', 'z') -join ' :: '
+</code></pre></div>
+
+<h4 id="ch4-4-break-continue">break, continue and labels</h4>
+<p><code>continue</code> skips the rest of the current pass and moves to the next iteration; <code>break</code> leaves the loop entirely. In <code>switch</code> the same words stop case evaluation. When loops nest, a label placed before the loop — <code>:outer foreach (...)</code> — gives <code>break</code> and <code>continue</code> a target, so an inner loop can terminate an outer one without a control flag. `return` is the third exit: it leaves not just the loop but the whole function or script.</p>
+
+<div class="codeWrap"><pre><code># continue skips one item; break leaves the loop.
+foreach ($s in 'a', 'b', 'c', 'd') {
+    if ($s -eq 'b') { continue }
+    if ($s -eq 'd') { break }
+    "kept: $s"        # a, then c
+}
+
+# A label lets the inner loop end the outer one.
+:outer foreach ($x in 1..3) {
+    foreach ($y in 1..3) {
+        if ($y -eq 2) { continue outer }
+        "$x/$y"
+    }
+}
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Functions, advanced functions and modules</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Functions turn a pipeline into a reusable tool, and modules package functions for sharing. This chapter covers function syntax and scope, parameter validation, the output behaviour that surprises most newcomers, advanced functions with <code>[CmdletBinding()]</code>, and how to lay out a real <code>.psm1</code> module.</p>
+
+<h3 id="ch5-1" data-toc>5.1 Function basics and scope</h3>
+<p class="topic-desc">A function is a named <code>param()</code> block plus a body, defined with <code>function Name { }</code>. It behaves exactly like a cmdlet on the pipeline, which is the whole point — your functions should be indistinguishable from built-ins to their callers.</p>
+
+<h4 id="ch5-1-syntax">Naming, parameters and calling</h4>
+<p>Follow the <code>Verb-Noun</code> law from chapter 1 — <code>Get-</code>, <code>Set-</code>, <code>Test-</code>, <code>New-</code> — so your function is discoverable through <code>Get-Command</code> and tab completion. The <code>param()</code> block is optional but almost always present; parameters are typed and can take defaults computed at call time. Callers pass named arguments with a dash, exactly as with cmdlets.</p>
+
+<div class="codeWrap"><pre><code># A small, correctly named function.
+function Get-Tomorrow {
+    param([datetime]$From = (Get-Date))
+    $From.AddDays(1)
+}
+Get-Tomorrow                        # tomorrow
+Get-Tomorrow -From '2026-12-31'     # 01/01/2027
+
+# A function on the pipeline looks like a cmdlet.
+Get-Process | Select-Object -First 2 ProcessName |
+    ForEach-Object { Get-Tomorrow }
+</code></pre></div>
+
+<h4 id="ch5-1-scope">Functions own their scope</h4>
+<p>As with variables, a function sees but cannot write its caller's variables. A function's own variables disappear when it returns, which is a feature: no leaking loop counters into the session. When a function genuinely must affect the session, three honest routes exist — return the value and let the caller assign, write <code>$script:</code> deliberately, or use <code>Set-Variable -Scope 1</code>. The default write-local rule is the reason the value of a function is its output, not its side effects.</p>
+
+<div class="codeWrap"><pre><code># The function's writes stay inside the function.
+$count = 0
+function Bump { $count = $count + 1 }
+Bump
+"outer still $count"                # 0
+
+# The explicit script prefix is the controlled escape.
+function Bump2 { $script:count = $script:count + 1 }
+Bump2
+"now $count"                        # 1
+</code></pre></div>
+
+<h3 id="ch5-2" data-toc>5.2 Parameters: validation and defaults</h3>
+<p class="topic-desc">Parameters are where a function proves it is a tool rather than a typed transcript. Attributes enforce presence, allowed values, ranges and types; <code>[switch]</code> parameters carry boolean flags; defaults cover the unstated.</p>
+
+<h4 id="ch5-2-attributes">The [Parameter()] attribute family</h4>
+<p><code>[Parameter(Mandatory = $true)]</code> prompts when a required argument is missing (or, under <code>-Confirm</code>-style automation, throws instead of guessing). <code>[ValidateSet('a','b')]</code> restricts a value to a fixed list and is the fastest way to catch typos with a clear error; <code>[ValidateRange(1, 31)]</code> bounds numbers; <code>[ValidatePattern('...')]</code> runs a regex. Validation runs before the body, so a function that passes validation never has to check those conditions itself.</p>
+
+<div class="codeWrap"><pre><code># Attributes do the checking so the body can trust its inputs.
+function Send-Report {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+
+        [ValidateSet('Daily', 'Weekly', 'Monthly')]
+        [string]$Cadence = 'Daily',
+
+        [ValidateRange(1, 31)]
+        [int]$Retry = 3
+    )
+    "report $Path · cadence $Cadence · retry $Retry"
+}
+Send-Report -Path .\r.csv -Cadence Weekly
+# Send-Report -Cadence Hourly   -> argument validation error, before the body
+</code></pre></div>
+
+<h4 id="ch5-2-switch-defaults">[switch] and computed defaults</h4>
+<p>A <code>[switch]</code> parameter is true only when the caller passes <code>-Force</code>; <code>-Force:$false</code> forces it off explicitly. Defaults may be computed expressions — <code>[datetime]$Born = (Get-Date).AddYears(-30)</code> — but they are evaluated per call, at call time, not once at definition. That difference matters for anything defaulting to "now": a default evaluated once at import time would pin the function to the day the module loaded.</p>
+
+<div class="codeWrap"><pre><code># A switch parameter is a Boolean flag.
+function Enable-Trace {
+    param([switch]$VerboseOut)
+    if ($VerboseOut) { 'tracing on' } else { 'tracing off' }
+}
+Enable-Trace -VerboseOut            # tracing on
+Enable-Trace                        # tracing off
+
+# A default computed at call time: $(Get-Date) style expressions work.
+function Get-Age {
+    param([datetime]$Born = (Get-Date).AddYears(-30))
+    [math]::Floor(((Get-Date) - $Born).TotalDays / 365.25)
+}
+Get-Age                             # about 30
+</code></pre></div>
+
+<h3 id="ch5-3" data-toc>5.3 What a function returns</h3>
+<p class="topic-desc">"Everything that isn't captured is output" is the one rule you must internalise. A function's return value is its entire output stream — every expression that was not assigned, sent to <code>$null</code>, or written to a different stream.</p>
+
+<h4 id="ch5-3-output">The output stream</h4>
+<p>Every statement that emits — a string literal on its own line, a cmdlet call, a method that returns — contributes to the function's output, which pipelines on and can be captured. <code>Write-Output</code> writes the same stream explicitly. <code>Write-Host</code> writes the information stream instead: it prints to the console but is <em>never</em> captured, so a function that used <code>Write-Host</code> for its result returns nothing. That is the historical source of half of all "why is my variable empty" questions.</p>
+
+<div class="codeWrap"><pre><code># Every un-captured expression becomes output.
+function Get-Three {
+    'first'                 # lines are expressions...
+    'second'
+    Write-Output 'third'    # ...as is an explicit Write-Output
+}
+$result = Get-Three
+$result.Count               # 3: an array of three strings
+
+# Write-Host goes to the information stream, NOT the return value.
+function Log-It { Write-Host 'to the console'; 42 }
+$captured = Log-It
+$captured                   # 42 -- the 42; the console text is gone
+</code></pre></div>
+
+<h4 id="ch5-3-return">return and the early exit</h4>
+<p><code>return $value</code> writes <code>$value</code> to the output stream and exits the function immediately. One line can therefore do duty as both an assignment and a guard: <code>if (-not (Test-Path $Path)) { return $null }</code>. The classic mistake is sprinkling <code>Write-Host</code> diagnostics inside a function and discovering the diagnostics polluted the captured output — assign any intermediate result to a private variable rather than letting it fall onto the stream.</p>
+
+<div class="codeWrap"><pre><code># return writes AND exits; the last expression also outputs.
+function Get-Adder {
+    param([int]$A, [int]$B)
+    return $A + $B
+}
+Get-Adder -A 20 -B 22         # 42
+
+# An early-exit guard keeps the contract simple.
+function Get-Config {
+    param([string]$Path)
+    if (-not (Test-Path $Path)) { return $null }
+    Get-Content $Path -Raw
+}
+</code></pre></div>
+
+<h4 id="ch5-3-pipeline-input">Functions that accept the pipeline</h4>
+<p>Declaring <code>[Parameter(ValueFromPipeline = $true)]</code> on a parameter (or the <code>ByPropertyName</code> variant from chapter 2) turns the function into a proper pipeline stage. The three blocks handle the lifecycle: <code>begin</code> once, <code>process</code> once per incoming object, <code>end</code> once. Without a <code>process</code> block a function runs <em>once</em>, receiving the whole collection in <code>$Input</code> — usually a surprise when objects were expected one at a time.</p>
+
+<div class="codeWrap"><pre><code># A pipeline-aware function: begin, process, end.
+function Join-Words {
+    param(
+        [Parameter(ValueFromPipeline = $true)]
+        [string]$Word
+    )
+    begin   { $parts = @() }
+    process { $parts += $Word }
+    end     { $parts -join ', ' }
+}
+'red', 'green', 'blue' | Join-Words      # red, green, blue
+</code></pre></div>
+
+<h3 id="ch5-4" data-toc>5.4 Advanced functions</h3>
+<p class="topic-desc">Adding <code>[CmdletBinding()]</code> promotes a function to an advanced function: it gains the common parameters (<code>-Verbose</code>, <code>-Debug</code>, <code>-WhatIf</code>, <code>-Confirm</code>, <code>-ErrorAction</code>), a <code>$PSCmdlet</code> context, and the supports-should-process machinery that makes destructive commands honest.</p>
+
+<h4 id="ch5-4-cmdletbinding">The common parameters, for free</h4>
+<p>With <code>[CmdletBinding()]</code> your function accepts the same common parameters as compiled cmdlets. <code>-Verbose</code> flips <code>Write-Verbose</code> messages on per-call; <code>-ErrorAction Stop</code> makes the function's non-terminating errors throwable upstream; <code>-Debug</code> and <code>-InformationAction</code> similarly govern their streams. This is cheap and transformative: callers can now handle your function exactly as they handle <code>Get-ChildItem</code>.</p>
+
+<div class="codeWrap"><pre><code># Advanced functions carry the common parameters.
+[CmdletBinding()]
+function Invoke-HealthCheck {
+    param([string[]]$Hosts)
+    foreach ($h in $Hosts) {
+        Write-Verbose "checking $h"
+        if (Test-Connection $h -Count 1 -Quiet) { "ok: $h" }
+        else { "down: $h" }
+    }
+}
+Invoke-HealthCheck -Hosts web01, db01 -Verbose
+</code></pre></div>
+
+<h4 id="ch5-4-shouldprocess">-WhatIf, -Confirm and ShouldProcess</h4>
+<p>For commands that change or destroy, declare <code>[CmdletBinding(SupportsShouldProcess)]</code> and gate every destructive action behind <code>$PSCmdlet.ShouldProcess()</code>. Callers then get <code>-WhatIf</code> (dry-run) and <code>-Confirm</code> (ask before acting) for free, and <code>$ConfirmPreference</code> decides which severity of operation asks by default. A function that honours ShouldProcess can be rehearsed on production data without touching anything — the single most valuable discipline in this whole chapter.</p>
+
+<div class="codeWrap"><pre><code># Destructive work, rehearsable and confirmable.
+function Remove-StaleLogs {
+    [CmdletBinding(SupportsShouldProcess)]
+    param([string]$Path, [int]$Days = 30)
+
+    Get-ChildItem $Path -File |
+        Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-$Days) } |
+        ForEach-Object {
+            if ($PSCmdlet.ShouldProcess($_.Name, 'Delete stale log')) {
+                Remove-Item $_.FullName
+            }
+        }
+}
+Remove-StaleLogs -Path C:\Logs -WhatIf       # dry run: publishes intent only
+Remove-StaleLogs -Path C:\Logs -Confirm:$false
+</code></pre></div>
+
+<h3 id="ch5-5" data-toc>5.5 Writing a module</h3>
+<p class="topic-desc">A module bundles functions, variables, aliases and their manifest into one folder that PowerShell can import by name. It is the difference between dot-sourcing a pile of scripts and shipping a professional tool: namespacing, versioning, autoloading on first use.</p>
+
+<h4 id="ch5-5-psm1">The .psm1 layout and Export-ModuleMember</h4>
+<p>The script module file holds your functions; <code>Export-ModuleMember</code> decides which of them become public. Anything not exported stays callable inside the module but invisible outside — your helper functions can be private, which is how modules stay tidy. Comment-based help written above each function travels with the export, so <code>Get-Help</code> works on module functions the moment the module is imported.</p>
+
+<div class="codeWrap"><pre><code># LogTools.psm1 -- helpers stay private, two functions go public.
+function Get-NewestLog {
+    param([string]$Dir)
+    Get-ChildItem $Dir -File -Filter '*.log' |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+}
+function Remove-OldLogs {
+    param([string]$Dir, [int]$Days = 30)
+    Get-ChildItem $Dir -File |
+        Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-$Days) } |
+        Remove-Item
+}
+Export-ModuleMember -Function Get-NewestLog, Remove-OldLogs
+</code></pre></div>
+
+<h4 id="ch5-5-manifest">The manifest and module paths</h4>
+<p><code>New-ModuleManifest</code> produces the <code>.psd1</code> sidecar that describes the module: root module, exported members, description, version, author. Every folder listed in <code>$env:PSModulePath</code> is searched when you type <code>Import-Module LogTools</code>; the classic home for a personal module is <code>Documents\PowerShell\Modules\LogTools\LogTools.psd1</code> with the <code>.psm1</code> beside it. A module discovered by name can be imported and unloaded per-session, which is the sane alternative to permanently dot-sourcing a growing script library.</p>
+
+<div class="codeWrap"><pre><code># Build the manifest, then import the module by name.
+New-ModuleManifest -Path .\LogTools\LogTools.psd1 `
+    -RootModule LogTools.psm1 `
+    -FunctionsToExport Get-NewestLog, Remove-OldLogs `
+    -Description 'Log housekeeping helpers'
+
+# Modules are found along $env:PSModulePath by name, once installed.
+$env:PSModulePath -split ';'
+Copy-Item .\LogTools "$env:USERPROFILE\Documents\PowerShell\Modules\" -Recurse
+Import-Module LogTools
+Get-Command -Module LogTools
+Remove-Module LogTools
+</code></pre></div>
+
+<h4 id="ch5-5-import">Dot-sourcing vs Import-Module</h4>
+<p>Dot-sourcing (<code>. .\helpers.ps1</code>) runs the file in the current session scope, which makes its functions and variables appear as if you typed them — fine for a scratch session, wrong for distribution, because there is no boundary and no unload. <code>Import-Module</code> loads into a module scope, exposes only the exported members, and can be removed again with <code>Remove-Module</code>. The practical rule: dot-source for personal experiments, import modules for anything others will rely on.</p>
+
+<div class="codeWrap"><pre><code># Dot-source: everything lands in your session, no boundary.
+. .\helpers.ps1
+Get-Help Get-NewestLog          # comment-based help exports with the module
+
+# Import: namespaced, exported-only, removable.
+Import-Module LogTools -Force   # -Force reloads after an edit
+Get-NewestLog C:\Logs
+Remove-Module LogTools          # unloaded without restarting the console
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Error handling</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">PowerShell has two distinct error kinds — terminating and non-terminating — and the whole error-handling toolbox exists to tell them apart. This chapter covers the <code>try</code>/<code>catch</code>/<code>finally</code> trio, the <code>-ErrorAction</code> machinery, the <code>$Error</code> session record, and how to raise and shape your own errors.</p>
+
+<h3 id="ch6-1" data-toc>6.1 Terminating vs non-terminating</h3>
+<p class="topic-desc">The key to error handling is knowing which kind you are dealing with. A non-terminating error is reported, recorded, and the script keeps going; a terminating error stops the current statement and unwinds to the nearest <code>catch</code> — or kills the script.</p>
+
+<h4 id="ch6-1-two-kinds">The two kinds are asymmetrical</h4>
+<p>Most cmdlet failures are non-terminating: <code>Get-Content C:\missing.txt</code> writes an error and moves on, because the cmdlet processes many files and one miss is not a reason to abort them all. A cast failure, a bad argument to a method, or an exception thrown in your own code is terminating — the pipeline unwinds immediately. The asymmetry matters because <code>try/catch</code> only catches terminating errors; a non-terminating error sails past it unless you first reclassify it.</p>
+
+<div class="codeWrap"><pre><code># Non-terminating: reported, recorded, execution continues.
+Get-Content C:\nope.txt -ErrorAction SilentlyContinue
+'still running'
+
+# Terminating: the statement throws and the script unwinds.
+[int]'abc'              # RuntimeException -- script stops right here
+'never reached'
+</code></pre></div>
+
+<h4 id="ch6-1-preference">Reshaping errors with $ErrorActionPreference</h4>
+<p><code>$ErrorActionPreference = 'Stop'</code> is the standard lever: it reclassifies every non-terminating error in its scope as terminating, making cmdlet failures catchable. It is a session-wide variable, so set it at the top of a script and reset it in a <code>finally</code> if you change it mid-stream. The other values are <code>Continue</code> (default), <code>SilentlyContinue</code>, <code>Ignore</code>, and <code>Inquire</code> (ask).</p>
+
+<div class="codeWrap"><pre><code># With 'Stop', a cmdlet failure becomes a catchable exception.
+$ErrorActionPreference = 'Stop'
+try {
+    Get-Item C:\missing-file.txt
+} catch {
+    "caught: $($_.Exception.Message)"
+}
+
+# Silent is a scope-inherited choice; keep it narrow.
+$ErrorActionPreference = 'SilentlyContinue'
+Get-ChildItem C:\Restricted -Recurse   # runs without error spam
+</code></pre></div>
+
+<h3 id="ch6-2" data-toc>6.2 try, catch, finally</h3>
+<p class="topic-desc"><code>try</code> guards a region, <code>catch</code> handles the terminating error, <code>finally</code> always runs. The trio is the modern replacement for the old <code>trap</code> statement and is what production scripts use.</p>
+
+<h4 id="ch6-2-try-catch">Catching and explaining failure</h4>
+<p>The caught error arrives in <code>$_</code> (also <code>$PSItem</code>) as an <code>ErrorRecord</code>: <code>$_.Exception.Message</code> is what the user should see, <code>$_.Exception.GetType().FullName</code> identifies the kind, and <code>$_.InvocationInfo</code> points at the statement. Always let <code>catch</code> either rethrow (<code>throw</code>) or explain itself — a bare script that swallows errors is how outages become mysteries. <code>$ErrorActionPreference = 'Stop'</code> in a <code>try</code> region guarantees that cmdlet failures reach your <code>catch</code>.</p>
+
+<div class="codeWrap"><pre><code># A config read that explains itself when it fails.
+$ErrorActionPreference = 'Stop'
+try {
+    $cfg = Get-Content C:\app\settings.json -Raw | ConvertFrom-Json
+    "server is $($cfg.server)"
+} catch {
+    "failed to read config: $($_.Exception.Message)"
+}
+</code></pre></div>
+
+<h4 id="ch6-2-catch-types">Catch specific exception types</h4>
+<p>Multiple <code>catch</code> blocks allow precise handling: a type filter selects by exception class, most specific first, and a bare trailing <code>catch</code> handles everything else. This is where you can respond differently to "no permission" versus "already gone" rather than printing one generic message. The filter matches by inheritance, so <code>[System.UnauthorizedAccessException]</code> is more specific than <code>[System.Exception]</code>.</p>
+
+<div class="codeWrap"><pre><code># Different failures, different handling, one region.
+try {
+    Remove-Item C:\locked.txt -ErrorAction Stop
+} catch [System.UnauthorizedAccessException] {
+    'no permission to delete'
+} catch [System.IO.FileNotFoundException] {
+    'file was already gone'
+} catch {
+    "other failure: $($_.Exception.GetType().FullName)"
+}
+</code></pre></div>
+
+<h4 id="ch6-2-finally">finally: guaranteed cleanup</h4>
+<p><code>finally</code> runs whether the <code>try</code> succeeded, a <code>catch</code> handled the error, or the script is unwinding — the reliable place to release file handles, restore a preference variable, or delete a temp file. It is so useful that PowerShell 7 permits <code>try</code>&nbsp;/&nbsp;<code>finally</code> without a <code>catch</code>: the error keeps propagating while your cleanup still happens. Resource objects that implement <code>IDisposable</code> get the same treatment automatically via <code>using</code> statements and <code>.Dispose()</code>.</p>
+
+<div class="codeWrap"><pre><code># finally runs on every path: success, caught error, or unwind.
+$fs = $null
+try {
+    $fs = [System.IO.File]::OpenRead('C:\big.bin')
+    'reading...'
+} finally {
+    if ($fs) { $fs.Dispose() }
+    'cleanup done'
+}
+
+# PS7: try/finally without catch -- the error still propagates.
+try {
+    [int]'boom'
+} finally {
+    'this runs, then the error continues outward'
+}
+</code></pre></div>
+
+<h3 id="ch6-3" data-toc>6.3 -ErrorAction, $Error and -ErrorVariable</h3>
+<p class="topic-desc">Per-command control and the session-wide error record are the fine-tuning layer. <code>-ErrorAction</code> overrides the preference for one call; <code>$Error</code> keeps the recent history; <code>-ErrorVariable</code> captures a specific command's failures.</p>
+
+<h4 id="ch6-3-erroraction">-ErrorAction per command</h4>
+<p>Every cmdlet accepts <code>-ErrorAction</code>, which overrides <code>$ErrorActionPreference</code> for that single invocation. <code>SilentlyContinue</code> here is the honest way to say "this one may legitimately miss", and <code>-ErrorAction Stop</code> is the surgical alternative to flipping the whole-script preference. Combined with <code>-ErrorVariable</code> you get both silence and information: ask the command to keep quiet, and still receive the ErrorRecord it would otherwise have logged.</p>
+
+<div class="codeWrap"><pre><code># One command's behaviour, one command's shape.
+Get-Content C:\missing.log -ErrorAction SilentlyContinue
+Get-Item C:\missing.log -ErrorAction SilentlyContinue -ErrorVariable ev
+"captured $($ev.Count) error(s): $($ev[0].FullyQualifiedErrorId)"
+
+# -OutVariable pairs with it: capture output AND errors separately.
+Get-Process notepad -OutVariable p -ErrorAction SilentlyContinue
+</code></pre></div>
+
+<h4 id="ch6-3-error-record">$Error and the ErrorRecord shape</h4>
+<p><code>$Error</code> is an array of the most recent <code>ErrorRecord</code> objects, newest first, capped at the <code>$MaximumErrorCount</code> default of 256. Each record carries <code>.Exception</code> (the underlying .NET exception), <code>.CategoryInfo</code> (the error category and the activity that failed), <code>.TargetObject</code> (what it was acting on), and <code>.FullyQualifiedErrorId</code> (a stable machine-readable id). Scripts that log should write all four, not just the message.</p>
+
+<div class="codeWrap"><pre><code># Inspect what a recorded error actually contains.
+Get-Item C:\nope.txt -ErrorAction SilentlyContinue
+$e = $Error[0]                      # newest first
+$e.Exception.Message
+$e.CategoryInfo.Activity
+$e.TargetObject
+$e.FullyQualifiedErrorId
+
+# The session record is bounded; clear it when counts matter.
+$Error.Clear()
+</code></pre></div>
+
+<div class="note"><code>SilentlyContinue</code> and <code>Ignore</code> are not the same: <code>Ignore</code> does not even record the error in <code>$Error</code> and is faster, but the error is lost to diagnosis. Reach for <code>SilentlyContinue</code> plus <code>-ErrorVariable</code> when you want both quiet operation and a trail.</div>
+
+<h3 id="ch6-4" data-toc>6.4 Raising your own errors</h3>
+<p class="topic-desc">Your functions should fail as loudly and helpfully as the cmdlets. <code>throw</code> produces a terminating error; <code>Write-Error</code> produces a non-terminating one; <code>trap</code> is the legacy catch-all you will still meet in old code.</p>
+
+<h4 id="ch6-4-throw">throw: your terminating error</h4>
+<p><code>throw 'message'</code> raises an exception whose message you control and, unless caught, stops the script. The message should name the failing object and what was expected of it — "Config file not found: C:\none.json". Because <code>throw</code> is terminating, it is also how a function refuses bad input after validation has already filtered the ordinary cases, and how a <code>catch</code> re-raises after logging.</p>
+
+<div class="codeWrap"><pre><code># A function that refuses, loudly and specifically.
+function Get-StrictConfig {
+    param([string]$Path)
+    if (-not (Test-Path $Path)) {
+        throw "Config file not found: $Path"
+    }
+    Get-Content $Path -Raw
+}
+try {
+    Get-StrictConfig C:\none.json
+} catch {
+    "custom error: $($_.Exception.Message)"
+}
+</code></pre></div>
+
+<h4 id="ch6-4-write-error">Write-Error: the non-terminating report</h4>
+<p><code>Write-Error</code> emits an error record without stopping the pipeline — which is exactly the behaviour to copy for "this item failed, keep processing the rest". Its <code>-Category</code> and <code>-ErrorId</code> parameters shape the record that lands in <code>$Error</code>, and <code>-ErrorAction Stop</code> can upgrade it at the call site. The design decision to make in every loop: do you want the whole operation to fail on one bad item, or to report it and continue?</p>
+
+<div class="codeWrap"><pre><code># One item fails, the rest keep going.
+function Test-Port {
+    param([int]$Port)
+    if ($Port -gt 65535) {
+        Write-Error "port $Port out of range" -Category InvalidArgument
+        return
+    }
+    "port $Port looks fine"
+}
+Test-Port 70000           # error recorded, script continues
+'still here'
+</code></pre></div>
+
+<h4 id="ch6-4-trap">trap: the legacy catch-all</h4>
+<p><code>trap { }</code> catches every terminating error in its scope — you meet it in older code and in some Microsoft samples, and it is worth recognising rather than writing. Inside the block, <code>continue</code> resumes the script, <code>break</code> unwinds out of the scope, and a bare <code>trap</code> without a control keyword keeps unwinding. New scripts should use <code>try/catch/finally</code>, which scopes the handling to a region instead of a whole scope.</p>
+
+<div class="codeWrap"><pre><code># A trap catches everything in scope; continue keeps the script alive.
+trap { "trap caught: $($_.Exception.Message)"; continue }
+[int]'nope'
+'after the trap'          # reached, because continue resumed execution
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Files, registry, services and tasks</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">Administration is where PowerShell earns its keep. This chapter works through the four stores you will touch most: files and streams, the registry, services and processes, and the Task Scheduler. The syntax stays the same everywhere because every store is a provider — a lesson from chapter 1 paying rent.</p>
+
+<h3 id="ch7-1" data-toc>7.1 Files and streams</h3>
+<p class="topic-desc">Reading, writing, copying and deleting files is the most common script workload. The <code>-Item</code> family handles filesystem objects as objects, and the content cmdlets handle their bytes and text.</p>
+
+<h4 id="ch7-1-content">Get-Content, Set-Content, Add-Content, Out-File</h4>
+<p><code>Get-Content</code> streams a file line by line, which matters for large logs — <code>-Tail 20</code> reads only the end. <code>Set-Content</code> overwrites, <code>Add-Content</code> appends, and <code>Out-File</code> formats pipeline output into a file. Encoding is the quiet killer: PowerShell 5.1 writes UTF-8 <em>with</em> a byte-order mark and defaults weirdly, while 7 uses clean UTF-8 — set <code>-Encoding utf8</code> explicitly when a consumer is picky. <code>-Raw</code> reads the whole file as one string instead of an array of lines.</p>
+
+<div class="codeWrap"><pre><code># Read, write, append; encoding chosen deliberately.
+Get-Content .\settings.ini
+Get-Content .\big.log -Tail 20
+Set-Content .\out.txt -Value 'line one', 'line two' -Encoding utf8
+Add-Content .\out.txt -Value 'line three'
+Get-Content .\out.txt -Raw        # one string with newlines intact
+
+# Out-File is the formatting-boundary form of the same job.
+Get-Process -Id $PID | Select-Object ProcessName, Id | Out-File .\proc.txt
+</code></pre></div>
+
+<h4 id="ch7-1-item-cmdlets">Copy, Move, Remove, Rename, Test</h4>
+<p>The <code>-Item</code> cmdlets take paths and behave predictably: <code>Copy-Item -Recurse</code> copies trees, <code>Remove-Item -Recurse -Force</code> deletes them, and <code>-WhatIf</code> on any of them previews without touching the disk — the cheapest dry run you will ever get. <code>Test-Path</code> is the boolean existence check, <code>Join-Path</code> builds paths without string concatenation, and <code>Split-Path</code> dissects them. Wildcards in paths are resolved by the provider, so <code>*.log</code> behaves consistently everywhere.</p>
+
+<div class="codeWrap"><pre><code># Create, copy, move, rename, delete, test.
+New-Item .\scratch -ItemType Directory -Force
+Copy-Item .\out.txt .\scratch\backup.txt
+Move-Item .\scratch\backup.txt .\scratch\renamed.txt
+Rename-Item .\scratch\renamed.txt -NewName 'final.txt'
+Remove-Item .\scratch -Recurse -Force
+Test-Path .\scratch                          # False
+
+# Path helpers beat string concatenation.
+Join-Path C:\ 'temp'                         # C:\temp
+Split-Path C:\temp\a.txt -Parent             # C:\temp
+</code></pre></div>
+
+<h4 id="ch7-1-csv">CSV as the interchange format</h4>
+<p><code>Export-Csv</code> turns an array of <code>PSCustomObject</code>s into a proper delimited file, and <code>Import-Csv</code> turns it back — column names from properties, values as strings. <code>-NoTypeInformation</code> drops the legacy type-name header line. The round trip is lossy by design (everything becomes text), so re-cast columns on import when you need real numbers or dates. CSV is also the natural hand-off between PowerShell and Excel, and the bridge for feeding property-bound pipeline parameters (chapter 2).</p>
+
+<div class="codeWrap"><pre><code># Data-shaped output to a sheet, and back again.
+Get-Process |
+    Select-Object -First 5 ProcessName, Id, CPU |
+    Export-Csv .\procs.csv -NoTypeInformation
+
+$rows = Import-Csv .\procs.csv
+$rows | Where-Object ProcessName -EQ 'notepad'
+$rows | Select-Object -First 2 | Format-Table ProcessName, Id, CPU -AutoSize
+</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 The registry as a drive</h3>
+<p class="topic-desc">The registry is just another provider: <code>HKLM:</code> and <code>HKCU:</code> behave like filesystem drives, and the same cmdlets you used on files read and write keys and values. The only new vocabulary is the ItemProperty cmdlets, which address a <em>value</em> attached to a key.</p>
+
+<h4 id="ch7-2-read">Reading keys and values</h4>
+<p><code>Get-ChildItem HKCU:\Software\...\Run</code> lists the subkeys of a key; <code>Get-ItemProperty</code> reads that key's <em>values</em>, which appear as properties of the returned object. So <code>$run.OneDrive</code> is the data of a value named <code>OneDrive</code> — a registry value maps to an object property, and changing the property writes back with <code>Set-ItemProperty</code>. Registry paths are case-insensitive, but the hive abbreviations are exact: <code>HKLM:</code> and <code>HKCU:</code> only.</p>
+
+<div class="codeWrap"><pre><code># Keys are children; values are properties of a key object.
+Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' |
+    Select-Object PSChildName
+
+$run = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
+$run.OneDrive                        # the data of the OneDrive value
+
+# The same read on the local machine hive.
+Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run' |
+    Format-List *                    # every value at once
+</code></pre></div>
+
+<h4 id="ch7-2-write">Creating keys, writing and removing values</h4>
+<p><code>New-Item HKCU:\Software\Contoso -Force</code> creates a key; <code>New-ItemProperty</code> adds a value with a type — <code>DWord</code> for numbers, <code>String</code> for text, <code>ExpandString</code> for strings with <code>%VAR%</code> references. <code>Set-ItemProperty</code> mutates, <code>Remove-ItemProperty</code> removes a single value, and <code>Remove-Item</code> removes entire keys. Registry writes commonly need elevation above the current user's hive, and <code>-WhatIf</code> works here too — rehearsal is identical across providers.</p>
+
+<div class="codeWrap"><pre><code># Write a whole setting and clean it up again.
+$base = 'HKCU:\Software\Contoso'
+New-Item $base -Force | Out-Null
+New-ItemProperty $base -Name 'Retry' -Value 3 -PropertyType DWord
+Set-ItemProperty $base -Name 'Retry' -Value 5
+Get-ItemProperty $base -Name 'Retry'
+Remove-ItemProperty $base -Name 'Retry'
+Remove-Item $base
+
+# A programmatic read-modify-write of a running app's setting.
+$key = 'HKCU:\Software\Contoso\App'
+New-Item $key -Force | Out-Null
+Set-ItemProperty $key -Name 'Theme' -Value 'dark'
+(Get-ItemProperty $key).Theme             # dark
+</code></pre></div>
+
+<div class="tip">Before editing the registry in a script, run <code>reg.exe export</code> or snapshot the key with <code>Get-ItemProperty</code> to a file. One keystroke of foresight turns a mistaken <code>Remove-ItemProperty</code> from a rebuild-the-machine incident into a five-second restore.</div>
+
+<h3 id="ch7-3" data-toc>7.3 Services and processes</h3>
+<p class="topic-desc">Services run without a user session and persist across reboots; processes are the running programs of the current session. Both are first-class object sources, so filtering, restarting and inspecting them is pure pipeline work.</p>
+
+<h4 id="ch7-3-services">Get-Service and its controlling siblings</h4>
+<p><code>Get-Service</code> lists services with <code>Status</code> and <code>StartType</code>; <code>Start-Service</code>, <code>Stop-Service</code> and <code>Restart-Service</code> change state, and <code>Set-Service -StartupType</code> changes the boot behaviour. Service names are not display names — the <code>-Name</code> you pass is the short service key (<code>Spooler</code>, not <code>Print Spooler</code>). Restarting, stopping or reconfiguring a service needs elevation, and the whole family accepts <code>-WhatIf</code>, which is how you prove a planned change without touching a production box.</p>
+
+<div class="codeWrap"><pre><code># Discover, filter, then act -- with a dry run first.
+Get-Service | Where-Object Status -EQ 'Running' | Select-Object -First 5 Name
+Get-Service Spooler | Restart-Service -WhatIf
+Get-Service Spooler | Restart-Service -PassThru | Select-Object Status
+Set-Service Spooler -StartupType Automatic
+Get-Service Spooler | Select-Object Status, StartType
+</code></pre></div>
+
+<h4 id="ch7-3-processes">Get-Process and Start-Process</h4>
+<p><code>Get-Process</code> returns running processes with typed metrics — <code>WS</code>, <code>CPU</code>, <code>StartTime</code>, <code>Path</code> — so "which five processes eat the most memory" is a sort, not a parser. <code>Start-Process</code> launches programs and, with <code>-PassThru</code>, hands you the <code>Process</code> object to poll or stop; without <code>-Wait</code> it returns immediately. <code>Stop-Process</code> terminates a process and ignores by <code>-Id</code> or <code>-Name</code> — but it is abrupt, killing unsaved work, so prefer asking the application to exit when one exists.</p>
+
+<div class="codeWrap"><pre><code># Who is eating the machine, as a sort.
+Get-Process | Sort-Object WS -Descending |
+    Select-Object -First 5 ProcessName, Id, WS
+
+# Launch, observe, stop.
+$p = Start-Process notepad -PassThru
+Start-Sleep -Seconds 1
+$p.HasExited                                    # False
+Stop-Process -Id $p.Id
+Get-Process notepad -ErrorAction SilentlyContinue   # gone
+</code></pre></div>
+
+<h3 id="ch7-4" data-toc>7.4 Scheduled tasks</h3>
+<p class="topic-desc">For work that must happen when nobody is watching, the <code>ScheduledTasks</code> module registers jobs in the Task Scheduler. The four building blocks are an action (what runs), a trigger (when), optional settings, and the registration itself.</p>
+
+<h4 id="ch7-4-register">Registering a task from cmdlets</h4>
+<p><code>New-ScheduledTaskAction</code> defines the executable and its arguments; <code>New-ScheduledTaskTrigger -Daily -At 02:00</code> defines the schedule; <code>New-ScheduledTaskSettingsSet -StartWhenAvailable</code> covers "machine was off at 2am". <code>Register-ScheduledTask</code> combines them under a name, and <code>-RunLevel Highest</code> requests elevation. The same four-piece construction works for logon triggers, weekly schedules, and one-time executions, and it is fully scriptable — a task that is defined in code can be versioned and recreated instead of hand-clicked.</p>
+
+<div class="codeWrap"><pre><code># Build action, trigger, settings; register; run immediately.
+$act  = New-ScheduledTaskAction -Execute 'powershell.exe' `
+    -Argument '-File C:\scripts\backup.ps1'
+$trig = New-ScheduledTaskTrigger -Daily -At '02:00'
+$set  = New-ScheduledTaskSettingsSet -StartWhenAvailable
+Register-ScheduledTask -TaskName 'NightlyBackup' `
+    -Action $act -Trigger $trig -Settings $set
+
+Start-ScheduledTask -TaskName 'NightlyBackup'
+Get-ScheduledTask -TaskName 'NightlyBackup' |
+    Select-Object State, TaskName
+</code></pre></div>
+
+<h4 id="ch7-4-track">What ran, when, and did it succeed</h4>
+<p><code>Get-ScheduledTaskInfo</code> answers the operational question — last run time, last result code, next run time. A result code of 0 means the action exited cleanly; anything else is the process's own exit code, which is why the scheduled action should be a script that exits non-zero on failure. The pair to script is: check <code>LastTaskResult</code>, and if it differs from an expected value, page someone rather than silently rescheduling.</p>
+
+<div class="codeWrap"><pre><code># Ask the scheduler what actually happened.
+Get-ScheduledTask -TaskName 'NightlyBackup' |
+    Get-ScheduledTaskInfo |
+    Select-Object LastRunTime, LastTaskResult, NextRunTime
+
+# A watch loop that alerts when a task starts failing.
+$bad = Get-ScheduledTaskInfo 'NightlyBackup'
+$bad.LastTaskResult | ForEach-Object {
+    if ($_ -ne 0) { Write-Warning "NightlyBackup last result: $_" }
+}
+
+Unregister-ScheduledTask -TaskName 'NightlyBackup' -Confirm:$false
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch8" data-toc>8 ▸ Remoting, jobs and professional scripting</h2>
+<div class="ch-toc"></div></div>
+<p class="topic-desc">The final chapter scales your scripts out and up. PowerShell remoting runs work on other machines; background jobs run work without blocking your console; and strict mode plus static analysis turn a working script into a maintainable one. It closes with a complete, runnable example that ties the whole guide together.</p>
+
+<h3 id="ch8-1" data-toc>8.1 Remoting</h3>
+<p class="topic-desc">Remoting is the ability to run script blocks on remote machines and receive their output back as objects. The transport is WinRM on Windows (ports 5985/5986), with SSH remoting available in PowerShell 7 — and one-time setup on each target.</p>
+
+<h4 id="ch8-1-enable">Enabling and testing the connection</h4>
+<p><code>Enable-PSRemoting</code> starts the WinRM listener, opens the firewall rule, and sets the service to start automatically — one command, run once per target with local administrator rights. WinRM listens on TCP 5985 (HTTP) and 5986 (HTTPS); <code>Test-WSMan</code> verifies a target answers before you build anything on it. On PowerShell 7, remoting to Linux and macOS uses an SSH transport instead: open port 22 and connect with <code>New-PSSession -HostName</code> rather than <code>-ComputerName</code>.</p>
+
+<div class="codeWrap"><pre><code># One-time setup on each target, as an administrator.
+Enable-PSRemoting -Force
+
+# Verify the listener answers before scripting against it.
+Test-WSMan web01
+Get-NetTCPConnection -LocalPort 5985 -State Listen
+
+# PowerShell 7 to a Linux box: SSH transport, host name not computer name.
+New-PSSession -HostName app01 -UserName deploy
+</code></pre></div>
+
+<h4 id="ch8-1-invoke">Invoke-Command: run a block somewhere else</h4>
+<p><code>Invoke-Command</code> runs a script block on one machine or many at once — <code>-ComputerName</code> accepts a list, and the response comes back as rich objects, each tagged with the <code>PSComputerName</code> it came from. Local variables are not visible inside the remote block: bind the values you need with <code>$using:name</code>, which ships a snapshot into the block before it travels. <code>-Credential (Get-Credential)</code> supplies alternate credentials, and <code>-AsJob</code> hands the whole fan-out to the job machinery from the next section instead of blocking your console.</p>
+
+<div class="codeWrap"><pre><code># Fan one block out to several machines; answers come back tagged.
+Invoke-Command -ComputerName web01, web02 -ScriptBlock {
+    Get-Service wuauserv | Select-Object Status
+} -Credential (Get-Credential)
+
+# $using: carries a local value into the remote session.
+$minMb = 100
+Invoke-Command -ComputerName web01 -ScriptBlock {
+    Get-Process |
+        Where-Object { $_.WorkingSet64 -gt ($using:minMb * 1MB) } |
+        Select-Object -First 3 ProcessName, WS
+}
+</code></pre></div>
+
+<h4 id="ch8-1-session">PSSessions: state that survives between calls</h4>
+<p>A PSSession is a persistent connection that keeps state across calls: a variable assigned in one <code>Invoke-Command -Session</code> is still there in the next, which makes multi-step remote work dramatically cheaper than reconnecting per command. Create the session once with <code>New-PSSession</code>, reuse it by name, and delete it with <code>Remove-PSSession</code> when the work is done. <code>Enter-PSSession</code> drops you into an interactive remote prompt from which <code>Exit-PSSession</code> returns. Sessions are bound to a machine, transport and credential, so keep one per distinct pair rather than reusing a session for a different account.</p>
+
+<div class="codeWrap"><pre><code># A session remembers between calls.
+$s = New-PSSession -ComputerName web01
+Invoke-Command -Session $s -ScriptBlock {
+    $env:MYSTATE = 'set on the remote side'
+}
+Invoke-Command -Session $s -ScriptBlock { $env:MYSTATE }
+Remove-PSSession $s
+
+# Interactive: Enter-PSSession web01  ...  Exit-PSSession
+</code></pre></div>
+
+<h3 id="ch8-2" data-toc>8.2 Background jobs</h3>
+<p class="topic-desc">A background job is a script block running in its own fresh <code>pwsh</code> process. Your console stays responsive, the job runs to completion unseen, and you collect the result when you are ready — the pattern for anything slow, from a long <code>Sort-Object</code> to a week of log analysis.</p>
+
+<h4 id="ch8-2-start-job">Starting a job and polling it</h4>
+<p><code>Start-Job</code> launches a new process, runs the script block, and hands you a Job object to poll. Because a job starts a fresh session it cannot see your local variables: pass the ones you need with <code>-ArgumentList</code> and receive them in a <code>param()</code> inside the block. The job's output is captured, never printed to your console — which is why the result always seems to be missing until you explicitly fetch it.</p>
+
+<div class="codeWrap"><pre><code># A job runs in its own process; poll it, then collect the result.
+$job = Start-Job -ScriptBlock {
+    Start-Sleep -Seconds 3
+    1..5 | ForEach-Object { $_ * $_ }
+}
+$job.State                          # Running, then Completed
+Receive-Job -Job $job -Wait
+Remove-Job $job                     # jobs are received AND removed
+</code></pre></div>
+
+<h4 id="ch8-2-receive-wait">Receive-Job, Wait-Job and cleanup</h4>
+<p><code>Receive-Job</code> retrieves everything a finished job produced; <code>-Wait</code> blocks until the job completes first, and <code>-Keep</code> leaves the output behind for a second read. <code>Get-Job</code> lists every job in the session — including the ones you forgot about — and <code>Remove-Job</code> deletes one and frees its buffered output. The tidy pattern for parallel work is start them all, <code>Wait-Job</code> on the set, receive each, then remove each: a fan-in that never blocks on the first slower job.</p>
+
+<div class="codeWrap"><pre><code># Start several, wait for the slowest, collect and clean up.
+$jobs = 1..3 | ForEach-Object {
+    Start-Job -ScriptBlock {
+        param($n) Start-Sleep -Seconds $n; "job $n done"
+    } -ArgumentList $_
+}
+Wait-Job $jobs | Out-Null
+$jobs | ForEach-Object { Receive-Job $_ }
+$jobs | Remove-Job
+Get-Job                     # nothing left behind
+</code></pre></div>
+
+<div class="note">The <code>Workflow*</code> cmdlets from PowerShell 3 were the earlier attempt at parallel flows, and they are gone from PowerShell 7. Jobs and <code>Invoke-Command -AsJob</code> provide the same concurrency without the legacy weight.</div>
+
+<h3 id="ch8-3" data-toc>8.3 Strict mode and static analysis</h3>
+<p class="topic-desc">A reliable script fails loudly on the mistakes that silently succeed by default. <code>Set-StrictMode</code> turns uninitialised-variable reads and missing-property access into errors, and PSScriptAnalyzer reviews the finished script for style, safety and logic problems — the closest thing the language has to a linter.</p>
+
+<h4 id="ch8-3-strict-mode">Set-StrictMode: fail on the silent nulls</h4>
+<p><code>Set-StrictMode -Version 3.0</code> (or <code>Latest</code>) makes three silent behaviours throw: reading a variable that was never defined, accessing a property that does not exist, and calling a method that is not there. Code written under strict mode surfaces a typo at the line where it happens instead of as a confusing <code>$null</code> cascade three screens later. The mode applies only to the scope that sets it, so put it at the top of a script or module — and note the trade-off: it changes behaviour, which is why you declare it deliberately rather than inherit it.</p>
+
+<div class="codeWrap"><pre><code># Strict mode converts silent nulls into loud, localised errors.
+Set-StrictMode -Version 3.0
+# $x = $NeverDefined            # ReferenceNotFound -- variable is gone
+# $h = @{ a = 1 }; $h.b         # PropertyNotFound -- key is gone
+'strict and deliberate from here'
+</code></pre></div>
+
+<h4 id="ch8-3-analyzer">PSScriptAnalyzer: the professional linter</h4>
+<p>PSScriptAnalyzer is Microsoft's static-analysis engine for PowerShell. It flags unused variables, assignment-where-comparison-meant (<code>=</code> in place of <code>-eq</code>), missing <code>ShouldProcess</code> on destructive functions, absent help, and hundreds of smaller issues, each graded by severity. <code>Invoke-ScriptAnalyzer</code> returns Issue objects, so you can filter hard failures out of the noise and, in CI, fail the build on <code>-Severity Error</code> alone. Install it once per machine; run it on every script before commit.</p>
+
+<div class="codeWrap"><pre><code># Install once, then review any script.
+Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+
+Invoke-ScriptAnalyzer -Path .\backup.ps1 |
+    Sort-Object Severity | Format-Table RuleName, Line, Message
+
+# In automation, only hard failures should break the build.
+Invoke-ScriptAnalyzer -Path .\backup.ps1 -Severity Error |
+    Select-Object RuleName, Line
+</code></pre></div>
+
+<h3 id="ch8-4" data-toc>8.4 A complete example script</h3>
+<p class="topic-desc">Everything in this guide, in one file: a realistic maintenance script that declares and validates parameters, runs under strict mode with stop-on-error, uses ShouldProcess so it can be rehearsed, prunes old backups, and reports clearly. This is the shape of a script you would hand to the Task Scheduler from chapter 7.</p>
+
+<h4 id="ch8-4-the-script">backup.ps1, end to end</h4>
+<p>Each line earns its place. The mandatory <code>Source</code> parameter forces the caller to say what to back up; strict mode and <code>$ErrorActionPreference = 'Stop'</code> mean a failure stops the run instead of producing a half-backup; <code>ShouldProcess</code> makes the whole script a dry run under <code>-WhatIf</code>; and the prune step keeps exactly the newest <code>-Keep</code> archives. Notice the pattern held throughout the guide: parameters validated before work, state-changing work gated, and a human-readable report at the end.</p>
+
+<div class="codeWrap"><pre><code># backup.ps1 -- nightly archive-and-prune, rehearsable.
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$Source,
+
+    [string]$Destination = "$env:USERPROFILE\backups",
+    [int]$Keep = 14
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+if (-not (Test-Path $Source)) { throw "source missing: $Source" }
+New-Item -Path $Destination -ItemType Directory -Force | Out-Null
+
+$stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+$file  = Join-Path $Destination "backup-$stamp.zip"
+
+if ($PSCmdlet.ShouldProcess($file, 'Create backup')) {
+    Compress-Archive -Path $Source -DestinationPath $file
+}
+
+# Keep only the newest $Keep archives; delete anything older.
+Get-ChildItem $Destination -Filter 'backup-*.zip' |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -Skip $Keep |
+    ForEach-Object { Remove-Item $_.FullName -Force }
+
+Write-Host "backup written to $file"
+</code></pre></div>
+
+<h4 id="ch8-4-running-it">The run book</h4>
+<p>Set the execution policy once, preview with <code>-WhatIf</code>, then run for real — and repeat the next night with a smaller <code>-Keep</code> when disk is tight. Because every run creates a timestamped archive and prunes to <code>Keep</code>, the backup set is self-maintaining: you never have to remember to delete old copies, and <code>-WhatIf</code> proves the prune filter before it touches a file.</p>
+
+<div class="codeWrap"><pre><code># Set the policy once, rehearse, then run for real.
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+.\backup.ps1 -Source C:\data -WhatIf          # preview: reports, changes nothing
+.\backup.ps1 -Source C:\data -Destination D:\arc
+
+# Long-running: each run adds an archive and prunes the old ones.
+.\backup.ps1 -Source C:\data -Keep 7
+Get-ChildItem D:\arc -Filter 'backup-*.zip' |
+    Select-Object Name, LastWriteTime, Length
+</code></pre></div>
+
+<div class="tip">The disciplines that separate a script from a tool, in one sentence: parameters with validation, ShouldProcess on anything destructive, strict mode on by default, an analyzer run before commit — and every tool you write should one day fit into a scheduled task just like this one.</div>
+</section>

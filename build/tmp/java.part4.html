@@ -1,0 +1,1498 @@
+<section class="chapter">
+<h2 id="ch12" data-toc>12 · The web with servlets and JSP</h2>
+<p class="topic-desc">Before Spring there was the Servlet API, and it is still the contract every Java web framework implements. Understanding the container model — one servlet instance, many request threads, a scoped session — explains the shape of everything built on top of it. The API is <code>jakarta.servlet</code> since Jakarta EE 9; the old <code>javax.servlet</code> namespace is dead.</p>
+
+<h3 id="ch12-servlet" data-toc>12.1 The servlet lifecycle and HttpServlet</h3>
+<p class="topic-desc">A servlet is a class the container instantiates once and calls with many concurrent requests. The lifecycle is <code>init</code>, then <code>service</code> many times, then <code>destroy</code>, and the concurrency of the middle phase is the whole design constraint.</p>
+
+<h4>One instance, many threads</h4>
+<p>The container creates a single servlet instance (unless the class is declared <code>SingleThreadModel</code>, which is deprecated and wrong). Requests arrive on container threads, so instance fields are shared mutable state and must be immutable, thread-safe or absent. Everything request-specific belongs in a local variable or the request attributes. <code>HttpServlet.service</code> dispatches by HTTP method to <code>doGet</code>, <code>doPost</code>, <code>doPut</code>, <code>doDelete</code> and the rest, and the default implementations of the less common methods return 405. Since Servlet 3.0 the mapping can be an annotation, <code>@WebServlet("/orders")</code>, or a <code>web.xml</code> entry; mixing both is legal but a duplicate URL pattern is a startup failure.</p>
+
+<div class="codeWrap"><pre><code>import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.time.Instant;
+
+@WebServlet(name = "health", urlPatterns = {"/health", "/healthz"}, loadOnStartup = 1)
+public class HealthServlet extends HttpServlet {
+
+    // Immutable instance state is safe to share across request threads.
+    private final Instant startedAt = Instant.now();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setHeader("Cache-Control", "no-store");
+
+        String status = "UP";
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.getWriter().printf(
+                "{\"status\":\"%s\",\"uptimeSeconds\":%d}%n",
+                status, java.time.Duration.between(startedAt, Instant.now()).toSeconds());
+    }
+}
+</code></pre></div>
+
+<h4>Request and response objects</h4>
+<p><code>HttpServletRequest</code> exposes parameters (<code>getParameter</code> returns the first value and <code>null</code> when absent), headers, the method, the URI, cookies, the session and a request-scoped attribute map. <code>getParameterMap</code> returns every value for a multi-valued field. The request body is a stream and can be read once, so a filter that consumes it must wrap the request to allow a re-read. <code>HttpServletResponse</code> sets the status, headers and content type before the body is committed; after the first flush the response is committed and a later <code>sendError</code> or <code>sendRedirect</code> throws <code>IllegalStateException</code>. Character encoding must be set before writing text, or the container uses its default and non-ASCII data arrives corrupted.</p>
+
+<div class="codeWrap"><pre><code>@WebServlet("/orders/create")
+public class CreateOrderServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        // Parameters are request-scoped values, never shared state.
+        String sku  = req.getParameter("sku");
+        String qty  = req.getParameter("qty");
+        String[] tags = req.getParameterValues("tag");
+
+        if (sku == null || sku.isBlank()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "sku is required");
+            return;
+        }
+        int count;
+        try {
+            count = Integer.parseInt(qty == null ? "1" : qty);
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "qty must be an integer");
+            return;
+        }
+
+        var created = new OrderService().create(sku, count, tags);
+        req.setAttribute("order", created);            // visible to a forward target
+
+        // PRG: redirect after a successful POST so a refresh does not resubmit.
+        resp.sendRedirect(req.getContextPath() + "/orders/view?id=" + created.id());
+    }
+}
+</code></pre></div>
+
+<div class="warn">A servlet's <code>init</code> runs once and is the place to open expensive shared resources, but you cannot rely on <code>destroy</code> being called on a JVM crash. Close a resource that must not leak with a shutdown hook as well, or use a container-managed <code>DataSource</code>.</div>
+
+<h3 id="ch12-webxml" data-toc>12.2 web.xml, the deployment descriptor and packaging a WAR</h3>
+<p class="topic-desc">A web application is packaged as a WAR: a jar-shaped archive with <code>WEB-INF/classes</code>, <code>WEB-INF/lib</code> and a <code>WEB-INF/web.xml</code>. The descriptor configures what annotations cannot easily express.</p>
+
+<h4>What the descriptor still owns</h4>
+<p>Servlet mappings, filters, listeners and context parameters can be annotations, but <code>web.xml</code> remains the place for ordering (which filter runs first when two match), welcome files, error pages, session configuration and security constraints. The filter ordering from <code>@WebFilter</code> is the order the container scans, which is not specified, so a filter chain whose order matters must be declared in <code>web.xml</code>. A <code>&lt;context-param&gt;</code> is application-wide and read with <code>getServletContext().getInitParameter</code>; a <code>&lt;init-param&gt;</code> is servlet-specific and read with <code>getServletConfig().getInitParameter</code>. A <code>&lt;listener&gt;</code> with <code>ServletContextListener</code> is the standard place to start and stop application-scoped resources.</p>
+
+<div class="codeWrap"><pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd"
+         version="6.1"&gt;
+
+  &lt;display-name&gt;orders-web&lt;/display-name&gt;
+
+  &lt;context-param&gt;
+    &lt;param-name&gt;jdbc.url&lt;/param-name&gt;
+    &lt;param-value&gt;jdbc:postgresql://db:5432/acme&lt;/param-value&gt;
+  &lt;/context-param&gt;
+
+  &lt;!-- Order here is the order they run. Annotations cannot express it. --&gt;
+  &lt;filter&gt;
+    &lt;filter-name&gt;encoding&lt;/filter-name&gt;
+    &lt;filter-class&gt;com.acme.web.EncodingFilter&lt;/filter-class&gt;
+  &lt;/filter&gt;
+  &lt;filter&gt;
+    &lt;filter-name&gt;auth&lt;/filter-name&gt;
+    &lt;filter-class&gt;com.acme.web.AuthFilter&lt;/filter-class&gt;
+  &lt;/filter&gt;
+  &lt;filter-mapping&gt;
+    &lt;filter-name&gt;encoding&lt;/filter-name&gt;&lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+  &lt;/filter-mapping&gt;
+  &lt;filter-mapping&gt;
+    &lt;filter-name&gt;auth&lt;/filter-name&gt;&lt;url-pattern&gt;/orders/*&lt;/url-pattern&gt;
+  &lt;/filter-mapping&gt;
+
+  &lt;listener&gt;
+    &lt;listener-class&gt;com.acme.web.AppLifecycle&lt;/listener-class&gt;
+  &lt;/listener&gt;
+
+  &lt;session-config&gt;
+    &lt;session-timeout&gt;30&lt;/session-timeout&gt;
+    &lt;cookie-config&gt;
+      &lt;http-only&gt;true&lt;/http-only&gt;
+      &lt;secure&gt;true&lt;/secure&gt;
+      &lt;same-site&gt;Lax&lt;/same-site&gt;
+    &lt;/cookie-config&gt;
+  &lt;/session-config&gt;
+
+  &lt;welcome-file-list&gt;&lt;welcome-file&gt;index.jsp&lt;/welcome-file&gt;&lt;/welcome-file-list&gt;
+
+  &lt;error-page&gt;
+    &lt;error-code&gt;404&lt;/error-code&gt;
+    &lt;location&gt;/WEB-INF/views/404.jsp&lt;/location&gt;
+  &lt;/error-page&gt;
+&lt;/web-app&gt;
+</code></pre></div>
+
+<div class="codeWrap"><pre><code># shell - the layout of a WAR
+src/main/webapp/WEB-INF/web.xml
+src/main/webapp/index.jsp
+src/main/webapp/WEB-INF/views/orders.jsp
+src/main/java/com/acme/web/CreateOrderServlet.java
+target/orders-web-1.0.war          # after mvn package
+
+# Inspect without deploying.
+jar --list --file target/orders-web-1.0.war | head
+mvn cargo:run                      # or an embedded container via a test
+</code></pre></div>
+
+<h4>Embedded containers and why they won</h4>
+<p>A traditional WAR needs a container: Tomcat, Jetty, WildFly or GlassFish, installed separately, with the WAR deployed into it. Since the mid-2010s the dominant model is to <em>embed</em> the container: the application's <code>main</code> method starts an embedded Tomcat or Jetty, which makes the deliverable a single jar and the deployment a process rather than an installation. Spring Boot does exactly this. The embedded model removes the shared-container classloader problems, gives every application its own JVM and its own tuning, and makes the process a first-class citizen for a scheduler. The cost is a bigger artifact and the loss of container-provided services such as JNDI, which must be provided by the application instead.</p>
+
+<div class="codeWrap"><pre><code>import org.apache.catalina.startup.Tomcat;
+import java.nio.file.Files;
+
+public class EmbeddedTomcat {
+    public static void main(String[] args) throws Exception {
+        var tomcat = new Tomcat();
+        tomcat.setPort(8080);
+        tomcat.getConnector();                       // must be called to create it
+
+        var ctx = tomcat.addContext("", Files.createTempDirectory("tomcat").toString());
+        Tomcat.addServlet(ctx, "health", new HealthServlet());
+        ctx.addServletMappingDecoded("/health", "health");
+
+        tomcat.start();
+        tomcat.getServer().await();                  // block until shutdown
+    }
+}
+</code></pre></div>
+
+<h3 id="ch12-jsp" data-toc>12.3 JSP, EL and JSTL</h3>
+<p class="topic-desc">A JSP is an HTML template compiled by the container into a servlet on first request. It exists so that markup lives in a file a designer can edit, and its disciplined use is as a pure view over data prepared by a servlet.</p>
+
+<h4>The implicit objects and what belongs in a page</h4>
+<p>A JSP has nine implicit objects, of which the important ones are <code>request</code>, <code>response</code>, <code>session</code>, <code>application</code>, <code>out</code> and <code>pageContext</code>. A scriptlet (<code>&lt;% ... %&gt;</code>) is raw Java in a template and should not be written: it defeats the separation the technology exists for and cannot be tested. The alternatives are Expression Language <code>${...}</code> for reading values and JSTL tags (<code>&lt;c:forEach&gt;</code>, <code>&lt;c:if&gt;</code>, <code>&lt;c:choose&gt;</code>, <code>&lt;fmt:formatNumber&gt;</code>) for control flow and formatting. Since JSP 2.0 the recommended shape is JSP as template plus a servlet that forwards a prepared model, with <code>&lt;jsp:include&gt;</code> for reusable fragments and a <code>&lt;taglib&gt;</code> for the JSTL prefix.</p>
+
+<div class="codeWrap"><pre><code>&lt;%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %&gt;
+&lt;%@ taglib prefix="c"   uri="jakarta.tags.core" %&gt;
+&lt;%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Orders&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Orders for ${empty sessionScope.user ? 'guest' : sessionScope.user}&lt;/h1&gt;
+
+  &lt;c:choose&gt;
+    &lt;c:when test="${empty orders}"&gt;
+      &lt;p&gt;No orders yet.&lt;/p&gt;
+    &lt;/c:when&gt;
+    &lt;c:otherwise&gt;
+      &lt;table&gt;
+        &lt;tr&gt;&lt;th&gt;SKU&lt;/th&gt;&lt;th&gt;Qty&lt;/th&gt;&lt;th&gt;Total&lt;/th&gt;&lt;/tr&gt;
+        &lt;c:forEach var="o" items="${orders}" varStatus="s"&gt;
+          &lt;tr class="${s.index % 2 == 0 ? 'even' : 'odd'}"&gt;
+            &lt;td&gt;&lt;c:out value="${o.sku}"/&gt;&lt;/td&gt;
+            &lt;td&gt;${o.qty}&lt;/td&gt;
+            &lt;td&gt;&lt;fmt:formatNumber value="${o.total}" type="currency" currencyCode="USD"/&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+        &lt;/c:forEach&gt;
+      &lt;/table&gt;
+      &lt;p&gt;Total: &lt;fmt:formatNumber value="${grandTotal}" type="currency"/&gt;&lt;/p&gt;
+    &lt;/c:otherwise&gt;
+  &lt;/c:choose&gt;
+
+  &lt;c:url var="create" value="/orders/create"/&gt;
+  &lt;a href="${create}"&gt;New order&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div>
+
+<div class="codeWrap"><pre><code>// The servlet that prepares the model and forwards. No markup in Java.
+@WebServlet("/orders")
+public class OrdersServlet extends HttpServlet {
+    private final OrderService service = new OrderService();
+
+    @Override protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws jakarta.servlet.ServletException, IOException {
+        var orders = service.findFor((String) req.getSession().getAttribute("user"));
+        req.setAttribute("orders", orders);
+        req.setAttribute("grandTotal", orders.stream().mapToDouble(Order::total).sum());
+        req.getRequestDispatcher("/WEB-INF/views/orders.jsp").forward(req, resp);
+    }
+}
+</code></pre></div>
+
+<div class="warn">JSP Expression Language does not escape HTML unless you use <code>&lt;c:out&gt;</code> or <code>&lt;fn:escapeXml&gt;</code>. Writing <code>${userComment}</code> directly into markup is a stored cross-site-scripting hole. Escape every value that originates from a user, or better, keep the page a pure template with no raw output at all.</div>
+
+<h3 id="ch12-sessions" data-toc>12.4 Sessions, cookies and filters</h3>
+<p class="topic-desc">HTTP is stateless, so the container supplies a session: a server-side map keyed by an opaque id that travels in a cookie. Filters are the cross-cutting layer that runs before and after every matching request.</p>
+
+<h4>How a session is created and found</h4>
+<p><code>request.getSession()</code> creates one if absent; <code>getSession(false)</code> returns <code>null</code> rather than creating one, which matters for a health check or a static asset. The id travels in the <code>JSESSIONID</code> cookie, which should be <code>HttpOnly</code> (unreadable from JavaScript), <code>Secure</code> (HTTPS only) and <code>SameSite=Lax</code> (blocks cross-site POST forgery). Session fixation is prevented by calling <code>changeSessionId()</code> at login and again at privilege elevation. Invalidation is <code>session.invalidate()</code>. Attributes in a session must be <code>Serializable</code> if the container may replicate or persist the session. For clustering, either sticky sessions plus replication, or a shared store such as Redis via Spring Session, or a stateless model where the session holds only an id.</p>
+
+<div class="codeWrap"><pre><code>@WebServlet("/login")
+public class LoginServlet extends HttpServlet {
+
+    @Override protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        String user = req.getParameter("user");
+        char[] pass = req.getParameter("password").toCharArray();
+
+        if (!authenticate(user, pass)) {
+            // Do not create a session for a failed login.
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "bad credentials");
+            return;
+        }
+
+        // Fixation defence: a fresh id for the authenticated session.
+        HttpSession existing = req.getSession(false);
+        if (existing != null) existing.invalidate();
+        HttpSession session = req.getSession(true);
+        session.setAttribute("user", user);
+        session.setMaxInactiveInterval(30 * 60);       // seconds
+
+        resp.sendRedirect(req.getContextPath() + "/orders");
+    }
+
+    private boolean authenticate(String user, char[] pass) {
+        return user != null &amp;&amp; pass.length &gt; 0;       // replace with a real check
+    }
+}
+</code></pre></div>
+
+<h4>Filters and the chain</h4>
+<p>A filter implements <code>Filter</code> and is invoked for every matching request; it calls <code>chain.doFilter(req, resp)</code> to continue, and the code after that call runs on the way out. That symmetric shape is what makes an encoding filter, a logging filter, a rate limiter, a correlation-id filter and an authentication filter all look the same. To change the request or the response, wrap it: a <code>HttpServletRequestWrapper</code> can add a header or allow the body to be re-read, and a <code>HttpServletResponseWrapper</code> can capture output for compression or for a cache. Filters run before servlets and after them, so they are the correct place for anything that applies to a whole path.</p>
+
+<div class="codeWrap"><pre><code>import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.UUID;
+
+@WebFilter(urlPatterns = "/*")
+public class CorrelationFilter implements Filter {
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        var req  = (HttpServletRequest) request;
+        var resp = (HttpServletResponse) response;
+
+        String id = req.getHeader("X-Request-Id");
+        if (id == null || id.isBlank()) id = UUID.randomUUID().toString();
+        req.setAttribute("requestId", id);
+        resp.setHeader("X-Request-Id", id);
+
+        long start = System.nanoTime();
+        try {
+            chain.doFilter(request, response);          // the rest of the chain
+        } finally {
+            long ms = (System.nanoTime() - start) / 1_000_000;
+            System.out.printf("%s %s -> %d in %d ms [%s]%n",
+                    req.getMethod(), req.getRequestURI(), resp.getStatus(), ms, id);
+        }
+    }
+}
+
+// An authentication filter that requests a session but does not create one.
+@WebFilter(urlPatterns = "/orders/*")
+class AuthFilter implements Filter {
+    @Override public void doFilter(ServletRequest rq, ServletResponse rs, FilterChain chain)
+            throws IOException, ServletException {
+        var req  = (HttpServletRequest) rq;
+        var resp = (HttpServletResponse) rs;
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            resp.sendRedirect(req.getContextPath() + "/login?next=" + req.getRequestURI());
+            return;                                     // do not continue
+        }
+        chain.doFilter(rq, rs);
+    }
+}
+</code></pre></div>
+
+<div class="tip">Keep session attributes few and small, and prefer to store an identifier plus a cache lookup rather than an object graph. A large session makes replication expensive, a schema change in an attribute breaks every active session, and an attribute that references a per-request object leaks memory for the session's lifetime.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch13" data-toc>13 · Spring Boot</h2>
+<p class="topic-desc">Spring Boot is the dominant Java application framework: a container for dependency injection over the Spring Framework, plus auto-configuration, an embedded server, an opinionated set of starters and production endpoints. Spring Boot 3.x requires Java 17 and uses the <code>jakarta</code> namespace; Spring Boot 4.0 followed in November 2025.</p>
+
+<h3 id="ch13-start" data-toc>13.1 Starters, auto-configuration and the application class</h3>
+<p class="topic-desc">A Boot application is a <code>main</code> method annotated <code>@SpringBootApplication</code>. Everything else — the server, the datasource, the JSON mapper, the security filter chain — is auto-configuration driven by what is on the classpath.</p>
+
+<h4>What the annotation does and how auto-configuration decides</h4>
+<p><code>@SpringBootApplication</code> is three annotations in one: <code>@SpringBootConfiguration</code> (a specialisation of <code>@Configuration</code>), <code>@ComponentScan</code> over the package of the class and everything below it, and <code>@EnableAutoConfiguration</code>. Auto-configuration classes are <code>@Conditional</code>: they apply only when a class is present on the classpath, a bean of a type is missing, a property is set, or the application is not a web application. That is why adding <code>spring-boot-starter-data-jpa</code> and a JDBC URL produces a working <code>EntityManagerFactory</code> with no configuration, and why adding nothing produces none. The condition report (<code>--debug</code>) prints every auto-configuration and the exact condition that decided it.</p>
+
+<div class="codeWrap"><pre><code>package com.acme.orders;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class OrdersApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(OrdersApplication.class, args);
+    }
+}
+</code></pre></div>
+
+<div class="codeWrap"><pre><code># pom.xml: a starter is a curated dependency set, not code
+&lt;parent&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+  &lt;version&gt;3.5.0&lt;/version&gt;
+&lt;/parent&gt;
+
+&lt;dependencies&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;&lt;/dependency&gt;          &lt;!-- Tomcat + MVC + Jackson --&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;&lt;/dependency&gt;     &lt;!-- Hibernate + HikariCP --&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.postgresql&lt;/groupId&gt;
+    &lt;artifactId&gt;postgresql&lt;/artifactId&gt;&lt;scope&gt;runtime&lt;/scope&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre></div>
+
+<div class="codeWrap"><pre><code># shell - see exactly why a bean was or was not created
+java -jar app.jar --debug
+# or: logging.level.org.springframework.boot.autoconfigure=DEBUG
+
+# The classic failure: the datasource is configured but no driver is present.
+# ***************************
+# APPLICATION FAILED TO START
+# ***************************
+# Description:
+# Failed to configure a DataSource: 'url' attribute is not specified
+# Action: consider adding a driver dependency, or set spring.datasource.url
+</code></pre></div>
+
+<h4>Starters as a compatibility contract</h4>
+<p>A starter pins a family of versions that are known to work together, which is the reason to prefer it over declaring Spring, Jackson, Tomcat and Hibernate versions by hand. The parent POM supplies <code>dependencyManagement</code> for the whole Boot release train, so a version conflict is a deliberate act rather than an accident. Override a single library only when necessary, and prefer the property the parent defines (<code>&lt;hibernate.version&gt;</code>) over a hard-coded dependency version, so the next Boot upgrade still moves it.</p>
+
+<h3 id="ch13-di" data-toc>13.2 Dependency injection, beans and scopes</h3>
+<p class="topic-desc">The container creates objects, wires their collaborators and manages their lifecycle. Injection is constructor-first, and the design pressure it creates — small classes with explicit dependencies — is the more important benefit.</p>
+
+<h4>Stereotypes, constructor injection and the context</h4>
+<p><code>@Component</code>, <code>@Service</code>, <code>@Repository</code> and <code>@Controller</code> all register a bean; the specialisations add semantics and, for <code>@Repository</code>, exception translation. Constructor injection is preferred because the dependencies can be <code>final</code>, the object cannot be constructed in an invalid state, and a misplaced dependency is a compile error rather than a <code>NullPointerException</code>. Since Spring 4.3 a single constructor needs no <code>@Autowired</code>. Two beans of the same type are ambiguous: resolve with a <code>@Qualifier</code>, a <code>@Primary</code>, or by naming the parameter after the bean. Configuration classes use <code>@Configuration</code> and <code>@Bean</code>, and a <code>@ConfigurationProperties</code> record binds a group of settings with type checking.</p>
+
+<div class="codeWrap"><pre><code>import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.*;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import java.util.List;
+
+@ConfigurationProperties(prefix = "orders")
+record OrdersProperties(int maxLines, List&lt;String&gt; allowedRegions) { }
+
+@Service
+class PricingService {
+    private final TaxClient tax;
+
+    // Constructor injection: final field, no @Autowired needed, testable.
+    PricingService(TaxClient tax) { this.tax = tax; }
+
+    java.math.BigDecimal priceWithTax(String region, java.math.BigDecimal net) {
+        return net.add(tax.rate(region).multiply(net));
+    }
+}
+
+interface TaxClient { java.math.BigDecimal rate(String region); }
+
+@Configuration
+class AppConfig {
+    @Bean
+    TaxClient taxClient(OrdersProperties props) {
+        // A bean method can take other beans as parameters and can be conditional.
+        return region -&gt; props.allowedRegions().contains(region)
+                ? new java.math.BigDecimal("0.20")
+                : java.math.BigDecimal.ZERO;
+    }
+}
+</code></pre></div>
+
+<div class="codeWrap"><pre><code># application.yml - the properties record binds this block
+orders:
+  max-lines: 500
+  allowed-regions:
+    - EU
+    - UK
+
+spring:
+  threads:
+    virtual:
+      enabled: true        # run request handling on virtual threads (Boot 3.2+)
+server:
+  port: 8080
+</code></pre></div>
+
+<h4>Scopes, proxies and the lifecycle</h4>
+<p>The default scope is <code>singleton</code>: one instance per context. <code>prototype</code> creates a new instance per injection point. <code>request</code> and <code>session</code> are web scopes and, being longer-lived than the singleton that injects them, are provided as a proxy that resolves the real object per call. <code>@PostConstruct</code> and <code>@PreDestroy</code> bracket a bean's life; <code>InitializingBean</code> and <code>DisposableBean</code> are the interface equivalents. Injection into a field of a bean is technically possible and is the wrong default: it hides the dependency list, makes the class impossible to construct in a test without reflection, and permits a circular reference that the container resolves by building a half-initialised object. Circular dependencies are a design smell; break them by extracting a third collaborator.</p>
+
+<div class="codeWrap"><pre><code>@Component
+class ReportCache {
+    private final java.util.Map&lt;String, Report&gt; cache = new java.util.concurrent.ConcurrentHashMap&lt;&gt;();
+    private final CaffeineHolder backing;          // whatever backs it
+
+    ReportCache(CaffeineHolder backing) { this.backing = backing; }
+
+    @jakarta.annotation.PostConstruct
+    void warmUp() { System.out.println("warming report cache"); }
+
+    @jakarta.annotation.PreDestroy
+    void flush() { cache.forEach((k, v) -&gt; backing.write(k, v)); }
+
+    // request-scoped bean injected into a singleton: resolved by proxy per call
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.beans.factory.ObjectProvider&lt;RequestContext&gt; ctx;
+}
+</code></pre></div>
+
+<div class="tip">Keep the context small. Every <code>@Component</code> is a bean the container instantiates at startup, and a context with thousands of beans has a measurable start-up cost and a wide tangle of dependencies. Favour explicit configuration for infrastructure and component scanning for the application layer, and never component-scan a package you do not own — you will register a bean the library's author never intended to be a bean.</div>
+
+<h3 id="ch13-rest" data-toc>13.3 REST controllers, content negotiation and error handling</h3>
+<p class="topic-desc">Spring MVC maps HTTP to Java methods with annotations: a URL to a method, a request body to a parameter, a return value to a response body. REST is a style over that mapping, not the mapping itself.</p>
+
+<h4>Mapping, binding and validation</h4>
+<p><code>@RestController</code> is <code>@Controller</code> plus <code>@ResponseBody</code>, so every return value is serialised. <code>@RequestMapping</code> and its shorthands <code>@GetMapping</code>, <code>@PostMapping</code>, <code>@PutMapping</code>, <code>@PatchMapping</code>, <code>@DeleteMapping</code> bind methods, and a class-level prefix composes with them. <code>@PathVariable</code>, <code>@RequestParam</code>, <code>@RequestHeader</code>, <code>@RequestBody</code> and <code>@RequestPart</code> pull the parts of a request into parameters. <code>@Valid</code> triggers Jakarta Bean Validation on an annotated parameter, and a failure throws <code>MethodArgumentNotValidException</code> before the method body runs. Jackson serialises the response; annotate with <code>@JsonIgnore</code>, <code>@JsonProperty</code> or a mixin when the wire format must differ from the class.</p>
+
+<div class="codeWrap"><pre><code>import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/orders")
+class OrderController {
+    private final OrderService service;
+    OrderController(OrderService service) { this.service = service; }
+
+    record CreateOrder(
+            @NotBlank String sku,
+            @Min(1) @Max(1000) int qty,
+            @Email String email) { }
+
+    record OrderView(long id, String sku, int qty, java.math.BigDecimal total) { }
+
+    @GetMapping("/{id}")
+    OrderView one(@PathVariable long id) {
+        return service.find(id).map(o -&gt; new OrderView(o.id(), o.sku(), o.qty(), o.total()))
+                      .orElseThrow(() -&gt; new OrderNotFoundException(id));
+    }
+
+    @GetMapping
+    List&lt;OrderView&gt; search(@RequestParam(defaultValue = "") String q,
+                           @RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "20") int size) {
+        return service.search(q, page, Math.min(size, 100))
+                      .stream().map(o -&gt; new OrderView(o.id(), o.sku(), o.qty(), o.total())).toList();
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    ResponseEntity&lt;OrderView&gt; create(@Valid @RequestBody CreateOrder body) {
+        var o = service.create(body.sku(), body.qty());
+        var view = new OrderView(o.id(), o.sku(), o.qty(), o.total());
+        return ResponseEntity.created(java.net.URI.create("/api/v1/orders/" + o.id())).body(view);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void delete(@PathVariable long id) { service.delete(id); }
+}
+</code></pre></div>
+
+<h4>Errors as RFC 9457 problem details</h4>
+<p>An API must fail predictably. Spring supports the <code>ProblemDetail</code> type, which serialises to <code>application/problem+json</code> with <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code> and <code>instance</code> — the RFC 9457 shape (the successor to RFC 7807). A <code>@RestControllerAdvice</code> with <code>@ExceptionHandler</code> methods centralises the mapping from domain exception to status and body, so no controller repeats the translation and no stack trace ever reaches a client. Validation failures map to 400 with the field errors included; an unauthenticated request to 401; a missing resource to 404; an unexpected exception to 500 with a correlation id and the detail suppressed.</p>
+
+<div class="codeWrap"><pre><code>import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+import org.springframework.web.context.request.WebRequest;
+
+class OrderNotFoundException extends RuntimeException {
+    OrderNotFoundException(long id) { super("order " + id + " not found"); }
+}
+
+@RestControllerAdvice
+class ApiErrors {
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    ProblemDetail notFound(OrderNotFoundException ex, WebRequest req) {
+        var pd = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        pd.setTitle("Order not found");
+        pd.setType(java.net.URI.create("https://errors.acme.com/order-not-found"));
+        pd.setProperty("instance", req.getDescription(false));
+        return pd;
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    ProblemDetail invalid(org.springframework.web.bind.MethodArgumentNotValidException ex) {
+        var pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Validation failed");
+        var fields = new java.util.LinkedHashMap&lt;String, String&gt;();
+        ex.getBindingResult().getFieldErrors()
+          .forEach(fe -&gt; fields.put(fe.getField(), fe.getDefaultMessage()));
+        pd.setProperty("errors", fields);
+        return pd;
+    }
+
+    @ExceptionHandler(Exception.class)
+    ProblemDetail unexpected(Exception ex) {
+        // Log with the stack trace; return nothing sensitive.
+        var pd = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        pd.setTitle("Internal error");
+        pd.setDetail("The request could not be completed");
+        return pd;
+    }
+}
+</code></pre></div>
+
+<div class="note">Return a DTO, never the entity. Serialising a JPA entity couples the database schema to the public API, leaks lazy-loading proxies (which throw or fetch the whole graph), and exposes columns that were never meant to be public. A record view type costs one mapping line and buys a stable contract.</div>
+
+<h3 id="ch13-data-jpa" data-toc>13.4 Spring Data JPA, entities and transactions</h3>
+<p class="topic-desc">JPA is the persistence specification; Hibernate is its implementation; Spring Data JPA generates repository implementations from interface declarations. Together they remove most hand-written SQL and introduce a specific set of performance traps.</p>
+
+<h4>Entities, repositories and derived queries</h4>
+<p>An entity is a class annotated <code>@Entity</code> with an <code>@Id</code>; the table name defaults to the class name in snake case and the column names to the field names. Repositories extend <code>JpaRepository&lt;T, ID&gt;</code>, and a method name such as <code>findByEmailAndActiveTrue</code> is parsed into a query — capable, but unpredictable past two or three conditions, so use <code>@Query</code> for anything non-obvious. Transactions are declared with <code>@Transactional</code>; the default is read-write and rolls back on a runtime exception but not on a checked one, which must be requested with <code>rollbackFor</code>. <code>readOnly = true</code> is a real optimisation, not documentation: it skips dirty checking.</p>
+
+<div class="codeWrap"><pre><code>import jakarta.persistence.*;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
+
+@Entity
+@Table(name = "customers", indexes = @Index(name = "ix_customers_email", columnList = "email", unique = true))
+class Customer {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 120)
+    private String name;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Enumerated(EnumType.STRING)
+    private Tier tier = Tier.STANDARD;
+
+    // Default LAZY: do not fetch the whole graph for a list screen.
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List&lt;Order&gt; orders = new ArrayList&lt;&gt;();
+
+    @Version
+    private long version;                 // optimistic locking
+
+    protected Customer() { }              // JPA needs a no-arg constructor
+    Customer(String name, String email) { this.name = name; this.email = email; }
+
+    // getters/setters omitted
+    enum Tier { STANDARD, GOLD }
+}
+
+interface CustomerRepository extends JpaRepository&lt;Customer, Long&gt; {
+
+    Optional&lt;Customer&gt; findByEmail(String email);
+
+    List&lt;Customer&gt; findByTierAndNameContainingIgnoreCase(Customer.Tier tier, String fragment);
+
+    // Explicit query with a named parameter: no name parsing, indexable.
+    @Query("select c from Customer c where c.tier = :tier and c.orders is not empty")
+    List&lt;Customer&gt; payingCustomers(@Param("tier") Customer.Tier tier);
+
+    // Projection: only the columns a screen needs.
+    interface NameOnly { String getName(); String getEmail(); }
+    List&lt;NameOnly&gt; findAllByTier(Customer.Tier tier);
+
+    @Modifying
+    @Transactional
+    @Query("update Customer c set c.tier = :tier where c.id = :id")
+    int promote(@Param("id") Long id, @Param("tier") Customer.Tier tier);
+}
+</code></pre></div>
+
+<h4>Lazy loading and the N+1 problem</h4>
+<p>A <code>@OneToMany</code> association is lazy by default, so iterating the children of each parent in a list issues one query per parent — the N+1 problem, which turns a 20 ms screen into a 2-second one. The fixes are a fetch join (<code>join fetch</code> in JPQL, or a <code>@EntityGraph</code>), a batch size (<code>@BatchSize</code> or <code>hibernate.default_batch_fetch_size</code>), or a projection that reads exactly the columns the screen needs. The other trap is that a lazy association accessed outside the transaction throws <code>LazyInitializationException</code> because the session is closed — the fix is to fetch eagerly within the transaction or to map to a DTO inside it, not to disable lazy loading globally.</p>
+
+<div class="codeWrap"><pre><code>// N+1: one query for the customers, then one per customer for the orders.
+var customers = customerRepository.findByTier(Customer.Tier.GOLD);
+customers.forEach(c -&gt; System.out.println(c.getOrders().size()));
+
+// Fix 1: an entity graph forces a single join.
+interface CustomerRepository extends JpaRepository&lt;Customer, Long&gt; {
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "orders")
+    List&lt;Customer&gt; findByTier(Customer.Tier tier);
+}
+
+// Fix 2: an explicit fetch join in JPQL, with distinct for duplicates.
+interface OrderRepository extends JpaRepository&lt;Order, Long&gt; {
+    @Query("select distinct c from Customer c join fetch c.orders where c.tier = :tier")
+    List&lt;Customer&gt; withOrders(@Param("tier") Customer.Tier tier);
+}
+
+// Fix 3: batch the lazy loads; one extra query per batch, not per row.
+// application.yml:
+//   spring.jpa.properties.hibernate.default_batch_fetch_size: 50
+</code></pre></div>
+
+<div class="codeWrap"><pre><code>// A service transaction with read-only fast path and a DTO mapping.
+@Service
+class CustomerService {
+    private final CustomerRepository customers;
+    CustomerService(CustomerRepository customers) { this.customers = customers; }
+
+    @Transactional(readOnly = true)
+    public List&lt;CustomerView&gt; listGold() {
+        return customers.findByTier(Customer.Tier.GOLD).stream()
+                .map(c -&gt; new CustomerView(c.getName(), c.getEmail()))   // inside the tx
+                .toList();
+    }
+
+    @Transactional(rollbackFor = java.io.IOException.class)
+    public void promote(Long id) throws java.io.IOException {
+        customers.promote(id, Customer.Tier.GOLD);
+        audit.record(id);                       // a checked exception can roll back too
+    }
+}
+record CustomerView(String name, String email) { }
+</code></pre></div>
+
+<div class="tip">Prefer Flyway or Liquibase migrations to <code>spring.jpa.hibernate.ddl-auto=update</code>. Automatic schema update cannot drop or rename a column safely, produces different DDL on different databases, and leaves the production schema with no version history. Set <code>ddl-auto: validate</code> in production so a migration that does not match the entity fails at startup.</div>
+
+<h3 id="ch13-config-test" data-toc>13.5 Configuration, profiles, actuator and testing</h3>
+<p class="topic-desc">An application is configured by properties, from several sources with a defined precedence, and verified by a test that starts the real context. Boot gives both a strong default for each.</p>
+
+<h4>Properties, profiles and the precedence order</h4>
+<p>Configuration comes from command-line arguments, then the operating-system environment, then an <code>application-{profile}.yml</code>, then <code>application.yml</code>, then defaults — later sources are overridden by earlier ones, and the environment wins over a file, which is what makes a container override work without rebuilding. A profile is a named group of settings activated by <code>spring.profiles.active</code>; use one per environment (<code>dev</code>, <code>test</code>, <code>prod</code>) and never commit a secret. Bind a group of properties to a validated record with <code>@ConfigurationProperties</code> and <code>@Validated</code> rather than scattering <code>@Value</code> strings; the record gives completion, type checking and a single place to see the surface. Secrets belong in the environment or a secrets manager, surfaced as an environment variable or a mounted file.</p>
+
+<div class="codeWrap"><pre><code># application.yml - defaults; secrets never appear here
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/acme}
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD}          # required; startup fails if unset
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false               # do not hold a session open for the view
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true                 # /actuator/health/liveness and /readiness
+</code></pre></div>
+
+<div class="codeWrap"><pre><code># A validated properties record: bad config fails at startup, not at first use.
+@ConfigurationProperties(prefix = "orders")
+@Validated
+record OrdersProperties(
+        @jakarta.validation.constraints.Min(1) @jakarta.validation.constraints.Max(10_000) int maxLines,
+        @org.hibernate.validator.constraints.URL String callbackUrl,
+        java.util.List&lt;String&gt; allowedRegions) { }
+
+// Activated on the main class or via @EnableConfigurationProperties.
+</code></pre></div>
+
+<h4>Actuator, and testing the context</h4>
+<p>The actuator exposes <code>/actuator/health</code> (with liveness and readiness probes for Kubernetes), <code>/actuator/metrics</code>, <code>/actuator/info</code>, and with the right dependencies <code>/actuator/prometheus</code>. Expose only what you need and secure the rest. For tests, <code>@SpringBootTest</code> starts a real context; <code>@WebMvcTest</code> starts only the web layer with a mocked service, which is far faster; <code>@DataJpaTest</code> starts only JPA against an in-memory or containerised database; <code>@MockBean</code>/<code>@MockitoBean</code> replaces a bean. Testcontainers is the modern way to test against the real database engine rather than an in-memory substitute, avoiding the class of bugs where H2 accepts SQL that PostgreSQL rejects.</p>
+
+<div class="codeWrap"><pre><code>import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(OrderController.class)
+class OrderControllerTest {
+    @org.springframework.beans.factory.annotation.Autowired MockMvc mvc;
+    @org.mockito.MockitoBean OrderService service;
+
+    @Test void rejectsAnInvalidQuantity() throws Exception {
+        mvc.perform(post("/api/v1/orders")
+                .contentType("application/json")
+                .content("{\"sku\":\"KB-01\",\"qty\":0,\"email\":\"a@b.com\"}"))
+           .andExpect(status().isBadRequest())
+           .andExpect(jsonPath("$.title").value("Validation failed"));
+    }
+
+    @Test void returnsAnOrder() throws Exception {
+        org.mockito.Mockito.when(service.find(1L)).thenReturn(java.util.Optional.of(
+                new Order(1L, "KB-01", 2, new java.math.BigDecimal("159.98"))));
+        mvc.perform(get("/api/v1/orders/1"))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$.sku").value("KB-01"));
+    }
+}
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class FullContextTest {
+    @org.springframework.boot.test.web.server.LocalServerPort int port;
+
+    @Test void healthIsUp() {
+        var rest = new org.springframework.web.client.RestClient.Builder().build();
+        // assert the actuator health endpoint returns UP
+    }
+}
+</code></pre></div>
+
+<div class="codeWrap"><pre><code>// Testcontainers: a real PostgreSQL for the persistence tests.
+@org.testcontainers.junit.jupiter.Testcontainers
+@DataJpaTest
+@org.springframework.test.context.DynamicPropertySource
+class CustomerRepositoryTest {
+
+    static final org.testcontainers.containers.PostgreSQLContainer&lt;?&gt; DB =
+            new org.testcontainers.containers.PostgreSQLContainer&lt;&gt;("postgres:17-alpine");
+
+    @org.springframework.test.context.DynamicPropertySource
+    static void props(org.springframework.test.context.DynamicPropertyRegistry r) {
+        DB.start();
+        r.add("spring.datasource.url", DB::getJdbcUrl);
+        r.add("spring.datasource.username", DB::getUsername);
+        r.add("spring.datasource.password", DB::getPassword);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired CustomerRepository customers;
+
+    @Test void findsByEmail() {
+        // save + find against the real engine
+    }
+}
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch14" data-toc>14 · Oracle SQL and Oracle Database</h2>
+<p class="topic-desc">Oracle Database is the enterprise RDBMS with its own SQL dialect, its own procedural language (PL/SQL) and a set of behaviours that differ from the open-source databases. This chapter covers the dialect, the objects Java code interacts with, and the JDBC specifics.</p>
+
+<h3 id="ch14-sql" data-toc>14.1 The Oracle SQL dialect</h3>
+<p class="topic-desc">Oracle SQL is close to standard SQL and diverges in a handful of places that trip up anyone arriving from PostgreSQL or MySQL. The divergences are mostly deliberate, and mostly older than the standard.</p>
+
+<h4>DUAL, the empty string and the type system</h4>
+<p><code>DUAL</code> is a one-row, one-column table owned by <code>SYS</code> that exists so a <code>SELECT</code> with no <code>FROM</code> has something to select from; <code>SELECT 1 FROM DUAL</code> is the canonical expression query, and it is still valid because a huge amount of Oracle SQL and thousands of tools assume it. The most notorious quirk is that <strong>Oracle treats the empty string as <code>NULL</code></strong>: <code>''</code> is <code>NULL</code>, <code>length('')</code> is <code>NULL</code> and not 0, and <code>WHERE name = ''</code> never matches anything. The type system uses <code>VARCHAR2</code> (not <code>VARCHAR</code>, which is reserved for a future standard meaning), <code>NUMBER</code> with an optional precision and scale, <code>DATE</code> which always carries a time component, <code>TIMESTAMP</code> with optional time zone, and <code>CLOB</code>/<code>BLOB</code> for large objects. A <code>BOOLEAN</code> type exists in PL/SQL always and in SQL since 23ai; before that, <code>NUMBER(1)</code> with a <code>CHECK (flag IN (0,1))</code> was the convention.</p>
+
+<div class="codeWrap"><pre><code>-- SQL*Plus / SQLcl
+SELECT 1 FROM DUAL;
+SELECT SYSDATE, SYSTIMESTAMP FROM DUAL;
+SELECT USER, SYS_CONTEXT('USERENV', 'DB_NAME') FROM DUAL;
+
+-- The empty string is NULL, and length('') is NULL, not 0.
+SELECT CASE WHEN '' IS NULL THEN 'NULL' ELSE 'empty' END FROM DUAL;   -- NULL
+SELECT LENGTH('') FROM DUAL;                                          -- (null)
+SELECT NVL(LENGTH(''), 0) FROM DUAL;                                  -- 0
+
+-- NVL family and the standard equivalents.
+SELECT NVL(comm, 0), COALESCE(bonus, comm, 0), NVL2(comm, 'has', 'none') FROM emp;
+SELECT NULLIF(status, 'UNKNOWN') FROM orders;
+
+-- DECODE is Oracle's pre-standard CASE.
+SELECT DECODE(tier, 'GOLD', 0.20, 'SILVER', 0.10, 0.05) FROM customers;
+
+-- Row limiting since 12c; ROWNUM is the older idiom.
+SELECT * FROM orders ORDER BY created_at DESC FETCH FIRST 10 ROWS ONLY;
+SELECT * FROM (SELECT * FROM orders ORDER BY created_at DESC) WHERE ROWNUM &lt;= 10;
+
+-- Date formatting is NLS-dependent; always use an explicit format mask.
+SELECT TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI:SS') FROM orders;
+SELECT TO_DATE('2026-10-14 09:30:00', 'YYYY-MM-DD HH24:MI:SS') FROM DUAL;
+SELECT ADD_MONTHS(SYSDATE, 3), TRUNC(SYSDATE, 'MM'), LAST_DAY(SYSDATE) FROM DUAL;
+</code></pre></div>
+
+<h4>Escaping, hierarchy and analytic queries</h4>
+<p>Oracle's identifier quoting is a double quote; a string literal is single-quoted, and an embedded single quote is doubled (<code>'O''Brien'</code>). The <code>q'[...]'</code> syntax removes the doubling for a literal full of quotes. Hierarchical queries use <code>CONNECT BY PRIOR</code> with the pseudo-column <code>LEVEL</code>, and <code>SYS_CONNECT_BY_PATH</code> builds a path string; the standard <code>WITH ... AS (recursive)</code> form is also supported. Analytic functions — <code>ROW_NUMBER</code>, <code>RANK</code>, <code>DENSE_RANK</code>, <code>LAG</code>, <code>LEAD</code>, <code>SUM() OVER</code> — are the standard way to compute a ranking or a running total without a self-join. The set operators are <code>UNION</code>, <code>UNION ALL</code>, <code>INTERSECT</code> and <code>MINUS</code>, the last standing in for <code>EXCEPT</code>.</p>
+
+<div class="codeWrap"><pre><code>-- Quoting and q-literals.
+SELECT 'O''Brien' AS name FROM DUAL;
+SELECT q'[It's got an apostrophe]' AS phrase FROM DUAL;
+SELECT 'He said "hi"' FROM DUAL;
+
+-- CONNECT BY: the management chain below a manager.
+SELECT LEVEL AS depth, LPAD(' ', (LEVEL - 1) * 2) || ename AS org
+  FROM emp
+ START WITH mgr IS NULL
+CONNECT BY PRIOR empno = mgr
+ ORDER SIBLINGS BY ename;
+
+-- The standard recursive form.
+WITH org (empno, ename, mgr, depth) AS (
+  SELECT empno, ename, mgr, 1 FROM emp WHERE mgr IS NULL
+  UNION ALL
+  SELECT e.empno, e.ename, e.mgr, o.depth + 1
+    FROM emp e JOIN org o ON e.mgr = o.empno
+)
+SELECT * FROM org ORDER BY depth, ename;
+
+-- Analytic ranking and a running total.
+SELECT ename, deptno, sal,
+       ROW_NUMBER() OVER (PARTITION BY deptno ORDER BY sal DESC) AS rn,
+       RANK()       OVER (PARTITION BY deptno ORDER BY sal DESC) AS rnk,
+       SUM(sal)     OVER (PARTITION BY deptno ORDER BY hiredate
+                          ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running
+  FROM emp;
+
+-- MERGE: an upsert in one statement.
+MERGE INTO customers t
+USING (SELECT :id AS id, :name AS name, :email AS email FROM DUAL) s
+   ON (t.id = s.id)
+WHEN MATCHED THEN UPDATE SET t.name = s.name, t.email = s.email
+WHEN NOT MATCHED THEN INSERT (id, name, email) VALUES (s.id, s.name, s.email);
+
+-- MINUS is EXCEPT.
+SELECT id FROM current_orders MINUS SELECT id FROM archived_orders;
+</code></pre></div>
+
+<div class="warn">Never rely on an implicit date format. <code>TO_DATE('01/02/03')</code> depends on <code>NLS_DATE_FORMAT</code> and will silently give a different date on a session with a different locale: the classic bug is a month/day swap that only appears in one country. Always pass a format mask to <code>TO_DATE</code>, and compare a <code>DATE</code>/<code>TIMESTAMP</code> column with a value of the same type, not with a string.</div>
+
+<h3 id="ch14-sequences" data-toc>14.2 Sequences, identity and concurrency-safe keys</h3>
+<p class="topic-desc">Oracle generates surrogate keys with a sequence, a server-side counter that is independent of any transaction. Since 12c a column may also be declared as an identity column, which creates and manages a sequence for you.</p>
+
+<h4>Sequences and their two number sources</h4>
+<p><code>CREATE SEQUENCE</code> with <code>START WITH</code>, <code>INCREMENT BY</code>, <code>CACHE</code>, <code>NOCACHE</code> and <code>CYCLE</code>/<code>NOCYCLE</code>. A sequence is consumed with <code>seq.NEXTVAL</code> and read with <code>seq.CURRVAL</code>; the value is not affected by rollback, so a rolled-back transaction leaves a gap, which is expected and correct — a sequence guarantees uniqueness and ordering, not contiguity. The <code>CACHE</code> setting controls how many values are pre-allocated in memory; a cache of 20 is the default and reduces contention, but a database restart loses the cached range, producing a jump and — for an ordered sequence with <code>NOORDER</code> — a possible out-of-order insert across a RAC cluster. The <code>ORDER</code> option guarantees globally increasing values in a cluster at the cost of inter-instance coordination.</p>
+
+<div class="codeWrap"><pre><code>CREATE SEQUENCE orders_seq
+  START WITH 1000
+  INCREMENT BY 1
+  NOCACHE
+  NOORDER
+  NOCYCLE;
+
+-- Use it, then reference the value in the same session.
+INSERT INTO orders (id, sku, qty) VALUES (orders_seq.NEXTVAL, 'KB-01', 2);
+INSERT INTO order_lines (order_id, line_no) VALUES (orders_seq.CURRVAL, 1);
+
+-- Identity column (12c+): no explicit sequence, no trigger.
+CREATE TABLE customers (
+  id      NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name    VARCHAR2(120) NOT NULL,
+  email   VARCHAR2(255) NOT NULL,
+  CONSTRAINT ux_customers_email UNIQUE (email)
+);
+
+-- GENERATED BY DEFAULT allows an explicit id; useful for data migration.
+CREATE TABLE legacy_import (
+  id NUMBER GENERATED BY DEFAULT ON NULL AS IDENTITY PRIMARY KEY,
+  payload CLOB
+);
+</code></pre></div>
+
+<h4>Getting a generated key back into Java</h4>
+<p>An <code>INSERT</code> does not return the new identity value unless you ask for it. JDBC's <code>Connection.prepareStatement(sql, new String[]{"ID"})</code> plus <code>getGeneratedKeys()</code> is the portable way; Oracle also supports <code>INSERT ... RETURNING id INTO ?</code> with an <code>OraclePreparedStatement</code> register, which avoids the extra fetch. A batch insert of thousands of rows with <code>getGeneratedKeys</code> is measurably slower, so a common pattern is to generate the keys client-side from a sequence or a UUID and insert with <code>batchUpdate</code>. UUID keys avoid the round trip but make an index less cache-friendly; a numeric sequence is usually the better default.</p>
+
+<div class="codeWrap"><pre><code>import java.sql.*;
+
+String sql = "INSERT INTO customers (name, email) VALUES (?, ?)";
+try (Connection con = ds.getConnection();
+     PreparedStatement ps = con.prepareStatement(sql, new String[]{"ID"})) {
+    ps.setString(1, "Ada");
+    ps.setString(2, "ada@example.com");
+    ps.executeUpdate();
+    try (ResultSet keys = ps.getGeneratedKeys()) {
+        if (keys.next()) System.out.println("new id = " + keys.getLong(1));
+    }
+}
+
+// RETURNING INTO binds the value directly, without a second round trip.
+String withReturning = "INSERT INTO customers (name, email) VALUES (?, ?) RETURNING id INTO ?";
+try (var ps = (oracle.jdbc.OraclePreparedStatement) con.prepareStatement(withReturning)) {
+    ps.setString(1, "Grace");
+    ps.setString(2, "grace@example.com");
+    ps.registerReturnParameter(3, oracle.jdbc.OracleTypes.NUMBER);
+    ps.executeUpdate();
+    try (var rs = ps.getReturnResultSet()) {
+        if (rs.next()) System.out.println("new id = " + rs.getLong(1));
+    }
+}
+</code></pre></div>
+
+<div class="note">A gap in a key column is not a bug, so never try to reuse or renumber ids. If business rules require a gapless document number — an invoice sequence, for instance — that is a different problem: it needs a locked row or a dedicated numbering table, because a sequence cannot fill a gap left by a rollback.</div>
+
+<h3 id="ch14-plsql" data-toc>14.3 PL/SQL blocks, cursors and exception handling</h3>
+<p class="topic-desc">PL/SQL is Oracle's procedural extension, executed inside the database. A block has three sections — declare, execute, handle — and the language's value is that it keeps a multi-step operation on the server, one round trip from the client.</p>
+
+<h4>The block and its variables</h4>
+<p>The anonymous block is <code>DECLARE ... BEGIN ... EXCEPTION ... END;</code>, with the declare and exception sections optional. Variables use <code>%TYPE</code> to inherit a column's type and <code>%ROWTYPE</code> to inherit a whole row, so a column width change does not break the code; <code>CONSTANT</code> marks a constant and <code>NOT NULL</code> adds a constraint. <code>SELECT ... INTO</code> assigns a single row and raises <code>NO_DATA_FOUND</code> or <code>TOO_MANY_ROWS</code> otherwise. <code>DBMS_OUTPUT.PUT_LINE</code> is the print statement, visible only when the client has enabled the buffer. A transaction is implicit: PL/SQL does not commit unless it is told to, which is what makes it composable from Java.</p>
+
+<div class="codeWrap"><pre><code>SET SERVEROUTPUT ON SIZE UNLIMITED
+
+DECLARE
+  v_email   customers.email%TYPE;
+  v_tier    customers.tier%TYPE := 'GOLD';
+  c_vat     CONSTANT NUMBER(4,2) := 0.20;
+  v_total   NUMBER(12,2);
+BEGIN
+  SELECT email, tier
+    INTO v_email, v_tier
+    FROM customers
+   WHERE id = 42;
+
+  v_total := 100 * (1 + c_vat);
+
+  DBMS_OUTPUT.PUT_LINE('customer ' || v_email || ' tier ' || v_tier);
+  DBMS_OUTPUT.PUT_LINE('total ' || TO_CHAR(v_total, 'FM999,999.00'));
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('no customer 42');
+  WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE('id is not unique - schema is broken');
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('unexpected: ' || SQLCODE || ' ' || SQLERRM);
+    RAISE;                      -- never swallow an unknown error
+END;
+/
+</code></pre></div>
+
+<h4>Cursors and bulk operations</h4>
+<p>A cursor is a handle to a query's result set. An <em>implicit</em> cursor is created for every DML statement and its attributes are read as <code>SQL%ROWCOUNT</code> and <code>SQL%FOUND</code>. An <em>explicit</em> cursor is declared, opened, fetched row by row, and closed; the <code>FOR rec IN cursor LOOP</code> form does all four and is what you should write. A <code>SYS_REFCURSOR</code> is a cursor variable that can be returned to a client, which is how a stored procedure returns a result set to JDBC. <code>BULK COLLECT</code> fetches many rows into a collection in one context switch and <code>FORALL</code> performs many DML statements in one, and both are the difference between a batch job running in seconds and in minutes.</p>
+
+<div class="codeWrap"><pre><code>-- Explicit cursor, the readable form.
+BEGIN
+  FOR rec IN (SELECT id, name FROM customers WHERE tier = 'GOLD' ORDER BY name) LOOP
+    DBMS_OUTPUT.PUT_LINE(rec.id || ' ' || rec.name);
+  END LOOP;
+END;
+/
+
+-- Bulk collect and forall: two orders of magnitude fewer context switches.
+DECLARE
+  TYPE t_ids IS TABLE OF customers.id%TYPE;
+  v_ids t_ids;
+BEGIN
+  SELECT id BULK COLLECT INTO v_ids FROM customers WHERE tier = 'SILVER';
+
+  FORALL i IN 1 .. v_ids.COUNT
+    UPDATE customers SET tier = 'GOLD' WHERE id = v_ids(i);
+
+  DBMS_OUTPUT.PUT_LINE('promoted ' || SQL%ROWCOUNT || ' customers');
+END;
+/
+
+-- A cursor variable returned to the client.
+CREATE OR REPLACE PROCEDURE gold_customers(p_cur OUT SYS_REFCURSOR) IS
+BEGIN
+  OPEN p_cur FOR SELECT id, name, email FROM customers WHERE tier = 'GOLD';
+END;
+/
+
+-- Named exceptions: a business rule with its own code and message.
+DECLARE
+  e_insufficient EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_insufficient, -20001);
+BEGIN
+  RAISE e_insufficient;
+EXCEPTION
+  WHEN e_insufficient THEN
+    DBMS_OUTPUT.PUT_LINE('caught the named condition');
+END;
+/
+</code></pre></div>
+
+<div class="tip">Always re-raise an unexpected exception, or at least log <code>SQLCODE</code> and <code>SQLERRM</code>. A <code>WHEN OTHERS THEN NULL;</code> handler is the classic Oracle defect: it converts a real failure into silent data loss and removes the only evidence that anything went wrong.</div>
+
+<h3 id="ch14-packages" data-toc>14.4 Procedures, functions, packages and triggers</h3>
+<p class="topic-desc">A stored subprogram is compiled in the database and called by name. A package groups related subprograms behind one specification, and it is the unit of API design in PL/SQL.</p>
+
+<h4>Procedures and functions</h4>
+<p>A procedure performs an action and returns nothing through the return position; a function returns a value and can be called from SQL. Both support parameters with the modes <code>IN</code> (default), <code>OUT</code> and <code>IN OUT</code>. <code>CREATE OR REPLACE</code> makes redeployment idempotent. A <code>FUNCTION</code> called from a SQL statement must be deterministic or the optimiser may cache a wrong result: declare <code>DETERMINISTIC</code> when that is true, and <code>PARALLEL_ENABLE</code> when it is safe to run in a parallel slave. A <code>RESULT_CACHE</code> clause caches the function's result keyed by its arguments, which is a large win for a lookup that is called per row.</p>
+
+<div class="codeWrap"><pre><code>CREATE OR REPLACE FUNCTION tax_amount(
+    p_region IN VARCHAR2,
+    p_net    IN NUMBER
+) RETURN NUMBER DETERMINISTIC IS
+    v_rate NUMBER(4,2);
+BEGIN
+  v_rate := CASE p_region
+              WHEN 'EU' THEN 0.20
+              WHEN 'UK' THEN 0.20
+              WHEN 'US' THEN 0.07
+              ELSE 0
+            END;
+  RETURN ROUND(p_net * v_rate, 2);
+END;
+/
+
+-- Callable from SQL once compiled.
+SELECT id, tax_amount('EU', 100) AS tax FROM orders FETCH FIRST 5 ROWS ONLY;
+
+CREATE OR REPLACE PROCEDURE promote_customer(
+    p_id   IN  NUMBER,
+    p_tier IN  VARCHAR2 DEFAULT 'GOLD',
+    p_rows OUT NUMBER
+) IS
+BEGIN
+  UPDATE customers SET tier = p_tier WHERE id = p_id;
+  p_rows := SQL%ROWCOUNT;
+END;
+/
+</code></pre></div>
+
+<h4>Packages, package state and triggers</h4>
+<p>A package has a <em>specification</em> (what is public) and a <em>body</em> (the implementation). Only the specification is referenced by dependents, so changing the body does not invalidate them. Package-level variables have session scope and persist for the life of the session, which makes them a per-session cache and also a per-session memory leak; <code>DBMS_SESSION.MODIFY_PACKAGE_STATE(DBMS_SESSION.REINITIALIZE)</code> resets them. A package can overload a subprogram by parameter type, and it can have an initialisation block at the end of the body that runs once per session. A trigger fires on DML or on a system event; a row-level trigger is the place for an audit row or a derived column, and a statement-level trigger for a bulk rule. Triggers are powerful and hard to debug: a trigger that fires on a table another trigger also touches can produce cascading updates that no application code can see.</p>
+
+<div class="codeWrap"><pre><code>-- Specification: the public API.
+CREATE OR REPLACE PACKAGE customer_api AS
+  FUNCTION  tax(p_region IN VARCHAR2, p_net IN NUMBER) RETURN NUMBER DETERMINISTIC;
+  PROCEDURE promote(p_id IN NUMBER, p_tier IN VARCHAR2 DEFAULT 'GOLD');
+  PROCEDURE list_gold(p_cur OUT SYS_REFCURSOR);
+  c_max_tier CONSTANT VARCHAR2(8) := 'PLATINUM';
+END customer_api;
+/
+
+-- Body: the implementation, plus a session-scoped counter.
+CREATE OR REPLACE PACKAGE BODY customer_api AS
+  g_calls PLS_INTEGER := 0;
+
+  FUNCTION tax(p_region IN VARCHAR2, p_net IN NUMBER) RETURN NUMBER IS
+  BEGIN
+    g_calls := g_calls + 1;
+    RETURN ROUND(p_net * CASE p_region WHEN 'EU' THEN 0.20 WHEN 'US' THEN 0.07 ELSE 0 END, 2);
+  END tax;
+
+  PROCEDURE promote(p_id IN NUMBER, p_tier IN VARCHAR2 DEFAULT 'GOLD') IS
+  BEGIN
+    UPDATE customers SET tier = p_tier WHERE id = p_id;
+    IF SQL%ROWCOUNT = 0 THEN
+      RAISE_APPLICATION_ERROR(-20002, 'no customer ' || p_id);
+    END IF;
+  END promote;
+
+  PROCEDURE list_gold(p_cur OUT SYS_REFCURSOR) IS
+  BEGIN
+    OPEN p_cur FOR SELECT id, name FROM customers WHERE tier = 'GOLD';
+  END list_gold;
+END customer_api;
+/
+
+-- An audit trigger: row-level, fires for every changed row.
+CREATE OR REPLACE TRIGGER trg_customers_audit
+AFTER INSERT OR UPDATE OR DELETE ON customers
+FOR EACH ROW
+BEGIN
+  INSERT INTO customers_audit (changed_at, action, old_tier, new_tier, actor)
+  VALUES (SYSTIMESTAMP,
+          CASE WHEN INSERTING THEN 'I' WHEN UPDATING THEN 'U' ELSE 'D' END,
+          :OLD.tier, :NEW.tier, SYS_CONTEXT('USERENV', 'SESSION_USER'));
+END;
+/
+</code></pre></div>
+
+<div class="warn">Package-level variables persist across calls in the same session, so a package used as a cache in a connection-pooled application holds a stale value for as long as the pooled connection lives. Either reset the state per unit of work or move the cache out of the database.</div>
+
+<h3 id="ch14-jdbc" data-toc>14.5 JDBC with the Oracle driver</h3>
+<p class="topic-desc">The Oracle JDBC driver (<code>ojdbc11.jar</code>, <code>ojdbc17.jar</code> for Java 17 and later) is a thin Java client that speaks Oracle's wire protocol directly. It is not a from-scratch reinvention: it implements the same <code>java.sql</code> interfaces, with a set of Oracle-specific extensions.</p>
+
+<h4>Connecting and the extensions worth knowing</h4>
+<p>The thin URL form is <code>jdbc:oracle:thin:@//host:port/service_name</code>, where the service name (not the SID) is the modern identifier. <code>oracle.jdbc.OracleConnection</code> adds Oracle types and features: <code>createArrayOf</code> for a <code>VARRAY</code> or nested table, <code>createStruct</code> for an object type, and <code>setObject</code> with an <code>OracleType</code> for <code>TIMESTAMP WITH TIME ZONE</code> or <code>INTERVAL</code>. <code>SYS_REFCURSOR</code> is registered as <code>OracleTypes.CURSOR</code> and read as a <code>ResultSet</code>. <code>ARRAY</code> and <code>Struct</code> mappings use <code>java.sql.Array</code> and <code>java.sql.Struct</code>. Fetch size matters more on Oracle than on most databases because the default is small; setting <code>setFetchSize(500)</code> on a statement that returns many rows is a large, free improvement.</p>
+
+<div class="codeWrap"><pre><code>import java.sql.*;
+import oracle.jdbc.OracleTypes;
+
+String url = "jdbc:oracle:thin:@//db-host:1521/ORCLPDB1";
+
+try (Connection con = DriverManager.getConnection(url, "app", System.getenv("ORA_PASSWORD"))) {
+
+    // Fetch size: the single most effective read tuning knob.
+    try (PreparedStatement ps = con.prepareStatement(
+             "SELECT id, name FROM customers WHERE tier = ? ORDER BY name")) {
+        ps.setFetchSize(500);
+        ps.setString(1, "GOLD");
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                System.out.println(rs.getLong("id") + " " + rs.getString("name"));
+            }
+        }
+    }
+
+    // Call a package procedure that returns a cursor.
+    try (CallableStatement cs = con.prepareCall("{ call customer_api.list_gold(?) }")) {
+        cs.registerOutParameter(1, OracleTypes.CURSOR);
+        cs.execute();
+        try (ResultSet rs = (ResultSet) cs.getObject(1)) {
+            while (rs.next()) System.out.println(rs.getString("name"));
+        }
+    }
+
+    // An IN OUT parameter of a scalar type.
+    try (CallableStatement cs = con.prepareCall("{ call customer_api.promote(?, ?, ?) }")) {
+        cs.setLong(1, 42L);
+        cs.setString(2, "GOLD");
+        cs.registerOutParameter(3, Types.NUMERIC);
+        cs.execute();
+        System.out.println("rows affected: " + cs.getInt(3));
+    }
+}
+</code></pre></div>
+
+<h4>Data types, dates and arrays</h4>
+<p>Oracle's types do not map one-to-one to Java. <code>NUMBER</code> without a scale may exceed a <code>long</code>, so read it as <code>BigDecimal</code> unless the column is known to be small. <code>DATE</code> carries a time component and maps to <code>java.sql.Timestamp</code>; a <code>TIMESTAMP WITH TIME ZONE</code> should be read with <code>getObject(..., OffsetDateTime.class)</code> so the offset survives. <code>CLOB</code> and <code>BLOB</code> stream with <code>getCharacterStream</code> and <code>getBinaryStream</code>. A nested table or <code>VARRAY</code> is a <code>java.sql.Array</code> whose <code>getArray()</code> returns an <code>Object[]</code>, and a user-defined object type is a <code>java.sql.Struct</code>. The <code>oracle.jdbc.OracleTypes</code> constants are the type codes to pass to <code>registerOutParameter</code> for the Oracle-specific cases.</p>
+
+<div class="codeWrap"><pre><code>// Exact numerics and time-zone-aware timestamps.
+String sql = "SELECT id, balance, created_ts FROM accounts WHERE id = ?";
+try (PreparedStatement ps = con.prepareStatement(sql)) {
+    ps.setLong(1, 42L);
+    try (ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+            java.math.BigDecimal balance = rs.getBigDecimal("balance");     // never a double
+            java.time.OffsetDateTime created =
+                    rs.getObject("created_ts", java.time.OffsetDateTime.class);
+            System.out.println(balance + " @ " + created);
+        }
+    }
+}
+
+// A VARRAY column: java.sql.Array wrapping a String[].
+try (PreparedStatement ps = con.prepareStatement("SELECT tags FROM products WHERE id = ?")) {
+    ps.setLong(1, 7L);
+    try (ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+            java.sql.Array arr = rs.getArray("tags");
+            if (arr != null) {
+                String[] tags = (String[]) arr.getArray();
+                System.out.println(java.util.Arrays.toString(tags));
+            }
+        }
+    }
+}
+
+// Passing an array back into a nested-table parameter.
+Object[] region = { "EU", "UK" };
+java.sql.Array sqlArray = con.createArrayOf("VARCHAR2", region);
+try (PreparedStatement ps = con.prepareStatement(
+        "INSERT INTO promo_regions (promo_id, regions) VALUES (?, ?)")) {
+    ps.setLong(1, 99L);
+    ps.setArray(2, sqlArray);
+    ps.executeUpdate();
+}
+</code></pre></div>
+
+<div class="tip">Use the thin driver and UCP (Universal Connection Pool) or HikariCP rather than the deprecated OCI driver. Verify the driver's server compatibility matrix before an upgrade: a driver several releases old can fail a new authentication or encryption negotiation in a way that reports as a generic connection error. Keep the driver on the same release train as the database where possible.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch15" data-toc>15 · Packaging and deployment</h2>
+<p class="topic-desc">A Java program ships as a set of class files plus the runtime that executes them. The choices are how many jars, whether the runtime is shared or bundled, and whether the unit of deployment is a jar, a native installer, a container image or a platform-managed buildpack.</p>
+
+<h3 id="ch15-jars" data-toc>15.1 Jars, fat jars and module jars</h3>
+<p class="topic-desc">A jar is a zip with a manifest. The packaging decision is where the dependencies live: alongside, inside, or resolved at runtime by a module path.</p>
+
+<h4>The three shapes</h4>
+<p>A <em>thin jar</em> contains only the application's classes and names its dependencies in the manifest's <code>Class-Path</code> or expects them on the classpath; it is small and stable but the deployment unit is a directory. A <em>fat</em> or <em>uber</em> jar contains every dependency, unzipped and flattened into one archive; it is a single file and the simplest thing to ship, at the cost of size and of resource-name collisions. A <em>shaded</em> jar goes further and relocates dependency packages under a private prefix, which is how two libraries that need incompatible versions of the same package coexist. A <em>modular</em> jar keeps the dependencies outside and declares them in <code>module-info</code>; it is the smallest runtime and the strongest encapsulation, and the strictest about its dependencies also being modular.</p>
+
+<div class="table-scroll"><table>
+<tr><th>Shape</th><th>Contents</th><th>Good for</th><th>Cost</th></tr>
+<tr><td>Thin jar</td><td>App classes only</td><td>Library published to a repository</td><td>Needs a classpath or lib directory at run time</td></tr>
+<tr><td>Fat / uber jar</td><td>App + all dependencies, flattened</td><td>A single-file service or CLI tool</td><td>Size; resource collisions; licence attribution</td></tr>
+<tr><td>Shaded jar</td><td>App + dependencies, relocated</td><td>Conflicting versions in one process</td><td>Build complexity; a larger artifact</td></tr>
+<tr><td>Nested-jar (Boot)</td><td>Dependencies kept as jars inside</td><td>Spring Boot services</td><td>Non-standard layout; requires the Boot loader</td></tr>
+<tr><td>Modular jar</td><td>App classes + module-info</td><td>jlink/jpackage, strict deps</td><td>Every dependency must be modular</td></tr>
+</table></div>
+
+<div class="codeWrap"><pre><code># shell - the same program in three shapes
+jar --create --file thin.jar -C build/classes .
+java -cp "thin.jar:lib/*" com.acme.Main
+
+mvn -q clean package                       # Boot produces a nested-jar fat jar
+java -jar target/app.jar
+
+# Shade and relocate a dependency with the Maven plugin.
+#   &lt;relocations&gt;&lt;relocation&gt;
+#     &lt;pattern&gt;com.google.common&lt;/pattern&gt;
+#     &lt;shadedPattern&gt;com.acme.internal.guava&lt;/shadedPattern&gt;
+#   &lt;/relocation&gt;&lt;/relocations&gt;
+</code></pre></div>
+
+<h4>What breaks inside a fat jar</h4>
+<p>Flattening destroys the <code>META-INF/services</code> service loader files when two dependencies provide the same file name: the second overwrites the first, and a JDBC driver or a JSON provider stops being discovered. Spring Boot's nested-jar layout avoids that by keeping each dependency as its own jar inside. A signed jar also breaks: the manifest digests no longer match after flattening, so a SecurityException or a class-load failure appears out of nowhere. And a resource addressed by a fixed path — <code>getResource("/config.properties")</code> — can shadow another module's file of the same name. These are the reasons a build tool's own packaging plugin is preferable to a hand-rolled unzip-and-rejar.</p>
+
+<div class="codeWrap"><pre><code># Gradle: a fat jar and a shadowed jar
+// build.gradle.kts
+tasks.jar {
+    manifest { attributes("Main-Class" to "com.acme.Main") }
+    from({ configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) } })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// Or use the plugin that gets it right:
+// plugins { id("com.github.johnrengelman.shadow") version "8.1.1" }
+// tasks.shadowJar { archiveClassifier = "all"; mergeServiceFiles() }
+</code></pre></div>
+
+<div class="warn">A fat jar built by naive extraction loses service files silently. <code>mergeServiceFiles()</code> in the shadow plugin and Boot's nested layout both solve it; a hand-written <code>unzip -o</code> loop does not. If a dependency becomes invisible only in the packaged artifact and works perfectly in the IDE, this is the first thing to check.</div>
+
+<h3 id="ch15-jlink" data-toc>15.2 jlink and custom runtime images</h3>
+<p class="topic-desc">Since JDK 9 the JDK itself is modular, and <code>jlink</code> can assemble a runtime image that contains only the modules an application needs. The output is a directory with its own <code>java</code> launcher.</p>
+
+<h4>What goes in and how big it gets</h4>
+<p><code>jlink --add-modules</code> takes either an explicit list or the special value <code>ALL-MODULE-PATH</code>, resolves the transitive closure, and writes an image with a <code>bin</code>, <code>conf</code>, <code>lib</code> and <code>legal</code> directory. Flags that matter: <code>--strip-debug</code> removes debug information, <code>--no-header-files</code> and <code>--no-man-pages</code> remove the C headers and manual pages a developer would need but a deployment does not, <code>--compress=zip-6</code> compresses the image, <code>--include-locales</code> keeps only selected locales, and <code>--vm=server</code> picks the HotSpot variant. A typical server application's image is tens of megabytes rather than the roughly 300 MB of a full JDK, and the win compounds in a container layer.</p>
+
+<div class="codeWrap"><pre><code># shell - the smallest useful server image, and a hello-world one
+JMODS="$JAVA_HOME/jmods"
+
+# Which modules does the application actually need?
+jdeps --multi-release 25 --ignore-missing-deps --print-module-deps --class-path "lib/*" app.jar
+# -&gt; java.base,java.logging,java.sql,java.naming,jdk.crypto.ec
+
+jlink --module-path "$JMODS" \
+      --add-modules java.base,java.logging,java.sql,java.naming,jdk.crypto.ec \
+      --strip-debug --no-header-files --no-man-pages --compress=zip-6 \
+      --output build/runtime
+
+build/runtime/bin/java -version
+du -sh build/runtime                 # a fraction of a full JDK
+
+# A one-module image and a launcher script, all in one command.
+jlink --add-modules java.base --add-launcher hello=hello.properties --output hello-image
+</code></pre></div>
+
+<h4>The launcher properties file and constraints</h4>
+<p><code>--add-launcher name=file.properties</code> embeds a launcher whose <code>main-class</code>, <code>module</code>, <code>class-path</code> and JVM options are recorded in the image, so the user runs <code>image/bin/name</code> rather than remembering a module path. The constraints are real: an automatic module (a plain jar with only a derived name) can be used on the module path but cannot be jlink'd into a custom image, and a dependency that uses deep reflection on a JDK-internal package needs <code>--add-opens</code> in the launcher's JVM options. For a non-modular application the working combination is <code>jlink</code> for the runtime plus an explicit <code>--class-path</code> in the launcher, or <code>jpackage</code> for the whole thing.</p>
+
+<div class="codeWrap"><pre><code># hello.properties - the launcher embedded in the image
+# main-class=com.acme.Main
+# class-path=lib/app.jar:lib/postgresql-42.7.4.jar
+# java-options=-Xmx512m
+# java-options=--add-opens=java.base/java.lang=ALL-UNNAMED
+
+# shell - build a runtime for a non-modular app and launch it
+jlink --add-modules ALL-MODULE-PATH --strip-debug --no-header-files --no-man-pages \
+      --compress=zip-6 --output build/runtime
+build/runtime/bin/java -cp "app.jar:lib/*" com.acme.Main --help
+</code></pre></div>
+
+<div class="tip">Size the image from <code>jdeps --print-module-deps</code> rather than guessing. Including a module you do not need costs a few megabytes; omitting one costs a <code>NoClassDefFoundError</code> at first use of a rarely exercised path, which is exactly the kind of failure that appears in production and not in a smoke test.</div>
+
+<h3 id="ch15-jpackage" data-toc>15.3 jpackage, native installers and GraalVM native image</h3>
+<p class="topic-desc">A JDK runtime is not something an end user should have to install. <code>jpackage</code> wraps a runtime image and an application into a platform-native installer; GraalVM Native Image compiles the application ahead of time into a standalone executable with no JVM at all.</p>
+
+<h4>jpackage output formats</h4>
+<p><code>jpackage --type</code> selects the platform's installer: <code>msi</code> or <code>exe</code> on Windows, <code>dmg</code> or <code>pkg</code> on macOS, <code>deb</code> or <code>rpm</code> on Linux, and <code>app-image</code> for an unpackaged directory. Inputs are <code>--input</code> (the classes and jars), <code>--main-jar</code> and <code>--main-class</code>, <code>--name</code>, <code>--app-version</code>, <code>--icon</code>, and <code>--runtime-image</code> to bundle a custom runtime. The result is a normal installer that registers the application with the operating system and installs a private runtime, so the user needs no JDK. This is the route to a desktop tool that behaves like every other app, and it is the pairing for the JavaFX work in chapter 10.</p>
+
+<div class="codeWrap"><pre><code># shell - a Windows MSI containing a trimmed runtime of its own
+jlink --add-modules java.base,java.desktop,javafx.controls --output build/runtime
+
+jpackage --type msi \
+         --name "Acme Orders" \
+         --app-version 1.4.0 \
+         --input build/libs \
+         --main-jar orders-desktop.jar \
+         --main-class com.acme.OrdersApp \
+         --runtime-image build/runtime \
+         --icon assets/app.ico \
+         --win-menu --win-shortcut \
+         --dest build/installers
+
+# A macOS disk image, and a Linux deb, from the same inputs.
+jpackage --type dmg --name "Acme Orders" ... --dest build/installers
+jpackage --type deb --name acme-orders ... --dest build/installers
+</code></pre></div>
+
+<h4>Native image and what it changes</h4>
+<p>GraalVM Native Image does a whole-program static analysis at build time and emits a platform native executable that includes only the reachable code. The results are a startup measured in tens of milliseconds instead of one or more seconds, a much smaller memory footprint, and no JVM at all. The cost is the analysis: reflection, dynamic proxies, JNI and resource loading are invisible to a static analyser, so they need explicit configuration, produced automatically by the tracing agent or supplied by a library's own metadata. Builds are slow (minutes) and the peak throughput of a hot loop can be lower than a warmed-up JIT, which matters for a long-running batch job and not at all for a scale-to-zero function.</p>
+
+<div class="codeWrap"><pre><code># shell - build a native executable, with the tracing agent filling the config
+native-image -jar target/app.jar -o build/acme \
+             -H:Name=acme -H:+ReportExceptionStackTraces
+
+# Java 24+ moved the entry points into the JDK so no extra toolchain is needed:
+# java -agentlib:native-image-agent=config-output-dir=META-INF/native-image -jar app.jar
+# (run the app through a representative workload, then build)
+
+# Verify startup time: this is the metric native image changes.
+time ./build/acme --version
+time java -jar target/app.jar --version
+</code></pre></div>
+
+<div class="note">Choose the packaging by the workload. A scale-to-zero serverless function wants native image or a trimmed runtime so cold start is small. A long-running service wants a normal JVM so the JIT can reach its peak and the operator can attach tools. A desktop tool wants <code>jpackage</code>. A batch job wants throughput, so the JVM with a large heap and the Parallel collector.</div>
+
+<h3 id="ch15-containers" data-toc>15.4 Containers, JVM tuning and cloud deployment</h3>
+<p class="topic-desc">A container is how a Java service is normally deployed now. The JVM must be told it is in a container, and the image must be layered so that a code change does not re-download the world.</p>
+
+<h4>The image, and why the order matters</h4>
+<p>Every <code>COPY</code> and <code>RUN</code> instruction is a layer, and Docker caches a layer until its inputs change. Copying the pom and running a dependency download before copying the source means the dependency layer survives a source change, which turns a two-minute rebuild into a few seconds. A multi-stage build compiles in one image and ships only the runtime in the next, which keeps the final image small and free of the build tools.</p>
+
+<div class="codeWrap"><pre><code># Dockerfile - multi-stage, cache-aware, non-root
+FROM eclipse-temurin:25-jdk AS build
+WORKDIR /src
+COPY mvnw pom.xml ./
+COPY .mvn .mvn
+RUN ./mvnw -B -q dependency:go-offline          # cached until the pom changes
+COPY src src
+RUN ./mvnw -B -q clean package -DskipTests      # tests run in CI, not here
+
+FROM eclipse-temurin:25-jre
+WORKDIR /app
+
+# Run as a non-root user.
+RUN groupadd -r app &amp;&amp; useradd -r -g app app
+COPY --from=build --chown=app:app /src/target/app.jar app.jar
+
+ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError -XX:+UseG1GC"
+USER app
+EXPOSE 8080
+
+# exec form, so the JVM is PID 1 and receives SIGTERM directly.
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+</code></pre></div>
+
+<h4>Container awareness, limits and probes</h4>
+<p>JDK 10 onwards is container-aware: with no explicit <code>-Xmx</code>, the heap defaults to 25% of the container's memory limit, and the number of GC and JIT threads follows the CPU quota. Set <code>-XX:MaxRAMPercentage</code> and <code>InitialRAMPercentage</code> so the heap is a stated fraction, and leave headroom for thread stacks, metaspace, the JIT code cache and direct buffers — a container sized exactly to the heap is killed by the OOM killer. Use <code>-XX:+ExitOnOutOfMemoryError</code> so a heap exhaustion terminates the process and the platform restarts it, rather than leaving it alive and failing every request. A Kubernetes readiness probe should point at <code>/actuator/health/readiness</code> and a liveness probe at <code>/actuator/health/liveness</code>, so a slow start is not mistaken for a hang and a deadlock is not mistaken for a slow start.</p>
+
+<div class="codeWrap"><pre><code># Kubernetes: resources, probes and a graceful shutdown window
+spec:
+  containers:
+    - name: orders
+      image: registry.example.com/acme/orders:1.4.0
+      ports: [{ containerPort: 8080 }]
+      resources:
+        requests: { memory: "512Mi", cpu: "250m" }
+        limits:   { memory: "1Gi",   cpu: "1" }
+      env:
+        - name: JAVA_TOOL_OPTIONS
+          value: "-XX:MaxRAMPercentage=70 -XX:+ExitOnOutOfMemoryError"
+      readinessProbe:
+        httpGet: { path: /actuator/health/readiness, port: 8080 }
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      livenessProbe:
+        httpGet: { path: /actuator/health/liveness, port: 8080 }
+        initialDelaySeconds: 20
+        periodSeconds: 10
+      lifecycle:
+        preStop: { exec: { command: ["sh", "-c", "sleep 5"] } }
+  terminationGracePeriodSeconds: 45
+</code></pre></div>
+
+<div class="codeWrap"><pre><code># shell - build, run and inspect the container locally
+docker build -t acme/orders:1.4.0 .
+docker run --rm -p 8080:8080 -e DB_PASSWORD=secret -m 1g acme/orders:1.4.0
+
+# Verify the JVM saw the container limit, not the host's memory.
+docker exec &lt;id&gt; java -XshowSettings:system -version 2&gt;&amp;1 | grep -i memory
+
+# Health, liveness and metrics.
+curl -s localhost:8080/actuator/health | jq
+curl -s localhost:8080/actuator/prometheus | head
+</code></pre></div>
+
+<div class="warn">Never put <code>-XX:+ExitOnOutOfMemoryError</code> in a single-shot batch job whose output has not been flushed: the process exits without running orderly shutdown code, so any partially written file stays partial. It is the right flag for a stateless server and the wrong one for a job that accumulates work in memory.</div>
+
+<div class="tip">For a serverless or scale-to-zero target, choose the packaging by cold-start budget: a trimmed <code>jlink</code> runtime helps, Spring Boot's AOT and CDS support helps more, and GraalVM Native Image helps most — at the cost of build time and reflection configuration. Measure the cold start with the real workload before committing to a route, because the difference between a 300 ms and a 30 ms start is what decides whether a function is viable.</div>
+</section>
+
+<section class="chapter">
+<h2 id="appendix" data-toc>16 · Appendix</h2>
+<p class="topic-desc">A condensed reference for the constructs and commands used throughout the guide, and a glossary of the terms that carry a precise meaning in Java.</p>
+
+<h3 id="appendix-cheatsheet" data-toc>16.1 Cheat sheet</h3>
+<p class="topic-desc">The facts worth keeping at hand: version numbers, the tools, the syntax that is easy to misremember, and the flags that change runtime behaviour.</p>
+
+<h4>Versions, tools and commands</h4>
+<div class="table-scroll"><table>
+<tr><th>Item</th><th>Value / command</th></tr>
+<tr><td>Current LTS</td><td>Java 25 (September 2025); previous LTS Java 21</td></tr>
+<tr><td>Class-file major version</td><td>Java 8 = 52, 11 = 55, 17 = 61, 21 = 65, 25 = 69</td></tr>
+<tr><td>Compile for an older LTS</td><td><code>javac --release 21</code></td></tr>
+<tr><td>Single-file run</td><td><code>java Hello.java</code> (Java 11+)</td></tr>
+<tr><td>REPL</td><td><code>jshell</code></td></tr>
+<tr><td>Disassemble</td><td><code>javap -c -p -v Class</code></td></tr>
+<tr><td>Module deps</td><td><code>jdeps --print-module-deps app.jar</code></td></tr>
+<tr><td>Custom runtime</td><td><code>jlink --add-modules ... --strip-debug --output image</code></td></tr>
+<tr><td>Installer</td><td><code>jpackage --type msi --main-jar app.jar ...</code></td></tr>
+<tr><td>Thread dump</td><td><code>jcmd &lt;pid&gt; Thread.print</code> or <code>jstack &lt;pid&gt;</code></td></tr>
+<tr><td>Heap info / dump</td><td><code>jcmd &lt;pid&gt; GC.heap_info</code>, <code>GC.heap_dump file.hprof</code></td></tr>
+<tr><td>GC statistics</td><td><code>jstat -gcutil &lt;pid&gt; 1000</code></td></tr>
+<tr><td>Flight recorder</td><td><code>jcmd &lt;pid&gt; JFR.start duration=60s filename=e.jfr</code></td></tr>
+</table></div>
+
+<h4>Syntax and flags</h4>
+<div class="table-scroll"><table>
+<tr><th>Need</th><th>Write</th></tr>
+<tr><td>Immutable list</td><td><code>List.of(a, b)</code> / <code>List.copyOf(src)</code></td></tr>
+<tr><td>Immutable map entry</td><td><code>Map.entry(k, v)</code></td></tr>
+<tr><td>Group and reduce</td><td><code>Collectors.groupingBy(f, Collectors.summingInt(g))</code></td></tr>
+<tr><td>Absent value</td><td><code>Optional.ofNullable(x).map(f).orElse(d)</code></td></tr>
+<tr><td>Read from a stream, write to a stream</td><td><code>? extends T</code> / <code>? super T</code> (PECS)</td></tr>
+<tr><td>Exhaustive switch</td><td>arrow arms over an enum or sealed type, no <code>default</code></td></tr>
+<tr><td>Pattern bind</td><td><code>if (o instanceof Point p)</code> / <code>case Circle(double r)</code></td></tr>
+<tr><td>Text block</td><td><code>""" … """</code> with incidental-indent stripping</td></tr>
+<tr><td>Local inference</td><td><code>var x = new HashMap&lt;String, List&lt;Integer&gt;&gt;()</code></td></tr>
+<tr><td>One virtual thread per task</td><td><code>Executors.newVirtualThreadPerTaskExecutor()</code></td></tr>
+<tr><td>Interruptible lock</td><td><code>ReentrantLock</code> with <code>tryLock(timeout)</code></td></tr>
+<tr><td>Atomic counter</td><td><code>AtomicInteger.incrementAndGet()</code></td></tr>
+<tr><td>Fan out and merge</td><td><code>CompletableFuture.allOf(...)</code></td></tr>
+<tr><td>Bound a wait</td><td><code>future.orTimeout(200, MILLISECONDS)</code></td></tr>
+<tr><td>Stream to array</td><td><code>stream.toArray(String[]::new)</code></td></tr>
+</table></div>
+
+<div class="codeWrap"><pre><code># shell - the JVM flags that appear in almost every production command
+java \
+  -Xms1g -Xmx1g \
+  -XX:+UseG1GC -XX:MaxGCPauseMillis=100 \
+  -XX:MaxRAMPercentage=70 -XX:+ExitOnOutOfMemoryError \
+  -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/dumps \
+  -XX:+UseStringDeduplication \
+  -Dfile.encoding=UTF-8 -Duser.timezone=UTC \
+  -Djdk.tracePinnedThreads=full \
+  -jar app.jar
+</code></pre></div>
+
+<div class="codeWrap"><pre><code>// Java - the idioms to have in your fingers
+List.of(); Map.of(); Set.of();                 // immutable factories
+record Point(int x, int y) { }                  // value type with equals/hashCode
+sealed interface Shape permits Circle, Rect { } // closed hierarchy
+switch (obj) { case Integer i -&gt; i; default -&gt; 0; }   // pattern switch
+"%.2f".formatted(3.14159);                      // 3.14
+list.stream().filter(Objects::nonNull).map(String::strip).toList();
+try (var in = Files.newBufferedReader(path)) { }
+Thread.ofVirtual().start(task);
+</code></pre></div>
+
+<h3 id="appendix-glossary" data-toc>16.2 Glossary</h3>
+<p class="topic-desc">Terms that carry a specific meaning in the Java ecosystem, and the distinction each one draws.</p>
+
+<h4>A&#8211;J</h4>
+<div class="table-scroll"><table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td><strong>Autoboxing</strong></td><td>Automatic conversion between a primitive and its wrapper (<code>int</code> &#8596; <code>Integer</code>); it allocates, and it hides a <code>NullPointerException</code> when the wrapper is null.</td></tr>
+<tr><td><strong>BOM</strong></td><td>Bill of materials. A POM or a Gradle platform that fixes the versions of a whole dependency family, so consumers declare coordinates without versions.</td></tr>
+<tr><td><strong>Bytecode</strong></td><td>The instruction set in a <code>.class</code> file, executed by the JVM. Portable and stack-based.</td></tr>
+<tr><td><strong>Carrier thread</strong></td><td>The platform thread a virtual thread is mounted on. A pinned virtual thread holds its carrier.</td></tr>
+<tr><td><strong>CDS / AOT</strong></td><td>Class Data Sharing and ahead-of-time class loading; they shorten JVM start-up by precomputing loaded state.</td></tr>
+<tr><td><strong>Erasure</strong></td><td>Removal of generic type arguments from the compiled class; the reason <code>new T[]</code> and <code>instanceof List&lt;String&gt;</code> are illegal.</td></tr>
+<tr><td><strong>Escape analysis</strong></td><td>A JIT optimisation that removes the allocation of an object proven not to escape its method.</td></tr>
+<tr><td><strong>Fat jar</strong></td><td>A jar containing its dependencies. Also called an uber jar.</td></tr>
+<tr><td><strong>GC root</strong></td><td>A reference the collector treats as live: a stack local, a static field, a JNI reference. Anything reachable from a root is retained.</td></tr>
+<tr><td><strong>Happens-before</strong></td><td>The memory-model relationship that guarantees one thread's writes are visible to another. A <code>volatile</code> write, a monitor release and a thread start all establish it.</td></tr>
+<tr><td><strong>JIT</strong></td><td>Just-in-time compilation of hot bytecode to native code, in tiers, with speculative optimisations and deoptimisation.</td></tr>
+<tr><td><strong>JPMS</strong></td><td>The Java Platform Module System (Java 9+): named modules, explicit exports and requires.</td></tr>
+<tr><td><strong>JMH</strong></td><td>The Java Microbenchmark Harness; the only defensible way to measure a micro-optimisation.</td></tr>
+</table></div>
+
+<h4>K&#8211;Z</h4>
+<div class="table-scroll"><table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td><strong>Metaspace</strong></td><td>The native-memory area holding class metadata, replacing the old fixed PermGen. It grows until the limit (<code>-XX:MaxMetaspaceSize</code>) is hit.</td></tr>
+<tr><td><strong>N+1</strong></td><td>One query for a list plus one more per element to load a lazy association; the most common ORM performance defect.</td></tr>
+<tr><td><strong>PECS</strong></td><td>Producer Extends, Consumer Super. The rule for choosing <code>? extends T</code> versus <code>? super T</code>.</td></tr>
+<tr><td><strong>Pinning</strong></td><td>A virtual thread blocking while it holds a carrier (commonly inside <code>synchronized</code>), which prevents the carrier from being reused.</td></tr>
+<tr><td><strong>Records</strong></td><td>Transparent, shallowly immutable data carriers with generated constructor, accessors, <code>equals</code>, <code>hashCode</code> and <code>toString</code>.</td></tr>
+<tr><td><strong>Sealed type</strong></td><td>A class or interface that names its permitted subtypes, enabling compiler-checked exhaustive switches.</td></tr>
+<tr><td><strong>StructuredTaskScope</strong></td><td>A scope for a group of subtasks: the block cannot exit until every subtask is finished, so cancellation and failure propagation cannot leak.</td></tr>
+<tr><td><strong>Text block</strong></td><td>A multi-line string literal with incidental indentation stripped.</td></tr>
+<tr><td><strong>ThreadLocal</strong></td><td>A per-thread variable. Convenient and a leak risk with pooled threads; <code>ScopedValue</code> is the modern replacement for request-scoped data.</td></tr>
+<tr><td><strong>Uber jar</strong></td><td>See <em>fat jar</em>.</td></tr>
+<tr><td><strong>VarHandle</strong></td><td>The supported API (Java 9+) for low-level, explicitly ordered field and array access, replacing most uses of <code>sun.misc.Unsafe</code>.</td></tr>
+<tr><td><strong>Virtual thread</strong></td><td>A JVM-scheduled thread with a heap-allocated stack; cheap enough to create one per task, for blocking work.</td></tr>
+<tr><td><strong>WAR</strong></td><td>Web application archive: a jar-shaped file with <code>WEB-INF/classes</code>, <code>WEB-INF/lib</code> and a descriptor, deployed into a servlet container.</td></tr>
+<tr><td><strong>ZGC</strong></td><td>A concurrent, generational, low-pause garbage collector, scalable to very large heaps.</td></tr>
+</table></div>
+
+<div class="note">The appendix deliberately stops at reference material. Every term above is explained in context in the chapter that introduces it, and every table row maps to a subsection with a worked example; use the sidebar to jump back to the explanation, not forward from the definition.</div>
+</section>

@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bun - All-in-One JavaScript Runtime Guide</title>
+<meta name="description" content="Bun is an all-in-one JavaScript runtime, bundler, test runner and package manager. Learn the Bun APIs, SQLite, bundling and the migration from Node.js.">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/bun.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Bun - All-in-One JavaScript Runtime Guide">
+<meta property="og:description" content="Bun is an all-in-one JavaScript runtime, bundler, test runner and package manager. Learn the Bun APIs, SQLite, bundling and the migration from Node.js.">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/bun.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-14">
+<meta property="article:section" content="Languages">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Bun - All-in-One JavaScript Runtime Guide">
+<meta name="twitter:description" content="Bun is an all-in-one JavaScript runtime, bundler, test runner and package manager. Learn the Bun APIs, SQLite, bundling and the migration from Node.js.">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/bun.html#article","headline":"Bun - All-in-One JavaScript Runtime Guide","name":"Bun - All-in-One JavaScript Runtime Guide","description":"Bun is an all-in-one JavaScript runtime, bundler, test runner and package manager. Learn the Bun APIs, SQLite, bundling and the migration from Node.js.","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/bun.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/bun.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-14","articleSection":"Languages","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Languages","item":"https://amin360it.github.io/quick-guides/index.html#cat-languages"},{"@type":"ListItem","position":3,"name":"Bun - All-in-One JavaScript Runtime Guide","item":"https://amin360it.github.io/quick-guides/bun.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Bun</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch0-orientation" data-target="ch0-orientation">0 · Orientation</a><ul>
+<li><a href="#ch0-what" data-target="ch0-what">0.1 What Bun is, and what it replaces</a></li>
+<li><a href="#ch0-install" data-target="ch0-install">0.2 Installing, pinning and upgrading Bun</a></li>
+<li><a href="#ch0-project" data-target="ch0-project">0.3 Creating a project and running scripts</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1-runtime" data-target="ch1-runtime">1 · The runtime</a><ul>
+<li><a href="#ch1-run" data-target="ch1-run">1.1 Running code: bun run</a></li>
+<li><a href="#ch1-engine" data-target="ch1-engine">1.2 The engine, globals and TypeScript</a></li>
+<li><a href="#ch1-watch" data-target="ch1-watch">1.3 Watch mode and hot reload</a></li>
+<li><a href="#ch1-debug" data-target="ch1-debug">1.4 Debugging, inspection and profiling</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2-package-manager" data-target="ch2-package-manager">2 · The package manager</a><ul>
+<li><a href="#ch2-install" data-target="ch2-install">2.1 Installing dependencies</a></li>
+<li><a href="#ch2-lockfile" data-target="ch2-lockfile">2.2 The lockfile</a></li>
+<li><a href="#ch2-workspaces" data-target="ch2-workspaces">2.3 Workspaces and catalogs</a></li>
+<li><a href="#ch2-global" data-target="ch2-global">2.4 Global tools and bunx</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3-bundler" data-target="ch3-bundler">3 · The bundler</a><ul>
+<li><a href="#ch3-build" data-target="ch3-build">3.1 Bundling with bun build</a></li>
+<li><a href="#ch3-targets" data-target="ch3-targets">3.2 Targets, formats and plugins</a></li>
+<li><a href="#ch3-devserver" data-target="ch3-devserver">3.3 The full-stack dev server and HTML imports</a></li>
+<li><a href="#ch3-compile" data-target="ch3-compile">3.4 Compiling to a standalone executable</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4-test-runner" data-target="ch4-test-runner">4 · The test runner</a><ul>
+<li><a href="#ch4-test" data-target="ch4-test">4.1 Writing and running tests</a></li>
+<li><a href="#ch4-mocks" data-target="ch4-mocks">4.2 Mocks, spies and module mocking</a></li>
+<li><a href="#ch4-snapshots" data-target="ch4-snapshots">4.3 Snapshots</a></li>
+<li><a href="#ch4-coverage" data-target="ch4-coverage">4.4 Coverage, filtering and CI</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch5-apis" data-target="ch5-apis">5 · Built-in APIs</a><ul>
+<li><a href="#ch5-io" data-target="ch5-io">5.1 Files, streams and the shell</a></li>
+<li><a href="#ch5-server" data-target="ch5-server">5.2 HTTP and WebSockets with Bun.serve</a></li>
+<li><a href="#ch5-sqlite" data-target="ch5-sqlite">5.3 SQLite, Postgres, MySQL and Redis</a></li>
+<li><a href="#ch5-security" data-target="ch5-security">5.4 Hashing, passwords and secrets</a></li>
+<li><a href="#ch5-process" data-target="ch5-process">5.5 Subprocesses and environment</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch6-compat" data-target="ch6-compat">6 · Node.js compatibility</a><ul>
+<li><a href="#ch6-meaning" data-target="ch6-meaning">6.1 What "Node.js compatible" actually means</a></li>
+<li><a href="#ch6-modules" data-target="ch6-modules">6.2 Built-in modules and the npm ecosystem</a></li>
+<li><a href="#ch6-differences" data-target="ch6-differences">6.3 Where behaviour differs from Node</a></li>
+<li><a href="#ch6-check" data-target="ch6-check">6.4 Type checking with bun check</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch7-migrate" data-target="ch7-migrate">7 · Migrating from Node.js</a><ul>
+<li><a href="#ch7-paths" data-target="ch7-paths">7.1 Choosing a migration path</a></li>
+<li><a href="#ch7-failures" data-target="ch7-failures">7.2 Common failure modes</a></li>
+<li><a href="#ch7-server" data-target="ch7-server">7.3 Migrating a server</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch8-production" data-target="ch8-production">8 · Production and deployment</a><ul>
+<li><a href="#ch8-build" data-target="ch8-build">8.1 Building for production</a></li>
+<li><a href="#ch8-containers" data-target="ch8-containers">8.2 Containers and CI</a></li>
+<li><a href="#ch8-ops" data-target="ch8-ops">8.3 Operations: memory, signals and observability</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch9-appendix" data-target="ch9-appendix">9 · Appendix</a><ul>
+<li><a href="#ch9-cli" data-target="ch9-cli">9.1 Command-line reference</a></li>
+<li><a href="#ch9-compare" data-target="ch9-compare">9.2 Bun and Node at a glance</a></li>
+<li><a href="#ch9-next" data-target="ch9-next">9.3 Where to go next</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+  <h1 class="am-band">
+    <span class="am-band-t">Bun</span>
+    <span class="am-band-s">10 chapters &middot; 47 topics &middot; 56 code samples &middot; works offline</span>
+  </h1>
+<section class="chapter">
+<h2 id="ch0-orientation" data-toc>0 · Orientation</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 0 · Orientation</button><div class="ch-toc-list"><a href="#ch0-what">0.1 What Bun is, and what it replaces</a><a href="#ch0-install">0.2 Installing, pinning and upgrading Bun</a><a href="#ch0-project">0.3 Creating a project and running scripts</a></div></div><h3 id="ch0-what" data-toc>0.1 What Bun is, and what it replaces</h3>
+<p class="topic-desc">Bun is a single native binary that does four jobs: it runs JavaScript and TypeScript, installs packages, bundles code for a browser or a server, and runs tests. That these are one product rather than four tools glued together explains almost every design decision in the rest of this guide.</p>
+
+<h4>Four tools, one process</h4>
+<p>A conventional JavaScript project has four moving parts that do not know about each other. A runtime executes the code, a package manager resolves the dependency graph, a bundler rewrites the source graph into something a browser can load, and a test runner discovers and executes assertions. Each is installed separately, versioned separately, and — because they do not share a parser, a module resolver or a cache — each re-reads and re-parses the same files. Bun subsumes all four. The module resolver used by <code>bun run</code> is the same resolver used by <code>bun build</code> and by <code>bun test</code>, so a path alias, a <code>package.json</code> condition or an <code>.env</code> file behaves identically in every mode. When a build works but a test does not, the difference is your code, not two divergent toolchains.</p>
+
+<h4>What it is not</h4>
+<p>Bun is not a framework. It has no opinion about UI, routing or state management, and it does not replace React, Vue, Next.js or Express. It is also not a drop-in replacement for every Node.js deployment: the package manager, the bundler and the test runner are Bun-specific, and the runtime is a different engine from Node's. Treat the four capabilities as separable. Many teams adopt only <code>bun install</code> first, because it is fast and reversible, and never run their application under the Bun runtime at all. That is a supported, common path — passing <code>--bun</code> to npm-style scripts is what forces the Bun runtime, and omitting it keeps Node in charge.</p>
+
+<h4>Why it is fast</h4>
+<p>Three things dominate Bun's performance story. First, the engine: Bun embeds WebKit's JavaScriptCore rather than V8, and JSC's start-up cost is substantially lower, which is visible on short-lived scripts and CLI tools where boot time is most of the wall clock. Second, everything is native: the package manager, the bundler and the test runner are compiled Rust, not JavaScript, so they do not pay a JavaScript boot cost before doing any work. Third, the runtime ships implementations of the APIs you reach for most — an HTTP server, SQLite, a shell, hashing — so fewer npm packages have to be downloaded, parsed and initialised before your first line runs. Bun 1.4 (August 2026) replaced the Zig core of the runtime with Rust; the external behaviour is unchanged, but the toolchain and the binary's memory profile are not.</p>
+
+<div class="note">Fast start-up is the reason Bun is pleasant for scripts and tests, but it is not a benchmark of throughput. For a long-running server, engine choice matters far less than your query patterns and I/O handling.</div>
+
+<h3 id="ch0-install" data-toc>0.2 Installing, pinning and upgrading Bun</h3>
+<p class="topic-desc">Installation is a single binary on your <code>PATH</code>. The interesting part is not the install command — it is pinning a version so that a build that passes locally also passes in CI six weeks later.</p>
+
+<h4>Platform installers</h4>
+<p>On macOS and Linux the installer is a shell script; it needs <code>unzip</code> on the machine. On Windows the equivalent is a PowerShell one-liner that requires Windows 10 version 1809 or newer. Both put <code>bun</code> in a user-level directory and add it to <code>PATH</code>; you may need to restart your shell afterwards. Package managers work too — npm, Homebrew and other registries all carry a Bun package if you prefer a manager you already use.</p>
+
+<div class="codeWrap"><pre><code># macOS / Linux
+curl -fsSL https://bun.com/install | bash
+
+# Windows (PowerShell)
+powershell -c "irm bun.sh/install.ps1 | iex"
+
+# via npm, if you would rather not use the script
+npm install -g bun</code></pre></div>
+
+<h4>Checking and pinning the version</h4>
+<p>Two commands report version information, and they answer different questions. <code>bun --version</code> prints the semantic version such as <code>1.4.3</code>; <code>bun --revision</code> prints the exact build revision, which is what you paste into a bug report. In CI, pin the version rather than installing latest, or a release on the morning of a deadline can change your build. The official Docker image tags make this easy: a floating <code>oven/bun:1</code> tracks the newest 1.x, while <code>oven/bun:1.4.3</code> is immutable. Applications that ship a compiled binary should pin the exact patch, because the compiled output embeds the runtime.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun --version      # 1.4.3
+bun --revision     # 1.4.3+abcdef123
+bun upgrade        # update to the latest release</code></pre></div>
+
+<h4>Upgrading and rolling back</h4>
+<p><code>bun upgrade</code> replaces the binary in place; pass <code>--canary</code> to move to the nightly line when you need a fix that has not shipped yet. Rolling back is deliberately unglamorous: re-run the installer with the version you want, or install a pinned release. This matters when an upgrade changes behaviour. Bun follows semantic versioning but ships substantial features in minor releases — 1.2 added HTML imports and routes, 1.3 rebuilt the dev server and added database clients, 1.4 rewrote the core — so "it is only a minor bump" is not a safe assumption in this project's history.</p>
+
+<h3 id="ch0-project" data-toc>0.3 Creating a project and running scripts</h3>
+<p class="topic-desc">A Bun project is a normal directory with a <code>package.json</code>. What changes is that you rarely need a separate TypeScript compiler, a bundler config or a test config file.</p>
+
+<h4>bun init and what it writes</h4>
+<p><code>bun init</code> scaffolds a project: a <code>package.json</code>, a <code>tsconfig.json</code> tuned for Bun, an <code>index.ts</code> entry point and an <code>.gitignore</code>. The <code>tsconfig.json</code> is the part worth reading, because it is what makes <code>bun run file.ts</code> type-check cleanly in your editor without a build step. It targets the latest ECMAScript and enables the module resolution rules Bun uses, so the editor and the runtime agree about where <code>@/lib/db</code> points. Pass <code>--react</code>, <code>--vue</code> or similar flags to pull in the matching template.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun init            # interactive scaffold
+bun init --yes      # accept defaults, no prompts
+bun init --react    # React template</code></pre></div>
+
+<h4>Defining and running scripts</h4>
+<p>Scripts live in the <code>scripts</code> field exactly as they do under npm, and <code>bun run &lt;name&gt;</code> executes them. Bun runs the named binary from <code>node_modules/.bin</code> when the script names one, and otherwise falls back to the Bun runtime. That fallback is the important detail: <code>"test": "jest"</code> runs Jest under the Bun runtime, which is usually what you want for compatibility, but <code>"dev": "node server.js"</code> will run Node if Node is installed unless you force Bun with <code>--bun</code>. Bun does not require a <code>run</code> keyword for many script names; <code>bun dev</code> is shorthand for <code>bun run dev</code>. Be explicit in CI anyway — ambiguity is cheap to remove and expensive to debug.</p>
+
+<div class="codeWrap"><pre><code>// package.json
+{
+  "name": "my-app",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "test": "bun test"
+  }
+}</code></pre></div>
+
+<div class="codeWrap"><pre><code># shell
+bun run dev          # run the dev script
+bun dev              # shorthand for the same thing
+bun --bun run dev    # force the Bun runtime inside the script
+bun run src/cli.ts   # run a file directly, no script needed</code></pre></div>
+
+<h4>Environment defaulting</h4>
+<p>Bun loads <code>.env</code> automatically before your code runs, so <code>Bun.env.DATABASE_URL</code> is populated without a library such as <code>dotenv</code> and without an import. Later chapters cover the exact precedence, but the orientation-level takeaway is that a fresh project usually needs no configuration file at all: no bundler config, no test config, no environment loader. If you are counting lines of configuration you can delete, that is the largest single win.</p>
+</section>
+<section class="chapter">
+<h2 id="ch1-runtime" data-toc>1 · The runtime</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 · The runtime</button><div class="ch-toc-list"><a href="#ch1-run">1.1 Running code: bun run</a><a href="#ch1-engine">1.2 The engine, globals and TypeScript</a><a href="#ch1-watch">1.3 Watch mode and hot reload</a><a href="#ch1-debug">1.4 Debugging, inspection and profiling</a></div></div><h3 id="ch1-run" data-toc>1.1 Running code: bun run</h3>
+<p class="topic-desc"><code>bun run</code> is the entry point for everything. It runs scripts, files and binaries, resolves TypeScript and JSX on the fly, and defaults to a fast start-up without a compile step.</p>
+
+<h4>Scripts, files and binaries</h4>
+<p><code>bun run</code> does three different things depending on the argument, and knowing which it will pick saves time. Given the name of a script in <code>package.json</code>, it runs that script. Given a path to a file, it executes that file with the Bun runtime — a <code>.ts</code>, <code>.tsx</code>, <code>.jsx</code> or <code>.js</code> file all work without configuration. Given the name of an executable on <code>PATH</code> or in <code>node_modules/.bin</code>, it runs that binary. When a script and a binary share a name, the script wins, because a project's own definition should not be shadowed by a globally installed tool.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun run build            # the "build" script from package.json
+bun build                # shorthand for the same script
+bun run ./src/cli.ts     # execute a TypeScript file directly
+bun run --bun vite dev   # run the vite binary under the Bun runtime</code></pre></div>
+
+<h4>Passing arguments and environment</h4>
+<p>Everything after the script name is forwarded to the script verbatim, which means <code>--</code> is not required the way it is with npm. Flags that belong to Bun itself must come before the script name. This distinction is a common source of confusion: <code>bun run dev --port 3000</code> passes <code>--port 3000</code> to your dev server, while <code>bun --watch run dev</code> tells Bun to watch. Environment variables are inherited from the parent process; anything defined in <code>.env</code> is merged in, and an inline assignment such as <code>NODE_ENV=production bun run start</code> works on Windows as well as POSIX shells, because Bun parses it rather than relying on the shell.</p>
+
+<h4>Transactions in a longer pipeline</h4>
+<p>Sequential steps are usually written as separate entries in <code>scripts</code> and composed with the shell's <code>&amp;&amp;</code>, but that is not portable to Windows <code>cmd</code>. For a cross-platform pipeline that stops on the first failure, write a small TypeScript driver and let Bun run it, or use the Bun shell, which implements <code>&amp;&amp;</code>, <code>||</code> and pipelines itself and therefore behaves identically on every platform. The next chapter covers the shell in detail; the point here is that "just use npm scripts" is not required.</p>
+
+<h3 id="ch1-engine" data-toc>1.2 The engine, globals and TypeScript</h3>
+<p class="topic-desc">Bun runs on JavaScriptCore. The practical consequences of that choice — and of the runtime's built-in TypeScript support — decide what you can delete from a typical project.</p>
+
+<h4>JavaScriptCore, not V8</h4>
+<p>Node.js and Bun share a language but not an engine. Node embeds V8; Bun embeds JavaScriptCore, the engine from WebKit. The visible differences are small at the language level — both implement modern ECMAScript — but they show up in two places. Start-up is markedly faster with JSC, which is why CLI tools feel instant. And occasionally a V8-specific escape hatch is absent or spelled differently, so code that violates a specification but happened to work on V8 can behave differently. Writing to the specification rather than to V8's quirks is the safe rule, and it is also what makes the same file run under both runtimes.</p>
+
+<h4>TypeScript and JSX without a build</h4>
+<p>Bun parses TypeScript and JSX directly. There is no <code>ts-node</code>, no <code>tsx</code>, no <code>esbuild</code> step required to run a <code>.ts</code> file — <code>bun run server.ts</code> simply works. Crucially, Bun does not type-check. It strips types and runs. That is a deliberate speed choice and it means type errors do not stop execution; you still need a checker (the editor's TypeScript service, or <code>bun check</code> in 1.4) for correctness. Configure JSX per file with a pragma comment: <code>@jsxRuntime classic</code>, <code>@jsxRuntime automatic</code> or <code>@jsxImportSource preact</code> at the top of the file selects the transform, and the choice can differ per file, which is useful when a monorepo mixes React and Preact.</p>
+
+<div class="codeWrap"><pre><code>// **/*.tsx uses the automatic runtime by default
+/** @jsxImportSource preact */
+import { render } from "preact";
+
+export function App() {
+  return &lt;h1&gt;Hello&lt;/h1&gt;;
+}</code></pre></div>
+
+<h4>Globals you get for free</h4>
+<p>Several APIs are available without an import: <code>Bun</code> itself (a namespace holding <code>Bun.serve</code>, <code>Bun.file</code>, <code>Bun.write</code>, <code>Bun.spawn</code>, <code>Bun.password</code> and much more), <code>Bun.env</code> for environment variables, and the web-standard globals <code>fetch</code>, <code>Request</code>, <code>Response</code>, <code>Headers</code>, <code>WebSocket</code>, <code>FormData</code>, <code>URL</code>, <code>TextEncoder</code> and <code>AbortController</code>. A few Node globals are present too, most notably <code>process</code> and <code>Buffer</code>, for compatibility. Preferring the web-standard spellings keeps code portable to browsers, Deno, workers and Node, in roughly that order of likelihood.</p>
+
+<div class="tip">Type definitions for the built-ins ship with the runtime package. Add <code>"types": ["bun"]</code> (or a reference directive) to <code>tsconfig.json</code> and your editor will autocomplete <code>Bun.serve</code> and friends in every file.</div>
+
+<h3 id="ch1-watch" data-toc>1.3 Watch mode and hot reload</h3>
+<p class="topic-desc">Bun can restart a process when files change, or reload modules inside a running process without a full restart. Choosing the right one is the difference between a two-second loop and a two-hundred-millisecond loop.</p>
+
+<h4>--watch: restart the process</h4>
+<p><code>bun --watch src/server.ts</code> watches the files that were imported and restarts the process when one changes. It is the right tool for a server whose start-up is cheap and whose state is disposable. Because it restarts the whole process, everything is reset: caches, connections and in-memory counters. Watch mode is careful about the file graph — it re-runs the import that changed rather than the whole program where it can, and it leaves the terminal history in place so you can scroll back through previous restarts.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun --watch src/server.ts     # restart on change
+bun --hot src/server.ts       # hot reload without a restart</code></pre></div>
+
+<h4>--hot: reload modules in place</h4>
+<p><code>bun --hot</code> keeps the process alive and re-evaluates changed modules, preserving global state between edits. That is a genuine win when start-up is expensive — reading a large file, warming a cache, opening a database pool — but it demands that your code tolerate being re-evaluated. A module-level connection created once at import time will be created again on each reload unless you guard it. The reliable pattern is to store long-lived resources on a global keyed by a stable name, then reuse them across reloads. A module-scoped <code>let</code> will not survive; a property on <code>globalThis</code> will.</p>
+
+<div class="codeWrap"><pre><code>// server.ts — survive hot reloads
+const key = "__db__";
+const pool = (globalThis as any)[key] ??= await createPool();
+
+export function query(sql: string) {
+  return pool.query(sql);
+}</code></pre></div>
+
+<div class="warn">Hot reload re-runs modules, not the whole program. If two modules capture references to each other at import time, a reload can leave one holding a stale reference. Prefer functions over captured objects, or restart with <code>--watch</code> when in doubt.</div>
+
+<h3 id="ch1-debug" data-toc>1.4 Debugging, inspection and profiling</h3>
+<p class="topic-desc">Because Bun is a normal runtime with an inspector protocol and a rich <code>console</code>, most debugging needs no extra tooling — but the flags are not the ones Node users reach for by reflex.</p>
+
+<h4>The inspector and DevTools</h4>
+<p><code>bun --inspect src/server.ts</code> starts the process and opens a WebSocket inspector on the standard port. Browsers' DevTools can attach to it, giving you breakpoints, a console, a heap snapshot and a profiler for a server-side process. Pass <code>--inspect-brk</code> to break on the first line, which is what you want for a script that fails immediately or whose input arrives from a pipe. The protocol is Chrome DevTools Protocol, so the tools you already use for front-end debugging work unchanged; only the URL you paste differs from the Node equivalent.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun --inspect src/server.ts        # attach DevTools
+bun --inspect-brk src/cli.ts       # break before the first statement
+bun --inspect-wait src/server.ts   # wait for a debugger to attach</code></pre></div>
+
+<h4>Reading values with console and Bun.inspect</h4>
+<p>Bun's <code>console.log</code> understands more than primitives: it prints objects with colour and depth, and <code>Bun.inspect(value)</code> returns that formatted string so you can embed it in your own output. <code>Bun.inspect.table(data)</code> renders an array of objects as aligned columns, which is far faster to read than a wall of JSON when you are comparing rows. Error stacks are source-mapped, so a stack from TypeScript points at the <code>.ts</code> line rather than a compiled equivalent. For production, prefer structured logging — write JSON to stdout — because the pretty-printer is for humans, and log collectors are not humans.</p>
+
+<div class="codeWrap"><pre><code>// inspect anything, including circular structures
+console.log(Bun.inspect({ a: 1, nested: { b: 2 } }));
+
+// render rows as a table
+console.table([{ name: "ada", role: "engineer" }]);
+
+// structured logging for a collector
+console.log(JSON.stringify({ level: "info", msg: "boot", pid: process.pid }));</code></pre></div>
+
+<div class="note"><code>console.table</code> and <code>Bun.inspect.table</code> are convenience, not a formatting contract. Column order follows object key order and is not stable across inputs, so never parse your own log output.</div>
+</section>
+<section class="chapter">
+<h2 id="ch2-package-manager" data-toc>2 · The package manager</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 · The package manager</button><div class="ch-toc-list"><a href="#ch2-install">2.1 Installing dependencies</a><a href="#ch2-lockfile">2.2 The lockfile</a><a href="#ch2-workspaces">2.3 Workspaces and catalogs</a><a href="#ch2-global">2.4 Global tools and bunx</a></div></div><h3 id="ch2-install" data-toc>2.1 Installing dependencies</h3>
+<p class="topic-desc"><code>bun install</code> reads <code>package.json</code>, resolves the graph, writes a lockfile and links <code>node_modules</code> — in one pass, with a cache shared across projects.</p>
+
+<h4>What one install actually does</h4>
+<p>A bare <code>bun install</code> satisfies every dependency class at once: <code>dependencies</code>, <code>devDependencies</code>, <code>optionalDependencies</code> and <code>peerDependencies</code>. That differs from npm, which historically left peer dependencies to the consumer and treats a production install as a separate mode. To skip development dependencies, pass <code>--production</code>; that is the flag a runtime container needs, and forgetting it is the most common reason a production image is hundreds of megabytes larger than the code it runs. The cache lives outside the project, so a second checkout of the same dependency graph does not re-download tarballs — it links from the cache and, on the platforms that support it, hardlinks the files into <code>node_modules</code>.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun install                       # install everything from package.json
+bun install --frozen-lockfile     # fail if the lockfile would change (CI)
+bun install --production          # skip devDependencies
+bun add zod                       # add a dependency and install it
+bun add -d @types/node            # add a devDependency
+bun remove lodash                 # uninstall
+bun update --latest               # upgrade within the manifest</code></pre></div>
+
+<h4>Lifecycle scripts and trust</h4>
+<p>Bun runs your project's own lifecycle scripts — <code>preinstall</code>, <code>install</code>, <code>postinstall</code>, <code>preprepare</code>, <code>postprepare</code> — but by default it does <strong>not</strong> run the lifecycle scripts of your dependencies. This is a security decision: a <code>postinstall</code> script in a transitive dependency is arbitrary code execution that happens before you have read a single line of it. Dependencies that genuinely need to build native code are listed as trusted, either in the lockfile or via configuration, and only those run their scripts. When a native module fails to load with a "cannot find binding" style error, an untrusted build script is the first thing to check.</p>
+
+<div class="note">If a package ships prebuilt binaries for your platform, extending the trust list is unnecessary — Bun installs the prebuild. Only packages that compile at install time need to be trusted.</div>
+
+<h4>Frozen lockfiles in CI</h4>
+<p>Continuous integration should never resolve a new dependency graph, because a transitive release published this morning is not the graph your tests passed against. <code>bun install --frozen-lockfile</code> installs exactly what the lockfile records and fails loudly if <code>package.json</code> and the lockfile disagree. Use it in CI and in Docker builds. The failure it produces — a mismatch between the manifest and the lock — is the cheapest possible version of the problem it prevents, which is a build that succeeds on a graph nobody reviewed.</p>
+
+<h3 id="ch2-lockfile" data-toc>2.2 The lockfile</h3>
+<p class="topic-desc">The lockfile records the exact resolved graph. Bun's is a text file, which makes it reviewable in a pull request — a deliberate change from the earlier binary format.</p>
+
+<h4>bun.lock is text</h4>
+<p>Modern Bun writes <code>bun.lock</code>, a human-readable file. Older projects have <code>bun.lockb</code>, the original binary format, which cannot be diffed or merged and therefore caused noisy conflicts whenever two branches touched dependencies. The text format resolves that: a reviewer can see that a patch release moved, and a merge conflict is a normal text conflict. Treat the lockfile as generated: commit it, never hand-edit it, and regenerate it with <code>bun install</code> after changing <code>package.json</code>.</p>
+
+<div class="codeWrap"><pre><code># commit the lockfile; it is generated, not written by hand
+git add package.json bun.lock
+
+# migrate an existing project; Bun reads the lockfile from npm, yarn or pnpm
+bun install          # recognises package-lock.json / yarn.lock / pnpm-lock.yaml
+rm package-lock.json # once bun.lock exists, keep exactly one lockfile</code></pre></div>
+
+<h4>Migrating without rewriting history</h4>
+<p>Bun reads <code>package-lock.json</code>, <code>yarn.lock</code> and <code>pnpm-lock.yaml</code>, so a migration does not require abandoning a working graph — you run <code>bun install</code>, verify, and then delete the old lockfile so that exactly one source of truth remains. Keeping two lockfiles is worse than either alone: they drift silently, and different contributors install different trees depending on which tool they ran. Before deleting the old file, check that any resolution overrides or patches it contained are represented in <code>package.json</code>, where they belong.</p>
+
+<h3 id="ch2-workspaces" data-toc>2.3 Workspaces and catalogs</h3>
+<p class="topic-desc">Workspaces let one repository hold several packages that share a single install. Catalogs go one step further and centralise the version numbers themselves.</p>
+
+<h4>Declaring workspaces</h4>
+<p>Add a <code>workspaces</code> array to the root <code>package.json</code> and Bun links the matching directories into the root <code>node_modules</code>, so a package can import a sibling by name rather than by relative path. Patterns are globs and may be negated to exclude a directory. A single install at the root resolves the union of every workspace's dependencies, which means one lockfile, one cache pass and no duplicated trees. Package scripts run in the package that declares them; to run one across every workspace, Bun takes a filter flag rather than a separate orchestration tool for the common case.</p>
+
+<div class="codeWrap"><pre><code>// root package.json
+{
+  "workspaces": ["packages/*", "apps/*", "!packages/legacy-*"]
+}</code></pre></div>
+
+<h4>workspace:* and catalogs</h4>
+<p>Inside a workspace, depend on a sibling with the <code>workspace:</code> protocol so the local package is used instead of a registry copy — <code>"@acme/core": "workspace:*"</code>, with <code>^</code> and <code>~</code> variants to constrain the version. Catalogs solve a different annoyance: the same dependency declared with the same range in a dozen manifests, which drifts. A catalog declares versions once, and members reference the catalog by name, so a bump is a one-line change in one file rather than a search-and-replace across the repository.</p>
+
+<div class="codeWrap"><pre><code>// root package.json
+{
+  "workspaces": { "packages": ["packages/*"], "catalog": { "zod": "^4.0.0" } }
+}
+// packages/core/package.json
+{
+  "name": "@acme/core",
+  "dependencies": { "zod": "catalog:" }
+}</code></pre></div>
+
+<div class="tip">Catalogs are the answer to "which Zod version are we on?". If that question takes more than a second to answer, the repository needs one.</div>
+
+<h3 id="ch2-global" data-toc>2.4 Global tools and bunx</h3>
+<p class="topic-desc">Not everything belongs in a project manifest. Global installs cover your machine, and <code>bunx</code> runs a package once without installing it at all.</p>
+
+<h4>Global installs</h4>
+<p><code>bun add --global &lt;name&gt;</code> installs a package into a shared directory and exposes its binaries on <code>PATH</code>. Use it for tools you reach for across projects and rarely pin — a formatter you like, a scaffolding CLI. Anything your build depends on belongs in the manifest instead, because a global is invisible to a colleague's machine and to CI. To list or remove globals, use <code>bun pm ls --global</code> and <code>bun remove -g</code>. Bun keeps global installs isolated so that a global tool's dependencies cannot leak into a project's resolution.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun add -g cowsay            # install a global command
+bun pm ls --global           # list what is installed globally
+bun remove -g cowsay         # uninstall a global command</code></pre></div>
+
+<h4>bunx: run once, install nothing</h4>
+<p><code>bunx &lt;package&gt;</code> downloads the package if needed, runs its binary with the arguments you pass, and leaves your project untouched. It is the right way to invoke a one-off generator or a comparison tool without adding a dependency you will never import. <code>bunx</code> is shorthand for <code>bun x</code>; both exist so that muscle memory from <code>npx</code> works. If the package is already a project dependency, prefer a script that calls it, because a <code>bunx</code> call resolves "latest" and therefore is not reproducible.</p>
+
+<div class="codeWrap"><pre><code># shell
+bunx create-vite my-app       # scaffold once, no dependency added
+bun x cowsay "hello"          # same thing, alternate spelling
+bunx --bun some-cli           # run the tool under the Bun runtime</code></pre></div>
+
+<div class="warn">A bare <code>bunx foo</code> fetches the latest version at call time. That is fine in a terminal and wrong in a build: pin the version (<code>bunx foo@3.2.1</code>) or add the tool to <code>devDependencies</code> and call it from a script.</div>
+</section>
+<section class="chapter">
+<h2 id="ch3-bundler" data-toc>3 · The bundler</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 · The bundler</button><div class="ch-toc-list"><a href="#ch3-build">3.1 Bundling with bun build</a><a href="#ch3-targets">3.2 Targets, formats and plugins</a><a href="#ch3-devserver">3.3 The full-stack dev server and HTML imports</a><a href="#ch3-compile">3.4 Compiling to a standalone executable</a></div></div><h3 id="ch3-build" data-toc>3.1 Bundling with bun build</h3>
+<p class="topic-desc"><code>bun build</code> takes an entry point and an output directory and produces a bundle, with no configuration file required. It shares the resolver with the runtime, so a path alias means the same thing in both.</p>
+
+<h4>The minimal invocation</h4>
+<p>A build needs an entry point and a destination. <code>bun build ./src/index.ts --outdir ./dist</code> parses the graph reachable from the entry, applies the same resolution rules the runtime uses, and writes the result. Multi-entry builds are supported by repeating the entry or by passing a glob. Because the resolver understands <code>tsconfig.json</code> paths and <code>package.json</code> export conditions, most projects need no config at all; a plugin is only required for a transform Bun does not already implement, such as a CSS preprocessor or a custom asset type.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun build ./src/index.ts --outdir ./dist
+bun build ./src/index.ts --outdir ./dist --sourcemap=linked
+bun build ./src/index.ts ./src/worker.ts --outdir ./dist --splitting</code></pre></div>
+
+<h4>The JavaScript API</h4>
+<p>The CLI is a thin wrapper over an exported function, and the function is what a build script or a plugin host should call. <code>Bun.build()</code> returns an object with a <code>success</code> boolean and an <code>outputs</code> array; each output exposes the generated <code>path</code>, the in-memory <code>Blob</code>-like contents and the source map. Checking <code>success</code> before writing anything is the difference between a clear error and a half-written <code>dist</code>. The returned outputs can be written yourself, served directly, or inspected in a test.</p>
+
+<div class="codeWrap"><pre><code>// build.ts
+const result = await Bun.build({
+  entrypoints: ["./src/index.ts"],
+  outdir: "./dist",
+  target: "bun",
+  minify: true,
+  sourcemap: "linked",
+});
+
+if (!result.success) {
+  for (const log of result.logs) console.error(log);
+  process.exit(1);
+}
+
+console.log(result.outputs.map((o) =&gt; o.path));</code></pre></div>
+
+<h4>Watch mode and incremental builds</h4>
+<p>Add <code>--watch</code> to rebuild when a file in the graph changes. Watch mode keeps the parsed graph in memory and rebuilds only what the change invalidates, so the second build is far cheaper than the first. It is meant for development loops; in production you build once. If a build takes long enough that you want incremental output in CI, that is usually a sign the graph should be split rather than that the build tool is slow.</p>
+
+<h3 id="ch3-targets" data-toc>3.2 Targets, formats and plugins</h3>
+<p class="topic-desc">The target decides which globals and built-ins are assumed present. Choosing the wrong one produces a bundle that builds successfully and fails at runtime, so this is the setting to get right first.</p>
+
+<h4>Choosing a target</h4>
+<p><code>--target browser</code> assumes a DOM and no Node built-ins; a reference to <code>node:fs</code> is an error rather than a silent shim. <code>--target bun</code> assumes the Bun runtime, so <code>Bun.serve</code> and <code>Bun.file</code> are available and imports of <code>bun:sqlite</code> resolve. <code>--target node</code> assumes Node and its built-ins. The engine also uses the target to decide default output format and which packages to treat as external. Bundling a server entry for <code>browser</code> is the classic mistake: it succeeds because the offending import is tree-shaken out, then fails in the environment where it was supposed to run.</p>
+
+<table>
+<thead><tr><th>Target</th><th>Assumes</th><th>Typical use</th></tr></thead>
+<tbody>
+<tr><td><code>browser</code></td><td>DOM, no Node built-ins</td><td>front-end assets, hydration bundles</td></tr>
+<tr><td><code>bun</code></td><td>Bun runtime and <code>bun:*</code> modules</td><td>Bun servers, CLIs run by Bun</td></tr>
+<tr><td><code>node</code></td><td>Node built-ins and globals</td><td>libraries published for Node consumers</td></tr>
+</tbody>
+</table>
+
+<h4>Output formats</h4>
+<p><code>--format esm</code> is the modern default and the only format you should choose without a specific reason to do otherwise. <code>--format cjs</code> and <code>--format iife</code> exist for compatibility — a CommonJS <code>require</code>-only consumer, or a script tag that expects a global — and are marked experimental, so verify the output rather than assuming equivalence with established bundlers. Set <code>--splitting</code> to share code between multiple entry points; without it, each entry carries its own copy of any shared module, which is correct but larger.</p>
+
+<h4>Plugins</h4>
+<p>A plugin is an object with a <code>name</code> and a <code>setup(build)</code> function that registers callbacks such as <code>onLoad</code> and <code>onResolve</code>. <code>onResolve</code> decides what a specifier points to; <code>onLoad</code> produces the contents for that path. The two are enough to implement a virtual module, a template compiler or an asset pipeline. Keep plugins narrow: a plugin that rewrites every import is a build system you now own, and the reason to use Bun is that you did not want to own one.</p>
+
+<div class="codeWrap"><pre><code>// plugin.ts — turn .txt imports into a string export
+import type { BunPlugin } from "bun";
+
+export const textPlugin: BunPlugin = {
+  name: "text-loader",
+  setup(build) {
+    build.onLoad({ filter: /\.txt$/ }, async (args) =&gt; ({
+      contents: `export default ${JSON.stringify(await Bun.file(args.path).text())}`,
+      loader: "js",
+    }));
+  },
+};</code></pre></div>
+
+<h3 id="ch3-devserver" data-toc>3.3 The full-stack dev server and HTML imports</h3>
+<p class="topic-desc">Since 1.2 and expanded in 1.3, Bun can serve an HTML entry point directly, bundling the scripts and styles it references on demand and reloading the browser when they change.</p>
+
+<h4>HTML as an entry point</h4>
+<p>Instead of configuring a bundler and a dev server separately, you point <code>Bun.serve</code> at an HTML file. Bun parses the document, finds its <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code> tags, and serves each as a bundled asset with the correct content type. Requesting the page in a browser is enough to build it; there is no separate watcher and no proxy. In production the same entry can be bundled ahead of time, so development and production share one mental model.</p>
+
+<div class="codeWrap"><pre><code>// dev-server.ts
+const server = Bun.serve({
+  port: 3000,
+  development: { hmr: true, console: true },
+  async fetch(req) {
+    const url = new URL(req.url);
+    if (url.pathname === "/") return new Response(Bun.file("./index.html"));
+    return new Response("Not found", { status: 404 });
+  },
+});
+console.log(server.url);</code></pre></div>
+
+<h4>Routes and development options</h4>
+<p>The <code>routes</code> option (from 1.2.3) maps URL patterns to handlers more declaratively than a <code>fetch</code> switch. A pattern such as <code>"/users/:id"</code> captures a parameter on <code>req.params.id</code>, and <code>"/api/*"</code> is a wildcard. A route value may be a handler function, a static <code>Response</code>, or a file returned by <code>Bun.file</code>. The <code>development</code> option enables hot module replacement in the browser and forwards browser <code>console.log</code> calls into your terminal — genuinely useful when a client-side error is hard to reproduce. Both are development-only conveniences; disable them in production.</p>
+
+<div class="codeWrap"><pre><code>// routes.ts
+Bun.serve({
+  routes: {
+    "/": new Response("home"),
+    "/health": () =&gt; Response.json({ ok: true }),
+    "/users/:id": (req) =&gt; Response.json({ id: req.params.id }),
+    "/files/*": (req) =&gt; Bun.file("./public" + req.params["*"]),
+  },
+  fetch(req) {
+    return new Response("Not found", { status: 404 });
+  },
+});</code></pre></div>
+
+<div class="note"><code>routes</code> requires Bun 1.2.3 or newer. On an older runtime the option is ignored and every request falls through to <code>fetch</code>, which presents as "my routes silently do nothing" rather than an error.</div>
+
+<h3 id="ch3-compile" data-toc>3.4 Compiling to a standalone executable</h3>
+<p class="topic-desc"><code>--compile</code> turns a TypeScript entry point into a single native binary that runs on a machine with no Bun and no <code>node_modules</code>. It is the deployment story for CLIs.</p>
+
+<h4>Building the binary</h4>
+<p><code>bun build ./cli.ts --compile --outfile mycli</code> produces one file that embeds your code and a copy of the runtime. Copy it to a fresh machine and it runs — no interpreter, no dependency install, no <code>package.json</code>. The JavaScript API equivalent sets <code>compile: { outfile }</code> in <code>Bun.build</code>. Because the runtime is embedded, the binary is tens of megabytes rather than a few kilobytes; that is the trade for a self-contained artifact.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun build ./cli.ts --compile --outfile mycli
+./mycli --help              # runs with no Bun installed
+
+# cross-compile for another platform
+bun build ./cli.ts --compile --target=bun-linux-x64 --outfile mycli-linux</code></pre></div>
+
+<h4>Cross-compilation and bytecode</h4>
+<p><code>--target</code> selects the platform the binary is for, so one machine can emit builds for Linux, macOS and Windows. That removes the need for a matrix of build runners when you only need to ship an artifact — though you should still test each artifact on a real machine of that platform, because cross-compilation does not exercise the target's quirks. <code>--bytecode</code> pre-compiles your JavaScript into the runtime's bytecode format so the binary does not parse source on start-up; in 1.4 this path is materially faster. Use it for tools where start-up latency is felt.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun build ./cli.ts --compile --bytecode --minify --outfile mycli
+bun build ./cli.ts --compile --target=bun-windows-x64 --outfile mycli.exe</code></pre></div>
+
+<div class="warn">A compiled binary embeds the runtime version you built it with. Rebuilding after a Bun upgrade is the only way to pick up runtime fixes; a stale binary is a fork you maintain by accident.</div>
+</section>
+<section class="chapter">
+<h2 id="ch4-test-runner" data-toc>4 · The test runner</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 · The test runner</button><div class="ch-toc-list"><a href="#ch4-test">4.1 Writing and running tests</a><a href="#ch4-mocks">4.2 Mocks, spies and module mocking</a><a href="#ch4-snapshots">4.3 Snapshots</a><a href="#ch4-coverage">4.4 Coverage, filtering and CI</a></div></div><h3 id="ch4-test" data-toc>4.1 Writing and running tests</h3>
+<p class="topic-desc"><code>bun test</code> discovers files matching a fixed set of patterns and runs them with a Jest-compatible API, without a transform step for TypeScript.</p>
+
+<h4>Discovery and the API</h4>
+<p>Bun finds <code>*.test.ts</code>, <code>*.spec.ts</code> and their JavaScript variants anywhere in the project, plus files under a <code>__tests__</code> directory. Inside a test file, <code>import { test, describe, expect } from "bun:test"</code> gives you the familiar shape. Tests may be synchronous or asynchronous; an <code>async</code> test that returns a promise is awaited, and a test that takes a <code>done</code> callback is supported for callback-style code. Running <code>bun test</code> with no arguments runs everything; passing a path runs one file, and passing a substring filters by name. Because the runner uses the same resolver as the runtime, importing a <code>.ts</code> source file from a test needs no configuration.</p>
+
+<div class="codeWrap"><pre><code>// math.test.ts
+import { describe, expect, test } from "bun:test";
+import { add } from "./math";
+
+describe("add", () =&gt; {
+  test("sums two numbers", () =&gt; {
+    expect(add(2, 3)).toBe(5);
+  });
+
+  test("resolves async work", async () =&gt; {
+    expect(await addAsync(2, 3)).toBe(5);
+  });
+
+  test("calls back", (done) =&gt; {
+    addCallback(2, 3, (sum) =&gt; {
+      expect(sum).toBe(5);
+      done();
+    });
+  });
+});</code></pre></div>
+
+<div class="codeWrap"><pre><code># shell
+bun test                # run every test file
+bun test math.test.ts   # one file
+bun test --grep "sums"  # filter by test name
+bun test --bail         # stop at the first failure
+bun test --watch        # re-run on change</code></pre></div>
+
+<h4>Assertions and matchers</h4>
+<p>The matcher set follows Jest closely: <code>toBe</code> for identity, <code>toEqual</code> for deep equality, <code>toThrow</code>, <code>toContain</code>, <code>toMatchObject</code>, <code>toBeCloseTo</code> for floating point, and the <code>not</code> modifier on all of them. <code>expect.assertions(n)</code> guards a test that would otherwise pass vacuously, which is the usual failure mode of a test written around a callback that never fires. For dates and numbers, prefer <code>toBeCloseTo</code> over <code>toBe</code>: exact floating-point equality is a specification of your arithmetic's rounding, not of its correctness.</p>
+
+<h3 id="ch4-mocks" data-toc>4.2 Mocks, spies and module mocking</h3>
+<p class="topic-desc">A mock replaces a dependency so a test can observe a call or control a response. Bun follows Jest's vocabulary, so existing tests usually port unchanged.</p>
+
+<h4>Mock functions</h4>
+<p><code>mock(fn)</code> wraps a function and records its calls; <code>jest.fn()</code> is the same thing under the alias that keeps Jest code working. The recorded state lives on <code>.mock.calls</code> and <code>.mock.results</code>, and you reset it with <code>.mockClear()</code> between tests so one test's calls do not leak into the next. A shared mock created at module scope and never cleared is the most common cause of a test that passes alone and fails in a suite.</p>
+
+<div class="codeWrap"><pre><code>import { expect, mock, test } from "bun:test";
+
+test("calls the logger once", () =&gt; {
+  const log = mock((msg: string) =&gt; msg);
+  sendReport({ log });
+
+  expect(log).toHaveBeenCalledTimes(1);
+  expect(log).toHaveBeenCalledWith("report sent");
+  log.mockClear();
+});</code></pre></div>
+
+<h4>Controlling a module</h4>
+<p>For a dependency whose behaviour matters more than its call count, replace the module rather than spying on a function. This is how you make a network call deterministic or force an error branch. Reset the module registry between tests so the replacement does not persist into a test that expects the real implementation. Keep module mocks at the edges of your system — a database client, an HTTP client, the clock — and let internal modules run for real, or the test stops describing your code and starts describing your mocks.</p>
+
+<div class="codeWrap"><pre><code>import { expect, mock, test } from "bun:test";
+import * as clock from "./clock";
+
+mock.module("./clock", () =&gt; ({
+  now: () =&gt; new Date("2026-01-01T00:00:00Z"),
+}));
+
+test("expiry is computed from the injected clock", () =&gt; {
+  expect(clock.now().getUTCFullYear()).toBe(2026);
+});</code></pre></div>
+
+<div class="tip">Mock the clock rather than sleeping. A test that waits three seconds to prove a timeout is a test that will flake on a loaded CI machine and cost three seconds every run.</div>
+
+<h3 id="ch4-snapshots" data-toc>4.3 Snapshots</h3>
+<p class="topic-desc">A snapshot records the output of an expression once and fails a later run when the output changes. It is powerful and easy to misuse.</p>
+
+<h4>Writing and updating snapshots</h4>
+<p><code>expect(value).toMatchSnapshot()</code> compares <code>value</code> against a stored serialisation. On the first run, or when <code>--update-snapshots</code> is passed, the snapshot is written instead of compared. Snapshots are stored next to the test in a <code>__snapshots__</code> directory as <code>.snap</code> files. Commit them: a snapshot is a specification, and a change to one is a deliberate act. In CI, never pass the update flag — an updated snapshot asserts nothing, which is the opposite of what CI is for.</p>
+
+<div class="codeWrap"><pre><code>import { expect, test } from "bun:test";
+import { renderRow } from "./table";
+
+test("row rendering", () =&gt; {
+  expect(renderRow({ name: "ada", role: "engineer" })).toMatchSnapshot();
+});</code></pre></div>
+
+<h4>When snapshots help and when they hurt</h4>
+<p>A snapshot earns its place when the output is large, stable and hard to assert field by field — a rendered fragment, a generated configuration, a formatted report. It becomes a liability when the output is large and unstable, because then every unrelated change rewrites the file and reviewers approve it without reading. A one-line object is better asserted with explicit matchers, which document intent and fail with a message a human can act on. When a snapshot does fail, read the diff before updating; the update key is easy to press and impossible to review.</p>
+
+<h3 id="ch4-coverage" data-toc>4.4 Coverage, filtering and CI</h3>
+<p class="topic-desc">Coverage reports which lines your tests executed. It is a map of what is untested, not a score of quality.</p>
+
+<h4>Generating coverage</h4>
+<p><code>bun test --coverage</code> instruments the run and prints a table with per-file percentages for functions and lines. Add <code>--coverage-reporter=lcov</code> to emit a file your CI dashboard can consume, or <code>text</code> for the terminal table. Thresholds can be enforced so a build fails below a floor. Instrumentation costs time, so run coverage on a slower schedule than the main test job if the suite is large.</p>
+
+<div class="codeWrap"><pre><code># shell
+bun test --coverage
+bun test --coverage --coverage-reporter=lcov
+bun test --coverage --coverage-threshold=80</code></pre></div>
+
+<h4>Filtering and isolating</h4>
+<p><code>--grep</code> filters by test name, and a path argument runs one file; together they make a tight edit-test loop possible without a separate watch process. Tests run in a fresh module registry, so a module-level variable is not shared between test files — a property you should rely on rather than fight. Mark an individual test or file with <code>skip</code> or <code>todo</code> to exclude it from the run while keeping it visible in the report; a silently deleted test is lost knowledge, a skipped one is a recorded debt.</p>
+
+<div class="note">Coverage counts lines executed, not behaviour verified. A test that calls a function and asserts nothing raises the number and protects nothing. Use the report to find untested <em>branches</em>, then write an assertion about each one.</div>
+</section>
+<section class="chapter">
+<h2 id="ch5-apis" data-toc>5 · Built-in APIs</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 5 · Built-in APIs</button><div class="ch-toc-list"><a href="#ch5-io">5.1 Files, streams and the shell</a><a href="#ch5-server">5.2 HTTP and WebSockets with Bun.serve</a><a href="#ch5-sqlite">5.3 SQLite, Postgres, MySQL and Redis</a><a href="#ch5-security">5.4 Hashing, passwords and secrets</a><a href="#ch5-process">5.5 Subprocesses and environment</a></div></div><h3 id="ch5-io" data-toc>5.1 Files, streams and the shell</h3>
+<p class="topic-desc">Bun ships a file API, a streaming model and a cross-platform shell. Together they replace a surprising amount of NPM surface area.</p>
+
+<h4>Bun.file and Bun.write</h4>
+<p><code>Bun.file(path)</code> returns a lazy reference to a file — it does not read anything until you ask. The reference exposes <code>.size</code>, <code>.type</code> (a MIME type inferred from the extension) and the reading methods <code>.text()</code>, <code>.json()</code>, <code>.arrayBuffer()</code>, <code>.bytes()</code> and <code>.stream()</code>. Passing a <code>BunFile</code> where a <code>Response</code> or a <code>fetch</code> body is expected works directly, which is why returning a file from a handler needs no read at all. <code>Bun.write(path, data)</code> is the write side; it accepts a string, a typed array, a <code>Blob</code>, a <code>Response</code> or a <code>BunFile</code>, and because it is implemented at the native layer, copying a file into place does not round-trip through JavaScript memory.</p>
+
+<div class="codeWrap"><pre><code>// read lazily
+const file = Bun.file("./data.json");
+console.log(file.size, file.type);      // size, "application/json"
+const data = await file.json();
+
+// write several shapes
+await Bun.write("./out.txt", "hello");
+await Bun.write("./copy.json", file);   // copy without a JS round-trip
+await Bun.write("./resp.json", await fetch(url));</code></pre></div>
+
+<h4>Streams</h4>
+<p>A <code>ReadableStream</code> from <code>file.stream()</code> is the right way to serve a large file: it is sent in chunks, so memory stays flat regardless of file size. The same interface is what <code>fetch</code> bodies and <code>Bun.serve</code> responses use, so the three compose without conversion. When you need line-by-line processing, wrap the stream in a text decoder and split on newlines rather than reading the whole file — a 2 GB log file that fits in no machine's memory is exactly the case streaming exists for.</p>
+
+<div class="codeWrap"><pre><code>// stream a file to a response, flat memory
+Bun.serve({
+  async fetch() {
+    return new Response(Bun.file("./big.csv"));
+  },
+});
+
+// read line by line
+const stream = Bun.file("./access.log").stream();
+for await (const chunk of stream) {
+  for (const line of new TextDecoder().decode(chunk).split("\n")) {
+    if (line.includes(" 500 ")) console.warn(line);
+  }
+}</code></pre></div>
+
+<h4>The Bun shell</h4>
+<p><code>import { $ } from "bun"</code> gives a tagged template that runs a command and returns its result, with variable interpolation escaped by default so a value from user input cannot become a shell injection. It implements pipelines, <code>&amp;&amp;</code> and <code>||</code> itself rather than delegating to <code>/bin/sh</code>, so the same script runs on Windows, macOS and Linux. Interpolated values may be JavaScript objects: a <code>Response</code>, a <code>Blob</code>, an <code>ArrayBuffer</code> or a <code>BunFile</code> is piped into the command's stdin. This is the API to reach for instead of <code>child_process</code> plus a quoting helper.</p>
+
+<div class="codeWrap"><pre><code>import { $ } from "bun";
+
+// escaped by default: fs cannot treat the value as shell syntax
+const dir = "my files";
+await $`ls ${dir}`;
+
+// pipes, and JS values on stdin
+const resp = await fetch("https://example.com");
+const bytes = await $`cat &lt; ${resp} | wc -c`;
+
+// capture output and throw on non-zero exit
+const { stdout } = await $`git rev-parse HEAD`.quiet();
+console.log(stdout.toString().trim());</code></pre></div>
+
+<div class="tip">The shell escapes interpolations, so <code>await $\`rm -rf ${path}\`</code> cannot be turned into an injection by a hostile <code>path</code>. Do not build command strings by concatenation — that discards the guarantee.</div>
+
+<h3 id="ch5-server" data-toc>5.2 HTTP and WebSockets with Bun.serve</h3>
+<p class="topic-desc"><code>Bun.serve</code> is a web-standard HTTP server built into the runtime. It speaks <code>Request</code> and <code>Response</code>, so handlers are portable to other runtimes.</p>
+
+<h4>A server without a framework</h4>
+<p>The handler receives a standard <code>Request</code> and returns a standard <code>Response</code>. There is no <code>res.end()</code>, no middleware chain and no framework object. Routing is a <code>switch</code> on <code>new URL(req.url).pathname</code> or, from 1.2.3, the declarative <code>routes</code> option. Returning <code>Response.json(data)</code> sets the content type and serialises in one call; returning <code>Bun.file(path)</code> streams a file. Because the interface is the web standard, a handler you write here can be lifted into a worker or a serverless adapter with little change.</p>
+
+<div class="codeWrap"><pre><code>// server.ts
+const server = Bun.serve({
+  port: 3000,
+  async fetch(req) {
+    const url = new URL(req.url);
+
+    if (req.method === "POST" &amp;&amp; url.pathname === "/echo") {
+      return Response.json(await req.json(), { status: 201 });
+    }
+    if (url.pathname === "/") {
+      return new Response("&lt;h1&gt;Hello&lt;/h1&gt;", {
+        headers: { "content-type": "text/html" },
+      });
+    }
+    return new Response("Not found", { status: 404 });
+  },
+});
+
+console.log(`listening on ${server.url}`);</code></pre></div>
+
+<h4>WebSockets</h4>
+<p>Add a <code>websocket</code> option with <code>open</code>, <code>message</code> and <code>close</code> callbacks, then upgrade a request by calling <code>server.upgrade(req)</code> from the handler and returning early. Bun maintains the connection and dispatches to your callbacks; <code>ws.send()</code> writes a message and <code>ws.subscribe(topic)</code> participates in the built-in pub/sub, where <code>server.publish(topic, data)</code> broadcasts to every subscriber. That publish path is native, so a chat fan-out does not need a Redis hop merely to reach sockets attached to the same process.</p>
+
+<div class="codeWrap"><pre><code>Bun.serve({
+  fetch(req, server) {
+    if (server.upgrade(req)) return; // handled
+    return new Response("upgrade failed", { status: 400 });
+  },
+  websocket: {
+    open(ws) {
+      ws.subscribe("room");
+      ws.send("welcome");
+    },
+    message(ws, msg) {
+      ws.publish("room", String(msg));
+    },
+    close(ws) {
+      ws.unsubscribe("room");
+    },
+  },
+});</code></pre></div>
+
+<h4>Cookies, TLS and limits</h4>
+<p>Bun includes a cookie API rather than requiring a parser: <code>Bun.Cookie</code> reads and writes attributes such as <code>HttpOnly</code>, <code>SameSite</code>, <code>Secure</code>, <code>Max-Age</code> and <code>Partitioned</code> explicitly, which keeps those flags visible in review. Pass <code>tls: { cert, key }</code> to serve HTTPS directly, and set <code>maxRequestBodySize</code> to cap uploads so a single request cannot exhaust memory. For a server behind a reverse proxy, remember that client address and scheme come from headers the proxy must set — trust them only from your own proxy.</p>
+
+<div class="codeWrap"><pre><code>Bun.serve({
+  tls: { cert: Bun.file("./cert.pem"), key: Bun.file("./key.pem") },
+  maxRequestBodySize: 10 * 1024 * 1024, // 10 MB
+  fetch(req) {
+    const jar = new Bun.CookieMap(req.headers.get("cookie") ?? "");
+    jar.set("session", "abc", { httpOnly: true, sameSite: "lax", path: "/" });
+    return new Response("ok", { headers: { "Set-Cookie": jar.toSetCookieHeaders() } });
+  },
+});</code></pre></div>
+
+<h3 id="ch5-sqlite" data-toc>5.3 SQLite, Postgres, MySQL and Redis</h3>
+<p class="topic-desc">SQLite is built in as <code>bun:sqlite</code>. Postgres, MySQL and Redis clients are built in too, so a service can talk to a database with no driver dependency.</p>
+
+<h4>bun:sqlite</h4>
+<p><code>import { Database } from "bun:sqlite"</code> gives a synchronous, prepared-statement API with the shape users of better-sqlite3 already know. <code>db.query(sql)</code> prepares once and can be reused; <code>.get()</code> returns one row, <code>.all()</code> returns an array and <code>.run()</code> executes a statement without reading rows. Parameters may be positional (<code>?</code>) or named (<code>$name</code> or <code>:name</code>). Transactions wrap a function so that a throw rolls the whole batch back. BLOB columns arrive as <code>Uint8Array</code>, and <code>.as(MyClass)</code> maps a row onto a class so the result is typed rather than a bare object.</p>
+
+<div class="codeWrap"><pre><code>import { Database } from "bun:sqlite";
+
+const db = new Database("app.sqlite", { create: true });
+db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, data BLOB)");
+
+db.run("INSERT INTO users (email) VALUES ($email)", { $email: "ada@example.com" });
+
+const one = db.query("SELECT * FROM users WHERE id = ?").get(1);
+
+const insert = db.transaction((rows) =&gt; {
+  for (const r of rows) db.run("INSERT INTO users (email) VALUES ($email)", { $email: r.email });
+  return rows.length;
+});
+const count = insert([{ email: "grace@example.com" }, { email: "linus@example.com" }]);
+
+console.log(one, count);</code></pre></div>
+
+<h4>Server databases and Redis</h4>
+<p>Bun also ships clients for Postgres, MySQL and Redis, so a project can drop the matching npm driver. The Postgres and MySQL clients support tagged-template or parameterised queries and connection pooling; the Redis client speaks the protocol directly with commands such as <code>get</code>, <code>set</code> and <code>publish</code>. Because these are built into the runtime, they are resolved by the same module system as everything else, which means no <code>pg</code> native build step and no <code>redis</code> client version to reconcile. The trade-off is portability: code written against these clients does not run on Node, so keep database access behind a thin module of your own if that matters.</p>
+
+<div class="codeWrap"><pre><code>// postgres (built-in)
+import { sql } from "bun";
+const rows = await sql`SELECT id, email FROM users WHERE id = ${id}`;
+
+// redis (built-in)
+import { redis } from "bun";
+await redis.set("counter", "1");
+const value = await redis.get("counter");</code></pre></div>
+
+<div class="note">Availability matters here: the SQLite module has been present for several releases, while the Postgres, MySQL and Redis clients arrived in 1.3. Pin your runtime version if you rely on them.</div>
+
+<h3 id="ch5-security" data-toc>5.4 Hashing, passwords and secrets</h3>
+<p class="topic-desc">Cryptographic primitives you would otherwise fetch from npm are part of the runtime, which removes a dependency and a build step from the security-sensitive part of an application.</p>
+
+<h4>Password hashing</h4>
+<p><code>Bun.password.hash(password)</code> returns a promise for a hash; pass <code>{ algorithm: "argon2id" }</code> (or <code>argon2i</code>/<code>argon2d</code>) with <code>memoryCost</code> and <code>timeCost</code> to tune the work factor, or choose bcrypt for compatibility with an existing database. <code>Bun.password.verify(password, hash)</code> returns a boolean and reads the parameters from the stored hash, so raising the cost later does not invalidate old hashes. Never store a fast hash of a password: the whole point of a slow algorithm is that an attacker with the database must spend the same work you spent at sign-up.</p>
+
+<div class="codeWrap"><pre><code>// hash at sign-up (argon2id by default)
+const hash = await Bun.password.hash("correct horse battery staple", {
+  algorithm: "argon2id",
+  memoryCost: 65536, // KiB
+  timeCost: 2,
+});
+
+// verify at login; parameters come from the hash
+const ok = await Bun.password.verify("correct horse battery staple", hash);</code></pre></div>
+
+<h4>General hashing</h4>
+<p><code>Bun.hash(data)</code> and the named helpers give non-cryptographic digests for caches and ETags, and <code>Bun.CryptoHasher</code> computes cryptographic digests such as SHA-256 incrementally, which is what you want for a large file or a stream. The distinction matters: use a fast hash to key a cache, and a cryptographic digest anywhere an attacker might try to construct a collision.</p>
+
+<div class="codeWrap"><pre><code>// fast, non-cryptographic: cache keys, dedup
+const key = Bun.hash("some cache key"); // number
+
+// cryptographic, incremental: files and streams
+const hasher = new Bun.CryptoHasher("sha256");
+hasher.update("hello ");
+hasher.update("world");
+const digest = hasher.digest("hex"); // string</code></pre></div>
+
+<h4>Random tokens and comparison</h4>
+<p><code>crypto.randomUUID()</code> and <code>crypto.getRandomValues()</code> come from the web platform and are always available; use them for session identifiers and salts, never <code>Math.random()</code>. When comparing a secret you received against one you stored, compare in constant time — the runtime exposes the primitive through the standard WebCrypto surface — so that a timing side channel does not reveal how many leading bytes were correct. These are one-line habits that prevent an entire class of vulnerability.</p>
+
+<h3 id="ch5-process" data-toc>5.5 Subprocesses and environment</h3>
+<p class="topic-desc">For a program you must run rather than a command you compose, <code>Bun.spawn</code> gives a typed handle on the process, its streams and its exit code.</p>
+
+<h4>Spawning and reading</h4>
+<p><code>Bun.spawn(["git", "status"], { cwd, env })</code> returns a <code>Bun.Subprocess</code> with <code>.pid</code>, a promise-like <code>.exited</code> resolving to the exit code, and readable streams on <code>.stdout</code> and <code>.stderr</code>. Reading the streams as they fill is the difference between a tool that works and one that deadlocks: a child that writes more than the pipe buffer holds will block until you drain it, so consume <code>stdout</code> while the process runs rather than awaiting <code>.exited</code> first. <code>Bun.spawnSync</code> is the blocking variant for a short command whose output you need before continuing.</p>
+
+<div class="codeWrap"><pre><code>const proc = Bun.spawn(["git", "log", "--oneline", "-5"], {
+  cwd: process.cwd(),
+  env: { ...process.env, GIT_PAGER: "cat" },
+  stdout: "pipe",
+});
+
+const text = await new Response(proc.stdout).text();
+const code = await proc.exited;
+if (code !== 0) throw new Error(`git failed: ${code}`);
+console.log(text);</code></pre></div>
+
+<h4>Environment variables</h4>
+<p>Bun loads <code>.env</code> automatically, then a file selected by <code>NODE_ENV</code> — <code>.env.production</code>, <code>.env.development</code> or <code>.env.test</code> — and finally the <code>*.local</code> variants. <code>.env.local</code> is skipped when <code>NODE_ENV=test</code>, so a test run does not pick up a developer's local overrides. Real environment variables that already exist in the process are not overwritten, which is what lets a deployment platform inject a secret and have it win over a checked-in default. Read values through <code>Bun.env.NAME</code>, or <code>process.env</code> if you need Node compatibility.</p>
+
+<div class="codeWrap"><pre><code># shell — .env
+DATABASE_URL=postgres://localhost/app
+API_KEY=dev-only</code></pre></div>
+
+<div class="codeWrap"><pre><code>// required secrets should fail loudly at boot
+const key = Bun.env.API_KEY;
+if (!key) throw new Error("API_KEY is required");
+
+// NODE_ENV selects which .env.* file is loaded
+console.log(Bun.env.NODE_ENV ?? "development");</code></pre></div>
+
+<div class="warn">Never commit a real secret in <code>.env</code>. Keep <code>.env</code> in <code>.gitignore</code>, commit a <code>.env.example</code> with placeholder names, and inject production values from the platform that runs the code.</div>
+</section>
+<section class="chapter">
+<h2 id="ch6-compat" data-toc>6 · Node.js compatibility</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 6 · Node.js compatibility</button><div class="ch-toc-list"><a href="#ch6-meaning">6.1 What "Node.js compatible" actually means</a><a href="#ch6-modules">6.2 Built-in modules and the npm ecosystem</a><a href="#ch6-differences">6.3 Where behaviour differs from Node</a><a href="#ch6-check">6.4 Type checking with bun check</a></div></div><h3 id="ch6-meaning" data-toc>6.1 What "Node.js compatible" actually means</h3>
+<p class="topic-desc">Bun aims to run Node.js code and packages without modification. The claim is behavioural, not aspirational, and it is tracked against a specific Node release — so the useful question is not "is it compatible" but "compatible with which Node, and for what".</p>
+
+<h4>Two layers of compatibility</h4>
+<p>There are two separate promises, and conflating them causes most migration surprises. The first is the <em>module</em> layer: <code>node:fs</code>, <code>node:path</code>, <code>node:crypto</code>, <code>node:stream</code>, <code>node:events</code>, <code>node:http</code> and dozens more are implemented, mostly completely, so an import resolves and behaves as documented. The second is the <em>runtime</em> layer: <code>process</code>, <code>Buffer</code>, <code>global</code>, <code>require</code>, <code>__dirname</code> and the rest of the ambient surface that Node injects into every program. Bun implements both, but the module layer is where the completeness is highest, because it is measurable — each built-in has a documented API you can compare against. Compatibility is tracked against Node.js v26 at the time of writing; consult the version table rather than assuming a method exists just because Node added it recently.</p>
+
+<h4>Why the claim is verifiable</h4>
+<p>Node's own test suite is the strongest available oracle, and the compatibility project runs it. That matters because a hand-written compatibility table tests what someone remembered to list, whereas a suite tests what the ecosystem actually does — including the undocumented behaviours packages depend on. When you find a gap, the productive move is to check whether it is a known difference before rewriting code around it, because a workaround for a gap that is about to close is permanent cost for temporary benefit.</p>
+
+<div class="note">Compatibility is versioned in both directions: the Bun version you run and the Node version it targets. Reading "supports Node" without both numbers tells you almost nothing.</div>
+
+<h3 id="ch6-modules" data-toc>6.2 Built-in modules and the npm ecosystem</h3>
+<p class="topic-desc">Most of the npm ecosystem is pure JavaScript and runs the moment the resolver finds it. The exceptions cluster around native addons and engine-specific behaviour.</p>
+
+<h4>Built-ins and interop</h4>
+<p>Node built-ins are available under both their legacy specifier and the <code>node:</code> prefix, so <code>require("fs")</code> and <code>import "node:fs"</code> both work. Bun also implements the interop rules that make mixed module systems function — a CommonJS module imported from ESM gets a default export and named destructuring where the static analysis supports it, and an ESM module required from CJS is handled where possible. These rules are subtle and were historically a source of breakage; the practical guidance is to write ESM in new code and let the runtime bridge the older packages. Prefer <code>node:</code>-prefixed imports in files you write, because they are unambiguous and portable.</p>
+
+<div class="codeWrap"><pre><code>// both spellings resolve
+import { readFileSync } from "node:fs";
+const fs = require("node:fs");
+
+// CJS package consumed from ESM
+import express from "express"; // default interop
+import { Router } from "express"; // named, when statically analysable</code></pre></div>
+
+<h4>Native addons</h4>
+<p>A package with a compiled addon — a <code>.node</code> file or a node-gyp build step — is the main place compatibility can fail, because the addon was compiled against V8's ABI and Bun runs JavaScriptCore. Packages that ship prebuilt binaries for your platform, or that use N-API, generally work. Packages that compile against V8 internals at install time do not, and no amount of resolver work fixes that. When a dependency fails to load with a symbol or ABI error, that is the diagnosis: it is a native addon, and the choice is a pure-JavaScript alternative or running that part under Node.</p>
+
+<div class="warn">A dependency whose install step compiles code needs to be trusted before Bun will run that script. A "cannot find binding" error after a fresh install is usually an untrusted build script rather than a missing prebuild — check the trusted list before reaching for a different package.</div>
+
+<h3 id="ch6-differences" data-toc>6.3 Where behaviour differs from Node</h3>
+<p class="topic-desc">The most useful part of a compatibility story is its boundary. These are the places where code that works on Node may behave differently on Bun, and why.</p>
+
+<h4>Engine and defaults</h4>
+<p>JavaScriptCore versus V8 is the root of most subtle differences. Specification-compliant code behaves the same; code that relied on a V8 quirk does not. Beyond the engine, Bun changes several defaults deliberately: it auto-loads <code>.env</code>, it runs TypeScript without a transform step, it resolves dependencies more permissively (installing peers and optional dependencies in one pass), and its HTTP server is a web-standard <code>Request</code>/<code>Response</code> API rather than Node's <code>IncomingMessage</code>/<code>ServerResponse</code>. None of these break Node code, because <code>node:http</code> still exists, but they change what idiomatic code looks like.</p>
+
+<table>
+<thead><tr><th>Area</th><th>Node.js</th><th>Bun</th></tr></thead>
+<tbody>
+<tr><td>Engine</td><td>V8</td><td>JavaScriptCore</td></tr>
+<tr><td>TypeScript</td><td>external step</td><td>runs directly (no type-check)</td></tr>
+<tr><td>Env files</td><td>library or <code>--env-file</code></td><td>auto-loaded, with precedence</td></tr>
+<tr><td>HTTP server</td><td><code>node:http</code></td><td><code>Bun.serve</code> (web standard) plus <code>node:http</code></td></tr>
+<tr><td>Peers/optional deps</td><td>install with flags</td><td>installed by default</td></tr>
+<tr><td>Dependency build scripts</td><td>run by default</td><td>run only if trusted</td></tr>
+</tbody>
+</table>
+
+<h4>Diagnosing a difference</h4>
+<p>When a file behaves differently under the two runtimes, reduce it to the smallest reproduction and check the compatibility table for that specific API before assuming the runtime is wrong. Then check the version: a difference documented for an older Bun may already be closed, and a difference in a newer Node may simply not be implemented yet. Keep a small script that runs your critical paths under both runtimes in CI if the code must support both — that is a stronger guarantee than any table, and it is cheap because the runtimes can coexist on one machine.</p>
+
+<h3 id="ch6-check" data-toc>6.4 Type checking with bun check</h3>
+<p class="topic-desc">Running TypeScript without checking it is fast and dangerous. Bun 1.4 added <code>bun check</code>, a built-in type checker aimed at closing that gap.</p>
+
+<h4>Why a checker is still needed</h4>
+<p>Bun strips types; it does not verify them. A file with a type error runs fine until the wrong value reaches a function that assumed otherwise, at which point the failure is a runtime error with a misleading stack. That is a deliberate trade — parsing and erasing types is what makes start-up fast — but it means the type system is only enforced if some tool enforces it. Editors do this live for open files, which is exactly the coverage you do not have in CI, where nobody has the file open.</p>
+
+<div class="codeWrap"><pre><code># shell — type-check the project
+bun check
+bun run --check src/index.ts   # check before running
+bun build ./src/index.ts --check --outdir dist</code></pre></div>
+
+<h4>Fitting it into a pipeline</h4>
+<p>Because <code>--check</code> can be attached to <code>bun run</code> and <code>bun build</code>, a check does not need its own script entry and the checked output is the output that ships. On large projects the built-in checker is faster than invoking the TypeScript compiler, which matters when a check runs on every commit. Keep the editor's TypeScript integration for the interactive feedback it gives — hover types, go-to-definition, quick fixes — and let <code>bun check</code> be the gate in CI. The two read the same <code>tsconfig.json</code>, so they agree about the code and disagree only about speed.</p>
+
+<div class="tip">If you already run <code>tsc --noEmit</code> in CI, <code>bun check</code> is a drop-in replacement for the gate; keep <code>tsc</code> installed if you also publish declaration files, since emitting <code>.d.ts</code> is a separate job from checking.</div>
+</section>
+<section class="chapter">
+<h2 id="ch7-migrate" data-toc>7 · Migrating from Node.js</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 7 · Migrating from Node.js</button><div class="ch-toc-list"><a href="#ch7-paths">7.1 Choosing a migration path</a><a href="#ch7-failures">7.2 Common failure modes</a><a href="#ch7-server">7.3 Migrating a server</a></div></div><h3 id="ch7-paths" data-toc>7.1 Choosing a migration path</h3>
+<p class="topic-desc">Migration is not one decision. The four Bun capabilities can be adopted independently, and the right first step is usually the one with the smallest blast radius.</p>
+
+<h4>Three levels of adoption</h4>
+<p>The least invasive step is to keep Node as the runtime and adopt only the package manager: replace <code>npm install</code> with <code>bun install</code> and stop there. It is fast, reversible, and touches CI configuration rather than application code. The middle step is to run scripts and tests under Bun while keeping the long-lived server on Node — <code>bun test</code> and <code>--bun</code> for tooling, Node for production. The deepest step is to run the application itself on Bun, which is where the built-in HTTP server and the database clients become available and where the compatibility surface is exercised hardest. There is no prize for reaching the deepest step fastest; each level has a measurable benefit and an independent rollback.</p>
+
+<div class="codeWrap"><pre><code># level 1 — package manager only
+bun install
+
+# level 2 — Bun runs the tooling, Node runs the app
+bun test
+bun --bun run eslint .
+
+# level 3 — Bun runs the app
+bun run src/server.ts</code></pre></div>
+
+<h4>Ordering the work</h4>
+<p>Start with a project whose test suite is green on Node, because that is your safety net. Move the package manager first and confirm CI still passes. Then run the suite under <code>bun test</code>; failures there are usually Jest-API gaps or a reliance on a Node-only global, and each is a small, contained fix. Only then change the runtime for the application, and do it behind a branch with the Node path still available. A migration that changes all four things at once cannot tell you which change broke the build.</p>
+
+<h3 id="ch7-failures" data-toc>7.2 Common failure modes</h3>
+<p class="topic-desc">Almost every migration problem falls into one of a handful of categories. Knowing them turns a baffling error into a two-minute fix.</p>
+
+<h4>Native addons and build scripts</h4>
+<p>The first category is compiled dependencies, covered earlier: a V8-ABI addon cannot load, and a dependency whose install script was skipped cannot build. Check the trusted list first. The second is environment assumptions — a Dockerfile that copied <code>package-lock.json</code> and ran <code>npm ci</code> now has no lockfile the new tool recognises, and a script that assumed <code>NODE_ENV</code> was unset now picks up an auto-loaded <code>.env</code>. Both are configuration, not code.</p>
+
+<div class="codeWrap"><pre><code># a Node-flavoured Dockerfile
+FROM node:22-slim
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+# the Bun equivalent
+FROM oven/bun:1
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production</code></pre></div>
+
+<h4>Test-runner and API gaps</h4>
+<p>The third category is the test runner: a Jest matcher that Bun has not implemented, a <code>jest.mock</code> call with a factory that behaves slightly differently, or a snapshot format difference. Each has a direct translation, and the failures are loud. The fourth is the HTTP layer: code that reached into <code>req.socket</code>, called <code>res.writeHead()</code> or relied on <code>process.nextTick</code> ordering may need adjustment if it moves off <code>node:http</code> onto <code>Bun.serve</code>. Keeping the framework's own server (Express, Fastify) on <code>node:http</code> and only changing the runtime is the low-risk route until you are ready to adopt the web-standard handler.</p>
+
+<div class="codeWrap"><pre><code>// Node style — still works, via node:http
+import { createServer } from "node:http";
+createServer((req, res) =&gt; {
+  res.writeHead(200, { "content-type": "text/plain" });
+  res.end("ok");
+}).listen(3000);</code></pre></div>
+
+<div class="tip">Keep a branch that runs the old command. If the migration stalls, <code>git switch</code> costs a second, whereas reconstructing the working Node configuration costs an afternoon.</div>
+
+<h3 id="ch7-server" data-toc>7.3 Migrating a server</h3>
+<p class="topic-desc">A web server is the hardest thing to migrate and the most valuable, because it is where the built-in APIs replace the most dependencies.</p>
+
+<h4>From framework to handler, or not</h4>
+<p>You do not have to abandon Express, Fastify or Koa to run on Bun — they run on <code>node:http</code>, which Bun implements, and many teams simply change the runtime and keep the framework. Migrating to <code>Bun.serve</code> is a separate, optional step that trades the framework's middleware ecosystem for a web-standard handler and a much smaller dependency tree. A useful middle path is to adopt <code>Bun.serve</code> for new endpoints while the existing framework serves the old ones, since both can share the same process and port only if one delegates to the other.</p>
+
+<div class="codeWrap"><pre><code>// framework on Bun — change nothing but the runtime
+import express from "express";
+const app = express();
+app.get("/health", (_req, res) =&gt; res.json({ ok: true }));
+app.listen(3000);</code></pre></div>
+
+<h4>What you gain and what you rewrite</h4>
+<p>Adopting <code>Bun.serve</code> replaces body-parsing middleware with <code>await req.json()</code>, replaces <code>res.json()</code> with <code>Response.json()</code>, and replaces a static-file middleware with <code>Bun.file()</code>. In exchange, middleware that assumed Node's request object — session stores, logging middleware, passport strategies — must be re-evaluated, because a standard <code>Request</code> does not carry the extra properties those packages attach. Migrate endpoint by endpoint behind a test that asserts the response body and status, and move the static files and health check first: they are the least entangled and the quickest to prove.</p>
+
+<table>
+<thead><tr><th>Concern</th><th>Node / Express</th><th>Bun.serve</th></tr></thead>
+<tbody>
+<tr><td>Body</td><td><code>body-parser</code></td><td><code>await req.json()</code></td></tr>
+<tr><td>Response</td><td><code>res.json(obj)</code></td><td><code>Response.json(obj)</code></td></tr>
+<tr><td>Static files</td><td><code>express.static</code></td><td><code>Bun.file(path)</code></td></tr>
+<tr><td>Routing</td><td>router + middleware</td><td><code>routes</code> map</td></tr>
+<tr><td>Streaming</td><td><code>res.write()</code></td><td><code>ReadableStream</code></td></tr>
+</tbody>
+</table>
+
+<div class="note">Measure before and after. A migration that removes twenty dependencies but doubles p99 latency is a net loss; capture a baseline on the Node path so the comparison is a number rather than an impression.</div>
+</section>
+<section class="chapter">
+<h2 id="ch8-production" data-toc>8 · Production and deployment</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 8 · Production and deployment</button><div class="ch-toc-list"><a href="#ch8-build">8.1 Building for production</a><a href="#ch8-containers">8.2 Containers and CI</a><a href="#ch8-ops">8.3 Operations: memory, signals and observability</a></div></div><h3 id="ch8-build" data-toc>8.1 Building for production</h3>
+<p class="topic-desc">Production code should be built once, reproducibly, and run as an artifact — not bundled on the server at start-up.</p>
+
+<h4>The build step</h4>
+<p>Bundle for the target the code actually runs on, set <code>NODE_ENV=production</code>, and fail the build on the first error rather than writing partial output. For a Bun server, <code>--target bun</code> keeps built-ins external and produces a bundle that starts fast; for a library consumed by others, <code>--target node</code> avoids assuming Bun. Emit a source map for the server unless it would leak source you do not want exposed, because an unreadable production stack trace costs more debugging time than the map costs bytes. The build should be a script, not a paragraph in a wiki.</p>
+
+<div class="codeWrap"><pre><code>// build.ts — fail fast, write atomically
+const result = await Bun.build({
+  entrypoints: ["./src/server.ts"],
+  outdir: "./dist",
+  target: "bun",
+  minify: true,
+  sourcemap: "linked",
+  define: { "process.env.NODE_ENV": JSON.stringify("production") },
+});
+
+if (!result.success) {
+  console.error(result.logs);
+  process.exit(1);
+}</code></pre></div>
+
+<h4>Compiled binaries as artifacts</h4>
+<p>For a CLI, <code>--compile</code> is the whole deployment: one file, no runtime, no <code>node_modules</code>. For a server, a compiled binary is possible but less compelling, because the container already provides isolation and you usually want the ability to patch without a rebuild. If you do compile a server, treat the binary as an immutable release artifact, tag it with the runtime version, and rebuild — never edit in place.</p>
+
+<h3 id="ch8-containers" data-toc>8.2 Containers and CI</h3>
+<p class="topic-desc">Bun publishes an official image, and its install is fast enough that a multi-stage build is straightforward. The details that matter are the lockfile and the production flag.</p>
+
+<h4>A reproducible image</h4>
+<p>Copy the manifest and the lockfile first, install against the frozen lockfile, and only then copy the source. That ordering is what lets Docker cache the dependency layer so a source-only change does not re-install the world. <code>--frozen-lockfile</code> guarantees the image matches the reviewed graph, and <code>--production</code> keeps development dependencies — test runners, type definitions, linters — out of the shipped layer.</p>
+
+<div class="codeWrap"><pre><code># Dockerfile
+FROM oven/bun:1 AS build
+WORKDIR /app
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+COPY . .
+RUN bun run build
+
+FROM oven/bun:1-slim
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production
+EXPOSE 3000
+CMD ["bun", "run", "dist/server.js"]</code></pre></div>
+
+<h4>CI structure</h4>
+<p>A useful pipeline installs with a frozen lockfile, runs the type check, runs the tests with coverage, and builds the artifact — in that order, so the cheapest failure comes first. Pin the Bun version in the workflow rather than installing latest, because a release mid-sprint is not a change anyone reviewed. Cache the install directory keyed on the lockfile hash; Bun's cache is content-addressed, so the key is stable as long as the lockfile is.</p>
+
+<div class="codeWrap"><pre><code># .github/workflows/ci.yml
+steps:
+  - uses: actions/checkout@v4
+  - uses: oven-sh/setup-bun@v2
+    with:
+      bun-version: 1.4.3
+  - run: bun install --frozen-lockfile
+  - run: bun check
+  - run: bun test --coverage
+  - run: bun run build</code></pre></div>
+
+<div class="tip">Run the production build in CI even if the deploy pipeline builds again. It catches a broken build at the point where a reviewer is looking, rather than at the point where a deploy is half-finished.</div>
+
+<h3 id="ch8-ops" data-toc>8.3 Operations: memory, signals and observability</h3>
+<p class="topic-desc">A runtime in production is judged by how it behaves under pressure and in a crash. Bun exposes the knobs and the signals you need.</p>
+
+<h4>Memory and process limits</h4>
+<p>Useful knobs include a heap limit for the JavaScript heap and a maximum body size on the server, both of which convert an unbounded failure into a bounded, observable one. A server process should run under a supervisor or an orchestrator that restarts it; state that matters belongs in a database or Redis, not in a module-level variable, because a restart is not an event you can forbid. Watch resident memory over time: a slow climb is a leak, and the heap snapshot from the inspector is how you find it.</p>
+
+<div class="codeWrap"><pre><code># cap the heap so a leak fails early and visibly
+BUN_JSC_forceRAMSize=536870912 bun run dist/server.js</code></pre></div>
+
+<h4>Signals and graceful shutdown</h4>
+<p>An orchestrator stops a container by sending <code>SIGTERM</code> and killing it after a grace period. The process must, on that signal, stop accepting new connections, finish in-flight requests, close pool connections and exit — otherwise every deploy drops a request. Bun reports the running server's pending request count, so a shutdown routine can drain rather than guess. Keep the handler short and idempotent: a shutdown path that itself hangs is worse than no handler, because it turns a rolling deploy into an outage.</p>
+
+<div class="codeWrap"><pre><code>const server = Bun.serve({ port: 3000, fetch: handle });
+
+async function shutdown() {
+  await server.stop();          // stop accepting, drain in-flight
+  await pool?.close();          // release resources
+  process.exit(0);
+}
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);</code></pre></div>
+
+<h4>Logging and health</h4>
+<p>Write structured logs to stdout and let the platform collect them; the terminal pretty-printer is for development. Expose two endpoints rather than one: a liveness check that reports whether the process is running, and a readiness check that reports whether it can serve — a database connection, a required dependency. An orchestrator that treats a failed dependency as a dead process will restart-loop a healthy service, so keep the two signals distinct. Log the request identifier, the status and the duration, and nothing else you cannot query later.</p>
+
+<div class="warn">Never log a request body, a token or a password. Structured logs are copied to systems with different access controls than production, and a secret in a log is a secret with a much longer life and a much wider audience.</div>
+</section>
+<section class="chapter">
+<h2 id="ch9-appendix" data-toc>9 · Appendix</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 9 · Appendix</button><div class="ch-toc-list"><a href="#ch9-cli">9.1 Command-line reference</a><a href="#ch9-compare">9.2 Bun and Node at a glance</a><a href="#ch9-next">9.3 Where to go next</a></div></div><h3 id="ch9-cli" data-toc>9.1 Command-line reference</h3>
+<p class="topic-desc">The commands you reach for most often, grouped by what they do. All of them accept <code>--help</code>.</p>
+
+<h4>Runtime and project</h4>
+<div class="codeWrap"><pre><code># shell
+bun --version                 # print the runtime version
+bun --revision                # print the exact build revision
+bun upgrade                   # update the binary in place
+bun init                      # scaffold a new project
+bun run &lt;script|file&gt;         # run a script, a file or a binary
+bun --bun run &lt;script&gt;        # force the Bun runtime inside a script
+bun --watch &lt;file&gt;            # restart on file change
+bun --hot &lt;file&gt;              # hot reload without restart
+bun --inspect &lt;file&gt;          # open the inspector
+bun check                     # type-check the project</code></pre></div>
+
+<h4>Packages, build and test</h4>
+<div class="codeWrap"><pre><code># shell
+bun install [--frozen-lockfile] [--production]
+bun add &lt;pkgs&gt; | bun add -d &lt;pkgs&gt; | bun remove &lt;pkgs&gt;
+bun update [--latest]
+bun pm ls --global
+bunx &lt;package&gt; [args]
+
+bun build &lt;entry&gt; --outdir dist --target bun --minify
+bun build &lt;entry&gt; --compile --outfile mycli
+bun test [&lt;path&gt;] [--grep &lt;str&gt;] [--coverage] [--watch]</code></pre></div>
+
+<h3 id="ch9-compare" data-toc>9.2 Bun and Node at a glance</h3>
+<p class="topic-desc">A summary for choosing between them. Neither column is universally better; the question is which trade-offs your project can absorb.</p>
+
+<table>
+<thead><tr><th>Dimension</th><th>Node.js</th><th>Bun</th></tr></thead>
+<tbody>
+<tr><td>Engine</td><td>V8</td><td>JavaScriptCore</td></tr>
+<tr><td>Language</td><td>JS, TS via a step</td><td>JS, TS and JSX directly</td></tr>
+<tr><td>Package manager</td><td>npm (separate)</td><td>built in</td></tr>
+<tr><td>Bundler</td><td>external</td><td>built in</td></tr>
+<tr><td>Test runner</td><td><code>node:test</code> or external</td><td>built in, Jest-compatible</td></tr>
+<tr><td>Native addons</td><td>broad support</td><td>N-API and prebuilds only</td></tr>
+<tr><td>Ecosystem maturity</td><td>longest track record</td><td>rapid, still closing gaps</td></tr>
+<tr><td>Best fit</td><td>maximum compatibility</td><td>new projects, tooling, speed</td></tr>
+</tbody>
+</table>
+
+<h4>How to decide</h4>
+<p>Choose Node when you depend on a native addon that only builds against V8, when a package's support matrix explicitly excludes Bun, or when your organisation already has hardened Node operations and no appetite for a new runtime. Choose Bun when you are starting fresh, when start-up latency matters — CLIs, serverless handlers, test suites — or when you want the package manager, bundler and test runner to be one install and one version. The honest answer for most existing applications is a hybrid: Bun for tooling and new services, Node where an ABI-bound dependency holds the line.</p>
+
+<h3 id="ch9-next" data-toc>9.3 Where to go next</h3>
+<p class="topic-desc">The runtime is large enough that a guide this size is a map, not the territory. These are the edges worth exploring next.</p>
+
+<h4>Adjacent guides</h4>
+<p>Several guides in this library pair with this one. <code>typescript.html</code> covers the type system that Bun erases rather than checks; <code>javascript.html</code> covers the language and the module semantics that the compatibility chapter refers to; <code>react.html</code>, <code>svelte.html</code> and <code>vuejs.html</code> cover the front-ends that <code>bun build</code> and the HTML-import dev server are typically pointed at; and <code>api-design.html</code> covers the HTTP concerns that <code>Bun.serve</code> makes concrete. Read the runtime chapter beside a real project rather than in isolation.</p>
+
+<h4>A practice sequence</h4>
+<p>Work through the topics in the order they appear here, and after each one change something real. Install Bun and pin the version in one project's CI. Swap its install command and confirm the lockfile is the only file that changed. Run its tests under <code>bun test</code> and fix what breaks. Then, in a scratch directory, build a small server with <code>Bun.serve</code>, a SQLite table and a test — the whole stack with no npm dependencies. That exercise touches every chapter of this guide at once, and it usually makes clear which of Bun's four capabilities you want to adopt first.</p>
+
+<div class="ex">The quickest way to judge whether Bun fits a codebase is to run <code>bun install</code> and <code>bun test</code> on it and read the output. Dependency-only adoption is reversible in a single command, and the failures it exposes are the failures that matter.</div>
+</section>
+</main>
+
+<button id="toTop" class="to-top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Bun.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

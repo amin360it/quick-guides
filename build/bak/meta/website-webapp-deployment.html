@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website and Web App Deployment - From Build to Production</title>
+<meta name="description" content="Website and Web App Deployment - static hosting, CI pipelines, domains, HTTPS, CDNs, and server rollouts.">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/website-webapp-deployment.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Website and Web App Deployment - From Build to Production">
+<meta property="og:description" content="Website and Web App Deployment - static hosting, CI pipelines, domains, HTTPS, CDNs, and server rollouts.">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/website-webapp-deployment.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-08">
+<meta property="article:section" content="Web Basics">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Website and Web App Deployment - From Build to Production">
+<meta name="twitter:description" content="Website and Web App Deployment - static hosting, CI pipelines, domains, HTTPS, CDNs, and server rollouts.">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/website-webapp-deployment.html#article","headline":"Website and Web App Deployment - From Build to Production","name":"Website and Web App Deployment - From Build to Production","description":"Website and Web App Deployment - static hosting, CI pipelines, domains, HTTPS, CDNs, and server rollouts.","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/website-webapp-deployment.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/website-webapp-deployment.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-08","articleSection":"Web Basics","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Web Basics","item":"https://amin360it.github.io/quick-guides/index.html#cat-web-basics"},{"@type":"ListItem","position":3,"name":"Website and Web App Deployment - From Build to Production","item":"https://amin360it.github.io/quick-guides/website-webapp-deployment.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script>
+</head>
+<body>
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Website and Web App Deployment</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 ▸ Orientation — The Deployment Landscape</a><ul>
+<li><a href="#ch1-1" data-target="ch1-1">1.1 Environments: dev, staging and production</a></li>
+<li><a href="#ch1-2" data-target="ch1-2">1.2 Shipping vs hosting</a></li>
+<li><a href="#ch1-3" data-target="ch1-3">1.3 How this guide is organised</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 ▸ Builds and Artifacts</a><ul>
+<li><a href="#ch2-1" data-target="ch2-1">2.1 Build pipelines</a></li>
+<li><a href="#ch2-2" data-target="ch2-2">2.2 Asset bundling and output hygiene</a></li>
+<li><a href="#ch2-3" data-target="ch2-3">2.3 Environment variables and configuration</a></li>
+<li><a href="#ch2-4" data-target="ch2-4">2.4 Versioning and reproducible builds</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 ▸ Hosting Platforms</a><ul>
+<li><a href="#ch3-1" data-target="ch3-1">3.1 Static hosting</a></li>
+<li><a href="#ch3-2" data-target="ch3-2">3.2 PaaS</a></li>
+<li><a href="#ch3-3" data-target="ch3-3">3.3 VPS: a whole machine</a></li>
+<li><a href="#ch3-4" data-target="ch3-4">3.4 Serverless and containers</a></li>
+<li><a href="#ch3-5" data-target="ch3-5">3.5 Choosing between them</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 ▸ Deployment Strategies</a><ul>
+<li><a href="#ch4-1" data-target="ch4-1">4.1 Manual vs scripted vs CI/CD</a></li>
+<li><a href="#ch4-2" data-target="ch4-2">4.2 Blue-green and canary releases</a></li>
+<li><a href="#ch4-3" data-target="ch4-3">4.3 Rolling updates and zero-downtime deploys</a></li>
+<li><a href="#ch4-4" data-target="ch4-4">4.4 Rollbacks</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 ▸ Domains, DNS and SSL</a><ul>
+<li><a href="#ch5-1" data-target="ch5-1">5.1 Registrars and domain basics</a></li>
+<li><a href="#ch5-2" data-target="ch5-2">5.2 DNS records: name to address</a></li>
+<li><a href="#ch5-3" data-target="ch5-3">5.3 HTTPS and TLS</a></li>
+<li><a href="#ch5-4" data-target="ch5-4">5.4 Redirects and the www question</a></li>
+<li><a href="#ch5-5" data-target="ch5-5">5.5 Email DNS: SPF, DKIM and DMARC</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 ▸ Monitoring and Observability</a><ul>
+<li><a href="#ch6-1" data-target="ch6-1">6.1 Uptime checks</a></li>
+<li><a href="#ch6-2" data-target="ch6-2">6.2 Logs</a></li>
+<li><a href="#ch6-3" data-target="ch6-3">6.3 Metrics</a></li>
+<li><a href="#ch6-4" data-target="ch6-4">6.4 Error tracking and alerting</a></li>
+<li><a href="#ch6-5" data-target="ch6-5">6.5 Dashboards and incident response</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 ▸ Scale, Security and Disaster Recovery</a><ul>
+<li><a href="#ch7-1" data-target="ch7-1">7.1 Caching layers</a></li>
+<li><a href="#ch7-2" data-target="ch7-2">7.2 Load balancing</a></li>
+<li><a href="#ch7-3" data-target="ch7-3">7.3 Auto-scaling</a></li>
+<li><a href="#ch7-4" data-target="ch7-4">7.4 Backups and restore drills</a></li>
+<li><a href="#ch7-5" data-target="ch7-5">7.5 Security hygiene in production</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+<h1 class="am-band">
+    <span class="am-band-t">Website and Web App Deployment</span>
+    <span class="am-band-s">7 chapters &middot; 38 topics &middot; 68 code samples &middot; works offline</span>
+  </h1>
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation — The Deployment Landscape</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 ▸ Orientation — The Deployment Landscape</button><div class="ch-toc-list"><a href="#ch1-1">1.1 Environments: dev, staging and production</a><a href="#ch1-2">1.2 Shipping vs hosting</a><a href="#ch1-3">1.3 How this guide is organised</a></div></div>
+<p class="topic-desc">Deployment is the final step that turns code into a live website or web app. This chapter maps the landscape you are moving through — dev, staging and production environments, the difference between shipping and hosting, and how the seven-chapter arc of this guide is organised — then hands you the tool stack you will use throughout.</p>
+
+<h3 id="ch1-1" data-toc>1.1 Environments: dev, staging and production</h3>
+<p class="topic-desc">Code does not jump from a laptop to the public internet; it moves through environments, each standing for a different audience and a different level of risk. Matching the environment to its job is the first habit of a safe deployment workflow.</p>
+<h4 id="ch1-1-map">The standard three-environment chain</h4>
+<p>Dev is where you work: fast iteration, seeded data, no real users. Staging is a production-shaped copy that real traffic does not touch — its whole job is to catch environment-specific failures — wrong config, missing assets, a version mismatch — before they reach the public. Production is what the public sees, and its quality bar is final: it must stay up, and every change to it is risk-managed. The chain exists so the risk concentrates in the cheapest place to catch it.</p>
+<div class="codeWrap"><pre><code># environments.yml - what each environment is for
+environments:
+  dev:
+    purpose:   local work-in-progress
+    audience:  the developer
+    data:      seeded fixtures, no real user data
+    quality:   whatever passes your own eyes
+  staging:
+    purpose:   last check before release
+    audience:  the team, testers, the client
+    data:      anonymised copy of production
+    quality:   clean installs, full smoke tests
+  production:
+    purpose:   serves real users
+    audience:  everyone
+    data:      real, backed up, encrypted at rest
+    quality:   must stay up; changes are risk-managed
+</code></pre></div>
+<h4 id="ch1-1-promote">Promotion: changes move forward, never back</h4>
+<p>A change that works in dev but fails in staging tells you something; a change that works in staging and fails in production tells you something else. Promote in one direction — dev to staging to production — and deploy the identical artifact at each step. A "hot-fix" that skips staging is an untested change wearing a production badge, and a production box edited by hand is a change the pipeline has never seen. The artifact you verify in staging is the artifact you ship.</p>
+<div class="codeWrap"><pre><code># promote.sh - build once, deploy the same artifact everywhere
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP=myapp
+VER=1.4.0
+ARTIFACT=dist/myapp-$VER.tar.gz
+
+npm ci
+npm run build
+tar czf "$ARTIFACT" dist/
+
+scp "$ARTIFACT" staging.example.com:/srv/myapp/releases/
+ssh staging.example.com "./deploy.sh $VER"
+# staging passes - same tarball, same command, production
+scp "$ARTIFACT" prod.example.com:/srv/myapp/releases/
+ssh prod.example.com "./deploy.sh $VER"
+</code></pre></div>
+<h4 id="ch1-1-parity">Parity: environments should differ only in config</h4>
+<p>The gap between staging and production should be a configuration value, not a different architecture. The classic failure: production sits behind a CDN and a load balancer while staging is a single naked server — so the caching bug, the missing header, the X-Forwarded-For assumption, all appear only in production, at the worst possible moment. Run the same smoke checks against every environment using the same script with a different URL; a small script beats a large apology.</p>
+<div class="codeWrap"><pre><code># smoke.sh - the same checks, run against any environment
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="${1:?usage: smoke.sh https://staging.example.com}"
+
+curl -fsS -o /dev/null -w "home %{http_code}\n" "$BASE/"
+curl -fsS -o /dev/null -w "api  %{http_code}\n" "$BASE/api/health"
+curl -fsS "$BASE/" | grep -q "&lt;title&gt;MyApp&lt;/title&gt;"
+echo "smoke passed against $BASE"
+</code></pre></div>
+<div class="note"><p>If you cannot afford a close staging, do not accept drift silently — automate the checks you would run by hand. A checked gap is a known gap; an unchecked one is a surprise.</p></div>
+
+<h3 id="ch1-2" data-toc>1.2 Shipping vs hosting</h3>
+<p class="topic-desc">Two ideas get conflated in every deployment discussion. Shipping is the act of turning a finished release into something that exists somewhere; hosting is the ongoing job of making that thing available, fast and secure. They are separable decisions, and keeping them separate is what makes a deployment portable.</p>
+<h4 id="ch1-2-shipping">Shipping: delivering a release</h4>
+<p>Shipping happens at a point in time: you tag a commit, upload an artifact, or push a container image. A release is a specific, recorded set of code, and shipping puts it somewhere. Record both ends — the git tag at the commit and the version inside the artifact — because that pair is your audit trail. "Which version is running?" should always have a two-step answer that ends at a commit.</p>
+<div class="codeWrap"><pre><code># shipping a release is a transfer, and it is recorded
+git tag -a v1.4.0 -m "release 1.4.0: ssr cache fix"
+git push origin v1.4.0
+# the artifact records the exact source it came from
+echo "v1.4.0" &gt; dist/VERSION
+tar czf myapp-1.4.0.tar.gz dist
+sha256sum myapp-1.4.0.tar.gz
+</code></pre></div>
+<h4 id="ch1-2-hosting">Hosting: keeping it available</h4>
+<p>Hosting is a state, not an event: serving files, running processes, renewing certificates, keeping the machine patched — a set of jobs that never stops after deploy day. The same release can be hosted many ways: a tarball on a static CDN, a container in a PaaS, a process on a VPS. The mistake is coupling the two — "we use platform X, so our release format is X's format" — when a standard build artifact would serve anywhere.</p>
+<div class="codeWrap"><pre><code># one release artifact, two hosting choices
+# static: upload the tarball and let the CDN serve it
+aws s3 cp myapp-1.4.0.tar.gz s3://myapp-releases/
+# container: run it in a PaaS or from your own registry
+docker tag myapp:1.4.0 registry.example.com/myapp:1.4.0
+docker push registry.example.com/myapp:1.4.0
+</code></pre></div>
+
+<h3 id="ch1-3" data-toc>1.3 How this guide is organised</h3>
+<p class="topic-desc">Seven chapters, taken in order, take you from a source tree to a site that survives real traffic. Chapter 2 builds the pipeline and the artifacts; chapter 3 picks a host; chapter 4 decides how releases land; chapters 5 to 7 cover domains and DNS, monitoring, and finally scale and safety. The older three-chapter edition's material — build scripts, Docker, static-versus-server hosting, CDNs, CI/CD — has been folded into this arc rather than dropped.</p>
+<h4 id="ch1-3-arc">The seven-chapter arc</h4>
+<p>Each chapter is a decision boundary: you cannot pick a deployment strategy before you know what an artifact is, and you cannot monitor what you have not deployed. Read in order if you are starting from scratch; jump to the chapter that names the problem you have — the content is written so that each section stands alone. Where a decision from an earlier chapter matters, it is said again in one line rather than assumed.</p>
+<div class="codeWrap"><pre><code># This guide in seven chapters
+# 1 orientation  environments, shipping vs hosting, tooling
+# 2 builds       pipelines, bundling, config, artifacts
+# 3 hosting      static, PaaS, VPS, serverless, containers
+# 4 strategies   manual, CI/CD, blue-green, canary, rollback
+# 5 domains      DNS records, HTTPS, redirects, email DNS
+# 6 monitoring   uptime, logs, metrics, alerts, incidents
+# 7 scale        caching, load balancing, backups, security
+</code></pre></div>
+<h4 id="ch1-3-mindset">The mindset: deploy early, deploy often</h4>
+<p>Deploying to production on the last day is risky; it turns an entire project into one giant, unrehearsed change. Deploy frequently, even with small changes — a small diff is easy to reason about, quick to roll back, and rarely needs a migration dance. A working site on a subdomain beats a polished draft on localhost: the pipeline, the DNS, the certificates and the deployment script all get exercised months before they are load-bearing.</p>
+<div class="codeWrap"><pre><code># deploy-checklist.txt - run before every production release
+# [ ] pushed to main, CI green on the exact commit
+# [ ] artifact built from that commit, hash recorded
+# [ ] staging smoke test passed (smoke.sh)
+# [ ] migration reviewed; a backup was taken before it
+# [ ] secrets exist in production config, none in the repo
+# [ ] release tagged, rollback plan written down
+# [ ] deploy.sh is the one approved way to deploy
+</code></pre></div>
+<h4 id="ch1-3-tools">Tools you will use throughout</h4>
+<p>GitHub Actions, Netlify, Render, Vercel, Docker, and any DNS provider. All free for personal projects — no paid service is required for any chapter. Each tool appears when the chapter needs it, and none of them is sacred: the patterns transfer to any vendor, which is why the code samples here mostly show plain files, YAML, shell and config rather than vendor-specific dashboards.</p>
+<div class="codeWrap"><pre><code># the tool stack used in this guide (all have free tiers)
+# CI:      GitHub Actions, GitLab CI
+# static:  Netlify, Vercel, Cloudflare Pages, GitHub Pages
+# PaaS:    Render, Fly.io, Railway
+# VPS:     any Ubuntu box - a droplet, a Hetzner VM, a Pi
+# DNS:     Cloudflare, Netlify DNS, your registrar's panel
+# rule:    every pattern here works on every vendor
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ Builds and Artifacts</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 ▸ Builds and Artifacts</button><div class="ch-toc-list"><a href="#ch2-1">2.1 Build pipelines</a><a href="#ch2-2">2.2 Asset bundling and output hygiene</a><a href="#ch2-3">2.3 Environment variables and configuration</a><a href="#ch2-4">2.4 Versioning and reproducible builds</a></div></div>
+<p class="topic-desc">A build pipeline turns source into a deployable artifact: install dependencies, run checks, compile, and produce exactly the files production will run. This chapter covers build pipelines and bundling, environment configuration, and the versioning and registry discipline that makes a build reproducible tomorrow.</p>
+
+<h3 id="ch2-1" data-toc>2.1 Build pipelines</h3>
+<p class="topic-desc">A build script turns source into a deployable artifact. For a static site it copies files into a dist folder; for a dynamic app it bundles JavaScript, compiles CSS, and may prerender HTML. The first rule is that the build is one command that behaves the same on every machine.</p>
+<h4 id="ch2-1-scripts">Scripts: the build as a single command</h4>
+<p>Put every step — lint, test, compile — in <code>package.json</code> scripts and call those from every tool that builds: your laptop, CI, the platform's build hook. If anything ever builds differently between two machines, it is because someone bypassed the script and ran bare commands. Chain them into one <code>ci</code> script so CI runs the same sequence a human would.</p>
+<div class="codeWrap"><pre><code>{
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "ci": "npm run lint &amp;&amp; npm run test &amp;&amp; npm run build"
+  }
+}
+</code></pre></div>
+<h4 id="ch2-1-ci">CI: the build runs on every push</h4>
+<p>A pipeline is only trustworthy when it runs in a clean environment on every push — that is what continuous integration means. GitHub Actions is the simplest option: a workflow runs jobs in a fresh container, so "works on my machine" stops being an excuse. The workflow installs, checks, builds and uploads the artifact; a deploy job in the same file can wait for approval.</p>
+<div class="codeWrap"><pre><code># .github/workflows/ci.yml
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+</code></pre></div>
+
+<h3 id="ch2-2" data-toc>2.2 Asset bundling and output hygiene</h3>
+<p class="topic-desc">Modern bundlers — Vite, webpack, esbuild — take many source files and emit few, minified, content-hashed assets. Hashing is what makes long-lived caching safe; output hygiene is what keeps the dist folder honest.</p>
+<h4 id="ch2-2-hash">Hashed filenames: cache-busting for free</h4>
+<p>When <code>main.css</code> becomes <code>main-a1b2c3.css</code>, a new deploy is a new filename: content at the old URL is immutable, the new URL has no cache entry, and a CDN can therefore serve assets with year-long TTLs. Without hashing you need short TTLs or manual cache-busting metadata, both of which drag performance down. The hash is derived from the content, so unchanged files keep their names and their cached copies.</p>
+<div class="codeWrap"><pre><code>// vite.config.js - content hashes in every output filename
+export default defineConfig({
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+    rollupOptions: {
+      output: {
+        entryFileNames: "assets/[name]-[hash].js",
+        chunkFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
+      },
+    },
+  },
+});
+</code></pre></div>
+<h4 id="ch2-2-clean">Clean output: never let two builds share a folder</h4>
+<p>A dist folder must contain exactly one build. If the bundler does not empty it, last week's stale files keep being served — a classic "but I deleted it" failure that surfaces in production as a 404 or an old asset. Empty the folder before building, then treat the folder as a single unit: hash it, archive it, upload it.</p>
+<div class="codeWrap"><pre><code># never mix two builds in one dist folder
+rm -rf dist
+npm run build
+tar czf myapp.tar.gz dist
+sha256sum myapp.tar.gz
+# the checksum is the artifact's fingerprint; make a note of it
+</code></pre></div>
+
+<h3 id="ch2-3" data-toc>2.3 Environment variables and configuration</h3>
+<p class="topic-desc">Never hardcode API keys or database URLs. Environment variables carry configuration: a <code>.env</code> file locally, injected secrets in production, and nothing secret ever committed to the repository.</p>
+<h4 id="ch2-3-env">The .env pattern</h4>
+<p>Configuration lives in text files: <code>.env.example</code> is committed and documents every variable with a placeholder value; the real <code>.env</code> is git-ignored and exists only where it is needed. A naming prefix tells you where a variable may travel — a <code>VITE_</code> prefix in Vite marks build-time values that get inlined into the client bundle, so anything with that prefix is publicly readable and must never be a secret.</p>
+<div class="codeWrap"><pre><code># .env.example - committed, fake values, documents the contract
+APP_URL=https://example.com
+DATABASE_URL=postgres://user:pass@localhost:5432/myapp
+API_KEY=replace-me-in-prod
+# VITE_-prefixed vars are inlined into the client bundle
+VITE_PUBLIC_TITLE=MyApp
+</code></pre></div>
+<h4 id="ch2-3-secrets">Secrets in CI: inject, never commit</h4>
+<p>A secret committed to the repository is compromised the moment the repo is shared — git history keeps it forever, so deleting the line later changes nothing. Inject secrets as masked variables in the CI settings or from a secret manager; the build receives them as environment variables only, and the logs never print them. A deploy workflow that needs a platform token reads it from <code>secrets</code>, not from the repo.</p>
+<div class="codeWrap"><pre><code># .github/workflows/deploy.yml (excerpt) - secrets injected
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VITE_PUBLIC_TITLE: MyApp
+    steps:
+      - run: npm ci &amp;&amp; npm run build
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+      - run: npx vercel --prod
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+</code></pre></div>
+<div class="warn"><p>Treat every committed secret as already public. The only correct response to "I pushed a key by accident" is immediate rotation of that key, not a commit that removes it.</p></div>
+<h4 id="ch2-3-flags">Build-time values vs runtime values</h4>
+<p>Two kinds of configuration. Build-time values — public titles, feature flags the bundle needs — are baked into the artifact at compile time. Runtime values — database URLs, API keys, service addresses — are read by the running process. The classic leak is baking a runtime secret into a static bundle: the browser needs it for the app to work, which means anyone can read it, which means it was never a secret.</p>
+<div class="codeWrap"><pre><code>// build-time: inlined into the bundle when the bundler runs
+//   import.meta.env.VITE_PUBLIC_TITLE
+// runtime: read by the server process, never in client code
+//   process.env.DATABASE_URL   (Node) or the platform's config
+// decision rule: if the browser can see it, anyone can have
+// used it. runtime secrets belong on the server only.
+</code></pre></div>
+
+<h3 id="ch2-4" data-toc>2.4 Versioning and reproducible builds</h3>
+<p class="topic-desc">A reproducible build is one where the same source commit produces the same artifact next month. Versioning gives the build a name; reproducibility gives that name a meaning — and an artifact registry gives the named artifact a home.</p>
+<h4 id="ch2-4-version">Semantic versioning with git</h4>
+<p>Tag releases <code>vMAJOR.MINOR.PATCH</code> at the commit and embed the version in the artifact, so the running site can say what it is. Between tags, <code>git describe</code> derives a unique identifier from the nearest tag plus the commit count and hash — useful for deploy logs that must name exactly what went out.</p>
+<div class="codeWrap"><pre><code>git tag -a v1.4.0 -m "release 1.4.0"
+git describe --tags --always   # v1.4.0, or v1.3.0-12-g3f9d2ab
+# embed the version so the site can report what it runs
+echo "v1.4.0" &gt; dist/VERSION
+</code></pre></div>
+<h4 id="ch2-4-repro">Reproducibility: lockfiles and containers</h4>
+<p><code>npm install</code> at two different times can produce two different dependency trees; <code>npm ci</code> installs exactly what the lockfile recorded, which is why CI always uses it. Docker goes further: a container fixes the Node version, the operating system and the file layout, so a build inside the container is the same on a laptop and in production. A multi-stage Dockerfile builds with one image and ships only the output with another.</p>
+<div class="codeWrap"><pre><code># Dockerfile - build in one image, ship only the output
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:1.27-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+</code></pre></div>
+<div class="note"><p>Never use <code>npm install</code> in a pipeline when a lockfile exists — it can silently upgrade a transitive dependency and turn a routine deploy into a mystery regression.</p></div>
+<h4 id="ch2-4-registry">Artifact registries: versioned storage</h4>
+<p>A registry is versioned, append-only storage for artifacts: container images, npm packages, private tarballs. Production pulls a pinned version — by digest where possible — so the build machine and the servers never share a filesystem and no server ever runs an unpinned build. Registries also make rollbacks mechanical: the previous version is still there, byte for byte.</p>
+<div class="codeWrap"><pre><code>docker build -t myapp:1.4.0 .
+docker tag myapp:1.4.0 ghcr.io/you/myapp:1.4.0
+docker push ghcr.io/you/myapp:1.4.0
+# production pulls by digest, so the tag can be trusted
+docker pull ghcr.io/you/myapp@sha256:4f3a1c9b2d8e7f6a0b1c2d3e4f5a6b7c
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Hosting Platforms</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 ▸ Hosting Platforms</button><div class="ch-toc-list"><a href="#ch3-1">3.1 Static hosting</a><a href="#ch3-2">3.2 PaaS</a><a href="#ch3-3">3.3 VPS: a whole machine</a><a href="#ch3-4">3.4 Serverless and containers</a><a href="#ch3-5">3.5 Choosing between them</a></div></div>
+<p class="topic-desc">Static hosts serve pre-built files with nothing running per request; a PaaS runs your app code for you; a VPS hands you a whole machine; serverless runs functions on demand; containers run the same image anywhere. This chapter maps the five, and how to choose between them without betting the project on a vendor.</p>
+
+<h3 id="ch3-1" data-toc>3.1 Static hosting</h3>
+<p class="topic-desc">Static hosting serves pre-built files directly from edge locations — the fastest, cheapest, most secure kind of hosting there is, for anything that does not need code running at request time. Choose static for speed and cost.</p>
+<h4 id="ch3-1-static">What a static host does</h4>
+<p>You upload a folder; the host stores it, puts it behind a CDN, issues HTTPS automatically, and returns files. Because nothing executes, there is almost nothing to attack and almost nothing to scale — a traffic spike is absorbed by the CDN, not by your servers. Static hosts also run small serverless functions and build hooks, which covers forms, APIs and preview deploys.</p>
+<div class="codeWrap"><pre><code># what a static host sees: a folder of files and a config
+dist/
+  index.html
+  assets/app-a1b2c3.js
+  assets/app-9f8e7d.css
+  404.html
+netlify.toml        # build command, headers, redirects
+</code></pre></div>
+<h4 id="ch3-1-config">Configuration: build command, headers and redirects</h4>
+<p>The host needs to know how to build the project and how to serve it. Netlify reads <code>netlify.toml</code>; Vercel reads <code>vercel.json</code>; GitHub Pages reads a workflow. Headers matter as much as routes — the caching and security headers you set here are part of the deployment, and the SPA fallback redirect is what stops refresh on a client-side route returning 404.</p>
+<div class="codeWrap"><pre><code># netlify.toml - build, headers and redirects in one file
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+</code></pre></div>
+
+<h3 id="ch3-2" data-toc>3.2 PaaS</h3>
+<p class="topic-desc">A Platform as a Service runs your app code for you: you push a repository or an image, and the platform builds it, runs it, holds the secrets, and restarts it when it crashes. You trade control of the server for not operating it.</p>
+<h4 id="ch3-2-paas">How a PaaS works</h4>
+<p>The platform takes your source or image, runs the build, and places the app behind a load balancer with HTTPS and a deployment history — rollbacks and redeploys are one click, and you never SSH in. Configuration surfaces as environment variables in the platform dashboard: server hosting runs your app code on every request, and the PaaS is what makes that safe to ignore. Describe the service as code so it is reproducible.</p>
+<div class="codeWrap"><pre><code># render.yaml - a PaaS described as code
+services:
+  - type: web
+    name: myapp
+    runtime: node
+    buildCommand: npm ci &amp;&amp; npm run build
+    startCommand: node server.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false    # set in the dashboard, masked
+      - key: NODE_ENV
+        value: production
+</code></pre></div>
+<h4 id="ch3-2-procfile">The process model: one manifest, many process types</h4>
+<p>Heroku-style PaaS platforms run your app as named process types: <code>web</code> serves requests, <code>worker</code> drains queues, <code>clock</code> runs scheduled jobs. Keeping them separate means a slow background job never blocks a request, and each type scales — or sleeps — independently. The Procfile is the 12-factor way to declare them.</p>
+<div class="codeWrap"><pre><code># Procfile - the process types the platform knows how to run
+web:    node server.js
+worker: node worker.js
+clock:  node cron.js
+</code></pre></div>
+
+<h3 id="ch3-3" data-toc>3.3 VPS: a whole machine</h3>
+<p class="topic-desc">A Virtual Private Server is one full machine that is yours alone: root access, no platform, no guard rails. It is the most flexible option and the most work — choosing a VPS means you also own updates, backups, firewalls and certificate renewal.</p>
+<h4 id="ch3-3-vps">What you get with root</h4>
+<p>A VPS gives you a real operating system with root privileges. You choose the stack, install whatever you want, and log in over SSH. The price is that everything the platform used to do — patching, monitoring, restarting — is now your job. It is the right tool when you need a specific stack, or when the platform's bill for a busy app exceeds the price of a cheap box.</p>
+<div class="codeWrap"><pre><code># the first ten minutes on a fresh VPS
+ssh root@203.0.113.10
+apt update &amp;&amp; apt upgrade -y
+adduser deploy &amp;&amp; usermod -aG sudo deploy
+ufw allow OpenSSH
+ufw allow 80,443/tcp
+ufw enable
+</code></pre></div>
+<h4 id="ch3-3-service">Run it as a service that survives logout</h4>
+<p>A process started in a terminal dies when you close it — and after any reboot. systemd is the standard way to make a web app a supervised service: start on boot, restart on crash, log to journald, and read config from an environment file that the code never commits.</p>
+<div class="codeWrap"><pre><code># /etc/systemd/system/myapp.service
+[Unit]
+Description=MyApp web server
+After=network.target
+
+[Service]
+User=deploy
+WorkingDirectory=/srv/myapp
+EnvironmentFile=/srv/myapp/.env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+</code></pre></div>
+<div class="warn"><p>A VPS without a patching habit is a liability on a schedule: the exploit you fear is usually announced for software you already run. Set unattended security updates, or a monthly maintenance slot that actually happens.</p></div>
+
+<h3 id="ch3-4" data-toc>3.4 Serverless and containers</h3>
+<p class="topic-desc">Serverless runs functions on demand and bills per invocation; containers package an app with its runtime so it runs identically anywhere. They answer different questions, though both remove "which machine" from your thinking.</p>
+<h4 id="ch3-4-faas">Serverless functions</h4>
+<p>A serverless function is code that runs when triggered — an API route, a webhook handler, a form submitter. The platform scales it from zero to thousands of instances in seconds, and you pay for actual invocations rather than an idle box. Cold starts (a function being spun up on demand) add latency; a warm function returns in milliseconds. Keep functions small and stateless and the platform can do its job.</p>
+<div class="codeWrap"><pre><code>// api/health.ts - a serverless route on a static host
+export default function handler(req, res) {
+  res.setHeader("Cache-Control", "no-store");
+  res.status(200).json({ ok: true, ts: Date.now() });
+}
+</code></pre></div>
+<h4 id="ch3-4-containers">Container hosting</h4>
+<p>Docker wraps your app in a container with a fixed Node version, OS and file structure, so it runs the same on your laptop and in production. A container host — Fly.io, Railway, a VPS with Compose — pulls the image and restarts the container when it crashes. The sample below is the preview-style container from the earlier edition: fine for a local look, while production should serve through a real web server as in section 2.4.</p>
+<div class="codeWrap"><pre><code># Dockerfile (preview edition) - carried forward from v1
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+CMD ["npm", "run", "preview"]
+</code></pre></div>
+<div class="codeWrap"><pre><code># run it locally, then push and run the same image elsewhere
+docker build -t myapp:local .
+docker run -d -p 8080:4173 --name myapp myapp:local
+docker tag myapp:local registry.example.com/myapp:local
+docker push registry.example.com/myapp:local
+</code></pre></div>
+
+<h3 id="ch3-5" data-toc>3.5 Choosing between them</h3>
+<p class="topic-desc">The best host is the one that fits your traffic shape, team and budget today — and you can move later when it stops fitting. Nobody is married to a hosting platform; the deployment patterns in this guide work on all of them.</p>
+<h4 id="ch3-5-matrix">A decision matrix</h4>
+<p>Static for anything with no per-user server work; a PaaS for a conventional server app you do not want to operate; a VPS for full control or particular software; serverless for bursty, small APIs; containers when the exact runtime must follow you between providers. Score the host against the need — never the reverse.</p>
+<div class="codeWrap"><pre><code># choose-first: answer the question, not the hype
+#   per-user data at request time?        PaaS / VPS / serverless
+#   arbitrary software to install?        VPS or containers
+#   brief spikes, then idle for hours?    serverless
+#   mostly static, a few dynamic bits?    static + functions
+#   no server administration budget?      static or PaaS
+#   must match an on-prem runtime?        containers
+</code></pre></div>
+<h4 id="ch3-5-move">You can move later</h4>
+<p>Keep the deployment portable — a standard build, a standard artifact, configuration outside the app — and moving hosts becomes a config change, not a rewrite. The one thing to avoid is betting the whole app on a vendor's bespoke function format: a thin adapter layer costs little and buys the freedom to leave.</p>
+<div class="codeWrap"><pre><code># portability checklist - nothing here mentions a vendor
+# [ ] npm run build produces a plain dist folder
+# [ ] all configuration comes from environment variables
+# [ ] the process starts with one command: node server.js
+# [ ] static assets and the API are separable
+# [ ] deploy.sh builds once and copies the artifact onward
+</code></pre></div>
+</section>
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Deployment Strategies</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 ▸ Deployment Strategies</button><div class="ch-toc-list"><a href="#ch4-1">4.1 Manual vs scripted vs CI/CD</a><a href="#ch4-2">4.2 Blue-green and canary releases</a><a href="#ch4-3">4.3 Rolling updates and zero-downtime deploys</a><a href="#ch4-4">4.4 Rollbacks</a></div></div>
+<p class="topic-desc">The release has been built and a host chosen — now the question is how it lands. A CI pipeline runs tests, builds artifacts, and deploys when the main branch changes; blue-green, canary and rolling strategies decide how much risk each release carries; and the rollback plan decides what happens when a release is wrong.</p>
+
+<h3 id="ch4-1" data-toc>4.1 Manual vs scripted vs CI/CD</h3>
+<p class="topic-desc">The ladder from manual to fully automated removes a place for human error to hide at each rung. All three are legitimate — the right one is the highest rung your team can actually maintain.</p>
+<h4 id="ch4-1-manual">Manual deploys: the baseline</h4>
+<p>A manual deploy is someone typing commands at a server. It works and it is the fastest way to start, but it is also the most failure-prone: the commands exist in one person's head, the server state is unknown, and nobody can prove which version is running. For a hobby site that is fine; the moment two people deploy, it stops being fine.</p>
+<div class="codeWrap"><pre><code># manual deploy - fine for a hobby, fragile once shared
+rsync -avz --delete dist/ deploy@203.0.113.10:/srv/myapp/current/
+ssh deploy@203.0.113.10 "systemctl restart myapp"
+</code></pre></div>
+<h4 id="ch4-1-scripted">Scripted deploys: the middle rung</h4>
+<p>The same steps, committed to a script, run by anyone. A script turns the deploy into a repeatable procedure; with <code>set -euo pipefail</code> it stops at the first failure instead of limping on. Scripts are also the unit CI runs — which is why the scripted rung is not a detour but the core of automation.</p>
+<div class="codeWrap"><pre><code>#!/usr/bin/env bash
+set -euo pipefail
+VERSION=$(cat dist/VERSION)
+rsync -avz --delete dist/ deploy@203.0.113.10:/srv/myapp/releases/$VERSION/
+ssh deploy@203.0.113.10 "ln -sfn /srv/myapp/releases/$VERSION /srv/myapp/current"
+ssh deploy@203.0.113.10 "systemctl restart myapp"
+</code></pre></div>
+<h4 id="ch4-1-cicd">CI/CD: the same script, triggered by the push</h4>
+<p>Continuous delivery runs that script on every push to main, after the tests pass; continuous deployment skips even the manual trigger. GitHub Actions is the simplest option: the workflow builds once, runs checks, then deploys the artifact — and the commit hash travels with the deploy so the log says exactly what went out.</p>
+<div class="codeWrap"><pre><code># .github/workflows/deploy.yml (excerpt)
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci &amp;&amp; npm run build
+      - run: ./deploy.sh ${{ github.sha }}
+</code></pre></div>
+<div class="tip"><p>Start at the rung you can sustain. A half-maintained pipeline that deploys broken builds is worse than an honest scripted deploy; you can climb later without throwing anything away — the script IS the pipeline's deploy step.</p></div>
+
+<h3 id="ch4-2" data-toc>4.2 Blue-green and canary releases</h3>
+<p class="topic-desc">Waiting for a slow rollout is optional. Blue-green keeps the old version fully running while the new one proves itself; canary sends real traffic to the new version in measured slices. Both make a release a reversible step rather than a leap.</p>
+<h4 id="ch4-2-bluegreen">Blue-green: two stacks, one switch</h4>
+<p>Run two complete environments — blue, the current one, and green, the new one. Deploy to green, run your checks against it on its real URL, then flip the router (or the load balancer, or DNS) from blue to green. If it goes wrong, flip the switch back: the rollback is the same switch you just used, and there is no "redeploy the old version" step at all.</p>
+<div class="codeWrap"><pre><code># nginx - both versions live; the router is the switch
+upstream myapp {
+  server 10.0.0.11:8080;   # blue - current, serving traffic
+  server 10.0.0.12:8080;   # green - staged, off until switched
+}
+server {
+  listen 443 ssl;
+  location / {
+    proxy_pass http://myapp;
+  }
+}
+</code></pre></div>
+<h4 id="ch4-2-canary">Canary: a small population, watched closely</h4>
+<p>A canary sends five to ten percent of real traffic to the new version while the rest stays on the old. You watch the canary's error rate and latency before letting it take a hundred percent — the name comes from the mine canary: the small population is the early-warning system. The weight split is a router setting, so drifting it up or back is one command.</p>
+<div class="codeWrap"><pre><code># nginx - 10% of traffic to the new version
+upstream myapp {
+  server 10.0.0.11:8080 weight=90;   # v1.3.0 - steady
+  server 10.0.0.12:8080 weight=10;   # v1.4.0 - canary
+}
+# once the canary looks clean: raise its weight to 100,
+# then drop the old server from the pool entirely
+</code></pre></div>
+
+<h3 id="ch4-3" data-toc>4.3 Rolling updates and zero-downtime deploys</h3>
+<p class="topic-desc">Rolling updates replace servers one at a time so the site never shows a maintenance page; zero-downtime is the discipline that makes rolling safe. The hard part is almost never the servers — it is the database.</p>
+<h4 id="ch4-3-rolling">Rolling: replace instances one by one</h4>
+<p>A rolling update takes servers out of the pool, replaces them with the new version, and puts them back — capacity stays roughly constant, and users never see downtime. Kubernetes defaults to this with <code>RollingUpdate</code>; a script can do the same against a load balancer. The one requirement is that the old and new versions can run side by side, because during the rollout they do.</p>
+<div class="codeWrap"><pre><code># kubectl - take the pool to the new image, one pod at a time
+kubectl set image deployment/myapp myapp=myapp:1.4.0
+kubectl rollout status deployment/myapp
+kubectl rollout history deployment/myapp
+</code></pre></div>
+<h4 id="ch4-3-database">The database is the real hairball</h4>
+<p>If the new version needs a schema change, the safe order is: migrate forward with a backwards-compatible change, deploy the new code, and clean up old columns in a later release. Dropping a column the old version still reads is how a "zero-downtime" deploy takes the site down at 2 a.m. — the old code crashes the moment the new schema lands.</p>
+<div class="codeWrap"><pre><code>-- release A: additive migration, then deploy the new code
+ALTER TABLE orders ADD COLUMN status text NOT NULL DEFAULT 'new';
+-- release B (after the old version is gone): clean up
+ALTER TABLE orders DROP COLUMN legacy_flag;
+</code></pre></div>
+<div class="warn"><p>Never bundle a destructive migration into the same release as the code that stops needing it. Additive first, deploy, then remove — three separate steps, each independently reversible.</p></div>
+
+<h3 id="ch4-4" data-toc>4.4 Rollbacks</h3>
+<p class="topic-desc">A rollback is a plan, not a panic. Decide before the release how you will revert it, because at 2 a.m. after a bad deploy nobody should be designing one.</p>
+<h4 id="ch4-4-redeploy">Rollback by redeploying the known-good version</h4>
+<p>The safest rollback is to redeploy the previous artifact — the one that was already running and proven. This is why artifacts are stored and versioned rather than rebuilt: "rebuild the old commit" can fail for reasons unrelated to your code, from a vanished dependency to a rotated registry key. The stored artifact is a time machine that does not need the internet.</p>
+<div class="codeWrap"><pre><code># rollback = the same deploy command, one version back
+cat releases/current             # myapp-1.4.0
+rsync -avz --delete releases/myapp-1.3.0/ deploy@203.0.113.10:/srv/myapp/releases/myapp-1.3.0/
+ssh deploy@203.0.113.10 "ln -sfn /srv/myapp/releases/myapp-1.3.0 /srv/myapp/current &amp;&amp; systemctl restart myapp"
+</code></pre></div>
+<h4 id="ch4-4-db">When the database makes rollback hard</h4>
+<p>If the release ran forward migrations, rolling back the code does not roll back the schema — and a destructive migration can make the old code crash on the new database. The two realistic answers: keep migrations reversible for the rollback window (an additive migration can almost always be undone), or decide up front that this release will be fixed forward rather than reverted, and tell the on-call person which one it is.</p>
+<div class="codeWrap"><pre><code>-- a reversible migration keeps the rollback door open
+ALTER TABLE orders ADD COLUMN status text;
+-- rollback of THIS migration, before the code is reverted:
+ALTER TABLE orders DROP COLUMN status;
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Domains, DNS and SSL</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 5 ▸ Domains, DNS and SSL</button><div class="ch-toc-list"><a href="#ch5-1">5.1 Registrars and domain basics</a><a href="#ch5-2">5.2 DNS records: name to address</a><a href="#ch5-3">5.3 HTTPS and TLS</a><a href="#ch5-4">5.4 Redirects and the www question</a><a href="#ch5-5">5.5 Email DNS: SPF, DKIM and DMARC</a></div></div>
+<p class="topic-desc">Before traffic reaches your host it must be named and trusted: a domain bought from a registrar, DNS records pointing it at the right place, HTTPS proving the connection, redirects collapsing the aliases, and email records that keep the domain's mail honest. Each of these is a deployment step, not an admin chore.</p>
+
+<h3 id="ch5-1" data-toc>5.1 Registrars and domain basics</h3>
+<p class="topic-desc">Registrars sell domains and keep them registered on your behalf. The domain is an asset — protect it like one, because domain expiry and unauthorised transfers are among the most common self-inflicted outages there are.</p>
+<h4 id="ch5-1-registrar">What a registrar does</h4>
+<p>You own the registration, not the name forever: if you stop paying, the domain eventually returns to the pool. Changing registrars is normal and a transfer needs the auth code from the old registrar. Useful when diffing a domain's state: <code>whois</code> reports who holds the domain and when it expires.</p>
+<div class="codeWrap"><pre><code># whois - who holds the domain, and when it expires
+whois example.com | grep -E "Registrar:|Expiry Date|Name Server"
+</code></pre></div>
+<h4 id="ch5-1-lock">Lock the name, keep the records current</h4>
+<p>Set registrar lock so the domain cannot be transferred without your explicit action; keep a strong, unique email on the account; check expiry regularly — and enable auto-renew. A hijacker who renews an expired domain you let lapse controls the name. DNSSEC, where the registrar offers it, stops DNS responses being forged on the way to your users.</p>
+<div class="codeWrap"><pre><code># review this list once a quarter, for every domain
+# [ ] auto-renew ON, payment method valid
+# [ ] registrar lock enabled
+# [ ] contact email is one you actually read
+# [ ] DNSSEC enabled if the registrar offers it
+# [ ] expiration date written somewhere you will see it
+</code></pre></div>
+
+<h3 id="ch5-2" data-toc>5.2 DNS records: name to address</h3>
+<p class="topic-desc">DNS translates a name like example.com into the things that serve it: A and AAAA records for addresses, CNAME for aliases, MX for mail, TXT for verification and policy. Getting these right is how a deploy actually becomes reachable.</p>
+<h4 id="ch5-2-address">A, AAAA and CNAME</h4>
+<p>An <code>A</code> record maps a name to an IPv4 address; <code>AAAA</code> does the same for IPv6; a <code>CNAME</code> aliases one name to another, so the target's address can change without touching your records. The apex — the bare <code>example.com</code> — can hold an A record but technically cannot be a CNAME, which is why hosts offer a special "apex redirect" service instead.</p>
+<div class="codeWrap"><pre><code>; dns zone - name, TTL, class, type, value
+example.com.      3600 IN A      203.0.113.10
+example.com.      3600 IN AAAA   2001:db8::10
+www.example.com.  3600 IN CNAME  example.com.
+api.example.com.  3600 IN A      203.0.113.11
+</code></pre></div>
+<h4 id="ch5-2-verify">TXT, MX and the records that prove things</h4>
+<p>TXT records carry verification tokens — for Google services, GitHub Pages, Let's Encrypt challenges — and email policy (SPF, DKIM, DMARC, covered in section 5.5). MX tells other mail servers where to deliver mail for the domain. After any DNS change, query a public resolver directly: <code>dig</code> shows what the world sees, while your own machine's cache may still hold the old answer.</p>
+<div class="codeWrap"><pre><code># dig - see the records exactly as published
+dig +short example.com A
+dig +short www.example.com CNAME
+dig +short example.com TXT
+dig +short example.com MX
+# DNS is cached everywhere: the TTL you publish says how
+# long old resolvers may keep the previous answer
+</code></pre></div>
+<div class="tip"><p>Lower the TTL of the records you are about to change to five minutes the day before a migration, then raise it back afterwards. It is the cheapest way to make a DNS move fast and reversible.</p></div>
+
+<h3 id="ch5-3" data-toc>5.3 HTTPS and TLS</h3>
+<p class="topic-desc">HTTPS encrypts traffic between the browser and the server, is required for HTTP/2 and for browser features like service workers, and is the baseline expectation of every modern site. With modern tooling it is also the easiest part of deployment.</p>
+<h4 id="ch5-3-tls">What TLS actually does</h4>
+<p>TLS is the encryption layer under HTTPS. The server presents a certificate proving it holds the private key for the domain; the browser verifies the chain back to a trusted root, and the two sides negotiate a session key. A valid certificate does not mean "trustworthy site" — it means "this is genuinely the domain you asked for". You can inspect a live certificate from any machine with openssl.</p>
+<div class="codeWrap"><pre><code># openssl - inspect the certificate a server actually presents
+openssl s_client -connect example.com:443 -servername example.com \
+  &lt;/dev/null 2&gt;/dev/null | openssl x509 -noout -subject -dates
+</code></pre></div>
+<h4 id="ch5-3-certs">Certificates: Let's Encrypt and the 90-day lifecycle</h4>
+<p>Let's Encrypt issues free certificates valid for 90 days — short enough that automation is the norm. <code>certbot</code> obtains a certificate via a challenge that proves you control the domain (over HTTP or DNS), installs it, and renews it on a timer. The renewal machinery is part of the deployment: check it works before you need it.</p>
+<div class="codeWrap"><pre><code># certbot - automatic issuance and renewal
+sudo apt install certbot
+sudo certbot --nginx -d example.com -d www.example.com
+# renewals happen on a timer; test the machinery now:
+sudo certbot renew --dry-run
+</code></pre></div>
+<div class="warn"><p>A certbot renewal that never runs is a certificate that quietly expires — the failure mode of "it worked at setup time". The <code>--dry-run</code> above, run quarterly, costs thirty seconds.</p></div>
+
+<h3 id="ch5-4" data-toc>5.4 Redirects and the www question</h3>
+<p class="topic-desc">A site answers at several names — http and https, www and apex — and every duplicate name splits traffic and ranking. Redirects collapse the aliases into one canonical scheme and host, and always force HTTPS in production.</p>
+<h4 id="ch5-4-redirect">Redirect: the whole scheme and host ladder</h4>
+<p>Always force HTTPS in production. One 301 from http to https plus one host canonicalisation is enough — every intermediate hop is a round trip the user pays for on every page load. On a static host, redirects are config, not code.</p>
+<div class="codeWrap"><pre><code># netlify.toml - canonical https, non-www, in three lines
+[[redirects]]
+  from = "http://*.example.com/*"
+  to = "https://example.com/:splat"
+  status = 301
+[[redirects]]
+  from = "https://www.example.com/*"
+  to = "https://example.com/:splat"
+  status = 301
+</code></pre></div>
+<h4 id="ch5-4-www">www or apex: pick one and enforce it</h4>
+<p>The apex cannot be a CNAME, which matters when your host hands you a hostname rather than an IP. Decide www or apex and enforce it everywhere — cookies and certificates are tied to the host, so switching later is a real migration. If the host gives you an IP, use an A record at the apex; if it gives you a hostname, use CNAME on www and their special apex-CNAME service.</p>
+<div class="codeWrap"><pre><code># nginx - canonical host enforcement at the server
+server {
+  listen 80;
+  server_name example.com www.example.com;
+  return 301 https://example.com$request_uri;
+}
+server {
+  listen 443 ssl http2;
+  server_name www.example.com;
+  return 301 https://example.com$request_uri;
+}
+server {
+  listen 443 ssl http2;
+  server_name example.com;
+  # the real site lives here
+}
+</code></pre></div>
+
+<h3 id="ch5-5" data-toc>5.5 Email DNS: SPF, DKIM and DMARC</h3>
+<p class="topic-desc">Email delivery is decided by the same DNS records as everything else. SPF, DKIM and DMARC are three TXT records that tell receiving servers who is authorised to send mail for your domain — without them, mail from your domain is forged by spammers, or dumped in the recipient's spam folder.</p>
+<h4 id="ch5-5-spf">SPF: who may send mail for your domain</h4>
+<p>SPF is a TXT record listing the servers allowed to send mail for your domain. It checks the envelope sender — the return-path — not the human-readable From, so it passes for spoofed display names. SPF also breaks on forwarding, which is exactly why it is never the whole story; stay within the ten-lookup limit the DNS suite offers.</p>
+<div class="codeWrap"><pre><code>; spf - allow only the provider's senders, hard-fail the rest
+example.com. 3600 IN TXT "v=spf1 include:_spf.example.net -all"
+; -all = hard fail: any other sender is forged
+; check it with: dig +short example.com TXT
+</code></pre></div>
+<h4 id="ch5-5-dkim">DKIM signs the mail; DMARC says what to do</h4>
+<p>DKIM signs each message with a private key, and the corresponding public key is published in DNS at a selector: <code>s1._domainkey</code>. Receiving servers verify the signature against that record. DMARC ties it together: it tells receivers what to do when SPF or DKIM fail — <code>none</code> (monitor), <code>quarantine</code> (spam) or <code>reject</code> — and where to send aggregate reports. Start at <code>none</code>, read the reports, then enforce.</p>
+<div class="codeWrap"><pre><code>; dkim - the public key for selector s1 (value from your provider)
+s1._domainkey.example.com. 3600 IN TXT "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQ..."
+; dmarc - monitor first, enforce once reports look clean
+_dmarc.example.com. 3600 IN TXT "v=DMARC1; p=quarantine; rua=mailto:dmarc@example.com"
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Monitoring and Observability</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 6 ▸ Monitoring and Observability</button><div class="ch-toc-list"><a href="#ch6-1">6.1 Uptime checks</a><a href="#ch6-2">6.2 Logs</a><a href="#ch6-3">6.3 Metrics</a><a href="#ch6-4">6.4 Error tracking and alerting</a><a href="#ch6-5">6.5 Dashboards and incident response</a></div></div>
+<p class="topic-desc">Monitoring is how a deployed site stays deployed: uptime checks prove it answers, logs record what really happened, metrics reveal how fast things are deteriorating, and alerting makes someone notice in time. This chapter covers the collection layers, then the dashboards and incident habits that turn them into judgment.</p>
+
+<h3 id="ch6-1" data-toc>6.1 Uptime checks</h3>
+<p class="topic-desc">An uptime check is an external request that verifies your site answers — the cheapest monitoring there is, because it sees the site the way a user does: from outside, over the public internet.</p>
+<h4 id="ch6-1-external">External checks see what users see</h4>
+<p>Put the monitor outside your network. It catches DNS failures, certificate expiry, router meltdowns and provider outages — the failures an on-box check cannot see because it shares the fate of the server. Check a real URL, and check the response rather than just the connection: a 500 page is "up" to a TCP check and down to a user.</p>
+<div class="codeWrap"><pre><code># uptime-check.sh - a plain curl check is a working monitor
+#!/usr/bin/env bash
+code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 10 https://example.com/)
+if [ "$code" != "200" ]; then
+  curl -fsS "https://api.pushover.net/1/messages.json" \
+    -F token=TOKEN -F user=USER \
+    -F "message=example.com returned $code"
+  exit 1
+fi
+echo "ok $code"
+</code></pre></div>
+<h4 id="ch6-1-frequency">Frequency, and the honesty of averages</h4>
+<p>A check every five minutes from one location catches hard outages but misses slow degradation; a 100% uptime number is a lie unless it reports response time alongside. Check from several regions if the audience is global, and treat a response you would not want to use as an outage in waiting rather than a passing mark.</p>
+<div class="codeWrap"><pre><code># what each number actually means
+#   p95 &lt; 200ms    healthy; users do not notice latency
+#   p95 &gt; 800ms    degradation; investigate before release day
+#   5xx &gt; 1%       real problem; a slice of users is erroring
+#   downtime 0     either true, or the monitor is broken
+</code></pre></div>
+
+<h3 id="ch6-2" data-toc>6.2 Logs</h3>
+<p class="topic-desc">Logs are the record of what actually happened — the raw material of every post-mortem. The discipline is to collect them in one searchable place, with timestamps and structure, before you need them.</p>
+<h4 id="ch6-2-access">The logs you already have</h4>
+<p>Web servers emit access logs: time, method, path, status, bytes, user agent. For a small site the access log is both an analytics system and an error finder — a cluster of 500s at 3 a.m. tells you when the new deploy went wrong even if nobody noticed for hours. Collect them away from the box: a server that dies takes its logs with it.</p>
+<div class="codeWrap"><pre><code># nginx access log - one line per request, already structured
+203.0.113.9 - - [11/Oct/2026:02:14:03 +0000] "GET /api/orders HTTP/1.1" 500 29 "-" "curl/8.5"
+203.0.113.9 - - [11/Oct/2026:02:14:04 +0000] "GET /api/orders HTTP/1.1" 500 29 "-" "curl/8.5"
+203.0.113.9 - - [11/Oct/2026:02:14:05 +0000] "GET /api/orders HTTP/1.1" 500 29 "-" "curl/8.5"
+</code></pre></div>
+<h4 id="ch6-2-structured">Structured logging: machine-readable by default</h4>
+<p>Logs an operator can grep are better than logs only a human can read; JSON lines are the portable format. Every field becomes a key, timestamps are ISO 8601, and tools can index, filter and alert without parsing prose. One log line per event — never one event spread across ten lines — and never log secrets, tokens or personal data wholesale.</p>
+<div class="codeWrap"><pre><code>{"time":"2026-10-11T02:14:03.001Z","level":"error","event":"checkout_failed","order":"A-1041","stage":"payment","err":"card_declined"}
+{"time":"2026-10-11T02:14:04.002Z","level":"warn","event":"slow_query","query_ms":1842,"db":"orders","q":"findByCustomer"}
+{"time":"2026-10-11T02:14:05.003Z","level":"info","event":"deploy","ver":"1.4.0","by":"ci","env":"production"}
+</code></pre></div>
+
+<h3 id="ch6-3" data-toc>6.3 Metrics</h3>
+<p class="topic-desc">Metrics are numbers over time — requests, latency, errors, saturation — aggregated so trends become visible and thresholds can fire alerts. Logs answer "what happened?"; metrics answer "how fast was it getting worse?"</p>
+<h4 id="ch6-3-reduse">RED vs USE: two mental models</h4>
+<p>RED (Rate, Errors, Duration) is for request-driven services: how many requests, how many fail, how long they take. USE (Utilisation, Saturation, Errors) is for resources: how full the CPU and disk are, how long jobs wait in queues, whether anything is erroring. Pick the three numbers you can act on — a dashboard with forty graphs answers no questions at 3 a.m.</p>
+<div class="codeWrap"><pre><code># prometheus text exposition - a tiny, useful metric set
+# HELP http_requests_total Requests served by method and status
+http_requests_total{method="GET",status="200"} 482193
+http_requests_total{method="GET",status="500"} 37
+# HELP http_request_duration_seconds Histogram of latencies
+http_request_duration_seconds_bucket{le="0.1"} 441120
+http_request_duration_seconds_bucket{le="0.5"} 478120
+</code></pre></div>
+<h4 id="ch6-3-health">Health endpoints: the contract between app and monitor</h4>
+<p>A <code>/health</code> endpoint is the app telling its platform, load balancer and uptime checker "I am ready". It should check the things that would make the app serve bad traffic — database reachability, essential services — and return quickly. A health check that queries the entire database is a health check that takes the site down.</p>
+<div class="codeWrap"><pre><code>// server.js - health checks the essentials, quickly
+app.get("/health", (req, res) => {
+  const db = pool.query("SELECT 1").then(() => true).catch(() => false);
+  res.status(db ? 200 : 503).json({ ok: db, uptime: process.uptime() });
+});
+</code></pre></div>
+
+<h3 id="ch6-4" data-toc>6.4 Error tracking and alerting</h3>
+<p class="topic-desc">Error tracking makes a failure visible with a stack trace and user context; alerting makes someone notice at the right time — not so early that alerts are ignored, not so late that the outage is already over.</p>
+<h4 id="ch6-4-errors">Error tracking: catch what tests miss</h4>
+<p>Client-side errors and server-side exceptions that no test covers — the older-browser edge case, the malformed payload from a partner API — surface only in production. Trackers such as Sentry collect the stack, the user context and the release; grouping identical errors turns forty thousand crash rows into one issue you can actually fix.</p>
+<div class="codeWrap"><pre><code>// sentry-style capture - the release travels with the event
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  release: process.env.APP_VERSION,
+  environment: process.env.NODE_ENV,
+});
+app.use((err, req, res, next) => {
+  Sentry.captureException(err);
+  res.status(500).json({ error: "internal" });
+});
+</code></pre></div>
+<h4 id="ch6-4-alerts">Alert design: page on the exception, not the noise</h4>
+<p>Alert when a human can still do something about it. Alert on an error rate crossing a threshold for a sustained window, not on a single failed request; alert on the slow, certain failures — backup age, certificate expiry thirty days out, disk filling up — the ones that take sites down on weekends. If an alert fires and nobody acts, it is training people to ignore it.</p>
+<div class="codeWrap"><pre><code># alert rules that earn their page (prometheus syntax)
+- alert: HighErrorRate
+  expr: rate(http_requests_total{status=~"5.."}[5m]) &gt; 0.05
+  for: 10m
+  labels: { severity: page }
+- alert: CertExpiringSoon
+  expr: probe_ssl_earliest_cert_expiry &lt; time() + 86400 * 30
+  labels: { severity: warn }
+- alert: BackupTooOld
+  expr: time() - backup_last_success &gt; 86400 * 2
+  labels: { severity: page }
+</code></pre></div>
+
+<h3 id="ch6-5" data-toc>6.5 Dashboards and incident response</h3>
+<p class="topic-desc">A dashboard turns monitoring into judgment; incident response turns judgment into action. Both are simpler than they sound if the habits — one screen of truth, a written runbook, a dated post-mortem — are built before the bad day.</p>
+<h4 id="ch6-5-dashboard">One screen you can read at 3 a.m.</h4>
+<p>The point of a dashboard is to answer "is it us, and where?" in under ten seconds: current error rate, latency, load, plus a marker for the last deploy. Draw a vertical line where the deploy happened — if that is where the graphs change, you have already found most incidents. Every panel must let you answer one 3 a.m. question or it does not belong.</p>
+<div class="codeWrap"><pre><code># a dashboard that answers questions, not a gallery of graphs
+# row 1 : traffic  - requests/min by status, p50/p95 latency
+# row 2 : health   - error %, last deploy marker, restarts
+# row 3 : capacity - CPU, memory, disk, DB connections
+# rule: every panel answers one 3-a.m. question or it leaves
+</code></pre></div>
+<h4 id="ch6-5-runbook">Incident response: the runbook and the blameless post-mortem</h4>
+<p>A runbook is the written answer to "the site is down — now what?": how to check the deploy state, where the logs live, how to roll back, who to call. Write it while calm. When it happens, respond in order: contain (roll back or take the bad version out), recover, then investigate. Afterwards, write a post-mortem that asks what the system allowed to happen — not who to blame.</p>
+<div class="codeWrap"><pre><code># runbook.md - the twenty-minute version
+# 1. is it the deploy?  compare the last deploy time with the
+#    first failed request (deploy marker / log timestamps)
+# 2. rollback:          ./rollback.sh  (redeploys previous artifact)
+# 3. not the deploy?    check disk (df -h), certificate
+#    (openssl s_client), and the provider status page
+# 4. post-mortem:       timeline + what the system allowed + actions
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ Scale, Security and Disaster Recovery</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 7 ▸ Scale, Security and Disaster Recovery</button><div class="ch-toc-list"><a href="#ch7-1">7.1 Caching layers</a><a href="#ch7-2">7.2 Load balancing</a><a href="#ch7-3">7.3 Auto-scaling</a><a href="#ch7-4">7.4 Backups and restore drills</a><a href="#ch7-5">7.5 Security hygiene in production</a></div></div>
+<p class="topic-desc">The last chapter is about surviving: caching to make the site cheap to serve, load balancing and auto-scaling so it keeps answering as traffic grows, backups with restores that have actually been practised, and the production security hygiene that stops most breaches before they start.</p>
+
+<h3 id="ch7-1" data-toc>7.1 Caching layers</h3>
+<p class="topic-desc">Caching is the cheapest scaling there is: a response served from cache costs almost nothing, while a response recomputed on a server costs a database query or worse. The skill is deciding what each layer is allowed to remember, and for how long.</p>
+<h4 id="ch7-1-http">HTTP caching: headers the browser and CDN share</h4>
+<p>Cache-Control is negotiated per response. <code>max-age</code> says how long the browser may reuse it; <code>public</code> allows shared caches (CDNs) to store it; content-hashed assets get the longest TTL. The trap is caching a personalised response and serving one user someone else's cart — which is why anything personal must carry <code>no-store</code>.</p>
+<div class="codeWrap"><pre><code># nginx - caching rules that match the kind of content
+location /assets/ {
+  expires 1y;                         # hashed, immutable
+  add_header Cache-Control "public, max-age=31536000, immutable";
+}
+location /api/me {
+  add_header Cache-Control "no-store";    # personal, never cache
+  proxy_pass http://backend;
+}
+location / {
+  add_header Cache-Control "public, max-age=0, must-revalidate";
+}
+</code></pre></div>
+<h4 id="ch7-1-tiers">The cache tiers: browser, CDN, in-memory</h4>
+<p>The browser caches assets; the CDN caches pages and APIs at the edge, worldwide; Redis or Memcached caches data inside your network. Each tier cuts the load on the one behind it. Invalidation is the hard half: versioned URLs need none — a new URL is new content — while an unversioned page you got wrong needs a purge or a short TTL to retire.</p>
+<div class="codeWrap"><pre><code># cache tiers, and what belongs in each
+# browser : content-hashed assets; personal? no-store
+# CDN     : public pages, stable GET APIs, static files
+# redis   : sessions, hot reads, rate-limit counters
+# rule: the higher the tier, the less it may trust its copy;
+# versioned URLs sidestep invalidation entirely
+</code></pre></div>
+
+<h3 id="ch7-2" data-toc>7.2 Load balancing</h3>
+<p class="topic-desc">A load balancer is the single address that spreads traffic across many servers — the front door that also runs health checks, so a dead server stops receiving requests before it stops responding.</p>
+<h4 id="ch7-2-lb">What sits behind the IP</h4>
+<p>The load balancer terminates the public connection, checks each backend's health, and forwards each request to a live one. It is the glue that makes rolling deploys and horizontal scaling possible at all: replace the servers underneath, keep the address. <code>max_fails</code> and <code>fail_timeout</code> make the balancer stop sending work to a server that is erroring.</p>
+<div class="codeWrap"><pre><code># nginx - two backends, health-gated, traffic spread
+upstream web {
+  server 10.0.0.11:8080 max_fails=3 fail_timeout=30s;
+  server 10.0.0.12:8080 max_fails=3 fail_timeout=30s;
+  keepalive 32;
+}
+server {
+  listen 80;
+  location / {
+    proxy_pass http://web;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}
+</code></pre></div>
+<h4 id="ch7-2-state">State: sticky sessions and shared storage</h4>
+<p>"Load balance everything" collides with in-memory state: a session held in one server's memory vanishes when the next request lands on a different server. Either make sessions sticky — route a user to the same server via a cookie — or, better, move session and file state out of the app entirely, to a database, Redis or object storage, so any server can serve any user.</p>
+<div class="codeWrap"><pre><code># nginx - sticky by cookie when you cannot move the state yet
+upstream web {
+  server 10.0.0.11:8080;
+  server 10.0.0.12:8080;
+  sticky cookie srv_id expires=1h;
+}
+# the migration target: sessions in redis, uploads in object
+# storage - so no stickiness is needed at all
+</code></pre></div>
+
+<h3 id="ch7-3" data-toc>7.3 Auto-scaling</h3>
+<p class="topic-desc">Scaling adds capacity when traffic needs it and removes it when it does not. Autoscaling is the discipline of doing that to a metric or a schedule, so a spike costs you compute instead of downtime.</p>
+<h4 id="ch7-3-hpa">Scale with a metric, not a guess</h4>
+<p>Horizontal scaling adds instances; vertical scaling adds power to the ones you have. Autoscaling needs a metric that predicts load — CPU utilisation or request rate — and time for a new instance to become ready. The classic failure is oscillation: scale-up takes four minutes, traffic drops, it scales down again, forever. Cooldowns and minimums are how you damp that.</p>
+<div class="codeWrap"><pre><code># kubernetes - the horizontal pod autoscaler in a few lines
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: myapp
+spec:
+  minReplicas: 2
+  maxReplicas: 12
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+</code></pre></div>
+<h4 id="ch7-3-schedule">Autoscale is a ceiling; budget is the floor</h4>
+<p>Autoscaling has a maximum, and the maximum is a budget decision, not a technical one — every instance costs money. Hold the minimum at two so one failure never takes the site to zero, and use scheduled scaling for predictable waves: a sale at 9 a.m. is better served by pre-provisioned capacity than by reacting to it.</p>
+<div class="codeWrap"><pre><code># scheduled scaling - for predictable peaks, not reactions
+kubectl scale deployment myapp --replicas=8    # 09:00 sale start
+kubectl scale deployment myapp --replicas=3    # 12:00 back down
+# the autoscaler from above still handles the unexpected part
+</code></pre></div>
+
+<h3 id="ch7-4" data-toc>7.4 Backups and restore drills</h3>
+<p class="topic-desc">A backup only exists when a restore has proven it works. Backups are a deployment feature: scheduled, encrypted, tested on a schedule, and never stored on the same box they protect.</p>
+<h4 id="ch7-4-backup">The 3-2-1 rule, made concrete</h4>
+<p>Three copies of your data, on two different media, one off-site. Concretely: a nightly database dump and a file snapshot, encrypted, pushed to object storage, with a retention policy — and the backup job itself monitored, because silent backup failures are the most common kind. Write the success timestamp somewhere an alert can see it.</p>
+<div class="codeWrap"><pre><code># backup.sh - nightly, encrypted, off-site, and logged
+#!/usr/bin/env bash
+set -euo pipefail
+STAMP=$(date -u +%Y%m%dT%H%MZ)
+pg_dump -Fc "$DATABASE_URL" |
+  openssl enc -aes-256-cbc -pbkdf2 -pass env:BACKUP_KEY |
+  aws s3 cp - "s3://myapp-backups/db-$STAMP.enc"
+echo "backup ok $STAMP" &gt; /var/lib/backup-last-success
+</code></pre></div>
+<h4 id="ch7-4-restore">Restore drills: an untested backup is a rumour</h4>
+<p>Once a quarter, restore a backup into a throwaway database and check the app boots against it. Time it — recovery time is a real number your colleagues will want. The drill will find the real failures: missing encryption keys, deleted buckets, dumps that were zero bytes because the cron environment had no PATH. Every discovery is a fix that would have been a disaster.</p>
+<div class="codeWrap"><pre><code># restore.sh - the drill nobody skips
+#!/usr/bin/env bash
+set -euo pipefail
+aws s3 cp s3://myapp-backups/db-20261010T0200Z.enc /tmp/db.enc
+openssl enc -d -aes-256-cbc -pbkdf2 -pass env:BACKUP_KEY \
+  -in /tmp/db.enc | pg_restore --clean --if-exists -d myapp_restore
+# then: boot the app against myapp_restore, run smoke.sh,
+# and log how long the whole drill took
+</code></pre></div>
+<div class="warn"><p>An untested backup is a rumour, not a plan. If restore has never been run, the first restore will happen during an outage — with an audience.</p></div>
+
+<h3 id="ch7-5" data-toc>7.5 Security hygiene in production</h3>
+<p class="topic-desc">Most production breaches are not clever exploits — they are unpatched software, exposed secrets and lazy headers. The hygiene list is short and boring, and it is worth more than an expensive scanner.</p>
+<h4 id="ch7-5-headers">Security headers: free protection at the edge</h4>
+<p>A handful of response headers harden the browser side. HSTS forces HTTPS, X-Content-Type-Options stops MIME sniffing, X-Frame-Options stops clickjacking, and a Content-Security-Policy limits what the page may load. None of them costs a server, and all of them cost nothing until a real attack uses the hole they close.</p>
+<div class="codeWrap"><pre><code># nginx - headers that cost nothing and close real holes
+add_header Strict-Transport-Security "max-age=63072000" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "DENY" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin";
+add_header Content-Security-Policy "default-src 'self'" always;
+</code></pre></div>
+<h4 id="ch7-5-hygiene">The boring checklist that stops most breaches</h4>
+<p>Patch monthly — the exploit you fear is usually in a dependency you already run; audit dependencies in CI; use least-privilege tokens (a deploy key that can only deploy); keep secrets in a vault, never in the repo; keep the database reachable only from the app's network; and plan rotation as a few commands, because the day a key leaks, speed is the mitigation.</p>
+<div class="codeWrap"><pre><code># the anti-breach checklist - run on every release
+npm audit --omit=dev        # known vulnerabilities in dependencies
+# [ ] production env has no secret that CI ever printed
+# [ ] firewall allows only 22/80/443 from the internet
+# [ ] database port closed to the public internet
+# [ ] deploy token can deploy, and nothing else
+# [ ] admin panes sit behind SSO or a VPN
+# [ ] backups and restore drill dated this quarter
+</code></pre></div>
+<div class="note"><p>Scale, security and recovery are not a final phase — they are the same systems as everything else in this guide: versioned, configured, scripted and tested. A site that can deploy, monitor and restore itself is a site you can sleep through.</p></div>
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Website and Web App Deployment - From Build to Production.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

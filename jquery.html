@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jQuery - DOM, Events &amp; AJAX Guide</title>
+<meta name="description" content="This opening chapter explains how to work through the offline guide from your first selector through plugins…. 11 chapters, 57 topics and 36 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/jquery.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="jQuery - DOM, Events &amp; AJAX Guide">
+<meta property="og:description" content="This opening chapter explains how to work through the offline guide from your first selector through plugins…. 11 chapters, 57 topics and 36 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/jquery.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="jQuery - DOM, Events &amp; AJAX Guide">
+<meta name="twitter:description" content="This opening chapter explains how to work through the offline guide from your first selector through plugins…. 11 chapters, 57 topics and 36 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/jquery.html#article","headline":"jQuery - DOM, Events & AJAX Guide","name":"jQuery - DOM, Events & AJAX Guide","description":"This opening chapter explains how to work through the offline guide from your first selector through plugins…. 11 chapters, 57 topics and 36 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/jquery.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/jquery.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"jQuery - DOM, Events & AJAX Guide","item":"https://amin360it.github.io/quick-guides/jquery.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">jQuery</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This jQuery Guide</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use all course long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · jQuery Fundamentals &amp; Setup</a><ul><li><a href="#ch1-what" data-target="ch1-what">1.1 What jQuery is and why it existed</a></li><li><a href="#ch1-include" data-target="ch1-include">1.2 Including jQuery: CDN vs npm</a></li><li><a href="#ch1-ready" data-target="ch1-ready">1.3 The $ function and document ready</a></li><li><a href="#ch1-chain" data-target="ch1-chain">1.4 Chainability</a></li><li><a href="#ch1-skip" data-target="ch1-skip">1.5 jQuery 3.x/4 notes — and when NOT to use it</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Selectors &amp; Traversal</a><ul><li><a href="#ch2-css" data-target="ch2-css">2.1 CSS selectors</a></li><li><a href="#ch2-filters" data-target="ch2-filters">2.2 Filters and pseudo-selectors</a></li><li><a href="#ch2-traverse" data-target="ch2-traverse">2.3 Traversal: find, children, parent, siblings, closest</a></li><li><a href="#ch2-each" data-target="ch2-each">2.4 each, eq, first, last</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · DOM Manipulation</a><ul><li><a href="#ch3-html" data-target="ch3-html">3.1 Content: html, text, val</a></li><li><a href="#ch3-attr" data-target="ch3-attr">3.2 Attributes, properties, data</a></li><li><a href="#ch3-class" data-target="ch3-class">3.3 Classes</a></li><li><a href="#ch3-insert" data-target="ch3-insert">3.4 Inserting and removing nodes</a></li><li><a href="#ch3-wrap" data-target="ch3-wrap">3.5 Wrapping, cloning, dimensions</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Events</a><ul><li><a href="#ch4-on" data-target="ch4-on">4.1 Binding with on, off, one</a></li><li><a href="#ch4-evtobj" data-target="ch4-evtobj">4.2 The event object</a></li><li><a href="#ch4-delegate" data-target="ch4-delegate">4.3 Event delegation with on()</a></li><li><a href="#ch4-custom" data-target="ch4-custom">4.4 Namespaced and custom events</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Effects &amp; Animation</a><ul><li><a href="#ch5-show" data-target="ch5-show">5.1 Show, hide, toggle, fade, slide</a></li><li><a href="#ch5-animate" data-target="ch5-animate">5.2 The animate() method</a></li><li><a href="#ch5-queue" data-target="ch5-queue">5.3 Queues, stop, delay, finish</a></li><li><a href="#ch5-css" data-target="ch5-css">5.4 CSS vs animation performance</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · AJAX</a><ul><li><a href="#ch6-ajax" data-target="ch6-ajax">6.1 $.ajax in full</a></li><li><a href="#ch6-shorthand" data-target="ch6-shorthand">6.2 Shorthands: $.get, $.post, $.getJSON</a></li><li><a href="#ch6-serial" data-target="ch6-serial">6.3 Serializing forms and building queries</a></li><li><a href="#ch6-promise" data-target="ch6-promise">6.4 Promise callbacks: done, fail, always</a></li><li><a href="#ch6-fetch" data-target="ch6-fetch">6.5 Modern fetch, for comparison</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Utilities &amp; Deferred</a><ul><li><a href="#ch7-each" data-target="ch7-each">7.1 $.each, $.map, $.grep</a></li><li><a href="#ch7-extend" data-target="ch7-extend">7.2 $.extend and type checks</a></li><li><a href="#ch7-deferred" data-target="ch7-deferred">7.3 Deferred objects</a></li><li><a href="#ch7-when" data-target="ch7-when">7.4 $.when and parallel requests</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Plugins &amp; Extending</a><ul><li><a href="#ch8-fn" data-target="ch8-fn">8.1 Extending $.fn</a></li><li><a href="#ch8-options" data-target="ch8-options">8.2 Options with $.extend</a></li><li><a href="#ch8-pattern" data-target="ch8-pattern">8.3 The chaining pattern and quality</a></li><li><a href="#ch8-popular" data-target="ch8-popular">8.4 Popular plugins — and the deprecation caution</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · jQuery in Modern Projects</a><ul><li><a href="#ch9-interop" data-target="ch9-interop">9.1 Interop with vanilla JS</a></li><li><a href="#ch9-migrate" data-target="ch9-migrate">9.2 Migrating away</a></li><li><a href="#ch9-perf" data-target="ch9-perf">9.3 Performance tips</a></li><li><a href="#ch9-frameworks" data-target="ch9-frameworks">9.4 Frameworks, accessibility, security</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Quick Reference &amp; Glossary</a><ul><li><a href="#app-selectors" data-target="app-selectors">A.1 Selector quick reference</a></li><li><a href="#app-traversal" data-target="app-traversal">A.2 Traversal and DOM method reference</a></li><li><a href="#app-events" data-target="app-events">A.3 Events and AJAX reference</a></li><li><a href="#app-glossary" data-target="app-glossary">A.4 Glossary</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">jQuery</span>
+      <span class="am-band-s">11 chapters &middot; 57 topics &middot; 36 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This jQuery Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This jQuery Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The right mindset</a><a href="#orientation-tools">Tools you will use all course long</a></div></div>
+    <p class="topic-desc">This opening chapter explains how to work through the offline guide from your first selector through plugins and AJAX. It sets expectations for the whole course: read chapters in order and interact with the examples, not just skim them. Open the browser developer console and type each sample yourself so the syntax becomes automatic. Nothing heavy to install, just a browser and a local page.</p>
+    <p>This is a complete, self-paced path through <strong>jQuery</strong>, the library that taught a generation of developers to bend the DOM to their will. Everything runs in a single HTML file — no internet required, progress is saved in your browser.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">Explains how the guide is split into three parts spanning ten chapters plus exercises, each chapter building on the last. Every chapter ends with copy-ready code that you should type out by hand rather than paste. Work through the material sequentially and keep the browser console open while reading, so each technique is tried the moment it is introduced. The structure turns reading into practice.</p>
+    <ul>
+      <li><strong>Part I (Ch. 1–3)</strong> — the core: setup, selectors and traversal, and DOM manipulation.</li>
+      <li><strong>Part II (Ch. 4–7)</strong> — behavior: events, effects, AJAX, and utilities with Deferred.</li>
+      <li><strong>Part III (Ch. 8–9)</strong> — extending and modern practice: plugins, interop, and migration.</li>
+      <li>Every chapter ends with exercises. Code is copy-ready; type it rather than pasting to build muscle memory.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset</h3>
+    <p class="topic-desc">Explains why jQuery still matters for legacy work and quick DOM scripting while being honest about what it is and is not. It is a lean library for selection, traversal, events, and AJAX, not an application framework. The point is to reach for it deliberately: use it where it genuinely saves work and use native JavaScript elsewhere. A balanced mindset keeps you productive in older codebases without overloading new ones.</p>
+    <p>jQuery is a DOM manipulation, event, and AJAX library that smoothed over every browser inconsistency before the native DOM caught up. Modern projects often do not need it, but millions of existing sites and admin panels still run on it, and its chainable style remains the fastest way to write throwaway UI scripts. Know what it is and when to reach for it.</p>
+    <h3 id="orientation-tools" data-toc>Tools you will use all course long</h3>
+    <p class="topic-desc">Lists the tools you will use all course long, starting with a browser and its developer console as your main laboratory. You also need a local HTML file and a way to load jQuery, typically a CDN link in a script tag. Nothing heavy is installed; the console gives immediate feedback on every selector and method you try. This minimal setup keeps the focus on learning the library itself.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>A modern browser + DevTools</td><td>Runs the code and exposes the console, <code>debugger</code>, and Network tab</td></tr>
+      <tr><td>jQuery via CDN or npm</td><td>The library itself, version 3.x (or 4.x where available)</td></tr>
+      <tr><td>DevTools console</td><td>Your lab: try every selector and method before it goes in code</td></tr>
+      <tr><td>A text editor</td><td>Where the final scripts live</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · jQuery Fundamentals &amp; Setup</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · jQuery Fundamentals &amp; Setup</button><div class="ch-toc-list"><a href="#ch1-what">1.1 What jQuery is and why it existed</a><a href="#ch1-include">1.2 Including jQuery: CDN vs npm</a><a href="#ch1-ready">1.3 The $ function and document ready</a><a href="#ch1-chain">1.4 Chainability</a><a href="#ch1-skip">1.5 jQuery 3.x/4 notes — and when NOT to use it</a></div></div>
+    <p class="topic-desc">Introduces what jQuery is, why it existed, and how to load and use it. You learn the two ways to bring the library in, via CDN or npm, and write your first script inside a document-ready handler. That handler makes sure your code runs only after the DOM is safe to touch. From there the chapter lines up the core ideas the rest of the guide builds on.</p>
+    <p>jQuery is a fast, small, feature-rich JavaScript library that makes HTML document traversal and manipulation, event handling, animation, and AJAX dramatically simpler across every browser. It rose to dominance in the 2010s and still powers a large share of the web’s legacy code.</p>
+    <h3 id="ch1-what" data-toc>1.1 What jQuery is and why it existed</h3>
+<h4 id="ch1-what--javascript" data-toc>1.1.1 JavaScript Alternatives</h4>
+    <p class="topic-desc">Explains the problem jQuery solved: the browser DOM APIs of its era were inconsistent across vendors, and working with them directly was painful. jQuery layered a uniform API on top, with fast selectors, chainable manipulation, normalized events, and AJAX helpers. Most of those ideas are now native in modern browsers as methods like querySelector and addEventListener. Understanding that history shows why jQuery exists and what modern code draws from it.</p>
+    <p>Browsers used to disagree on almost every DOM API, from selecting elements to listening for clicks. jQuery gave one API that worked everywhere, hid cross-browser quirks, and added conveniences such as chainable methods and CSS-selector queries long before <code>querySelectorAll</code> existed. The web needed it; modern browsers have since absorbed most of it.</p>
+    <div class="codeWrap"><pre><code>// The same idea, then and now
+// jQuery (still works today):
+var items = $("li.item");        // CSS query that worked in old browsers
+
+// Native equivalent:
+const items = document.querySelectorAll("li.item");</code></pre></div>
+    <p class="code-note">Both lines select the same elements; the jQuery version was the only one that worked consistently in old browsers, which is exactly why it took over.</p>
+    <h3 id="ch1-include" data-toc>1.2 Including jQuery: CDN vs npm</h3>
+<h4 id="ch1-include--npm-details" data-toc>1.2.1 npm Package Details</h4>
+    <p class="topic-desc">Shows the two ways to load jQuery into a page. The first is a script tag pointing at a Content Delivery Network URL, which is typical when a page owns its markup and needs no build step. The second is the npm package, installed into a project and bundled by your tooling. Either way you should load jQuery before your own scripts that depend on it.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- CDN: easiest for a plain HTML page --&gt;
+&lt;script src="https://code.jquery.com/jquery-3.7.1.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  $(function () {
+    console.log("jQuery " + $.fn.jquery + " loaded");
+  });
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">The CDN script tag loads jQuery globally, and the ready handler prints the loaded version to prove it works before you go any further.</p>
+    <p>With a build tool, install from npm instead: <code>npm install jquery</code>, then <code>import $ from "jquery"</code>. The global <code>$</code> from a script tag is fine for classic pages; modules are better for bundled apps.</p>
+    <h3 id="ch1-ready" data-toc>1.3 The $ function and document ready</h3>
+<h4 id="ch1-ready--domcontentloaded" data-toc>1.3.1 DOMContentLoaded vs Ready</h4>
+    <p class="topic-desc">Explains the dollar sign alias and the document-ready pattern, the first jQuery code most people write. Using $(document).ready or the shorthand $(function(){...}) registers a callback that runs after the DOM is parsed and safe to manipulate. Scripts in the head otherwise run before the document structure exists and may fail. The ready handler keeps that first script reliable.</p>
+    <div class="codeWrap"><pre><code>$(document).ready(function () {
+  // Runs only after the DOM is ready to be manipulated
+  $("h1").addClass("animated");
+});
+
+// The convenient shorthand — the same thing:
+$(function () {
+  $("h1").addClass("animated");
+});</code></pre></div>
+    <p class="code-note">Both forms wait for the DOM to be ready before touching it, which is why a script in the head can still safely style elements at the bottom of the page.</p>
+    <h3 id="ch1-chain" data-toc>1.4 Chainability</h3>
+<h4 id="ch1-chain--read-vs-write" data-toc>1.4.1 Read vs Write Rule</h4>
+    <p class="topic-desc">Shows jQuery’s signature feature: most methods return the same jQuery set they were called on, so calls chain together. For example $('div').addClass('a').find('p').hide() does three operations in one statement. Chainability relies on the read versus write rule, where a method called with an argument writes to all matched elements and called with no argument reads the first one. Keeping that rule in mind prevents chain surprises.</p>
+    <div class="codeWrap"><pre><code>$("ul#menu")
+  .addClass("open")        // returns the same selection
+  .children("li")
+  .first()
+  .css("color", "tomato"); // ...so these can follow each other
+
+// Getter vs setter: one argument reads, extra arguments write
+var color = $("h1").css("color");   // reads the first match
+$("h1").css("color", "red");        // writes to every match</code></pre></div>
+    <p class="code-note">Every setter returns the selection so calls flow downward, and the same method reads when given one argument or writes when given more.</p>
+    <div class="tip"><p>jQuery methods return a <strong>jQuery object</strong>, not raw elements. Use <code>.get(0)</code> or <code>[0]</code> to reach the underlying DOM node when a native API demands it.</p></div>
+    <h3 id="ch1-skip" data-toc>1.5 jQuery 3.x/4 notes — and when NOT to use it</h3>
+<h4 id="ch1-skip--version-notes" data-toc>1.5.1 Version Upgrade Notes</h4>
+    <p class="topic-desc">Explains the jQuery 3.x and 4.x landscape, including what changed between the versions and how to upgrade safely. It also lists the cases where native browser code beats jQuery, such as simple selection with querySelector or event handling with addEventListener. The honest take is that using jQuery less is still knowing how to use it well. You learn to recognise when the library helps and when it is redundant.</p>
+    <p>jQuery 3.x is the stable line you will meet on almost every legacy site. jQuery 4 removed long-deprecated code, dropped old browser support, and trimmed the size; both lines share the same core API. Skip jQuery entirely when you only need a few selectors and events — <code>document.querySelectorAll</code>, <code>addEventListener</code>, and <code>fetch</code> cover most of it.</p>
+    <div class="warn"><p>Never load jQuery more than once on a page and never mix two versions. The second script tag overwrites <code>$</code> and breaks plugins silently.</p></div>
+    <div class="ex"><h4 id="ch1-skip--exercises-1">Exercises 1</h4><ol>
+      <li>Load jQuery from a CDN and print the version with <code>$.fn.jquery</code>.</li>
+      <li>Write a document-ready handler that adds a class to <code>h1</code>.</li>
+      <li>Chain <code>.css()</code> and <code>.text()</code> on <code>#menu</code>, then read one value back.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Selectors &amp; Traversal</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Selectors &amp; Traversal</button><div class="ch-toc-list"><a href="#ch2-css">2.1 CSS selectors</a><a href="#ch2-filters">2.2 Filters and pseudo-selectors</a><a href="#ch2-traverse">2.3 Traversal: find, children, parent, siblings, closest</a><a href="#ch2-each">2.4 each, eq, first, last</a></div></div>
+    <p class="topic-desc">Covers selecting elements with the full CSS selector language plus jQuery’s extra pseudo-selectors, then moving through the tree with traversal methods. Together selection and traversal give you every way to reach the elements your code needs to work on. This grammar sits under every later chapter, since DOM manipulation, events, and effects all start from a selected set.</p>
+    <p>Every jQuery session begins with a selection. Chapter 2 is the grammar: how to target elements precisely, how to narrow a set with filters, and how to move around the tree once you have it.</p>
+    <h3 id="ch2-css" data-toc>2.1 CSS selectors</h3>
+<h4 id="ch2-css--performance" data-toc>2.1.1 Selector Performance</h4>
+    <p class="topic-desc">Shows that $ takes the full CSS selector language, so anything CSS can address jQuery can select. You pass classes, IDs, attribute selectors, combinators such as descendant and child, and grouped comma-separated lists. The result is a jQuery object wrapping every matching element, ready for chaining. Prefer the most specific selector that still catches the elements you intend, because simpler selectors are usually faster.</p>
+    <div class="codeWrap"><pre><code>$("#app")                    // by id
+$(".alert.success")          // element with both classes
+$("form input[type=radio]")  // attribute selector
+$('a[href^="https"]')        // links whose href starts with https
+$("article &gt; p")           // direct children only
+$("h1, h2, h3")              // grouped selector</code></pre></div>
+    <p class="code-note">These selectors address elements the same way CSS does, and $ always returns a collection — even for an id — that behaves like an array.</p>
+    <h3 id="ch2-filters" data-toc>2.2 Filters and pseudo-selectors</h3>
+<h4 id="ch2-filters--pseudo-details" data-toc>2.2.1 Pseudo-selector Details</h4>
+    <p class="topic-desc">Shows the positional and state filters jQuery adds beyond plain CSS, placed at the end of a selector to narrow the matched set. Positional filters such as :first, :last, :eq(n), :even, and :odd pick members by index, while state filters like :visible, :hidden, :checked, and :has(selector) narrow by condition. For example $('li:has(span)') keeps only list items containing a span. Remember that :hidden includes elements hidden by CSS or offscreen.</p>
+    <div class="codeWrap"><pre><code>$("li:first")           // first match of the set
+$("li:last")
+$("li:eq(2)")            // index 2 (the third item)
+$("li:even")             // zero-based even indexes
+$("input:enabled")       // enabled form fields only
+$("input:checked")
+$("div:visible")         // excludes display:none
+$("li:not(.done)")</code></pre></div>
+    <p class="code-note">jQuery extends plain CSS with positional and state filters such as :eq, :even, :visible, and :not, which trim a selection without extra code.</p>
+    <h3 id="ch2-traverse" data-toc>2.3 Traversal: find, children, parent, siblings, closest</h3>
+<h4 id="ch2-traverse--methods" data-toc>2.3.1 Traversal Methods Detail</h4>
+    <p class="topic-desc">Shows the core tree-walking methods that move a selection through the document. find returns descendants matching a selector, children gets direct children, parent climbs one level, and siblings reaches the other elements on the same level. closest walks upward and returns the first ancestor that matches, including the element itself. Each method returns a new jQuery set, so further filtering stays chainable and the original selection is untouched.</p>
+    <div class="codeWrap"><pre><code>$("#card")
+  .find("button")          // all descendants matching
+  .first()
+  .addClass("primary");
+
+$("h2").parent();          // direct parent element
+$("h2").siblings("p");     // siblings filtered by selector
+$("h2").closest("section");// nearest ancestor matching
+
+$("#card").children("li"); // direct children only</code></pre></div>
+    <p class="code-note">find searches downward, children stays one level down, parent and closest climb up, and siblings steps sideways — every method returns a fresh, chainable set.</p>
+    <h3 id="ch2-each" data-toc>2.4 each, eq, first, last</h3>
+<h4 id="ch2-each--iteration" data-toc>2.4.1 Iteration Details</h4>
+    <p class="topic-desc">Shows how to iterate over a selection and how to pick out a single member. each runs a callback for every element in the set, with the index and the raw DOM element available, and this bound to the element. eq(n) returns a wrapped jQuery object for the element at position n, often combined with :eq in a selector. first and last simply cut the ends off the current set while left-to-right order is preserved.</p>
+    <div class="codeWrap"><pre><code>$("li").each(function (index, element) {
+  // 'this' is the raw DOM element while the loop runs
+  $(this).attr("data-index", index);
+});
+
+var third = $("li").eq(2);     // wrapped: usable in a chain
+var first = $("li").first();   // wrapped too
+var raw   = $("li")[0];        // unwrapped DOM node</code></pre></div>
+    <p class="code-note">each runs a callback per element with this bound to the raw node, while eq, first, and last keep results wrapped so chains can continue.</p>
+    <div class="ex"><h4 id="ch2-each--exercises-2">Exercises 2</h4><ol>
+      <li>Select every <code>input</code> inside a <code>form</code> using one descendent selector.</li>
+      <li>Give the first <code>nav</code> link the class <code>active</code> via <code>:first</code>.</li>
+      <li>Walk from <code>#card</code> to its section and back with <code>parent</code> and <code>find</code>.</li>
+      <li>Use <code>each</code> to number every <code>li</code> with a data attribute.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · DOM Manipulation</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · DOM Manipulation</button><div class="ch-toc-list"><a href="#ch3-html">3.1 Content: html, text, val</a><a href="#ch3-attr">3.2 Attributes, properties, data</a><a href="#ch3-class">3.3 Classes</a><a href="#ch3-insert">3.4 Inserting and removing nodes</a><a href="#ch3-wrap">3.5 Wrapping, cloning, dimensions</a></div></div>
+    <p class="topic-desc">Covers the create, update, and delete operations you perform on a page: reading and writing content, attributes, classes, and the surrounding structure. You use methods such as html, text, val, attr, prop, and data for values stored on elements, and insertion and removal methods for reshaping the tree. These tools are how jQuery pages actually change what the user sees.</p>
+    <p>Selecting an element is the set-up; changing it is the point. This chapter covers the content accessors, the class tools, and the insert-and-remove methods you will use constantly.</p>
+    <h3 id="ch3-html" data-toc>3.1 Content: html, text, val</h3>
+<h4 id="ch3-html--safety" data-toc>3.1.1 HTML vs Text Safety</h4>
+    <p class="topic-desc">Shows the three content accessors jQuery uses to read and write what is inside an element. html returns or sets the inner markup, text handles plain text with HTML never interpreted, and val reads or sets form field values. Each method reads the first matched element and, when given an argument, writes to every matched element. Using text instead of html also avoids accidental script or markup injection.</p>
+    <div class="codeWrap"><pre><code>var markup = $("#card").html();    // inner HTML as a string
+$("#card").html("&lt;p&gt;Replace everything&lt;/p&gt;");
+
+$("#card").text("Plain text only");  // tags become literal, visible text
+var heading = $("h1").text();        // read the first match
+
+var email = $("#email").val();       // value of a form field
+$("#email").val("me@example.com");   // set it
+
+// html() parses markup; text() never does — pick text() for user input
+$(".bio").text(userInput);   // shown as text, never executed</code></pre></div>
+    <p class="code-note">html parses and inserts markup, text inserts plain escaped text, and val exchanges form values — one argument reads, extra arguments write, and text is the safe choice for user data.</p>
+    <h3 id="ch3-attr" data-toc>3.2 Attributes, properties, data</h3>
+<h4 id="ch3-attr--details" data-toc>3.2.1 Attr vs Prop vs Data</h4>
+    <p class="topic-desc">Distinguishes the three ways to store and read data on elements so you pick the right one. attr reads and writes HTML attributes as they appear in markup, prop handles reflected DOM properties such as checked and disabled, and data works with data- attributes and converts types automatically. The classic confusion is calling attr where a real property such as a checkbox checked state is changing.</p>
+    <div class="codeWrap"><pre><code>// Attributes live in the HTML source; properties are live DOM state
+$("a").attr("href", "/new/path");    // writes the href attribute
+$("img").removeAttr("title");
+
+$("input").prop("checked", true);    // sets the live property
+$("input").attr("checked", true);    // only writes the attribute
+
+// data() bridges data-* without writing attributes back
+$(".card").data("userId", 42);
+var id = $(".card").data("userId");  // 42
+
+// Rule of thumb: prop() for element state, attr() for HTML source</code></pre></div>
+    <p class="code-note">attr manipulates what is written in the HTML, prop sets the element’s live property such as checked, and data manages values through the data-* bridge.</p>
+    <h3 id="ch3-class" data-toc>3.3 Classes</h3>
+<h4 id="ch3-class--trio" data-toc>3.3.1 The Class Trio</h4>
+    <p class="topic-desc">Shows the class trio that powers almost every UI state change: addClass and removeClass to switch classes on and off, toggleClass to flip them based on presence or a force argument, and hasClass as a boolean query. These compose into styling any state, such as showing an active tab or marking a validation error. Classes keep styling in CSS while jQuery only manages which ones apply.</p>
+    <div class="codeWrap"><pre><code>$("#menu").addClass("open");            // always adds
+$("#menu").removeClass("open");         // always removes
+$("#menu").toggleClass("open");         // switches, respects state
+$("#menu").toggleClass("open", isOpen); // force on/off from a boolean
+
+var open = $("#menu").hasClass("open"); // true or false</code></pre></div>
+    <p class="code-note">addClass, removeClass, and toggleClass move UI states in and out, while hasClass reads the current state — the entire vocabulary of visual toggling.</p>
+    <h3 id="ch3-insert" data-toc>3.4 Inserting and removing nodes</h3>
+<h4 id="ch3-insert--methods" data-toc>3.4.1 Insert Methods Detail</h4>
+    <p class="topic-desc">Shows the methods that reshape the document tree by moving nodes around. append and prepend insert content inside an element as its last or first child, while after and before insert outside it as the next or previous sibling. With no argument, empty removes all child content and remove takes the element out entirely, while detach removes but keeps its event handlers.</p>
+    <div class="codeWrap"><pre><code>$("#list").append("&lt;li&gt;Last item&lt;/li&gt;");    // child at the end
+$("#list").prepend("&lt;li&gt;First item&lt;/li&gt;"); // child at the start
+$("#card").after("&lt;p&gt;After the card&lt;/p&gt;");  // sibling after
+$("#card").before("&lt;p&gt;Before the card&lt;/p&gt;");// sibling before
+
+$("#old").remove();             // delete the node and its events
+$("#box").empty();              // remove all children, keep #box</code></pre></div>
+    <p class="code-note">append and prepend add children at either end, after and before add siblings, and remove deletes nodes entirely while empty clears contents but keeps the element.</p>
+    <h3 id="ch3-wrap" data-toc>3.5 Wrapping, cloning, dimensions</h3>
+<h4 id="ch3-wrap--clone" data-toc>3.5.1 Clone Detail</h4>
+    <p class="topic-desc">Shows the structural helpers beyond plain insertion. wrap and wrapAll surround matched elements in new parent markup, clone duplicates nodes so you can copy them elsewhere without touching the original, and the dimension methods width, height, and position read element geometry. Cloning matters before events complicate the copy, and clone with true also copies attached handlers. Dimensions are read after layout, so call them once the DOM is settled.</p>
+    <div class="codeWrap"><pre><code>$("code").wrap('&lt;div class="code-block"&gt;&lt;/div&gt;'); // wrap each match
+
+var copy = $("#row").clone(true);      // deep clone, handlers included
+$("#table tbody").append(copy);
+
+var w = $("#box").width();             // content-box width
+var h = $("#box").outerHeight(true);   // includes padding, border, margin
+var pos = $("#box").offset();          // top/left relative to the document
+$("main").css("height", 240);          // set a dimension inline</code></pre></div>
+    <p class="code-note">wrap wraps each element, clone(true) copies the node and its handlers, and the width, outerHeight, and offset methods read layout numbers that css() can also write.</p>
+    <div class="warn"><p>Never insert strings built from user input with <code>.html()</code> or <code>$(userInput)</code> — that injects HTML. Escape with <code>.text()</code> or build nodes with <code>document.createElement</code>.</p></div>
+    <div class="ex"><h4 id="ch3-wrap--exercises-3">Exercises 3</h4><ol>
+      <li>Swap the text of two headings using <code>text()</code>.</li>
+      <li>Toggle a class on a menu from a boolean variable.</li>
+      <li>Add three <code>li</code> elements: one via <code>append</code>, one via <code>prepend</code>, one via <code>after</code>.</li>
+      <li>Clone a row into another table and read its <code>offset()</code>.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Events</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Events</button><div class="ch-toc-list"><a href="#ch4-on">4.1 Binding with on, off, one</a><a href="#ch4-evtobj">4.2 The event object</a><a href="#ch4-delegate">4.3 Event delegation with on()</a><a href="#ch4-custom">4.4 Namespaced and custom events</a></div></div>
+    <p class="topic-desc">Covers jQuery’s event layer, which is still one of the simplest and strongest parts of the library. You bind and unbind handlers with on and off, delegate events through a selector argument, inspect the normalized event object, and fire your own custom events. Everything stays consistent across browsers, which was the whole point of the API when it was written.</p>
+    <p>Events are the input half of any interactive page. jQuery’s event API hides the browser differences in how events fire and delivers one consistent object to your handlers.</p>
+    <h3 id="ch4-on" data-toc>4.1 Binding with on, off, one</h3>
+<h4 id="ch4-on--details" data-toc>4.1.1 on/off/one Details</h4>
+    <p class="topic-desc">Shows the modern event binding API built around on, off, and one. on('click', handler) binds a handler and accepts an optional selector or data argument, while off removes previously bound handlers, optionally filtered by namespace. Every shorthand you know, such as click or hover, is just on under a familiar name. one binds a handler that fires only once and then removes itself.</p>
+    <div class="codeWrap"><pre><code>$("#buy").on("click", function () {
+  alert("Purchased");
+});
+
+$("#buy").off("click");          // remove that handler
+$("#buy").one("submit", function () {   // fires exactly once
+  console.log("First submit");
+});
+
+// Multiple events, one behavior
+$("input").on("focus blur", function () {
+  $(this).toggleClass("focus-ring");
+});</code></pre></div>
+    <p class="code-note">on attaches handlers, off removes them, one limits a handler to a single fire, and spaces in the event string bind several events at once.</p>
+    <h3 id="ch4-evtobj" data-toc>4.2 The event object</h3>
+<h4 id="ch4-evtobj--properties" data-toc>4.2.1 Event Properties</h4>
+    <p class="topic-desc">Shows the normalized event object jQuery passes to every handler, with the same fields in every browser. You read target and currentTarget for the element involved, pageX and pageY for coordinates, and key-related fields like which for keyboard events. preventDefault cancels the default browser action and stopPropagation stops the bubbling to parent elements. Rely on the normalized fields instead of browser-specific equivalents.</p>
+    <div class="codeWrap"><pre><code>$("#field").on("keydown", function (e) {
+  console.log("Key", e.key, "code", e.code);
+  if (e.key === "Enter") { e.preventDefault(); submit(); }
+});
+
+$("img").on("click", function (e) {
+  console.log("Clicked", e.target, "at", e.pageX, e.pageY);
+});
+
+$("a").on("click", function (e) {
+  e.preventDefault();     // cancel navigation, keep the event alive
+});</code></pre></div>
+    <p class="code-note">The handler receives a normalized event object with consistent properties such as key, target, pageX, and preventDefault across every browser.</p>
+    <h3 id="ch4-delegate" data-toc>4.3 Event delegation with on()</h3>
+<h4 id="ch4-delegate--detail" data-toc>4.3.1 Delegation Details</h4>
+    <p class="topic-desc">Explains event delegation, a top-three jQuery pattern that works through the selector argument of on. When you call on('click', '.item', handler), the handler is attached to the container once and fires only for descendants matching the selector, no matter when they were added. Elements created later work immediately because the listener lives on an ancestor that already exists. Delegation also reduces the number of handlers on big lists.</p>
+    <div class="codeWrap"><pre><code>// One delegated handler on an ancestor catches clicks from
+// #todo items that exist today and any that appear later
+$("#todo").on("click", "li", function () {
+  $(this).toggleClass("done");
+});
+
+// New inserts need no rebinding:
+$("#todo").append("&lt;li&gt;New item, still clickable&lt;/li&gt;");</code></pre></div>
+    <p class="code-note">Passing a selector to on() binds one handler that matches dynamically added descendants, so newly appended items respond without rebinding.</p>
+    <p>Without delegation you would re-bind after every insert. Delegation is one handler for the whole subtree, which is also faster for large lists.</p>
+    <h3 id="ch4-custom" data-toc>4.4 Namespaced and custom events</h3>
+<h4 id="ch4-custom--namespace" data-toc>4.4.1 Namespacing Details</h4>
+    <p class="topic-desc">Shows namespaced events and custom events, which turn jQuery’s event system into a tiny pub/sub pattern. Namespacing a binding such as on('click.settings', handler) lets you remove only that group with off('click.settings'). trigger fires a handler synchronously and bubbles like a native event, while triggerHandler fires handlers without bubbling. Custom events, triggered on elements and caught by on('myEvent', handler), coordinate components cleanly.</p>
+    <div class="codeWrap"><pre><code>// Namespaces let you remove one group of handlers
+$("#x").on("click.menu", doMenu);
+$("#x").off("click.menu");        // only the .menu handlers go
+
+// Custom events sync modules without coupling them
+$("#list").on("item:added", function (e, name) {
+  renderRow(name);
+});
+$("#list").trigger("item:added", ["Telephone"]);   // extra args ride along
+
+// trigger also fires real events like clicks
+$("#buy").trigger("click");</code></pre></div>
+    <p class="code-note">Namespaces give removal precision, while trigger fires both custom events and real ones, letting modules communicate through declared events instead of direct calls.</p>
+    <div class="ex"><h4 id="ch4-custom--exercises-4">Exercises 4</h4><ol>
+      <li>Bind a click with <code>.one()</code> and prove it fires exactly once.</li>
+      <li>Delegate a click over <code>li</code> items added after page load.</li>
+      <li>Add a <code>keydown</code> handler that prevents Enter from submitting.</li>
+      <li>Create a <code>cart:updated</code> event and listen to it from two places.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Effects &amp; Animation</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Effects &amp; Animation</button><div class="ch-toc-list"><a href="#ch5-show">5.1 Show, hide, toggle, fade, slide</a><a href="#ch5-animate">5.2 The animate() method</a><a href="#ch5-queue">5.3 Queues, stop, delay, finish</a><a href="#ch5-css">5.4 CSS vs animation performance</a></div></div>
+    <p class="topic-desc">Covers the built-in effects API and the queue system behind it. show, hide, and toggle reveal or conceal elements, fade and slide animate opacity or height, and animate tweens any numeric CSS property across time. Because effects queue by default, the queue methods stop, delay, and finish let you control the flow. Well-chosen effects make state changes legible to the user.</p>
+    <p>Animation is where jQuery shines at the moment-to-moment level: a show, a fade, a slide that tells the eye what changed. This chapter also explains the queue that runs behind every effect.</p>
+    <h3 id="ch5-show" data-toc>5.1 Show, hide, toggle, fade, slide</h3>
+<h4 id="ch5-show--effects" data-toc>5.1.1 Effects Detail</h4>
+    <p class="topic-desc">Shows the convenience animations for common visibility changes, each taking an optional duration and a callback. show, hide, and toggle animate the element’s display back and forth, fadeIn, fadeOut, and fadeToggle animate opacity, and slideDown, slideUp, and slideToggle animate height. The callback runs once the animation completes for every element in the set. Choosing the effect whose axis matches the change, such as fade for appearance, reads most naturally.</p>
+    <div class="codeWrap"><pre><code>$("#panel").hide(300);         // fade out and collapse to display:none
+$("#panel").show(300);
+$("#panel").toggle(300);       // respects the current state
+
+$("#msg").fadeOut("slow");     // opacity only
+$("#msg").fadeIn("slow");
+$("#msg").fadeToggle(200);
+
+$("#drawer").slideUp(400);     // height only
+$("#drawer").slideDown(400);
+
+// The callback runs when the animation finishes
+$("#panel").fadeOut(400, function () {
+  console.log("Fully hidden");
+});</code></pre></div>
+    <p class="code-note">show and hide animate display, fade animates opacity, slide animates height, and every call takes a duration plus an optional completion callback.</p>
+    <h3 id="ch5-animate" data-toc>5.2 The animate() method</h3>
+<h4 id="ch5-animate--details" data-toc>5.2.1 Animate Details</h4>
+    <p class="topic-desc">Shows the general animation engine behind the shortcuts. animate takes a map of numeric CSS properties plus a duration, easing, and options, and tweens those values smoothly, for example animate({ left: '+=30', opacity: 0.5 }). Since only numeric values animate, strings must be expressed as numbers or relative increments. The options object also includes step and complete callbacks for per-frame and finished work.</p>
+    <div class="codeWrap"><pre><code>$("#ball").animate(
+  {
+    left: "+=120px",          // relative move from the current value
+    opacity: 0.5,             // any numeric CSS property
+    height: 80,
+  },
+  {
+    duration: 600,
+    easing: "swing",          // default; "linear" is the other built-in
+    complete: function () {}, // runs when the animation ends
+  }
+);</code></pre></div>
+    <p class="code-note">animate moves any numeric CSS property from its current value, supports relative targets like +=120px, and takes an options object for easing and completion.</p>
+    <h3 id="ch5-queue" data-toc>5.3 Queues, stop, delay, finish</h3>
+<h4 id="ch5-queue--details" data-toc>5.3.1 Queue Details</h4>
+    <p class="topic-desc">Explains that jQuery animations queue by default, so chained effects play one after another rather than at once. delay inserts a timed pause into the queue, and stop halts the current animation, optionally jumping to the end, clearing the queue, or both. finish jumps every queued animation to its final state instantly. Controlling the queue is essential, otherwise several rapid calls can leave effects stampeding over each other.</p>
+    <div class="codeWrap"><pre><code>// Effects share a per-element queue, so these run one after another
+$("#box")
+  .slideUp(300)
+  .delay(150)              // pause between effects
+  .slideDown(300);
+
+// Rapid hover-overs pile up unless you stop the running effect
+$(this)
+  .stop(true, true)        // clear the queue, jump to the end
+  .animate({ left: 40 }, 200);
+
+$("#box").finish();        // end everything instantly at final values
+
+$("#box").queue(function (next) {
+  doSyncWork();            // any custom step can join the queue
+  next();                  // release the next step
+});</code></pre></div>
+    <p class="code-note">Effects run sequentially through a per-element queue, delay inserts a pause, and stop(true, true) clears pending steps and snaps to the end before restarting.</p>
+    <h3 id="ch5-css" data-toc>5.4 CSS vs animation performance</h3>
+<h4 id="ch5-css--performance" data-toc>5.4.1 CSS Animation Performance</h4>
+    <p class="topic-desc">Explains what animates cheaply and what forces the browser to do expensive work. Properties such as transform and opacity run on the compositor without re-layout, while top, left, width, and height trigger re-layout every frame. That is why modern CSS transitions and animations often beat jQuery effects for the same job. Treat jQuery effects as convenience helpers and move to CSS when motion becomes a requirement.</p>
+    <p>Browsers composite <code>transform</code> and <code>opacity</code> on the GPU. Animating width, height, left, or top forces layout reflows on every frame, and jQuery’s historic convenience effects all touch those properties. Prefer <code>transform: translate()</code> or CSS transitions for anything that runs often.</p>
+    <div class="codeWrap"><pre><code>/* Cheap: compositor-only */
+#panel { transition: transform .3s, opacity .3s; }
+#panel.is-open { transform: translateX(0); opacity: 1; }
+
+/* Expensive under animation: width, height, top, left, margin */</code></pre></div>
+    <p class="code-note">Moving with transform and fading with opacity stay on the compositor, while animating box properties triggers layout — which is why jQuery’s position effects run slower.</p>
+    <div class="warn"><p>Respect <code>prefers-reduced-motion</code>. If the user asks for less motion, skip or shrink animations — accessibility and performance in one habit.</p></div>
+    <div class="ex"><h4 id="ch5-css--exercises-5">Exercises 5</h4><ol>
+      <li>Toggle a panel with <code>slideUp/slideDown</code> and a completion log.</li>
+      <li>Animate a dot across the screen and back with <code>animate</code>.</li>
+      <li>Prevent hover-queue pile-up with <code>stop(true, true)</code>.</li>
+      <li>Rebuild one effect as a CSS transition and compare smoothness.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · AJAX</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · AJAX</button><div class="ch-toc-list"><a href="#ch6-ajax">6.1 $.ajax in full</a><a href="#ch6-shorthand">6.2 Shorthands: $.get, $.post, $.getJSON</a><a href="#ch6-serial">6.3 Serializing forms and building queries</a><a href="#ch6-promise">6.4 Promise callbacks: done, fail, always</a><a href="#ch6-fetch">6.5 Modern fetch, for comparison</a></div></div>
+    <p class="topic-desc">Covers how jQuery lets pages talk to a server without reloading, through $.ajax and its helpers. You configure a request with url, method, and data, serialise form inputs, handle failures in a central way, and chain promise-style callbacks. The shorthand methods sit on top of the same machinery, so one mental model covers the whole chapter.</p>
+    <p>AJAX is how a page updates with fresh data instead of reloading. jQuery’s layer handles encoding, parsing, and error plumbing so you can focus on the data.</p>
+    <h3 id="ch6-ajax" data-toc>6.1 $.ajax in full</h3>
+<h4 id="ch6-ajax--config" data-toc>6.1.1 AJAX Config Details</h4>
+    <p class="topic-desc">Shows the configuration object of $.ajax, the one method every other AJAX helper wraps. You pass a plain object with url, method, data, dataType, headers, timeout, and callbacks such as success, error, and complete. The library builds the request, handles serialisation and CORS, and passes a derived promise back. Everything in the rest of the chapter is a shorthand over this single call.</p>
+    <div class="codeWrap"><pre><code>$.ajax({
+  url: "/api/posts",
+  method: "GET",                // or POST, PUT, DELETE
+  dataType: "json",             // parse the response as JSON
+  data: { page: 2 },            // query string for GET, body otherwise
+  success: function (data, status, xhr) {
+    renderPosts(data);
+  },
+  error: function (xhr, status, err) {
+    console.error(status, err);
+  }
+});</code></pre></div>
+    <p class="code-note">$.ajax takes one options object describing the request; success and error run on the outcome, and dataType tells jQuery how to interpret the response.</p>
+    <h3 id="ch6-shorthand" data-toc>6.2 Shorthands: $.get, $.post, $.getJSON</h3>
+<h4 id="ch6-shorthand--details" data-toc>6.2.1 Shorthand Details</h4>
+    <p class="topic-desc">Shows the convenience wrappers for the common request patterns, which read like sentences instead of a configuration dump. $.get(url) and $.post(url, data, callback) carry out the named verbs, and $.getJSON(url) is $.get with dataType set to json. Each returns the same promise and accepts arguments that the underlying $.ajax call would spread across its options. Pick the shorthand when the defaults match your need.</p>
+    <div class="codeWrap"><pre><code>$.get("/api/posts", { page: 2 }, function (data) {
+  renderPosts(data);               // GET with a query string
+});
+
+$.post("/api/posts", { title: "Hello" }, function (data) {
+  console.log("Created", data.id); // form-encoded body
+});
+
+$.getJSON("/api/posts/7.json", function (post) {
+  renderPost(post);                // like $.get with dataType:"json"
+});</code></pre></div>
+    <p class="code-note">$.get, $.post, and $.getJSON hide the options object, so a request collapses to a URL, optional data, and a success callback.</p>
+    <h3 id="ch6-serial" data-toc>6.3 Serializing forms and building queries</h3>
+<h4 id="ch6-serial--details" data-toc>6.3.1 Serialization Details</h4>
+    <p class="topic-desc">Shows how to turn a form into a request payload without hand-building query strings. serialize reads the form’s successful controls and returns a URL-encoded string ready for a query or body, while serializeArray returns an array of name and value objects for further processing. $.param encodes a plain object or nested structure into the same query format. Together these keep data handling automatic and consistent.</p>
+    <div class="codeWrap"><pre><code>var qs = $("#search-form").serialize();
+// "q=jquery&amp;category=utils"   (URL-encoded, in field order)
+
+var arr = $("#search-form").serializeArray();
+// [{name:"q", value:"jquery"}, {name:"category", value:"utils"}]
+
+$.get("/api/search", $("#search-form").serialize(), renderResults);
+
+// Build query parameters explicitly
+var params = $.param({ q: "jquery", page: 2 });   // "q=jquery&amp;page=2"
+$.get("/api/search?" + params, renderResults);</code></pre></div>
+    <p class="code-note">serialize flattens the form into an encoded query string and serializeArray gives the name/value pairs, both ready to send with $.get or $.post.</p>
+    <h3 id="ch6-promise" data-toc>6.4 Promise callbacks: done, fail, always</h3>
+<h4 id="ch6-promise--details" data-toc>6.4.1 Promise Details</h4>
+    <p class="topic-desc">Shows the promise-style chain most jQuery code uses for AJAX, which reads more naturally than the success and error options. Every request returns a promise that categorises completion state, and you attach done for success, fail for failure, and always for code that runs either way. You can also register global handlers that observe all requests. Chaining these callbacks keeps each request’s outcome handling in one place.</p>
+    <div class="codeWrap"><pre><code>$.getJSON("/api/posts")
+  .done(function (data) {
+    renderPosts(data);
+  })
+  .fail(function (xhr, status, err) {
+    $("#error").text("Request failed: " + status);   // tell the user
+  })
+  .always(function () {
+    $("#spinner").hide();            // runs on success or failure
+  });
+
+// Global handlers: every request passes through these
+$(document).ajaxStart(function () { $("#spinner").show(); });
+$(document).ajaxStop(function () { $("#spinner").hide(); });</code></pre></div>
+    <p class="code-note">done, fail, and always attach success, error, and cleanup paths, while ajaxStart and ajaxStop toggle a spinner once for any number of in-flight requests.</p>
+    <h3 id="ch6-fetch" data-toc>6.5 Modern fetch, for comparison</h3>
+<h4 id="ch6-fetch--details" data-toc>6.5.1 Fetch Details</h4>
+    <p class="topic-desc">Shows the native fetch counterpart so you can translate between the two worlds. fetch(url, options) returns a Promise that resolves with a Response object, and you check response.ok before consuming the body as text or json. Error handling differs, since fetch only rejects on network failure and treats HTTP errors as responses. The ideas match even though the shapes differ.</p>
+    <div class="codeWrap"><pre><code>fetch("/api/posts", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ title: "Hello" })   // JSON body, not form-encoded
+})
+  .then((r) =&gt; { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  .then(renderPosts)
+  .catch((err) =&gt; console.error(err));</code></pre></div>
+    <p class="code-note">fetch uses native Promises and requires manual JSON and error handling, whereas jQuery encodes forms and parses JSON for you — the trade-off of one fewer dependency.</p>
+    <div class="tip"><p>Prefer <code>$.ajax</code> with a deferred for new jQuery code and <code>fetch</code> for new vanilla code. Legacy endpoints returning XML or form-encoded bodies are where jQuery still shines.</p></div>
+    <div class="ex"><h4 id="ch6-fetch--exercises-6">Exercises 6</h4><ol>
+      <li>Load a JSON list with <code>$.getJSON</code> and render it into a <code>ul</code>.</li>
+      <li>Serialize a form and send it with <code>$.post</code>; log the server reply.</li>
+      <li>Add a global spinner that shows only while requests are in flight.</li>
+      <li>Rewrite one request with <code>fetch</code> and compare error handling.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Utilities &amp; Deferred</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Utilities &amp; Deferred</button><div class="ch-toc-list"><a href="#ch7-each">7.1 $.each, $.map, $.grep</a><a href="#ch7-extend">7.2 $.extend and type checks</a><a href="#ch7-deferred">7.3 Deferred objects</a><a href="#ch7-when">7.4 $.when and parallel requests</a></div></div>
+    <p class="topic-desc">Covers the static helpers jQuery keeps on the $ object for working with arrays, objects, and type checks, plus the Deferred object that powers the async story. The utilities transform and inspect ordinary data, while Deferred and $.when coordinate asynchronous work such as parallel AJAX calls. Together they let you manage data and timing without extra libraries.</p>
+    <p>Beyond the DOM, jQuery ships a small toolkit of helpers for plain data, and the Deferred object that gives you control over asynchronous flow.</p>
+    <h3 id="ch7-each" data-toc>7.1 $.each, $.map, $.grep</h3>
+<h4 id="ch7-each--detail" data-toc>7.1.1 Each Detail</h4>
+    <p class="topic-desc">Shows the array and object utilities for iteration, transformation, and filtering. $.each iterates every item and calls a callback with the index and value, $.map transforms each item and flattens the result into a new array, and $.grep filters an array by a predicate or inverted test. Each works uniformly on arrays and on objects. Returning undefined from the map callback drops that item.</p>
+    <div class="codeWrap"><pre><code>var nums = [1, 2, 3, 4];
+
+$.each(nums, function (i, n) {
+  console.log(i + ": " + n);
+});
+
+var doubled = $.map(nums, function (n) { return n * 2; });       // [2,4,6,8]
+var evens   = $.grep(nums, function (n) { return n % 2 === 0; }); // [2,4]
+
+// The same helpers also iterate object keys
+$.each({ name: "Ada", age: 36 }, function (key, value) {
+  console.log(key, value);
+});</code></pre></div>
+    <p class="code-note">$.each iterates arrays or objects, $.map transforms every element into a new array, and $.grep filters one array down — the same trio in every JavaScript toolkit.</p>
+    <h3 id="ch7-extend" data-toc>7.2 $.extend and type checks</h3>
+<h4 id="ch7-extend--detail" data-toc>7.2.1 Extend Detail</h4>
+    <p class="topic-desc">Shows the merge utility and the type-check helpers. $.extend copies properties from one or more objects into a target, and with deep as the first argument it merges nested structures recursively. It is the workhorse of plugin option handling, merging user options over defaults. The isType helpers such as isArray, isFunction, and isPlainObject answer the classic detection questions that loose JavaScript typing raises.</p>
+    <div class="codeWrap"><pre><code>var defaults = { color: "red", size: 12 };
+
+// merge right into left; duplicate keys keep the rightmost value
+var config = $.extend({}, defaults, { size: 20 });
+// { color:"red", size:20 }
+
+// deep merge with "true" first for nested objects
+$.extend(true, {}, defaults, { meta: { theme: "dark" } });
+
+// type checks
+$.isArray([]);            // true
+$.isFunction(alert);      // true
+$.isPlainObject({ a: 1 });// true
+$.isNumeric("42");        // true
+$.type(null);             // "null"
+$.type([]);               // "array"</code></pre></div>
+    <p class="code-note">$.extend merges objects left to right, with true as the first argument enabling a deep merge, and the is* helpers give trustworthy type checks that raw typeof cannot.</p>
+    <h3 id="ch7-deferred" data-toc>7.3 Deferred objects</h3>
+<h4 id="ch7-deferred--detail" data-toc>7.3.1 Deferred Detail</h4>
+    <p class="topic-desc">Explains the mechanics of the Deferred object, the engine behind every jQuery AJAX promise. You create a deferred, later call resolve or reject to settle it, and attach chained callbacks with done, fail, and always. The promise method returns a read-only view so outside code can observe the outcome without resolving it. Because .then and the other methods return new promises, async work chains naturally.</p>
+    <div class="codeWrap"><pre><code>function loadWithDelay(url, ms) {
+  var d = $.Deferred();
+  setTimeout(function () {
+    d.resolve(fetchCached(url));   // hand data to the done() handlers
+  }, ms);
+  return d.promise();              // expose only the read-only side
+}
+
+loadWithDelay("/api/stats", 500)
+  .done(function (data) { renderStats(data); })
+  .fail(function () { showError(); });</code></pre></div>
+    <p class="code-note">A Deferred is a promise you control: resolve alerts done handlers, reject alerts fail handlers, and returning d.promise() keeps callers read-only.</p>
+    <h3 id="ch7-when" data-toc>7.4 $.when and parallel requests</h3>
+<h4 id="ch7-when--detail" data-toc>7.4.1 When Detail</h4>
+    <p class="topic-desc">Shows $.when, the utility that synchronizes several deferreds or promises. You pass multiple arguments, and the returned promise resolves only after every one of them has resolved, receiving all their values as arguments to the done callback. If any input rejects, the result rejects with that reason. It is the standard way to launch several AJAX requests in parallel and wait for all of them.</p>
+    <div class="codeWrap"><pre><code>var authors = $.getJSON("/api/authors");
+var posts   = $.getJSON("/api/posts");
+
+$.when(authors, posts)
+  .done(function (authorsRes, postsRes) {
+    renderDashboard(authorsRes[0], postsRes[0]);
+  })
+  .fail(function () {
+    console.error("At least one request failed");
+  });
+
+// $.when on plain values resolves immediately
+$.when(1, 2, doAsync()).done(function (a, b, result) {
+  console.log(a + b, result);   // result = resolved value of doAsync()
+});</code></pre></div>
+    <p class="code-note">$.when waits for every request in the list, passes each resolved value into done, and is fail-fast: one rejection runs the fail handler.</p>
+    <div class="ex"><h4 id="ch7-when--exercises-7">Exercises 7</h4><ol>
+      <li>Transform a dataset with <code>$.map</code> and filter it with <code>$.grep</code>.</li>
+      <li>Merge three option objects with <code>$.extend</code> and name the winner.</li>
+      <li>Write a function that returns a promise resolving after 1 second.</li>
+      <li>Fire two requests with <code>$.when</code> and render combined output.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Plugins &amp; Extending</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Plugins &amp; Extending</button><div class="ch-toc-list"><a href="#ch8-fn">8.1 Extending $.fn</a><a href="#ch8-options">8.2 Options with $.extend</a><a href="#ch8-pattern">8.3 The chaining pattern and quality</a><a href="#ch8-popular">8.4 Popular plugins — and the deprecation caution</a></div></div>
+    <p class="topic-desc">Shows how to write, configure, and chain your own jQuery plugins by adding methods to $.fn. A plugin is a function that runs against the selected set, merges user options over defaults, and returns the set for chaining. Extending jQuery this way is how the ecosystem stayed useful for over fifteen years. You also learn the habits that keep plugins predictable and how to vet plugins you inherit.</p>
+    <p>A plugin is the word for a jQuery extension that behaves like a built-in method. Writing one teaches you the chainable, options-driven style that made the ecosystem work.</p>
+    <h3 id="ch8-fn" data-toc>8.1 Extending $.fn</h3>
+<h4 id="ch8-fn--detail" data-toc>8.1.1 fn Detail</h4>
+    <p class="topic-desc">Shows the basic plugin skeleton: a function attached to $.fn. Inside the plugin, this is the jQuery collection the plugin was called on, and the function runs once against the whole set rather than once per element. You apply collection methods or iterate with each depending on the behaviour needed. Returning this at the end keeps the plugin chainable with whatever follows.</p>
+    <div class="codeWrap"><pre><code>// Define the plugin on $.fn
+$.fn.glow = function () {
+  // 'this' is the jQuery collection produced by the selector
+  this.css("box-shadow", "0 0 8px gold");
+  return this;              // keep the chain alive
+};
+
+// Use it like any built-in method
+$("#logo").glow().css("border-radius", 4);</code></pre></div>
+    <p class="code-note">A plugin is just a method on $.fn where this is the selection, and returning this keeps chaining working exactly like the built-in methods.</p>
+    <h3 id="ch8-options" data-toc>8.2 Options with $.extend</h3>
+<h4 id="ch8-options--detail" data-toc>8.2.1 Options Detail</h4>
+    <p class="topic-desc">Shows the defaults-and-options merge pattern that every published plugin uses. You declare plugin defaults on the function or on $.fn.plugin.defaults, then merge the caller’s options over them with $.extend so a caller only passes what they want changed. Deep options use the recursive form. The pattern makes plugins configurable without breaking callers as defaults grow.</p>
+    <div class="codeWrap"><pre><code>$.fn.tooltip = function (options) {
+  // merge caller options over the defaults, fresh on every call
+  var settings = $.extend({}, $.fn.tooltip.defaults, options);
+
+  return this.each(function () {
+    var $el = $(this);
+    $el.append("&lt;span class=\"tip-inner\"&gt;" + settings.text + "&lt;/span&gt;");
+  });   // each() keeps the chain intact while visiting every element
+};
+
+// Publish defaults so callers (and later overrides) can read them
+$.fn.tooltip.defaults = { text: "Default text" };
+
+$(".hint").tooltip({ text: "Click to edit" });</code></pre></div>
+    <p class="code-note">Defaults live on the plugin, $.extend overlays caller options per call, and returning this.each applies the logic element by element while the chain keeps flowing.</p>
+    <h3 id="ch8-pattern" data-toc>8.3 The chaining pattern and quality</h3>
+<h4 id="ch8-pattern--detail" data-toc>8.3.1 Pattern Detail</h4>
+    <p class="topic-desc">Enumerates the habits that make plugins play well with the rest of jQuery. Always return this so calls chain, iterate safely with each or collection methods, expose defaults publicly for inspection and modification, and scope plugin names to avoid collisions. Respect whether your code needs to loop per element or act on the set. These practices make plugins predictable, testable, and friendly to share.</p>
+    <ul>
+      <li>Always <code>return this</code> unless the plugin is a getter by contract.</li>
+      <li>Iterate with <code>this.each</code> so every selected element gets the treatment.</li>
+      <li>Expose <code>$.fn.name.defaults</code> so global default changes are possible.</li>
+      <li>Dispatch on the first argument: <code>plugin("method", ...)</code> for method-style plugins.</li>
+    </ul>
+    <div class="codeWrap"><pre><code>$.fn.counter = function (method) {
+  var methods = {
+    reset: function () { return this.text("0"); },
+    inc:   function () { return this.text((+this.text()) + 1); }
+  };
+  if (methods[method]) { return methods[method].apply(this, arguments); }
+  // No matching method: treat the call as initialization
+  return this;
+};
+
+$("#count").counter("inc");    // dispatches to methods.inc
+$("#count").counter("reset");</code></pre></div>
+    <p class="code-note">Dispatching on the first string argument turns one plugin entry point into many methods, letting each public action stay small and chainable.</p>
+    <h3 id="ch8-popular" data-toc>8.4 Popular plugins — and the deprecation caution</h3>
+<h4 id="ch8-popular--detail" data-toc>8.4.1 Popular Detail</h4>
+    <p class="topic-desc">Notes the famous plugin ecosystem built over jQuery’s peak years, from widgets and sliders to data tables and lightboxes. Most of those 2010s plugins are now abandoned, so the chapter carries a deprecation caution: vet anything you adopt before shipping it. Check maintenance, browser support, and whether native or framework equivalents now do the job. Favouring well-maintained modern solutions is the responsible default.</p>
+    <p>The ecosystem that grew around jQuery — lightboxes, datepickers, carousels, table plugins — seeded hundreds of proven patterns. Many are unmaintained today, and some depend on jQuery versions or features that are gone. Before adopting, check the last commit date, jQuery 3.x compatibility, the license, and whether a native <code>&lt;dialog&gt;</code>, a native picker, or a <code>v-if</code> in your framework already covers it.</p>
+    <div class="warn"><p>Treat every plugin as code you inherit. If it fails on jQuery 3.x/4 or has had no release in years, writing the forty-line native version is often cheaper than supporting it.</p></div>
+    <div class="ex"><h4 id="ch8-popular--exercises-8">Exercises 8</h4><ol>
+      <li>Write a <code>highlight</code> plugin that sets a background color and returns <code>this</code>.</li>
+      <li>Add a <code>defaults</code> object and verify a caller option overrides it.</li>
+      <li>Extend it with an <code>off</code> method dispatching from the plugin name.</li>
+      <li>Audit one popular plugin for maintenance status and jQuery 3.x support.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · jQuery in Modern Projects</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · jQuery in Modern Projects</button><div class="ch-toc-list"><a href="#ch9-interop">9.1 Interop with vanilla JS</a><a href="#ch9-migrate">9.2 Migrating away</a><a href="#ch9-perf">9.3 Performance tips</a><a href="#ch9-frameworks">9.4 Frameworks, accessibility, security</a></div></div>
+    <p class="topic-desc">Covers living with jQuery in a codebase that also runs modern JavaScript, and the pragmatic ways to move off it. You learn to interoperate with vanilla code over the same DOM, migrate method by method using the migrate plugin, and keep jQuery fast with caching and delegation. The chapter ends by positioning jQuery against frameworks and stressing accessibility and security habits.</p>
+    <p>Legacy code, quick admin panels, and odd corners of modern apps still run jQuery. This chapter makes coexistence clean, migration deliberate, and performance honest.</p>
+    <h3 id="ch9-interop" data-toc>9.1 Interop with vanilla JS</h3>
+<h4 id="ch9-interop--detail" data-toc>9.1.1 Interop Detail</h4>
+    <p class="topic-desc">Shows how jQuery and native code live in the same DOM without friction. jQuery sets wrap the same nodes the browser knows, so you pull the raw element out with get(0) or index zero and hand it to native APIs, and wrap any native node in $() to use jQuery on it again. Mixing styles is fine as long as you re-query deliberately and avoid stale references.</p>
+    <div class="codeWrap"><pre><code>// jQuery → native: read the DOM node
+var node = $("h1")[0];            // or .get(0)
+var name = node.tagName;          // "H1": a native field
+
+// native → jQuery: wrap it back
+var $el = $(document.querySelector("#app"));
+$el.addClass("booted");
+
+// Events coexist; handlers are just functions
+$("button").on("click", function () {
+  var form = this.closest("form"); // native method on the raw element
+  if (form) form.reset();
+});</code></pre></div>
+    <p class="code-note">Indexing a jQuery set yields the native node, wrapping a node with $ restores the jQuery methods, and inside a handler this is always the raw element.</p>
+    <h3 id="ch9-migrate" data-toc>9.2 Migrating away</h3>
+<h4 id="ch9-migrate--detail" data-toc>9.2.1 Migrate Detail</h4>
+    <p class="topic-desc">Shows a low-risk path off jQuery using the migrate plugin and native replacements. You load the migrate plugin temporarily so deprecated jQuery calls keep working while it logs what each one can be replaced with. Then you swap usage method by method, for example querySelector for $, addEventListener for on, and fetch for AJAX helpers. Removing usage incrementally keeps the app shippable at every step.</p>
+    <div class="codeWrap"><pre><code>// Load jquery-migrate during the transition; it logs removed APIs
+&lt;script src="https://code.jquery.com/jquery-3.7.1.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"&gt;&lt;/script&gt;
+
+/* Native replacements for the most common calls */
+$(sel)                  → document.querySelectorAll(sel)
+$el.find(sel)           → $el.querySelectorAll(sel)
+$el.addClass / removeClass → el.classList.add / remove
+$el.text()              → el.textContent
+$el.val()               → el.value
+$el.on("click", fn)     → el.addEventListener("click", fn)
+$el.html(str)           → el.innerHTML = str  /* sanitize first */</code></pre></div>
+    <p class="code-note">The migrate plugin logs every removed API while you work, and the table translates the ten most common calls — most migrations are this small subset in repeat.</p>
+    <div class="warn"><p>jQuery.migrate is a <em>temporary</em> aid, not a runtime to keep. Treat its console warnings as your migration checklist.</p></div>
+    <h3 id="ch9-perf" data-toc>9.3 Performance tips</h3>
+<h4 id="ch9-perf--detail" data-toc>9.3.1 Perf Detail</h4>
+    <p class="topic-desc">Gives the practical rules for keeping jQuery fast in real pages. Cache selections in variables instead of re-querying the DOM, delegate events so one handler serves many elements, batch DOM writes, and use the narrowest selector that gets the job done. jQuery itself is fast; the usual slowdowns come from repeated queries and forced layout thrash. These habits apply to the whole page, not just jQuery.</p>
+    <ul>
+      <li>Cache selections that repeat: <code>var $cards = $(".card");</code> — re-querying on every loop is the classic sin.</li>
+      <li>Start with the tightest selector: <code>#id</code> first, then scope with <code>$("#app").find(".row")</code>.</li>
+      <li>Delegate with <code>on(evt, sel, fn)</code> instead of hundreds of individual bindings.</li>
+      <li>Avoid layout thrash: batch reads, then batch writes.</li>
+      <li>Detach before heavy edits: <code>detach()</code>, mutate, then re-append.</li>
+    </ul>
+    <div class="codeWrap"><pre><code>// Bad: the selector reruns on every loop iteration
+for (var i = 0; i &lt; 200; i++) {
+  $("#row-" + i).addClass("even");
+}
+
+// Better: query once, reuse the set
+var $rows = $("[id^=row-]");
+$rows.addClass("even");      // one query, one pass</code></pre></div>
+    <p class="code-note">Querying once outside the loop and reusing the set avoids hundreds of wasted lookups — the single most common jQuery performance mistake.</p>
+    <h3 id="ch9-frameworks" data-toc>9.4 Frameworks, accessibility, security</h3>
+<h4 id="ch9-frameworks--detail" data-toc>9.4.1 Frameworks Detail</h4>
+    <p class="topic-desc">Positions jQuery against modern frameworks and covers the habits that outlive any library. Frameworks bring component models, declarative rendering, and reactivity that far exceed what jQuery offers, while jQuery stays lean for progressive enhancement. The accessibility habits cover using real interactive elements and announcing state changes to screen readers, and the security habits cover treating user input as data, escaping HTML, and never injecting unvetted markup.</p>
+    <table>
+      <tr><th>Concern</th><th>Guidance</th></tr>
+      <tr><td>Frameworks</td><td>React/Vue/Svelte own the render cycle; reach for jQuery only for legacy or interactivity outside that cycle</td></tr>
+      <tr><td>Accessibility</td><td>Keep keyboard focus, roles, and <code>aria-*</code> honest; effects must never trap focus</td></tr>
+      <tr><td>Security</td><td>Never insert unsanitized strings via <code>.html()</code>; escape server output; validate on the client and again on the server</td></tr>
+      <tr><td>When to keep it</td><td>Legacy apps, admin panels, pages without a bundler — jQuery is stable and widely understood</td></tr>
+    </table>
+    <p>Frameworks give you state and rendering; jQuery gives you surgical DOM edits. They coexist only when jQuery touches nodes the framework does not render, and the two never trade nodes. That boundary is the difference between a working hybrid and a mystery.</p>
+    <div class="ex"><h4 id="ch9-frameworks--exercises-9">Exercises 9</h4><ol>
+      <li>Read a value through jQuery and write it back through native JS, then the reverse.</li>
+      <li>Run migrate on a small legacy page and fix every warning it logs.</li>
+      <li>Profile a looping <code>$(...)</code> query versus a cached set in DevTools.</li>
+      <li>Add keyboard focus and an <code>aria</code> state to one of your toggles.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Quick Reference &amp; Glossary</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Quick Reference &amp; Glossary</button><div class="ch-toc-list"><a href="#app-selectors">A.1 Selector quick reference</a><a href="#app-traversal">A.2 Traversal and DOM method reference</a><a href="#app-events">A.3 Events and AJAX reference</a><a href="#app-glossary">A.4 Glossary</a></div></div>
+    <p class="topic-desc">Bundles the quick-reference tables and a glossary into a single closing page. Each table gathers the selectors, traversal methods, event bindings, and AJAX calls you met in the chapters, sorted for fast lookup. Skim it whenever you forget the name of a method or property, or the exact signature. It is designed to be the page you return to while you work.</p>
+    <h3 id="app-selectors" data-toc>A.1 Selector quick reference</h3>
+<h4 id="app-selectors--detail" data-toc>A.1.1 Selectors Detail</h4>
+    <p class="topic-desc">Lists the selector forms you will use daily, from plain CSS to jQuery’s extensions. It covers classes, IDs, attributes, combinators, and groups in a table, with the extra positional and state filters such as :eq and :checked called out separately. Each row shows the syntax and a one-line meaning so you can find the right selector fast.</p>
+    <table>
+      <tr><th>Selector</th><th>Selects</th></tr>
+      <tr><td><code>#id</code> / <code>.class</code></td><td>By id / by class</td></tr>
+      <tr><td><code>elem</code> / <code>elem, elem</code></td><td>By tag / grouped set</td></tr>
+      <tr><td><code>a[data-x]</code>, <code>a[href^="https"]</code></td><td>Presence / prefix match on an attribute</td></tr>
+      <tr><td><code>ul &gt; li</code></td><td>Direct children</td></tr>
+      <tr><td><code>li + li</code></td><td>Immediately following sibling</td></tr>
+      <tr><td><code>:first</code>, <code>:last</code>, <code>:eq(n)</code></td><td>Positional pick from the set</td></tr>
+      <tr><td><code>:even</code>, <code>:odd</code></td><td>Zero-based alternate indexes</td></tr>
+      <tr><td><code>:not(...)</code></td><td>Everything outside the argument</td></tr>
+      <tr><td><code>:checked</code>, <code>:disabled</code>, <code>:visible</code></td><td>State-filtered inputs and elements</td></tr>
+    </table>
+    <h3 id="app-traversal" data-toc>A.2 Traversal and DOM method reference</h3>
+<h4 id="app-traversal--detail" data-toc>A.2.1 Traversal Detail</h4>
+    <p class="topic-desc">Maps the tree-walking and content methods with the direction each one takes. find moves down, children moves to direct children, parent and closest move up, and siblings stays level, while the content methods read and write what is inside an element. The table pairs each method with a short phrase so you can recall it at a glance.</p>
+    <table>
+      <tr><th>Method</th><th>Direction / what it does</th></tr>
+      <tr><td><code>.find(sel)</code></td><td>Down — every matching descendant</td></tr>
+      <tr><td><code>.children(sel)</code></td><td>Down — direct children only</td></tr>
+      <tr><td><code>.parent()</code> / <code>.parents()</code></td><td>Up — one level / every ancestor</td></tr>
+      <tr><td><code>.closest(sel)</code></td><td>Up — nearest matching ancestor</td></tr>
+      <tr><td><code>.siblings(sel)</code></td><td>Sideways — filtered siblings</td></tr>
+      <tr><td><code>.next()</code> / <code>.prev()</code></td><td>Next / previous sibling</td></tr>
+      <tr><td><code>.eq(n)</code> / <code>.first()</code> / <code>.last()</code></td><td>Pick one member of the set</td></tr>
+      <tr><td><code>.each(fn)</code></td><td>Iterate the set; <code>this</code> is the raw node</td></tr>
+    </table>
+    <h3 id="app-events" data-toc>A.3 Events and AJAX reference</h3>
+<h4 id="app-events--detail" data-toc>A.3.1 Events Detail</h4>
+    <p class="topic-desc">Collects the event binding, triggering, and AJAX calls in one table. For events it covers on, off, one, trigger, and the normalized event object, and for AJAX it lists $.ajax plus the get, post, and getJSON shorthands with their callbacks. Each entry shows the signature and purpose so the table works as a quick refresher.</p>
+    <table>
+      <tr><th>Call</th><th>What it does</th></tr>
+      <tr><td><code>.on(evt, [sel], fn)</code></td><td>Bind; with a selector it delegates</td></tr>
+      <tr><td><code>.off(evt[, sel])</code></td><td>Unbind matching handlers</td></tr>
+      <tr><td><code>.one(evt, fn)</code></td><td>Bind for a single fire</td></tr>
+      <tr><td><code>.trigger(evt, [data])</code></td><td>Fire the event, native or custom</td></tr>
+      <tr><td><code>e.preventDefault()</code></td><td>Cancel the default action</td></tr>
+      <tr><td><code>e.stopPropagation()</code></td><td>Stop the event from bubbling</td></tr>
+      <tr><td><code>$.ajax(opts)</code></td><td>Full request control</td></tr>
+      <tr><td><code>$.get / $.post / $.getJSON</code></td><td>Shorthand requests</td></tr>
+      <tr><td><code>.done / .fail / .always</code></td><td>Promise callbacks on any request</td></tr>
+      <tr><td><code>$.param()</code> / <code>.serialize()</code></td><td>Build query strings from objects / forms</td></tr>
+    </table>
+    <h3 id="app-glossary" data-toc>A.4 Glossary</h3>
+<h4 id="app-glossary--detail" data-toc>A.4.1 Glossary Detail</h4>
+    <p class="topic-desc">Defines the core terms used across the guide in one skim, from selector and traversal to event delegation, Deferred, and promise. Each definition stays short and links the concept to where the guide covers it in depth. Read it once as a map of the vocabulary, then return whenever a term re-appears and you want a reminder.</p>
+    <ul>
+      <li><strong>jQuery set / collection</strong> — an array-like object of matched elements with chainable methods.</li>
+      <li><strong>Chain</strong> — calling methods one after another; each returns the same set.</li>
+      <li><strong>Getter vs setter arity</strong> — one argument reads the first match, two or more write to every match.</li>
+      <li><strong>Delegation</strong> — one handler on an ancestor covers current and future descendants.</li>
+      <li><strong>Deferred</strong> — a controllable promise: resolve and reject drive the done/fail handlers.</li>
+      <li><strong>Effect queue</strong> — animations on one element run in sequence; stop and finish manage the pile.</li>
+      <li><strong>Migration aid</strong> — jquery-migrate logs which removed APIs still gate your code.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>jQuery — DOM, Events &amp; AJAX Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web App Design - UX, UI and Product Thinking</title>
+<meta name="description" content="Web App Design - interface architecture, data flows, forms, error states, offline logic, and visual design for webapps.">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/webapp-design.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Web App Design - UX, UI and Product Thinking">
+<meta property="og:description" content="Web App Design - interface architecture, data flows, forms, error states, offline logic, and visual design for webapps.">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/webapp-design.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-08">
+<meta property="article:section" content="Web Basics">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Web App Design - UX, UI and Product Thinking">
+<meta name="twitter:description" content="Web App Design - interface architecture, data flows, forms, error states, offline logic, and visual design for webapps.">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/webapp-design.html#article","headline":"Web App Design - UX, UI and Product Thinking","name":"Web App Design - UX, UI and Product Thinking","description":"Web App Design - interface architecture, data flows, forms, error states, offline logic, and visual design for webapps.","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/webapp-design.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/webapp-design.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-08","articleSection":"Web Basics","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Web Basics","item":"https://amin360it.github.io/quick-guides/index.html#cat-web-basics"},{"@type":"ListItem","position":3,"name":"Web App Design - UX, UI and Product Thinking","item":"https://amin360it.github.io/quick-guides/webapp-design.html"}]}]}</script>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script>
+</head>
+<body>
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Web App Design</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 ▸ Orientation: Web Apps and the App Design Process</a><ul>
+<li><a href="#ch1-1" data-target="ch1-1">1.1 Web app vs website</a></li>
+<li><a href="#ch1-2" data-target="ch1-2">1.2 The app design process</a></li>
+<li><a href="#ch1-3" data-target="ch1-3">1.3 Design tools and hand-off</a></li>
+<li><a href="#ch1-4" data-target="ch1-4">1.4 How this guide is organised</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 ▸ UX Research for Apps</a><ul>
+<li><a href="#ch2-1" data-target="ch2-1">2.1 User interviews</a></li>
+<li><a href="#ch2-2" data-target="ch2-2">2.2 Jobs-to-be-done and personas</a></li>
+<li><a href="#ch2-3" data-target="ch2-3">2.3 Task analysis</a></li>
+<li><a href="#ch2-4" data-target="ch2-4">2.4 Competitive teardown</a></li>
+<li><a href="#ch2-5" data-target="ch2-5">2.5 Usability testing basics</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 ▸ Information Architecture</a><ul>
+<li><a href="#ch3-1" data-target="ch3-1">3.1 App structure and sitemaps</a></li>
+<li><a href="#ch3-2" data-target="ch3-2">3.2 Navigation design</a></li>
+<li><a href="#ch3-3" data-target="ch3-3">3.3 Labels, and search vs browse</a></li>
+<li><a href="#ch3-4" data-target="ch3-4">3.4 Onboarding</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 ▸ Interaction Design</a><ul>
+<li><a href="#ch4-1" data-target="ch4-1">4.1 Affordances and feedback</a></li>
+<li><a href="#ch4-2" data-target="ch4-2">4.2 Component states</a></li>
+<li><a href="#ch4-3" data-target="ch4-3">4.3 Animations and transitions</a></li>
+<li><a href="#ch4-4" data-target="ch4-4">4.4 Microcopy</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 ▸ Visual Design for Apps</a><ul>
+<li><a href="#ch5-1" data-target="ch5-1">5.1 Component design</a></li>
+<li><a href="#ch5-2" data-target="ch5-2">5.2 Density and data display</a></li>
+<li><a href="#ch5-3" data-target="ch5-3">5.3 Colour and typography in app UIs</a></li>
+<li><a href="#ch5-4" data-target="ch5-4">5.4 Theming</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 ▸ Prototyping</a><ul>
+<li><a href="#ch6-1" data-target="ch6-1">6.1 Low-fidelity wireframes</a></li>
+<li><a href="#ch6-2" data-target="ch6-2">6.2 High-fidelity mockups</a></li>
+<li><a href="#ch6-3" data-target="ch6-3">6.3 Interactive prototypes</a></li>
+<li><a href="#ch6-4" data-target="ch6-4">6.4 Design-to-dev specs</a></li>
+</ul></li>
+<li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 ▸ App-Specific UX</a><ul>
+<li><a href="#ch7-1" data-target="ch7-1">7.1 Responsive vs adaptive</a></li>
+<li><a href="#ch7-2" data-target="ch7-2">7.2 Desktop vs mobile app patterns</a></li>
+<li><a href="#ch7-3" data-target="ch7-3">7.3 PWA considerations</a></li>
+<li><a href="#ch7-4" data-target="ch7-4">7.4 Accessibility in apps</a></li>
+<li><a href="#ch7-5" data-target="ch7-5">7.5 Design systems and testing</a></li>
+</ul></li>
+</ul></nav>
+</aside>
+
+<main id="content">
+<h1 class="am-band">
+    <span class="am-band-t">Web App Design</span>
+    <span class="am-band-s">7 chapters &middot; 37 topics &middot; 63 code samples &middot; works offline</span>
+  </h1>
+<section class="chapter">
+<h2 id="ch1" data-toc>1 ▸ Orientation: Web Apps and the App Design Process</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 1 ▸ Orientation: Web Apps and the App Design Process</button><div class="ch-toc-list"><a href="#ch1-1">1.1 Web app vs website</a><a href="#ch1-2">1.2 The app design process</a><a href="#ch1-3">1.3 Design tools and hand-off</a><a href="#ch1-4">1.4 How this guide is organised</a></div></div>
+<p class="topic-desc">This first chapter pins down what a web app actually is, the five-phase process used to design one, the tools that cover each stage, and how the rest of the guide is organised. Everything that follows assumes you can answer the first question: are you designing an app or a page set?</p>
+
+<h3 id="ch1-1" data-toc>1.1 Web app vs website</h3>
+<p class="topic-desc">A website is a document you read; a web app is a tool you operate. Any design work for an interactive product starts by deciding which one you own.</p>
+<h4 id="ch1-1-verdict">The decisive questions</h4>
+<p>Three questions separate the two. First: does what this user does change what the screen shows? Second: is there per-user state that must survive a reload or a login? Third: is the primary verb <em>do, manage, create</em> rather than <em>read</em>? Answer yes to two of the three and you are designing an app: you inherit empty states, loading states, validation, sessions and failure recovery as first-class design concerns, not page polish. The one-page checklist below is the verdict tool.</p>
+<div class="codeWrap"><pre><code>Feature                    Website          Web app
+Primary verb               read, browse     do, manage, create
+Identity                   optional         required
+Content changes by         publisher        user actions
+Per-user state             none             prefs, drafts, sessions
+Session survives reload?   irrelevant       required
+Main failure to design     layout, type     states, errors, recovery
+</code></pre></div>
+
+<h4 id="ch1-1-continuum">A continuum, not a dichotomy</h4>
+<p>The boundary is fuzzy and the middle is real: a checkout flow on a marketing site is app-shaped, while a dashboard that shows one chart is site-shaped, even though it lives in an "app". The practical test is interaction density — count the distinct verbs a user performs per session. Document tools such as Notion are apps wearing a document skin; the skin is a deliberate choice about familiarity, not a verdict on the architecture. The failure mode that costs most is assuming "it is just pages" and skipping the state design that chapters 4 and 5 cover in detail.</p>
+<div class="codeWrap"><pre><code>Score each question 0 or 1:
+
+1. Does this user's action change what the screen shows?
+2. Is there per-user state that must survive reload or login?
+3. Is the primary verb do / manage / create, not read?
+
+Score 2 or more   -> app mode: all seven chapters apply
+Score 0 or 1      -> page mode: chapters 4, 6 and 7 still pay for
+                     themselves, but density and state work will be light
+</code></pre></div>
+<div class="note">App mode is assumed for the rest of this guide. If the answers put you in page mode, most chapters still improve the result — the priorities are just different.</div>
+
+<h3 id="ch1-2" data-toc>1.2 The app design process</h3>
+<p class="topic-desc">Designing an app is a loop of five phases — discover, define, design, prototype, test — run per feature, not once per product. The loop is the process; the documents it produces are side effects.</p>
+<h4 id="ch1-2-frame">Frame the problem before you draw</h4>
+<p>Discovery (chapter 2) gathers evidence about the job; definition turns that evidence into a problem statement that names the user, the job, the blocker and the success metric. A well-formed statement makes the feature falsifiable: weeks later you can ask whether the metric moved, and the answer settles the argument. Skip the statement and you design to address a symptom you misnamed in the first place. Keep the statement short enough to fit on a notecard — if it cannot, you have not decided what the problem is.</p>
+<div class="codeWrap"><pre><code>Template — write one line at a time, then cut:
+
+FOR   [who — a persona by job, not by age]
+WHO   [situation verb]             e.g. "must sync two accounting systems"
+WANT  [outcome they need]          e.g. "reconcile the ledger each Friday"
+BUT   [the blocker today]          e.g. "they export CSVs and re-key them"
+PROVE [the metric that moves]      e.g. "reconciliation under 10 minutes"
+
+If the sentence survives on a notecard, it is a problem statement.
+</code></pre></div>
+
+<h4 id="ch1-2-iterate">Design, prototype, test, repeat</h4>
+<p>Design outputs climb fidelity one level at a time — wireframe, mockup, interactive prototype (chapter 6) — and each level is tested before the next is paid for. Testing rules of thumb have held for decades: three to five participants per round surface most usability problems, and the round ends by fixing the top three issues and re-testing. One round a week beats three rounds at the end of the month, because a fix found after five screens exist costs five times as much as the same fix found after one screen. If a round surfaces zero issues, the scenarios were too easy or the prototype too forgiving — that is a finding about the test, not praise for the design.</p>
+<div class="codeWrap"><pre><code>One design round = one week, four slots:
+
+1. Pick: the top 3 untested decisions from the last round.
+2. Build: the lowest fidelity that answers the question (chapter 6).
+3. Test: 3-5 users, 4-6 tasks, each task from the hypothesis list.
+4. Debrief: 30 minutes, list what changed; top 3 fixes next round.
+
+A round with zero design changes means the hypothesis was too safe.
+</code></pre></div>
+<div class="tip">Track decisions changed per research round, not hours spent. A single interview that overturns a design decision has paid for the entire exercise.</div>
+
+<h3 id="ch1-3" data-toc>1.3 Design tools and hand-off</h3>
+<p class="topic-desc">Figma, Penpot, VS Code and browser DevTools cover every stage of app design, and no paid tool is required for any chapter. Hand-off is where design becomes a contract with the people who build it.</p>
+<h4 id="ch1-3-pipeline">One tool lane per stage</h4>
+<p>Research lives in documents and spreadsheets; wireframes and mockups live in Figma or Penpot boards with tokens and component instances; interaction is a prototype mode inside the same tool or real code; hand-off is a dev link with specs attached. The trap is the tool chain that redraws the same screen three times in three tools — every redraw is a chance for the design to drift, and the redraw time is time not spent testing. Keep the artifact single-sourced: one board that the mockup, the prototype and the dev link all read from.</p>
+<div class="codeWrap"><pre><code>Typical workflow for one screen:
+  task analysis  ->  wireframe in Figma/Penpot
+  wireframe      ->  mockup with real tokens and data
+  mockup         ->  prototype wired for the usability test
+  prototype      ->  dev link with the component spec, states, tokens
+
+Repeat until the core task completes without friction.
+</code></pre></div>
+
+<h4 id="ch1-3-contract">What a hand-off must contain</h4>
+<p>A hand-off is complete when a developer can build the screen without reopening the design file. That means annotated flows with entry points and exits, a component spec that lists every state, named tokens for colour, type and spacing, breakpoint behaviour, and the loading, empty and error states for each screen. If a state is missing from the spec, the developer will invent one — usually the cheapest rendering and the least thoughtful UX. Version the hand-off, because a screen already being built is a poor listener to design changes.</p>
+<div class="codeWrap"><pre><code>hand-off/                    contents
+  flows/                     entry and exit annotations per task
+  screen-states/             default + loading + empty + error per screen
+  components/                spec per component: anatomy, states, tokens
+  tokens/                    colour, type, spacing, radius, motion
+  behaviour/                 validation timing, navigation rules, error copy
+  breakpoints/               layout changes per width, safe areas included
+</code></pre></div>
+<div class="warn">A screenshot folder is not a spec. Screenshots answer what a screen looks like; a spec answers what it does in every state — and the states are where apps win or lose.</div>
+
+<h3 id="ch1-4" data-toc>1.4 How this guide is organised</h3>
+<p class="topic-desc">The guide runs in the same order the work does: research first, then architecture, interaction, visual design, prototyping, and finally the app-specific concerns that cut across all of it.</p>
+<h4 id="ch1-4-rhythm">The section rhythm</h4>
+<p>Chapters 2 through 5 build an app's design from evidence to pixels: 2 gathers research, 3 decides structure and navigation, 4 defines behaviour, 5 gives it visual form. Chapter 6 covers prototyping and the design-to-dev hand-off, and chapter 7 the concerns that are particular to apps rather than pages — responsive and adaptive strategy, desktop and mobile patterns, progressive web apps, accessibility and design systems. Every section follows the same rhythm: a topic description, dense prose, two code examples and a callout flagging the most common mistake.</p>
+<div class="codeWrap"><pre><code>The arc of the guide, in one line:
+
+research -> architecture -> interaction -> visual -> prototype -> ship
+
+Each chapter ends with a concrete test, not a summary.
+</code></pre></div>
+
+<h4 id="ch1-4-flowtest">Flows first, UI second</h4>
+<p>A web app is a tool, not a document. Users come to complete a task — a report signed off, an invoice matched, a test run green — not to read a story. Start with the primary task, design the screens that serve it, and add visual polish only after the flow works, because a flow that requires thought is a bug no amount of visual design can fix. The working definition of done is simple and is used at the end of every chapter.</p>
+<div class="codeWrap"><pre><code>Flow test — run after every design change:
+
+- A first-time user completes the primary task unaided.
+- Every step gives feedback within a second.
+- Failure paths exist: error, empty, offline, retry.
+- A returning user can resume where they left off.
+- The screen reads as designed with real data, not sample data.
+</code></pre></div>
+<div class="tip">Before you pixel-polish, ask: can a first-time user finish the core task? If not, fix the flow first.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 ▸ UX Research for Apps</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 2 ▸ UX Research for Apps</button><div class="ch-toc-list"><a href="#ch2-1">2.1 User interviews</a><a href="#ch2-2">2.2 Jobs-to-be-done and personas</a><a href="#ch2-3">2.3 Task analysis</a><a href="#ch2-4">2.4 Competitive teardown</a><a href="#ch2-5">2.5 Usability testing basics</a></div></div>
+<p class="topic-desc">Research converts guesses into requirements. For an app the stakes are higher than for a brochure, because a wrong assumption is paid for again on every screen — so the research bar here is: enough evidence to name the job, the user and the friction before anything is designed.</p>
+
+<h3 id="ch2-1" data-toc>2.1 User interviews</h3>
+<p class="topic-desc">Interviews reveal what people actually do and why. What people say they would use in the future is a poor predictor; what they did last week is evidence.</p>
+<h4 id="ch2-1-past">Ask about the past, not the future</h4>
+<p>"Would you use a feature that…?" invites politeness; "walk me through the last time you did X" invites a story, and stories contain steps, tools, workarounds and emotions you can design around. Structure the interview around a recent occurrence of the job: the trigger, the first action, the tools used in order, the moment it broke, the workaround. Record and transcribe; afterwards code the quotes onto themes — the theme board, not the transcript, is what drives the design. Five to eight interviews per segment is the practical range; beyond that, new themes taper sharply unless the segment is genuinely broad.</p>
+<div class="codeWrap"><pre><code>Interview script, story-first:
+
+1. "Walk me through the last time you [the job they came for]."
+2. "What did you do first? What did you do when that didn't work?"
+3. "Which tools did you use, in order? Where did you leave one for another?"
+4. "What broke or got stuck? What did you do instead?"
+5. "If that step disappeared overnight, what would you notice?"
+6. "What did you do last time that you would never want to do again?"
+
+Never ask: "Would you use a feature that…" — people say yes to be polite.
+</code></pre></div>
+
+<h4 id="ch2-1-run">Run the sessions, then analyse</h4>
+<p>Recruit from the target segment — frequency of use and job title matter more than demographics. One moderator, one note-taker; the moderator should talk about a fifth of the time. After each session, log the most important quote, one surprise, and which existing theme it strengthens; when two consecutive sessions add no new theme, you have hit saturation and can stop. Workarounds observed mid-session are the most valuable data in the room: they are the product your users already designed.</p>
+<div class="codeWrap"><pre><code>After every interview, fill three lines:
+
+QUOTE     the most important verbatim line, with task context
+SURPRISE  one thing you did not expect (workaround, emotion, tool)
+THEME     which existing theme it strengthens, or "new theme"
+
+Stop interviewing a segment when two consecutive sessions add no new theme.
+</code></pre></div>
+<div class="tip">Never correct a participant's workaround mid-session — the workaround is the data. Ask about it afterwards, in their words.</div>
+
+<h3 id="ch2-2" data-toc>2.2 Jobs-to-be-done and personas</h3>
+<p class="topic-desc">Jobs-to-be-done names the situation a user is hiring your app for; personas give that job a believable owner with real constraints. Together they keep design decisions honest.</p>
+<h4 id="ch2-2-jtbd">Write the job, not the feature</h4>
+<p>The JTBD format is: <em>When [situation], I want to [motivation], so I can [expected outcome].</em> The statement must be about the situation and the outcome, never the solution — "so I can export to CSV" is a button, not an outcome; "so I can move the figures into the system my finance team uses" is an outcome. Use the statement as a gate: a feature that does not serve a stated job is a candidate for the backlog, and a statement that names a solution has skipped the thinking. The classic failure is writing the statement backwards from the feature you already wanted.</p>
+<div class="codeWrap"><pre><code>Format:  When [situation], I want to [motivation], so I can [outcome].
+
+Bad:   "When exporting, I want a CSV button, so I can export."
+       — a solution dressed as a job; it names the button, not the need.
+
+Good:  "When I close the monthly books, I want the figures to match
+        my finance system, so I can sign off without re-keying."
+       — situation and outcome; a CSV button may or may not be the answer.
+</code></pre></div>
+
+<h4 id="ch2-2-personas">Personas are behaviour, not demographics</h4>
+<p>A persona earns its place by changing a design decision. The features that change decisions are frequency of use, device and context, technical confidence, and tolerance for interruption — not age, income or hobbies. Two or three personas for an app is typical; five suggests you researched segments rather than jobs. Each card names a goal, the blockers, and one scenario that the team can design and test against. If nobody can say which decision a persona changed, cut it — a persona that decorates the wall is a cost, not a tool.</p>
+<div class="codeWrap"><pre><code>persona: ara-budget-owner
+job:     keeps the family budget in one live document
+goal:    reconcile the month in under 15 minutes, on a phone
+frequency: opens daily, deep sessions weekly
+constraints: two interruptions per session; no spreadsheet software
+scenario: monthly bank export arrives; must match it against the budget
+influence: every screen gets a phone-first layout and auto-save
+</code></pre></div>
+<div class="warn">An age-and-hobbies list ("34, likes hiking") is a demographic profile, not a persona. If the card does not change a design decision, it is decoration.</div>
+
+<h3 id="ch2-3" data-toc>2.3 Task analysis</h3>
+<p class="topic-desc">Task analysis breaks a real job into its steps, decisions and objects so you can see exactly where the app should compress, automate or remove friction.</p>
+<h4 id="ch2-3-decompose">Decompose the job</h4>
+<p>For the app's primary task, record the trigger, the objects involved, the decisions, the steps in order, the tools used, and the end state. Pay particular attention to where the user leaves the app mid-job — the spreadsheet, the email, the second tab. Each exit is either a missing feature or a deliberately trusted external partner, and the difference must be a conscious decision. The same analysis run on the current flow and the proposed flow gives you the step delta, which is the plainest possible measure of whether the design is helping.</p>
+<div class="codeWrap"><pre><code>Task: send the monthly report to the manager
+
+trigger     the first of the month
+objects     report, recipients, delivery confirmation
+decisions   which month, who sees it, draft or final
+steps       open app > open report > edit > share > pick three people
+tools used  app + email (people receive it as an attachment)
+end state   manager confirms receipt
+exits       copy-paste into a spreadsheet for reformatting — pattern or gap?
+</code></pre></div>
+
+<h4 id="ch2-3-friction">Friction is where the steps multiply</h4>
+<p>Compare the current flow with the proposed flow step by step. Every removed step is a saved interaction, but removal must not hide a safety decision — deleting a confirmation step because it removes a step is how files get lost. Hunt for improvisation: the note-taking, the intermediate export, the reformatting ritual. Improvised steps are users telling you which feature is missing, and they are the cheapest research you will ever do. Each row of the comparison ends with an explicit decision: build it, remove it, or keep the manual path for power users.</p>
+<div class="codeWrap"><pre><code>current              target                   decision
+export to CSV        in-app share             remove the export? keep as power path
+paste into email     saved recipient groups   group picker instead of retyping
+reformat in Excel    report layout engine     native layout, not a sheet
+
+Rule: every row is a conscious decision — build, remove or keep for power users.
+</code></pre></div>
+
+<h3 id="ch2-4" data-toc>2.4 Competitive teardown</h3>
+<p class="topic-desc">A teardown scores competitors on the tasks your users actually do, so you can adopt patterns with evidence and skip the layouts that belong to someone else's content.</p>
+<h4 id="ch2-4-matrix">Score tasks, not features</h4>
+<p>Build the matrix from the task analysis: tasks down the rows, competitors across the columns. Score each competitor 1–5 on completing the task, and add a step-count column — the median steps to first success. The step count is the pattern signal: if every competitor takes six steps to share a document, there is room to improve; if they all take two, the mental model is established and innovation will cost you learning time. Score yourself honestly; the "us today" row is where the plan starts.</p>
+<div class="codeWrap"><pre><code>                 create   share   reconcile   steps (median)
+Competitor A       5        4        2             8
+Competitor B       3        5        4             5
+Competitor C       4        2        5             6
+us today           2        3        1            11
+</code></pre></div>
+
+<h4 id="ch2-4-patterns">Steal patterns, keep your layout</h4>
+<p>Patterns travel between products: command-K quick search, autosave with visible status, undo, inline validation timing, keyboard shortcuts, dense table defaults, and the retry-after-error loop. Layouts do not travel — they encode another product's content and priorities, which is why wholesale copying always produces an app that feels like a worse version of the competitor. Record each stolen pattern with its trigger, its cost, and its payoff in your context. The checklist below is the teardown's output format.</p>
+<div class="codeWrap"><pre><code>Teardown checklist — per competitor, per primary task:
+
+- steps to first success            (count them, write them down)
+- where the user can get lost       (paths with no visible exit)
+- patterns used more than once      (search, undo, autosave, validation)
+- what is gated or charged          (what hides behind the paywall)
+- one thing worth stealing          (a pattern, not a layout)
+- one thing worth avoiding          (and the reason)
+</code></pre></div>
+<div class="note">A teardown is scored against your users' tasks, not the competitors' feature lists. A feature nobody in your segment uses is noise, however impressive it is.</div>
+
+<h3 id="ch2-5" data-toc>2.5 Usability testing basics</h3>
+<p class="topic-desc">Usability testing confirms the design works on real tasks with real people. Without it, "it works" means "it works for the designer".</p>
+<h4 id="ch2-5-script">A scenario, not a questionnaire</h4>
+<p>Write four to six tasks as goals, not steps: "send the March report to your manager", not "click Share". No leading actions, no tool hints, no success cues. The moderator reads the task, the participant works, and the moderator stays silent — the only prompt after a long silence is "what are you looking for right now?". A pilot session with a colleague catches broken setups, broken prototype links and leading scripts before they burn a real participant. Reassuring the participant ("that's right") is prohibited: it teaches them the intended path and destroys the test.</p>
+<div class="codeWrap"><pre><code>Usability test — moderator script, once per task:
+
+"You're on the projects screen. Send the March report to your manager.
+Talk me through what you're doing as you go."
+
+Prompts, only after ten seconds of silence:
+- "What are you looking for right now?"
+- "What did you expect to happen there?"
+
+Never: lead the action, name a UI element, or reassure a right answer.
+</code></pre></div>
+
+<h4 id="ch2-5-metrics">Measure the four numbers</h4>
+<p>For each task record: completion (yes, partial, no), time on task, observable errors, and confidence. Then rank the issues by severity times frequency — a task two of four participants cannot complete is a high-severity issue even if it looks minor in a screenshot. The output of a round is a fix list of the top three issues, re-tested next round. This is where the earlier chapters pay off: the fix list from a usability test is the most reliable input to the problem statements of chapter 1.2.</p>
+<div class="codeWrap"><pre><code>task   completed   time   errors                  severity
+1      yes         42s    none                    -
+2      no          -      wrong section            high (2 of 4 failed here)
+3      partial     90s    missed the save action   med
+
+severity: high = blocks the task, med = slows it, low = polish.
+fix list = the top three by severity x frequency, re-tested next round.
+</code></pre></div>
+<div class="tip">Test early and cheap: a wireframe you can test beats a mockup you cannot, and a mockup beats a built screen. Usability testing is cheapest when the design is still cheap to change.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch3" data-toc>3 ▸ Information Architecture</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 3 ▸ Information Architecture</button><div class="ch-toc-list"><a href="#ch3-1">3.1 App structure and sitemaps</a><a href="#ch3-2">3.2 Navigation design</a><a href="#ch3-3">3.3 Labels, and search vs browse</a><a href="#ch3-4">3.4 Onboarding</a></div></div>
+<p class="topic-desc">Information architecture decides what exists, what it is called, and how the user reaches it. In a web app the IA is also the URL scheme — the sitemap and the route table must describe the same structure.</p>
+
+<h3 id="ch3-1" data-toc>3.1 App structure and sitemaps</h3>
+<p class="topic-desc">The sitemap is the skeleton of the app: the sections, the objects, and how they relate. The router is that skeleton made executable.</p>
+<h4 id="ch3-1-map">Map the app, then map the router</h4>
+<p>Draw the sitemap from the task analysis — top-level sections should equal the user's mental buckets (Projects, Reports, Settings), not the org chart. The route table then mirrors the sitemap one to one: a route that exists in the app but not in the sitemap is a feature that escaped design, and a sitemap node with no route is a promise nobody can keep. Keep URLs readable, because the URL is a name users type, bookmark and share — <code>/projects/42</code> teaches the structure; <code>/view?id=42</code> teaches nothing.</p>
+<div class="codeWrap"><pre><code>Sitemap (one node per page, from task analysis):
+
+projects                      projects/[id]
+  list                └─ details: edit · share · export
+reports
+settings
+  profile  ·  workspace  ·  billing
+
+The route table mirrors it 1:1 — a route not in the sitemap escaped design:
+
+const routes = {
+  '/':                   projectsList,
+  '/projects':           projectsList,
+  '/projects/:id':       projectView,
+  '/projects/:id/edit':  projectEdit,
+  '/reports':            reportsList,
+  '/settings/billing':   billingView
+};
+</code></pre></div>
+
+<h4 id="ch3-1-depth">Shallow, and above all predictable</h4>
+<p>"Three clicks" is not the rule — predictability is. A user must be able to guess where something lives, and a predictable structure needs no learning time. Open card sorting exposes the mental model: give users unlabelled items from the app and watch them group and name the groups; the taxonomy that matches their clustering is the taxonomy that will not need a tutorial. A flat structure of two levels fits tools; deeper nesting is survivable only with progressive disclosure (3.4) and visible breadcrumbs. Test the structure with a tree test before any screen is designed: give users a task and a text-only sitemap, and see where they click.</p>
+<div class="codeWrap"><pre><code>Tree test — structure before screens:
+
+"Your team has a shared budget. You need to change who can edit it."
+
+users choose:  Settings > Workspace > Permissions    (82% correct)
+          or:  Budget > Options > Access              (11% correct)
+          or:  Not there                               (7% give up)
+
+Above ~70% in the tree test, the structure is learnable. Below that,
+fix the labels and groups before designing any screen.
+</code></pre></div>
+<div class="note">The sitemap is also the navigation's job description: any node not reachable from the primary navigation is an orphan, and orphans are where apps lose their content.</div>
+
+<h3 id="ch3-2" data-toc>3.2 Navigation design</h3>
+<p class="topic-desc">Navigation is the sitemap made interactive: the primary chrome, the signals that show where the user is, and the paths between screens.</p>
+<h4 id="ch3-2-primary">Pick the chrome for the app's shape</h4>
+<p>The right primary navigation falls out of the sitemap's shape. A few sections with content-heavy pages sit well in a top bar; many modules of a tool-heavy app need a left rail, and at six or more items the rail must use labels, not icons alone — icons are the least recognisable part of an interface. On phones the thumb reaches the bottom, so the bottom tab bar wins with three to five tabs. Settings and account are secondary; they belong in a corner or a secondary rail, not in the primary chrome where they would compete with the real work.</p>
+<div class="codeWrap"><pre><code>Shape of the app              Primary navigation
+few sections, content-heavy   top bar
+many modules, tool-heavy      left rail — labels, not icons (6+ items)
+phone, thumb reach            bottom tab bar, 3-5 tabs
+account plus deep settings    secondary corner rail
+
+Rule: the choice falls out of the sitemap shape, not the platform trend.
+</code></pre></div>
+
+<h4 id="ch3-2-location">Show where the user is</h4>
+<p>An app needs three navigational signals everywhere: the current section highlighted, breadcrumbs in deep flows, and an obvious way home. Beyond location, the navigation is the app's ambient dashboard — unread counts, pending drafts, failing tests belong in the chrome where the user already looks. The nav item is a component like any other and carries the same state discipline as the rest of the app (chapter 4): a current state, a hover state and a count badge are all specified, never improvised.</p>
+<div class="codeWrap"><pre><code>Nav item anatomy — from the design system tokens:
+
+state     background    label         indicator
+default   bg-subtle     text          none
+hover     bg-raise      text strong   none
+current   accent        accent-ink    left rail mark (3px)
+count     —             text          badge: pending items
+
+Three signals the user needs everywhere: current section, way home,
+and what is pending.
+</code></pre></div>
+<div class="warn">Hamburger-only navigation hides the entire map behind one icon. It is a smell on mobile and a failure on desktop — if it appears, the sitemap-to-chrome mapping above was skipped.</div>
+
+<h3 id="ch3-3" data-toc>3.3 Labels, and search vs browse</h3>
+<p class="topic-desc">Labels are the first words a user meets, and search and browse answer different retrieval questions. Both are information-architecture decisions, not cosmetic ones.</p>
+<h4 id="ch3-3-labels">Label with the user's verbs and nouns</h4>
+<p>Run a label audit over every heading, nav item and button, and take the words from the interview transcripts, not the codebase. If eight of ten participants called a screen "the folder page", it is Folders, however the schema names it. Buttons state the outcome with a verb ("Save draft", "Send", "Delete"), and one action per verb — "Add New" says "add" and "new" and commits to neither. The audit is cheap and its absence is why products ship with "Duplicate Entity" when every user says "Copy".</p>
+<div class="codeWrap"><pre><code>Label audit — keep the user's word, drop the developer's:
+
+screen word        better label    why
+Duplicate Entity   Copy            the transcripts say "copy"
+Entity History     Versions        matches visible objects
+Edit Property      Edit            one verb per action
+Add New            Add             "new" adds nothing but width
+</code></pre></div>
+
+<h4 id="ch3-3-search">Search retrieves, browse discovers</h4>
+<p>Add search when the object count crosses the point where scanning fails — roughly dozens of rows, definitely at hundreds of items. Search requires indexing, filters and a designed no-results state; browse requires a taxonomy that is learnable. The two answer different questions: "I know what it is called" is search; "where do I find X?" is browse. Most apps need both, so decide per retrieval question and give each a predictable entry point — a search box in the chrome and a browse path in the taxonomy, never both hidden halfway down a screen.</p>
+<div class="codeWrap"><pre><code>Decide by retrieval question:
+
+question type                 answer
+"where do I find X?"          browse the taxonomy
+"I know it's called X"        search first
+"list all X in state Y"       browse + filter
+"one I made in June"          search + date filter
+
+Add search when scanning fails — dozens of rows or hundreds of items.
+Search needs filters and a designed no-results state; browse needs a
+learnable taxonomy. Most apps need both.
+</code></pre></div>
+
+<h3 id="ch3-4" data-toc>3.4 Onboarding</h3>
+<p class="topic-desc">Onboarding is not a tour of features; it is the first-run sequence that gets a new user's real job done before they give up.</p>
+<h4 id="ch3-4-firstrun">First run delivers value, not a tour</h4>
+<p>The best onboarding is a constrained first task: a believable sample appears immediately, imported data or demo data, and the first task mirrors a real job with guidance that lives on the screen. Defer configuration that has a safe default until it is needed — a settings screen that must be completed before anything works is a wall, not a welcome. The feature tour is the opposite of onboarding: it lists features the new user has no context for and no desire for yet. Measure activation — the first task completed — not just sign-up; a sign-up without activation is a visitor who never found the value.</p>
+<div class="codeWrap"><pre><code>Activation checklist for first run:
+
+1. a believable sample appears immediately (import or demo data)
+2. the first task mirrors a real job, with guidance on-screen
+3. every setting with a safe default stays hidden until needed
+4. the "tour" is replaced by a two-line hint at the task
+5. activation = first task completed, measured — not sign-up clicks
+</code></pre></div>
+
+<h4 id="ch3-4-progressive">Progressive disclosure: beginner defaults, power paths</h4>
+<p>Progressive disclosure shows the beginner the three settings that matter and nests the rest behind an "Advanced" group. It is the same mechanism that grows with the product: as the feature count rises, the visible surface stays constant and the depth moves into clearly marked groups. Two levels are usually enough — a visible default and one expanded group. Re-asking a choice the user has already made is the failure mode: preferences persist, and a settings screen that asks the same question twice is a design that does not trust itself.</p>
+<div class="codeWrap"><pre><code>Tiering a settings screen:
+
+visible default          advanced group
+email address            SMTP host, port, TLS
+notification prefs       per-event toggles, quiet hours
+privacy visibility       granular share links, export policy
+
+Save the choice; never re-ask. Two levels are usually enough.
+</code></pre></div>
+<div class="tip">Watch the first-run funnel in analytics with the activation event, not page views. The screen where new users drop off is the screen that needs the next design round.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 ▸ Interaction Design</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 4 ▸ Interaction Design</button><div class="ch-toc-list"><a href="#ch4-1">4.1 Affordances and feedback</a><a href="#ch4-2">4.2 Component states</a><a href="#ch4-3">4.3 Animations and transitions</a><a href="#ch4-4">4.4 Microcopy</a></div></div>
+<p class="topic-desc">Interaction design decides what happens when the user acts: whether the action was visible as possible, whether it was acknowledged, and whether it can be undone. This chapter covers affordances and feedback, component states, motion, and the words on the interface.</p>
+
+<h3 id="ch4-1" data-toc>4.1 Affordances and feedback</h3>
+<p class="topic-desc">An affordance is the perceived possibility of an action; feedback is the response that confirms the action happened. Both are designed, and both fail silently when skipped.</p>
+<h4 id="ch4-1-affordance">Make actions look actionable</h4>
+<p>Cursor, underline, shadow and motion all signal interactivity, and the signals must hold in every state the control has. The inverse rule matters as much: a grey box that looks like a disabled button when it is a status card is a lie the user will click repeatedly. Links need their affordances in every state — the resting underline is what makes the hover state meaningful. Keep the interactive surface generous: the hit area is the whole control, not the text inside it, and keyboard users need a visible focus ring because they cannot see the hover state at all.</p>
+<div class="codeWrap"><pre><code>/* links and buttons must look actionable in every state */
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+a:hover {
+  color: var(--accent-strong);
+  text-decoration-thickness: 2px;
+}
+
+button, .btn {
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+button:focus-visible, .btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+</code></pre></div>
+
+<h4 id="ch4-1-loop">Close the feedback loop</h4>
+<p>Every action must produce a response, and the response-time limits are decades old and still true: about 0.1 seconds feels instant, about 1 second is a flow, and about 10 seconds breaks the task — anything slower needs progress indication and a way out. The anatomy of the loop is mechanical: an action mutates state, and the rendered UI reflects it; design the loop backwards from your slowest action. Optimistic UI acknowledges immediately and reconciles with the server later, but only where rollback is visible and cheap — an optimistic debit that silently fails is a trust killer.</p>
+<div class="codeWrap"><pre><code>// the loop every interaction rides: action -> state -> rendered UI
+
+const state = { items: [] };
+
+function act(update) {
+  state.items = update(state.items);   // pure update
+  render();
+}
+
+function addItem(text) {
+  act(list => [...list, text]);
+}
+
+function render() {
+  document.getElementById('list').textContent =
+    state.items.join(', ');
+}
+</code></pre></div>
+<div class="tip">Response-time budget — instant under 100ms, flow at a second, break at ten. Audit every primary action against it once, and design the slow ones twice.</div>
+
+<h3 id="ch4-2" data-toc>4.2 Component states</h3>
+<p class="topic-desc">Every component is a state machine: default, hover, focus, active, disabled, loading, error, empty. Design all of them, or a developer will invent the ones you skipped.</p>
+<h4 id="ch4-2-machine">Specify the machine, not a screenshot</h4>
+<p>The missing-state bug is the most common failure in app design: a table with no empty state, a Save button with no saving state, a delete flow with no confirming state. For each component, list every state it can be in and what changes — colour, label, behaviour — and hand that table over with the design. The loading state deserves its own attention: a skeleton that matches the final geometry (same rows, same proportions) is far less jarring than a spinner, because the layout does not jump when the data lands.</p>
+<div class="codeWrap"><pre><code>Button state machine — design every row before the component ships:
+
+default    resting look, full label
+hover      raised surface, pointer cursor
+focus      visible ring — keyboard users' location
+active     pressed surface while the pointer is down
+disabled   dimmed, with the reason surfaced nearby
+loading    label swaps to "Saving…" + spinner, input locked
+error      field border + message naming the violated rule
+empty      n/a on a button; on lists: what to do, first action
+</code></pre></div>
+<div class="codeWrap"><pre><code>&lt;div class="skeleton" role="status" aria-label="Loading results"&gt;
+  &lt;div class="skeleton-line"&gt;&lt;/div&gt;
+  &lt;div class="skeleton-line"&gt;&lt;/div&gt;
+  &lt;div class="skeleton-line"&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre></div>
+
+<h4 id="ch4-2-disabled">Disabled is a state with a reason</h4>
+<p>Disabled is not removed, and it is not "greyed out": a control can only be disabled when the user can tell why. Surface the reason — helper text under the field, a tooltip, or the label itself — and prefer leaving the control enabled with an explanation on click when the blocker is likely to resolve (a form that is incomplete today will be complete in a minute). Never disable the only way to complete a task. There are two implementations and they mean different things: HTML <code>disabled</code> removes the control from the tab order, while <code>aria-disabled</code> keeps it discoverable. Choose deliberately.</p>
+<div class="codeWrap"><pre><code>&lt;!-- disabled with a reason stays discoverable --&gt;
+&lt;button aria-disabled="true" aria-describedby="why-disabled"&gt;
+  Publish
+&lt;/button&gt;
+&lt;p id="why-disabled"&gt;Add a title before publishing.&lt;/p&gt;
+</code></pre></div>
+<div class="warn"><code>aria-disabled</code> keeps a control in the tab order so keyboard users can discover it; <code>disabled</code> removes it entirely. For a condition that will resolve, the discoverable option is the honest one.</div>
+
+<h3 id="ch4-3" data-toc>4.3 Animations and transitions</h3>
+<p class="topic-desc">Motion has three jobs — continuity (something moved rather than vanished), direction (this is where it went), and emphasis (watch this). Everything else is decoration and should be cut.</p>
+<h4 id="ch4-3-principles">Motion principles and timings</h4>
+<p>Duration scales with distance and importance: micro-interactions such as hovers and pressed states run 80–150ms, panels and slide-overs 150–300ms, entrances 300–500ms. Easing should not be linear for anything that moves — ease-out for entrances, ease-in-out for transitions between states; spring-like curves for emphasis. Shared-element motion is only correct when the element genuinely is the same object moving between two places; animating two unrelated elements that merely look alike teaches the eye a lie. Every animation gets a token, not an ad-hoc duration, so the system stays one knob to turn.</p>
+<div class="codeWrap"><pre><code>/* duration scales with distance; easing is never linear */
+
+:root {
+  --dur-micro: 100ms;    /* hover, pressed, colour swaps        */
+  --dur-panel: 220ms;    /* reveals, slide-overs                */
+  --dur-enter: 320ms;    /* page and modal entrance             */
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+.panel { transition: transform var(--dur-panel) var(--ease-out); }
+</code></pre></div>
+
+<h4 id="ch4-3-reduced">Respect reduced-motion</h4>
+<p><code>prefers-reduced-motion</code> exists because motion makes a significant minority of users nauseous or dizzy, and for everyone else a transition that delays a task is friction. The reduced-motion preference should collapse animation to a meaningful fade or nothing at all, with state changes remaining instant — the data still updates, the page still works, it just does not fly around. Collapse to near-zero durations rather than removing behaviour, so the state machine of 4.2 is untouched by the preference.</p>
+<div class="codeWrap"><pre><code>@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</code></pre></div>
+<div class="note">Motion must never delay a task: if an animation makes the user wait, it has turned feedback into friction. When in doubt, fade.</div>
+
+<h3 id="ch4-4" data-toc>4.4 Microcopy</h3>
+<p class="topic-desc">Microcopy is the words on buttons, error messages, empty states and confirmations. It is designed like any other part of the interface, not written after the layout is locked.</p>
+<h4 id="ch4-4-voice">Verb-first buttons, explain-the-fix errors</h4>
+<p>Button labels name the outcome: "Save draft", "Publish", "Send". Error messages say what happened, why, and what to do — never "Error" and never "invalid", which blames the user without a rule. Empty states are prime real estate: they say what this area is for and offer the first action, instead of apologising with "no rows found". Read every message aloud; if it needs a second read, cut words. The table below is the format for the standard before-and-after pass, and it should run while the screens are still in mockup.</p>
+<div class="codeWrap"><pre><code>before                    after
+"Error"                   "We couldn't save. Check your connection and retry."
+"Invalid input"           "Passwords need 12 or more characters."
+"Submit"                  "Save draft"
+"Are you sure?"           "Delete 3 drafts? This can't be undone."
+"Session expired"         "You were signed out. Your work is saved."
+</code></pre></div>
+
+<h4 id="ch4-4-context">Write for the moment</h4>
+<p>The destructive confirmation is the moment of maximum anxiety, and the microcopy carries the whole weight of it. State the object, the consequence, and the undo path, in that order: "Delete report 'March reconciliation'? It will be removed for everyone who can see it. This can't be undone." Validation microcopy names the rule that failed ("Passwords need 12 or more characters") rather than "invalid input", and flags the first failing field rather than firing a wall of messages. Draft microcopy during design, not after hand-off — the words change the layout, and the layout changes the words.</p>
+<div class="codeWrap"><pre><code>Destructive confirmation, in order:
+
+1. the object      "Delete report 'March reconciliation'?"
+2. the consequence "It will be removed for everyone you shared it with."
+3. the undo path   "This can't be undone."  or  "Undo available for 10s."
+
+Never write "Are you sure?" alone — the user already clicked. Tell them
+what they are about to destroy.
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 ▸ Visual Design for Apps</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 5 ▸ Visual Design for Apps</button><div class="ch-toc-list"><a href="#ch5-1">5.1 Component design</a><a href="#ch5-2">5.2 Density and data display</a><a href="#ch5-3">5.3 Colour and typography in app UIs</a><a href="#ch5-4">5.4 Theming</a></div></div>
+<p class="topic-desc">In an app, visual design is hierarchy and legibility under task pressure: separate component design, density and data display, colour and typography, and theming. The goal is not decoration but a readable, scannable tool surface.</p>
+
+<h3 id="ch5-1" data-toc>5.1 Component design</h3>
+<p class="topic-desc">Components are the app's building blocks. Each one gets a spec that declares its anatomy, its states and the tokens it uses — the same spec the developer builds from (chapter 6.4).</p>
+<h4 id="ch5-1-anatomy">One component, one job, one spec</h4>
+<p>The boundary rule from the old component architectures still holds as a design rule: a button is a button, a card is a card, a page is a page. Every component spec declares its anatomy (the parts), the states from chapter 4.2, the tokens it consumes, its variants, and its behaviour under constraint — what happens with a two-character label or a forty-character one. Components are borrowed wholesale from the design system (7.5) rather than redrawn per screen; a screen that restyles a shared component is how systems die. The spec below is the contract for a button and is the template for every component in the library.</p>
+<div class="codeWrap"><pre><code>{
+  "button": {
+    "anatomy": ["label", "spinner", "keyboard shortcut"],
+    "states": ["default", "hover", "focus", "active", "disabled", "loading"],
+    "variants": ["primary", "secondary", "ghost", "danger"],
+    "tokens": ["color.bg.accent", "color.ink.accent", "space.3", "radius"],
+    "behaviour": {
+      "loading": "label swaps to spinner, input locked, no double submit",
+      "shortLabel": "minimum two characters, no truncation",
+      "longLabel": "wraps, never truncates"
+    }
+  }
+}
+</code></pre></div>
+
+<h4 id="ch5-1-forms">Forms are the app's input contract</h4>
+<p>Forms gather the data an app is for, and the interaction rules are settled: label above the input (labels scan faster and survive errors, where placeholders vanish), validate after blur rather than on the first keystroke, anchor each error to its field, and keep values on failure. Submission must be acknowledged and idempotent — a double tap on Submit must not create two records. The flow contract is the same loop as every other action: submit, validating, success or error, retry. The old form-handler pattern carries forward as the behavioural spec, not the code.</p>
+<div class="codeWrap"><pre><code>field      validate       when          error style
+email      format         after blur    inline, names the rule
+password   strength       after blur    inline, lists the rule
+submit     all fields     on submit     scroll to first error
+endpoint   server rules   on submit     keep values, top-of-form summary
+
+The flow for a submit: idle -> validating -> success | error -> retry.
+</code></pre></div>
+<div class="warn">Clearing a field on error is the fastest way to lose the user's typing. Never clear on validation error, and keep the typed values on a server error too — the network was the problem, not the data.</div>
+
+<h3 id="ch5-2" data-toc>5.2 Density and data display</h3>
+<p class="topic-desc">Density is how much data fits without losing legibility. Tables and lists are where most application UI actually lives, so this is the chapter where apps earn their keep.</p>
+<h4 id="ch5-2-density">Three density levels</h4>
+<p>Density is a token, not a string of per-screen tweaks: comfortable for touch-first mobile, compact for desktop keyboard work, dense for monitoring grids and large data sets. Give the user a switch and persist the choice. The classic defect is the desk-density table shipped to phone width, or the comfortable card at 2560 pixels with three columns of empty space — density is a per-device decision, made at the component level so that every screen honours it. Build every new component at all three densities, or the phone screen is an accident waiting for release.</p>
+<div class="codeWrap"><pre><code>Density presets — a token, not per-screen tweaks:
+
+comfortable   touch-first, 48px rows, generous whitespace    (mobile)
+compact       desk work, 40px rows, table lists              (laptop)
+dense         data grids, 32px rows, tabular numbers         (monitoring)
+
+Let the user switch; persist the choice. Build every component at all
+three densities, or the desk screen ships to phones by accident.
+</code></pre></div>
+
+<h4 id="ch5-2-tables">Tables: the data workhorse</h4>
+<p>A data table is a reading instrument: sticky headers keep the column meaning while rows scroll, numeric columns right-align so values compare down the column, and numbers render in tabular figures so digits do not jitter as they change. Two actions per row maximum — one primary action always visible, secondary actions behind a hover or ellipsis menu, because every visible button competes for attention. The table needs its empty and loading states like any other component, and a footer that says what is shown ("1,240 of 4,512") rather than dumping a wall of rows. On mobile, tables become cards or minified rows — a table is not fluidly resizable.</p>
+<div class="codeWrap"><pre><code>Table anatomy — the reading instrument:
+
+sticky header          column titles stay while rows scroll
+numeric alignment      right-aligned, tabular-nums so digits don't jitter
+dates and times        relative on mobile, absolute on hover
+primary action         first cell, always visible
+secondary actions      ellipsis menu (touch) / hover row (desktop)
+empty state            what to do first, never "no rows"
+row count              footer: "1,240 of 4,512 shown", not a wall
+</code></pre></div>
+<div class="note">A table is not fluidly resizable; below a width threshold it becomes cards. Set that threshold at the breakpoint table (7.1), not at the moment a screen happens to overflow.</div>
+
+<h3 id="ch5-3" data-toc>5.3 Colour and typography in app UIs</h3>
+<p class="topic-desc">In an app, colour and type are encoding systems before they are decoration: colour codes states and data categories, and type carries the hierarchy that density compresses.</p>
+<h4 id="ch5-3-colour">Colour codes states and categories</h4>
+<p>Semantic colour roles must mean the same thing everywhere in the app: info for neutral status, success for saved and synced, warning for degraded, danger for errors and destructive acts. Data categories get hues that stay distinguishable under colour-blindness — never encode the danger state in colour alone; pair it with an icon or label because colour is the most fragile channel you have. The floors are WCAG AA and fixed, not aspirational: 4.5:1 for text, 3:1 for UI edges, and both themes of 5.4 must clear them.</p>
+<div class="codeWrap"><pre><code>Semantic colour roles — consistent across the whole app:
+
+info      neutral status, facts          (the accent blue)
+success   saved, done, in sync           (green)
+warning   attention, degraded            (amber)
+danger    errors, destructive acts       (red)
+
+Contrast floors, both themes: 4.5:1 text, 3:1 UI edges (WCAG AA).
+State must pair colour with an icon or label — never colour alone.
+</code></pre></div>
+
+<h4 id="ch5-3-type">A small ramp with roles</h4>
+<p>Two families, used on purpose: a UI sans for everything readable and a mono face for data. The ramp is four to six sizes with named roles — display, title, body, caption, number — so any screen can pick a size by role rather than by feel. Body copy at 16px with a line-height around 1.4–1.5 keeps dense app text scannable, and caption sizes stay above the practical floor for anything interactive. Numbers and timestamps render in tabular figures so columns stop jittering; that single declaration fixes more data-table wobble than any layout tweak.</p>
+<div class="codeWrap"><pre><code>:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --fs-display: 2rem;     /* screen titles, one per page  */
+  --fs-title:   1.375rem; /* section titles               */
+  --fs-body:    1rem;     /* the 99 percent case           */
+  --fs-caption: .875rem;  /* meta, timestamps              */
+  --fs-num:     .875rem;  /* numbers: tabular-nums         */
+}
+
+.nums {
+  font-variant-numeric: tabular-nums;
+}
+</code></pre></div>
+<div class="note">The 44px touch-target floor (7.1) is also a typography rule: if a control's tap area must be 44px, its label is never going to be a 10px caption. Scale the label with the target.</div>
+
+<h3 id="ch5-4" data-toc>5.4 Theming</h3>
+<p class="topic-desc">A theme is a map of tokens, swapped in one place. Design in tokens from the start and a second theme is a second map — not a second stylesheet and not a second component library.</p>
+<h4 id="ch5-4-tokens">Tokens make themes a swap</h4>
+<p>Design with semantic tokens — <code>color.bg</code>, <code>color.accent</code>, <code>ink.subtle</code>, <code>space.4</code> — that resolve to page variables, and let themes be alternative maps from the same names. If any component hardcodes a hex value, it belongs to no theme and will not survive the switch. The hex lives in exactly one place: the token file. The two maps below are the archetype — same names, different roles — and there is no third place where colour may be written.</p>
+<div class="codeWrap"><pre><code>light {
+  "color.bg":        "#f4f8fd",
+  "color.bg.raise":  "#ffffff",
+  "color.ink":       "#0b1f3a",
+  "color.ink.subtle":"#46586f",
+  "color.accent":    "#0267b2",
+  "color.ink.accent":"#ffffff"
+}
+
+dark {
+  "color.bg":        "#03122f",
+  "color.bg.raise":  "#0a1a33",
+  "color.ink":       "#e6f1ff",
+  "color.ink.subtle":"#a7b8cc",
+  "color.accent":    "#00d1ff",
+  "color.ink.accent":"#03203f"
+}
+</code></pre></div>
+
+<h4 id="ch5-4-dark">Dark mode rebalances; it does not invert</h4>
+<p>Dark mode is its own rendering problem, not a colour-inversion filter. Invert a photo and the result is wrong; invert a theme and the same happens: pure black surfaces cause halation on bright screens, saturated colours bloom, and semantic colours lose their meaning. The dark theme rebalances: deep navy rather than black, a lighter red for danger so text-pair contrast survives, lower-saturation borders, and elevation carried by borders and lift instead of shadows. Every token in 5.4-1 ships a dark counterpart or it ships twice — once as a promise and once as a bug.</p>
+<div class="codeWrap"><pre><code>Dark theme rebalances — build it, do not invert it:
+
+surface     deep navy, never #000  (pure black smears on bright screens)
+danger      lighter red for the same 4.5:1 text contrast
+borders     lower saturation than the light theme
+shadows     reduce them — elevation reads via borders and lift
+images      dim with a scrim when text must read over them
+
+Rule: a semantic colour that cannot keep its meaning in both themes
+is not a semantic colour yet.
+</code></pre></div>
+<div class="note">Token discipline is the cheapest theming insurance there is: a screen that reads tokens needs ten minutes to theme; a screen with hardcoded hex needs a redesign.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 ▸ Prototyping</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 6 ▸ Prototyping</button><div class="ch-toc-list"><a href="#ch6-1">6.1 Low-fidelity wireframes</a><a href="#ch6-2">6.2 High-fidelity mockups</a><a href="#ch6-3">6.3 Interactive prototypes</a><a href="#ch6-4">6.4 Design-to-dev specs</a></div></div>
+<p class="topic-desc">Prototyping climbs fidelity level by level — wireframe, mockup, interactive prototype — testing cheaply at each level before the expensive commitments of the next. The same artifacts that test the design become the spec that ships with it.</p>
+
+<h3 id="ch6-1" data-toc>6.1 Low-fidelity wireframes</h3>
+<p class="topic-desc">Wireframes test structure, content and flow with boxes and grey — no colour, no type decisions, no pixels spent on decisions that are not made yet.</p>
+<h4 id="ch6-1-structure">Boxes, real labels, real order</h4>
+<p>Grey rectangles are fine for imagery, but text must be real: a placeholder "Title" driving layout produces a layout sized for the word Title, and the real heading will wrap. Use the same widths, borders and spacing that the real screen will keep, so the wireframe is a skeleton rather than a suggestion. Work on boards in Figma or Penpot, one frame per screen state — the board of a task's states is the first honest picture of the whole flow, and it costs nothing to reshuffle. The wireframe below is the whole point: structure, in grey, instantly reshufflable.</p>
+<div class="codeWrap"><pre><code>+--------------------------------------------------------------+
+| logo   Projects  Reports  [search.........]          [avatar] |
++--------------------------------------------------------------+
+| projects  |  March reconciliation                  [share]    |
+| ...       |  ------------------------------------------------ |
+| reports   |  status: draft          edited: 2 min ago         |
+| settings  |  [Budgets]  [Actuals]  rows: 14                   |
++--------------------------------------------------------------+
+</code></pre></div>
+
+<h4 id="ch6-1-recording">Annotate the flow, not the box</h4>
+<p>Every arrow drawn between wireframes is a design decision — the entry, the exit, the state change — and decisions made silently are decisions never reviewed. Mark each flow decision with a circled letter on the frame (A1, A2), keep the explanation in a notes column beside the board, and treat the annotations as the first draft of the hand-off spec (6.4). The convention keeps the artboard clean and makes the thinking visible to the whole team, including the developers who will eventually implement it.</p>
+<div class="codeWrap"><pre><code>Annotation markers — circled on the frame, explained beside it:
+
+A1  entry:  from the Projects list, row menu &gt; Open
+A2  state:  header shows a draft chip until the report is published
+A3  exit:   Share opens the recipient picker (mockup 03)
+A4  error:  save failure shows a banner and keeps the fields
+
+Every arrow and every state note is a decision the team can review.
+</code></pre></div>
+<div class="tip">Wireframes are disposable, and that is their virtue: the skeleton is fixed by the cheapest possible investment. The moment a screen needs real colour and type, it has graduated to chapter 6.2.</div>
+
+<h3 id="ch6-2" data-toc>6.2 High-fidelity mockups</h3>
+<p class="topic-desc">High-fidelity mockups carry real tokens, real data and every state. They are the visual design proven on paper before anything is built, and the board itself is the beginning of the hand-off.</p>
+<h4 id="ch6-2-states">Every state on the board</h4>
+<p>A key screen ships with five states on the board: default with real data, loading (the geometry before data arrives), empty (first run and no matches), error (connection and validation failures), and success (the confirmation after the primary action). One missing state is one state the developer has to invent, and the invented one will be the cheapest — usually a bare spinner and a grey "no rows". Mockup states are the direct visualisation of the state machines from 4.2; the checklist below applies per screen, not per once.</p>
+<div class="codeWrap"><pre><code>Every key screen ships five states on the board:
+
+1  default    real tokens, real data
+2  loading    the geometry before data arrives
+3  empty      first-run view and no-matches view
+4  error      connection failure and validation failure
+5  success    the confirmation after the primary action
+
+One missing state = one state the developer invents.
+</code></pre></div>
+
+<h4 id="ch6-2-data">Realistic data, not lorem ipsum</h4>
+<p>Lorem ipsum hides every defect it is meant to reveal: wrapping, truncation, numeric alignment and the difference between a 9-char ID and a 40-char title. Mock up with data that breaks layouts on purpose — long names, six-digit numbers, real dates — so that truncation rules and wide-table behaviour are decided in the mockup, not on the built screen. Every text token gets a maximum length in the spec; every number column uses tabular figures before it jitters in production.</p>
+<div class="codeWrap"><pre><code>Use data that breaks layouts, on purpose:
+
+title   "Quarterly reconciliation notes draft v7 final (2)"
+name    "Aravelli-González, María José"
+number  1,240,963.75
+date    2026-10-02 14:08
+
+types:  numbers right-aligned, mono face, tabular-nums.
+truncation rule: ellipsis at the container, title on hover.
+</code></pre></div>
+<div class="note">If a mockup cannot decide truncation, a browser will — one character at a time, at a width you never tested. Decide it in the mockup with the worst-case string.</div>
+
+<h3 id="ch6-3" data-toc>6.3 Interactive prototypes</h3>
+<p class="topic-desc">An interactive prototype tests flow behaviour — navigation, state changes, error handling — without a backend. It is a test rig for the hypotheses of the round, not a demo deck.</p>
+<h4 id="ch6-3-wiring">Wire the hypotheses, not every pixel</h4>
+<p>A prototype earns its budget by answering the round's top questions. Wire the happy path plus the two most important failure paths, and leave the rest as static frames; with three to five users per round and four to six tasks, a prototype of ten wired screens beats a demo of fifty. The interaction map below is the wiring list — each line names the screens a task travels and the hypothesis that task is testing. If a screen is not on the map for this round, it does not get wired this round.</p>
+<div class="codeWrap"><pre><code>Wiring list for the round — hypothesis in each line:
+
+01 dashboard  -> 02 project       (find the month in under 10 seconds)
+03 share      -> 04 recipients    (pick three people and confirm)
+05 reconcile  -> 06 conflict      (what happens on a mismatch)
+06 error      -> 01               (retry without losing the edits)
+</code></pre></div>
+
+<h4 id="ch6-3-tools">Choose the tool by the question</h4>
+<p>Figma and Penpot prototype layout, navigation and visual states quickly, and they are the right home for most rounds. Code — HTML, CSS and a little JavaScript — earns its way when the question is about timing, asynchronous behaviour, real data, keyboard support or performance: fake timers and fixed delays cannot test a slow network, and a prototype that never loads slowly cannot test the loading state. The generic rule covers every tool choice: test the question at the lowest fidelity that answers it.</p>
+<div class="codeWrap"><pre><code>Question                                Prototype in
+navigation, states, visual layout       Figma / Penpot
+timing, async, real data                code (HTML/CSS/JS)
+keyboard and screen-reader behaviour    code, real browser
+performance under load                  code — fake timers can't test it
+
+Rule: test the question at the lowest fidelity that answers it.
+</code></pre></div>
+<div class="warn">A prototype with fixed timers and canned data cannot test speed, and a prototype is never permission to skip the states. If the question is "how does it feel under load", prototype in code before the design half of the round is over.</div>
+
+<h3 id="ch6-4" data-toc>6.4 Design-to-dev specs</h3>
+<p class="topic-desc">Hand-off turns prototypes into building instructions: tokens, states, behaviour, breakpoints and naming that both sides agree on. The spec is the contract, and the acceptance test is that a developer never needs to reopen the design.</p>
+<h4 id="ch6-4-manifest">The spec is a contract</h4>
+<p>A component-level spec lists the tokens by name, the anatomy, every state from the machine, the behaviour rules and the responsive rules — and it names the copy with maximum lengths. The developer should build from the spec without reopening the design, and the designer should be able to verify the build against it. Page-level specs add the flow annotations from 6.1. Both get versioned, because the screen in progress is a bad listener to a spec that changed last night. The manifest below is the per-component contract; the fields are non-negotiable.</p>
+<div class="codeWrap"><pre><code>Component hand-off, page "Button":
+
+tokens      color.bg.accent, color.ink.accent, radius, space.3
+anatomy     label + spinner + optional shortcut
+states      six states from the machine, all rendered
+behaviour   loading locks the input; no double submit
+copy        label strings, max lengths in the design tokens
+responsive  full width below 480px, inline at and above
+
+Acceptance: the developer builds it without reopening the design.
+</code></pre></div>
+
+<h4 id="ch6-4-naming">Name layers like the code</h4>
+<p>Layer names are the first draft of the CSS: a Figma frame called <code>Button/Primary</code> becomes <code>.btn.btn-primary</code> without interpretation, and a layer called <code>Group 47</code> becomes a mystery the developer has to solve. Rename layers and components to the token and class names before hand-off; renames after the build start - and the screen drifts from the system. The convention is a table of two columns and it is cheap: renaming is minutes, reverse-engineering is days.</p>
+<div class="codeWrap"><pre><code>Name layers like the code they will become:
+
+Figma layer        code name
+Button/Primary     .btn.btn-primary
+Icon/chevron-r     .icon-chevron-right
+Type/tabular       .nums       (font-variant-numeric: tabular-nums)
+
+Rename before hand-off. A renamed layer maps 1:1; a layer called
+"Group 47" maps to a question today and a drift tomorrow.
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch7" data-toc>7 ▸ App-Specific UX</h2>
+<div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents &middot; 7 ▸ App-Specific UX</button><div class="ch-toc-list"><a href="#ch7-1">7.1 Responsive vs adaptive</a><a href="#ch7-2">7.2 Desktop vs mobile app patterns</a><a href="#ch7-3">7.3 PWA considerations</a><a href="#ch7-4">7.4 Accessibility in apps</a><a href="#ch7-5">7.5 Design systems and testing</a></div></div>
+<p class="topic-desc">Not every app is a phone app, and no app is a static page. This final chapter covers the concerns particular to apps: responsive and adaptive strategy, desktop and mobile patterns, progressive web apps, accessibility, and the design system plus testing that hold it all together.</p>
+
+<h3 id="ch7-1" data-toc>7.1 Responsive vs adaptive</h3>
+<p class="topic-desc">Responsive reflows fluidly; adaptive swaps in distinct layouts at chosen widths. Apps use both deliberately, and the breakpoints are chosen by content, not by device inventory.</p>
+<h4 id="ch7-1-strategy">Fluid everywhere, adaptive where it matters</h4>
+<p>Fluid grids handle prose and simple layouts; distinct layouts handle the components that genuinely change shape — a table that becomes cards, a toolbar that becomes an overflow menu, a rail that becomes a drawer. The breakpoints themselves are triggers, not truths: 480, 768, 1024 and 1280 CSS pixels cover the common territory without pretending to be a census of devices. Test at each breakpoint and at the widths between them, because the ugliest failures live halfway between two breakpoints. A breakpoint strategy is a table with a reason in every cell.</p>
+<div class="codeWrap"><pre><code>Breakpoints are content triggers, not device inventory:
+
+&lt; 480px    single column, bottom nav, table rows become cards
+480-767    two columns, toolbar overflows into a menu
+768-1023   sidebar appears — context rails
+1024-1279  primary rail plus a detail panel
+&gt;= 1280px  multi-pane layouts, full tables
+
+Test at the breakpoints and at the widths between them.
+</code></pre></div>
+
+<h4 id="ch7-1-targets">Touch targets and safe areas</h4>
+<p>Interactive targets need 44 CSS px minimum — the 44px floor of mobile guidance and WCAG Level AAA. Never shrink a control to fit a breakpoint; restructure the row instead, because a 32px button saves space and costs fat-finger retries. Devices with notches and rounded corners need the safe-area insets so bottom bars do not sit under the home indicator; those insets are browser-provided values, not guesses. The coarse-pointers media query catches the real difference: touch users cannot hover, so everything hover does must also be reachable by tap.</p>
+<div class="codeWrap"><pre><code>/* 44px minimum target, safe areas included */
+
+.target {
+  min-height: 44px;
+  min-width: 44px;
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (pointer: coarse) {
+  .target { min-height: 48px; }  /* thumbs on phones */
+}
+</code></pre></div>
+<div class="note">A control that needs hover to be discoverable has no discoverability on touch. If hover reveals an action, the action also needs a tap-path way in.</div>
+
+<h3 id="ch7-2" data-toc>7.2 Desktop vs mobile app patterns</h3>
+<p class="topic-desc">The same app at two sizes is two products: the input modes, the attention and the context differ. The mobile version is designed from the mobile context, not compressed from the desktop screens.</p>
+<h4 id="ch7-2-shell">Shells differ by input and attention</h4>
+<p>Desktop users have a keyboard, a hover cursor, multiple windows and a long attention span; the desktop shell shows a persistent rail, dense data, and keyboard shortcuts, and the app can have more than one pane of content visible. Mobile users hold the phone in one hand, work in fragments of attention, and get interrupted; the mobile shell puts the primary navigation at the bottom where the thumb is, keeps one task on screen, and must restore context when the user returns — a mobile session that loses its place is a session that ends. Do not port screens; adapt the priority of tasks.</p>
+<div class="codeWrap"><pre><code>The same app, two shells:
+
+desktop                        mobile
+rail plus hover                bottom tab bar, thumb reach
+keyboard shortcuts             no keyboard — one-tap tasks
+multiple windows               one window, restore on return
+hover-only actions             long-press / ellipsis menus
+dense tables                   cards or minified rows
+</code></pre></div>
+
+<h4 id="ch7-2-context">Design for the context</h4>
+<p>The context exercise makes the difference explicit: take the same two tasks, lay them out at both sizes, and notice which actions change rank. "Reconcile the month" on mobile strips to approve-or-flag; "edit the report" on mobile becomes read-and-pocket-edits. Whatever drops out of the mobile version must either be reachable in one more tap or visibly unavailable — a feature that is hidden is a bug, because the user will spend minutes hunting it. The output of the exercise is a priority list per platform, which is also the input to the density and breakpoint decisions of 5.2 and 7.1.</p>
+<div class="codeWrap"><pre><code>Context exercise — two tasks, both sizes:
+
+task A  "reconcile the month"   mobile: strip to approve-or-flag
+task B  "edit the report"       mobile: read and pocket edits only
+
+Whatever drops out of the mobile version is either one more tap away
+or visibly unavailable — a hidden feature is a bug.
+</code></pre></div>
+
+<h3 id="ch7-3" data-toc>7.3 PWA considerations</h3>
+<p class="topic-desc">A progressive web app is a web app plus installation and offline capability: a manifest, a service worker and a UI that is honest about connectivity. The offline work from the earlier architecture chapters carries forward as the design contract.</p>
+<h4 id="ch7-3-manifest">Installable: the manifest</h4>
+<p>The manifest is what makes an app installable: name, icons, start URL, display mode and colours. <code>short_name</code> is the label under the icon on a phone home screen — keep it to about twelve characters, because that is what the platform shows. Icons ship at 192 and 512, <code>display: standalone</code> drops the browser chrome so the app feels like an app, and the theme colour should match the app's surface so the launch screen does not flash. Installability requires HTTPS and a service worker; the manifest alone is inert.</p>
+<div class="codeWrap"><pre><code>{
+  "name": "Reconcile — budget matching",
+  "short_name": "Reconcile",
+  "start_url": "/app",
+  "display": "standalone",
+  "theme_color": "#03122f",
+  "background_color": "#03122f",
+  "icons": [
+    { "src": "/icons/192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
+</code></pre></div>
+
+<h4 id="ch7-3-offline">Offline is a UX, not just caching</h4>
+<p>Offline capability is decided per resource: the app shell is cached at install and versioned; data is cached per object; mutations are queued and retried. The user-visible contract follows: a banner says you are offline and edits are saved locally, a badge shows pending sync, conflicts resolve with an explicit choice, and storage pressure warns before eviction. The service worker pattern from the earlier architecture carries forward as the caching layer, with the versioning discipline that prevents stale data — a cache that never updates serves yesterday's app forever.</p>
+<div class="codeWrap"><pre><code>const CACHE = 'app-v2';   // bump the version when assets change
+
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(assetList)));
+});
+
+self.addEventListener('activate', (e) => {
+  e.waitUntil(caches.keys().then((keys) =>
+    Promise.all(
+      keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
+    )
+  ));
+});
+
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    caches.match(e.request).then((r) => r || fetch(e.request))
+  );
+});
+</code></pre></div>
+<div class="codeWrap"><pre><code>Offline, user-visible:
+
+connection lost      banner: "You're offline — edits are saved locally"
+queued mutations     badge on Sync: 2 pending
+conflict on return   explicit pick: keep mine / keep theirs / merge
+storage pressure     warn before eviction
+
+Rule: the offline mode is a promise the UI must keep, not a debug flag.
+</code></pre></div>
+<div class="warn">A cache that never updates serves stale data forever. Version the cache on every release, purge old versions in activate, and let the version bump be part of the release checklist, not an insight.</div>
+
+<h3 id="ch7-4" data-toc>7.4 Accessibility in apps</h3>
+<p class="topic-desc">Apps are built from custom widgets, so accessibility is a design requirement like responsive layout: semantics, keyboard order and contrast are all decided, never improvised.</p>
+<h4 id="ch7-4-semantics">Semantics and keyboard order</h4>
+<p>Custom components carry ARIA semantics and keyboard behaviour as part of their spec: a dialog announces itself with <code>role="dialog"</code> plus a labelled title, traps focus while open and returns it on close; a toggle reports its state with <code>aria-pressed</code>; tables mark their headers. The focus order is designed per screen — it is the visual order read linearly — and the focus ring is visible everywhere because the keyboard is a real input method, not a fallback. The panel below is the canonical dialog pattern; the keyboard handling is a spec, not a nicety.</p>
+<div class="codeWrap"><pre><code>&lt;!-- dialog: role, label, description, focus managed --&gt;
+&lt;div role="dialog" aria-modal="true"
+     aria-labelledby="del-title" aria-describedby="del-desc"&gt;
+  &lt;h2 id="del-title"&gt;Delete report?&lt;/h2&gt;
+  &lt;p id="del-desc"&gt;This can't be undone for shared copies.&lt;/p&gt;
+  &lt;button id="del-cancel"&gt;Cancel&lt;/button&gt;
+  &lt;button id="del-confirm"&gt;Delete&lt;/button&gt;
+&lt;/div&gt;
+</code></pre></div>
+<div class="codeWrap"><pre><code>// focus trap and return: Tab stays inside, ESC closes, focus returns
+const dlg = document.getElementById('del-dialog');
+function openDialog() {
+  dlg.hidden = false;
+  document.getElementById('del-cancel').focus();
+}
+dlg.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeDialog();
+});
+</code></pre></div>
+
+<h4 id="ch7-4-checks">Automated pass plus a keyboard pass</h4>
+<p>Accessibility is verified in two layers. The automated layer — axe or Lighthouse — catches the mechanical faults: missing labels, low contrast, unlinked form fields. The manual layer catches what tools cannot: run the keyboard pass tabbing through the whole app in order, operating every control with Enter, Space and the arrow keys, zooming to 200 percent, and checking both themes plus forced-colours. Automate the first layer in CI so it never regresses; schedule the second before every release, because a passed automated check is a floor, not a certificate.</p>
+<div class="codeWrap"><pre><code>Per-screen release checklist:
+
+- axe or Lighthouse: zero critical issues
+- keyboard pass: tab order matches visual order; every control operable
+- visible focus ring everywhere (no outline: none without replacement)
+- zoom to 200 percent: no overlap, no lost controls
+- contrast 4.5:1 text, 3:1 UI edges, in both themes
+- screen-reader smoke test of the primary task, one pass, notes kept
+</code></pre></div>
+<div class="tip">The keyboard pass is the sharpest design audit you have: if the app works without a pointer, the semantics, order and states are all probably right.</div>
+
+<h3 id="ch7-5" data-toc>7.5 Design systems and testing</h3>
+<p class="topic-desc">A design system is the app's shared source of truth — tokens, components and guidance, versioned and consumed by every screen. Testing protects both the system and each release.</p>
+<h4 id="ch7-5-system">One source of truth</h4>
+<p>A system has four layers: tokens (the only place colour and spacing exist), components (specs from chapter 5.1), patterns (the repeated answers — empty states, error handling, offline), and guidance (copy rules, accessibility, deprecations). Screens consume the system; they never restyle. Changes land in the system first and flow to screens through token names — a screen that hardcodes a value has left the system, and the drift is how systems die. Governance is small and regular: a weekly review that accepts changes, deprecates old tokens and cuts the ones nobody uses, because every token kept is a promise to maintain it.</p>
+<div class="codeWrap"><pre><code>design-system/
+  tokens/      colour, type, space, radius, motion — the only hex home
+  components/  button, form, table, modal — one spec each
+  patterns/    empty state, error, offline, loading — the repeated answers
+  guidance/    copy rules, density, accessibility, deprecations
+
+Screens consume the system; they never restyle. Change lands here
+first, then flows to screens through the token names.
+</code></pre></div>
+
+<h4 id="ch7-5-testing">Test the states, not just the happy path</h4>
+<p>Release testing covers the state machines from 4.2: every component in every state, in both themes, at every breakpoint. Around the state coverage sit the other passes — visual regression for component changes, the breakpoint sweep, and one usability task carried over from the last research round, because a release that ships an untested state ships the developer's guess at that state. The matrix below is a per-release ritual; the cells are ticked from the machine, never from a screenshot of the happy path.</p>
+<div class="codeWrap"><pre><code>Release matrix — every component, every state:
+
+component   default  hover  focus  active  disabled  loading  error  empty
+button       ok       ok     ok     ok      ok        ok       -      -
+table        ok       -      -      -       ok        ok       ok     ok
+form         ok       ok     ok     -       ok        ok       ok     -
+
+Plus per release: visual-regression diff, breakpoint sweep,
+keyboard pass, and one usability task from the last test round.
+</code></pre></div>
+<div class="warn">A design system nobody updates is a museum: it decorates the wall and stale token names keep leaking onto screens. It earns its keep only because designs and builds read the same place.</div>
+</section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Web App Design - UX, UI and Product Thinking.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

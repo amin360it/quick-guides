@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n8n Guide</title>
+  <link rel="stylesheet" href="assets/shell.css">
+  <script>
+    /* Resolve the theme and colour mode before first paint, so neither flashes. */
+    (function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+  </script>
+</head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">n8n</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+  </ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">n8n</span>
+      <span class="am-band-s">8 chapters · 45 topics · 65 code samples · works offline</span>
+    </h1>
+  <section class="chapter">
+  <h2 id="orientation" data-toc>Welcome · n8n</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · n8n</button><div class="ch-toc-list"><a href="#orientation-what">0.1 What is n8n?</a><a href="#orientation-install">0.2 Installation</a></div></div>
+  <h3 id="orientation-what" data-toc>0.1 What is n8n?</h3>
+
+  <p class="topic-desc">n8n is a workflow automation tool that connects APIs, databases, and services with a visual builder. It is source-available and can be self-hosted or used in the cloud.</p>
+
+  <h4 id="orientation-what--source" data-toc>0.1.1 Source-Available</h4>
+  <p>n8n is source-available under the fairly-paid license, allowing free use for personal and small team workflows while offering commercial licensing for larger deployments.</p>
+
+  <h4 id="orientation-what--self-hosted" data-toc>0.1.2 Self-Hosted vs Cloud</h4>
+  <div class="codeWrap"><pre><code># Self-hosted via Docker
+docker run -p 5678:5678 -e n8n_BASIC_AUTH_ACTIVE=true -e n8n_BASIC_AUTH_USER=admin -e n8n_BASIC_AUTH_PASSWORD=password n8nio/n8n
+
+# Cloud version
+# Sign up at n8n.io and use the hosted version</code></pre></div>
+
+  <h3 id="orientation-install" data-toc>0.2 Installation</h3>
+
+  <p class="topic-desc">Installing n8n is straightforward via npm, Docker, or Homebrew.</p>
+
+  <h4 id="orientation-install--npm" data-toc>0.2.1 npm Installation</h4>
+  <div class="codeWrap"><pre><code>npm install n8n -g
+n8n</code></pre></div>
+
+  <h4 id="orientation-install--docker" data-toc>0.2.2 Docker Installation</h4>
+  <div class="codeWrap"><pre><code>docker run -p 5678:5678 -e n8n_BASIC_AUTH_ACTIVE=true -e n8n_BASIC_AUTH_USER=admin -e n8n_BASIC_AUTH_PASSWORD=password n8nio/n8n</code></pre></div>
+
+  <h2 id="ch1" data-toc>1 · Workflow Basics</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 1 · Workflow Basics</button><div class="ch-toc-list"><a href="#ch1-nodes">1.1 Nodes and Connections</a><a href="#ch1-triggers">1.2 Triggers</a></div></div>
+  <h3 id="ch1-nodes" data-toc>1.1 Nodes and Connections</h3>
+
+  <p class="topic-desc">Workflows in n8n are built from nodes. Each node performs a specific function, from HTTP requests to database queries, and nodes are connected by drawing edges between them.</p>
+
+  <h4 id="ch1-nodes--types" data-toc>1.1.1 Node Types</h4>
+  <p>n8n includes over 200 pre-built nodes covering categories like:</p>
+  <ul>
+    <li>AI and LLMs (OpenAI, Claude, Google Gemini)</li>
+    <li>Databases (PostgreSQL, MySQL, MongoDB)</li>
+    <li>API (HTTP Request, Webhooks)</li>
+    <li>File Systems (Local, SFTP, FTP)</li>
+    <li>Email (SMTP, SendGrid)</li>
+  </ul>
+
+  <h3 id="ch1-triggers" data-toc>1.2 Triggers</h3>
+
+  <p class="topic-desc">Triggers start a workflow execution. Common triggers include:</p>
+
+  <h4 id="ch1-triggers--cron" data-toc>1.2.1 Cron Trigger</h4>
+  <div class="codeWrap"><pre><code># Run workflow every 5 minutes
+{
+  "trigger": "cron",
+  "cronExpression": "*/5 * * * *"
+}</code></pre></div>
+
+  <h4 id="ch1-triggers--webhook" data-toc>1.2.2 Webhook Trigger</h4>
+  <div class="codeWrap"><pre><code># Trigger workflow via HTTP POST
+{
+  "trigger": "webhook"
+}</code></pre></div>
+
+  <h2 id="ch2" data-toc>2 · AI Integration</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 2 · AI Integration</button><div class="ch-toc-list"><a href="#ch2-openai">2.1 OpenAI Integration</a><a href="#ch2-claude">2.2 Claude Integration</a><a href="#ch2-prompts">2.3 Prompt Engineering</a></div></div>
+  <h3 id="ch2-openai" data-toc>2.1 OpenAI Integration</h3>
+
+  <p class="topic-desc">Connect n8n to OpenAI's models for text generation, embeddings, and more.</p>
+
+  <h4 id="ch2-openai--api" data-toc>2.1.1 API Configuration</h4>
+  <div class="codeWrap"><pre><code>
+{
+  "name": "OpenAI",
+  "parameters": {
+    "model": "gpt-4o-mini",
+    "temperature": 0.7,
+    "maxTokens": 1000
+  }
+}</code></pre></div>
+
+  <h3 id="ch2-claude" data-toc>2.2 Claude Integration</h3>
+
+  <p class="topic-desc">Connect n8n to Anthropic's Claude model for AI assistance.</p>
+
+  <h4 id="ch2-claude--api" data-toc>2.2.1 API Configuration</h4>
+  <div class="codeWrap"><pre><code>
+{
+  "name": "Claude",
+  "parameters": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.5,
+    "maxTokens": 800
+  }
+}</code></pre></div>
+
+  <h3 id="ch2-prompts" data-toc>2.3 Prompt Engineering</h3>
+
+  <p class="topic-desc">Best practices for writing effective prompts for AI models.</p>
+
+  <h4 id="ch2-prompts--structure" data-toc>2.3.1 Prompt Structure</h4>
+  <div class="codeWrap"><pre><code>
+# Effective prompt structure
+System: You are a helpful assistant.
+User: {{user_input}}
+Assistant:{{completion}}
+</code></pre></div>
+
+  <h2 id="ch3" data-toc>3 · Working with Data</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 3 · Working with Data</button><div class="ch-toc-list"><a href="#ch3-databases">3.1 Database Integration</a><a href="#ch3-transformations">3.2 Data Transformations</a><a href="#ch3-file-operations">3.3 File Operations</a></div></div>
+  <h3 id="ch3-databases" data-toc>3.1 Database Integration</h3>
+
+  <p class="topic-desc">Connect n8n to various databases for read/write operations.</p>
+
+  <h4 id="ch3-databases--postgres" data-toc>3.1.1 PostgreSQL Integration</h4>
+  <div class="codeWrap"><pre><code>
+{
+  "parameters": {
+    "operation": "executeQuery",
+    "query": "SELECT * FROM users WHERE active = true"
+  }
+}</code></pre></div>
+
+  <h2 id="app-end" data-toc>A. Appendix</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · A. Appendix</button><div class="ch-toc-list"><a href="#app-deployment">A.1 Deployment</a><a href="#app-tools">A.2 Tools</a></div></div>
+  <h3 id="app-deployment" data-toc>A.1 Deployment</h3>
+
+  <p class="topic-desc">Deploy n8n via Docker, npm, or cloud.</p>
+
+  <h3 id="app-tools" data-toc>A.2 Tools</h3>
+
+  <p class="topic-desc">Essential tools for n8n workflow development.</p>
+
+</main>
+
+<button id="toTop" class="to-top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>n8n.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

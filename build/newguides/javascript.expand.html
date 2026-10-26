@@ -1,0 +1,1352 @@
+<section class="chapter">
+<h2 id="ch13" data-toc>13 · Web Storage and IndexedDB</h2>
+
+<h3 id="ch13-webstorage" data-toc>13.1 localStorage and sessionStorage</h3>
+<p class="topic-desc">Both are synchronous key/value stores that persist strings for one origin. They are simple, fast for small payloads, and the source of a surprising number of performance and correctness bugs.</p>
+
+<h4>What the two stores actually give you</h4>
+<p><code>localStorage</code> keeps data until the user or the app removes it. <code>sessionStorage</code> is scoped to a single top-level browsing context and is discarded when that tab closes. Neither is shared with a different origin, and neither is sent to the server on every request the way a cookie is. That last property is why they replaced cookies for caching user preferences and drafts: a 40 KB preference blob in <code>localStorage</code> costs nothing on the network, whereas the same blob as a cookie would ride along on every image and stylesheet request.</p>
+<p>The API is deliberately tiny: <code>getItem</code>, <code>setItem</code>, <code>removeItem</code>, <code>clear</code> and the <code>length</code> property. Values are coerced to strings, so anything you store that is not a string either silently becomes one or, for objects, becomes the useless <code>"[object Object]"</code>. Wrapping every write in a small typed helper is the difference between a store you can reason about and one that returns <code>"undefined"</code> strings forever.</p>
+
+<div class="codeWrap"><pre><code>// A minimal, safe wrapper. Every value round-trips through JSON.
+const store = {
+  get(key, fallback = null) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw === null ? fallback : JSON.parse(raw);
+    } catch (err) {
+      return fallback; // corrupt entry or storage blocked
+    }
+  },
+  set(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (err) {
+      // QuotaExceededError or a privacy setting that denies writes
+      console.warn('persist failed', key, err.name);
+      return false;
+    }
+  },
+  remove(key) {
+    localStorage.removeItem(key);
+  }
+};
+
+store.set('theme', { name: 'nord', density: 'compact' });
+console.log(store.get('theme').name); // "nord"</code></pre></div>
+
+<h4>Storage is synchronous, and that is the real cost</h4>
+<p>Reads and writes block the main thread. A single <code>getItem</code> returning a few hundred bytes is measured in microseconds and is invisible. Storing a 2 MB JSON document and parsing it on every keystroke is a different animal: the stringify, the write, and the subsequent parse all happen on the thread that is trying to paint the page. The classic symptom is a text editor that stutters when it autosaves a large draft.</p>
+<p>The fix is not to abandon the API but to bound it. Keep hot state in memory and write to storage on a debounce, store a compact representation rather than a pretty one, and move anything genuinely large to IndexedDB, which is asynchronous by design. <code>sessionStorage</code> has the same synchronous cost, so it is not a performance escape hatch; it is a lifetime escape hatch.</p>
+
+<div class="warn"><code>localStorage</code> is unavailable, or throws, when the user has blocked cookies in some browsers, when the page is embedded in a sandboxed iframe without <code>allow-same-origin</code>, or in some private-browsing modes. Always read through a try/catch and degrade to an in-memory object rather than assuming a successful write.</div>
+
+<h4>The storage event, and where it does not fire</h4>
+<p>When one tab changes a key, every <em>other</em> same-origin tab receives a <code>storage</code> event. The tab that made the change does not. The event carries <code>key</code>, <code>oldValue</code>, <code>newValue</code>, <code>url</code> and <code>storageArea</code>, which makes it a workable poor-man's broadcast channel for things like "the user logged out" or "the theme changed".</p>
+<p>It is not a reliable synchronization primitive. The event fires after the fact, there is no ordering guarantee across many writers, and a burst of writes produces a burst of events. Use it to invalidate a cache or to nudge other tabs to re-read, never as the primary source of truth.</p>
+
+<div class="codeWrap"><pre><code>// Every other tab on this origin hears this.
+window.addEventListener('storage', (event) => {
+  if (event.storageArea !== localStorage) return; // ignore sessionStorage
+  if (event.key === 'auth') {
+    if (event.newValue === null) location.reload();
+  }
+});
+
+// Broadcast a logout to sibling tabs.
+localStorage.setItem('auth', JSON.stringify({ user: null, at: Date.now() }));</code></pre></div>
+
+<div class="note">Storage is per origin, and origin means scheme plus host plus port. <code>https://app.example.com</code> and <code>http://app.example.com</code> are different stores, as are two ports on the same host. Moving a site from one hostname to another leaves the old store behind and users see their settings reset.</div>
+
+<h3 id="ch13-quotas" data-toc>13.2 Quotas, serialization and structured clone</h3>
+<p class="topic-desc">Storage limits are not a single number, they are a per-origin budget shared with IndexedDB and the Cache API. Knowing the rules prevents both silent data loss and the quota crashes that come with it.</p>
+
+<h4>The quota model in current browsers</h4>
+<p>Modern engines give each origin a share of the disk rather than a fixed 5 MB. The practical ceiling is typically around 60 percent of total disk for a given origin, with the whole browser capped so one origin cannot fill the drive. Quotas are shared across <code>localStorage</code>, <code>sessionStorage</code>, IndexedDB and the Cache API, so a service worker that caches 300 MB of media is eating the same budget as your database.</p>
+<p>Browsers also enforce eviction. Under storage pressure a browser may clear the whole origin's bucket without asking, which is why anything users would be upset to lose must either be small, re-syncable from the server, or protected by <code>navigator.storage.persist()</code>. Persistent storage is granted heuristically, based on site engagement and whether the app is installed, and the call can simply return <code>false</code>.</p>
+
+<div class="codeWrap"><pre><code>// How much room is there, and how much is already used?
+async function reportStorage() {
+  if (!navigator.storage) return null;
+  const { usage = 0, quota = 0 } = await navigator.storage.estimate();
+  const megabytes = (bytes) => Math.round(bytes / (1024 * 1024));
+  console.log(megabytes(usage) + ' MB used of ' + megabytes(quota) + ' MB');
+  return { usage, quota };
+}
+
+// Ask the browser to exempt this origin from eviction.
+const persisted = await navigator.storage.persist();
+console.log('exempt from eviction:', persisted);</code></pre></div>
+
+<h4>Structured clone is not JSON</h4>
+<p><code>postMessage</code>, IndexedDB and <code>structuredClone</code> all use the structured clone algorithm rather than JSON. Structured clone understands <code>Map</code>, <code>Set</code>, <code>Date</code>, <code>RegExp</code>, <code>ArrayBuffer</code>, typed arrays, <code>Blob</code>, <code>File</code> and even circular references. JSON understands none of those and will happily turn a <code>Date</code> into a string and a <code>Map</code> into <code>{}</code>.</p>
+<p>What structured clone cannot carry: functions, DOM nodes, class prototypes, symbols and getters that are not enumerable data. Cloning an instance of a class gives you a plain object with the same fields, not an instance, so a <code>toJSON</code> or an explicit rehydrate step is usually the honest choice. The practical rule is that <code>localStorage</code> is JSON, while IndexedDB and workers are structured clone, and mixing the two mental models produces bugs where a <code>Date</code> mysteriously becomes a string after a save and reload.</p>
+
+<div class="codeWrap"><pre><code>const original = {
+  when: new Date('2026-01-01T00:00:00Z'),
+  tags: new Set(['a', 'b']),
+  board: new Map([['r1', 7]]),
+  buffer: new Uint8Array([1, 2, 3])
+};
+original.self = original; // circular reference is fine
+
+const copy = structuredClone(original);
+console.log(copy.when instanceof Date); // true
+console.log(copy.tags instanceof Set);  // true
+console.log(copy.self === copy);        // true
+
+// JSON, by contrast, mangles almost everything:
+const json = JSON.parse(JSON.stringify(original)); // throws on circular refs</code></pre></div>
+
+<div class="tip">Structured clone has no size limit of its own, but it is not free: cloning a large typed array copies the bytes. When the goal is moving data to a worker rather than duplicating it, mark the buffer as transferable so ownership moves instead of being copied.</div>
+
+<h3 id="ch13-idb" data-toc>13.3 IndexedDB object stores and transactions</h3>
+<p class="topic-desc">IndexedDB is the browser's real database: asynchronous, transactional, able to hold hundreds of megabytes of structured data, and cursed with an event-based API that predates promises.</p>
+
+<h4>The model: databases, object stores, records</h4>
+<p>An IndexedDB database contains named object stores, and an object store holds records keyed by a key path or by an out-of-line key. A store is roughly a table, a record is roughly a row, and a record's value can be any structured-cloneable object. The schema — the set of stores and indexes — is only changeable inside an <code>upgrade</code> transaction that the browser opens for you when it sees a version number higher than the stored one.</p>
+<p>Everything happens in a transaction. A transaction is scoped to one or more stores, has a mode of <code>readonly</code>, <code>readwrite</code> or <code>versionchange</code>, and commits automatically when the microtask queue drains without new requests being issued. That auto-commit is the single most common surprise: if you <code>await</code> a fetch or a timer in the middle of a transaction, the transaction closes and the next request throws <code>TransactionInactiveError</code>. Keep transactions synchronous and short; do the network work outside, then open a fresh transaction to write.</p>
+
+<div class="codeWrap"><pre><code>// Open (or create) the database and declare its schema.
+function openDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('notes-db', 2);
+
+    request.onupgradeneeded = (event) => {
+      const db = request.result;
+      const oldVersion = event.oldVersion;
+
+      if (oldVersion < 1) {
+        const notes = db.createObjectStore('notes', { keyPath: 'id', autoIncrement: true });
+        notes.createIndex('by_updated', 'updatedAt');
+      }
+      if (oldVersion < 2) {
+        const tags = db.createObjectStore('tags', { keyPath: 'name' });
+        tags.createIndex('by_count', 'count');
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => reject(new Error('another tab holds an old version'));
+  });
+}
+
+const db = await openDb();
+console.log(db.objectStoreNames);</code></pre></div>
+
+<h4>Promisifying requests without breaking transactions</h4>
+<p>A request is a one-shot event emitter: it fires <code>success</code> or <code>error</code> exactly once. Wrapping each request in a promise is fine, because the request is issued inside the transaction and the promise settles on the same turn. What is not fine is awaiting something unrelated between two requests. A helper that resolves on <code>onsuccess</code> and rejects on <code>onerror</code>, plus a separate helper that resolves on the transaction's <code>oncomplete</code>, gives you both a usable value and a durable commit signal.</p>
+
+<div class="codeWrap"><pre><code>const ask = (request) => new Promise((resolve, reject) => {
+  request.onsuccess = () => resolve(request.result);
+  request.onerror = () => reject(request.error);
+});
+
+const done = (tx) => new Promise((resolve, reject) => {
+  tx.oncomplete = () => resolve();
+  tx.onerror = () => reject(tx.error);
+  tx.onabort = () => reject(tx.error);
+});
+
+async function addNote(db, note) {
+  const tx = db.transaction('notes', 'readwrite');
+  const record = { ...note, updatedAt: Date.now() };
+  const key = await ask(tx.objectStore('notes').add(record));
+  await done(tx); // wait for the durable commit
+  return key;
+}
+
+const id = await addNote(db, { title: 'Storage', body: 'IndexedDB basics' });
+console.log('stored with key', id);</code></pre></div>
+
+<div class="warn">Do not <code>await fetch()</code> or <code>setTimeout</code> inside an open IndexedDB transaction. The transaction auto-commits as soon as the request queue empties and the microtask checkpoint passes, and every later request throws. Fetch first, then open the transaction.</div>
+
+<h4>Versioning and the blocked event</h4>
+<p>Bumping the version forces the browser to run your upgrade callback in every tab that has the database open. If a tab is still holding an old connection, the upgrade is <code>blocked</code> and the new tab waits. The standard remedy is to close idle connections when a <code>versionchange</code> event arrives on the old connection, then reload, so a deploy is not held hostage by a tab someone left open overnight.</p>
+
+<div class="codeWrap"><pre><code>// On the old connection: yield when a newer page wants to upgrade.
+db.onversionchange = () => {
+  db.close();
+  console.info('A newer version of the app is open; close this tab or reload.');
+};
+
+// Detect connections held by other tabs during an upgrade.
+request.onblocked = () => {
+  console.warn('Upgrade blocked: another tab still has version ' + request.result.version);
+};</code></pre></div>
+
+<h3 id="ch13-indexes" data-toc>13.4 Indexes, cursors and range queries</h3>
+<p class="topic-desc">A store answers lookups by primary key. Everything else — "notes updated this week", "tags starting with c" — needs an index, and index lookups are what separate a query that scans ten thousand records from one that touches three.</p>
+
+<h4>Indexes over a key path</h4>
+<p>An index is created inside the upgrade transaction with <code>createIndex(name, keyPath, options)</code>. Options matter: <code>unique</code> rejects duplicate index keys, and <code>multiEntry</code> indexes each element of an array value separately, which turns a <code>tags: ['js', 'web']</code> array into two index entries. A record can appear under several index keys, so a store with three useful indexes can be answered in three different ways without any additional storage of the full record.</p>
+<p>The index key is derived from the record at write time, so a compound key path such as <code>['status', 'updatedAt']</code> produces a key that sorts by status first and by timestamp second. That ordering is what makes a range query over the second component usable only when the first is pinned with an exact value.</p>
+
+<div class="codeWrap"><pre><code>// Inside onupgradeneeded
+const notes = db.createObjectStore('notes', { keyPath: 'id' });
+notes.createIndex('by_updated', 'updatedAt');
+notes.createIndex('by_status_updated', ['status', 'updatedAt']);
+notes.createIndex('by_tag', 'tags', { multiEntry: true });
+notes.createIndex('by_slug', 'slug', { unique: true });</code></pre></div>
+
+<h4>Cursors and key ranges</h4>
+<p>An <code>IDBKeyRange</code> describes a contiguous slice: <code>only</code> for an exact match, <code>lowerBound</code>, <code>upperBound</code>, and <code>bound</code> for both, each with an open flag for exclusive ends. A cursor walks the range in key order and fires once per record, which lets you stream a large result set without materialising it all in one array.</p>
+<p>Direction is set at open time: <code>next</code>, <code>prev</code>, <code>nextunique</code> and <code>prevunique</code>. The unique variants skip records that share an index key, which is exactly what you want when you only need one example per tag. IndexedDB gives no ordering guarantee across different indexes, but within one index the order is always by key, so pagination by storing the last seen key is stable and cheap.</p>
+
+<div class="codeWrap"><pre><code>// Stream every note updated in the last 24 hours, newest first.
+async function recentNotes(db, since) {
+  const range = IDBKeyRange.lowerBound(since);
+  const tx = db.transaction('notes', 'readonly');
+  const index = tx.objectStore('notes').index('by_updated');
+  const out = [];
+
+  return new Promise((resolve, reject) => {
+    const cursor = index.openCursor(range, 'prev');
+    cursor.onsuccess = () => {
+      const c = cursor.result;
+      if (!c) return resolve(out);
+      out.push(c.value);
+      c.continue();
+    };
+    cursor.onerror = () => reject(cursor.error);
+  });
+}
+
+// One note per tag, using the unique cursor direction.
+function firstPerTag(db) {
+  const tx = db.transaction('notes', 'readonly');
+  const rows = [];
+  const cursor = tx.objectStore('notes').index('by_tag').openCursor(null, 'nextunique');
+  cursor.onsuccess = () => {
+    const c = cursor.result;
+    if (!c) return rows;
+    rows.push({ tag: c.key, id: c.primaryKey });
+    c.continue();
+  };
+  return rows;
+}</code></pre></div>
+
+<div class="ex">Deleting or updating a record inside a cursor fires another cursor event for the mutated key in some implementations, because the index is being rewritten while you walk it. Collect keys first, then act on them in a separate transaction, whenever the operation changes an indexed field.</div>
+
+<h4>Counting and existence without reading values</h4>
+<p><code>count()</code> over a range uses the index and returns a number, not records, so a "how many failed jobs today" badge costs almost nothing. For existence, open a cursor with a range of exactly the value you care about and stop after the first hit rather than loading all matches. Both patterns keep the amount of structured-cloned data crossing the transaction boundary to a minimum, which is where most of the time in a large query actually goes.</p>
+
+<h3 id="ch13-choose" data-toc>13.5 When to choose which store</h3>
+<p class="topic-desc">Five storage mechanisms coexist in a modern browser, and picking the wrong one is a decision that is expensive to reverse. The choice follows from three questions: how much data, how is it queried, and who is allowed to lose it.</p>
+
+<h4>The decision in one table</h4>
+<p>The table below is the whole argument. Cookies are for the server; <code>sessionStorage</code> is for a tab's lifetime; <code>localStorage</code> is for small preferences; IndexedDB is for anything with structure or volume; the Cache API belongs to the service worker and is addressed by request.</p>
+<table>
+<thead><tr><th>Store</th><th>Capacity</th><th>Access</th><th>Best for</th></tr></thead>
+<tbody>
+<tr><td>Cookie</td><td>about 4 KB each</td><td>sent on every request</td><td>session identity the server must see</td></tr>
+<tr><td><code>sessionStorage</code></td><td>a few MB</td><td>synchronous</td><td>wizard state, per-tab drafts</td></tr>
+<tr><td><code>localStorage</code></td><td>a few MB</td><td>synchronous</td><td>theme, language, tiny preferences</td></tr>
+<tr><td>IndexedDB</td><td>large, shared origin budget</td><td>asynchronous, transactional</td><td>offline datasets, queues, large structured state</td></tr>
+<tr><td>Cache API</td><td>large, shared origin budget</td><td>asynchronous</td><td>HTTP responses for a service worker</td></tr>
+</tbody>
+</table>
+
+<h4>Four rules of thumb</h4>
+<p>First, if the server needs the value on each request, it is a cookie and nothing else will do, because no other store is transmitted. Second, if the value is under a few kilobytes and is read on startup, <code>localStorage</code> is the least code for the job. Third, if the value is large, structured, or something you need to query by more than its identity, it is IndexedDB. Fourth, if the value is an HTTP response you want to replay offline, it is the Cache API, ideally written by a service worker rather than by page code.</p>
+<p>Two failure modes are worth naming. Writing a large dataset into <code>localStorage</code> and parsing it on every render is the most common performance bug in this area, because it is the path of least resistance. Treating <code>localStorage</code> as durable is the other: clients clear it, browsers evict it under pressure, and a user moving to a new laptop loses it. Anything that matters must exist on the server or be reconstructable, with local storage acting as a cache rather than the system of record.</p>
+
+<div class="codeWrap"><pre><code>// Choose a backend once, then hide the choice behind one interface.
+async function createStore() {
+  if (navigator.storage && navigator.storage.getDirectory) {
+    return { kind: 'indexeddb', read: idbRead, write: idbWrite };
+  }
+  const probe = '__probe__';
+  try {
+    localStorage.setItem(probe, '1');
+    localStorage.removeItem(probe);
+    return { kind: 'localstorage', read: lsRead, write: lsWrite };
+  } catch (err) {
+    return { kind: 'memory', read: memRead, write: memWrite };
+  }
+}</code></pre></div>
+
+<div class="tip">Because the quota is shared, a service worker cache can starve your IndexedDB writes. If a feature stores media offline, cap the cache size deliberately in the worker and evict oldest-first rather than letting the browser decide which technology loses its data.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch14" data-toc>14 · Web Workers and concurrency</h2>
+
+<h3 id="ch14-kinds" data-toc>14.1 Dedicated, shared and service workers</h3>
+<p class="topic-desc">JavaScript has one call stack per agent, so long work blocks paint and input. Workers put extra call stacks beside the main one, each with its own global scope and no DOM access.</p>
+
+<h4>Three worker kinds, three lifetimes</h4>
+<p>A <b>dedicated worker</b> is created by one page with <code>new Worker(url)</code> and dies with that page. It is the general tool for offloading computation: parsing, image processing, sorting, encryption. A <b>shared worker</b> is reachable from any same-origin page through a <code>MessagePort</code>, so several tabs share one instance — useful for a single websocket multiplexed across tabs, though support is uneven and most teams use <code>BroadcastChannel</code> instead.</p>
+<p>A <b>service worker</b> is a different beast: it is an event-driven proxy sitting between the page and the network, with no page attached, and it is covered in the next chapter. It is not a place to run CPU work, because the browser will terminate it when it goes idle.</p>
+
+<div class="codeWrap"><pre><code>// main.js — a module worker; note the trailing comma in the options object
+const worker = new Worker('./heavy.js', { type: 'module' });
+
+worker.postMessage({ job: 'sort', rows: 500000 });
+worker.addEventListener('message', (event) => {
+  console.log('worker replied with', event.data);
+});
+
+// heavy.js
+self.addEventListener('message', (event) => {
+  const { rows } = event.data;
+  const numbers = Array.from({ length: rows }, () => Math.random());
+  numbers.sort((a, b) => a - b);
+  self.postMessage({ median: numbers[Math.floor(rows / 2)] });
+});</code></pre></div>
+
+<h4>The worker global scope</h4>
+<p>Inside a worker you have <code>self</code> rather than <code>window</code>: timers, <code>fetch</code>, <code>indexedDB</code>, <code>crypto</code>, <code>WebSocket</code>, <code>TextEncoder</code> and the Cache API are available. There is no <code>document</code>, no <code>localStorage</code>, no direct DOM access, and no layout. Any result that must reach the screen comes back as a message.</p>
+<p>That separation is the feature. It means a worker cannot accidentally touch shared DOM state, which removes a whole category of race conditions. It also means the boundary crossing is the only thing you have to reason about, and the next sub-topic is entirely about making that crossing cheap.</p>
+<div class="codeWrap"><pre><code>// feature-detect inside a worker
+const caps = {
+  canvas: typeof OffscreenCanvas !== 'undefined',
+  storage: typeof indexedDB !== 'undefined',
+  net: typeof fetch === 'function',
+  wasm: typeof WebAssembly === 'object'
+};
+self.postMessage({ caps });
+
+// An inline worker from a Blob avoids a second network request.
+const source = 'self.onmessage = (e) => self.postMessage(e.data * 2);';
+const blobUrl = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }));
+const inline = new Worker(blobUrl);</code></pre></div>
+
+<div class="note">Workers do not have access to <code>document</code>, and that includes <code>document.cookie</code> and <code>localStorage</code>. If a worker needs a value from page storage, read it on the main thread and pass it in the first message rather than trying to reach for it on the worker side.</div>
+
+<h3 id="ch14-postmessage" data-toc>14.2 postMessage, structured clone and transferable objects</h3>
+<p class="topic-desc">Everything that crosses a worker boundary is a message, and every message pays a cost. Structured clone copies; transfer moves. Knowing which one you triggered is the difference between a fast app and one that stalls on large payloads.</p>
+
+<h4>What a message round trip involves</h4>
+<p><code>postMessage(data)</code> serialises <code>data</code> with the structured clone algorithm, queues it on the receiving agent, deserialises it there, and dispatches a <code>message</code> event. Functions, DOM nodes and class prototypes do not survive. Circular references do. For a small object the whole thing is sub-millisecond; for a 50 MB typed array it is a full copy of those bytes, and the copy happens on the sender's thread before the message is even queued, so a naive large <code>postMessage</code> blocks exactly the thread you were trying to unblock.</p>
+<p>The transferable list, passed as the second argument, fixes that. It lists objects whose ownership moves rather than being copied: the sender's reference is neutered — its <code>byteLength</code> becomes 0 — and the receiver gets the actual memory. <code>ArrayBuffer</code> and its views, <code>MessagePort</code>, <code>ImageBitmap</code>, <code>OffscreenCanvas</code> and streams are transferable. The pattern for a repeated job is to keep one buffer, transfer it to the worker, let the worker write the result in place, and transfer it back. Zero copies, constant cost.</p>
+
+<div class="codeWrap"><pre><code>// Copying: the whole buffer is duplicated before the event is queued.
+const pixels = new Uint8ClampedArray(width * height * 4);
+worker.postMessage({ pixels });
+
+// Transferring: ownership moves, the sender is left with a neutered buffer.
+const buffer = pixels.buffer;
+worker.postMessage({ pixels, width, height }, [buffer]);
+console.log(pixels.byteLength); // 0 — do not use it again
+
+// The worker can transfer it back when it is finished.
+self.onmessage = ({ data }) => {
+  const view = new Uint8ClampedArray(data.pixels.buffer ?? data.pixels);
+  // ... mutate view in place ...
+  self.postMessage({ pixels: view, width: data.width }, [view.buffer]);
+};</code></pre></div>
+
+<h4>Typed-array views must be transferred, not their views</h4>
+<p>The transferable is the underlying <code>ArrayBuffer</code>, not the <code>Uint8Array</code> that views it. Transferring a buffer that has other views alive leaves those views detached, which is why the pattern above re-wraps the incoming buffer in a fresh view on the worker side. Also note that a subarray shares its parent's buffer: transferring the parent to a worker detaches the subarray too, silently. Slice first if both sides need the bytes.</p>
+
+<div class="codeWrap"><pre><code>// A round trip that preserves one buffer instead of allocating per job.
+worker.onmessage = ({ data }) => {
+  const next = new Uint8Array(data.buffer);
+  // reuse `next` for the next frame
+};
+
+function sendFrame(buffer) {
+  transferInFlight = true;
+  worker.postMessage({ buffer }, [buffer]);
+}
+
+// Guard against sending while a previous transfer is still out.
+let transferInFlight = false;</code></pre></div>
+
+<div class="warn">A transferred buffer is not usable on the sending side. Reusing it, or a view over it, after the <code>postMessage</code> gives you a zero-length array and a bug that only appears under load. Ping-pong the same buffer back and forth, and never keep a second reference to a buffer you transferred.</div>
+
+<h4>MessagePort: a private, directed channel</h4>
+<p>For anything more complex than one request/response pair, create an explicit channel with <code>new MessageChannel()</code>. The two ends are <code>port1</code> and <code>port2</code>; transfer one end and the two sides now have a dedicated pipe that no other message can be confused with. Ports must be <code>start()</code>ed or have an <code>onmessage</code> handler attached, otherwise queued messages never wake the receiver.</p>
+
+<div class="codeWrap"><pre><code>const channel = new MessageChannel();
+const worker = new Worker('./stream.js', { type: 'module' });
+
+worker.postMessage({ port: channel.port1 }, [channel.port1]);
+channel.port2.onmessage = (event) => console.log('progress', event.data);
+
+// stream.js
+self.onmessage = ({ data: { port } }) => {
+  let i = 0;
+  const timer = setInterval(() => {
+    port.postMessage({ done: i += 5 });
+    if (i >= 100) clearInterval(timer);
+  }, 20);
+};</code></pre></div>
+
+<h3 id="ch14-sab" data-toc>14.3 SharedArrayBuffer and Atomics</h3>
+<p class="topic-desc">Everything so far moved data by copying or by handing ownership over. A shared buffer is different: two agents read and write the same bytes, which enables real parallelism and the entire class of race conditions that comes with it.</p>
+
+<h4>Why sharing needs cross-origin isolation</h4>
+<p><code>SharedArrayBuffer</code> was removed from browsers in 2018 because it enabled timing attacks such as Spectre. It is now available only to cross-origin isolated documents, which means every response must carry <code>Cross-Origin-Opener-Policy: same-origin</code> and <code>Cross-Origin-Embedder-Policy: require-corp</code>. Until both headers are present, <code>crossOriginIsolated</code> is false and the constructor throws. That is why a shared-memory feature must be guarded and, in most codebases, wrapped behind a fallback that copies instead.</p>
+
+<div class="codeWrap"><pre><code>if (crossOriginIsolated) {
+  const shared = new SharedArrayBuffer(1024 * 1024); // 1 MB, no transfer needed
+  const view = new Int32Array(shared);
+  worker.postMessage({ shared, count: 4 });
+} else {
+  console.warn('SharedArrayBuffer unavailable: enable COOP and COEP');
+}</code></pre></div>
+
+<h4>Atomics: the only safe way to touch it</h4>
+<p>Ordinary reads and writes to a shared buffer are not synchronized, and the compiler is free to cache a value in a register so a polling loop never observes a change. <code>Atomics</code> provides the primitives: <code>load</code>, <code>store</code>, <code>add</code>, <code>sub</code>, <code>exchange</code>, <code>compareExchange</code>, plus <code>wait</code> and <code>notify</code> for blocking and waking. A worker pool usually combines an atomic counter used as a job index with a control word used as a sleep/wake signal.</p>
+
+<div class="codeWrap"><pre><code>// worker.js — take the next index atomically, so two workers never collide.
+self.onmessage = ({ data: { shared, total, done } }) => {
+  const index = new Int32Array(shared);
+  const results = new Float64Array(shared, 64);
+  const flag = new Int32Array(done);
+
+  for (;;) {
+    const job = Atomics.add(index, 0, 1);
+    if (job >= total) break;
+    results[job] = Math.sqrt(job) * Math.PI;
+  }
+  Atomics.add(flag, 0, 1);          // report completion
+  Atomics.notify(flag, 0);          // wake the main thread if it is waiting
+};
+
+// main.js — block until every worker has finished.
+const flag = new Int32Array(new SharedArrayBuffer(4));
+while (Atomics.load(flag, 0) < workerCount) {
+  Atomics.wait(flag, 0, Atomics.load(flag, 0), 1000); // timeout in ms
+}</code></pre></div>
+
+<div class="ex"><code>Atomics.wait</code> is not allowed on the main thread of a browser, because blocking the UI is precisely what it prevents. Main-thread coordination uses <code>Atomics.waitAsync</code>, which returns a promise, or simply polls with a timeout while yielding to the event loop.</div>
+
+<h4>When sharing is worth the complexity</h4>
+<p>Shared memory pays for itself when the data is large and the access pattern is fine-grained and concurrent: a growth simulation, a physics grid updated by several workers, an audio processing graph, a WASM module with threads. For a one-shot sort or a JSON parse, the extra headers, the fallback path and the atomic discipline cost far more than the copy they avoid. Reach for it only when profiling shows memory bandwidth is the bottleneck, not when it merely looks impressive on a diagram.</p>
+
+<h3 id="ch14-pools" data-toc>14.4 Worker pools and offloading heavy work</h3>
+<p class="topic-desc">One worker is a thread; several workers behind a queue are a scheduler. A pool bounds concurrency to the number of hardware threads, reuses expensive instances, and keeps a burst of jobs from spawning a worker per task.</p>
+
+<h4>Sizing a pool</h4>
+<p>Spawn roughly <code>navigator.hardwareConcurrency</code> workers, clamped to a sane range such as two to eight. Below that you leave cores idle; above it, context switching and duplicated per-worker startup cost dominate. A worker also has a fixed memory cost of several megabytes, so a 32-worker pool on a small laptop is worse than four. If jobs are heterogeneous, keep one small dedicated worker for latency-sensitive work and a larger pool for batch work rather than sharing a single queue.</p>
+<p>Startup is not free either. Compiling a large module worker can take tens of milliseconds, so create the pool lazily on first use and keep it warm. The pool should also be the owner of the transferable buffers, recycling them between jobs so steady-state usage allocates nothing.</p>
+
+<div class="codeWrap"><pre><code>class WorkerPool {
+  constructor(url, size) {
+    const cores = navigator.hardwareConcurrency || 4;
+    this.size = Math.max(2, Math.min(size ?? cores, 8));
+    this.url = url;
+    this.idle = [];
+    this.queue = [];
+    this.pending = new Map();
+    this.started = false;
+  }
+
+  start() {
+    if (this.started) return;
+    this.started = true;
+    for (let i = 0; i < this.size; i += 1) {
+      const worker = new Worker(this.url, { type: 'module' });
+      worker.onmessage = (event) => this.settle(worker, event.data);
+      worker.onerror = (event) => this.fail(worker, event.message);
+      this.idle.push(worker);
+    }
+  }
+
+  run(payload, transfer = []) {
+    this.start();
+    return new Promise((resolve, reject) => {
+      this.queue.push({ payload, transfer, resolve, reject });
+      this.drain();
+    });
+  }
+
+  drain() {
+    while (this.idle.length > 0 && this.queue.length > 0) {
+      const worker = this.idle.pop();
+      const job = this.queue.shift();
+      this.pending.set(worker, job);
+      worker.postMessage(job.payload, job.transfer);
+    }
+  }
+
+  settle(worker, data) {
+    const job = this.pending.get(worker);
+    this.pending.delete(worker);
+    if (job) job.resolve(data);
+    this.idle.push(worker);
+    this.drain();
+  }
+
+  fail(worker, message) {
+    const job = this.pending.get(worker);
+    this.pending.delete(worker);
+    if (job) job.reject(new Error(message));
+    worker.terminate();
+    const replacement = new Worker(this.url, { type: 'module' });
+    replacement.onmessage = (event) => this.settle(replacement, event.data);
+    this.idle.push(replacement);
+    this.drain();
+  }
+}
+
+const pool = new WorkerPool('./tile-worker.js');
+const tiles = await Promise.all(chunks.map((c) => pool.run({ chunk: c })));</code></pre></div>
+
+<h4>Progress, cancellation and errors</h4>
+<p>A pool needs a correlation id on every message if a worker can be running more than one logical job, and it needs a defined behaviour for cancellation: either terminate the worker and replace it — expensive but immediate — or set a shared flag the job checks between units of work. Errors do not cross the boundary as exceptions; a thrown error inside a worker fires <code>onerror</code> on the page with a message and a filename, and the pool must reject the corresponding promise and replace the dead worker or future jobs will queue forever.</p>
+
+<div class="codeWrap"><pre><code>// Report progress without finishing the job.
+self.onmessage = ({ data }) => {
+  const { id, rows } = data;
+  const out = new Float32Array(rows);
+  for (let i = 0; i < rows; i += 1) {
+    out[i] = Math.sin(i / 100);
+    if (i % 20000 === 0) {
+      self.postMessage({ id, type: 'progress', done: i, total: rows });
+    }
+  }
+  self.postMessage({ id, type: 'done', out }, [out.buffer]);
+};</code></pre></div>
+
+<div class="tip">OffscreenCanvas is the clean way to run rendering in a worker: transfer the canvas once, then draw frames off the main thread. Combine it with <code>requestAnimationFrame</code> in the worker and the page's main thread never touches a single pixel.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch15" data-toc>15 · Service Workers and Progressive Web Apps</h2>
+
+<h3 id="ch15-lifecycle" data-toc>15.1 Lifecycle: install, activate, fetch</h3>
+<p class="topic-desc">A service worker is a script the browser runs independently of any page, intercepting network requests for its scope. Its lifecycle is deliberately conservative so that one bad deploy cannot brick every open tab.</p>
+
+<h4>Registration and scope</h4>
+<p>The page registers a worker with <code>navigator.serviceWorker.register(url, { scope })</code>. The scope defaults to the worker's own directory and cannot be widened without a <code>Service-Worker-Allowed</code> response header, which is why a worker served from <code>/js/sw.js</code> can only control <code>/js/</code> by default. Register from the top level of the app and serve the script from the root if you want to control every navigation.</p>
+<p>The worker runs only on HTTPS, or on <code>localhost</code>, because a cached response from an untrusted origin is a security problem. It has no DOM, no <code>window</code> and no <code>localStorage</code>; it has <code>self</code>, <code>caches</code>, <code>fetch</code>, <code>indexedDB</code>, <code>clients</code> and an event-driven lifetime. The browser starts it when an event arrives and terminates it when idle, so module-level state does not survive; anything that must persist goes in IndexedDB or the Cache API.</p>
+
+<div class="codeWrap"><pre><code>// Page code: register once, at the top level of the app.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+    console.log('scope', reg.scope);
+    reg.addEventListener('updatefound', () => console.log('new worker installing'));
+  });
+}</code></pre></div>
+
+<h4>The three phases and the third one that is not install or activate</h4>
+<p><b>Install</b> fires once per version. It is the place to pre-cache the shell: open the cache, add the URLs, and fail loudly if any of them 404s, because a failed install aborts the whole thing. <b>Activate</b> fires once after install, and is the place to delete caches from previous versions and to take control of open pages. <b>Fetch</b> fires for every controlled request, for the lifetime of the version, and is where the caching strategy lives.</p>
+<p>A newly installed worker does not control the page that registered it until that page reloads, unless it calls <code>clients.claim()</code> during activation. That is intentional: swapping the network layer under a running app mid-session can break in-flight state. It is also why a first visit frequently appears to ignore the worker until the second navigation.</p>
+
+<div class="codeWrap"><pre><code>// sw.js
+const VERSION = 'v7';
+const SHELL = ['/', '/index.html', '/app.css', '/app.js', '/offline.html'];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(VERSION).then((cache) => cache.addAll(SHELL))
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)));
+    await self.clients.claim(); // take over pages that are already open
+  })());
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(route(event.request));
+});
+
+async function route(request) {
+  const cached = await caches.match(request);
+  return cached || fetch(request);
+}</code></pre></div>
+
+<div class="note">A service worker is torn down between events to save memory, so <code>event.waitUntil(promise)</code> is not optional when your handler does asynchronous work. Return the promise and the browser keeps the worker alive until it settles; leave it out and the worker may be killed mid-write.</div>
+
+<h3 id="ch15-caching" data-toc>15.2 Caching strategies</h3>
+<p class="topic-desc">A caching strategy is a statement about which of two sources wins and what happens when one of them fails. There are five that cover almost every case, and most apps should use different ones per request type.</p>
+
+<h4>The five strategies</h4>
+<p><b>Cache first</b> answers from the cache and only goes to the network on a miss. It is the fastest option for versioned, immutable assets such as hashed bundles and fonts, and the wrong choice for anything that changes, because the user sees a stale copy until the cache is versioned out. <b>Network first</b> tries the network and falls back to the cache, which is right for API data the user expects to be fresh, at the cost of a slow first byte when the network is poor.</p>
+<p><b>Stale while revalidate</b> returns the cached copy immediately and refreshes the cache in the background. It gives a fast response and eventual freshness, which is ideal for headlines, avatars and non-critical lists. <b>Cache only</b> and <b>network only</b> are for the two extremes: precached shell files that must never hit the network, and requests that must never be cached at all, such as authenticated POSTs or analytics beacons.</p>
+
+<div class="codeWrap"><pre><code>// Cache first, with a network fallback and an offline page.
+async function cacheFirst(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const hit = await cache.match(request);
+  if (hit) return hit;
+  try {
+    const response = await fetch(request);
+    if (response.ok) cache.put(request, response.clone());
+    return response;
+  } catch (err) {
+    return caches.match('/offline.html');
+  }
+}
+
+// Stale while revalidate: answer now, refresh in the background.
+async function staleWhileRevalidate(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const hit = await cache.match(request);
+  const update = fetch(request)
+    .then((response) => {
+      if (response.ok) cache.put(request, response.clone());
+      return response;
+    })
+    .catch(() => hit);
+  return hit || update;
+}</code></pre></div>
+
+<h4>Routing by request type</h4>
+<p>A real worker decides per request. Navigations get network first with an offline fallback so a deploy is visible immediately; hashed static assets get cache first because their URL changes when their content does; images get stale while revalidate; API calls get network first with a short timeout and a cached fallback for the offline case. Only same-origin, GET requests should be cached — a cross-origin POST or an OAuth redirect must pass straight through.</p>
+
+<div class="codeWrap"><pre><code>self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (request.method !== 'GET') return; // never cache mutations
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith(networkFirst(request));
+  } else if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(cacheFirst(request, 'v7'));
+  } else if (url.pathname.startsWith('/api/')) {
+    event.respondWith(networkFirst(request, 3000));
+  } else {
+    event.respondWith(staleWhileRevalidate(request, 'v7'));
+  }
+});</code></pre></div>
+
+<div class="warn">Never cache a response to an authenticated API call in a shared cache without varying on the credential, or one user's data can be served to another. If a response depends on a cookie or an <code>Authorization</code> header, either leave it uncached or store it in a per-user cache name.</div>
+
+<h4>Partial content and opaque responses</h4>
+<p>Range requests — <code>206 Partial Content</code> — cannot be cached and replayed as if they were complete; a cached 206 served to a request expecting the whole file produces a truncated media element. Cross-origin requests made without CORS produce an <code>opaque</code> response whose status the worker cannot read, so <code>response.ok</code> is always false for them and a size check is impossible. If you must cache them, cache them deliberately and account for the padding browsers report as quota usage.</p>
+
+<h3 id="ch15-manifest" data-toc>15.3 The web app manifest and installability</h3>
+<p class="topic-desc">A service worker makes an app work offline; a manifest makes it installable. Installability is a browser-defined bar: the app is served over HTTPS, has a worker with a fetch handler, and has a manifest with a name, icons and a start URL.</p>
+
+<h4>The required fields</h4>
+<p>A manifest is a JSON file linked from the head with <code>&lt;link rel="manifest"&gt;</code>. The minimum for an install prompt is <code>name</code> (or <code>short_name</code>), <code>icons</code> including at least a 192 px and a 512 px entry with <code>purpose: "any"</code>, <code>start_url</code> within the worker's scope, and <code>display</code> set to <code>standalone</code> or <code>fullscreen</code>. Add a <code>maskable</code> icon so Android can crop it to any shape without clipping the artwork, and set <code>theme_color</code> and <code>background_color</code> so the splash screen does not flash white.</p>
+
+<div class="codeWrap"><pre><code>&lt;!-- in the document head --&gt;
+&lt;link rel="manifest" href="/manifest.webmanifest"&gt;
+&lt;link rel="apple-touch-icon" href="/icons/icon-192.png"&gt;
+&lt;meta name="theme-color" content="#03122f"&gt;</code></pre></div>
+
+<div class="codeWrap"><pre><code>{
+  "name": "Amin360iT Quick Guides",
+  "short_name": "Quick Guides",
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#03122f",
+  "theme_color": "#03122f",
+  "description": "Offline developer guides.",
+  "categories": ["education", "developer"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Topics", "url": "/topics.html" }
+  ]
+}</code></pre></div>
+
+<h4>The install prompt and why it is deferred</h4>
+<p>Browsers no longer show a prompt on their own schedule for most users; Chrome fires <code>beforeinstallprompt</code>, and the page may hold the event and call <code>prompt()</code> later from a button. If you never call it, nothing happens, which is the intended control: the app asks at a moment that makes sense rather than the instant the page loads. <code>appinstalled</code> tells you the user accepted. Safari on iOS has no such API and no prompt at all; installation is a manual Share, and the meta tags plus <code>apple-mobile-web-app-capable</code> are what make that path work.</p>
+
+<div class="codeWrap"><pre><code>let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredPrompt = event;
+  installButton.hidden = false;
+});
+
+installButton.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  console.log(outcome); // "accepted" or "dismissed"
+  deferredPrompt = null;
+  installButton.hidden = true;
+});
+
+window.addEventListener('appinstalled', () => console.log('installed'));</code></pre></div>
+
+<div class="tip">A useful check while developing: the Application panel in devtools shows whether each manifest criterion is met and which one is missing. "Installability: no matching service worker" almost always means the worker registered with a scope narrower than the <code>start_url</code>.</div>
+
+<h3 id="ch15-push" data-toc>15.4 Push notifications and background sync</h3>
+<p class="topic-desc">Two capabilities let a worker act with no page open: push wakes it from the server, and background sync wakes it from a failed request. Both run in the worker's event loop, with all the lifetime rules that implies.</p>
+
+<h4>Subscriptions and the push message</h4>
+<p>Push requires permission, a <code>PushManager</code> subscription and a server that holds the endpoint and the keys. <code>registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })</code> returns an object whose endpoint is a capability URL — anyone who has it can push to that user, so it must be stored server-side, not in page code. The server encrypts the payload, the browser decrypts it and fires a <code>push</code> event in the worker, and the handler has a hard deadline of a few seconds to display a notification or the browser may show nothing at all.</p>
+<p>Every push must produce a visible notification on most platforms, which is why <code>userVisibleOnly</code> is mandatory in Chrome: silent push is a spamming vector. Notifications are also the only click target while the app is closed, so the <code>notificationclick</code> handler decides whether to focus an existing client or open a new window.</p>
+
+<div class="codeWrap"><pre><code>// Page: ask, then subscribe.
+const registration = await navigator.serviceWorker.ready;
+const permission = await Notification.requestPermission();
+if (permission === 'granted') {
+  const subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+  });
+  await fetch('/api/push/subscribe', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(subscription)
+  });
+}
+
+// sw.js
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : { title: 'Update', body: 'New content' };
+  event.waitUntil(self.registration.showNotification(data.title, {
+    body: data.body,
+    tag: data.tag,        // replaces a previous notification with the same tag
+    data: { url: data.url },
+    icon: '/icons/icon-192.png'
+  }));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = event.notification.data.url || '/';
+  event.waitUntil((async () => {
+    const list = await self.clients.matchAll({ type: 'window' });
+    const existing = list.find((c) => c.url.includes(target));
+    if (existing) return existing.focus();
+    return self.clients.openWindow(target);
+  })());
+});</code></pre></div>
+
+<h4>Background sync and periodic sync</h4>
+<p><code>SyncManager</code> retries a named task when connectivity returns, which turns "the user hit save while offline" into a durable queue rather than a lost write. The page calls <code>registration.sync.register('outbox')</code>; the worker listens for <code>sync</code>, drains an IndexedDB queue, and rethrows if it should be retried. <code>periodicsync</code> adds a coarse interval, but it requires an installed app and a high site engagement score, so it cannot be relied on for correctness — only for prefetching.</p>
+
+<div class="codeWrap"><pre><code>self.addEventListener('sync', (event) => {
+  if (event.tag !== 'outbox') return;
+  event.waitUntil(flushOutbox());
+});
+
+async function flushOutbox() {
+  const pending = await readQueue('outbox');
+  for (const item of pending) {
+    const response = await fetch(item.url, item.init);
+    if (!response.ok) throw new Error('retry later'); // fails the sync, browser retries
+    await removeFromQueue('outbox', item.id);
+  }
+}
+
+// Page side: queue the write, then ask the browser to retry when online.
+await enqueue('outbox', { url: '/api/notes', init: { method: 'POST', body: body } });
+await navigator.serviceWorker.ready.then((reg) => reg.sync.register('outbox'));</code></pre></div>
+
+<div class="note">A failing <code>sync</code> event is retried by the browser with its own backoff, but a bug that always throws will retry forever. Count attempts on the queued item and drop or park anything that has failed more than a handful of times.</div>
+
+<h3 id="ch15-update" data-toc>15.5 Update flow and cache versioning</h3>
+<p class="topic-desc">A service worker sits between the user and the server, so it can serve a deploy the user never sees. An update flow is the set of decisions that make a new version arrive, arrive atomically, and not break a running session.</p>
+
+<h4>When the browser checks for a new worker</h4>
+<p>The browser bypasses the HTTP cache for the worker script — modern engines cap that at 24 hours regardless of headers — and starts an update check on navigation, on functional events, and when <code>registration.update()</code> is called. If the script's bytes differ, the new worker installs in parallel and waits. The old worker keeps serving until every client using it is gone or the new one calls <code>skipWaiting()</code>.</p>
+<p>That "waiting" state is the crux. Auto-skipping gives users the new version immediately but can swap the network layer while a page holds in-flight state. Never auto-skipping means a long-lived tab pins an old version indefinitely. The usual compromise is to prompt: the page watches <code>updatefound</code> and <code>statechange</code>, shows a "reload to update" banner, and on confirmation sends <code>skipWaiting</code> to the waiting worker and reloads after <code>controllerchange</code>. Guard the reload so it fires once, not on every claim.</p>
+
+<div class="codeWrap"><pre><code>// Page: offer an update instead of applying it silently.
+const registration = await navigator.serviceWorker.register('/sw.js');
+let reloading = false;
+
+registration.addEventListener('updatefound', () => {
+  const installing = registration.installing;
+  installing.addEventListener('statechange', () => {
+    if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+      showUpdateBanner(() => installing.postMessage({ type: 'SKIP_WAITING' }));
+    }
+  });
+});
+
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+  if (reloading) return; // statechange fires more than once
+  reloading = true;
+  location.reload();
+});</code></pre></div>
+
+<div class="codeWrap"><pre><code>// sw.js
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+// Version the cache by build id so a deploy cannot collide with the old one.
+const BUILD = '2026-10-15T09';
+const SHELL_CACHE = 'shell-' + BUILD;
+const DATA_CACHE = 'data-' + BUILD;
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    const keep = [SHELL_CACHE, DATA_CACHE];
+    await Promise.all(keys.filter((k) => !keep.includes(k)).map((k) => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});</code></pre></div>
+
+<h4>Atomic updates and the cache name is the version</h4>
+<p>Because the cache name encodes the build, activation deletes exactly the previous generation, and there is no window in which half the assets come from the new version and half from the old. Precaching during install is what makes the switch atomic: either every shell file is present in the new cache, or the install fails and the old worker keeps running. Never write cache names by hand in two places; derive them from one constant, and never reuse a name across builds, because a stale entry with the same name is invisible to every deletion routine.</p>
+
+<div class="warn">A worker that fails to install leaves a broken app for anyone who only ever gets the new version, so test the offline path explicitly: load once online, then stop the server and reload. If the shell is not cached before activation, the user sees the browser's offline error rather than your page.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch16" data-toc>16 · Real-time browser communication</h2>
+
+<h3 id="ch16-websocket" data-toc>16.1 WebSocket</h3>
+<p class="topic-desc">The WebSocket API is a single bidirectional connection that begins as an HTTP request and then upgrades. It is the default transport whenever the client and server both need to send at any time.</p>
+
+<h4>How the connection is established</h4>
+<p>The client sends an HTTP request with <code>Upgrade: websocket</code> and a base64 nonce. A server that agrees answers <code>101 Switching Protocols</code>, and from that point the TCP connection carries framed messages in both directions with no further HTTP overhead. The handshake is a normal HTTP request, so cookies, subprotocols and an <code>Origin</code> header all travel with it, which is what lets your existing session authentication work without a separate token exchange — and what makes an origin check on the server essential, since browsers do not apply the same-origin policy to WebSocket connections the way they do to fetches.</p>
+<p>A message can be a string or binary. Strings are UTF-8; binary arrives as a <code>Blob</code> by default, or as an <code>ArrayBuffer</code> if you set <code>binaryType = 'arraybuffer'</code>. There is no request/response correlation in the protocol itself, so an application-level <code>id</code> is needed the moment two operations can be in flight at once.</p>
+
+<div class="codeWrap"><pre><code>const socket = new WebSocket('wss://api.example.com/live', ['app.v2']);
+socket.binaryType = 'arraybuffer';
+
+socket.addEventListener('open', () => {
+  socket.send(JSON.stringify({ type: 'hello', at: Date.now() }));
+});
+
+socket.addEventListener('message', (event) => {
+  if (typeof event.data === 'string') {
+    const message = JSON.parse(event.data);
+    handle(message);
+  } else {
+    renderFrame(new Uint8Array(event.data));
+  }
+});
+
+socket.addEventListener('close', (event) => {
+  console.log('closed', event.code, event.reason, 'clean:', event.wasClean);
+});
+
+socket.addEventListener('error', () => console.warn('socket error'));
+
+// Backpressure: bufferedAmount grows if you send faster than the link drains.
+function sendSafely(payload) {
+  if (socket.bufferedAmount > 1024 * 1024) {
+    console.warn('dropping frame, buffer is full');
+    return false;
+  }
+  socket.send(payload);
+  return true;
+}</code></pre></div>
+
+<h4>Close codes, backpressure and the half-open problem</h4>
+<p><code>bufferedAmount</code> is the only flow-control signal the API exposes. Sending a stream of frames faster than the network drains queues them in memory and grows without bound, which is the usual cause of a tab allocating gigabytes during a video call. Watch the value and drop or coalesce frames rather than accumulating them.</p>
+<p>A connection can also die without a close frame — a dropped cell connection, a suspended laptop, a NAT table expiry. No <code>close</code> event fires until TCP eventually times out, which can be minutes, so an application-level heartbeat is mandatory for anything that must be known to be alive. That is covered in 16.4.</p>
+
+<div class="ex">A WebSocket connection does not survive the page entering the back-forward cache in a usable state, and mobile browsers terminate sockets aggressively on background. Treat every disconnect as normal and design the UI to resync from a server cursor rather than assuming a continuous stream.</div>
+
+<h3 id="ch16-sse" data-toc>16.2 Server-Sent Events</h3>
+<p class="topic-desc">SSE is a one-way stream over ordinary HTTP where the server keeps the response open and writes text frames. It is far simpler than WebSocket and, for notifications and live feeds, usually the better choice.</p>
+
+<h4>The wire format and the client API</h4>
+<p>A response with <code>Content-Type: text/event-stream</code> stays open and carries named fields separated by blank lines: <code>event</code> for the type, <code>data</code> for the payload, <code>id</code> for the last event identifier, and <code>retry</code> for the reconnection delay in milliseconds. The <code>EventSource</code> object reconnects on its own and, crucially, sends <code>Last-Event-ID</code> on the next request so the server can replay what was missed. That automatic resumption with replay is the feature WebSocket makes you build yourself.</p>
+<p>The cost is direction: the client cannot push. A typical design pairs a read-only SSE stream with normal POSTs for writes, which is enough for dashboards, chat read receipts, build logs, notification bells and price tickers.</p>
+
+<div class="codeWrap"><pre><code>// Client
+const stream = new EventSource('/api/events', { withCredentials: true });
+
+stream.addEventListener('message', (event) => append(JSON.parse(event.data)));
+stream.addEventListener('build', (event) => updateBuild(JSON.parse(event.data)));
+stream.addEventListener('open', () => setStatus('live'));
+stream.addEventListener('error', () => {
+  // EventSource retries automatically; readyState 2 means it gave up.
+  if (stream.readyState === 2) scheduleManualRetry();
+});
+
+// Server (Node) — one event with an id so a reconnect can resume.
+res.writeHead(200, {
+  'content-type': 'text/event-stream',
+  'cache-control': 'no-cache',
+  connection: 'keep-alive'
+});
+let id = 0;
+setInterval(() => {
+  id += 1;
+  res.write('id: ' + id + '\n');
+  res.write('event: build\n');
+  res.write('data: ' + JSON.stringify({ id, state: 'running' }) + '\n\n');
+}, 1000);</code></pre></div>
+
+<h4>Buffering, proxies and connection limits</h4>
+<p>The usual reason an SSE stream "does not work in production" is an intermediary that buffers the response. Nginx needs <code>proxy_buffering off</code> and <code>X-Accel-Buffering: no</code>; a CDN may need explicit configuration; and a compression middleware can hold the whole stream until a flush. Sending an initial comment line of a few kilobytes of padding forces early flushes in some stacks and is a common workaround.</p>
+<p>The other limit is per-origin connection count. Under HTTP/1.1 a browser allows about six connections per origin, and an SSE stream occupies one permanently, which can starve ordinary requests. Under HTTP/2 or HTTP/3 the limit is far higher and multiplexed, so serve SSE over HTTP/2 and keep a comment heartbeat flowing every 15 to 30 seconds so idle proxies do not close the pipe.</p>
+
+<div class="codeWrap"><pre><code># nginx: disable buffering for the event stream route
+location /api/events {
+  proxy_pass http://app;
+  proxy_http_version 1.1;
+  proxy_set_header Connection '';
+  proxy_buffering off;
+  proxy_cache off;
+  chunked_transfer_encoding off;
+  add_header X-Accel-Buffering no;
+  proxy_read_timeout 1h;
+}</code></pre></div>
+
+<div class="tip">Because EventSource reconnects automatically, server-side replay support is what makes the stream correct rather than merely available. Keep a short ring buffer of recent events keyed by id, and honour <code>Last-Event-ID</code> on the reconnect request.</div>
+
+<h3 id="ch16-webrtc" data-toc>16.3 WebRTC data channels</h3>
+<p class="topic-desc">WebRTC connects two browsers directly, so the data does not traverse your server in steady state. The data channel is the part of that stack you can use without any media, and it is the only browser transport that can be unreliable and unordered on purpose.</p>
+
+<h4>Peer connections, ICE and SDP</h4>
+<p>Two peers exchange session descriptions through a signalling channel of your own choosing — usually your WebSocket — then probe for a working network path using ICE candidates gathered from STUN and, when a direct path is impossible, relayed through TURN. STUN is cheap and works for most home networks; TURN relays all traffic through your server and is the reason a working WebRTC deployment still needs bandwidth. Roughly one in five connections needs TURN, and shipping without it produces intermittent, geography-dependent failures that are miserable to debug.</p>
+<p>The security model matters too. RTCPeerConnection is DTLS-encrypted and requires a secure context; media access needs user permission; and ICE candidates can leak local IP addresses unless an <code>iceTransportPolicy</code> of <code>relay</code> is set. Everything is authenticated by fingerprint in the SDP, so the signalling channel must itself be trusted — an attacker who can tamper with signalling can substitute a peer.</p>
+
+<div class="codeWrap"><pre><code>const pc = new RTCPeerConnection({
+  iceServers: [{ urls: 'stun:stun.example.com' }]
+});
+
+const channel = pc.createDataChannel('chat', { ordered: true });
+channel.onopen = () => channel.send(JSON.stringify({ type: 'ping' }));
+channel.onmessage = (event) => console.log('peer said', event.data);
+
+pc.onicecandidate = (event) => {
+  if (event.candidate) signal.send({ candidate: event.candidate });
+};
+
+pc.ondatachannel = (event) => {
+  event.channel.onmessage = (e) => console.log('incoming', e.data);
+};
+
+// Offerer
+const offer = await pc.createOffer();
+await pc.setLocalDescription(offer);
+signal.send({ sdp: pc.localDescription });
+
+// Answerer
+pc.ondatachannel = (event) => attach(event.channel);
+await pc.setRemoteDescription(offer);
+const answer = await pc.createAnswer();
+await pc.setLocalDescription(answer);
+signal.send({ sdp: pc.localDescription });</code></pre></div>
+
+<h4>Ordering and reliability are configurable</h4>
+<p>A data channel has three knobs that HTTP and WebSocket do not expose. <code>ordered: false</code> lets messages arrive out of order, which removes head-of-line blocking at the cost of application complexity. <code>maxRetransmits</code> limits retries and <code>maxPacketLifeTime</code> limits the retry window, so a stale position update can be dropped rather than delivered late. Setting either of those makes the channel unreliable, which is the right choice for game state, cursor positions and live annotations, and the wrong choice for chat or file transfer.</p>
+<p>Bandwidth estimation is automatic but coarse: there is no direct throughput API, so senders must adapt using <code>bufferedAmount</code> and application-level acknowledgements, exactly as with WebSocket. Large payloads must be chunked with a chunk size under about 16 KB and, on unreliable channels, with a header so a lost chunk does not corrupt the file.</p>
+
+<div class="codeWrap"><pre><code>// A lossy channel for state that is worthless once superseded.
+const cursor = pc.createDataChannel('cursor', {
+  ordered: false,
+  maxRetransmits: 0
+});
+
+cursor.send(JSON.stringify({ x, y, t: Date.now() }));
+
+// Chunked transfer for anything larger than a packet or two.
+const CHUNK = 16 * 1024;
+const bytes = new Uint8Array(await file.arrayBuffer());
+for (let offset = 0; offset < bytes.length; offset += CHUNK) {
+  const slice = bytes.subarray(offset, offset + CHUNK);
+  transfer.send(JSON.stringify({ id, offset, total: bytes.length, data: slice }));
+}</code></pre></div>
+
+<div class="warn">Do not build a small WebRTC data channel that carries JSON between two tabs and expect WebSocket-level ergonomics. Signalling, TURN, permission prompts and per-browser quirks make it heavier than a server relay; choose it when latency or privacy genuinely requires a direct path, or when the payload is media.</div>
+
+<h3 id="ch16-reconnect" data-toc>16.4 Reconnection, backoff and heartbeats</h3>
+<p class="topic-desc">Real networks drop. A transport that has no reconnection policy is a feature that works on a desk and fails in a lift. This sub-topic is the small amount of code that makes all three transports dependable.</p>
+
+<h4>Exponential backoff with jitter</h4>
+<p>Retrying immediately after a failure hammers a server that is probably already struggling, and a thousand clients doing it in lockstep produce a thundering herd on recovery. The fix is exponential backoff with full jitter: delay is a random value between zero and a ceiling that doubles each attempt, capped at some maximum such as 30 seconds. The cap matters — without it, a client that slept through a long outage takes hours to notice it is back.</p>
+<p>Reset the attempt counter only on evidence of health, not on a successful TCP connect. A socket that opens and closes repeatedly is a server that is failing, and treating each open as success produces a fast reconnect loop that looks exactly like an attack.</p>
+
+<div class="codeWrap"><pre><code>function backoffDelay(attempt, base = 800, cap = 30000) {
+  const ceiling = Math.min(cap, base * 2 ** attempt);
+  return Math.random() * ceiling; // full jitter
+}
+
+class ReliableSocket {
+  constructor(url, onMessage) {
+    this.url = url;
+    this.onMessage = onMessage;
+    this.attempt = 0;
+    this.healthy = false;
+    this.connect();
+  }
+
+  connect() {
+    this.socket = new WebSocket(this.url);
+    this.socket.addEventListener('open', () => {
+      this.healthy = false;      // only a heartbeat confirms health
+      this.startHeartbeat();
+    });
+    this.socket.addEventListener('message', (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === 'pong') { this.noteHealthy(); return; }
+      this.onMessage(message);
+    });
+    this.socket.addEventListener('close', () => {
+      this.stopHeartbeat();
+      const delay = backoffDelay(this.attempt);
+      this.attempt = Math.min(this.attempt + 1, 10);
+      setTimeout(() => this.connect(), delay);
+    });
+  }
+
+  noteHealthy() {
+    this.healthy = true;
+    this.attempt = 0;
+  }
+
+  startHeartbeat() {
+    this.timer = setInterval(() => {
+      if (this.socket.readyState !== WebSocket.OPEN) return;
+      if (!this.healthy) this.socket.close(); // missed the last pong
+      this.healthy = false;
+      this.socket.send(JSON.stringify({ type: 'ping', at: Date.now() }));
+    }, 15000);
+  }
+
+  stopHeartbeat() {
+    clearInterval(this.timer);
+  }
+}</code></pre></div>
+
+<h4>Heartbeats, resume tokens and offline awareness</h4>
+<p>A heartbeat is a small message sent on a fixed interval with a deadline for the reply. If the reply does not come, the connection is treated as dead and closed deliberately — which is what turns a silent, half-open socket into a <code>close</code> event the backoff logic can act on. Servers often do the same from their side, so pick an interval below the proxy's idle timeout; 15 to 30 seconds is typical.</p>
+<p>Reconnecting is only half the job. The client also needs to know what it missed, which means the server must expose a monotonic cursor — a sequence number, an event id or a timestamp — and the client must send the last one it processed. On resume, the server replays from that cursor. Store the cursor in IndexedDB or <code>localStorage</code> before acknowledging the message so a crash cannot lose it. Finally, listen to <code>online</code>, <code>offline</code> and <code>visibilitychange</code>: reconnecting on a phone that has been asleep for an hour is usually better done on the next visible frame than on a timer that fired while the tab was frozen.</p>
+
+<div class="codeWrap"><pre><code>// Resume from the last processed cursor instead of starting over.
+const cursorKey = 'events.cursor';
+
+async function openWithResume() {
+  const lastId = localStorage.getItem(cursorKey) || '0';
+  const url = '/api/events?since=' + encodeURIComponent(lastId);
+  const response = await fetch(url, { headers: { accept: 'text/event-stream' } });
+  consume(response.body);
+}
+
+window.addEventListener('online', () => console.log('network back, retry now'));
+window.addEventListener('offline', () => console.log('network gone, pause retries'));
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') socket.close(); // trigger a fresh connect
+});</code></pre></div>
+
+<div class="note">Page unload is not a reliable place to persist a cursor — <code>beforeunload</code> may not run on mobile. Write the cursor as each batch is acknowledged, not when the tab closes.</div>
+
+<h3 id="ch16-choose" data-toc>16.5 Choosing a transport</h3>
+<p class="topic-desc">Four mechanisms look similar from a diagram and behave very differently in production. The choice is driven by direction, fan-out, latency budget and how much infrastructure you are prepared to operate.</p>
+
+<h4>The comparison that decides it</h4>
+<table>
+<thead><tr><th>Transport</th><th>Direction</th><th>Reconnect</th><th>Best for</th></tr></thead>
+<tbody>
+<tr><td>Polling</td><td>client pull</td><td>trivial, nothing to reconnect</td><td>slow-changing data, simple deploys</td></tr>
+<tr><td>SSE</td><td>server to client</td><td>automatic with <code>Last-Event-ID</code></td><td>feeds, notifications, logs, read-only streams</td></tr>
+<tr><td>WebSocket</td><td>bidirectional</td><td>you write it</td><td>chat, collaboration, games, presence</td></tr>
+<tr><td>WebRTC data channel</td><td>peer to peer</td><td>you write it, plus ICE restart</td><td>media, privacy-sensitive or ultra-low latency paths</td></tr>
+</tbody>
+</table>
+<p>Start at the top of that table and move down only when the row above cannot do the job. Polling with a sensible interval handles more "real-time" requirements than teams admit, and it needs no new server infrastructure, survives every proxy, and reconnects by definition. SSE is the right answer for the very common case of updates that flow one way; it is a few lines on both sides and the browser does the hard part. WebSocket earns its complexity when the client genuinely pushes at the same rate, or when fan-out per message is small and volume is high. WebRTC is the last resort, justified by latency or by a requirement that traffic not pass through your server at all.</p>
+
+<div class="codeWrap"><pre><code>// A polling loop that adapts instead of hammering the server.
+async function poll(cursor, { min = 2000, max = 60000 } = {}) {
+  let interval = min;
+  for (;;) {
+    const response = await fetch('/api/changes?since=' + cursor);
+    if (response.status === 429) {
+      interval = Math.min(max, interval * 2); // server is unhappy, back off
+    } else {
+      const body = await response.json();
+      cursor = body.cursor;
+      if (body.changes.length > 0) {
+        apply(body.changes);
+        interval = min;
+      } else {
+        interval = Math.min(max, interval * 1.5); // idle, slow down
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, interval));
+  }
+}</code></pre></div>
+
+<h4>Operational realities</h4>
+<p>Every long-lived connection consumes a server file descriptor and a slot in your reverse proxy's worker pool, so ten thousand idle sockets is a capacity decision, not a free upgrade. Sticky sessions, graceful restarts and horizontal scaling all interact badly with long connections: a deploy drains and closes every socket, and each client must reconnect with jitter to avoid a synchronised stampede against the new instances. Load balancers must be configured with read timeouts above your heartbeat interval, and a CDN in front of a streaming endpoint needs explicit buffering disabled.</p>
+<div class="tip">Whatever you choose, put it behind one interface in the client — <code>subscribe(topic, handler)</code> — so the transport is an implementation detail. Swapping SSE for WebSocket later should be a change inside that module, not a change in every component that listens for updates.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch17" data-toc>17 · Platform APIs for real apps</h2>
+
+<h3 id="ch17-canvas" data-toc>17.1 Canvas 2D and requestAnimationFrame</h3>
+<p class="topic-desc">Canvas is an immediate-mode drawing surface: you issue draw calls and the pixels persist until you draw over them. It is the right tool for charts, games, image editing and any visual that DOM elements cannot express.</p>
+
+<h4>The drawing model and the device pixel ratio trap</h4>
+<p>A canvas has two sizes. Its CSS size is the layout box, and its width and height attributes are the backing store. If the two disagree, the browser scales the bitmap and everything is blurry on a high-density display. The fix is to set the attributes to the CSS size multiplied by <code>devicePixelRatio</code>, then scale the context by the same factor so your drawing code can keep using CSS units. Re-read the ratio on every resize, because dragging a window between monitors changes it.</p>
+
+<div class="codeWrap"><pre><code>function fitCanvas(canvas) {
+  const ratio = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * ratio);
+  canvas.height = Math.round(rect.height * ratio);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0); // draw in CSS pixels
+  return ctx;
+}
+
+const ctx = fitCanvas(document.querySelector('#chart'));
+ctx.fillStyle = '#03122f';
+ctx.fillRect(0, 0, 300, 160);
+ctx.strokeStyle = '#00d1ff';
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.moveTo(0, 120);
+ctx.lineTo(150, 40);
+ctx.lineTo(300, 90);
+ctx.stroke();</code></pre></div>
+
+<h4>The animation loop</h4>
+<p><code>requestAnimationFrame</code> schedules a callback before the next paint and passes a high-resolution timestamp. It pauses when the tab is hidden, which is a feature: a background animation costs nothing. Never animate with <code>setInterval</code>, and never use the timestamp as a delta without clamping it — a tab that was hidden for a minute resumes with a delta of 60,000 ms, and any physics stepping that far will teleport everything off screen. Always clear the frame first, draw from state, and keep the state update independent of the frame rate by multiplying by an elapsed-time factor.</p>
+
+<div class="codeWrap"><pre><code>const state = { x: 20, y: 80, vx: 90, last: 0 };
+
+function frame(now) {
+  const dt = state.last ? Math.min((now - state.last) / 1000, 0.05) : 0;
+  state.last = now;
+
+  state.x += state.vx * dt;
+  if (state.x > 300 || state.x < 10) state.vx *= -1;
+
+  ctx.clearRect(0, 0, 320, 200);
+  ctx.fillStyle = '#00d1ff';
+  ctx.beginPath();
+  ctx.arc(state.x, state.y, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);</code></pre></div>
+
+<div class="warn">Reading a layout value such as <code>getBoundingClientRect</code> between draw calls forces a synchronous reflow and can cut the frame rate in half. Read all geometry once per frame, before drawing anything, and write to the DOM only outside the loop.</div>
+
+<h4>Beyond pixels: transforms, filters and the offscreen path</h4>
+<p>The 2D context exposes <code>save</code> and <code>restore</code> around transform stacks, which is how you draw a rotated object without recomputing every coordinate. <code>setTransform</code> with a matrix handles scale and translate together; <code>globalCompositeOperation</code> gives you blend modes; <code>ctx.filter</code> accepts CSS filter syntax for blur and saturation. For heavy scenes, an <code>OffscreenCanvas</code> transferred to a worker keeps the main thread free, and an <code>ImageBitmap</code> decoded off-thread with <code>createImageBitmap</code> avoids the main-thread decode cost of <code>new Image()</code>.</p>
+
+<div class="codeWrap"><pre><code>const bitmap = await createImageBitmap(file); // decoded off the main thread
+const off = document.createElement('canvas');
+off.width = bitmap.width;
+off.height = bitmap.height;
+off.getContext('2d').drawImage(bitmap, 0, 0);
+
+const worker = new Worker('./render.js', { type: 'module' });
+const offscreen = off.transferControlToOffscreen();
+worker.postMessage({ canvas: offscreen }, [offscreen]);</code></pre></div>
+
+<h3 id="ch17-audio" data-toc>17.2 Web Audio</h3>
+<p class="topic-desc">Web Audio is a graph of nodes processed by the audio thread. You connect sources to effects to a destination, schedule events against a sample clock, and the browser handles the timing.</p>
+
+<h4>Graphs, nodes and the audio clock</h4>
+<p>An <code>AudioContext</code> is the container. Sources include <code>OscillatorNode</code>, <code>AudioBufferSourceNode</code> for decoded samples, <code>MediaElementAudioSourceNode</code> for a video or audio element, and <code>MediaStreamAudioSourceNode</code> for a microphone. Effects include <code>GainNode</code>, <code>BiquadFilterNode</code>, <code>DelayNode</code>, <code>ConvolverNode</code> and <code>DynamicsCompressorNode</code>. Everything ends at <code>context.destination</code>, or at a <code>MediaStreamAudioDestinationNode</code> when you want to send the result elsewhere.</p>
+<p>The reason not to use it as a glorified <code>audio</code> element is the scheduling model. Every automation call takes a time in <code>context.currentTime</code>, a monotonically increasing value in seconds, which lets you schedule a note or a fade to land on an exact sample rather than "as soon as the main thread gets around to it". That precision is what makes Web Audio usable for music, games and metronomes; it is useless for anything that must be triggered by a DOM event with jitter.</p>
+
+<div class="codeWrap"><pre><code>// A short percussive blip with an exponential decay envelope.
+function blip(context, frequency = 440, when = context.currentTime) {
+  const osc = context.createOscillator();
+  const gain = context.createGain();
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(frequency, when);
+
+  gain.gain.setValueAtTime(0.0001, when);
+  gain.gain.exponentialRampToValueAtTime(0.4, when + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.3);
+
+  osc.connect(gain).connect(context.destination);
+  osc.start(when);
+  osc.stop(when + 0.32);
+}
+
+const context = new AudioContext();
+blip(context, 660);
+blip(context, 990, context.currentTime + 0.15);</code></pre></div>
+
+<h4>Autoplay policy and user-gesture unlocking</h4>
+<p>An <code>AudioContext</code> created without a user gesture starts <code>suspended</code>, and resuming it later requires a gesture too. The reliable pattern is to create the context lazily on the first click or keypress, call <code>resume()</code>, and check <code>context.state</code> before assuming sound will play. Any audio graph built before the gesture still works, it is simply silent until resumed — which produces the classic bug where a game is mute for its first minute with no error anywhere.</p>
+
+<div class="codeWrap"><pre><code>let context = null;
+
+async function unlockAudio() {
+  if (!context) context = new AudioContext();
+  if (context.state === 'suspended') await context.resume();
+  console.log('audio state:', context.state);
+  return context;
+}
+
+document.addEventListener('pointerdown', unlockAudio, { once: true });
+
+// Decoding a file into a reusable buffer, once.
+async function loadSample(url) {
+  const bytes = await (await fetch(url)).arrayBuffer();
+  return context.decodeAudioData(bytes); // context must exist and be unlocked
+}</code></pre></div>
+
+<div class="tip">A <code>GainNode</code> between the graph and the destination is the standard master volume: automate its <code>gain</code> for fades, and ramp rather than assign to avoid clicks. An abrupt gain change from 0.8 to 0 is a step discontinuity and is audible as a pop.</div>
+
+<h3 id="ch17-file" data-toc>17.3 File and Clipboard APIs</h3>
+<p class="topic-desc">Reading a file the user picked, dragging one in, and putting something on the clipboard are three small APIs that most apps need and most implementations get subtly wrong.</p>
+
+<h4>Reading a picked file</h4>
+<p>An <code>&lt;input type="file"&gt;</code> gives you a <code>FileList</code> of <code>File</code> objects, which are <code>Blob</code>s with a name and a last-modified date. They can be read with <code>text()</code>, <code>arrayBuffer()</code> or <code>stream()</code>, and the stream form is what allows progressive parsing of a multi-gigabyte file without holding it in memory. A <code>File</code> from an input has no real path: browsers deliberately hide it, so anything that needs a path must go through a picker API and a handle instead.</p>
+<p>Drag and drop is the second entry point. A drop target must call <code>preventDefault</code> on both <code>dragover</code> and <code>drop</code>, or the browser navigates away from your app and opens the file. The drop event carries <code>dataTransfer.files</code> for real files and <code>dataTransfer.items</code> when you want directory entries; <code>getAsFileSystemHandle</code> is the modern path that also works for folders.</p>
+
+<div class="codeWrap"><pre><code>// Streaming read: constant memory, even for a huge file.
+async function parseLargeTsv(file) {
+  const reader = file.stream().getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop(); // keep the incomplete tail
+    for (const line of lines) handleRow(line.split('\t'));
+  }
+}
+
+dropZone.addEventListener('dragover', (event) => event.preventDefault());
+dropZone.addEventListener('drop', async (event) => {
+  event.preventDefault(); // without this the browser opens the file
+  for (const file of event.dataTransfer.files) {
+    await parseLargeTsv(file);
+  }
+});</code></pre></div>
+
+<h4>Clipboard: permission, focus and formats</h4>
+<p>The async Clipboard API is restricted to secure contexts and requires the document to be focused and usually a transient user activation. <code>writeText</code> and <code>readText</code> are widely supported; rich formats go through <code>ClipboardItem</code> with a map of MIME types to blobs, and only a few types are permitted. Reading the clipboard is much more restricted than writing it, because clipboard contents are frequently sensitive: Safari prompts, Firefox has limited support for images, and any of these can fail for reasons a web page cannot see.</p>
+
+<div class="codeWrap"><pre><code>// Write plain and rich text together, so the target picks the best it understands.
+async function copyResult(markdown, html) {
+  try {
+    const item = new ClipboardItem({
+      'text/plain': new Blob([markdown], { type: 'text/plain' }),
+      'text/html': new Blob([html], { type: 'text/html' })
+    });
+    await navigator.clipboard.write([item]);
+    return true;
+  } catch (err) {
+    // Fall back to the legacy selection trick for older engines.
+    console.warn('clipboard write failed', err.name);
+    return false;
+  }
+}
+
+document.querySelector('#copy').addEventListener('click', () => {
+  copyResult('# Title', '&lt;h1&gt;Title&lt;/h1&gt;');
+});</code></pre></div>
+
+<div class="warn">Never read the clipboard on load, and never write to it without the user asking. Both are privacy-sensitive and both fail without a user gesture in current browsers, so a "copy to clipboard" button that works when clicked will silently do nothing if it is triggered from a timer.</div>
+
+<h4>Persistent handles and download links</h4>
+<p><code>showOpenFilePicker</code> and <code>showSaveFilePicker</code> return a <code>FileSystemFileHandle</code> that can be retained across sessions in IndexedDB and re-authorised with <code>requestPermission()</code>, which is how a web editor offers "reopen my project". For the write-back case that does not need a handle, <code>URL.createObjectURL(blob)</code> on an anchor's <code>href</code> with a <code>download</code> attribute triggers a save without any server round trip. Revoke the object URL when you are done, or the blob stays alive for the lifetime of the document.</p>
+
+<h3 id="ch17-observers" data-toc>17.4 IntersectionObserver, MutationObserver, ResizeObserver</h3>
+<p class="topic-desc">These three APIs replace the classic loops — scroll handlers, polling for element changes and window resize listeners — with asynchronous callbacks that the browser schedules efficiently and off the critical path.</p>
+
+<h4>IntersectionObserver: visibility without scroll math</h4>
+<p>An observer watches an element against a root, by default the viewport, and reports when the intersection crosses a threshold. The callback fires asynchronously after layout, gives you the ratio and the bounding rectangles, and never runs on the scroll thread. That is what makes lazy-loading images, infinite-scroll sentinels, sticky header detection and impression tracking cheap instead of janky. <code>rootMargin</code> lets you preload before an element is truly visible, which is how a gallery starts fetching one screenful early.</p>
+<p>The canonical use is an image whose real source lives in <code>data-src</code>. Swap it on first intersection, then <code>unobserve</code>, because a one-shot observation costs nothing after it has fired. For a continuously tracked element, keep observing and read <code>isIntersecting</code> each time.</p>
+
+<div class="codeWrap"><pre><code>const lazy = new IntersectionObserver((entries, observer) => {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    const img = entry.target;
+    img.src = img.dataset.src;
+    img.removeAttribute('data-src');
+    observer.unobserve(img); // one shot
+  }
+}, { rootMargin: '600px 0px', threshold: 0.01 });
+
+document.querySelectorAll('img[data-src]').forEach((img) => lazy.observe(img));
+
+// A sentinel at the bottom of a list, for infinite scroll.
+const sentinel = new IntersectionObserver(([entry]) => {
+  if (entry.isIntersecting) loadNextPage();
+}, { root: null, threshold: 0 });
+sentinel.observe(document.querySelector('#end-of-list'));</code></pre></div>
+
+<h4>ResizeObserver and MutationObserver</h4>
+<p><code>ResizeObserver</code> reports an element's content box changing, including changes caused by its parent rather than the viewport — the case a window <code>resize</code> listener cannot see, such as a sidebar being collapsed by a sibling. Callbacks run before paint, so writing layout-affecting styles inside one can trigger the "ResizeObserver loop completed with undelivered notifications" error; schedule the write in <code>requestAnimationFrame</code> instead.</p>
+<p><code>MutationObserver</code> batches DOM changes into records with <code>childList</code>, <code>attributes</code> and <code>characterData</code> flags, and delivers them as a microtask. It is the correct replacement for polling for third-party widgets and for detecting content injected by an extension, but it is not a rendering hook and it will happily fire thousands of times for a chatty framework. Filter with <code>attributeFilter</code> and <code>subtree</code> and disconnect when you no longer need it.</p>
+
+<div class="codeWrap"><pre><code>const sizeWatch = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    const width = entry.contentRect.width;
+    requestAnimationFrame(() => layoutChart(width)); // never write layout here directly
+  }
+});
+sizeWatch.observe(document.querySelector('#panel'));
+
+const domWatch = new MutationObserver((records) => {
+  for (const record of records) {
+    if (record.type === 'attributes' && record.attributeName === 'class') {
+      syncThemeFrom(record.target);
+    }
+  }
+});
+domWatch.observe(document.body, {
+  attributes: true,
+  attributeFilter: ['class'],
+  subtree: true
+});</code></pre></div>
+
+<div class="tip">All three observers deliver an array of entries, not a single element, and several records can arrive in one batch. Iterate the array every time; code that reads only <code>entries[0]</code> works in testing and drops updates under load.</div>
+
+<h3 id="ch17-misc" data-toc>17.5 Geolocation, Notifications, Performance and Page Visibility</h3>
+<p class="topic-desc">The remaining platform APIs share a theme: they are permission-gated, they can fail for reasons the page cannot observe, and each has a legitimate reason to be denied. Handle the failure path first.</p>
+
+<h4>Geolocation, notifications and their permission model</h4>
+<p><code>navigator.geolocation.getCurrentPosition</code> is one-shot and <code>watchPosition</code> streams updates until you clear the watch id; both take a success callback, an error callback and options for accuracy and timeout. The error code distinguishes a denied permission from a position the device simply could not fix, so the two must be handled differently — retrying a denied request annoys the user without ever succeeding. Always pass a timeout and <code>maximumAge</code>, because without them a request can hang indefinitely on a desktop with no GPS and no network location service.</p>
+<p><code>Notification.requestPermission()</code> must be called from a user gesture in current browsers, and once denied it cannot be requested again — the origin has to be changed. That makes the decision to prompt effectively permanent, so prompt at a moment of clear value rather than on first load. As a complement, the <code>Permissions</code> API reports state through <code>navigator.permissions.query({ name: 'geolocation' })</code> so you can adapt the UI without triggering a request.</p>
+
+<div class="codeWrap"><pre><code>function locate({ timeout = 8000, highAccuracy = false } = {}) {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) return reject(new Error('unsupported'));
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy }),
+      (err) => reject(new Error(err.code === 1 ? 'denied' : 'unavailable')),
+      { enableHighAccuracy: highAccuracy, timeout, maximumAge: 30000 }
+    );
+  });
+}
+
+locate().then(showOnMap).catch((err) => {
+  if (err.message === 'denied') showManualEntry();
+});</code></pre></div>
+
+<h4>Performance measurement and page visibility</h4>
+<p>The Performance API is how you find out what the user actually experienced. <code>performance.now()</code> gives a monotonic clock for spans; <code>performance.mark</code> and <code>measure</code> record them for devtools; <code>PerformanceObserver</code> reports <code>largest-contentful-paint</code>, <code>layout-shift</code>, <code>longtask</code> and navigation timing as they happen, which is the only way to observe field data rather than a lab run. The most useful entry for real apps is <code>longtask</code>: any task over 50 ms is visible to the user as input latency, and its attribution points at the script that caused it.</p>
+<p><code>document.visibilityState</code> tells you whether the tab is visible, and <code>visibilitychange</code> is the hook that should drive nearly every background behaviour: pause animations and game loops, stop polling and timers, flush a pending autosave, and resume with a fresh connection instead of trusting a socket that has been idle. The <code>pagehide</code> and <code>pageshow</code> events cover the back-forward cache, where a page is frozen rather than unloaded and <code>unload</code> may never fire.</p>
+
+<div class="codeWrap"><pre><code>// Field measurement for the two metrics users feel most.
+new PerformanceObserver((list) => {
+  const last = list.getEntries().at(-1);
+  report('lcp', Math.round(last.startTime));
+}).observe({ type: 'largest-contentful-paint', buffered: true });
+
+new PerformanceObserver((list) => {
+  for (const entry of list.getEntries()) {
+    report('longtask', { ms: Math.round(entry.duration), name: entry.name });
+  }
+}).observe({ type: 'longtask', buffered: true });
+
+// One hook to pause and resume everything background-related.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    pauseLoops();
+    flushAutosave();
+    socket.close();
+  } else {
+    resumeLoops();
+    socket.reconnectNow();
+  }
+});</code></pre></div>
+
+<div class="note">Measurement must never itself be the bottleneck: a performance reporter that sends an HTTP request per entry produces more long tasks than it finds. Batch entries and flush on <code>visibilitychange</code>, when the page is going away anyway and the work cannot hurt the frame rate.</div>
+</section>

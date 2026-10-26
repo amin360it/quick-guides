@@ -1,0 +1,769 @@
+<section class="chapter">
+<h2 id="orientation" data-toc>0 · Orientation</h2>
+<p class="topic-desc">Java is a statically typed, class-based language compiled to an intermediate bytecode that runs on the Java Virtual Machine. This guide is written against <strong>Java 25 LTS</strong> (released September 2025) and notes where a construct needs Java 21 LTS or is newer than it. Everything is real, runnable code; nothing depends on an IDE.</p>
+
+<h3 id="orientation-jdk" data-toc>0.1 JDK, JRE and JVM: what each one is</h3>
+<p class="topic-desc">The three acronyms name three different things that are often installed as one package. Getting the boundary right explains most "it works in my IDE but not on the server" problems.</p>
+
+<h4>The execution pipeline</h4>
+<p>Java source (a <code>.java</code> text file) is not executed directly. <code>javac</code> translates it to <strong>bytecode</strong> (a <code>.class</code> file), a compact, stack-based instruction set defined by the Java Virtual Machine Specification. The <strong>JVM</strong> then loads and runs that bytecode, translating hot paths to native machine code at runtime. Because the bytecode format and the JVM's semantics are specified independently of any CPU, one compiled artifact runs unmodified on every platform that has a compliant JVM — the "write once, run anywhere" property.</p>
+<p>A <strong>JRE</strong> (Java Runtime Environment) is a JVM plus the core class library, enough to run compiled programs but not to compile them. Since JDK 9 the JRE is no longer shipped as a separate download for desktop use; instead the JDK itself, plus the <code>jlink</code> tool, is used to build a custom runtime image containing only the modules an application needs. A <strong>JDK</strong> (Java Development Kit) is a JRE plus the development tools: <code>javac</code>, <code>jar</code>, <code>javadoc</code>, <code>jshell</code>, <code>jlink</code>, <code>jpackage</code>, <code>jcmd</code>, <code>jconsole</code> and the rest.</p>
+
+<div class="table-scroll"><table>
+<tr><th>Artifact</th><th>Contains</th><th>You need it to</th></tr>
+<tr><td>JVM</td><td>The bytecode interpreter, JIT compiler and garbage collectors</td><td>Execute <code>.class</code> files (embedded in a JRE or JDK)</td></tr>
+<tr><td>JRE</td><td>JVM + core libraries (<code>java.base</code> and friends)</td><td>Run a packaged application (built with <code>jlink</code> since 9)</td></tr>
+<tr><td>JDK</td><td>JRE + developer tools + <code>src.zip</code></td><td>Compile, test, profile, package, publish</td></tr>
+</table></div>
+
+<h4>Versioning is not what it looks like</h4>
+<p><code>java -version</code> prints the <em>feature</em> version first, then the build. The old <code>1.8.0_402</code> style has been gone since JDK 9: Java 8 is <code>1.8</code>, but Java 9 onwards is just <code>9</code>, <code>21</code>, <code>25</code>. The JDK's own version string and the <code>--release</code> flag you compile with are separate concerns, and <code>javac --release 21</code> on a JDK 25 compiler produces a class file that runs on a Java 21 runtime — this is the supported way to target an older LTS, and it is stricter than the obsolete <code>-source</code>/<code>-target</code> pair because it also checks the API surface.</p>
+
+<div class="codeWrap"><pre><code># shell - one command answers "what am I running?"
+java -version          # openjdk version "25.0.1" 2025-10-21 LTS
+javac -version         # javac 25.0.1
+java -XshowSettings:properties -version 2>&gt;&amp;1 | grep -i java.home
+
+# Compile for an older LTS and prove the class file version.
+javac --release 21 -d out src/Main.java
+javap -verbose out/Main.class | grep 'major version'   # major version: 65
+</code></pre></div>
+
+<div class="note">A class file's <code>major version</code> is the feature version + 44: Java 8 is 52, Java 11 is 55, Java 17 is 61, Java 21 is 65, Java 25 is 69. When a runtime refuses to load a class with <code>UnsupportedClassVersionError</code>, this number is the whole story.</div>
+
+<h3 id="orientation-install" data-toc>0.2 Installing a JDK: Temurin, vendors and SDKMAN</h3>
+<p class="topic-desc">There is one language specification and many JDK builds of it. Choosing a build is a support question, not a language question, and the choice is easily reversed because they all pass the same compliance tests.</p>
+
+<h4>Which build to pick</h4>
+<p><strong>Eclipse Temurin</strong> (the Adoptium project) is the most widely deployed no-cost build and the safest default: it is TCK-tested, has a predictable quarterly patch cadence, and publishes long-term support for the LTS lines. Oracle JDK is the reference build and is free for development and for production use under the NFTC licence, but its support terms differ from Temurin's. <strong>Amazon Corretto</strong>, <strong>Azul Zulu</strong>, <strong>Microsoft Build of OpenJDK</strong> and <strong>BellSoft Liberica</strong> are all TCK-compliant alternatives; the practical differences are patch timing, additional collectors or profilers bundled in, and the commercial support contract behind them. What you must not do is pick the <code>jre</code>-only package if you intend to compile, or a non-LTS feature release if you want a five-year patch commitment.</p>
+
+<div class="table-scroll"><table>
+<tr><th>Line</th><th>Released</th><th>Status in late 2026</th><th>Use it when</th></tr>
+<tr><td><strong>25</strong></td><td>Sep 2025</td><td>Current LTS</td><td>Default for new projects</td></tr>
+<tr><td>24 / 23 / 22</td><td>2024&#8211;2025</td><td>Superseded feature releases</td><td>Never for production; they had six months of support</td></tr>
+<tr><td><strong>21</strong></td><td>Sep 2023</td><td>Previous LTS, still fully maintained</td><td>Libraries and servers not yet certified on 25</td></tr>
+<tr><td>17</td><td>Sep 2021</td><td>Older LTS, maintenance</td><td>Legacy enterprise baselines</td></tr>
+<tr><td>11 / 8</td><td>2018 / 2014</td><td>Late maintenance; 8 is near end of life</td><td>Only to match an unchangeable deployment target</td></tr>
+</table></div>
+
+<h4>Installing one, or several</h4>
+<p>On Linux the distribution package manager is fine for a single JDK, but most developers need to move between versions per project. <strong>SDKMAN</strong> handles that on macOS, Linux and WSL/Git Bash, and <code>jenv</code> or <code>asdf</code> do the same job. On Windows, either the Temurin MSI plus a manual <code>JAVA_HOME</code> change, or SDKMAN inside WSL, works; the JDK that <em>Gradle and Maven use</em> is chosen by <code>JAVA_HOME</code>, while the JDK that <em>runs your shell commands</em> is chosen by <code>PATH</code>. Confusing those two is the single most common build-environment bug.</p>
+
+<div class="codeWrap"><pre><code># shell - SDKMAN, the cross-platform route
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+sdk list java                 # every vendor and version, with an install id
+sdk install java 25.0.1-tem   # Temurin 25 LTS
+sdk install java 21.0.5-tem   # keep an older LTS beside it
+sdk use java 21.0.5-tem       # current shell only
+sdk default java 25.0.1-tem   # persist
+
+# Pin the JDK for a directory (jenv), so `java` follows `cd`.
+jenv add /Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home
+echo 25 &gt; .java-version
+</code></pre></div>
+
+<div class="tip">Set <code>JAVA_HOME</code> and never rely on a shim script to guess it. Gradle, Maven, Tomcat, most CI images and the Spring Boot Maven plugin all read <code>JAVA_HOME</code> directly, and a stale value silently builds with the wrong compiler while <code>java -version</code> in your terminal shows the right one.</div>
+
+<h3 id="orientation-first" data-toc>0.3 Your first program: javac, java, and the classpath</h3>
+<p class="topic-desc">A minimal Java program makes the compilation model concrete: the file name, the public type name and the way the launcher finds the entry point are all connected.</p>
+
+<h4>Source to running process</h4>
+<p>A <code>public</code> top-level type must live in a file whose name matches it exactly, case included: <code>Greeter.java</code> holds <code>public class Greeter</code>. The launcher needs a <code>static void main(String[] args)</code> method as its entry point. In Java 25, JEP 512 relaxed both rules — a single-file program may omit the class declaration and may use an <em>instance</em> <code>void main()</code> — which makes the teaching example genuinely shorter without changing how larger programs work.</p>
+
+<div class="codeWrap"><pre><code>// Greeter.java - the classic form; compiles on every version from Java 8 up
+public class Greeter {
+    public static void main(String[] args) {
+        String who = args.length &gt; 0 ? args[0] : "world";
+        System.out.println("Hello, " + who + "!");
+    }
+}
+</code></pre></div>
+
+<div class="codeWrap"><pre><code># shell - compile then run
+javac Greeter.java          # writes Greeter.class beside the source
+java Greeter Ada            # Hello, Ada!
+
+# Since Java 11 you can skip the explicit compile for a single file:
+java Greeter.java Ada       # compiles in memory, runs, no .class left behind
+java --enable-preview Greeter.java
+</code></pre></div>
+
+<h4>The compact source file (Java 25)</h4>
+<p>Java 25 finalised <em>compact source files and instance main methods</em>. A file may contain bare statements; the compiler wraps them in an implicit class, and <code>main</code> need not be <code>static</code> or <code>public</code>. This is a real language change, not a script mode: the file still compiles to a normal class, and you grow into the explicit form by adding the class declaration when you need more than one method.</p>
+
+<div class="codeWrap"><pre><code>// Hello.java - Java 25 compact source file
+void main() {
+    System.out.println("Hello from a compact source file");
+    for (int i = 1; i &lt;= 3; i++) System.out.println("line " + i);
+}
+</code></pre></div>
+
+<h4>The classpath</h4>
+<p><code>java</code> locates classes by searching the <em>classpath</em>: directories and jar files, separated by <code>;</code> on Windows and <code>:</code> elsewhere. If a class is not on the classpath the launcher reports <code>ClassNotFoundException</code> or <code>NoClassDefFoundError</code>; if it is, but has no suitable <code>main</code>, the message is <code>Main method not found</code>. Since JDK 9 the more robust mechanism is the <em>module path</em>, where each jar declares which packages it exports and which it needs, but the classpath remains the default for the whole Maven Central ecosystem.</p>
+
+<div class="codeWrap"><pre><code># shell - putting a directory and a jar on the classpath
+java -cp "out;lib/gson-2.11.0.jar" com.acme.Main
+java -classpath out:lib/postgresql-42.7.4.jar com.acme.Main   # Unix
+
+# A runnable jar records its own Main-Class, so no -cp is needed:
+java -jar app.jar
+</code></pre></div>
+
+<h3 id="orientation-jshell" data-toc>0.4 JShell: a read-eval-print loop for Java</h3>
+<p class="topic-desc">JShell (JEP 222, standard since JDK 9) is an interactive tool that evaluates Java snippets without a class, a file or a compile step. It is the fastest way to check what an API actually does, and it is a first-class debugging aid rather than a teaching toy.</p>
+
+<h4>How it differs from compiling a scratch file</h4>
+<p>JShell maintains a live set of declarations. Typing an expression prints its value and type; typing a method adds it to the current session; typing a class behaves as if you had written it. Snippets are numbered, and <code>/edit</code>, <code>/list</code>, <code>/vars</code>, <code>/methods</code>, <code>/history</code> and <code>/save</code> operate on that numbered state. Uncaught exceptions do not terminate the session — they print and the prompt returns, which is exactly the behaviour you want when exploring an unfamiliar library.</p>
+
+<div class="codeWrap"><pre><code># shell
+jshell --enable-preview
+</code></pre></div>
+
+<div class="codeWrap"><pre><code>// JShell session (the | marks the REPL, not source code)
+|  Welcome to JShell -- Version 25.0.1
+|  For an introduction type: /help intro
+
+jshell&gt; var names = java.util.List.of("Ada", "Grace", "Barbara");
+names ==&gt; [Ada, Grace, Barbara]
+
+jshell&gt; names.stream().map(String::toUpperCase).sorted().toList()
+$2 ==&gt; [ADA, BARBARA, GRACE]
+
+jshell&gt; String.format("%,.2f", 1234567.891)
+$3 ==&gt; "1,234,567.89"
+
+jshell&gt; /vars
+|    List&lt;String> names = [Ada, Grace, Barbara]
+|    List&lt;String> $2 = [ADA, BARBARA, GRACE]
+
+jshell&gt; /save scratch.jsh
+</code></pre></div>
+
+<h4>Fed from a file or piped, for reproducibility</h4>
+<p>JShell reads a script with <code>/open script.jsh</code> or <code>jshell --execution local script.jsh</code>, which turns it into a lightweight test harness. Because the startup cost is roughly a second once warmed, it is also useful for a quick benchmark of two implementations — though for anything that needs a real measurement you should use JMH, covered in the JVM chapter.</p>
+
+<div class="codeWrap"><pre><code># shell - a .jsh file is just a series of snippets
+cat &gt; check.jsh &lt;&lt;'EOF'
+String s = "  hello  ";
+System.out.println("[" + s.strip() + "]");
+System.out.println(Character.isDigit('7'));
+EOF
+jshell --execution local check.jsh
+</code></pre></div>
+
+<div class="warn">JShell evaluates snippets with the same security context as any other JVM process. It is a developer tool, not a sandbox: a pasted snippet can read files and open sockets. Do not run unknown snippets on a machine you care about.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch1" data-toc>1 · Language basics</h2>
+<p class="topic-desc">The parts of Java that never changed: the primitive types and their exact widths, the operator set and its precedence surprises, the four control constructs, arrays as fixed-length objects, and the <code>String</code> class with its two modern additions — text blocks and local variable type inference with <code>var</code>.</p>
+
+<h3 id="ch1-primitives" data-toc>1.1 Primitive types, literals and widening</h3>
+<p class="topic-desc">Java has eight primitive types and they have specified, platform-independent widths. That is unusual and valuable: a <code>long</code> is exactly 64 bits everywhere, so a binary file format written on one machine reads correctly on another.</p>
+
+<h4>The eight types and what each is for</h4>
+<p>Use <code>int</code> for almost all whole numbers and <code>long</code> when a value can exceed about two billion — file sizes, epoch milliseconds, ID spaces. <code>byte</code> and <code>short</code> exist mainly for binary formats and for arrays where memory density matters; arithmetic on them promotes to <code>int</code> first. <code>double</code> is the default for real numbers and follows IEEE 754, which means it cannot represent most decimal fractions exactly; for money use <code>BigDecimal</code> or a minor-unit <code>long</code>, never <code>double</code>. <code>char</code> is a single UTF-16 code <em>unit</em>, not a full Unicode character — an emoji is two <code>char</code>s, which is why <code>String</code> iteration by index is not the same as iteration by code point.</p>
+
+<div class="table-scroll"><table>
+<tr><th>Type</th><th>Width</th><th>Range / notes</th><th>Literal form</th></tr>
+<tr><td><code>byte</code></td><td>8 bits</td><td>&#8211;128 to 127</td><td><code>(byte) 7</code></td></tr>
+<tr><td><code>short</code></td><td>16 bits</td><td>&#8211;32,768 to 32,767</td><td><code>(short) 7</code></td></tr>
+<tr><td><code>int</code></td><td>32 bits</td><td>&#8211;2,147,483,648 to 2,147,483,647</td><td><code>42</code>, <code>0x2A</code>, <code>0b101010</code>, <code>0o52</code></td></tr>
+<tr><td><code>long</code></td><td>64 bits</td><td>&#8211;9.22&#215;10<sup>18</sup> to 9.22&#215;10<sup>18</sup></td><td><code>42L</code>, <code>1_000_000L</code></td></tr>
+<tr><td><code>float</code></td><td>32 bits</td><td>IEEE 754 single, ~7 significant digits</td><td><code>3.14f</code></td></tr>
+<tr><td><code>double</code></td><td>64 bits</td><td>IEEE 754 double, ~15 significant digits</td><td><code>3.14</code>, <code>6.02e23</code></td></tr>
+<tr><td><code>boolean</code></td><td>JVM-defined</td><td><code>true</code> or <code>false</code>; not convertible to a number</td><td><code>true</code></td></tr>
+<tr><td><code>char</code></td><td>16 bits</td><td>A UTF-16 code unit, <code>'\u0000'</code> to <code>'\uffff'</code></td><td><code>'A'</code>, <code>'\n'</code>, <code>'\u00e9'</code></td></tr>
+</table></div>
+
+<h4>Widening, narrowing and the overflow that does not throw</h4>
+<p>Assignment from a narrower to a wider primitive (<code>byte</code> to <code>int</code>) is silent and lossless. The reverse requires an explicit cast and <em>truncates</em>; it never throws. Integer arithmetic wraps silently, so <code>Integer.MAX_VALUE + 1</code> is <code>Integer.MIN_VALUE</code>. This is the behaviour you want in a hash function and the behaviour you do not want in a counter — use <code>Math.addExact</code>, <code>Math.multiplyExact</code> or <code>long</code>/<code>BigInteger</code> where the range is genuinely in doubt. Integer division truncates toward zero, and dividing a negative by a positive follows that rule, which surprises people migrating from languages that round down.</p>
+
+<div class="codeWrap"><pre><code>// Widening is implicit; narrowing needs a cast and can silently corrupt.
+int big = 130;
+byte truncated = (byte) big;              // -126  (130 - 256)
+
+long max = Integer.MAX_VALUE;
+int wrapped = (int) (max + 1);            // -2147483648, no exception
+
+try {
+    int safe = Math.addExact(Integer.MAX_VALUE, 1);
+} catch (ArithmeticException e) {
+    System.out.println("overflow detected: " + e.getMessage());
+}
+
+// Integer division truncates toward zero.
+System.out.println(7 / 2);                // 3
+System.out.println(-7 / 2);               // -3
+System.out.println(7 % -2);               // 1
+System.out.println(7.0 / 2);              // 3.5
+
+// Underscores are ignored; 0x / 0b / 0o select the radix.
+long salary = 1_250_000L;
+int mask = 0b1011_0000;
+System.out.printf("%d %s %s%n", salary, Integer.toBinaryString(mask), Integer.toHexString(255));
+</code></pre></div>
+
+<div class="warn">Never use <code>==</code> to compare floating-point values for equality, including against <code>0.0</code>. <code>0.1 + 0.2 == 0.3</code> is <code>false</code>. Compare the absolute difference against a tolerance, or use <code>BigDecimal</code> with an explicit scale and <code>RoundingMode</code> for money and measurement.</div>
+
+<h3 id="ch1-operators" data-toc>1.2 Operators, precedence and short-circuit evaluation</h3>
+<p class="topic-desc">The operator set is small and C-derived. Two things repay attention: the difference between the boolean operators that short-circuit and those that do not, and the precedence of the bitwise operators, which is lower than most people assume.</p>
+
+<h4>Short-circuit versus eager boolean operators</h4>
+<p><code>&amp;&amp;</code> and <code>||</code> evaluate the right operand only when the result is not already determined. <code>&amp;</code> and <code>|</code> on booleans evaluate both sides always. That distinction is not stylistic: <code>list != null &amp;&amp; !list.isEmpty()</code> is safe, <code>list != null &amp; !list.isEmpty()</code> throws <code>NullPointerException</code>. The eager forms are only appropriate when both operands are side-effecting and both effects are wanted, which is rare.</p>
+
+<div class="codeWrap"><pre><code>// Short-circuit guards the dereference.
+String s = null;
+boolean safe   = s != null &amp;&amp; s.length() &gt; 0;    // false, no NPE
+// boolean boom = s != null &amp;  s.length() &gt; 0;   // NullPointerException
+
+// Bit tricks on ints: | and &amp; are bitwise here.
+int READ = 0b001, WRITE = 0b010, EXEC = 0b100;
+int perms = READ | WRITE;                 // 3
+boolean canExec = (perms &amp; EXEC) != 0;     // false
+perms |= EXEC;                            // 7
+perms &amp;= ~WRITE;                           // 5
+System.out.println(Integer.toBinaryString(perms));   // 101
+
+// Ternary, and the ternary-with-autoboxing trap.
+int n = 7;
+String parity = (n % 2 == 0) ? "even" : "odd";</code></pre></div>
+
+<h4>Precedence and the instanceOf-and-cast idiom</h4>
+<p>Precedence runs, from tightest to loosest: postfix, unary, cast, multiplicative, additive, shift, relational, equality, bitwise AND, bitwise XOR, bitwise OR, logical AND, logical OR, ternary, assignment. The shift and bitwise operators bind <em>looser</em> than equality, so <code>a &amp; b == c</code> parses as <code>a &amp; (b == c)</code> and does not compile on <code>int</code>s. Parenthesise bit manipulation. Since Java 16 the <code>instanceof</code> pattern removes the cast: <code>if (obj instanceof String s)</code> binds <code>s</code> in the true branch, and the compiler knows it is in scope.</p>
+
+<div class="codeWrap"><pre><code>Object value = "forty-two";
+// Old idiom: check, then cast, then use.
+if (value instanceof String) {
+    String s = (String) value;
+    System.out.println(s.length());
+}
+// Since Java 16: the binding is part of the test.
+if (value instanceof String s &amp;&amp; s.length() &gt; 3) {
+    System.out.println(s.toUpperCase());     // FORTY-TWO
+}
+
+// Shifts: &gt;&gt; is arithmetic (sign-extending), &gt;&gt;&gt; is logical.
+int neg = -8;
+System.out.println(neg &gt;&gt; 1);      // -4
+System.out.println(neg &gt;&gt;&gt; 1);     // 2147483644
+System.out.println(1 &lt;&lt; 10);        // 1024
+// Shifts mask the count to 5 bits (6 for long), so 1 &lt;&lt; 33 == 2, not overflow.
+System.out.println(1 &lt;&lt; 33);       // 2
+</code></pre></div>
+
+<div class="tip">Enable <code>-Xlint:all</code> (and <code>-Werror</code> in CI) from the first day. Most precedence and boxing mistakes are reported as warnings long before they become runtime defects, and a project that starts clean stays clean.</div>
+
+<h3 id="ch1-control" data-toc>1.3 Control flow, including switch expressions and pattern matching</h3>
+<p class="topic-desc">Java has the four conventional constructs plus two modern ones that changed the shape of real code: the arrow form of <code>switch</code>, which does not fall through and can produce a value, and pattern matching for <code>switch</code>, which finalised in Java 21.</p>
+
+<h4>Loops, labels and the for-each form</h4>
+<p>The enhanced <code>for</code> loop works on anything <code>Iterable</code> or an array and is the default choice because it cannot go out of bounds. Use an indexed loop only when the index itself matters. Labels let a single <code>break</code> or <code>continue</code> target an outer loop, which is clearer than a boolean flag in a nested search.</p>
+
+<div class="codeWrap"><pre><code>String[] hosts = {"alpha", "beta", "gamma"};
+
+for (String host : hosts) System.out.println(host);
+
+// break/continue target the labeled loop, not the nearest one.
+search:
+for (int row = 0; row &lt; 3; row++) {
+    for (int col = 0; col &lt; 3; col++) {
+        if (row * col == 4) {
+            System.out.println("found at " + row + "," + col);
+            break search;
+        }
+    }
+}
+
+// while for an unknown trip count; do/while runs at least once.
+int n = 1;
+while (n &lt; 100) n *= 2;             // 128
+do { n--; } while (n &gt; 0 &amp;&amp; n % 5 != 0);
+</code></pre></div>
+
+<h4>Switch statements and switch expressions</h4>
+<p>The colon form falls through, which is occasionally useful and usually a bug; the arrow form does not. A <em>switch expression</em> must be exhaustive, and for an enum or a sealed hierarchy the compiler enforces that, which turns "I forgot a case" from a runtime surprise into a compile error. Use <code>yield</code> to return a value from a block arm.</p>
+
+<div class="codeWrap"><pre><code>enum Day { MON, TUE, WED, THU, FRI, SAT, SUN }
+
+// Arrow statement: no fall-through, no break needed.
+String kind(Day d) {
+    return switch (d) {
+        case SAT, SUN -&gt; "weekend";
+        case MON, TUE, WED, THU, FRI -&gt; "weekday";
+    };   // exhaustive by construction
+}
+
+// Pattern matching for switch (final in Java 21) with a guard.
+String describe(Object o) {
+    return switch (o) {
+        case null            -&gt; "nothing";
+        case Integer i when i &lt; 0 -&gt; "negative int " + i;
+        case Integer i       -&gt; "int " + i;
+        case String s        -&gt; {
+            int len = s.strip().length();
+            yield "string of length " + len;
+        }
+        case int[] a         -&gt; "array of " + a.length + " ints";
+        default              -&gt; "something else: " + o.getClass().getSimpleName();
+    };
+}
+
+System.out.println(kind(Day.SAT) + " / " + describe(-3) + " / " + describe("  hi  "));
+</code></pre></div>
+
+<div class="note">Matching <code>case null</code> explicitly is a Java 21 addition; without it, <code>switch</code> on a null reference throws <code>NullPointerException</code>, and the compiler says so rather than leaving it implicit. Ordering matters in a pattern switch too: the first matching arm wins, so put guarded and specific arms before general ones.</div>
+
+<h3 id="ch1-arrays" data-toc>1.4 Arrays are objects with a fixed length</h3>
+<p class="topic-desc">An array is a fixed-size, contiguous, zero-indexed object with a <code>length</code> field and a covariant element type. It is the fastest sequence Java has and the least forgiving.</p>
+
+<h4>Creation, defaults and copying</h4>
+<p>An array is created with <code>new</code> or an initialiser and its length never changes. Elements are default-initialised: <code>0</code> for numeric primitives, <code>false</code> for <code>boolean</code>, <code>'\u0000'</code> for <code>char</code>, <code>null</code> for references. Access outside <code>[0, length)</code> throws <code>ArrayIndexOutOfBoundsException</code>, which is one of the cheapest checks the JVM performs. Copy with <code>Arrays.copyOf</code> or <code>System.arraycopy</code>; do not loop unless the copy needs transformation.</p>
+
+<div class="codeWrap"><pre><code>int[] primes = {2, 3, 5, 7, 11};
+int[] zeros  = new int[5];                   // all 0
+String[] names = new String[3];              // all null
+
+System.out.println(primes.length);           // 5
+int[] bigger = Arrays.copyOf(primes, 8);     // pads with 0
+System.arraycopy(primes, 1, bigger, 0, 3);   // overlapping-safe, fast
+
+// Two-dimensional: an array of arrays, so rows may differ in length.
+int[][] grid = new int[3][4];
+int[][] jagged = {{1}, {2, 3}, {4, 5, 6}};
+for (int[] row : jagged) System.out.println(Arrays.toString(row));
+
+// Sorting and searching: mutating and binary-search pair.
+int[] data = {5, 1, 4, 2, 3};
+Arrays.sort(data);                           // [1, 2, 3, 4, 5]
+System.out.println(Arrays.binarySearch(data, 4));   // 2
+
+// Arrays are covariant: a String[] is an Object[].
+Object[] objs = names;
+objs[0] = Integer.valueOf(1);                // compiles, throws ArrayStoreException at runtime
+</code></pre></div>
+
+<h4>When not to use an array</h4>
+<p>Prefer <code>ArrayList</code> or <code>List.of</code> for ordinary collections: they grow, they interoperate with the collections framework and streams, and the boxing cost for primitives is usually irrelevant. Reach for an array when the length is truly fixed and known, when you need primitive density (a million <code>int</code>s is 4 MB as an array and roughly ten times that as a boxed <code>ArrayList&lt;Integer&gt;</code>), or at an API boundary where the shape is contractual. Note also that an array is mutable and its contents are mutable: <code>Arrays.asList(arr)</code> gives a fixed-size view backed by the array, so a write through one is visible through the other. <code>List.of(...)</code> is the immutable alternative.</p>
+
+<div class="codeWrap"><pre><code>// Defensive copy: never hand an internal array to a caller.
+final class IntBag {
+    private final int[] values;
+    IntBag(int[] values) { this.values = values.clone(); }
+    int[] snapshot()     { return values.clone(); }
+}
+
+// A varargs parameter is an array, which is why this is a real aliasing bug.
+static void printAll(String... items) {
+    for (String s : items) System.out.print(s + " ");
+    System.out.println();
+}
+printAll("a", "b", "c");                 // a b c
+
+String[] backing = {"x", "y"};
+printAll(backing);                       // passes the array itself, not a copy
+
+// Stream over an array without boxing.
+int sum = Arrays.stream(primes).sum();   // IntStream
+System.out.println(sum + " " + Arrays.stream(primes).average().orElse(0));
+</code></pre></div>
+
+<h3 id="ch1-strings" data-toc>1.5 String, StringBuilder, text blocks and var</h3>
+<p class="topic-desc"><code>String</code> is immutable, final and the most used class in the language. Its operations, its encoding rules and the two syntax additions that changed how strings are written together cover most day-to-day string work.</p>
+
+<h4>Immutability, the string pool and encoding</h4>
+<p>A <code>String</code>'s characters are never modified after construction; every "change" returns a new instance. String literals are interned in a pool, so two literals with the same text are the same object and <code>==</code> works; a string built at runtime is a different object, so <code>==</code> fails and <code>equals</code> is required. <code>String</code> stores UTF-16 internally and the class exposes <code>charAt</code> in code units, so an emoji occupies two indices. Use <code>codePointCount</code> and <code>codePoints()</code> when the text may contain non-BMP characters, and always pass an explicit <code>Charset</code> when converting to or from bytes.</p>
+
+<div class="codeWrap"><pre><code>String a = "java";
+String b = "java";                    // same pooled literal
+String c = new String("java");        // distinct object
+System.out.println(a == b);           // true
+System.out.println(a == c);           // false
+System.out.println(a.equals(c));      // true - always compare with equals
+
+// Common operations, all returning new strings.
+String raw = "  Ada Lovelace  ";
+System.out.println("[" + raw.strip() + "]");
+System.out.println(raw.contains("Love"));
+System.out.println(raw.replace("Ada", "Grace"));
+System.out.println(String.join(", ", List.of("a", "b", "c")));
+System.out.println("a,b,,c".split(",", -1).length);   // 4, -1 keeps trailing empties
+
+// Unicode-aware length.
+String emoji = "\uD83D\uDE00";        // grinning face
+System.out.println(emoji.length());                  // 2 code units
+System.out.println(emoji.codePointCount(0, emoji.length()));   // 1 character
+
+// Formatted output: printf and formatted are the same engine.
+System.out.printf("%s scored %.1f%% in %d ms%n", "Ada", 87.53, 42);
+System.out.println(String.format("%,d", 1234567));
+</code></pre></div>
+
+<h4>Text blocks</h4>
+<p>A text block (final in Java 15) is a multi-line string literal delimited by three double quotes. Incidental leading whitespace is stripped, based on the least-indented line and the position of the closing delimiter, and newlines are preserved as written. <code>\</code> at end of line suppresses the newline, and <code>\s</code> preserves a trailing space that would otherwise be stripped. Use text blocks for SQL, JSON, HTML and shell snippets; concatenating those with <code>"...\n"</code> is now a defect rather than a style choice.</p>
+
+<div class="codeWrap"><pre><code>String sql = """
+        SELECT id, email
+          FROM users
+         WHERE created_at &gt;= ?
+         ORDER BY id
+        """;
+System.out.println(sql.lines().count());     // 4 lines of content
+
+String json = """
+        {"name": "%s", "active": %b}
+        """.formatted("Ada", true);
+System.out.println(json.strip());
+
+// \  at end of line joins; \s keeps a significant trailing space.
+String joined = """
+        one \
+        two""";
+System.out.println(joined);                  // "one two"
+</code></pre></div>
+
+<h4>var and building strings efficiently</h4>
+<p><code>var</code> (local variable type inference, final in Java 10) lets the compiler infer a local variable's type from its initialiser. It is not dynamic typing: the type is fixed at compile time and can be seen in the editor. It improves readability when the right-hand side already names the type, and hurts it when it does not — <code>var x = get();</code> is strictly worse than naming the type. It works only for local variables with an initialiser, <code>for</code> indices in enhanced loops, and <code>try</code>-with-resources; it does not work for fields, parameters or return types. For repeated concatenation in a loop, use <code>StringBuilder</code>, because <code>s += x</code> in a loop allocates a new string every iteration and turns linear work quadratic.</p>
+
+<div class="codeWrap"><pre><code>var counts = new HashMap&lt;String, Integer&gt;();   // clear: the type is on the right
+var users  = List.of("Ada", "Grace");        // List&lt;String>
+for (var u : users) System.out.println(u.toUpperCase());
+
+// Quadratic: each += copies the whole accumulated string.
+String slow = "";
+for (int i = 0; i &lt; 10_000; i++) slow += i;
+
+// Linear: StringBuilder amortises growth in a char array.
+var sb = new StringBuilder(16_000);
+for (int i = 0; i &lt; 10_000; i++) sb.append(i);
+String fast = sb.toString();
+
+// Since Java 9 the compiler turns a single += chain into invokedynamic,
+// but a loop is still a loop. String.join covers the delimiter case.
+System.out.println(String.join("-", "2026", "10", "14"));
+</code></pre></div>
+</section>
+
+<section class="chapter">
+<h2 id="ch2" data-toc>2 · Object-oriented Java</h2>
+<p class="topic-desc">Java's type system is nominal and single-inheritance based, with interfaces supplying the multiple-inheritance half. The modern additions — records, sealed hierarchies and switch patterns — formalise designs that used to require boilerplate and runtime checks.</p>
+
+<h3 id="ch2-classes" data-toc>2.1 Classes, objects, constructors and encapsulation</h3>
+<p class="topic-desc">A class is a blueprint; an object is an instance with its own field storage and a reference to its class. Constructors initialise that storage, and access control decides which of it the outside world may touch.</p>
+
+<h4>Fields, methods and the four access levels</h4>
+<p>Access modifiers are ordered <code>private</code>, package-private (no modifier), <code>protected</code>, <code>public</code>. The practical rule is to keep fields <code>private</code> and expose behaviour, not data: a public mutable field cannot be guarded, cannot be observed, and cannot be reimplemented later. <code>protected</code> is the most dangerous level because it is visible both to subclasses anywhere and to the whole package, so it is a weak encapsulation boundary. <code>static</code> members belong to the class rather than an instance; <code>final</code> on a field means it must be assigned exactly once, which the compiler checks for definite assignment in every constructor. <code>this</code> disambiguates a field from a parameter; <code>super</code> refers to the parent's members.</p>
+
+<div class="codeWrap"><pre><code>public final class BankAccount {
+    private final String owner;
+    private long balanceCents;                       // mutable, but private
+    private static long accountsOpened;              // shared, not per-instance
+
+    public BankAccount(String owner) {
+        this(owner, 0L);                             // constructor chaining
+        accountsOpened++;
+    }
+
+    public BankAccount(String owner, long opening) {
+        this.owner   = Objects.requireNonNull(owner, "owner");
+        this.balance = Math.max(0, opening);
+    }
+
+    public void deposit(long cents) {
+        if (cents &lt;= 0) throw new IllegalArgumentException("deposit must be positive");
+        balance += cents;
+    }
+
+    public boolean withdraw(long cents) {
+        if (cents &gt; balance) return false;            // failure as a value, not an exception
+        balance -= cents;
+        return true;
+    }
+
+    public long balanceCents() { return balance; }    // read-only accessor
+    public static long accountsOpened() { return accountsOpened; }
+
+    @Override public String toString() {
+        return "%s: %d.%02d".formatted(owner, balance / 100, balance % 100);
+    }
+}
+</code></pre></div>
+
+<h4>Object's contract: equals, hashCode and toString</h4>
+<p>Every class inherits <code>equals</code>, <code>hashCode</code> and <code>toString</code> from <code>Object</code>. If you override <code>equals</code> you must override <code>hashCode</code> consistently, or a <code>HashMap</code> or <code>HashSet</code> will store an object and then fail to find it. The contract is reflexive, symmetric, transitive, consistent, and <code>a.equals(null)</code> is always false. <code>hashCode</code> may change only if the fields used in <code>equals</code> change — which is why mutable objects make poor map keys. Since Java 7 the <code>Objects.hash</code> and <code>Objects.equals</code> helpers remove the hand-written null checks. Records (section 2.4) generate all three correctly, which is the main reason to prefer them for value types.</p>
+
+<div class="codeWrap"><pre><code>public final class Point {
+    private final int x, y;
+    public Point(int x, int y) { this.x = x; this.y = y; }
+    public int x() { return x; }
+    public int y() { return y; }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        return o instanceof Point p &amp;&amp; p.x == x &amp;&amp; p.y == y;   // pattern, Java 16+
+    }
+    @Override public int hashCode() { return Objects.hash(x, y); }
+    @Override public String toString() { return "Point[x=%d, y=%d]".formatted(x, y); }
+}
+
+var map = new HashMap&lt;Point, String&gt;();
+map.put(new Point(1, 2), "origin-ish");
+System.out.println(map.get(new Point(1, 2)));   // works only because hashCode matches
+</code></pre></div>
+
+<div class="note">Immutable classes are the simplest correctness tool in the language: no setter, all fields <code>final</code>, defensive copies of arrays and collections in and out, and the class itself <code>final</code> so a subclass cannot break the invariants. Immutability also gives you free thread safety — see chapter 6.</div>
+
+<h3 id="ch2-inheritance" data-toc>2.2 Inheritance, abstract classes and polymorphism</h3>
+<p class="topic-desc">Single inheritance lets a class reuse and specialise its parent. It is the right tool when the subtype genuinely <em>is</em> the supertype and the supertype is designed for extension; otherwise composition is safer, and misuse of inheritance is the origin of most fragile class hierarchies.</p>
+
+<h4>Overriding, the annotation and dispatch</h4>
+<p>Instance methods are dispatched dynamically: the runtime class decides which override runs, regardless of the declared type of the reference. Fields are not — they are resolved statically, which is a frequent source of confusion, so never shadow a field. Always annotate an override with <code>@Override</code> so that a typo becomes a compile error rather than a silent overload. An override may widen access but never narrow it, and may narrow the return type (covariant returns). Marking a class <code>final</code> or a method <code>final</code> forbids further overriding, which is how you protect an invariant.</p>
+
+<div class="codeWrap"><pre><code>abstract class Shape {
+    private final String name;
+    protected Shape(String name) { this.name = name; }
+    public String name() { return name; }
+
+    public abstract double area();          // subclasses must supply this
+
+    public String describe() {              // template method: shared algorithm
+        return "%s has area %.3f".formatted(name, area());
+    }
+}
+
+final class Circle extends Shape {
+    private final double r;
+    Circle(double r) { super("circle"); this.r = r; }
+    @Override public double area() { return Math.PI * r * r; }
+}
+
+final class Rect extends Shape {
+    private final double w, h;
+    Rect(double w, double h) { super("rectangle"); this.w = w; this.h = h; }
+    @Override public double area() { return w * h; }
+}
+
+List&lt;Shape> shapes = List.of(new Circle(1), new Rect(2, 3));
+for (Shape s : shapes) System.out.println(s.describe());   // dynamic dispatch
+</code></pre></div>
+
+<h4>The fragile base class problem</h4>
+<p>Inheritance couples a subclass to its parent's implementation, not just its interface. A parent that adds a method with the same signature as an existing subclass method, changes a protected helper's contract, or relies on a self-call that a subclass overrides can break subclasses it has never seen. The remedies are: design for extension explicitly (document it, keep invariants in <code>final</code> or <code>private</code> helpers, prefer abstract methods over empty ones), or avoid inheritance in favour of composition. The classic example is a class that extends <code>HashSet</code> to count additions: it breaks the moment the parent adds a method that bypasses <code>add</code>. The fix is a wrapper class implementing <code>Set</code> and delegating, which is also what the JDK does for most of its unmodifiable wrappers.</p>
+
+<div class="codeWrap"><pre><code>// Fragile: a HashSet subclass that counts overrides add() only.
+class CountingSet&lt;E&gt; extends HashSet&lt;E&gt; {
+    int added;
+    @Override public boolean add(E e) { added++; return super.add(e); }
+    // addAll() in the parent does NOT call add(), so added is wrong after bulk ops.
+}
+
+// Robust: composition and delegation, with no location assumptions.
+class InstrumentedSet&lt;E&gt; implements Set&lt;E&gt; {
+    private final Set&lt;E> delegate = new HashSet&lt;>();
+    private int added;
+    @Override public boolean add(E e) {
+        boolean changed = delegate.add(e);
+        if (changed) added++;
+        return changed;
+    }
+    @Override public boolean addAll(Collection&lt;? extends E&gt; c) {
+        boolean changed = false;
+        for (E e : c) changed |= add(e);       // every path goes through add()
+        return changed;
+    }
+    @Override public int size() { return delegate.size(); }
+    @Override public boolean isEmpty() { return delegate.isEmpty(); }
+    @Override public boolean contains(Object o) { return delegate.contains(o); }
+    @Override public Iterator&lt;E&gt; iterator() { return delegate.iterator(); }
+}
+</code></pre></div>
+
+<div class="tip">Prefer composition by default and use inheritance only for a genuine is-a relationship where the parent documents the extension points. Making every class <code>final</code> unless you intend it to be extended is a cheap habit that prevents a whole category of bugs.</div>
+
+<h3 id="ch2-interfaces" data-toc>2.3 Interfaces, default methods and functional contracts</h3>
+<p class="topic-desc">An interface declares a type that any number of unrelated classes may implement, which recovers the multiple inheritance of type that the class rule forbids. Since Java 8 interfaces may carry implementation, and since 9 they may carry private helpers.</p>
+
+<h4>Abstract methods, default methods and static factory methods</h4>
+<p>All interface methods are implicitly <code>public</code>; all fields are implicitly <code>public static final</code>. A <code>default</code> method supplies an implementation that implementers inherit and may override, which is what let the JDK add <code>List.sort</code>, <code>Iterable.forEach</code> and the stream methods to published interfaces without breaking the world. A <code>private</code> method (Java 9+) factors out a helper shared by several defaults and is not part of the API. <code>static</code> methods on an interface are for factories and utilities that belong to the type — <code>List.of</code>, <code>Comparator.comparing</code>, <code>Stream.of</code>.</p>
+
+<div class="codeWrap"><pre><code>public interface Repository&lt;T, ID&gt; {
+    Optional&lt;T&gt; findById(ID id);
+    List&lt;T&gt; findAll();
+    void save(T entity);
+
+    default boolean exists(ID id) { return findById(id).isPresent(); }
+
+    default void saveAll(Collection&lt;T&gt; entities) {
+        entities.forEach(this::save);          // default built on abstract methods
+    }
+
+    // Diamond resolution helper: shared, not exposed.
+    static &lt;T&gt; Repository&lt;T, String&gt; empty() {
+        return new Repository&lt;&gt;() {
+            public Optional&lt;T&gt; findById(String id) { return Optional.empty(); }
+            public List&lt;T&gt; findAll() { return List.of(); }
+            public void save(T entity) { throw new UnsupportedOperationException(); }
+        };
+    }
+}
+</code></pre></div>
+
+<h4>The diamond problem, and why a functional interface matters</h4>
+<p>If two interfaces both declare a default method with the same signature, a class implementing both does not compile until it overrides the method, and it can pick a side with <code>InterfaceA.super.method()</code>. That is a real ambiguity rule, not a resolution order, which is the key difference from C++. An interface with exactly one abstract method is a <em>functional interface</em> and is the target type of a lambda or method reference; <code>@FunctionalInterface</code> asserts that shape so a later added method breaks the build rather than breaking every lambda. The JDK's four core functional interfaces are <code>Function</code>, <code>Consumer</code>, <code>Predicate</code> and <code>Supplier</code>, plus the primitive specialisations that avoid boxing (chapter 5).</p>
+
+<div class="codeWrap"><pre><code>@FunctionalInterface
+interface Validator&lt;T&gt; {
+    List&lt;String&gt; validate(T value);            // the single abstract method
+    default Validator&lt;T&gt; and(Validator&lt;T&gt; other) {
+        return v -&gt; { var a = validate(v); a.addAll(other.validate(v)); return a; };
+    }
+}
+
+Validator&lt;String&gt; notBlank = s -&gt;
+        (s == null || s.isBlank()) ? List.of("must not be blank") : List.of();
+Validator&lt;String&gt; longEnough = s -&gt;
+        (s != null &amp;&amp; s.length() &lt; 3) ? List.of("must be at least 3 characters") : List.of();
+
+var problems = notBlank.and(longEnough).validate("ab");
+System.out.println(problems);            // [must be at least 3 characters]
+
+// Two interfaces with the same default: the class must disambiguate.
+interface A { default String tag() { return "A"; } }
+interface B { default String tag() { return "B"; } }
+class Both implements A, B {
+    @Override public String tag() { return A.super.tag() + B.super.tag(); }
+}
+</code></pre></div>
+
+<h3 id="ch2-enums-records" data-toc>2.4 Enums and records</h3>
+<p class="topic-desc">Enums and records are the two cases where the compiler can generate the correctness machinery for you, and both are almost always better than the hand-written alternative.</p>
+
+<h4>Enums are real classes</h4>
+<p>An enum type has a fixed set of instances, created once at class initialisation, and each constant is a <code>public static final</code> field. Because they are objects, an enum can carry fields, constructors and methods, which turns a tag into a type that answers questions. Enums are safe in <code>switch</code> (since Java 14 the compiler checks exhaustiveness for switch expressions), they serialise robustly by name, and they are inherently thread-safe because the constant set is created during class loading. The <code>values()</code> array is a fresh copy on every call, so do not call it in a loop; <code>EnumSet</code> and <code>EnumMap</code> are the efficient collections for enum keys.</p>
+
+<div class="codeWrap"><pre><code>enum HttpStatus {
+    OK(200, "OK"),
+    NOT_MODIFIED(304, "Not Modified"),
+    NOT_FOUND(404, "Not Found"),
+    SERVER_ERROR(500, "Internal Server Error");
+
+    private final int code;
+    private final String reason;
+    HttpStatus(int code, String reason) { this.code = code; this.reason = reason; }
+
+    public int code() { return code; }
+    public boolean isError() { return code &gt;= 400; }
+
+    public static HttpStatus fromCode(int code) {
+        for (HttpStatus s : values()) if (s.code == code) return s;
+        throw new IllegalArgumentException("unknown status " + code);
+    }
+}
+
+System.out.println(HttpStatus.NOT_FOUND.code());        // 404
+System.out.println(HttpStatus.NOT_FOUND.isError());     // true
+
+// EnumSet is a bit vector: fast membership and bulk operations.
+var retryable = EnumSet.of(HttpStatus.SERVER_ERROR);
+System.out.println(retryable.contains(HttpStatus.OK));  // false
+</code></pre></div>
+
+<h4>Records are transparent data carriers</h4>
+<p>A record (final in Java 16) declares its state in the header and the compiler generates a canonical constructor, accessor methods named after the components, and correct <code>equals</code>, <code>hashCode</code> and <code>toString</code>. Records are shallowly immutable — the references do not change, but a mutable list inside a record is still mutable, so copy defensively in a compact constructor. You may add static factories, extra methods and validation; you may not add instance fields. Use records for DTOs, value objects, tuple-like returns, map keys and any local grouping that a class would express with twenty lines of boilerplate. A record can implement an interface but cannot extend a class, and cannot be extended.</p>
+
+<div class="codeWrap"><pre><code>record Money(long cents, Currency currency) {
+    // Compact constructor: validate and normalise, no field assignment needed.
+    Money {
+        if (cents &lt; 0) throw new IllegalArgumentException("negative money");
+        currency = Objects.requireNonNull(currency);
+    }
+    static Money usd(long cents) { return new Money(cents, Currency.US); }
+    Money plus(Money other) {
+        if (other.currency != currency) throw new IllegalArgumentException("currency mismatch");
+        return new Money(cents + other.cents, currency);
+    }
+    boolean isZero() { return cents == 0; }
+}
+
+var a = Money.usd(1250);
+var b = Money.usd(750);
+System.out.println(a.plus(b));        // Money[cents=2000, currency=US]
+System.out.println(a.equals(Money.usd(1250)));   // true - generated equals
+
+// Records are the natural carrier for multiple return values.
+record MinMax(int min, int max) {}
+static MinMax bounds(int[] xs) {
+    int lo = Integer.MAX_VALUE, hi = Integer.MIN_VALUE;
+    for (int x : xs) { lo = Math.min(lo, x); hi = Math.max(hi, x); }
+    return new MinMax(lo, hi);
+}
+var mm = bounds(new int[]{4, 9, -2, 7});
+System.out.println(mm.min() + ".." + mm.max());     // -2..9
+</code></pre></div>
+
+<h3 id="ch2-sealed" data-toc>2.5 Sealed types and exhaustive pattern matching</h3>
+<p class="topic-desc">A sealed interface or class names its permitted subtypes and nothing else may implement it. Final in Java 17, sealed types are what make a compiler-checked closed hierarchy possible, and combined with record patterns and pattern <code>switch</code> they replace visitor patterns and runtime <code>instanceof</code> chains.</p>
+
+<h4>Permits, and the three forms of a subtype</h4>
+<p><code>sealed interface Shape permits Circle, Rect, Triangle</code> restricts the set of direct subtypes. A subtype must be declared <code>final</code>, <code>sealed</code> (continuing the hierarchy with its own permits list) or <code>non-sealed</code> (reopening extension for that branch). Because the compiler knows the complete set, a <code>switch</code> over a sealed type needs no <code>default</code> and the compiler rejects a switch that misses a case. Adding a new subtype then produces compile errors at every site that must handle it — the opposite of the visitor pattern, where a new case is silently ignored until it throws at runtime. This is the mechanism that makes "parse, don't validate" and algebraic-data-type modelling practical in Java.</p>
+
+<div class="codeWrap"><pre><code>sealed interface Shape permits Circle, Rect, Triangle {
+    double area();
+}
+record Circle(double r) implements Shape { public double area() { return Math.PI * r * r; } }
+record Rect(double w, double h) implements Shape { public double area() { return w * h; } }
+record Triangle(double base, double height) implements Shape {
+    public double area() { return base * height / 2; }
+}
+
+// No default arm: the compiler proves exhaustiveness over the sealed set.
+static String classify(Shape s) {
+    return switch (s) {
+        case Circle(double r)              -&gt; "circle of radius " + r;
+        case Rect(double w, double h)      -&gt; "rectangle " + w + "x" + h;
+        case Triangle(double b, double h)  -&gt; "triangle with base " + b;
+    };
+}
+
+System.out.println(classify(new Circle(2)));            // circle of radius 2.0
+</code></pre></div>
+
+<h4>Record patterns and nested deconstruction</h4>
+<p>A record pattern matches the type and destructures its components in one step, and patterns nest, so a tree or a message envelope is matched structurally rather than through accessor calls. Combined with a guard (<code>when</code>), this expresses rules that previously needed a sequence of <code>if</code> statements and casts. The cost is that pattern switch is still resolved on the runtime class, so a very long pattern list has the same dispatch cost as the equivalent <code>instanceof</code> chain; for hot paths where the type set is a closed sealed hierarchy, add an explicit discriminator or measure.</p>
+
+<div class="codeWrap"><pre><code>sealed interface Json permits JStr, JNum, JArr, JObj {}
+record JStr(String value) implements Json {}
+record JNum(double value) implements Json {}
+record JArr(List&lt;Json&gt; items) implements Json {}
+record JObj(Map&lt;String, Json&gt; fields) implements Json {}
+
+static String render(Json j) {
+    return switch (j) {
+        case JStr(String s)                        -&gt; '"' + s + '"';
+        case JNum(double d)                        -&gt; String.valueOf(d);
+        case JArr(List&lt;Json&gt; items)                -&gt; items.stream()
+                .map(Main::render).collect(Collectors.joining(",", "[", "]"));
+        case JObj(Map&lt;String, Json&gt; fields)       -&gt; fields.entrySet().stream()
+                .map(e -&gt; '"' + e.getKey() + "\":" + render(e.getValue()))
+                .collect(Collectors.joining(",", "{", "}"));
+    };
+}
+
+// Nested record pattern with a guard.
+sealed interface Event permits Click, Key {}
+record Click(int x, int y) implements Event {}
+record Key(String code, boolean ctrl) implements Event {}
+
+static String handle(Event e) {
+    return switch (e) {
+        case Click(int x, int y) when x == 0 &amp;&amp; y == 0 -&gt; "origin click";
+        case Click(int x, int y)                          -&gt; "click at " + x + "," + y;
+        case Key(String c, boolean ctrl) when ctrl        -&gt; "shortcut " + c;
+        case Key(String c, boolean ctrl)                  -&gt; "key " + c;
+    };
+}
+</code></pre></div>
+
+<div class="tip">Sealed hierarchies pair naturally with records: make the interface sealed, make each variant a record, and every handler becomes an exhaustive <code>switch</code> with no cast and no unreachable default. If you find yourself writing a <code>default</code> arm that throws <code>IllegalStateException</code>, the type is not closed and should not be sealed — or the missing case is a real gap.</div>
+</section>

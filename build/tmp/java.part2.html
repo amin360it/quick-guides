@@ -1,0 +1,1110 @@
+<section class="chapter">
+<h2 id="ch3" data-toc>3 · Collections and generics</h2>
+<p class="topic-desc">The collections framework is a set of interfaces with several implementations each, chosen by the operation that dominates. Generics are the compile-time type system over those containers, erased at runtime — and understanding the erasure explains every surprising signature you will meet.</p>
+
+<h3 id="ch3-collections" data-toc>3.1 List, Set, Map and Deque, and choosing between them</h3>
+<p class="topic-desc">Four interfaces cover almost all needs. Choosing the right implementation is a matter of knowing which operation you are optimising and which guarantee you are buying.</p>
+
+<h4>The interfaces and their implementations</h4>
+<p><code>List</code> is an ordered sequence with positional access. <code>ArrayList</code> is a growable array: <code>get</code> is O(1), appending is amortised O(1), insertion in the middle is O(n). <code>LinkedList</code> is a doubly linked list: it is the worst of both worlds in practice — O(n) positional access and poor cache behaviour — so prefer <code>ArrayDeque</code> whenever you need a queue or a stack. <code>Set</code> forbids duplicates. <code>HashSet</code> gives O(1) average membership and no order; <code>LinkedHashSet</code> preserves insertion order for a small memory cost; <code>TreeSet</code> keeps elements sorted in O(log n). <code>Map</code> maps keys to values; <code>HashMap</code>, <code>LinkedHashMap</code> and <code>TreeMap</code> mirror the three set behaviours, and <code>EnumMap</code> is a plain array indexed by the enum's ordinal when the keys are enum constants.</p>
+
+<div class="table-scroll"><table>
+<tr><th>Need</th><th>Choose</th><th>Complexity (get / add / contains)</th></tr>
+<tr><td>Ordered sequence, random access</td><td><code>ArrayList</code></td><td>O(1) / O(1)* / O(n)</td></tr>
+<tr><td>FIFO queue or LIFO stack</td><td><code>ArrayDeque</code></td><td>O(1) ends / O(1) ends / O(n)</td></tr>
+<tr><td>Uniqueness, no order</td><td><code>HashSet</code></td><td>&#8211; / O(1)* / O(1)*</td></tr>
+<tr><td>Uniqueness, insertion order</td><td><code>LinkedHashSet</code></td><td>&#8211; / O(1)* / O(1)*</td></tr>
+<tr><td>Uniqueness, sorted</td><td><code>TreeSet</code></td><td>&#8211; / O(log n) / O(log n)</td></tr>
+<tr><td>Key&#8594;value lookup</td><td><code>HashMap</code></td><td>O(1)* / O(1)* / O(1)*</td></tr>
+<tr><td>Key&#8594;value, sorted keys, range queries</td><td><code>TreeMap</code></td><td>O(log n) / O(log n) / O(log n)</td></tr>
+<tr><td>Key&#8594;value, enum keys</td><td><code>EnumMap</code></td><td>O(1) / O(1) / O(1)</td></tr>
+<tr><td>Concurrent access from many threads</td><td><code>ConcurrentHashMap</code></td><td>O(1)* without global locks</td></tr>
+</table></div>
+<p><em>* amortised or average case; O(n) worst case if every key collides.</em></p>
+
+<h4>The factory methods and the mutability that matters</h4>
+<p><code>List.of</code>, <code>Set.of</code> and <code>Map.of</code> create structurally immutable collections: they cannot be added to or removed from, they reject null elements, and they are compact. But they are only <em>shallowly</em> immutable — the elements themselves may be mutable. <code>List.copyOf</code> takes a snapshot of an existing collection and rejects nulls. <code>Collections.unmodifiableList</code> is different: it is a view, so the original still changes underneath. Use <code>List.of</code> for constants and <code>copyOf</code> for defensive copies, and never rely on a mutable class as a key or a set element.</p>
+
+<div class="codeWrap"><pre><code>var mutable = new ArrayList&lt;String&gt;();
+mutable.add("alpha");
+mutable.addAll(List.of("beta", "gamma"));
+
+var immutable = List.copyOf(mutable);        // snapshot; mutable is unaffected later
+// immutable.add("delta");                    // UnsupportedOperationException
+
+var view = Collections.unmodifiableList(mutable);
+mutable.add("delta");
+System.out.println(view.size());             // 4 - the view changed too
+
+var byId = new HashMap&lt;Integer, String&gt;();
+byId.put(1, "one");
+byId.putIfAbsent(1, "ONE");                  // no-op
+byId.merge(2, "two", String::concat);        // insert or combine
+byId.computeIfAbsent(3, k -&gt; "value" + k);    // "value3"
+System.out.println(byId.getOrDefault(9, "missing"));
+
+// Insertion-ordered map: predictably iterates the way it was written.
+var ordered = new LinkedHashMap&lt;String, Integer&gt;();
+ordered.put("b", 2);
+ordered.put("a", 1);
+System.out.println(ordered);                 // {b=2, a=1}
+</code></pre></div>
+
+<div class="warn">Returning <code>List.of</code> from a public method is not the same as being null-safe. These factories throw <code>NullPointerException</code> on a null element, so a method that builds a list from user data must filter or reject nulls before calling them. And a <code>HashMap</code> with a mutable key is a live bug: mutate a field used by <code>hashCode</code> and the entry becomes unreachable even though it is still in the map.</div>
+
+<h3 id="ch3-iteration" data-toc>3.2 Iteration, removal and the ConcurrentModificationException</h3>
+<p class="topic-desc">Every collection is <code>Iterable</code>, which makes the enhanced <code>for</code> loop universal. Mutating a collection while iterating it is the single most common collections bug, and the failure mode is a fail-fast exception rather than silent corruption.</p>
+
+<h4>The iterator contract</h4>
+<p><code>iterator()</code> returns an object with <code>hasNext()</code>, <code>next()</code> and optionally <code>remove()</code>. A collection tracks a modification count; the iterator compares it and throws <code>ConcurrentModificationException</code> on the next call after an external structural change. This is a best-effort detection, not a guarantee, which is exactly why the correct pattern is not "remove the check" but "use <code>Iterator.remove()</code> or <code>removeIf</code>". <code>removeIf</code> is the modern, one-line way to drop elements by predicate. An <code>Iterator</code> over a <code>Map</code> comes from <code>keySet()</code>, <code>values()</code> or <code>entrySet()</code>, all of which are views onto the same map.</p>
+
+<div class="codeWrap"><pre><code>var names = new ArrayList&lt;&gt;(List.of("Ada", "alan", "Grace", "bob"));
+
+// Wrong: ConcurrentModificationException
+// for (String n : names) if (Character.isLowerCase(n.charAt(0))) names.remove(n);
+
+// Right, pattern 1: removeIf, one pass, no index bookkeeping.
+names.removeIf(n -&gt; Character.isLowerCase(n.charAt(0)));
+
+// Right, pattern 2: explicit iterator when the loop body needs more.
+var it = names.iterator();
+while (it.hasNext()) {
+    String n = it.next();
+    if (n.length() &gt; 4) it.remove();
+}
+
+// Right, pattern 3: iterate a copy when the shape changes unpredictably.
+for (String n : List.copyOf(names)) { /* safe to mutate names here */ }
+
+// Map traversal with entrySet, the only way to get keys and values together.
+var ages = Map.of("Ada", 36, "Grace", 45);
+for (var e : ages.entrySet()) System.out.println(e.getKey() + " -&gt; " + e.getValue());
+ages.forEach((k, v) -&gt; System.out.println(k + " is " + v));
+</code></pre></div>
+
+<h4>Views, sub-lists and equality</h4>
+<p><code>subList</code>, <code>keySet</code>, <code>values</code>, <code>entrySet</code>, <code>Arrays.asList</code> and <code>Collections.unmodifiable*</code> all return <em>views</em>: writes through them reach the original and vice versa. A view is a performance win and an aliasing hazard. Equality for collections is defined by content and order for <code>List</code>, by content for <code>Set</code>, and by key-value pairs for <code>Map</code> — so <code>Set</code> and <code>Map</code> equality is unordered, which is why a <code>HashSet</code> and a <code>LinkedHashSet</code> with the same members are <code>equals</code>. Note that <code>List.equals</code> ignores the concrete class, so an <code>ArrayList</code> equals a <code>LinkedList</code> with the same elements.</p>
+
+<div class="codeWrap"><pre><code>var all = new ArrayList&lt;&gt;(List.of(1, 2, 3, 4, 5, 6));
+List&lt;Integer&gt; window = all.subList(1, 4);         // [2, 3, 4], a view
+window.set(0, 20);                                 // writes to index 1 of `all`
+System.out.println(all);                           // [1, 20, 3, 4, 5, 6]
+
+// Snapshot when you need independence.
+List&lt;Integer&gt; copy = List.copyOf(window);
+
+System.out.println(List.of(1, 2).equals(new LinkedList&lt;&gt;(List.of(1, 2))));   // true
+System.out.println(Set.of(1, 2).equals(new LinkedHashSet&lt;&gt;(Set.of(2, 1)))); // true
+
+// Arrays.asList is a fixed-size view of the array, not a copy.
+Integer[] boxed = {1, 2, 3};
+List&lt;Integer&gt; backing = Arrays.asList(boxed);
+backing.set(0, 99);
+System.out.println(boxed[0]);                      // 99
+// backing.add(4);                                  // UnsupportedOperationException
+</code></pre></div>
+
+<h3 id="ch3-comparator" data-toc>3.3 Comparable and Comparator: ordering as data</h3>
+<p class="topic-desc">Sorting needs an ordering, and Java separates the two cases: a type's <em>natural</em> ordering (<code>Comparable</code>) and an <em>external</em> ordering supplied at the call site (<code>Comparator</code>). The comparator API is a clean demonstration of why functional composition matters.</p>
+
+<h4>The two interfaces and the contract</h4>
+<p><code>Comparable&lt;T&gt;</code> has one method, <code>compareTo</code>, and defines the type's default order; <code>String</code>, the wrapper types and <code>LocalDate</code> implement it. <code>Comparator&lt;T&gt;</code> is a functional interface with <code>compare</code> and a large set of static and default combinators: <code>comparing</code>, <code>thenComparing</code>, <code>reversed</code>, <code>nullsFirst</code>, <code>nullsLast</code>. Both contracts require a consistent, transitive ordering, and both require that comparing equal elements gives zero. The single most common violation is subtracting: <code>return a.price() - b.price()</code> overflows for large or negative values, so use <code>Integer.compare</code> or <code>Comparator.comparingInt</code> instead. Sorting uses a stable merge sort on objects, so the input order of equal elements is preserved, which is what makes multi-key sorting via <code>thenComparing</code> work.</p>
+
+<div class="codeWrap"><pre><code>record Employee(String name, String dept, int salary, Integer bonus) {}
+
+var staff = new ArrayList&lt;&gt;(List.of(
+    new Employee("Ada",    "eng",     120_000, 5_000),
+    new Employee("Grace",  "eng",     140_000, null),
+    new Employee("Alan",   "research", 95_000, 2_000),
+    new Employee("Barbara","research", 95_000, 9_000)));
+
+// Compound ordering: department ascending, then salary descending, then name.
+Comparator&lt;Employee&gt; order =
+    Comparator.comparing(Employee::dept)
+              .thenComparing(Employee::salary, Comparator.reverseOrder())
+              .thenComparing(Employee::name);
+
+staff.sort(order);
+staff.forEach(e -&gt; System.out.println(e.dept() + " " + e.name() + " " + e.salary()));
+
+// Null-safe with a key extractor; nulls last.
+Comparator&lt;Employee&gt; byBonus = Comparator
+        .comparing(Employee::bonus, Comparator.nullsLast(Integer::compareTo));
+
+System.out.println(Collections.max(staff, byBonus).name());
+
+// Build a TreeMap with an explicit order.
+var byName = new TreeMap&lt;&gt;(Comparator.comparing(Employee::name));
+staff.forEach(e -&gt; byName.put(e, e.salary()));
+byName.keySet().forEach(k -&gt; System.out.print(k.name() + " "));
+</code></pre></div>
+
+<h4>Total ordering versus equality</h4>
+<p>A <code>TreeSet</code> and <code>TreeMap</code> use the comparator as their notion of identity, not <code>equals</code>. If a comparator returns zero for two objects that are not <code>equals</code>, the set quietly discards one — the documented consequence is that <code>SortedSet</code>'s behaviour is "inconsistent with equals". If you sort by a subset of the fields, keep the comparator consistent, or accept that duplicates by that key collapse. The fix when both behaviours are wanted is to append <code>thenComparing</code> on a unique field, or to use a <code>LinkedHashMap</code> to keep the first value seen.</p>
+
+<div class="codeWrap"><pre><code>// A comparator that ignores a distinguishing field collapses entries in a TreeSet.
+var bySalary = new TreeSet&lt;&gt;(Comparator.comparingInt(Employee::salary));
+bySalary.add(new Employee("Ada", "eng", 95_000, null));
+bySalary.add(new Employee("Alan", "research", 95_000, null));
+System.out.println(bySalary.size());        // 1 - Alan was treated as equal to Ada
+
+// Make the order total by appending a tie-breaker.
+var bySalaryThenName = new TreeSet&lt;&gt;(
+        Comparator.comparingInt(Employee::salary).thenComparing(Employee::name));
+bySalaryThenName.add(new Employee("Ada", "eng", 95_000, null));
+bySalaryThenName.add(new Employee("Alan", "research", 95_000, null));
+System.out.println(bySalaryThenName.size()); // 2
+</code></pre></div>
+
+<div class="note">Sorting a mutable list by a field and then mutating that field is undefined behaviour: the list is no longer sorted and binary search will return nonsense. For a collection keyed by a mutable attribute, re-sort explicitly or hold the data in a <code>TreeMap</code> keyed by an immutable snapshot.</div>
+
+<h3 id="ch3-generics" data-toc>3.4 Generic methods, wildcards and type erasure</h3>
+<p class="topic-desc">Generics moved type errors from runtime casts to compile-time checks, but they are implemented by erasure: type parameters exist for the compiler and are gone in the class file. Every limitation of the feature follows from that one decision.</p>
+
+<h4>Type parameters, bounds and PECS</h4>
+<p>A generic method declares its own type parameters: <code>static &lt;T&gt; List&lt;T&gt; repeat(T value, int n)</code>. Bounds restrict the type: <code>&lt;T extends Comparable&lt;T&gt;&gt;</code>. A wildcard appears at a <em>use</em> site: <code>List&lt;?&gt;</code> is "a list of some unknown type", <code>List&lt;? extends Number&gt;</code> is a producer and <code>List&lt;? super Integer&gt;</code> is a consumer. The rule of thumb is <strong>PECS</strong>: Producer Extends, Consumer Super. A name for the constraint: <code>List&lt;Integer&gt;</code> is not a subtype of <code>List&lt;Number&gt;</code>, because that would allow adding a <code>Double</code> to a list of integers. Arrays are covariant and therefore unsound at runtime; generics are invariant and sound at compile time.</p>
+
+<div class="codeWrap"><pre><code>// A bounded generic method.
+static &lt;T extends Comparable&lt;? super T&gt;&gt; T max(List&lt;T&gt; xs) {
+    T best = xs.get(0);
+    for (T x : xs) if (x.compareTo(best) &gt; 0) best = x;
+    return best;
+}
+System.out.println(max(List.of(3, 9, 4, 1)));       // 9
+
+// PECS: read from ? extends, write to ? super.
+static double sum(List&lt;? extends Number&gt; src) {
+    double total = 0;
+    for (Number n : src) total += n.doubleValue();
+    return total;
+}
+static void fill(List&lt;? super Integer&gt; dst, int n) {
+    for (int i = 0; i &lt; n; i++) dst.add(i);
+}
+System.out.println(sum(List.of(1, 2.5, 3)));        // 6.5
+var sink = new ArrayList&lt;Number&gt;();
+fill(sink, 3);                                       // ArrayList&lt;Integer&gt; would also work
+System.out.println(sink);
+</code></pre></div>
+
+<h4>What erasure forbids</h4>
+<p>Because <code>List&lt;String&gt;</code> and <code>List&lt;Integer&gt;</code> erase to the same <code>List</code>, you cannot <code>new T()</code>, cannot create a generic array (<code>new T[n]</code>), cannot overload on <code>List&lt;String&gt;</code> versus <code>List&lt;Integer&gt;</code>, and cannot call <code>instanceof List&lt;String&gt;</code>. You cannot use a primitive as a type argument — <code>List&lt;int&gt;</code> is illegal, so boxing applies. Where you need the erased type at runtime you pass a <code>Class&lt;T&gt;</code> token or a <code>TypeReference</code>-style superclass capture. Unchecked-warning suppression is legitimate at a boundary where you have verified the invariant by hand, and should be accompanied by a comment saying what that invariant is.</p>
+
+<div class="codeWrap"><pre><code>// Class-token pattern: the erased type arrives as an argument.
+static &lt;T&gt; T[] newArray(Class&lt;T&gt; type, int size) {
+    @SuppressWarnings("unchecked")
+    T[] arr = (T[]) java.lang.reflect.Array.newInstance(type, size);
+    return arr;
+}
+String[] names = newArray(String.class, 3);
+
+// Heap pollution: a varargs generic parameter is really an Object[].
+@SafeVarargs
+static &lt;T&gt; List&lt;T&gt; listOf(T... items) { return new ArrayList&lt;&gt;(Arrays.asList(items)); }
+List&lt;Integer&gt; ints = listOf(1, 2, 3);
+
+// A generic method with two parameters and a mapping function.
+static &lt;K, V&gt; Map&lt;K, V&gt; indexBy(List&lt;V&gt; items, Function&lt;V, K&gt; keyFn) {
+    var out = new HashMap&lt;K, V&gt;();
+    for (V v : items) out.put(keyFn.apply(v), v);
+    return out;
+}
+System.out.println(indexBy(List.of("ada", "grace"), String::length));   // {3=ada, 5=grace}
+</code></pre></div>
+
+<div class="warn">Do not use raw types in new code. A raw <code>List</code> disables every generic check on that reference and its calls, which reintroduces the <code>ClassCastException</code> that generics exist to prevent. When you must interoperate with a legacy API, confine the raw type to the smallest possible scope and convert to a wildcard or a parameterised type immediately.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch4" data-toc>4 · Exceptions and I/O</h2>
+<p class="topic-desc">The exception system is a checked/unchecked split that Java alone among mainstream languages enforces. The I/O system has two APIs — the old stream-based <code>java.io</code> and the modern <code>java.nio.file</code> — and a buffering rule that separates fast code from slow.</p>
+
+<h3 id="ch4-exceptions" data-toc>4.1 Checked and unchecked exceptions, try/catch/finally</h3>
+<p class="topic-desc">Every throwable is either an <code>Error</code> (a JVM-level failure you do not catch), a checked exception (a subclass of <code>Exception</code> that is not a <code>RuntimeException</code>) or an unchecked exception. The compiler forces you to acknowledge the checked kind; it does not force anything for the unchecked kind.</p>
+
+<h4>The taxonomy and whose fault it is</h4>
+<p>Checked exceptions model an expected, recoverable environmental failure — a missing file, a refused socket, a deadlock retry — that the immediate caller can plausibly handle. Unchecked exceptions model a programming error: <code>NullPointerException</code>, <code>IllegalArgumentException</code>, <code>IndexOutOfBoundsException</code>. The heuristic is that a checked exception should be recoverable by the caller and an unchecked one should not happen at all. Errors (<code>OutOfMemoryError</code>, <code>StackOverflowError</code>, <code>LinkageError</code>) indicate a condition the application cannot repair; catching them is almost always wrong. <code>finally</code> runs on both the normal and the exceptional path, and only once; it runs before a propagating exception continues, so returning from <code>finally</code> discards an in-flight exception. Do not do that.</p>
+
+<div class="codeWrap"><pre><code>import java.io.*;
+
+class ConfigLoader {
+    // Checked: the caller can retry, fall back, or report to the user.
+    static String load(File f) throws IOException {
+        if (!f.exists()) throw new FileNotFoundException(f.getPath());
+        try (var in = new BufferedReader(new FileReader(f))) {
+            return in.readLine();
+        }
+    }
+
+    static int parseInt(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {           // unchecked in, checked out
+            throw new IllegalArgumentException("not a number: " + s, e);
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            System.out.println(load(new File("config.properties")));
+        } catch (FileNotFoundException e) {
+            System.err.println("missing file: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("I/O failed: " + e);
+        } finally {
+            System.out.println("attempt finished");   // always runs
+        }
+    }
+}
+</code></pre></div>
+
+<h4>Multi-catch, chaining and custom types</h4>
+<p>Several exception types that share a handler are caught in one clause with <code>|</code>; the parameter is implicitly <code>final</code>. Exception chaining (<code>new IllegalStateException("...", cause)</code>) preserves the original stack trace, so never lose the cause — a wrapper that discards it makes the failure undiagnosable. A custom exception is worth creating when callers need to distinguish the failure programmatically; it should carry the fields needed to describe it and usually extends the nearest matching JDK type. Catching <code>Exception</code> or <code>Throwable</code> broadly is only correct at the outermost boundary of a thread or a request, where the alternative is losing the failure entirely.</p>
+
+<div class="codeWrap"><pre><code>// A domain exception with the data a caller needs.
+class InsufficientFundsException extends Exception {
+    private final long requested, available;
+    InsufficientFundsException(long requested, long available) {
+        super("requested %d, available %d".formatted(requested, available));
+        this.requested = requested;
+        this.available = available;
+    }
+    public long shortfall() { return requested - available; }
+}
+
+// Multi-catch, and wrapping while keeping the cause.
+try {
+    Thread.sleep(10);
+    Integer.parseInt("x");
+} catch (InterruptedException | NumberFormatException e) {
+    throw new IllegalStateException("startup failed", e);     // cause preserved
+}
+
+// Re-throwing with a more specific type (Java 7+ precise rethrow).
+static void rethrow(boolean flag) throws java.io.IOException {
+    try {
+        if (flag) throw new java.io.IOException("io");
+        throw new java.sql.SQLException("sql");
+    } catch (Exception e) {
+        throw e;      // compiler keeps the precise checked types
+    }
+}
+</code></pre></div>
+
+<div class="tip">Design the failure, not just the happy path. Document each method's checked exceptions in Javadoc with <code>@throws</code>, decide whether a failure is a value (<code>Optional</code>, <code>boolean</code>, a result record) or an exception, and apply that decision consistently. Exceptions are for exceptional flow; using them for ordinary control flow is both slower and harder to read.</div>
+
+<h3 id="ch4-trywith" data-toc>4.2 try-with-resources and the AutoCloseable contract</h3>
+<p class="topic-desc">Any resource holding an operating-system handle — a file, a socket, a database connection, a lock — must be released deterministically. try-with-resources (Java 7) is the mechanism, and it fixes the suppressed-exception problem that a hand-written <code>finally</code> cannot.</p>
+
+<h4>How it works and what it fixes</h4>
+<p>Resources declared in the <code>try (...)</code> header must implement <code>AutoCloseable</code>; they are closed in reverse declaration order, before any <code>catch</code> or <code>finally</code> block runs. If the body throws and <code>close()</code> also throws, the body's exception is the one thrown and the close failure is added as a <em>suppressed</em> exception, retrievable with <code>getSuppressed()</code>. The hand-written equivalent loses one of the two. Since Java 9 the resource variable may be effectively final and declared outside the header, which lets a method accept a resource and close it itself.</p>
+
+<div class="codeWrap"><pre><code>// The body's exception wins; close()'s failure is attached as suppressed.
+class Flaky implements AutoCloseable {
+    private final String name;
+    Flaky(String name) { this.name = name; }
+    public void work() { throw new IllegalStateException(name + " work"); }
+    public void close() { throw new IllegalStateException(name + " close"); }
+}
+
+try {
+    try (var f = new Flaky("resource")) {
+        f.work();
+    }
+} catch (IllegalStateException e) {
+    System.out.println(e.getMessage());                        // resource work
+    for (Throwable s : e.getSuppressed()) System.out.println("suppressed: " + s.getMessage());
+}
+
+// Java 9+: close a resource the caller supplied.
+static void drain(InputStream in) throws IOException {
+    try (in) { in.transferTo(OutputStream.nullOutputStream()); }
+}
+</code></pre></div>
+
+<h4>Reading and writing safely</h4>
+<p>The pattern for real file work is a chain of buffered streams inside one <code>try</code>: closing the outermost closes the chain, and buffering turns one syscall per byte into one per several kilobytes. <code>java.nio.file.Files</code> covers the common whole-file cases in a single call — <code>readString</code>, <code>writeString</code>, <code>readAllLines</code>, <code>newBufferedReader</code> — and is usually the right first choice. For anything binary, <code>BufferedInputStream</code> plus <code>DataInputStream</code> or a <code>ByteBuffer</code> gives explicit control of endianness and alignment.</p>
+
+<div class="codeWrap"><pre><code>import java.io.*;
+import java.nio.file.*;
+
+Path path = Path.of("notes.txt");
+Files.writeString(path, "first\nsecond\n", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+for (String line : Files.readAllLines(path)) System.out.println(line);
+
+// Streaming a large file: constant memory, explicit buffering.
+try (var reader = Files.newBufferedReader(path)) {
+    String line;
+    while ((line = reader.readLine()) != null) System.out.println("&gt; " + line);
+}
+
+// Binary: buffering is the difference between 4 KB and 1 MB per syscall.
+try (var in = new BufferedInputStream(new FileInputStream("data.bin"));
+     var out = new BufferedOutputStream(new FileOutputStream("copy.bin"))) {
+    var buf = new byte[8192];
+    int n;
+    while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+}
+</code></pre></div>
+
+<div class="warn"><code>close()</code> on a wrapper such as <code>BufferedReader</code> closes the underlying stream too. If two wrappers share one stream and both are closed, the second close is usually harmless for files but can be a use-after-free protocol error for network or native handles. Own the stream in exactly one place.</div>
+
+<h3 id="ch4-nio" data-toc>4.3 java.nio.file: Path, Files and filesystem operations</h3>
+<p class="topic-desc"><code>java.nio.file</code> replaced <code>java.io.File</code> as the recommended API. <code>Path</code> is an immutable, provider-based location; <code>Files</code> is a static utility for operations; <code>FileSystem</code> abstracts the platform, which is what makes the same code work on Windows, POSIX and inside a zip filesystem.</p>
+
+<h4>Path arithmetic and the Files toolbox</h4>
+<p>A <code>Path</code> is not a string: <code>resolve</code> appends, <code>resolveSibling</code> replaces the last element, <code>relativize</code> computes a relative path, <code>normalize</code> removes <code>.</code> and <code>..</code>, and <code>toAbsolutePath</code> anchors it. Paths are compared with <code>Files.isSameFile</code> when symlinks are involved, because two different path strings can name one file. <code>Files</code> offers <code>exists</code>, <code>isDirectory</code>, <code>size</code>, <code>createDirectories</code>, <code>move</code>, <code>copy</code>, <code>delete</code>, <code>deleteIfExists</code>, <code>walk</code>, <code>list</code> and <code>readAttributes</code>. </p>
+
+<div class="codeWrap"><pre><code>import java.nio.file.*;
+import java.nio.file.attribute.*;
+import java.io.IOException;
+
+Path base = Path.of("build", "out");
+Files.createDirectories(base);                       // parents as needed
+Path config = base.resolve("app.properties");
+Path sibling = config.resolveSibling("app.yml");     // build/out/app.yml
+System.out.println(base.relativize(config));         // app.properties
+
+Files.writeString(config, "port=8080\n");
+System.out.println(Files.size(config) + " bytes");
+System.out.println(Files.getLastModifiedTime(config).toInstant());
+
+// Walk a tree, filtering by extension, streaming not loading.
+try (var paths = Files.walk(base)) {
+    paths.filter(p -&gt; p.toString().endsWith(".properties"))
+         .forEach(p -&gt; System.out.println("found " + p));
+}
+
+// Atomic move when both paths are on the same filesystem.
+Path tmp = base.resolve("app.properties.tmp");
+Files.writeString(tmp, "port=9090\n");
+Files.move(tmp, config, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+
+// Read a whole small file in one call; prefer streaming for large ones.
+String text = Files.readString(config);
+System.out.println(text.strip());
+</code></pre></div>
+
+<h4>Attributes, temporary files and permission</h4>
+<p><code>Files.readAttributes(path, BasicFileAttributes.class)</code> returns size, timestamps, and whether the entry is a regular file, directory, symbolic link or other. <code>Files.setPosixFilePermissions</code> and <code>PosixFilePermissions.fromString("rw-r--r--")</code> set Unix permissions; on Windows the same attributes are emulated and the call may not throw but has no effect. <code>Files.createTempFile</code> and <code>Files.createTempDirectory</code> create a file with a randomly generated name in the system temp directory, and <code>deleteOnExit</code> is a JVM-shutdown hook — useful for tests, unsuitable for long-lived processes because it accumulates.</p>
+
+<div class="codeWrap"><pre><code>var attrs = Files.readAttributes(config, BasicFileAttributes.class);
+System.out.printf("size=%d dir=%b symlink=%b%n",
+        attrs.size(), attrs.isDirectory(), attrs.isSymbolicLink());
+
+// POSIX permissions; silently a no-op on a Windows filesystem provider.
+try {
+    Files.setPosixFilePermissions(config,
+            PosixFilePermissions.fromString("rw-r--r--"));
+} catch (UnsupportedOperationException e) {
+    System.out.println("no POSIX permissions here");
+}
+
+// Temp files, and a delete-on-exit safety net for tests.
+Path scratch = Files.createTempFile("java-guide-", ".txt");
+Files.writeString(scratch, "ephemeral");
+scratch.toFile().deleteOnExit();
+
+// Walking with a depth limit and a visitor that skips directories.
+try (var s = Files.walk(base, 2)) {
+    s.filter(Files::isRegularFile).forEach(System.out::println);
+}
+</code></pre></div>
+
+<h3 id="ch4-streams" data-toc>4.4 Buffered streams, character encodings and files that do not fit in memory</h3>
+<p class="topic-desc">Two decisions determine I/O throughput and correctness: how many bytes each system call moves, and which character encoding converts between bytes and text. The first is a performance matter; the second is a data-integrity matter.</p>
+
+<h4>Buffering and why a raw stream is slow</h4>
+<p>A <code>FileInputStream.read()</code> issues one operating-system call per byte. A <code>BufferedInputStream</code> wraps it with an 8 KB array by default, so the same loop issues roughly one call per 8,192 bytes — a two-order-of-magnitude difference on a large file. The buffering is transparent: the code is unchanged, only the wrapper is. Writing is the same story, and an unflushed buffer means data that exists in memory and not on disk, which is why a writer must be flushed or closed. <code>flush()</code> forces the bytes out; <code>close()</code> flushes and releases the handle.</p>
+
+<div class="codeWrap"><pre><code>import java.io.*;
+import java.nio.charset.StandardCharsets;
+
+// Slow: one syscall per byte.
+try (InputStream raw = new FileInputStream("big.dat")) {
+    int b;
+    long total = 0;
+    while ((b = raw.read()) != -1) total++;
+}
+
+// Fast: same loop, buffered by the decorator.
+try (InputStream in = new BufferedInputStream(new FileInputStream("big.dat"))) {
+    int b;
+    while ((b = in.read()) != -1) { /* work */ }
+}
+
+// Text always with an explicit charset.
+try (var w = new BufferedWriter(new OutputStreamWriter(
+        new FileOutputStream("out.txt"), StandardCharsets.UTF_8))) {
+    w.write("caf\u00e9 \u2014 \u20ac\n");
+    w.newLine();
+}   // close() flushes
+</code></pre></div>
+
+<h4>Encodings, and streaming files larger than memory</h4>
+<p>Text is bytes plus an encoding. The platform default was historically the source of "it works on my machine" mojibake, and Java 18 made UTF-8 the default for <code>Files</code>, <code>PrintStream</code> and friends; you should still pass <code>StandardCharsets.UTF_8</code> explicitly when interoperating with another system. Strip a byte-order mark with <code>Files.newBufferedReader</code> or detect it deliberately. For a file too large to hold in memory, read line by line with <code>BufferedReader.lines()</code> or map the file with a <code>MappedByteBuffer</code>; for a directory tree, walk it and process one entry at a time. The invariant is that peak memory should not scale with file size.</p>
+
+<div class="codeWrap"><pre><code>// Stream lines with bounded memory, close the backing reader with the try.
+try (var lines = Files.lines(Path.of("huge.csv"), StandardCharsets.UTF_8)) {
+    long bad = lines.skip(1)
+                    .map(String::strip)
+                    .filter(l -&gt; !l.isEmpty())
+                    .map(line -&gt; line.split(",", -1))
+                    .filter(cols -&gt; cols.length &lt; 3)
+                    .count();
+    System.out.println(bad + " malformed rows");
+}
+
+// Count words across a tree in one pipeline, still streaming.
+try (var s = Files.walk(Path.of("docs"))) {
+    long words = s.filter(p -&gt; p.toString().endsWith(".txt"))
+                  .flatMap(p -&gt; {
+                      try { return Files.lines(p).map(String::strip); }
+                      catch (IOException e) { throw new UncheckedIOException(e); }
+                  })
+                  .flatMap(l -&gt; java.util.Arrays.stream(l.split("\\s+")))
+                  .filter(w -&gt; !w.isBlank())
+                  .count();
+    System.out.println(words + " words");
+}
+</code></pre></div>
+
+<div class="tip">Prefer <code>Files</code> to <code>File</code> in new code: <code>Files</code> reports failures with useful <code>IOException</code> messages, follows the NIO provider abstraction, and the whole-file methods remove most <code>try</code>/<code>finally</code> boilerplate. Keep <code>File</code> only where a legacy API demands it.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch5" data-toc>5 · Lambdas, streams and functional Java</h2>
+<p class="topic-desc">Java 8 added lambdas, method references, a stream pipeline and <code>Optional</code>, and they changed how collections are processed far more than the syntax suggests. The pipeline reads as a description of the transformation rather than a sequence of loop steps.</p>
+
+<h3 id="ch5-functional" data-toc>5.1 Functional interfaces, lambda syntax and closures</h3>
+<p class="topic-desc">A lambda has no type until it is given a target type, and the target must be a functional interface. That indirection is why a lambda can be passed to a standard-library method without any new interface being declared.</p>
+
+<h4>The four core interfaces and their primitive variants</h4>
+<p><code>Function&lt;T,R&gt;</code> transforms, <code>Consumer&lt;T&gt;</code> acts, <code>Predicate&lt;T&gt;</code> tests and <code>Supplier&lt;T&gt;</code> produces. Each has primitive specialisations to avoid boxing: <code>IntFunction</code>, <code>ToIntFunction</code>, <code>IntPredicate</code>, <code>IntSupplier</code> and so on. The <code>java.util.function</code> package also provides <code>BiFunction</code>, <code>UnaryOperator</code>, <code>BinaryOperator</code> and the composition defaults <code>andThen</code>, <code>compose</code>, <code>and</code>, <code>or</code> and <code>negate</code>. Where a real domain concept exists — a <code>Validator</code>, a <code>RetryPolicy</code> — declaring your own functional interface gives the compiler a place to enforce the contract and gives tooling a name to show.</p>
+
+<div class="codeWrap"><pre><code>import java.util.function.*;
+
+Function&lt;String, Integer&gt; length = String::length;
+Predicate&lt;String&gt; isBlank          = String::isBlank;
+Consumer&lt;String&gt;  print            = System.out::println;
+Supplier&lt;String&gt;  greeting         = () -&gt; "hello";
+
+// Composition without extra syntax.
+Function&lt;Integer, Integer&gt; plusOne = x -&gt; x + 1;
+System.out.println(length.andThen(plusOne).apply("abcd"));     // 5
+
+Predicate&lt;String&gt; notBlank = isBlank.negate();
+System.out.println(isBlank.or(notBlank).test("  "));           // true
+
+// A lambda closes over effectively final locals; it may not reassign them.
+int base = 10;
+IntUnaryOperator addBase = n -&gt; n + base;
+System.out.println(addBase.applyAsInt(5));                     // 15
+// base = 20;  // compile error: not effectively final
+</code></pre></div>
+
+<h4>Closures, capturing and this</h4>
+<p>A lambda captures variables from its enclosing scope, and the captured local must be effectively final — assigned once. The reason is that the lambda may outlive the method invocation, so the captured value is copied at creation time, and allowing reassignment would define which copy is visible. Captured <em>fields</em> are read through <code>this</code>, so a lambda inside an instance method can see and mutate instance state; that is why a lambda in a field initialiser can deadlock a class initialiser. Inside a lambda, <code>this</code> refers to the enclosing instance, unlike an anonymous class where it refers to the anonymous instance — a difference that changes behaviour when a method is overridden.</p>
+
+<div class="codeWrap"><pre><code>class Counter {
+    private int total;
+
+    // Lambda: `this` is the Counter.
+    Runnable lambda = () -&gt; total++;
+
+    // Anonymous class: `this` is the anonymous instance.
+    Runnable anon = new Runnable() {
+        private int total;                  // shadows Counter.total
+        public void run() { this.total++; }
+    };
+
+    int total() { return total; }
+}
+
+// Callback style with a captured accumulator.
+static &lt;T&gt; void each(List&lt;T&gt; items, Consumer&lt;T&gt; action) { items.forEach(action); }
+var seen = new StringBuilder();
+each(List.of("a", "b"), s -&gt; seen.append(s));
+System.out.println(seen);                   // ab
+</code></pre></div>
+
+<h3 id="ch5-methodrefs" data-toc>5.2 Method references and constructor references</h3>
+<p class="topic-desc">A method reference is a shorter lambda for the case where the body simply calls an existing method. There are four forms, and learning to recognise them removes most of the noise from stream code.</p>
+
+<h4>The four forms</h4>
+<p><code>Type::staticMethod</code> (for example <code>Integer::parseInt</code>) is a <code>Function&lt;String,Integer&gt;</code>. <code>instance::method</code> binds a receiver (<code>System.out::println</code>). <code>Type::instanceMethod</code> takes the receiver as the first argument (<code>String::length</code> is <code>Function&lt;String,Integer&gt;</code>, <code>String::compareTo</code> is a <code>Comparator&lt;String&gt;</code>). <code>Type::new</code> is a constructor reference, and an array constructor reference <code>String[]::new</code> is the idiomatic argument to <code>Stream.toArray</code>. The double colon is not a member access operator; it is a concrete reference to a method whose signature must match the target functional interface exactly.</p>
+
+<div class="codeWrap"><pre><code>import java.util.function.*;
+import java.util.stream.*;
+
+record User(String name, int age) {}
+
+var names = List.of("ada", "grace", "alan");
+
+names.stream().map(String::toUpperCase).forEach(System.out::println);   // instance form
+
+// Type::instanceMethod takes the first argument as the receiver.
+System.out.println(names.stream().mapToInt(String::length).sum());
+
+// Constructor reference and array constructor reference.
+Supplier&lt;ArrayList&lt;String&gt;&gt; factory = ArrayList::new;
+String[] arr = names.toArray(String[]::new);
+User[] users = Stream.of("Ada", "Grace")
+                     .map(n -&gt; new User(n, 30))
+                     .toArray(User[]::new);
+
+// Both of these are the same lambda; the method reference is clearer.
+names.stream().map(s -&gt; s.strip()).toList();
+names.stream().map(String::strip).toList();
+</code></pre></div>
+
+<h4>When a method reference is the wrong choice</h4>
+<p>A method reference cannot carry an argument, so anything beyond a straight pass-through stays a lambda. Overusing them hurts readability when the target method name is less informative than the parameter name: <code>map(Person::name)</code> is excellent, <code>map(Person::get)</code> is worse than <code>p -&gt; p.get("name")</code>. Because a method reference is not an object literal, there is no per-call allocation — but a lambda that captures is instantiated once per evaluation of its enclosing expression, so a lambda created inside a tight loop is a small allocation each time; hoist it to a <code>static final</code> field when it captures nothing.</p>
+
+<div class="codeWrap"><pre><code>// Hoist a stateless lambda to a constant: one instance for the whole JVM.
+static final Comparator&lt;String&gt; BY_LENGTH = Comparator.comparingInt(String::length);
+
+// A reference to an overloaded method needs the target type to disambiguate.
+Function&lt;String, Integer&gt; f = Integer::valueOf;         // (String) -&gt; Integer
+// Function&lt;Integer, String&gt; g = Integer::toString;     // ambiguous? no: (int) -&gt; String
+
+// Bound receiver instance form, useful for a fixed prefix.
+var prefix = "id-";
+names.stream().map(prefix::concat).forEach(System.out::println);
+</code></pre></div>
+
+<h3 id="ch5-streams" data-toc>5.3 Stream operations: map, filter, flatMap, reduce</h3>
+<p class="topic-desc">A stream is a lazy pipeline over a source. The pipeline is described once and executed once, and nothing runs until the terminal operation is called. This laziness is what allows a filter and a map to be fused into a single pass.</p>
+
+<h4>The pipeline shape and the four operation groups</h4>
+<p>Operations are: <em>source</em> (<code>stream()</code>, <code>Stream.of</code>, <code>IntStream.range</code>, <code>Files.lines</code>), <em>intermediate and stateless</em> (<code>filter</code>, <code>map</code>, <code>flatMap</code>, <code>peek</code>, <code>mapMulti</code>), <em>intermediate and stateful</em> (<code>sorted</code>, <code>distinct</code>, <code>limit</code>, <code>skip</code>, <code>takeWhile</code>), and <em>terminal</em> (<code>collect</code>, <code>reduce</code>, <code>forEach</code>, <code>count</code>, <code>anyMatch</code>, <code>findFirst</code>, <code>toList</code>). A stateful operation must see earlier elements before it can emit, so it buffers; placing <code>sorted</code> early in a long pipeline is a common cause of surprising memory use. A stream is consumed once: reusing it throws <code>IllegalStateException</code>.</p>
+
+<div class="codeWrap"><pre><code>import java.util.*;
+import java.util.stream.*;
+
+record Order(String customer, String sku, int qty, double unitPrice) {}
+
+var orders = List.of(
+    new Order("ada",   "KB-01", 2, 79.99),
+    new Order("grace", "MS-10", 1, 24.50),
+    new Order("ada",   "MS-10", 3, 24.50),
+    new Order("alan",  "KB-01", 1, 79.99),
+    new Order("grace", "HD-22", 1, 129.00));
+
+// filter + map + sorted + terminal toList
+var bigSpendLines = orders.stream()
+        .filter(o -&gt; o.qty() * o.unitPrice() &gt; 100)
+        .map(o -&gt; "%s bought %d x %s".formatted(o.customer(), o.qty(), o.sku()))
+        .sorted()
+        .toList();
+bigSpendLines.forEach(System.out::println);
+
+// flatMap flattens a nested structure one level.
+var byCustomer = orders.stream()
+        .collect(Collectors.groupingBy(Order::customer,
+                 Collectors.mapping(Order::sku, Collectors.toList())));
+System.out.println(byCustomer);
+
+// reduce: total revenue, and a version with an identity and a combiner.
+double revenue = orders.stream()
+        .mapToDouble(o -&gt; o.qty() * o.unitPrice())
+        .sum();
+double revenueFold = orders.stream()
+        .reduce(0.0, (acc, o) -&gt; acc + o.qty() * o.unitPrice(), Double::sum);
+System.out.printf("%.2f / %.2f%n", revenue, revenueFold);
+</code></pre></div>
+
+<h4>Laziness, ordering and the primitives</h4>
+<p>Because the pipeline is lazy, an infinite source terminates as soon as a short-circuiting operation is satisfied: <code>Stream.iterate(1, n -&gt; n + 1).filter(n -&gt; n % 7 == 0).findFirst()</code> returns immediately. Also because it is lazy, <code>peek</code> is not a debugging substitute for a terminal operation — nothing executes without one, which is why a "logging" peek that appears to do nothing is working exactly as specified. <code>IntStream</code>, <code>LongStream</code> and <code>DoubleStream</code> avoid boxing and carry extra terminals (<code>sum</code>, <code>average</code>, <code>summaryStatistics</code>). Finally, use <code>forEachOrdered</code> rather than <code>forEach</code> when the encounter order matters; on a parallel stream, <code>forEach</code> deliberately does not preserve it.</p>
+
+<div class="codeWrap"><pre><code>// Lazy, infinite source; short-circuits at the first match.
+long firstMultipleOf7 = Stream.iterate(1L, n -&gt; n + 1)
+        .filter(n -&gt; n % 7 == 0)
+        .findFirst()
+        .orElseThrow();
+System.out.println(firstMultipleOf7);        // 7
+
+// IntStream avoids boxing and gives statistics in one pass.
+var stats = IntStream.rangeClosed(1, 100).summaryStatistics();
+System.out.printf("min=%d max=%d avg=%.2f sum=%d%n",
+        stats.getMin(), stats.getMax(), stats.getAverage(), stats.getSum());
+
+// takeWhile / dropWhile stop at the first false.
+var sortedNums = List.of(1, 2, 3, 9, 4, 5);
+System.out.println(sortedNums.stream().takeWhile(n -&gt; n &lt; 5).toList());   // [1, 2, 3]
+System.out.println(sortedNums.stream().dropWhile(n -&gt; n &lt; 5).toList());   // [9, 4, 5]
+
+// peek is a no-op without a terminal operation.
+Stream.of(1, 2, 3).peek(System.out::println);          // prints nothing
+Stream.of(1, 2, 3).peek(System.out::println).count();  // prints 1 2 3
+</code></pre></div>
+
+<div class="warn">Do not use a stream where the body needs to break out early, mutate external state conditionally, or handle checked exceptions. Streams are for mapping and aggregating; a loop is clearer for a search with side effects, and the exception noise from wrapping <code>IOException</code> in <code>UncheckedIOException</code> repeatedly is a sign the loop was the right tool.</div>
+
+<h3 id="ch5-collectors" data-toc>5.4 Collectors: grouping, partitioning and downstream reduction</h3>
+<p class="topic-desc"><code>Collectors</code> is the reduction vocabulary of the stream API. It answers "into what shape?" — a list, a map, a total, a joined string — and downstream collectors compose, so a grouped average or a nested map is one pipeline.</p>
+
+<h4>The common collectors</h4>
+<p><code>Collectors.toList</code>, <code>toSet</code>, <code>toMap</code> and their <code>toUnmodifiable*</code> variants are the basic shapes. <code>groupingBy</code> produces a <code>Map&lt;K, List&lt;V&gt;&gt;</code> and accepts a downstream collector. <code>partitioningBy</code> always produces a two-entry map keyed by <code>Boolean</code>. <code>joining</code> concatenates strings with a delimiter, prefix and suffix. <code>counting</code>, <code>summingInt</code>, <code>averagingDouble</code>, <code>mapping</code>, <code>filtering</code> and <code>teeing</code> are the combinational ones. <code>toMap</code> throws <code>IllegalStateException</code> on a duplicate key unless a merge function is supplied, which is deliberate: a silent overwrite is the bug it prevents.</p>
+
+<div class="codeWrap"><pre><code>import java.util.*;
+import java.util.stream.*;
+
+record Sale(String region, String rep, String product, int units, double price) {}
+
+var sales = List.of(
+    new Sale("east", "ada",   "keyboard", 12, 79.99),
+    new Sale("east", "ada",   "mouse",     7, 24.50),
+    new Sale("west", "grace", "keyboard",  4, 79.99),
+    new Sale("west", "grace", "monitor",   3, 219.00),
+    new Sale("east", "alan",  "monitor",   2, 219.00));
+
+// Group by region, then reduce each group to a total, in one pass.
+Map&lt;String, Double&gt; revenueByRegion = sales.stream()
+    .collect(Collectors.groupingBy(
+        Sale::region,
+        Collectors.summingDouble(s -&gt; s.units() * s.price())));
+System.out.println(revenueByRegion);
+
+// Two-level grouping: region -&gt; rep -&gt; count.
+Map&lt;String, Map&lt;String, Long&gt;&gt; unitsByRep = sales.stream()
+    .collect(Collectors.groupingBy(Sale::region,
+             Collectors.groupingBy(Sale::rep, Collectors.counting())));
+System.out.println(unitsByRep);
+
+// toMap with an explicit merge: never let the default overwrite.
+Map&lt;String, Double&gt; totalPerRep = sales.stream()
+    .collect(Collectors.toMap(
+        Sale::rep,
+        s -&gt; s.units() * s.price(),
+        Double::sum));
+System.out.println(totalPerRep);
+
+// joining, with a mapping downstream and a sorted stream.
+String products = sales.stream()
+    .map(Sale::product).distinct().sorted()
+    .collect(Collectors.joining(", ", "[", "]"));
+System.out.println(products);
+</code></pre></div>
+
+<h4>partitioning, teeing and the identity of a reduction</h4>
+<p><code>partitioningBy</code> is <code>groupingBy</code> specialised to a boolean predicate, and it always returns both keys even when one side is empty — useful because it removes a null check. <code>teeing</code> runs two collectors over the same stream and combines their results, which computes a mean or a min-and-max in one pass instead of two. The identity of a reduction must be genuinely neutral: using <code>0</code> as the identity for a string concatenation is fine; using <code>""</code> as the identity for a numeric sum is a type error; and a mutable identity such as a shared <code>ArrayList</code> is wrong for a parallel stream because the combiner would merge aliased state.</p>
+
+<div class="codeWrap"><pre><code>// partitioningBy always has both keys, which is convenient.
+Map&lt;Boolean, List&lt;Sale&gt;&gt; split = sales.stream()
+    .collect(Collectors.partitioningBy(s -&gt; s.units() &gt; 5));
+System.out.println(split.get(true).size() + " big / " + split.get(false).size() + " small");
+
+// teeing: average and count in a single traversal.
+record Stats(double avg, long n) {}
+Stats stats = sales.stream().collect(Collectors.teeing(
+    Collectors.averagingDouble(Sale::units),
+    Collectors.counting(),
+    Stats::new));
+System.out.printf("avg units %.2f over %d lines%n", stats.avg(), stats.n());
+
+// A custom downstream: the top product per region by units.
+Map&lt;String, Optional&lt;Sale&gt;&gt; topByRegion = sales.stream()
+    .collect(Collectors.groupingBy(Sale::region,
+             Collectors.maxBy(Comparator.comparingInt(Sale::units))));
+topByRegion.forEach((r, s) -&gt; System.out.println(r + " -&gt; " + s.orElseThrow().product()));
+
+// Collect into a TreeMap to control key order.
+var sorted = sales.stream().collect(Collectors.groupingBy(
+        Sale::region, TreeMap::new, Collectors.summingInt(Sale::units)));
+System.out.println(sorted);
+</code></pre></div>
+
+<h3 id="ch5-optional" data-toc>5.5 Optional and the null-avoidance strategy</h3>
+<p class="topic-desc"><code>Optional&lt;T&gt;</code> is a container that either holds one value or holds nothing, and it exists to make absence an explicit part of a method's signature. It is not a general-purpose null replacement, and using it as one reintroduces the problem it solves.</p>
+
+<h4>What it is for, and the methods that keep it usable</h4>
+<p>Its intended use is a <em>return type</em> where absence is a normal outcome: <code>findById</code>, <code>max</code>, <code>findFirst</code>. It forces the caller to make a decision with <code>orElse</code>, <code>orElseThrow</code>, <code>orElseGet</code> or a transformation chain, and the compiler will not let the value be used without unwrapping it. The methods to know are <code>map</code>, <code>flatMap</code>, <code>filter</code>, <code>ifPresent</code>, <code>ifPresentOrElse</code>, <code>or</code>, <code>stream</code> and <code>isEmpty</code>. Since Java 10, <code>orElseThrow()</code> with no argument throws <code>NoSuchElementException</code> and is the concise form of "this must be present".</p>
+
+<div class="codeWrap"><pre><code>import java.util.*;
+
+record Customer(long id, String name, Address address) {}
+record Address(String city, String country) {}
+
+var repo = Map.of(1L, new Customer(1, "ada", new Address("London", "UK")));
+
+// Absence is in the type, and the chain stays flat.
+String country = Optional.ofNullable(repo.get(9L))
+        .map(Customer::address)
+        .map(Address::country)
+        .orElse("unknown");
+System.out.println(country);
+
+// orElseThrow is the "required" case with a useful message.
+Customer found = Optional.ofNullable(repo.get(1L))
+        .orElseThrow(() -&gt; new NoSuchElementException("customer 1"));
+
+// ifPresentOrElse handles both branches without a null check.
+Optional.ofNullable(repo.get(2L)).ifPresentOrElse(
+        c -&gt; System.out.println("found " + c.name()),
+        () -&gt; System.out.println("no such customer"));
+
+// Optional.stream() turns a list of optionals into a stream of present values.
+var ids = List.of(1L, 2L, 3L);
+var present = ids.stream().map(repo::get).filter(Objects::nonNull).toList();
+System.out.println(present.size());
+</code></pre></div>
+
+<h4>Where Optional does not belong</h4>
+<p>Do not use <code>Optional</code> as a field type, a method parameter, a collection element, or a key in a map. It is not <code>Serializable</code>, it adds an allocation per call where a plain reference or a sentinel would do, and a parameter of type <code>Optional</code> forces every caller to wrap a value that is already present in the overwhelming majority of calls — use overloading or a default method instead. <code>OptionalInt</code>, <code>OptionalLong</code> and <code>OptionalDouble</code> exist for primitives. The wider strategy is: document nullability, use <code>Objects.requireNonNull</code> for preconditions, annotate with <code>@Nullable</code>/<code>@NonNull</code> so a static checker can verify, and reserve <code>Optional</code> for the return position where it expresses a real choice.</p>
+
+<div class="codeWrap"><pre><code>// Anti-patterns, each with the alternative.
+class Bad {
+    Optional&lt;String&gt; name;                          // field: use a plain field + null
+    void save(Optional&lt;String&gt; tag) {}              // parameter: overload instead
+    List&lt;Optional&lt;String&gt;&gt; tags;                    // element: filter before collecting
+}
+class Good {
+    private String name;                            // nullable, documented + annotated
+    void save() { save(null); }
+    void save(String tag) { Objects.requireNonNullElse(tag, "default"); }
+
+    Optional&lt;String&gt; nickname() {                  // return position: the right place
+        return Optional.ofNullable(name).filter(n -&gt; !n.isBlank());
+    }
+
+    // OptionalInt avoids boxing for the primitive case.
+    OptionalInt best(List&lt;Integer&gt; xs) {
+        return xs.stream().mapToInt(Integer::intValue).max();
+    }
+}
+</code></pre></div>
+
+<div class="tip">A method that returns <code>Optional</code> should never also be able to return a meaningful <code>null</code>, and a method that can return <code>null</code> should be named or annotated so that it is obvious. Mixing the two conventions in one codebase is worse than either convention alone.</div>
+</section>
+
+<section class="chapter">
+<h2 id="ch6" data-toc>6 · Concurrency</h2>
+<p class="topic-desc">Java's memory model is shared-memory threads with defined visibility rules. The modern approach is to avoid raw threads: hand work to an executor, model a pipeline as a <code>CompletableFuture</code>, and for blocking I/O use virtual threads, final in Java 21.</p>
+
+<h3 id="ch6-threads" data-toc>6.1 Threads, Runnable and the thread lifecycle</h3>
+<p class="topic-desc">A thread is an independent path of execution with its own call stack, sharing the heap with every other thread in the JVM. Creating one is cheap by historical standards and still far from free, which is why executors exist.</p>
+
+<h4>Creating threads, and why you usually should not</h4>
+<p>There are two ways to define a task: implement <code>Runnable</code> or extend <code>Thread</code>. Prefer <code>Runnable</code> — it separates the work from the scheduling, works with every executor, and does not consume the single inheritance slot. <code>Thread.ofPlatform()</code> and <code>Thread.ofVirtual()</code> (Java 21) are the modern builder-based constructors. A thread moves through NEW, RUNNABLE, BLOCKED/WAITING/TIMED_WAITING and TERMINATED; <code>getState()</code> reports it. A thread that throws an uncaught exception invokes its handler and terminates; by default the stack trace goes to <code>System.err</code>. Daemon threads do not keep the JVM alive, which makes them suitable for background housekeeping and unsuitable for work whose result you need.</p>
+
+<div class="codeWrap"><pre><code>// Runnable, not Thread subclass.
+Runnable job = () -&gt; {
+    System.out.println(Thread.currentThread().getName() + " running");
+    try { Thread.sleep(50); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+};
+
+Thread t = new Thread(job, "worker-1");
+t.start();
+t.join();                                   // wait for termination
+System.out.println(t.getState());           // TERMINATED
+
+// The builder form (Java 21), with an uncaught-exception handler.
+Thread worker = Thread.ofPlatform()
+        .name("worker-", 0)
+        .daemon(true)
+        .uncaughtExceptionHandler((th, ex) -&gt; System.err.println(th.getName() + ": " + ex))
+        .start(job);
+
+// Interruption is cooperative: sleep/wait throw, a loop must check.
+Thread longTask = Thread.ofPlatform().start(() -&gt; {
+    while (!Thread.currentThread().isInterrupted()) {
+        // do a chunk of work
+    }
+});
+Thread.sleep(20);
+longTask.interrupt();                       // sets the flag / throws at a blocking call
+</code></pre></div>
+
+<h4>Sharing the heap, and the cost of a thread</h4>
+<p>Threads share all objects, so any mutable state reachable from two threads is a data race unless access is synchronised or the state is immutable. The classic failure is the lost update: two threads read a counter, both increment, both write, and one increment disappears. A platform thread on a 64-bit JVM reserves about a megabyte of stack by default, and each is a real operating-system thread, so a few thousand is the practical ceiling before scheduling and memory dominate. That limit is why the answer for I/O-heavy workloads is an executor or virtual threads rather than one thread per request.</p>
+
+<div class="codeWrap"><pre><code>// A demonstrable lost update, and the three fixes.
+class Counter {
+    private int unsafe;
+    private final java.util.concurrent.atomic.AtomicInteger atomic = new java.util.concurrent.atomic.AtomicInteger();
+    private int sync;
+    private final java.util.concurrent.locks.ReentrantLock lock = new java.util.concurrent.locks.ReentrantLock();
+
+    void bumpUnsafe() { unsafe++; }                      // race
+    void bumpAtomic() { atomic.incrementAndGet(); }       // CAS, lock-free
+    synchronized void bumpSync() { sync++; }              // monitor
+    void bumpLock() { lock.lock(); try { sync++; } finally { lock.unlock(); } }
+}
+
+var c = new Counter();
+var pool = java.util.concurrent.Executors.newFixedThreadPool(8);
+for (int i = 0; i &lt; 8; i++) pool.submit(() -&gt; { for (int j = 0; j &lt; 100_000; j++) c.bumpAtomic(); });
+pool.shutdown();
+pool.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS);
+System.out.println("atomic should be 800000, was " + c.atomic.get());</code></pre></div>
+
+<div class="warn">Never call <code>Thread.stop()</code>, <code>Thread.suspend()</code> or <code>Thread.resume()</code>. They are deprecated for removal because they can leave a monitor held or a data structure half-updated, and there is no safe way for a library to defend against them. Interruption is the supported mechanism.</div>
+
+<h3 id="ch6-sync" data-toc>6.2 Synchronisation and the Java memory model</h3>
+<p class="topic-desc">Synchronisation does two jobs, and forgetting the second is why correct-looking code fails intermittently. It provides mutual exclusion, and it establishes the happens-before relationship that makes one thread's writes visible to another.</p>
+
+<h4>Monitors, volatile and atomicity</h4>
+<p>Every object has a monitor; <code>synchronized</code> on a block or method acquires it, and release happens before a later acquire of the same monitor, so everything the releasing thread wrote becomes visible. Without that edge, a value written by one thread may never be seen by another — the CPU cache and the JIT are both allowed to keep the old value. <code>volatile</code> gives visibility and ordering but not atomicity, so it is right for a flag and wrong for a counter. <code>AtomicInteger</code>, <code>AtomicReference</code> and the <code>VarHandle</code> API use compare-and-set for lock-free atomicity. Since Java 9, <code>VarHandle</code> exposes the full set of memory-ordering modes (<code>getAcquire</code>, <code>setRelease</code>, <code>compareAndExchange</code>), which is the controlled alternative to <code>volatile</code> and to <code>Unsafe</code>.</p>
+
+<div class="codeWrap"><pre><code>class Shared {
+    private volatile boolean running = true;    // visibility, not atomicity
+    private final Object gate = new Object();
+    private long total;
+
+    void stop() { running = false; }            // visible to the loop immediately
+
+    void run() {
+        while (running) { Thread.onSpinWait(); }
+    }
+
+    // Mutual exclusion plus the happens-before edge for `total`.
+    void add(long n) {
+        synchronized (gate) { total += n; }
+    }
+    synchronized long total() { return total; }
+
+    // The lock-free equivalent with VarHandle (Java 9+).
+    private static final java.lang.invoke.VarHandle TOTAL;
+    static {
+        try {
+            TOTAL = java.lang.invoke.MethodHandles.lookup()
+                    .findVarHandle(Shared.class, "total", long.class);
+        } catch (ReflectiveOperationException e) { throw new ExceptionInInitializerError(e); }
+    }
+    void addCas(long n) {
+        long current;
+        do { current = (long) TOTAL.getVolatile(this); }
+        while (!TOTAL.compareAndSet(this, current, current + n));
+    }
+}
+</code></pre></div>
+
+<h4>Deadlock, livelock and the tools that find them</h4>
+<p>Deadlock needs two locks acquired in opposite orders by two threads. The prevention is a global lock-ordering discipline: always acquire in the same sequence, or acquire one lock, or use <code>tryLock</code> with a timeout and back off. <code>jstack</code> and <code>jcmd &lt;pid&gt; Thread.print</code> detect a cycle and print it explicitly. Livelock is the same disagreement without blocking — two threads repeatedly retrying and yielding to each other. Starvation is one thread never getting scheduled because its lock is always taken by a higher-priority or busier peer. The safest design removes the contention instead: confine mutable state to one thread, share only immutable objects, and use the concurrent collections rather than wrapping a <code>HashMap</code> in <code>synchronized</code>.</p>
+
+<div class="codeWrap"><pre><code>import java.util.concurrent.locks.ReentrantLock;
+
+// Ordered acquisition, or a bounded retry, are the two defences.
+class Transfer {
+    private final Object a = new Object();
+    private final Object b = new Object();
+
+    void ordered(boolean forward) {
+        Object first = forward ? a : b;
+        Object second = forward ? b : a;
+        synchronized (first) {
+            synchronized (second) { /* both held, same order for everyone */ }
+        }
+    }
+
+    // Timeout-based avoidance when a global order is impractical.
+    static boolean tryBoth(ReentrantLock x, ReentrantLock y) throws InterruptedException {
+        if (x.tryLock(50, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+            try {
+                if (y.tryLock(50, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+                    try { return true; } finally { y.unlock(); }
+                }
+            } finally { x.unlock(); }
+        }
+        return false;      // caller backs off and retries with jitter
+    }
+}
+</code></pre></div>
+
+<div class="note">The simplest way to make a class thread-safe is to make it immutable: <code>final</code> fields, no setters, defensive copies of arrays and collections. An immutable object is safely publishable from any thread with no synchronisation at all, because there is no write to race with. Prefer that to a correct lock when the design allows it.</div>
+
+<h3 id="ch6-executors" data-toc>6.3 ExecutorService, thread pools and the structured alternatives</h3>
+<p class="topic-desc">An executor separates task submission from thread management, reusing a pool instead of creating a thread per request. The <code>java.util.concurrent</code> package is the entry point for essentially all concurrent code.</p>
+
+<h4>Pool types and the queue behind each</h4>
+<p><code>newFixedThreadPool(n)</code> bounds concurrency with an unbounded queue, which is right for CPU-bound work and dangerous if tasks can submit tasks, because the queue can grow without limit. <code>newCachedThreadPool()</code> creates threads on demand and reuses idle ones, which suits short asynchronous tasks and can explode under load. <code>newScheduledThreadPool(n)</code> adds delay and rate repetition. <code>newVirtualThreadPerTaskExecutor()</code> (Java 21) creates a virtual thread per task with no pooling. Since Java 19, <code>Executors.newThreadPerTaskExecutor(ThreadFactory)</code> is the general form. A <code>ThreadPoolExecutor</code> configured directly exposes the queue and rejection policy, which is where the real tuning happens.</p>
+
+<div class="table-scroll"><table>
+<tr><th>Factory</th><th>Threads</th><th>Queue</th><th>Use for</th></tr>
+<tr><td><code>newFixedThreadPool(n)</code></td><td>Fixed n</td><td>Unbounded</td><td>CPU-bound, bounded work</td></tr>
+<tr><td><code>newCachedThreadPool()</code></td><td>Unbounded, reused</td><td>Synchronous</td><td>Many short independent tasks</td></tr>
+<tr><td><code>newScheduledThreadPool(n)</code></td><td>Fixed n</td><td>Delay queue</td><td>Timers, periodic jobs</td></tr>
+<tr><td><code>newVirtualThreadPerTaskExecutor()</code></td><td>One virtual per task</td><td>None</td><td>Millions of blocking I/O tasks</td></tr>
+<tr><td><code>newWorkStealingPool()</code></td><td>Fork-join</td><td>Per-thread deques</td><td>Recursive, uneven tasks</td></tr>
+</table></div>
+
+<div class="codeWrap"><pre><code>import java.util.concurrent.*;
+
+record Page(String url, String body) {}
+
+var pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+try {
+    // submit returns a Future; invokeAll fans out and waits for all.
+    List&lt;Future&lt;Page&gt;&gt; futures = pool.invokeAll(urls.stream()
+            .map(url -&gt; (Callable&lt;Page&gt;) () -&gt; fetch(url))
+            .toList());
+
+    List&lt;Page&gt; pages = new ArrayList&lt;&gt;();
+    for (Future&lt;Page&gt; f : futures) {
+        try { pages.add(f.get()); }
+        catch (ExecutionException e) { System.err.println("failed: " + e.getCause()); }
+    }
+} finally {
+    pool.shutdown();                          // no new tasks; waits for the queue
+    if (!pool.awaitTermination(10, TimeUnit.SECONDS)) pool.shutdownNow();
+}
+</code></pre></div>
+
+<h4>Cancellation, shutdown and StructuredTaskScope</h4>
+<p><code>Future.cancel(true)</code> interrupts the running thread; the task must cooperate, and a task that already completed returns <code>false</code>. A <code>Future</code> has no way to compose, so two dependent steps need either blocking <code>get</code> calls or a <code>CompletableFuture</code>. <code>shutdown()</code> stops accepting submissions and lets the queue drain; <code>shutdownNow()</code> interrupts running tasks and drains the queue into a return value; <code>awaitTermination</code> is how a program waits for a graceful stop. Java 21 added <strong>StructuredTaskScope</strong> (preview in 21, more settled since), which scopes a group of subtasks to a block: when the block exits, every subtask is finished, so cancellation and error propagation cannot leak. With it, <code>StructuredTaskScope.ShutdownOnFailure</code> cancels siblings as soon as one fails, which is the fan-out-and-merge pattern without manual bookkeeping.</p>
+
+<div class="codeWrap"><pre><code>import java.util.concurrent.*;
+import java.util.concurrent.StructuredTaskScope;   // preview API
+
+record Quote(String vendor, int price) {}
+
+// Fan out to three vendors; first failure cancels the rest.
+static Quote bestQuote(List&lt;String&gt; vendors) throws Exception {
+    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+        List&lt;StructuredTaskScope.Subtask&lt;Quote&gt;&gt; tasks = vendors.stream()
+                .map(v -&gt; scope.fork(() -&gt; quote(v)))
+                .toList();
+        scope.join();                 // wait for all (or for the first failure)
+        scope.throwIfFailed();        // rethrow here on the calling thread
+        return tasks.stream().map(Subtask::get)
+                    .min(Comparator.comparingInt(Quote::price)).orElseThrow();
+    }
+}
+
+// Graceful shutdown of a pool, the pattern to copy.
+var pool = Executors.newFixedThreadPool(4);
+pool.shutdown();
+if (!pool.awaitTermination(5, TimeUnit.SECONDS)) {
+    List&lt;Runnable&gt; neverRan = pool.shutdownNow();
+    System.err.println(neverRan.size() + " tasks abandoned");
+}
+</code></pre></div>
+
+<h3 id="ch6-completable" data-toc>6.4 CompletableFuture: composing asynchronous work</h3>
+<p class="topic-desc"><code>CompletableFuture</code> models a value that will exist later, and, unlike <code>Future</code>, it can be composed, combined, recovered and given a default. It is the standard way to express a pipeline of asynchronous steps without blocking a thread per step.</p>
+
+<h4>Creating, chaining and combining</h4>
+<p><code>supplyAsync</code> starts a value-producing task and <code>runAsync</code> a void one, both on the common ForkJoinPool unless an executor is supplied — and supplying one is usually correct in a server, because the common pool is shared with every parallel stream in the process. <code>thenApply</code> transforms, <code>thenCompose</code> flattens a nested future, <code>thenCombine</code> joins two independent futures, <code>allOf</code> waits for many and <code>anyOf</code> for the first. The <code>Async</code> variants run the continuation on a different thread from the executor. <code>handle</code> and <code>exceptionally</code> are the recovery paths; <code>whenComplete</code> observes without changing the result.</p>
+
+<div class="codeWrap"><pre><code>import java.util.concurrent.*;
+
+var io = Executors.newVirtualThreadPerTaskExecutor();
+
+CompletableFuture&lt;String&gt; user = CompletableFuture.supplyAsync(() -&gt; "ada", io);
+CompletableFuture&lt;List&lt;String&gt;&gt; orders = CompletableFuture.supplyAsync(
+        () -&gt; List.of("KB-01", "MS-10"), io);
+
+CompletableFuture&lt;String&gt; summary = user
+        .thenCombine(orders, (u, o) -&gt; u + " has " + o.size() + " orders")
+        .exceptionally(ex -&gt; "unavailable: " + ex.getCause().getMessage());
+
+System.out.println(summary.join());     // ada has 2 orders
+
+// Fan out to many, wait for all, tolerate individual failures.
+List&lt;CompletableFuture&lt;Integer&gt;&gt; priceFutures = List.of("a", "b", "c").stream()
+        .map(sku -&gt; CompletableFuture.supplyAsync(() -&gt; price(sku), io)
+                .exceptionally(ex -&gt; -1))
+        .toList();
+
+CompletableFuture.allOf(priceFutures.toArray(CompletableFuture[]::new)).join();
+System.out.println(priceFutures.stream().map(CompletableFuture::join).toList());
+
+io.shutdown();
+</code></pre></div>
+
+<h4>Timeouts, and the pool that must not be starved</h4>
+<p><code>orTimeout</code> and <code>completeOnTimeout</code> (Java 9) bound a stage without a manual scheduler. The classic failure mode is a pipeline whose stages all run on one small pool: a stage that blocks waiting for another future on the same pool consumes the thread the other stage needs and the whole thing stalls. The fixes are to give blocking work its own executor, to use <code>thenComposeAsync</code> with an explicit executor, or — best — to run the blocking steps on <code>newVirtualThreadPerTaskExecutor</code> where a blocked task parks rather than occupying a platform thread. Always shut down an executor you created; the common pool must not be shut down.</p>
+
+<div class="codeWrap"><pre><code>import java.util.concurrent.*;
+
+var pool = Executors.newVirtualThreadPerTaskExecutor();
+try {
+    CompletableFuture&lt;Integer&gt; slow = CompletableFuture
+            .supplyAsync(() -&gt; { sleep(2_000); return 1; }, pool)
+            .orTimeout(200, TimeUnit.MILLISECONDS)
+            .exceptionally(ex -&gt; -1);
+
+    System.out.println(slow.join());           // -1 after 200 ms, not 2 s
+
+    // Retry: re-attempt the stage, bounded, with a delay.
+    CompletableFuture&lt;String&gt; flaky = CompletableFuture.supplyAsync(() -&gt; mayFail(), pool);
+    CompletableFuture&lt;String&gt; retried = flaky
+            .thenApply(CompletableFuture::completedFuture)
+            .exceptionally(ex -&gt; CompletableFuture.supplyAsync(() -&gt; mayFail(), pool))
+            .thenCompose(f -&gt; f);
+    System.out.println(retried.join());
+} finally {
+    pool.shutdown();
+}
+</code></pre></div>
+
+<div class="warn">Do not call <code>join()</code> or <code>get()</code> on a future from inside a task running on the same pool. With a bounded pool this deadlocks as soon as the number of nested waits reaches the thread count; the symptom is a hang under load that never reproduces in a test with one request. Virtual threads make this far less likely because a parked task does not hold a carrier, but composing instead of blocking is still the correct design.</div>
+
+<h3 id="ch6-virtual" data-toc>6.5 Virtual threads and Project Loom</h3>
+<p class="topic-desc">Virtual threads, final in Java 21 (JEP 444), are threads scheduled by the JVM rather than the operating system. They exist so that the simple blocking style scales to hundreds of thousands of concurrent tasks, without rewriting everything as callbacks or reactive streams.</p>
+
+<h4>What they are, and the carrier relationship</h4>
+<p>A virtual thread is a <code>Thread</code> instance with a tiny stack stored on the heap. Many virtual threads are mounted on a small pool of platform threads called <em>carriers</em> — by default, one per available processor. When a virtual thread blocks on a supported operation (socket I/O, <code>Thread.sleep</code>, a <code>java.util.concurrent</code> synchroniser, <code>LockSupport.park</code>) the JVM unmounts it and frees the carrier for another virtual thread. The consequence is that a million concurrent tasks cost heap, not a million OS threads. Everything else is unchanged: <code>Thread.currentThread()</code> still works, stack traces still print, and debugging tools understand them.</p>
+
+<div class="codeWrap"><pre><code>import java.util.concurrent.*;
+
+// One virtual thread.
+Thread vt = Thread.ofVirtual().name("io-1").start(() -&gt; System.out.println("on " + Thread.currentThread()));
+vt.join();
+System.out.println(vt.isVirtual());        // true
+
+// A per-task executor: the default choice for blocking I/O in a server.
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    List&lt;Future&lt;String&gt;&gt; futures = new ArrayList&lt;&gt;();
+    for (int i = 0; i &lt; 100_000; i++) {
+        int id = i;
+        futures.add(executor.submit(() -&gt; {
+            Thread.sleep(50);                       // parks, does not pin a carrier
+            return "task " + id + " done on " + Thread.currentThread();
+        }));
+    }
+    System.out.println(futures.get(0).get());
+}   // ExecutorService is AutoCloseable since Java 19: closes on block exit
+</code></pre></div>
+
+<h4>Pinning, thread locals and the migration rules</h4>
+<p>A virtual thread <em>pins</em> its carrier while it is inside a <code>synchronized</code> block or method that blocks, and it also pins while inside a native frame or a foreign function call. A pinned virtual thread prevents the carrier from being reused, which degrades to the old one-OS-thread-per-task behaviour without failing; <code>-Djdk.tracePinnedThreads=full</code> reports the cases. The remedy is to replace <code>synchronized</code> with <code>ReentrantLock</code> in code that may block while holding the monitor — <code>synchronized</code> is being reworked to cooperate, and later JDKs reduce the problem, but the lock migration is the portable fix. Two more rules: <code>ThreadLocal</code> still works but tens of thousands of copies of a large per-thread object is now a memory problem, so prefer <code>ScopedValue</code> (final in Java 25) for request-scoped data; and do not pool virtual threads, because their whole point is that creation is cheap and they are short-lived.</p>
+
+<div class="codeWrap"><pre><code>import java.util.concurrent.locks.ReentrantLock;
+
+// Pin: blocking inside synchronized holds the carrier.
+class Pinned {
+    synchronized void fetch() {
+        try { Thread.sleep(100); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+    }
+}
+
+// Portable fix: a ReentrantLock does not pin.
+class Unpinned {
+    private final ReentrantLock lock = new ReentrantLock();
+    void fetch() {
+        lock.lock();
+        try {
+            Thread.sleep(100);                  // unmounts the virtual thread
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+
+// ScopedValue: immutable, request-scoped data with no ThreadLocal leak.
+static final ScopedValue&lt;String&gt; REQUEST_ID = ScopedValue.newInstance();
+
+static void handle(String id) throws Exception {
+    ScopedValue.where(REQUEST_ID, id).run(() -&gt;
+        System.out.println("handling " + REQUEST_ID.get()));
+    // outside the scope REQUEST_ID.isBound() is false
+}
+</code></pre></div>
+
+<div class="tip">Virtual threads are for <strong>blocking</strong> work: I/O, database calls, waiting on other services. They are not for CPU-bound work — a computation that pegs a core still needs a platform thread and a bounded pool sized to the processor count, or it will simply create contention. A common production shape is a virtual-thread-per-request executor for the I/O layer and a fixed pool for the compute steps, with <code>ForkJoinPool.commonPool()</code> left to parallel streams.</div>
+</section>

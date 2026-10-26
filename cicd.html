@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI/CD - Continuous Integration &amp; Delivery Guide</title>
+<meta name="description" content="A roadmap in plain language that orients readers to the book before they start. It frames the order of…. 18 chapters, 68 topics and 20 code samples. fully…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/cicd.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="CI/CD - Continuous Integration &amp; Delivery Guide">
+<meta property="og:description" content="A roadmap in plain language that orients readers to the book before they start. It frames the order of…. 18 chapters, 68 topics and 20 code samples. fully…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/cicd.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="CI/CD - Continuous Integration &amp; Delivery Guide">
+<meta name="twitter:description" content="A roadmap in plain language that orients readers to the book before they start. It frames the order of…. 18 chapters, 68 topics and 20 code samples. fully…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/cicd.html#article","headline":"CI/CD - Continuous Integration & Delivery Guide","name":"CI/CD - Continuous Integration & Delivery Guide","description":"A roadmap in plain language that orients readers to the book before they start. It frames the order of…. 18 chapters, 68 topics and 20 code samples. fully…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/cicd.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/cicd.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"CI/CD - Continuous Integration & Delivery Guide","item":"https://amin360it.github.io/quick-guides/cicd.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">CI/CD</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This CI/CD Guide</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will meet</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Why CI/CD Exists</a><ul><li><a href="#ch1-problem" data-target="ch1-problem">1.1 The problem with manual releases</a></li><li><a href="#ch1-definitions" data-target="ch1-definitions">1.2 CI vs CD vs CD</a></li><li><a href="#ch1-benefits" data-target="ch1-benefits">1.3 What good CI/CD buys you</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · Version Control Workflows</a><ul><li><a href="#ch2-strategies" data-target="ch2-strategies">2.1 Branching strategies</a></li><li><a href="#ch2-pr" data-target="ch2-pr">2.2 Pull requests and protected branches</a></li><li><a href="#ch2-commits" data-target="ch2-commits">2.3 Commit hygiene and conventions</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Build Automation &amp; Artifacts</a><ul><li><a href="#ch3-build" data-target="ch3-build">3.1 What "build" means</a></li><li><a href="#ch3-immutable" data-target="ch3-immutable">3.2 Build once, deploy many</a></li><li><a href="#ch3-docker" data-target="ch3-docker">3.3 Multi-stage Docker builds</a></li><li><a href="#ch3-repro" data-target="ch3-repro">3.4 Reproducible builds</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Testing in the Pipeline</a><ul><li><a href="#ch4-pyramid" data-target="ch4-pyramid">4.1 The test pyramid</a></li><li><a href="#ch4-quality-gates" data-target="ch4-quality-gates">4.2 Quality gates</a></li><li><a href="#ch4-flaky" data-target="ch4-flaky">4.3 Flaky tests are the enemy</a></li><li><a href="#ch4-parallel" data-target="ch4-parallel">4.4 Parallelism and caching</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Pipeline as Code</a><ul><li><a href="#ch5-github" data-target="ch5-github">5.1 GitHub Actions</a></li><li><a href="#ch5-gitlab" data-target="ch5-gitlab">5.2 GitLab CI</a></li><li><a href="#ch5-structure" data-target="ch5-structure">5.3 Designing a pipeline</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Artifacts, Registries &amp; Versioning</a><ul><li><a href="#ch6-artifacts" data-target="ch6-artifacts">6.1 Passing artifacts between jobs</a></li><li><a href="#ch6-registry" data-target="ch6-registry">6.2 Container and package registries</a></li><li><a href="#ch6-versioning" data-target="ch6-versioning">6.3 Versioning schemes</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Environments &amp; Configuration</a><ul><li><a href="#ch7-envs" data-target="ch7-envs">7.1 Environment tiers</a></li><li><a href="#ch7-config" data-target="ch7-config">7.2 Configuration vs code</a></li><li><a href="#ch7-previews" data-target="ch7-previews">7.3 Preview environments</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Deployment Strategies</a><ul><li><a href="#ch8-strategies" data-target="ch8-strategies">8.1 The menu</a></li><li><a href="#ch8-canary" data-target="ch8-canary">8.2 Canary by the numbers</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · Database Changes in CI/CD</a><ul><li><a href="#ch9-migrations" data-target="ch9-migrations">9.1 Migrations as code</a></li><li><a href="#ch9-backcompat" data-target="ch9-backcompat">9.2 Backward-compatible migrations</a></li><li><a href="#ch9-rollback" data-target="ch9-rollback">9.3 Rolling back data changes</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Secrets Management</a><ul><li><a href="#ch10-never" data-target="ch10-never">10.1 Rules that never bend</a></li><li><a href="#ch10-stores" data-target="ch10-stores">10.2 Secret stores and OIDC</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · Observability &amp; Release Health</a><ul><li><a href="#ch11-signals" data-target="ch11-signals">11.1 The three signals</a></li><li><a href="#ch11-slo" data-target="ch11-slo">11.2 SLOs and error budgets</a></li><li><a href="#ch11-rollback" data-target="ch11-rollback">11.3 Automated rollback</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch12" data-target="ch12">12 · Security in the Pipeline</a><ul><li><a href="#ch12-scanning" data-target="ch12-scanning">12.1 The scanner family</a></li><li><a href="#ch12-supplychain" data-target="ch12-supplychain">12.2 Supply-chain integrity</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch13" data-target="ch13">13 · Platform Examples</a><ul><li><a href="#ch13-k8s" data-target="ch13-k8s">13.1 Kubernetes with GitOps</a></li><li><a href="#ch13-serverless" data-target="ch13-serverless">13.2 Serverless pipelines</a></li><li><a href="#ch13-paas" data-target="ch13-paas">13.3 PaaS and container apps</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch14" data-target="ch14">14 · Toolchain Deep Dive: GitHub Actions</a><ul><li><a href="#ch14-anatomy" data-target="ch14-anatomy">14.1 Anatomy of a workflow</a></li><li><a href="#ch14-reuse" data-target="ch14-reuse">14.2 Reusable workflows and matrix</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch15" data-target="ch15">15 · DORA Metrics &amp; Maturity</a><ul><li><a href="#ch15-dora" data-target="ch15-dora">15.1 The four key metrics</a></li><li><a href="#ch15-maturity" data-target="ch15-maturity">15.2 A maturity path</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch16" data-target="ch16">16 · Culture, Failure &amp; Continuous Improvement</a><ul><li><a href="#ch16-culture" data-target="ch16-culture">16.1 Blameless culture</a></li><li><a href="#ch16-postmortem" data-target="ch16-postmortem">16.2 A postmortem template</a></li><li><a href="#ch16-practices" data-target="ch16-practices">16.3 Practices that keep pipelines healthy</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Cheat Sheets &amp; Roadmap</a><ul><li><a href="#app-pipeline" data-target="app-pipeline">A.1 Reference pipeline stages</a></li><li><a href="#app-roadmap" data-target="app-roadmap">A.2 Roadmap: beginner to advanced</a></li><li><a href="#app-cheatsheets" data-target="app-cheatsheets">A.3 Rules of thumb</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">CI/CD</span>
+      <span class="am-band-s">18 chapters &middot; 68 topics &middot; 20 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This CI/CD Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This CI/CD Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-tools">Tools you will meet</a></div></div>
+    <p class="topic-desc">A roadmap in plain language that orients readers to the book before they start. It frames the order of chapters, tells you to read foundations, delivery, operations and mastery in sequence, and encourages hands-on work with the exercises. Use it as a map so every later section lands with context and you can keep track of your progress.</p>
+    <p>A practical, end-to-end course on <strong>Continuous Integration and Continuous Delivery/Deployment</strong>: the culture, the pipelines, the patterns and the failure modes. Single file, offline, progress saved locally.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+    <p class="topic-desc">A map of the book’s structure, sixteen chapters split across foundations, delivery, operations and mastery. It shows where version control, builds, testing, deployment, security and culture each sit in the journey. Skim it once so you know where every topic fits and which chapter to revisit when a question comes up.</p>
+    <ul>
+      <li><strong>Foundations (Ch. 1–4)</strong> — why CI/CD exists, version-control workflows, build automation and testing in the pipeline.</li>
+      <li><strong>Delivery (Ch. 5–9)</strong> — pipeline as code, artifacts, environments, deployment strategies and database changes.</li>
+      <li><strong>Operations (Ch. 10–14)</strong> — secrets, observability, security, supply chain and platform examples.</li>
+      <li><strong>Mastery (Ch. 15–16)</strong> — maturity models, DORA metrics and building a culture of boring deploys.</li>
+    </ul>
+    <div class="tip"><p>The word "boring" is the goal: when deployments are routine and reversible, the team ships small changes constantly and outages shrink.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will meet</h3>
+    <p class="topic-desc">A quick map of the tool landscape you will meet: git hosts like GitHub and GitLab, CI runners such as GitHub Actions and GitLab CI, container and package registries, and deployment tools. GitHub Actions appears often, but the patterns transfer everywhere. It sets expectations so later chapters can name tools without re-explaining them from scratch.</p>
+    <table>
+      <tr><th>Layer</th><th>Examples</th></tr>
+      <tr><td>Source</td><td>Git, GitHub, GitLab, Bitbucket</td></tr>
+      <tr><td>CI runners</td><td>GitHub Actions, GitLab CI, Jenkins, CircleCI, Buildkite</td></tr>
+      <tr><td>Build/packaging</td><td>Docker, Buildx, MSBuild, Maven, npm, Composer</td></tr>
+      <tr><td>Registries</td><td>GHCR, ECR, Artifactory, NuGet, npm registry</td></tr>
+      <tr><td>Deploy</td><td>Kubernetes, Helm, Argo CD, Terraform, Ansible</td></tr>
+      <tr><td>Quality/security</td><td>ESLint, SonarQube, Trivy, Snyk, dependency scanners</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Why CI/CD Exists</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Why CI/CD Exists</button><div class="ch-toc-list"><a href="#ch1-problem">1.1 The problem with manual releases</a><a href="#ch1-definitions">1.2 CI vs CD vs CD</a><a href="#ch1-benefits">1.3 What good CI/CD buys you</a></div></div>
+    <p class="topic-desc">Explains the problems that continuous integration and continuous delivery solve: late integration bugs, manual release steps, and deployments that depend on one person knowing the drill. CI merges and verifies changes often, while CD ships small verified increments. The chapter frames these pains so the automation patterns later in the guide have a clear reason to exist.</p>
+    <p>Integration used to happen once every few weeks, in a painful "merge week". CI/CD replaces big risky releases with small, verified, frequent ones.</p>
+    <h3 id="ch1-problem" data-toc>1.1 The problem with manual releases</h3>
+    <p class="topic-desc">Describes the failure modes of hand-run releases: undocumented steps, environment drift, conflicting changes, and a single person who holds the expertise. Because the procedure lives in someone’s head, rebuilds and rollbacks are slow and inconsistent. Automation exists to turn this personal ritual into a repeatable, recorded process, which justifies everything the rest of the guide covers.</p>
+    <ul>
+      <li>Long-lived branches drift and conflict painfully.</li>
+      <li>Manual steps are undocumented and non-repeatable.</li>
+      <li>Bugs are found late, when they are most expensive.</li>
+      <li>Only one person knows how to deploy — a bus-factor of one.</li>
+    </ul>
+    <h3 id="ch1-definitions" data-toc>1.2 CI vs CD vs CD</h3>
+    <p class="topic-desc">Distinguishes continuous integration, continuous delivery and continuous deployment by how far automation reaches. Continuous integration merges and tests every change, continuous delivery leaves a human gate before production, and continuous deployment releases automatically when the pipeline passes. The comparison helps you decide where your own automation should stop and where humans should stay in charge.</p>
+    <table>
+      <tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td>Continuous Integration</td><td>Every change is merged to trunk and automatically built + tested.</td></tr>
+      <tr><td>Continuous Delivery</td><td>Every passing build is deployable to production; release is a business decision.</td></tr>
+      <tr><td>Continuous Deployment</td><td>Every passing build goes to production automatically, no human gate.</td></tr>
+    </table>
+    <h3 id="ch1-benefits" data-toc>1.3 What good CI/CD buys you</h3>
+    <p class="topic-desc">Summarizes the payoff of good CI/CD: a smaller blast radius, faster feedback and releases that repeat exactly the same way every time. Teams gain the confidence to ship frequently because a red pipeline catches problems early while they are cheap to fix. Frequent small releases reduce risk, and that confidence is the real currency the practice buys.</p>
+    <ul>
+      <li>Smaller changes → smaller blast radius → easier rollback.</li>
+      <li>Fast feedback: catch defects minutes after writing them.</li>
+      <li>Repeatable, auditable releases.</li>
+      <li>Developer confidence to refactor and improve.</li>
+    </ul>
+    <div class="ex"><h4 id="ch1-benefits--exercises-1">Exercises 1</h4><ol>
+      <li>List every manual step in your current release and mark which could be automated.</li>
+      <li>Decide where you sit between Delivery and Deployment, and why.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · Version Control Workflows</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Version Control Workflows</button><div class="ch-toc-list"><a href="#ch2-strategies">2.1 Branching strategies</a><a href="#ch2-pr">2.2 Pull requests and protected branches</a><a href="#ch2-commits">2.3 Commit hygiene and conventions</a></div></div>
+    <p class="topic-desc">Covers how your branching model shapes integration pain, including strategies such as trunk-based development, GitHub Flow and GitFlow, plus pull requests and commit conventions. It explains how protected branches, code review and Conventional Commits rules combine with CI to keep the main branch green. This workflow is the foundation every later pipeline job assumes.</p>
+    <h3 id="ch2-strategies" data-toc>2.1 Branching strategies</h3>
+    <p class="topic-desc">Compares trunk-based development, GitHub Flow and GitFlow in terms of integration effort versus release control. Trunk-based keeps branches short and merges frequent, which suits continuous delivery, while GitFlow adds release and hotfix branches for scheduled releases. The trade-off decides how painful each integration feels, and teams shipping continuously tend to favor short-lived branches.</p>
+    <table>
+      <tr><th>Strategy</th><th>Shape</th><th>Fits</th></tr>
+      <tr><td>Trunk-based</td><td>Short-lived branches merged to main daily</td><td>High-performing CI/CD teams</td></tr>
+      <tr><td>GitHub Flow</td><td>Feature branch → PR → main</td><td>Most web teams</td></tr>
+      <tr><td>GitFlow</td><td>develop/release/hotfix branches</td><td>Versioned/enterprise releases</td></tr>
+    </table>
+    <div class="tip"><p>The more branches that live long, the more integration pain you manufacture. Prefer short branches and feature flags over long-lived branches.</p></div>
+    <h3 id="ch2-pr" data-toc>2.2 Pull requests and protected branches</h3>
+    <p class="topic-desc">Explains how protected branches enforce reviews and a green CI run before anything lands. Branch protection rules in repository settings require pull requests, at least one approving review, and passing status checks, so main cannot be pushed directly. The pull request becomes the front door of a disciplined pipeline where every change is examined and verified before merging.</p>
+    <div class="codeWrap"><pre><code># Protect main:
+#  - require a PR before merging
+#  - require status checks (CI) to pass
+#  - require at least one review
+#  - require branch up to date before merge
+#  - disallow force-push and deletion</code></pre></div>
+    <p class="code-note">A checklist of branch-protection rules that force every change through a reviewed, green-CI pull request to main.</p>
+    <h3 id="ch2-commits" data-toc>2.3 Commit hygiene and conventions</h3>
+    <p class="topic-desc">Introduces Conventional Commits, where message prefixes such as fix, feat and BREAKING CHANGE drive generated changelogs and automatic versioning. Tools like commitlint enforce the format and semantic-release parses messages to decide the next SemVer version. Consistent messages make history readable and automatable instead of a tangle of free-text summaries.</p>
+    <div class="codeWrap"><pre><code>feat(auth): add refresh-token rotation
+fix(cart): prevent negative quantities
+chore(deps): bump framework to 13.1
+
+# Conventional Commits enable automated changelogs + semantic versioning.</code></pre></div>
+    <p class="code-note">Conventional Commits format messages as type(scope): description, which unlocks automated changelogs and semantic versioning.</p>
+    <div class="ex"><h4 id="ch2-commits--exercises-2">Exercises 2</h4><ol>
+      <li>Protect a branch with required CI checks.</li>
+      <li>Convert a week of commits to Conventional Commits.</li>
+      <li>Pick a branching strategy for a 5-dev team and justify it.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Build Automation &amp; Artifacts</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Build Automation &amp; Artifacts</button><div class="ch-toc-list"><a href="#ch3-build">3.1 What "build" means</a><a href="#ch3-immutable">3.2 Build once, deploy many</a><a href="#ch3-docker">3.3 Multi-stage Docker builds</a><a href="#ch3-repro">3.4 Reproducible builds</a></div></div>
+    <p class="topic-desc">Explains that building turns source into a versioned, immutable artifact you can promote through every environment. The chapter covers compilation, bundling, packaging and containerisation, and argues for building once and reusing the result instead of rebuilding per environment. Artifacts are tagged with versions and commit SHAs so every deployment stays traceable to its source.</p>
+    <h3 id="ch3-build" data-toc>3.1 What "build" means</h3>
+    <p class="topic-desc">Defines build as compiling, bundling, packaging or containerising source into a single deployable unit. The output, called the artifact, is the thing you test, promote and deploy everywhere. Naming each build stage and recording its inputs makes results reproducible and traceable back to the exact commit that produced them.</p>
+    <p>Building transforms source into a runnable/deployable unit: compile, bundle, package, containerise. The output is an <strong>artifact</strong> — a versioned, immutable file you can promote through environments.</p>
+    <h3 id="ch3-immutable" data-toc>3.2 Build once, deploy many</h3>
+    <p class="topic-desc">Argues that rebuilding the same source per environment causes drift and works-in-staging surprises. Instead, the pipeline builds one immutable artifact once, then varies only injected configuration for each target. Promote that same artifact through test, staging and production so the bits you tested are exactly the bits that reach users.</p>
+    <div class="codeWrap"><pre><code># Anti-pattern: rebuild per environment (drift, "works in staging")
+# Pattern: build once -&gt; promote the identical artifact
+build  -&gt; image:v42  (tested)
+promote-&gt; staging     (image:v42)
+promote-&gt; production  (image:v42)
+
+# Environment differences come from CONFIG, never from recompiling.</code></pre></div>
+    <p class="code-note">Promote the exact same tested image through staging into production; only config differs at deploy time, never the build.</p>
+    <h3 id="ch3-docker" data-toc>3.3 Multi-stage Docker builds</h3>
+    <p class="topic-desc">Shows how a Dockerfile with multiple FROM stages separates the build toolchain from the runtime image. Early stages compile or bundle with full toolchains, and later stages copy only the output into a slim final image. The result is small, reproducible images that never ship compilers or build dependencies, with BuildKit providing layer and dependency caching.</p>
+    <div class="codeWrap"><pre><code>FROM node:22 AS build  # compile stage
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci  # install from lockfile
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html  # keep final image small
+# tiny, reproducible final image with no build tooling inside</code></pre></div>
+    <p class="code-note">A two-stage Dockerfile keeps the npm toolchain out of the final nginx image, shrinking it and leaving no build secrets behind.</p>
+    <h3 id="ch3-repro" data-toc>3.4 Reproducible builds</h3>
+    <p class="topic-desc">Explains pinning package lockfiles and image digests so the same source always yields the same artifact. Dependency resolution is fixed to exact versions rather than ranges, and base images are referenced by SHA instead of mutable tags. Reproducibility is what makes rollbacks trustworthy, because you can rebuild exactly the thing that once worked in production.</p>
+    <ul>
+      <li>Pin dependency versions (lockfiles committed).</li>
+      <li>Pin base images by digest, not floating tags.</li>
+      <li>Same inputs → same artifact; cache safely and hermetically.</li>
+    </ul>
+    <div class="ex"><h4 id="ch3-repro--exercises-3">Exercises 3</h4><ol>
+      <li>Write a multi-stage Dockerfile for an app you know.</li>
+      <li>Explain why rebuilding per environment is dangerous.</li>
+      <li>Pin one base image by digest.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Testing in the Pipeline</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Testing in the Pipeline</button><div class="ch-toc-list"><a href="#ch4-pyramid">4.1 The test pyramid</a><a href="#ch4-quality-gates">4.2 Quality gates</a><a href="#ch4-flaky">4.3 Flaky tests are the enemy</a><a href="#ch4-parallel">4.4 Parallelism and caching</a></div></div>
+    <p class="topic-desc">Lays out the testing strategy CI uses as its eyes: many fast unit tests, a smaller set of focused integration tests, and a few end-to-end checks. The chapter explains how to place each test type at the right pipeline stage and keep CI fast and honest. Tests run on every push so failures surface in minutes instead of at deploy time.</p>
+    <h3 id="ch4-pyramid" data-toc>4.1 The test pyramid</h3>
+    <p class="topic-desc">Presents the classic test pyramid: many fast unit tests at the base, some integration tests in the middle, and few slow end-to-end tests at the top. Inverting that shape makes feedback slow and brittle, so the guide recommends writing mostly small isolated tests. Following the pyramid keeps pipeline minutes low while coverage stays meaningful.</p>
+    <table>
+      <tr><th>Layer</th><th>Speed</th><th>Confidence</th><th>Count</th></tr>
+      <tr><td>Unit</td><td>Milliseconds</td><td>Logic</td><td>Many</td></tr>
+      <tr><td>Integration</td><td>Seconds</td><td>Components talk</td><td>Some</td></tr>
+      <tr><td>End-to-end</td><td>Minutes</td><td>Whole system</td><td>Few</td></tr>
+    </table>
+    <h3 id="ch4-quality-gates" data-toc>4.2 Quality gates</h3>
+    <p class="topic-desc">Describes gates that stop the pipeline on lint, coverage or type errors, defined as commands or jobs in the workflow. A lint job runs a tool such as ESLint or flake8, a test job enforces coverage thresholds, and a type-check job catches type errors before deploy. Fail fast so developers hear about problems within minutes of pushing.</p>
+    <div class="codeWrap"><pre><code>- run: npm run lint
+- run: npm test -- --coverage  # coverage gate
+- run: npm run test:e2e
+- run: npx tsc --noEmit  # type check
+# Fail fast: lint first, expensive e2e last.</code></pre></div>
+    <p class="code-note">Quality-gate steps run cheap checks first and the expensive end-to-end suite last so the pipeline fails fast on simple errors.</p>
+    <h3 id="ch4-flaky" data-toc>4.3 Flaky tests are the enemy</h3>
+    <p class="topic-desc">Warns that tests which pass and fail without any code change poison trust in a red pipeline that everyone learns to ignore. The advice is to quarantine flaky tests immediately, investigate the root cause, and fix or delete them rather than silently retrying. A reliably green pipeline is the only signal a team can learn to trust.</p>
+    <ul>
+      <li>Quarantine flaky tests immediately; a red pipeline everyone ignores is worse than no pipeline.</li>
+      <li>Sources of flakiness: timing/races, shared state, ordering, network, clock/timezone.</li>
+      <li>Retry once for insight, but fix the root cause.</li>
+    </ul>
+    <h3 id="ch4-parallel" data-toc>4.4 Parallelism and caching</h3>
+    <p class="topic-desc">Explains strategies for keeping CI wall-clock time low as the test suite grows. Jobs split test files across multiple runners using matrix or shard configuration, and dependency caches restore package installs on each run. Cache keys tie to lockfile digests so caching stays correct while total minutes stay affordable.</p>
+    <div class="codeWrap"><pre><code># Split tests across runners to cut wall-clock time
+strategy:  # one matrix row per shard
+  matrix: { shard: [1, 2, 3, 4] }
+- run: npm test -- --shard=${{ matrix.shard }}/4  # run this shard's slice
+
+# Cache dependencies
+- uses: actions/cache@v4
+  with:
+    path: ~/.npm
+    key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}  # bust on lockfile change</code></pre></div>
+    <p class="code-note">A four-way shard matrix spreads tests across runners, and a lockfile-keyed cache keeps npm installs fast.</p>
+    <div class="ex"><h4 id="ch4-parallel--exercises-4">Exercises 4</h4><ol>
+      <li>Classify your existing tests into the pyramid.</li>
+      <li>Add a coverage threshold gate to a pipeline.</li>
+      <li>Find the flakiest test you have and diagnose it.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Pipeline as Code</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Pipeline as Code</button><div class="ch-toc-list"><a href="#ch5-github">5.1 GitHub Actions</a><a href="#ch5-gitlab">5.2 GitLab CI</a><a href="#ch5-structure">5.3 Designing a pipeline</a></div></div>
+    <p class="topic-desc">Explains that a pipeline becomes code the moment it lives in the repository, reviewed and versioned like any other file. The chapter shows GitHub Actions and GitLab CI side by side so you can read one workflow format and translate it into the other. Pipeline changes go through the same pull request review process as application code.</p>
+    <h3 id="ch5-github" data-toc>5.1 GitHub Actions</h3>
+    <p class="topic-desc">Describes how GitHub Actions defines workflows in YAML files under .github/workflows, using triggers, jobs and steps. A workflow triggers on events such as push, pull request or schedule, then runs steps inside jobs on hosted or self-hosted runners. Every push or pull request can run a full quality gate without extra infrastructure.</p>
+    <div class="codeWrap"><pre><code>name: pipeline
+on:
+  push: { branches: [main] }  # CI on main pushes
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # fetch the repo
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test</code></pre></div>
+    <p class="code-note">A minimal GitHub Actions pipeline that runs on every push and PR, installing dependencies then linting and testing on ubuntu.</p>
+    <h3 id="ch5-gitlab" data-toc>5.2 GitLab CI</h3>
+    <p class="topic-desc">Explains how GitLab CI structures work in stages and jobs inside a single YAML file at the repository root. Stages such as build, test and deploy run in order, while jobs in one stage run in parallel, with artifacts flowing to later stages automatically. Each job can restrict the branches or tags that trigger it.</p>
+    <div class="codeWrap"><pre><code>stages: [test, build, deploy]  # run in order
+test:
+  stage: test
+  image: node:22  # per-job runner image
+  script:
+    - npm ci
+    - npm test
+  artifacts:
+    reports: { junit: junit.xml }</code></pre></div>
+    <p class="code-note">GitLab CI splits work into ordered stages, runs npm install and tests in one job, and publishes a JUnit report for the UI.</p>
+    <h3 id="ch5-structure" data-toc>5.3 Designing a pipeline</h3>
+    <p class="topic-desc">Advises designing stages, gates and reusable pieces before writing a single line of YAML. Break the flow into validate, test, build and deploy stages, and make each job rerunnable without side effects so pipelines are idempotent and safe to rerun. Shared templates and reusable jobs avoid duplication across workflows.</p>
+    <ul>
+      <li><strong>Stages</strong>: validate → test → build → scan → deploy.</li>
+      <li><strong>Gates</strong>: stop the line on failure; no manual overrides without record.</li>
+      <li><strong>Reuse</strong>: composite actions / reusable workflows / templates.</li>
+      <li><strong>Idempotent</strong>: running twice must be safe.</li>
+    </ul>
+    <div class="ex"><h4 id="ch5-structure--exercises-5">Exercises 5</h4><ol>
+      <li>Write a CI workflow that lints, tests and builds.</li>
+      <li>Extract repeated steps into a reusable action or template.</li>
+      <li>Add a manual approval gate before a "deploy" job.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Artifacts, Registries &amp; Versioning</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Artifacts, Registries &amp; Versioning</button><div class="ch-toc-list"><a href="#ch6-artifacts">6.1 Passing artifacts between jobs</a><a href="#ch6-registry">6.2 Container and package registries</a><a href="#ch6-versioning">6.3 Versioning schemes</a></div></div>
+    <p class="topic-desc">Explains that artifacts need a home, a version and a traceable link to their source. The chapter covers passing build outputs between CI jobs, storing images and packages in registries, and choosing a versioning scheme. Every artifact records the commit SHA that produced it so deployments can be audited and rolled back confidently.</p>
+    <h3 id="ch6-artifacts" data-toc>6.1 Passing artifacts between jobs</h3>
+    <p class="topic-desc">Describes how CI systems upload build outputs in one job so later jobs can download them without rebuilding. GitHub Actions uses actions/upload-artifact and actions/download-artifact, while GitLab CI passes artifacts between stages automatically. The artifact you test is the same one you deploy, so nothing drifts between jobs or environments.</p>
+    <div class="codeWrap"><pre><code>- run: npm run build  # produce dist/
+- uses: actions/upload-artifact@v4  # stash for later jobs
+  with: { name: dist, path: dist/ }
+# later job
+- uses: actions/download-artifact@v4  # restore in deploy job
+  with: { name: dist }</code></pre></div>
+    <p class="code-note">The build job uploads dist as a named artifact that a later job downloads unchanged, avoiding a rebuild.</p>
+    <h3 id="ch6-registry" data-toc>6.2 Container and package registries</h3>
+    <p class="topic-desc">Explains how registries such as GHCR, Docker Hub and package managers store versioned images and packages with access control. Pushing from the pipeline lets you tag each image or package with both a semantic version and the immutable git commit SHA. That dual tagging supports rollback and keeps the deployment audit trail intact.</p>
+    <div class="codeWrap"><pre><code>docker build -t ghcr.io/acme/api:1.4.2 .  # tag image with version
+docker push ghcr.io/acme/api:1.4.2  # publish to registry
+# tag by semantic version + immutable git SHA for traceability</code></pre></div>
+    <p class="code-note">Build and push tag the image with a semantic version so every environment pulls the identical, traceable artifact.</p>
+    <h3 id="ch6-versioning" data-toc>6.3 Versioning schemes</h3>
+    <p class="topic-desc">Contrasts SemVer for libraries and API consumers with CalVer and plain build numbers for continuously deployed services. SemVer communicates breaking changes through major, minor and patch numbers, while CalVer encodes the date. Whatever scheme you pick, record the git SHA alongside the version so operations can always identify the exact source of a release.</p>
+    <ul>
+      <li><strong>SemVer</strong> (MAJOR.MINOR.PATCH) for libraries.</li>
+      <li><strong>CalVer</strong> or build numbers for continuously deployed services.</li>
+      <li>Always record the commit SHA in the artifact metadata — it is your audit trail.</li>
+    </ul>
+    <div class="ex"><h4 id="ch6-versioning--exercises-6">Exercises 6</h4><ol>
+      <li>Publish a Docker image to a registry from CI.</li>
+      <li>Add a git-SHA label to an artifact.</li>
+      <li>Pick a versioning scheme for a web service and document it.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Environments &amp; Configuration</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Environments &amp; Configuration</button><div class="ch-toc-list"><a href="#ch7-envs">7.1 Environment tiers</a><a href="#ch7-config">7.2 Configuration vs code</a><a href="#ch7-previews">7.3 Preview environments</a></div></div>
+    <p class="topic-desc">Explains how code flows through local, CI, staging and production while configuration is injected separately for each environment. The chapter covers environment tiers, why configuration belongs outside the artifact, and preview environments created per pull request. Keeping the artifact byte-identical across environments is what prevents drift.</p>
+    <h3 id="ch7-envs" data-toc>7.1 Environment tiers</h3>
+    <p class="topic-desc">Describes the tiers from local and CI through staging to production, each existing to catch problems before the next one sees them. Staging approximates production with realistic data and traffic, and preview environments catch issues even earlier per branch. The point is that code never reaches production without first proving itself in a lower tier.</p>
+    <p>Typical progression: <em>local → CI → staging/pre-prod → production</em>, plus ephemeral preview environments per pull request.</p>
+    <h3 id="ch7-config" data-toc>7.2 Configuration vs code</h3>
+    <p class="topic-desc">Explains the rule that configuration lives in the environment, never baked into the image. Secrets, URLs and feature values are injected as environment variables or resolved at runtime by a secrets manager, so the same artifact behaves differently only through those injected values. That is what makes one build deployable to many environments safely.</p>
+    <div class="codeWrap"><pre><code># Same artifact, different config injected at deploy time:
+APP_ENV=production  # injected at deploy time
+DATABASE_URL=postgres://...
+FEATURE_NEW_CHECKOUT=true  # flag rides the same artifact
+
+12-factor rule: store config in the environment, never baked into the image.</code></pre></div>
+    <p class="code-note">These environment variables are injected at deploy time, keeping one artifact identical and valid across every environment.</p>
+    <h3 id="ch7-previews" data-toc>7.3 Preview environments</h3>
+    <p class="topic-desc">Describes preview environments that spin up a production-like space for each pull request and tear it down on merge. Platforms such as Vercel, Netlify or Kubernetes namespaces keyed to the branch deploy the artifact under a unique URL. They dramatically shorten UI reviews, API contract checks and database migration review.</p>
+    <ul>
+      <li>Spin up an isolated, prod-like environment per PR (namespace + DB schema).</li>
+      <li>Tear it down on merge/close to control cost.</li>
+      <li>Massively shortens review of UI and migrations.</li>
+    </ul>
+    <div class="ex"><h4 id="ch7-previews--exercises-7">Exercises 7</h4><ol>
+      <li>List config values that differ per environment.</li>
+      <li>Design a preview-environment naming scheme.</li>
+      <li>Argue for or against a dedicated staging tier for a small team.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Deployment Strategies</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Deployment Strategies</button><div class="ch-toc-list"><a href="#ch8-strategies">8.1 The menu</a><a href="#ch8-canary">8.2 Canary by the numbers</a></div></div>
+    <p class="topic-desc">Explains the choices for how new code reaches users and how fast you can undo it. The chapter compares recreate, rolling, blue-green, canary and feature flags, weighing downtime, speed and rollback complexity for each. Choosing the right strategy depends on your service’s statefulness and tolerance for risk.</p>
+    <h3 id="ch8-strategies" data-toc>8.1 The menu</h3>
+    <p class="topic-desc">Compares the deployment strategy menu and the trade-offs each one makes. Recreate is simplest but causes downtime, rolling replaces instances gradually with zero downtime, blue-green flips traffic between two identical environments, canary shifts small percentages, and feature flags gate code at runtime. Pick based on how stateful your service is and how much risk you will tolerate.</p>
+    <table>
+      <tr><th>Strategy</th><th>Idea</th><th>Rollback</th></tr>
+      <tr><td>Recreate</td><td>Stop old, start new</td><td>Slow, downtime</td></tr>
+      <tr><td>Rolling</td><td>Replace instances gradually</td><td>Roll back the wave</td></tr>
+      <tr><td>Blue-green</td><td>Two full environments, switch traffic</td><td>Instant switch back</td></tr>
+      <tr><td>Canary</td><td>Small % of traffic first</td><td>Drop canary</td></tr>
+      <tr><td>Feature flags</td><td>Deploy dark, enable per user</td><td>Flip flag off</td></tr>
+    </table>
+    <h3 id="ch8-canary" data-toc>8.2 Canary by the numbers</h3>
+    <p class="topic-desc">Explains how canary deploys shift small traffic percentages, such as five or ten percent, while watching error rate and latency for the new version. Orchestrators like Argo Rollouts promote or roll back automatically when health signals dip. Automatic rollback triggers protect users because a bad release never reaches everyone.</p>
+    <div class="codeWrap"><pre><code># Progressive delivery
+5% traffic  -&gt; watch error rate/latency 5 min
+25% traffic -&gt; watch 10 min
+100%        -&gt; done
+
+# Automatic rollback triggers on an error-budget burn:
+#   errors &gt; 1% OR p95 latency &gt; 500ms  =&gt; abort and shift back</code></pre></div>
+    <p class="code-note">A progressive canary steps traffic up while error-budget thresholds act as triggers for automatic rollback.</p>
+    <div class="tip"><p>Combine canary with feature flags: the flag controls <em>exposure</em>, the canary controls <em>infrastructure risk</em>. They answer different questions.</p></div>
+    <div class="ex"><h4 id="ch8-canary--exercises-8">Exercises 8</h4><ol>
+      <li>Choose a strategy for a stateful service and justify it.</li>
+      <li>Write the rollback triggers you would automate.</li>
+      <li>Sketch a blue-green cutover with a load balancer.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · Database Changes in CI/CD</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Database Changes in CI/CD</button><div class="ch-toc-list"><a href="#ch9-migrations">9.1 Migrations as code</a><a href="#ch9-backcompat">9.2 Backward-compatible migrations</a><a href="#ch9-rollback">9.3 Rolling back data changes</a></div></div>
+    <p class="topic-desc">Explains why schema changes are the hardest part of continuous delivery: data cannot roll back the way code can. The chapter covers versioned migrations, backward compatibility and safe rollback strategies. Every migration is versioned in the repo and runs through the pipeline before it touches production data.</p>
+    <h3 id="ch9-migrations" data-toc>9.1 Migrations as code</h3>
+    <p class="topic-desc">Describes keeping migration scripts versioned in the repository and running them as pipeline or deploy steps with tools such as Flyway, Alembic or Prisma Migrate. Never rewrite or edit a migration that has already shipped; add a new one instead so history stays intact. Each migration produces a schema that is reproducible from the repo alone.</p>
+    <div class="codeWrap"><pre><code># Version migrations in the repo; run them in the pipeline:
+php artisan migrate --force      # Laravel
+dotnet ef database update        # EF Core
+npx prisma migrate deploy        # Prisma
+
+# Never edit history: add a NEW migration to change things.</code></pre></div>
+    <p class="code-note">Each framework runs its versioned migration inside the pipeline; change history by adding, never by editing.</p>
+    <h3 id="ch9-backcompat" data-toc>9.2 Backward-compatible migrations</h3>
+    <p class="topic-desc">Presents the expand, deploy, backfill, contract dance for zero-downtime schema changes. First add the new column or table, deploy code that tolerates the old shape, backfill data, then stop using the old structure and finally drop it. Renames and NOT NULL constraints must be staged across releases or old code breaks.</p>
+    <div class="codeWrap"><pre><code># "Expand / contract" for zero-downtime:
+# 1 EXPAND: add nullable column / new table (old code ignores it)
+# 2 DEPLOY: code writes to both old + new
+# 3 BACKFILL: job fills historical rows
+# 4 CONTRACT: stop using old, drop it in a later release
+
+# DANGER (breaks during the window): rename column, drop column, NOT NULL without default</code></pre></div>
+    <p class="code-note">Expand, deploy, backfill, contract keeps schema changes safe; renames, drops and bare NOT NULL are the listed traps.</p>
+    <h3 id="ch9-rollback" data-toc>9.3 Rolling back data changes</h3>
+    <p class="topic-desc">Explains that code rolls back quickly but data does not, so destructive schema changes need special care. Prefer additive changes that both old and new code can tolerate, and take snapshots or backups before any destructive operation. That snapshot becomes the recovery path if a release goes wrong.</p>
+    <p>Code rollback is easy; data rollback is hard. Prefer additive changes, take backups/snapshots before destructive ones, and separate schema migration from data migration.</p>
+    <div class="ex"><h4 id="ch9-rollback--exercises-9">Exercises 9</h4><ol>
+      <li>Convert a "rename column" into an expand/contract sequence.</li>
+      <li>Add a migration step to a deployment pipeline.</li>
+      <li>Explain why dropping a column is rarely a safe rollback target.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Secrets Management</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Secrets Management</button><div class="ch-toc-list"><a href="#ch10-never">10.1 Rules that never bend</a><a href="#ch10-stores">10.2 Secret stores and OIDC</a></div></div>
+    <p class="topic-desc">Explains that secrets such as API keys and cloud credentials are the crown jewels a pipeline carries. The chapter covers the rules for never storing them in code, injecting them at deploy time, and rotating them the moment they leak. Least privilege keeps the blast radius small whenever something does go wrong.</p>
+    <h3 id="ch10-never" data-toc>10.1 Rules that never bend</h3>
+    <p class="topic-desc">Sets the non-negotiable rules of secret handling: never commit secrets to the repository, inject them only at deploy or run time, and rotate them the moment they leak. Restrict each credential to the minimum scope and permissions the pipeline actually needs. Least privilege keeps the blast radius small whenever a secret is exposed.</p>
+    <ul>
+      <li>Never commit secrets; scan for them in pre-commit and CI.</li>
+      <li>Inject at deploy time from a secret store.</li>
+      <li>Rotate on exposure, immediately, and assume compromise.</li>
+      <li>Least privilege: a pipeline gets only what it needs.</li>
+    </ul>
+    <h3 id="ch10-stores" data-toc>10.2 Secret stores and OIDC</h3>
+    <p class="topic-desc">Explains how secret managers such as HashiCorp Vault, AWS Secrets Manager and GitHub encrypted secrets hold credentials outside the repository. OpenID Connect lets a workflow exchange a short-lived token for cloud credentials without storing long-lived keys anywhere. That removes permanent secrets from the pipeline environment entirely.</p>
+    <div class="codeWrap"><pre><code># Prefer short-lived credentials via OIDC over static keys:
+permissions:
+  id-token: write  # OIDC token for AWS
+  contents: read
+- uses: aws-actions/configure-aws-credentials@v4
+  with:
+    role-to-assume: arn:aws:iam::123:role/ci  # short-lived, no static keys
+    aws-region: eu-west-1
+# No long-lived AWS keys stored anywhere.</code></pre></div>
+    <p class="code-note">OIDC grants the workflow a short-lived role via id-token, so no static cloud keys ever exist in the repo.</p>
+    <div class="warn"><p>Secrets leaked in logs, PR comments or build artifacts are extremely common. Mask them, avoid printing env, and rotate anything that touches a log.</p></div>
+    <div class="ex"><h4 id="ch10-stores--exercises-10">Exercises 10</h4><ol>
+      <li>Add a secret-scanning step to CI.</li>
+      <li>Replace a static cloud key with OIDC federation.</li>
+      <li>Document a rotation procedure for one secret.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · Observability &amp; Release Health</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Observability &amp; Release Health</button><div class="ch-toc-list"><a href="#ch11-signals">11.1 The three signals</a><a href="#ch11-slo">11.2 SLOs and error budgets</a><a href="#ch11-rollback">11.3 Automated rollback</a></div></div>
+    <p class="topic-desc">Argues that you cannot safely deploy what you cannot watch. The chapter connects metrics, logs and traces to release gates and rollback decisions, so health data becomes part of the pipeline itself. Deployments get gated on real signals instead of on faith that everything is fine.</p>
+    <h3 id="ch11-signals" data-toc>11.1 The three signals</h3>
+    <p class="topic-desc">Describes the three observability signals and the job each one does: metrics measure rates and counts, logs explain events with detail, and traces locate latency across services. Tools like Prometheus, Grafana, OpenTelemetry and Jaeger provide them. Together they tell you whether a release is healthy enough to keep moving forward.</p>
+    <table>
+      <tr><th>Signal</th><th>Answers</th></tr>
+      <tr><td>Metrics</td><td>How much / how fast (error rate, latency, throughput)</td></tr>
+      <tr><td>Logs</td><td>What happened for this request</td></tr>
+      <tr><td>Traces</td><td>Where time went across services</td></tr>
+    </table>
+    <h3 id="ch11-slo" data-toc>11.2 SLOs and error budgets</h3>
+    <p class="topic-desc">Explains how service level objectives translate customer happiness into concrete numbers, measured with service level indicators such as availability or latency. The error budget, the allowed slack over a period, tells you how much risk remains before you must stop shipping. Rapid budget burns freeze risky changes until reliability recovers.</p>
+    <div class="codeWrap"><pre><code>SLI: fraction of requests served successfully under 300ms
+SLO: 99.9% over 30 days
+Error budget: 0.1% = ~43 minutes/month
+If the budget burns fast -&gt; freeze risky changes and stabilise.
+Deploy health gates compare the canary's SLI against the baseline.</code></pre></div>
+    <p class="code-note">The SLO defines the target, the error budget quantifies allowed failure, and a burned budget freezes risky changes.</p>
+    <h3 id="ch11-rollback" data-toc>11.3 Automated rollback</h3>
+    <p class="topic-desc">Describes wiring rollback directly to an SLI so a bad rollout reverts itself automatically. The pipeline or orchestrator watches signals such as error rate and latency and, when thresholds break, swaps back to the previous artifact. The previous artifact is usually the fastest fix because it restores known-good code immediately.</p>
+    <p>Wire the deployment controller to the SLI: if error rate or latency crosses a threshold during rollout, shift traffic back automatically. The fastest fix is usually the previous artifact.</p>
+    <div class="ex"><h4 id="ch11-rollback--exercises-11">Exercises 11</h4><ol>
+      <li>Define one SLI and SLO for an endpoint you own.</li>
+      <li>Compute the monthly error budget for 99.9%.</li>
+      <li>Describe the rollback trigger you would automate.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch12" data-toc>12 · Security in the Pipeline</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Security in the Pipeline</button><div class="ch-toc-list"><a href="#ch12-scanning">12.1 The scanner family</a><a href="#ch12-supplychain">12.2 Supply-chain integrity</a></div></div>
+    <p class="topic-desc">Argues that security belongs inside CI, not bolted on after release. The chapter maps the scanner family, supply-chain integrity and pipeline hardening onto the pipeline stages where each has the most effect. Code and artifacts are checked from commit through deploy so nothing insecure reaches users.</p>
+    <h3 id="ch12-scanning" data-toc>12.1 The scanner family</h3>
+    <p class="topic-desc">Describes the security scanners and the layers each covers: SAST on source code, DAST against a running application, SCA on dependencies, container scans on images, and secret scans on repository history. Run each at the stage where it gives the best signal, such as SAST in the lint stage and container scans just before pushing to the registry.</p>
+    <table>
+      <tr><th>Tool type</th><th>Finds</th><th>When</th></tr>
+      <tr><td>SAST</td><td>Insecure code patterns</td><td>On PR</td></tr>
+      <tr><td>DAST</td><td>Runtime vulnerabilities</td><td>Against a running env</td></tr>
+      <tr><td>SCA</td><td>Vulnerable dependencies</td><td>Every build + scheduled</td></tr>
+      <tr><td>Container scan</td><td>CVEs in image layers</td><td>On image build</td></tr>
+      <tr><td>Secret scan</td><td>Leaked credentials</td><td>Pre-commit + CI</td></tr>
+    </table>
+    <h3 id="ch12-supplychain" data-toc>12.2 Supply-chain integrity</h3>
+    <p class="topic-desc">Explains how to make an artifact’s history trustworthy: sign artifacts and images with cosign, ship a software bill of materials, and pin third-party actions to full commit SHAs instead of tags. Provenance metadata answers the question of exactly how an artifact was built and by whom. That integrity is what lets you trust a release end to end.</p>
+    <ul>
+      <li>Sign artifacts and images; verify signatures before deploy.</li>
+      <li>Generate an SBOM (Software Bill of Materials) per release.</li>
+      <li>Pin and review third-party actions; prefer trusted publishers.</li>
+      <li>Follow SLSA-style provenance: know exactly how an artifact was built.</li>
+    </ul>
+    <div class="warn"><p>CI runners are high-value targets: they hold credentials and can deploy. Treat pipeline config changes like production changes — reviewed and protected.</p></div>
+    <div class="ex"><h4 id="ch12-supplychain--exercises-12">Exercises 12</h4><ol>
+      <li>Add dependency scanning to a pipeline.</li>
+      <li>Generate an SBOM for a build.</li>
+      <li>Explain why an unpinned third-party action is a risk.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch13" data-toc>13 · Platform Examples</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Platform Examples</button><div class="ch-toc-list"><a href="#ch13-k8s">13.1 Kubernetes with GitOps</a><a href="#ch13-serverless">13.2 Serverless pipelines</a><a href="#ch13-paas">13.3 PaaS and container apps</a></div></div>
+    <p class="topic-desc">Shows three ways to run the same CI/CD principles on real platforms: Kubernetes with GitOps, serverless, and platform as a service. Each pattern implements building, testing and deploying differently while keeping the same core ideas of immutable artifacts and progressive release. The chapter makes abstract concepts concrete by showing them in runnable form.</p>
+    <h3 id="ch13-k8s" data-toc>13.1 Kubernetes with GitOps</h3>
+    <p class="topic-desc">Explains how Git becomes the single source of truth in a GitOps setup, with Argo CD or Flux continuously reconciling the cluster to the state declared in the repository. CI builds and pushes the image, then the CD tool watches Git, applies the manifest and reports drift. Rollbacks are simply a git revert.</p>
+    <div class="codeWrap"><pre><code># Desired state lives in git; a controller reconciles the cluster.
+# CI builds + pushes an image; CD updates the manifest; Argo CD applies it.
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: api }
+spec:
+  replicas: 3
+  strategy: { type: RollingUpdate }  # zero-downtime rollout
+  template:
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/acme/api:1.4.2  # pinned immutable tag
+          readinessProbe: { httpGet: { path: /healthz, port: 8080 } }</code></pre></div>
+    <p class="code-note">A Deployment manifest pinned to one image; the readiness probe is what the GitOps controller checks during the rollout.</p>
+    <h3 id="ch13-serverless" data-toc>13.2 Serverless pipelines</h3>
+    <p class="topic-desc">Describes deploying serverless functions with aliases and traffic shifts instead of managing hosts. Platforms such as AWS Lambda with AWS SAM or Vercel deploy function code, attach an alias, and shift traffic between versions. Immutability and canary still apply even though there is no server infrastructure to manage.</p>
+    <p>Serverless shifts the unit of deploy to functions: build → package → deploy → alias/traffic-shift. Same principles (immutable artifacts, canary, rollback) with different tooling.</p>
+    <h3 id="ch13-paas" data-toc>13.3 PaaS and container apps</h3>
+    <p class="topic-desc">Explains how platform as a service collapses builds, releases and routing into sensible defaults. Providers such as Heroku, Railway and Azure Container Apps take the source or container and handle provisioning, scaling and rollout automatically. A great starting point for a team, until scale or compliance requirements demand finer control.</p>
+    <p>Platforms like Render, Fly, Heroku or Azure Container Apps collapse much of the ops: connect the repo, define the build, and they handle releases. Good default until scale or compliance forces more control.</p>
+    <div class="ex"><h4 id="ch13-paas--exercises-13">Exercises 13</h4><ol>
+      <li>Write a Deployment + Service manifest for a web app.</li>
+      <li>Describe the GitOps loop in your own words.</li>
+      <li>Pick a PaaS and list what it automates for you.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch14" data-toc>14 · Toolchain Deep Dive: GitHub Actions</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Toolchain Deep Dive: GitHub Actions</button><div class="ch-toc-list"><a href="#ch14-anatomy">14.1 Anatomy of a workflow</a><a href="#ch14-reuse">14.2 Reusable workflows and matrix</a></div></div>
+    <p class="topic-desc">A focused dissection of GitHub Actions so the earlier concepts stick. The chapter examines workflow anatomy, reusable workflows and the matrix strategy in detail. It reads the real YAML syntax for triggers, jobs and steps, and for passing values between jobs.</p>
+    <h3 id="ch14-anatomy" data-toc>14.1 Anatomy of a workflow</h3>
+    <p class="topic-desc">Describes a workflow file as a name, triggers set with the on keyword, concurrency, and jobs, each declaring runs-on and a list of steps. Jobs run in parallel on runners and exchange values through needs dependencies and the outputs property. Permissions and environment define which secrets and scopes each job can use.</p>
+    <div class="codeWrap"><pre><code>name: release
+on:
+  push:
+    tags: ['v*']  # version tags trigger release
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: { contents: read, packages: write }
+    outputs: { tag: ${{ steps.meta.outputs.tag }} }
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        run: echo "tag=${GITHUB_REF_NAME}" &gt;&gt; "$GITHUB_OUTPUT"
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production  # gate this deploy job
+    steps:
+      - run: echo deploying ${{ needs.build.outputs.tag }}</code></pre></div>
+    <p class="code-note">A tag-triggered release workflow with concurrency control; the build job hands its tag output to a gated production deploy.</p>
+    <h3 id="ch14-reuse" data-toc>14.2 Reusable workflows and matrix</h3>
+    <p class="topic-desc">Explains how the matrix strategy fans one job out across combinations of operating systems, runtimes and other variables, and how reusable workflows let teams call a centrally maintained workflow from many repositories with the uses keyword. A path filters which combinations run. Both keep duplication low and test coverage wide.</p>
+    <div class="codeWrap"><pre><code>jobs:
+  test:
+    strategy:
+      matrix:  # test matrix combos
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22]  # two Node majors
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/setup-node@v4
+        with: { node-version: ${{ matrix.node }} }</code></pre></div>
+    <p class="code-note">The matrix fans the same test job across two OSes and two Node majors, with setup-node caching dependencies per run.</p>
+    <div class="tip"><p>Use <code>concurrency</code> to cancel superseded PR runs and to serialise production deploys. It prevents "two deploys racing" bugs.</p></div>
+    <div class="ex"><h4 id="ch14-reuse--exercises-14">Exercises 14</h4><ol>
+      <li>Build a tag-triggered release workflow.</li>
+      <li>Use a matrix to test on two runtimes.</li>
+      <li>Add concurrency control to stop duplicate deploys.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch15" data-toc>15 · DORA Metrics &amp; Maturity</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · DORA Metrics &amp; Maturity</button><div class="ch-toc-list"><a href="#ch15-dora">15.1 The four key metrics</a><a href="#ch15-maturity">15.2 A maturity path</a></div></div>
+    <p class="topic-desc">Explains the DORA metrics as a shared scoreboard for delivery performance, and maps a path from manual builds to boring continuous deploys. Teams measure deployment frequency, lead time, change failure rate and MTTR to find their gaps. The chapter pairs measurement with a maturity ladder to climb one rung at a time.</p>
+    <h3 id="ch15-dora" data-toc>15.1 The four key metrics</h3>
+    <p class="topic-desc">Describes DORA’s four key metrics: deployment frequency, lead time for changes, change failure rate, and time to restore service. Tools like GitHub, GitLab and the Four Keys dashboard can compute them from pipeline data and incident records. Comparing your numbers with the elite performer bands shows where the pipeline is weakest.</p>
+    <table>
+      <tr><th>Metric</th><th>Measures</th><th>Elite</th></tr>
+      <tr><td>Deployment frequency</td><td>How often you ship</td><td>On demand / daily+</td></tr>
+      <tr><td>Lead time for changes</td><td>Commit → production</td><td>&lt; 1 day</td></tr>
+      <tr><td>Change failure rate</td><td>% deploys causing incidents</td><td>0–15%</td></tr>
+      <tr><td>MTTR</td><td>Time to restore service</td><td>&lt; 1 hour</td></tr>
+    </table>
+    <h3 id="ch15-maturity" data-toc>15.2 A maturity path</h3>
+    <p class="topic-desc">Charts a sequence from your current state toward continuous delivery, automating the build first, then tests, then deploys, and finally rollback. Each step removes a manual bottleneck and increases the team’s trust in the pipeline. The goal is a boring pipeline that ships on every commit without drama.</p>
+    <ol>
+      <li>Automate the build (stop building on laptops).</li>
+      <li>Automate tests in CI on every PR.</li>
+      <li>Automate deploys to staging, then production.</li>
+      <li>Add canary + automatic rollback.</li>
+      <li>Make deploy-on-merge boring and continuous.</li>
+    </ol>
+    <div class="ex"><h4 id="ch15-maturity--exercises-15">Exercises 15</h4><ol>
+      <li>Measure your current deployment frequency and lead time.</li>
+      <li>Identify the bottleneck metric and the next maturity step.</li>
+      <li>Set a 90-day target for one DORA metric.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch16" data-toc>16 · Culture, Failure &amp; Continuous Improvement</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Culture, Failure &amp; Continuous Improvement</button><div class="ch-toc-list"><a href="#ch16-culture">16.1 Blameless culture</a><a href="#ch16-postmortem">16.2 A postmortem template</a><a href="#ch16-practices">16.3 Practices that keep pipelines healthy</a></div></div>
+    <p class="topic-desc">Argues that the best tooling fails without the right culture around it. The chapter covers blameless postmortems, a practical postmortem template, and the practices that keep pipelines healthy. Culture is treated as part of the system, not a soft afterthought bolted onto the tooling.</p>
+    <h3 id="ch16-culture" data-toc>16.1 Blameless culture</h3>
+    <p class="topic-desc">Explains that blameless postmortems chase how the system allowed the failure to happen, not who caused it. Incident reviews focus on process, tooling and automation gaps rather than individual mistakes. Psychological safety is what keeps people shipping and reporting problems early instead of hiding them.</p>
+    <p>If a deploy fails and the response is "who did it?", people hide mistakes and stop deploying. Blameless postmortems ask <em>how the system allowed it</em> and produce fixes, not culprits.</p>
+    <h3 id="ch16-postmortem" data-toc>16.2 A postmortem template</h3>
+    <p class="topic-desc">Gives a structured template for writing incident reviews: impact summary, timeline, root cause, what worked, and action items each with an owner and a date. Keep the narrative short and the fixes concrete, with one clear owner per action. Concrete improvements matter far more than a perfect story.</p>
+    <div class="codeWrap"><pre><code>Title: Checkout 5xx during release v42
+Impact: 12 min, 3% of checkouts failed
+Timeline: (UTC, what happened, who noticed, actions)
+Root cause: canary health check missed a downstream timeout
+What went well: automatic rollback triggered in 40s
+Action items: (owner, due date) tighten canary thresholds
+Lessons: (small, concrete)</code></pre></div>
+    <p class="code-note">A compact postmortem structure: impact, timeline, root cause, what went well, then owner-and-deadline action items.</p>
+    <h3 id="ch16-practices" data-toc>16.3 Practices that keep pipelines healthy</h3>
+    <p class="topic-desc">Lists the habits that keep delivery on rails: fast pipelines so feedback arrives quickly, loud failures nobody can ignore, zero flaky tests, and an owner for each pipeline. Treat the pipeline as a product with a maintainer and a backlog, improved and refactored like any other application code.</p>
+    <ul>
+      <li>Keep the pipeline fast (target &lt; 10 min for PR checks).</li>
+      <li>Make failures loud, specific and actionable.</li>
+      <li>Delete or fix flaky tests the day they appear.</li>
+      <li>Own the pipeline as a product with a maintainer.</li>
+    </ul>
+    <div class="ex"><h4 id="ch16-practices--exercises-16">Exercises 16</h4><ol>
+      <li>Write a postmortem for a past incident (even a small one).</li>
+      <li>Time your PR pipeline; find the biggest time sink.</li>
+      <li>Pick one cultural change to adopt this quarter.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Cheat Sheets &amp; Roadmap</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Cheat Sheets &amp; Roadmap</button><div class="ch-toc-list"><a href="#app-pipeline">A.1 Reference pipeline stages</a><a href="#app-roadmap">A.2 Roadmap: beginner to advanced</a><a href="#app-cheatsheets">A.3 Rules of thumb</a></div></div>
+    <p class="topic-desc">Serves as the quick-reference and learning-path section of the guide. It collects the canonical pipeline stages, a beginner-to-advanced roadmap, and a dozen rules of thumb, each in condensed form. Come back here whenever you need the one-line version of a whole chapter.</p>
+    <h3 id="app-pipeline" data-toc>A.1 Reference pipeline stages</h3>
+    <p class="topic-desc">Lists the canonical stage order for a mature pipeline: validate, test, build, scan, deploy. Each stage runs as a job and ends in a gate that stops the line on failure, so a broken commit never travels downstream. It is the template every workflow in the guide maps back to.</p>
+    <table>
+      <tr><th>Stage</th><th>Examples</th><th>Gate</th></tr>
+      <tr><td>Validate</td><td>lint, format, typecheck</td><td>Block on error</td></tr>
+      <tr><td>Test</td><td>unit, integration, e2e</td><td>Block on failure</td></tr>
+      <tr><td>Build</td><td>compile, bundle, container</td><td>Produce artifact</td></tr>
+      <tr><td>Scan</td><td>SAST, SCA, secret scan</td><td>Block on high severity</td></tr>
+      <tr><td>Deploy</td><td>staging → canary → prod</td><td>Health gates + rollback</td></tr>
+    </table>
+    <h3 id="app-roadmap" data-toc>A.2 Roadmap: beginner to advanced</h3>
+    <p class="topic-desc">Describes a progression from a working lint-test-build workflow all the way up to canary rollbacks and GitOps. Each rung adds one capability, such as artifact promotion, preview environments or automated rollback. Use it to plan your next quarter, climbing one rung at a time in a sensible order.</p>
+    <table>
+      <tr><th>Stage</th><th>You can…</th></tr>
+      <tr><td>Beginner</td><td>Write a workflow that lints, tests and builds on every push</td></tr>
+      <tr><td>Intermediate</td><td>Build once, promote artifacts, deploy to staging with secrets and caching</td></tr>
+      <tr><td>Advanced</td><td>Canary + auto-rollback, OIDC secrets, SBOM/signing, GitOps, DORA tracking</td></tr>
+    </table>
+    <h3 id="app-cheatsheets" data-toc>A.3 Rules of thumb</h3>
+    <p class="topic-desc">Collects a dozen rules that condense the whole course: build once and deploy many, fail fast, keep CI fast, protect main, never commit secrets, and measure DORA metrics. Each rule maps back to a chapter for deeper reading. Re-read them before large refactors as a quick sanity check.</p>
+    <ul>
+      <li><strong>Build once, deploy many.</strong></li>
+      <li><strong>Small batches; short branches; deploy often.</strong></li>
+      <li><strong>Everything as code, reviewed.</strong></li>
+      <li><strong>Fail fast, fail loud, roll back automatically.</strong></li>
+      <li><strong>Measure DORA; improve the bottleneck.</strong></li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>CI/CD — Continuous Integration &amp; Delivery Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

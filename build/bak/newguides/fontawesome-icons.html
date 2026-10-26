@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Awesome Icons Guide</title>
+  <link rel="stylesheet" href="assets/shell.css">
+  <script>
+    /* Resolve the theme and colour mode before first paint, so neither flashes. */
+    (function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+  </script>
+</head>
+
+<body>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Font Awesome Icons</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode">
+    <svg id="icSun" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar"><div id="searchWrap">
+  <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul>
+  </ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Font Awesome Icons</span>
+      <span class="am-band-s">8 chapters · 30 topics · 45 code samples · works offline</span>
+    </h1>
+  <section class="chapter">
+  <h2 id="orientation" data-toc>Welcome · Font Awesome</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Font Awesome</button><div class="ch-toc-list"><a href="#orientation-install">0.1 Installation</a><a href="#orientation-basic-use">0.2 Basic Usage</a></div></div>
+  <h3 id="orientation-install" data-toc>0.1 Installation</h3>
+
+  <p class="topic-desc">Font Awesome can be included in several ways. The most common methods are:</p>
+
+  <h4 id="orientation-install--cdn">CDN</h4>
+  <p>Include Font Awesome via a CDN link in your HTML <code><head></code>:</p>
+
+  <div class="codeWrap"><pre><code><!-- Font Awesome 6 CDN -->
+<link rel="stylesheet"
+      href=&quothttps://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></code></pre></div>
+
+  <h4 id="orientation-install--npm">npm</h4>
+  <p>Install via npm:</p>
+
+  <div class="codeWrap"><pre><code>npm install @fontawesome/fontawesome6
+npm install @fontawesome/free-solid-svg-icons</code></pre></div>
+
+  <h3 id="orientation-basic-use" data-toc>0.2 Basic Usage</h3>
+
+  <p class="topic-desc">Once included, Font Awesome icons are ready to use with the <code><i></code> tag:</p>
+
+  <h4 id="orientation-basic-use--basic-icon">Basic Icon</h4>
+  <p>Include an icon using the <code><i></code> tag with the appropriate <code>fa</code> and icon class:</p>
+
+  <div class="codeWrap"><pre><code><i class=&quotfa fa-home"></i></code></pre></div>
+
+  <h4 id="orientation-basic-use--sizing">Sizing Icons</h4>
+  <p>Control icon size with size classes:</p>
+
+  <div class="codeWrap"><pre><code><i class=&quotfa fa-home fa-lg"></i> <!-- 33% larger -->
+<i class=&quotfa fa-home fa-2x"></i> <!-- 2x larger -->
+<i class=&quotfa fa-home fa-3x"></i> <!-- 3x larger -->
+<i class=&quotfa fa-home fa-4x"></i> <!-- 4x larger -->
+<i class=&quotfa fa-home fa-5x"></i> <!-- 5x larger -- may not fit within parent */</code></pre></div>
+
+  <h2 id="ch1" data-toc>1 · Icon Library</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 1 · Icon Library</button><div class="ch-toc-list"><a href="#ch1-solid-icons">1.1 Solid Icons</a><a href="#ch1-regular-icons">1.2 Regular Icons</a></div></div>
+  <h3 id="ch1-solid-icons" data-toc>1.1 Solid Icons</h3>
+
+  <p class="topic-desc">Solid icons are the most commonly used Font Awesome style. They use the <code>fa-solid</code> prefix.</p>
+
+  <h4 id="ch1-solid-icons--home">Home Icon</h4>
+  <div class="codeWrap"><pre><code><i class=&quotfa fa-solid fa-home"></i></code></pre></div>
+
+  <h4 id="ch1-solid-icons--search">Search Icon</h4>
+  <div class="codeWrap"><pre><code><i class=&quotfa fa-solid fa-search"></i></code></pre></div>
+
+  <h2 id="ch2" data-toc>2 · Advanced Usage</h2>
+  <div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · 2 · Advanced Usage</button><div class="ch-toc-list"><a href="#ch2-li">2.1 CSS Styling</a><a href="#ch2-animation">2.2 Animation</a></div></div>
+  ...
+</section>
+</main>
+
+<button id="toTop" class="to-top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Font Awesome Icons.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

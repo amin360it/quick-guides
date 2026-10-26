@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bootstrap 5 - Components &amp; Layout Guide</title>
+<meta name="description" content="This opening chapter explains how to work through the guide, from the starter template to custom Sass builds…. 13 chapters, 68 topics and 49 code samples.…">
+<link rel="canonical" href="https://amin360it.github.io/quick-guides/bootstrap5.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Amin360iT">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#03122f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303122f'/%3E%3Cpath d='M16 6 L26 26 H21.6 L19.4 21.4 H12.6 L10.4 26 H6 Z M14.2 17.6 H17.8 L16 13.8 Z' fill='%2300d1ff'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Amin360iT Quick Guides">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Bootstrap 5 - Components &amp; Layout Guide">
+<meta property="og:description" content="This opening chapter explains how to work through the guide, from the starter template to custom Sass builds…. 13 chapters, 68 topics and 49 code samples.…">
+<meta property="og:url" content="https://amin360it.github.io/quick-guides/bootstrap5.html">
+<meta property="og:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="844">
+<meta property="og:image:alt" content="Amin360iT Quick Guides - Software, Web &amp; Digital Solutions">
+<meta property="article:published_time" content="2026-01-01">
+<meta property="article:modified_time" content="2026-10-02">
+<meta property="article:section" content="Foundations">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@amin360it">
+<meta name="twitter:title" content="Bootstrap 5 - Components &amp; Layout Guide">
+<meta name="twitter:description" content="This opening chapter explains how to work through the guide, from the starter template to custom Sass builds…. 13 chapters, 68 topics and 49 code samples.…">
+<meta name="twitter:image" content="https://amin360it.github.io/quick-guides/assets/brand/hero.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://amin360it.github.io/quick-guides/bootstrap5.html#article","headline":"Bootstrap 5 - Components & Layout Guide","name":"Bootstrap 5 - Components & Layout Guide","description":"This opening chapter explains how to work through the guide, from the starter template to custom Sass builds…. 13 chapters, 68 topics and 49 code samples.…","inLanguage":"en","url":"https://amin360it.github.io/quick-guides/bootstrap5.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://amin360it.github.io/quick-guides/bootstrap5.html"},"image":"https://amin360it.github.io/quick-guides/assets/brand/hero.jpg","author":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides"},"publisher":{"@type":"Organization","name":"Amin360iT","url":"https://amin360it.github.io/quick-guides","logo":{"@type":"ImageObject","url":"https://amin360it.github.io/quick-guides/assets/brand/logo.png"}},"datePublished":"2026-01-01","dateModified":"2026-10-02","articleSection":"Foundations","keywords":[],"wordCount":0,"proficiencyLevel":"Beginner","isAccessibleForFree":true,"hasPart":[]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://amin360it.github.io/quick-guides/index.html"},{"@type":"ListItem","position":2,"name":"Foundations","item":"https://amin360it.github.io/quick-guides/index.html#cat-foundations"},{"@type":"ListItem","position":3,"name":"Bootstrap 5 - Components & Layout Guide","item":"https://amin360it.github.io/quick-guides/bootstrap5.html"}]}]}</script>
+<link rel="stylesheet" href="assets/shell.css">
+<script>
+/* Resolve the theme and colour mode before first paint, so neither flashes. */
+
+(function(){try{var r=document.documentElement,s=localStorage.getItem('amin360it-theme'),d=(s==='dark'||s==='light')?s:'dark',m=localStorage.getItem('amin360it-mode');r.setAttribute('data-theme',d);r.setAttribute('data-mode',m||'default');}catch(e){}})();
+</script></head>
+<body>
+  <a class="am-skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <button id="burger" class="btn" title="Menu" aria-label="Open table of contents">
+    <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <a class="logo" href="index.html" title="Amin360iT Quick Guides - the whole library"><img class="logo-img" src="assets/brand/logo.png" alt="" width="179" height="160"><span class="logo-brand"><span class="logo-b1">Amin</span><span class="logo-b2">360iT</span></span><svg class="logo-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="vh">, </span><span class="logo-page">Bootstrap 5</span></a>
+  <div class="spacer"></div>
+  <nav id="topnav" class="topnav" aria-label="Guide navigation"></nav>
+  <button id="themeBtn" class="btn" title="Toggle dark / light mode" aria-label="Toggle dark or light theme" aria-pressed="false">
+    <svg id="icSun" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+    <svg id="icMoon" class="theme-ic" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <span id="themeLabel">Dark mode</span>
+  </button>
+  <div class="mode-wrap">
+    <button id="modeBtn" class="btn" title="Colour mode" aria-label="Colour mode" aria-haspopup="true" aria-expanded="false">
+      <svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span id="modeSwatch" class="mode-swatch" aria-hidden="true"></span>
+      <span id="modeLabel">Amin360iT</span>
+    </button>
+    <div id="modePop" class="mode-pop" role="menu" aria-label="Colour mode" hidden></div>
+  </div>
+  <div id="progressBar"></div>
+</header>
+
+<aside id="sidebar">
+  <div id="searchWrap">
+    <input id="search" type="text" placeholder="Search topics / chapters...">
+  </div>
+  <div id="tocCount"></div>
+  <nav id="toc" aria-label="Table of contents"><ul><li class="chapter open"><span class="arrow">▸</span><a href="#orientation" data-target="orientation">Welcome — How to Use This Bootstrap 5 Guide</a><ul><li><a href="#orientation-how" data-target="orientation-how">How this guide is organised</a></li><li><a href="#orientation-mindset" data-target="orientation-mindset">The right mindset</a></li><li><a href="#orientation-tools" data-target="orientation-tools">Tools you will use the whole guide long</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch1" data-target="ch1">1 · Getting Started</a><ul><li><a href="#ch1-changed" data-target="ch1-changed">1.1 What Bootstrap 5 changed</a></li><li><a href="#ch1-cdn" data-target="ch1-cdn">1.2 Installing via CDN or npm</a></li><li><a href="#ch1-template" data-target="ch1-template">1.3 The starter template</a></li><li><a href="#ch1-bundle" data-target="ch1-bundle">1.4 The JS bundle and icons</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch2" data-target="ch2">2 · The Grid System</a><ul><li><a href="#ch2-basics" data-target="ch2-basics">2.1 Containers, rows and columns</a></li><li><a href="#ch2-12col" data-target="ch2-12col">2.2 The 12-column model and breakpoints</a></li><li><a href="#ch2-responsive" data-target="ch2-responsive">2.3 Responsive column classes and auto-layout</a></li><li><a href="#ch2-gutters" data-target="ch2-gutters">2.4 Gutters, offsets and ordering</a></li><li><a href="#ch2-nesting" data-target="ch2-nesting">2.5 Nesting</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch3" data-target="ch3">3 · Layout &amp; Breakpoints</a><ul><li><a href="#ch3-containers" data-target="ch3-containers">3.1 Fluid and fixed containers</a></li><li><a href="#ch3-display" data-target="ch3-display">3.2 Display utilities</a></li><li><a href="#ch3-flex" data-target="ch3-flex">3.3 Flex utilities</a></li><li><a href="#ch3-spacing" data-target="ch3-spacing">3.4 The spacing scale</a></li><li><a href="#ch3-breakpoints" data-target="ch3-breakpoints">3.5 Breakpoints in Sass mixins</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch4" data-target="ch4">4 · Content &amp; Typography</a><ul><li><a href="#ch4-headings" data-target="ch4-headings">4.1 Headings, display headings and lead</a></li><li><a href="#ch4-text" data-target="ch4-text">4.2 Inline text utilities and blockquotes</a></li><li><a href="#ch4-lists" data-target="ch4-lists">4.3 Lists and images</a></li><li><a href="#ch4-tables" data-target="ch4-tables">4.4 Figures and tables</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch5" data-target="ch5">5 · Forms &amp; Validation</a><ul><li><a href="#ch5-controls" data-target="ch5-controls">5.1 Form controls</a></li><li><a href="#ch5-groups" data-target="ch5-groups">5.2 Input groups and floating labels</a></li><li><a href="#ch5-selects" data-target="ch5-selects">5.3 Selects, checks, switches and range</a></li><li><a href="#ch5-layout" data-target="ch5-layout">5.4 Form layout on the grid</a></li><li><a href="#ch5-validation" data-target="ch5-validation">5.5 Validation styles</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch6" data-target="ch6">6 · Components I</a><ul><li><a href="#ch6-buttons" data-target="ch6-buttons">6.1 Buttons and button groups</a></li><li><a href="#ch6-badges" data-target="ch6-badges">6.2 Badges and alerts</a></li><li><a href="#ch6-cards" data-target="ch6-cards">6.3 Cards</a></li><li><a href="#ch6-accordion" data-target="ch6-accordion">6.4 Accordions and list groups</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch7" data-target="ch7">7 · Components II</a><ul><li><a href="#ch7-navs" data-target="ch7-navs">7.1 Navs and tabs</a></li><li><a href="#ch7-navbar" data-target="ch7-navbar">7.2 The navbar with responsive collapse</a></li><li><a href="#ch7-breadcrumb" data-target="ch7-breadcrumb">7.3 Breadcrumbs, pagination and dropdowns</a></li><li><a href="#ch7-modal" data-target="ch7-modal">7.4 Modals and offcanvas</a></li><li><a href="#ch7-more" data-target="ch7-more">7.5 Tooltips, popovers, toasts and carousel</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch8" data-target="ch8">8 · Helpers &amp; Utilities</a><ul><li><a href="#ch8-spacing" data-target="ch8-spacing">8.1 Spacing and color utilities</a></li><li><a href="#ch8-borders" data-target="ch8-borders">8.2 Borders, shadows and position</a></li><li><a href="#ch8-sizing" data-target="ch8-sizing">8.3 Sizing, overflow, opacity and z-index</a></li><li><a href="#ch8-stacks" data-target="ch8-stacks">8.4 Stacks, ratio and vertical alignment</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch9" data-target="ch9">9 · JavaScript Behaviour</a><ul><li><a href="#ch9-data" data-target="ch9-data">9.1 data-bs-* attributes</a></li><li><a href="#ch9-api" data-target="ch9-api">9.2 The programmatic API</a></li><li><a href="#ch9-events" data-target="ch9-events">9.3 Events and lifecycle</a></li><li><a href="#ch9-optin" data-target="ch9-optin">9.4 Tooltip and popover opt-in plus accessibility</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch10" data-target="ch10">10 · Customization</a><ul><li><a href="#ch10-cssvars" data-target="ch10-cssvars">10.1 CSS variables</a></li><li><a href="#ch10-sass" data-target="ch10-sass">10.2 Sass variables and maps</a></li><li><a href="#ch10-npm" data-target="ch10-npm">10.3 Customizing with npm and compiling</a></li><li><a href="#ch10-modes" data-target="ch10-modes">10.4 Color modes, RTL and reducing the bundle</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#ch11" data-target="ch11">11 · Accessibility &amp; Best Practices</a><ul><li><a href="#ch11-semantic" data-target="ch11-semantic">11.1 Semantic markup</a></li><li><a href="#ch11-focus" data-target="ch11-focus">11.2 Focus states and keyboard support</a></li><li><a href="#ch11-aria" data-target="ch11-aria">11.3 ARIA in components</a></li><li><a href="#ch11-contrast" data-target="ch11-contrast">11.4 Contrast and common misuse</a></li></ul></li><li class="chapter open"><span class="arrow">▸</span><a href="#appendix" data-target="appendix">Appendix · Quick Reference &amp; Glossary</a><ul><li><a href="#app-grid" data-target="app-grid">A.1 Breakpoints and the grid</a></li><li><a href="#app-spacing" data-target="app-spacing">A.2 Spacing scale and key utilities</a></li><li><a href="#app-components" data-target="app-components">A.3 Common components at a glance</a></li><li><a href="#app-glossary" data-target="app-glossary">A.4 Glossary</a></li></ul></li></ul></nav>
+</aside>
+
+<main id="content">
+    <h1 class="am-band">
+      <span class="am-band-t">Bootstrap 5</span>
+      <span class="am-band-s">13 chapters &middot; 68 topics &middot; 49 code samples &middot; works offline</span>
+    </h1>
+
+<section class="chapter">
+    <h2 id="orientation" data-toc>Welcome — How to Use This Bootstrap 5 Guide</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Welcome — How to Use This Bootstrap 5 Guide</button><div class="ch-toc-list"><a href="#orientation-how">How this guide is organised</a><a href="#orientation-mindset">The right mindset</a><a href="#orientation-tools">Tools you will use the whole guide long</a></div></div>
+    <p class="topic-desc">This opening chapter explains how to work through the guide, from the starter template to custom Sass builds, entirely offline. Read the chapters in sequence, typing out every snippet by hand to build real muscle memory. Each chapter builds on the previous one, so resist skipping around until you have finished the grid chapters.</p>
+    <p>This is a complete, self-paced path through <strong>Bootstrap 5.3</strong>, the most popular CSS framework on the web. Everything runs from static HTML files — no internet connection and no build step required until the customization chapter — and every snippet is copy-ready.</p>
+    <h3 id="orientation-how" data-toc>How this guide is organised</h3>
+<h4 id="orientation-how--structure" data-toc>How this guide is organised - Structure</h4>
+    <p class="topic-desc">This section maps the four-part structure of the guide across eleven chapters and exercises, showing how each part moves from layout to components to behaviour. Everything builds upward from the grid, exactly like real projects do. Use it to see where you are in the overall journey and what each chapter expects you to know already.</p>
+    <ul>
+      <li><strong>Part I (Ch. 1–3)</strong> — setup, the grid system and the layout utilities that anchor every page.</li>
+      <li><strong>Part II (Ch. 4–5)</strong> — content styling, typography and forms with validation.</li>
+      <li><strong>Part III (Ch. 6–7)</strong> — components: buttons, cards, navbars, modals and the rest.</li>
+      <li><strong>Part IV (Ch. 8–11)</strong> — helpers, JavaScript behaviour, customization and accessibility.</li>
+      <li>Every chapter ends with exercises. <strong>Type</strong> the examples into your own HTML file and open it in a browser — selective copy-paste teaches nothing.</li>
+    </ul>
+    <h3 id="orientation-mindset" data-toc>The right mindset</h3>
+<h4 id="orientation-mindset--bootstrap">The right mindset - Bootstrap philosophy</h4>
+    <p class="topic-desc">This section introduces Bootstrap’s philosophy of utility-first layout sitting on top of a finished component system. Think of the two layers separately: utility classes such as d-flex and p-3 shape layout, while components like cards and navbars supply complete ready-made widgets. Master the two layers and every page composes itself from existing building blocks.</p>
+    <p>Bootstrap is really <em>two systems in one</em>. The <strong>utilities</strong> (spacing, display, flex) lay out and fine-tune a page; the <strong>components</strong> (cards, navbars, alerts) drop in finished, accessible widgets. Roughly: build the skeleton with utilities, then slot components into it. Nearly every "how do I…" question maps onto one of those two layers.</p>
+    <div class="tip"><p>Keep <code>getbootstrap.com/docs/5.3</code> open beside this guide. Here you learn the why and the order; the official docs are the exhaustive reference for every class name.</p></div>
+    <h3 id="orientation-tools" data-toc>Tools you will use the whole guide long</h3>
+<h4 id="orientation-tools--devtools">Tools you will use the whole guide long - DevTools</h4>
+    <p class="topic-desc">This section lists the tools used throughout the guide, from the Bootstrap CDN to browser developer tools. You will need a code editor, a browser, and the devtools panel to inspect layout and spacing live. The optional tools are installed once and carry you through every later chapter.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>CDN link + script</td><td>Zero-install start (Ch. 1–8)</td></tr>
+      <tr><td>A local HTML file</td><td>Your practice page for every snippet</td></tr>
+      <tr><td>Browser devtools</td><td>Inspect classes, test breakpoints, debug layout</td></tr>
+      <tr><td>Node.js + npm</td><td>Download and compile Sass (Ch. 10)</td></tr>
+      <tr><td>The official docs</td><td>Exhaustive class and variable reference</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch1" data-toc>1 · Getting Started</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Getting Started</button><div class="ch-toc-list"><a href="#ch1-changed">1.1 What Bootstrap 5 changed</a><a href="#ch1-cdn">1.2 Installing via CDN or npm</a><a href="#ch1-template">1.3 The starter template</a><a href="#ch1-bundle">1.4 The JS bundle and icons</a></div></div>
+    <p class="topic-desc">This chapter gets Bootstrap 5 into a project through either the CDN or npm and explains what version 5 changed from its predecessor. You will build the canonical starter template that every Bootstrap page descends from and meet the JavaScript bundle that powers its interactive components. Both installation routes are covered so you can pick the right one for practice or production.</p>
+    <p>Bootstrap 5 dropped jQuery, adopted CSS variables and RTL support, and made the grid more flexible than ever. This chapter gets a working page up within two minutes and lays the foundation every later chapter builds on.</p>
+    <h3 id="ch1-changed" data-toc>1.1 What Bootstrap 5 changed</h3>
+<h4 id="ch1-changed--migration">1.1.1 Migration from BS4</h4>
+    <p class="topic-desc">This section summarises the headline changes in version 5, from dropping jQuery to adopting CSS variables throughout. Knowing these changes explains most of the differences you will meet in older tutorials. It gives you the mental model needed to read Bootstrap 5 code and to adapt advice written for earlier versions.</p>
+    <ul>
+      <li><strong>No jQuery</strong> — the JavaScript is plain ES modules; the bundle works with any framework or none.</li>
+      <li><strong>CSS custom properties</strong> — every component exposes design tokens you can override in plain CSS.</li>
+      <li><strong>RTL support</strong> — flip the whole framework with one attribute (<code>dir="rtl"</code>).</li>
+      <li><strong>Custom color modes</strong> — dark mode ships as a first-class feature in 5.3.</li>
+      <li><strong>Utilities API</strong> — generate your own utility classes in Sass.</li>
+      <li>No support for Internet Explorer; modern browsers only.</li>
+    </ul>
+    <h3 id="ch1-cdn" data-toc>1.2 Installing via CDN or npm</h3>
+<h4 id="ch1-cdn--package-manager">1.2.1 Package Manager Installation</h4>
+    <p class="topic-desc">This section shows the two installation routes: the CDN for instant use and npm for compiled styling. The CDN involves pasting the bootstrap css link and the bundle script tag into your page head. The npm route adds bootstrap as a dependency so you can version it and later customize it during compilation.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- Quick start: these two tags are all a prototype needs --&gt;
+&lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+
+# Or install into a project with npm, then import the source in your own Sass
+npm install bootstrap@5.3.3
+@import "bootstrap/scss/bootstrap";</code></pre></div>
+    <p class="code-note">The two CDN tags drop Bootstrap’s CSS and JavaScript into any page instantly, while npm install fetches the source files so you can customize and compile them yourself.</p>
+    <p>With npm you typically let a bundler (Vite or webpack) resolve the stylesheet for you; the CDN remains the fastest way to experiment or prototype.</p>
+    <h3 id="ch1-template" data-toc>1.3 The starter template</h3>
+<h4 id="ch1-template--basic-template">1.3.1 Basic Template Structure</h4>
+    <p class="topic-desc">This section builds the canonical starter template every Bootstrap page descends from. The viewport meta tag makes responsive design work on mobile, and the lang attribute plus proper doctype keep accessibility and validation correct. Copy this skeleton and it becomes the base of every page you write.</p>
+    <div class="codeWrap"><pre><code>&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;Hello, world!&lt;/title&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello, world!&lt;/h1&gt;
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre></div>
+    <p class="code-note">This is the minimum Bootstrapped page: the stylesheet in the head, the bundle script just before the closing body tag, and the viewport meta that enables responsive scaling on phones.</p>
+    <div class="warn"><p>Keep that <code>width=device-width, initial-scale=1</code> viewport meta in every page. Without it the breakpoints still trigger but phones render the page zoomed out.</p></div>
+    <h3 id="ch1-bundle" data-toc>1.4 The JS bundle and icons</h3>
+<h4 id="ch1-bundle--icon-fonts">1.4.1 Icon Fonts and JS</h4>
+    <p class="topic-desc">This section explains the two JavaScript files shipped with Bootstrap and how to add the icon set. The full bundle includes every plugin, while the separate file is for pages that need only toasts and popovers. Icons come from the separate bootstrap-icons library added as a stylesheet link.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- Bundle: every plugin plus Popper, one file, no extra dependencies --&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Or the slim split: only tooltips and popovers depend on Popper --&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Icons: an optional SVG font by the Bootstrap team --&gt;
+&lt;link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"&gt;
+&lt;i class="bi bi-github"&gt;&lt;/i&gt;</code></pre></div>
+    <p class="code-note">The bundle ships every plugin plus Popper for positioning, the slim file drops Popper, and the icons stylesheet turns a simple i tag into an SVG icon.</p>
+    <div class="ex"><h4 id="ch1-bundle--exercises-1">Exercises 1</h4><ol>
+      <li>Create <code>index.html</code> from the starter template and open it on your phone — it must fit the viewport perfectly.</li>
+      <li>Add a Bootstrap Icons <code>bi-heart</code> icon and a paragraph with the class <code>lead</code>.</li>
+      <li>Remove the viewport meta and reload on a narrow window; note how the layout degrades.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch2" data-toc>2 · The Grid System</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · The Grid System</button><div class="ch-toc-list"><a href="#ch2-basics">2.1 Containers, rows and columns</a><a href="#ch2-12col">2.2 The 12-column model and breakpoints</a><a href="#ch2-responsive">2.3 Responsive column classes and auto-layout</a><a href="#ch2-gutters">2.4 Gutters, offsets and ordering</a><a href="#ch2-nesting">2.5 Nesting</a></div></div>
+    <p class="topic-desc">This chapter covers the flexbox grid made of containers, rows, columns, breakpoints and auto-layout classes. You place a container, put a row inside it, and fill the row with column classes such as col-md-6. The grid is the backbone of every Bootstrap layout you will ever build, so it deserves careful study.</p>
+    <p>Bootstrap’s grid is a mobile-first, flexbox-based system of <strong>containers &gt; rows &gt; columns</strong>. Learn the three layers, the twelve-column model and the breakpoint prefixes, and you can describe any layout on the web in a handful of classes.</p>
+    <h3 id="ch2-basics" data-toc>2.1 Containers, rows and columns</h3>
+<h4 id="ch2-basics--containers">2.1.1 Containers Detail</h4>
+    <p class="topic-desc">This section introduces the three layers of the grid: the container, the row and the column. Every column must sit inside a row, and every row inside a container, so the hierarchy is strict. The container class also centers content and applies horizontal padding, giving the whole layout its width behaviour.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="container"&gt;                &lt;!-- centers content, max-width per breakpoint --&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col"&gt;Half width&lt;/div&gt;     &lt;!-- two cols share the row 50/50 --&gt;
+    &lt;div class="col"&gt;Half width&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">The container sets the page width, the row creates a flex line, and bare col columns divide the available space equally among themselves.</p>
+    <p><code>.container</code> is the fixed-width wrapper that centers content: full width until each breakpoint, then a fixed max width. <code>.row</code> is a flex container whose direct children — the columns — are the flex items.</p>
+    <h3 id="ch2-12col" data-toc>2.2 The 12-column model and breakpoints</h3>
+<h4 id="ch2-12col--breakpoints">2.2.1 Breakpoints Detail</h4>
+    <p class="topic-desc">This section explains the twelve-column model and the five breakpoint prefixes from sm to xxl. Each column class carries a number that says how many of the twelve slots it spans, so col-4 takes one third of the row. Combining prefix and number lets the same class behave differently at different screen widths.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="row"&gt;
+  &lt;div class="col-4"&gt;span 4&lt;/div&gt;     &lt;!-- 4 of the 12 slots --&gt;
+  &lt;div class="col-4"&gt;span 4&lt;/div&gt;
+  &lt;div class="col-4"&gt;span 4&lt;/div&gt;
+  &lt;div class="col-8"&gt;8 of 12&lt;/div&gt;    &lt;!-- fills the row with the 4 below --&gt;
+  &lt;div class="col-4"&gt;4 of 12&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Numbered columns always take exactly that many of the twelve slots, so three col-4 columns fill one row and col-8 plus col-4 fill the next.</p>
+    <div class="tip"><p>Twelve is just the default — and it divides nicely into 2, 3, 4 and 6 equal columns. Change the total in Sass if your design needs a different rhythm.</p></div>
+    <h3 id="ch2-responsive" data-toc>2.3 Responsive column classes and auto-layout</h3>
+<h4 id="ch2-responsive--classes">2.3.1 Responsive Classes</h4>
+    <p class="topic-desc">This section shows how breakpoint suffixes change column spans at each viewport width. A class like col-md-6 means half width from the md breakpoint up, while un-prefixed col utilities give equal-width auto layout. These prefixed classes are the heart of responsive layout in Bootstrap.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="row"&gt;
+  &lt;div class="col-sm-6 col-lg-3"&gt;half on small, quarter on large&lt;/div&gt;
+  &lt;div class="col-sm-6 col-lg-3"&gt;same&lt;/div&gt;
+  &lt;div class="col-sm-6 col-lg-3"&gt;two per row on tablets&lt;/div&gt;
+  &lt;div class="col-sm-6 col-lg-3"&gt;four across on desktops&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- equally many columns: drop the numbers entirely --&gt;
+&lt;div class="row"&gt;
+  &lt;div class="col-md"&gt;auto, equal width&lt;/div&gt;
+  &lt;div class="col-md"&gt;auto, equal width&lt;/div&gt;
+  &lt;div class="col-md"&gt;auto, equal width&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Breakpoint suffixes apply rules from that width upward, so col-sm-6 col-lg-3 means half-width from small and quarter-width from large; the bare col-md classes share equally.</p>
+    <p>The auto-layout classes let ratios and flexible leftovers coexist: combine <code>col-8</code> with a bare <code>col</code> and the latter absorbs the space the former leaves free.</p>
+    <h3 id="ch2-gutters" data-toc>2.4 Gutters, offsets and ordering</h3>
+<h4 id="ch2-gutters--gutters">2.4.1 Gutters and Offsets</h4>
+    <p class="topic-desc">This section covers the spacing between columns, column offsets and the order utilities. Gutter classes such as g-3 control the padding between columns, offset classes like offset-md-3 shift a column right, and order classes reflow columns on small screens. These refine the grid without resorting to margin hacks.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="row g-4"&gt;                       &lt;!-- gutter: 1.5rem between columns --&gt;
+  &lt;div class="col-md-5 offset-md-1"&gt;left, pushed in one slot&lt;/div&gt;
+  &lt;div class="col-md-5 offset-md-1"&gt;right, pushed in one slot&lt;/div&gt;
+  &lt;div class="col order-last"&gt;shown last, first in markup&lt;/div&gt;
+  &lt;div class="col"&gt;middle in markup and view&lt;/div&gt;
+  &lt;div class="col order-first"&gt;shown first, last in markup&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">The g-4 class pads the gutters between columns, offsets push a column right by whole slots, and order classes reorder columns visually without touching the source.</p>
+    <div class="warn"><p>order-* reorders <em>visually</em> only. Keyboard and screen-reader order still follow the source markup, so keep meaningful content in a sensible order in the HTML.</p></div>
+    <h3 id="ch2-nesting" data-toc>2.5 Nesting</h3>
+<h4 id="ch2-nesting--nesting">2.5.1 Nesting Details</h4>
+    <p class="topic-desc">This section shows how columns can host their own inner row to create sub-layouts. Inside a column you add a new row div whose children follow the same twelve-slot rhythm. Nesting keeps sub-layouts aligned to the grid and is the standard way to build complex, multi-level sections.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="row"&gt;
+  &lt;div class="col-md-6"&gt;
+    &lt;div class="row"&gt;                    &lt;!-- nested grid inside the column --&gt;
+      &lt;div class="col-6"&gt;sub-half&lt;/div&gt;
+      &lt;div class="col-6"&gt;sub-half&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="col-md-6"&gt;right column&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">A row placed directly inside a column recreates the full twelve-slot grid within that column’s space, keeping all nested content on the same rhythm.</p>
+    <div class="ex"><h4 id="ch2-nesting--exercises-2">Exercises 2</h4><ol>
+      <li>Build four <code>col-lg-3</code> cards on one row, then two <code>col-md-6</code> panels below.</li>
+      <li>Make a <code>col-4 col-lg-3</code> sidebar with an offset of 1 beside a content column.</li>
+      <li>Insert a nested row with two <code>col-6</code> cells inside the content column.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch3" data-toc>3 · Layout &amp; Breakpoints</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Layout &amp; Breakpoints</button><div class="ch-toc-list"><a href="#ch3-containers">3.1 Fluid and fixed containers</a><a href="#ch3-display">3.2 Display utilities</a><a href="#ch3-flex">3.3 Flex utilities</a><a href="#ch3-spacing">3.4 The spacing scale</a><a href="#ch3-breakpoints">3.5 Breakpoints in Sass mixins</a></div></div>
+    <p class="topic-desc">This chapter goes beyond the grid to the wider layout system: containers, display, flex, spacing and breakpoints. You combine the d-* visibility classes, flex utilities and the spacing scale to shape how content behaves at every screen size. These utilities finish the layout layer that the grid begins.</p>
+    <p>The grid gives you structure; the layout utilities give you <em>control</em>. Containers, display and flex classes are how you create the arrangement, alignment and breathing room that make a page feel designed.</p>
+    <h3 id="ch3-containers" data-toc>3.1 Fluid and fixed containers</h3>
+<h4 id="ch3-containers--types">3.1.1 Container Types</h4>
+    <p class="topic-desc">This section compares the fixed container class with the fluid container and the per-breakpoint variants. Container sets a centered, max-width wrapper that changes width at each breakpoint, while container-fluid spans the full viewport width. Choosing the right wrapper sets the whole page’s width behaviour.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="container"&gt; ... &lt;/div&gt;       &lt;!-- centered, max-width changes per breakpoint --&gt;
+&lt;div class="container-fluid"&gt; ... &lt;/div&gt;    &lt;!-- always 100% of the parent width --&gt;
+&lt;div class="container-md"&gt; ... &lt;/div&gt;       &lt;!-- fluid below md, fixed from md up --&gt;</code></pre></div>
+    <p class="code-note">container centers a fixed-width block that steps up at each breakpoint, container-fluid always fills the width, and container-md behaves fluid below md and fixed from md onward.</p>
+    <div class="codeWrap"><pre><code>/* The five container widths, from the Sass variables — override and rebuild */
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px
+);</code></pre></div>
+    <p class="code-note">These Sass values are the exact widths each container locks onto at its breakpoint; overriding them and recompiling changes the rhythm of every fixed container.</p>
+    <h3 id="ch3-display" data-toc>3.2 Display utilities</h3>
+<h4 id="ch3-display--hidden">3.2.1 Hidden Utilities</h4>
+    <p class="topic-desc">This section shows how the d-* classes control visibility and layout mode per breakpoint. Classes like d-none and d-md-block can hide or show elements at different viewport widths. They replace conditional markup for show-and-hide needs, keeping responsive behaviour in CSS rather than in duplicated HTML.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="d-none d-md-block"&gt;    &lt;!-- hidden on phones, block from md up --&gt;
+  This copy appears from the md breakpoint.
+&lt;/div&gt;
+&lt;span class="d-inline-flex align-items-center"&gt;inline, laid out with flex&lt;/span&gt;
+&lt;div class="d-grid gap-2"&gt;          &lt;!-- display: grid with a 0.5rem gap --&gt;
+  &lt;button class="btn btn-primary"&gt;child 1&lt;/button&gt;
+  &lt;button class="btn btn-outline-primary"&gt;child 2&lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Display classes set display per breakpoint: d-none hides below md, d-inline-flex makes an inline flexbox, and d-grid turns a wrapper into a CSS grid.</p>
+    <p>Every value has a responsive form — <code>d-block</code>, <code>d-md-block</code>, <code>d-lg-none</code> — plus print helpers such as <code>d-print-block</code>.</p>
+    <h3 id="ch3-flex" data-toc>3.3 Flex utilities</h3>
+<h4 id="ch3-flex--direction">3.3.1 Flex Direction</h4>
+    <p class="topic-desc">This section introduces the flex utility pack for alignment, direction and wrapping. Classes such as d-flex, justify-content-between and align-items-center do in markup what flexbox CSS does in a stylesheet. Gap and order utilities complete the set, so most layouts need no custom CSS.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="d-flex justify-content-between align-items-center"&gt;
+  &lt;span&gt;left&lt;/span&gt;
+  &lt;span class="ms-auto"&gt;pushed right by margin&lt;/span&gt;
+  &lt;span&gt;right&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="flex-column flex-lg-row"&gt;  &lt;!-- stack on phones, row on lg --&gt;
+  &lt;div class="flex-grow-1"&gt;fills extra space&lt;/div&gt;
+  &lt;div class="flex-shrink-0"&gt;never shrinks&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">justify-content and align-items position children along the main and cross axes, ms-auto absorbs leftover space, and flex-grow-1 makes one item fill the remainder.</p>
+    <table>
+      <tr><th>Utility</th><th>Effect</th></tr>
+      <tr><td><code>justify-content-*</code></td><td>Main-axis alignment: start, center, between, around, evenly</td></tr>
+      <tr><td><code>align-items-*</code></td><td>Cross-axis alignment: start, center, end, stretch, baseline</td></tr>
+      <tr><td><code>flex-wrap</code></td><td>Allow items to wrap onto new lines</td></tr>
+      <tr><td><code>flex-grow-1</code></td><td>Let one item absorb all leftover space</td></tr>
+      <tr><td><code>ms-auto</code> / <code>me-auto</code></td><td>Auto margins push items apart</td></tr>
+    </table>
+    <h3 id="ch3-spacing" data-toc>3.4 The spacing scale</h3>
+<h4 id="ch3-spacing--scale">3.4.1 The Spacing Scale</h4>
+    <p class="topic-desc">This section explains the spacing scale behind the margin and padding utilities. Classes like mt-3 or px-4 combine a prefix for property, a breakpoint where allowed, and a number from zero to five. The numbered scale keeps spacing consistent across the whole design instead of relying on arbitrary values.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="p-4"&gt;padding on all sides&lt;/div&gt;      &lt;!-- 1.5rem --&gt;
+&lt;div class="mx-auto"&gt;horizontally centered&lt;/div&gt;   &lt;!-- auto margins --&gt;
+&lt;div class="mt-5 mb-2"&gt;top and bottom margins&lt;/div&gt;
+&lt;div class="ps-3 pe-3"&gt;padding start and end only&lt;/div&gt;
+&lt;div class="py-2"&gt;vertical padding&lt;/div&gt;
+&lt;div class="ms-auto"&gt;margin-left: auto (pushes right)&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Spacing utilities combine a property (m or p), a side (t, b, s, e, x, y) and a scale step from 0 to 5 that multiplies the base 0.25rem.</p>
+    <p>Step 0 is zero spacing and each step adds <code>0.25rem</code> (step 5 is <code>3rem</code>). Add your own steps to the <code>$spacers</code> map when the built-in scale is too coarse.</p>
+    <h3 id="ch3-breakpoints" data-toc>3.5 Breakpoints in Sass mixins</h3>
+    <p class="topic-desc">This section shows the Sass breakpoint mixins for writing responsive rules alongside the framework. You use mixins such as media-breakpoint-up inside custom Sass to apply rules from a given breakpoint upward. This is the customization path that utility classes alone cannot reach, so it matters for real projects.</p>
+    <div class="codeWrap"><pre><code>@use "bootstrap/scss/mixins/breakpoints" as *;
+
+.custom-panel { padding: 1rem; }
+
+@include media-breakpoint-up(lg) {     // lg and above
+  .custom-panel { padding: 2rem; }
+}
+
+@include media-breakpoint-down(md) {   // strictly below md
+  .custom-panel { border-top: 2px solid; }
+}</code></pre></div>
+    <p class="code-note">The media-breakpoint-up and media-breakpoint-down mixins wrap your rules in the same min-width and max-width queries the grid uses, so custom CSS stays in sync.</p>
+    <div class="ex"><h4 id="ch3-breakpoints--exercises-3">Exercises 3</h4><ol>
+      <li>Show a navigation hint only above <code>lg</code> using display utilities.</li>
+      <li>Center a <code>col-md-6</code> block horizontally with <code>mx-auto</code>.</li>
+      <li>Write a Sass rule that only applies from <code>md</code> upward using a breakpoint mixin.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch4" data-toc>4 · Content &amp; Typography</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Content &amp; Typography</button><div class="ch-toc-list"><a href="#ch4-headings">4.1 Headings, display headings and lead</a><a href="#ch4-text">4.2 Inline text utilities and blockquotes</a><a href="#ch4-lists">4.3 Lists and images</a><a href="#ch4-tables">4.4 Figures and tables</a></div></div>
+    <p class="topic-desc">This chapter covers the base content styling: headings, text utilities, quotes, lists, images and tables. You pair structural HTML elements with classes such as display-4, lead, text-muted and the table variants. Getting typography right is what separates a prototype from a finished product.</p>
+    <p>Bootstrap resets most native HTML to a clean baseline, then adds utilities to adjust weight, alignment and emphasis. This chapter styles the words and media that live inside the layout.</p>
+    <h3 id="ch4-headings" data-toc>4.1 Headings, display headings and lead</h3>
+<h4 id="ch4-headings--semantic">4.1.1 Semantic Headings</h4>
+    <p class="topic-desc">This section shows heading styling, the display variants and the lead paragraph class. Native h1 through h6 get consistent styles, while display-1 through display-6 give oversized marketing headings. Adding class lead to a paragraph increases its size and weight for introductory text. These are the first classes you reach for on any page.</p>
+    <div class="codeWrap"><pre><code>&lt;h1 class="display-1"&gt;Oversized headline&lt;/h1&gt;   &lt;!-- lightweight, magazine-style heading --&gt;
+&lt;h2&gt;Regular Bootstrap heading&lt;/h2&gt;
+
+&lt;p class="lead"&gt;This intro paragraph is larger and lighter than body copy.&lt;/p&gt;
+
+&lt;h3 class="h1"&gt;H3 tag styled as an H1&lt;/h3&gt;         &lt;!-- keep the tag, swap the look --&gt;
+&lt;div class="display-5 fw-semibold"&gt;any element can look like a display heading&lt;/div&gt;</code></pre></div>
+    <p class="code-note">display-1 through display-6 give oversized headings, lead enlarges intro paragraphs, and the h1 class restyles a heading without changing its tag.</p>
+    <h3 id="ch4-text" data-toc>4.2 Inline text utilities and blockquotes</h3>
+<h4 id="ch4-text--whitespace">4.2.1 Whitespace Handling</h4>
+    <p class="topic-desc">This section covers the inline text helpers, alignment classes and blockquote styling. Utilities set weight, emphasis and color in one-word classes such as fw-bold, font-italic and text-uppercase. Blockquote markup gets the blockquote class and optional blockquote-footer for attribution, and text alignment classes mirror the CSS alignment properties.</p>
+    <div class="codeWrap"><pre><code>&lt;p&gt;&lt;mark&gt;highlighted&lt;/mark&gt;, &lt;del&gt;deleted&lt;/del&gt;, &lt;s&gt;struck&lt;/s&gt;, &lt;ins&gt;inserted&lt;/ins&gt;&lt;/p&gt;
+&lt;p class="fw-bold"&gt;bold by utility&lt;/p&gt;
+&lt;p class="fst-italic text-muted"&gt;italic, muted copy&lt;/p&gt;
+&lt;p class="text-uppercase small text-secondary"&gt;eyebrow-style label&lt;/p&gt;
+
+&lt;blockquote class="blockquote"&gt;
+  &lt;p&gt;A well-known quote, only a guide.&lt;/p&gt;
+  &lt;footer class="blockquote-footer"&gt;Someone in &lt;cite title="Source Title"&gt;Source Title&lt;/cite&gt;&lt;/footer&gt;
+&lt;/blockquote&gt;</code></pre></div>
+    <p class="code-note">Inline semantic elements get Bootstrap’s default styling, fw- and fst- set weight and style, and the blockquote classes render a quoted passage with a muted attribution footer.</p>
+    <div class="codeWrap"><pre><code>&lt;p class="text-start text-md-center text-lg-end"&gt;alignment changes with the breakpoint&lt;/p&gt;
+&lt;p class="text-break"&gt;this long unbroken value will wrap instead of overflowing the card&lt;/p&gt;
+&lt;p class="text-truncate"&gt;one line, ending with an ellipsis when the text runs long&lt;/p&gt;</code></pre></div>
+    <p class="code-note">Text alignment is breakpoint-aware, text-break forces long words to wrap, and text-truncate collapses overflowing text onto one line with an ellipsis.</p>
+    <h3 id="ch4-lists" data-toc>4.3 Lists and images</h3>
+<h4 id="ch4-lists--styled">4.3.1 Styled Lists</h4>
+    <p class="topic-desc">This section shows the list styling utilities and the image helpers. Class list-unstyled removes the default bullet styling, while list-inline turns items into a horizontal row. The img-fluid class makes images scale with their container and img-thumbnail adds a bordered frame. Together they cover most common content needs.</p>
+    <div class="codeWrap"><pre><code>&lt;ul class="list-unstyled"&gt;&lt;li&gt;no bullets, no padding&lt;/li&gt;&lt;/ul&gt;
+
+&lt;ul class="list-inline"&gt;                  &lt;!-- items on one line instead of stacked --&gt;
+  &lt;li class="list-inline-item"&gt;Link A&lt;/li&gt;
+  &lt;li class="list-inline-item"&gt;Link B&lt;/li&gt;
+  &lt;li class="list-inline-item"&gt;Link C&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;img src="photo.jpg" class="img-fluid" alt="A sample photo"&gt;   &lt;!-- max-width 100%, height auto --&gt;
+&lt;img src="avatar.png" class="img-thumbnail" alt="Portrait"&gt;     &lt;!-- 1px border frame --&gt;</code></pre></div>
+    <p class="code-note">list-unstyled strips bullets, list-inline lays the items on one line, img-fluid never overflows its parent, and img-thumbnail adds a picture frame.</p>
+    <div class="warn"><p>Always set the <code>alt</code> attribute on meaningful images and leave it empty (<code>alt=""</code>) on decorative ones — that is the accessibility contract images hold.</p></div>
+    <h3 id="ch4-tables" data-toc>4.4 Figures and tables</h3>
+<h4 id="ch4-tables--responsive">4.4.1 Responsive Tables</h4>
+    <p class="topic-desc">This section covers figure captions and the full table styling toolkit. The figure and figure-caption classes pair images with captions, while table, table-striped, table-hover and table-bordered style data tables. Wrapping a table in the table-responsive class lets it scroll horizontally on small screens.</p>
+    <div class="codeWrap"><pre><code>&lt;figure class="figure"&gt;
+  &lt;img src="chart.png" class="figure-img img-fluid rounded" alt="Quarterly chart"&gt;
+  &lt;figcaption class="figure-caption"&gt;Q1 figures at a glance.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;div class="table-responsive"&gt;                  &lt;!-- horizontal scroll on small screens --&gt;
+  &lt;table class="table table-striped table-hover"&gt;
+    &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Role&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;&lt;td&gt;Ada&lt;/td&gt;&lt;td&gt;Engineer&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr class="table-primary"&gt;&lt;td&gt;Lin&lt;/td&gt;&lt;td&gt;Lead&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">figure pairs an image with a muted caption, table classes add borders, striping and hover states, and the table-responsive wrapper adds a scrollbar when space runs out.</p>
+    <p>Rows and cells accept contextual classes such as <code>table-primary</code>, tables can be <code>table-sm</code>, and the responsive wrapper takes breakpoint variants like <code>table-responsive-md</code>.</p>
+    <div class="ex"><h4 id="ch4-tables--exercises-4">Exercises 4</h4><ol>
+      <li>Style a headline with <code>display-3</code> and an intro paragraph with <code>lead</code>.</li>
+      <li>Compose a blockquote with a <code>blockquote-footer</code> citation.</li>
+      <li>Wrap a striped, hoverable table in <code>table-responsive</code> and test it on a phone.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch5" data-toc>5 · Forms &amp; Validation</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Forms &amp; Validation</button><div class="ch-toc-list"><a href="#ch5-controls">5.1 Form controls</a><a href="#ch5-groups">5.2 Input groups and floating labels</a><a href="#ch5-selects">5.3 Selects, checks, switches and range</a><a href="#ch5-layout">5.4 Form layout on the grid</a><a href="#ch5-validation">5.5 Validation styles</a></div></div>
+    <p class="topic-desc">This chapter covers the form controls, input groups, layout helpers and validation styling. Bootstrap forms look and behave the same in every browser with one class per control, and form-check components style checkboxes and switches. Grid helpers then lay fields out responsively, and validation classes tint controls for feedback.</p>
+    <p>Forms are where Bootstrap’s polish shows: every native input is normalised with <code>form-control</code>, every label gets its companion class, and validation turns red or green automatically.</p>
+    <h3 id="ch5-controls" data-toc>5.1 Form controls</h3>
+<h4 id="ch5-controls--types">5.1.1 Control Types</h4>
+    <p class="topic-desc">This section shows the form-control class that styles inputs and textareas across every browser. Adding class form-control to an input, select or textarea normalises its size, font and border. Form-select is the sibling class for selects, and form-label plus form-text handle captions and helper text.</p>
+    <div class="codeWrap"><pre><code>&lt;form&gt;                                  &lt;!-- every control needs a label; helper text is tied on --&gt;
+  &lt;div class="mb-3"&gt;
+    &lt;label for="email" class="form-label"&gt;Email address&lt;/label&gt;
+    &lt;input type="email" class="form-control" id="email" placeholder="name@example.com"&gt;
+    &lt;div class="form-text"&gt;We never share your email.&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="mb-3"&gt;
+    &lt;label for="notes" class="form-label"&gt;Notes&lt;/label&gt;
+    &lt;textarea class="form-control" id="notes" rows="3"&gt;&lt;/textarea&gt;
+  &lt;/div&gt;
+  &lt;button type="submit" class="btn btn-primary"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</code></pre></div>
+    <p class="code-note">The form-label, form-control and form-text trio styles labels, inputs and helper text coherently, and a wrapping mb-3 div spaces each control apart.</p>
+    <p>Disabled controls just need the <code>disabled</code> attribute; Bootstrap dims them. <code>readonly</code> keeps the background intact but locks editing.</p>
+    <h3 id="ch5-groups" data-toc>5.2 Input groups and floating labels</h3>
+<h4 id="ch5-groups--labels">5.2.1 Floating Labels</h4>
+    <p class="topic-desc">This section shows input groups, which attach affixes and buttons to a control, plus floating labels that animate in place. The input-group wraps a control with input-group-text or buttons on either side. Floating labels swap the label for a placeholder and use the form-floating wrapper. Both patterns save layout work.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="input-group mb-3"&gt;
+  &lt;span class="input-group-text"&gt;@&lt;/span&gt;
+  &lt;input type="text" class="form-control" placeholder="Username" aria-label="Username"&gt;
+&lt;/div&gt;
+&lt;div class="input-group mb-3"&gt;
+  &lt;input type="text" class="form-control" placeholder="Amount" aria-label="Amount"&gt;
+  &lt;span class="input-group-text"&gt;.00&lt;/span&gt;
+  &lt;button class="btn btn-outline-secondary" type="button"&gt;Apply&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class="form-floating"&gt;                &lt;!-- the label floats over the control --&gt;
+  &lt;input type="email" class="form-control" id="floating" placeholder="name@example.com"&gt;
+  &lt;label for="floating"&gt;Email address&lt;/label&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">input-group-text wraps affixes around a control so they fuse into one border, and form-floating overlays the label on the control and floats it on focus or when filled.</p>
+    <h3 id="ch5-selects" data-toc>5.3 Selects, checks, switches and range</h3>
+<h4 id="ch5-selects--options">5.3.1 Form Controls Options</h4>
+    <p class="topic-desc">This section covers the remaining control types: custom selects, checkboxes, radios, switches and the range slider. Form-select styles dropdowns, while form-check, form-check-input and form-check-label build checkboxes and radios, and form-switch turns them into switches. The form-range class styles the range slider, and all share the same label and feedback system.</p>
+    <div class="codeWrap"><pre><code>&lt;select class="form-select" aria-label="Choose a region"&gt;
+  &lt;option selected&gt;Open this select menu&lt;/option&gt;
+  &lt;option value="1"&gt;North&lt;/option&gt;
+  &lt;option value="2"&gt;South&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;div class="form-check"&gt;
+  &lt;input class="form-check-input" type="checkbox" value="" id="terms"&gt;
+  &lt;label class="form-check-label" for="terms"&gt;I agree to the terms&lt;/label&gt;
+&lt;/div&gt;
+
+&lt;div class="form-check form-switch"&gt;      &lt;!-- toggle styling for the same input --&gt;
+  &lt;input class="form-check-input" type="checkbox" role="switch" id="toggle"&gt;
+  &lt;label class="form-check-label" for="toggle"&gt;Enable notifications&lt;/label&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">form-select restyles the native select, form-check wraps a styled checkbox or radio, and swapping form-check for form-switch turns it into a toggle.</p>
+    <p>Radios use the same pattern with <code>type="radio"</code> plus a shared <code>name</code> for grouping, and <code>form-range</code> styles the native range input.</p>
+    <h3 id="ch5-layout" data-toc>5.4 Form layout on the grid</h3>
+<h4 id="ch5-layout--grid">5.4.1 Grid Layout</h4>
+    <p class="topic-desc">This section shows how to lay forms out with the grid using rows and columns. You place form controls inside col classes so fields receive gutters and responsive widths like any other grid content. Row g-3 gaps the fields, and unprefixed col classes make them equal width automatically.</p>
+    <div class="codeWrap"><pre><code>&lt;form&gt;
+  &lt;div class="row g-3"&gt;
+    &lt;div class="col-sm-6"&gt;
+      &lt;label for="first" class="form-label"&gt;First name&lt;/label&gt;
+      &lt;input type="text" class="form-control" id="first"&gt;
+    &lt;/div&gt;
+    &lt;div class="col-sm-6"&gt;
+      &lt;label for="last" class="form-label"&gt;Last name&lt;/label&gt;
+      &lt;input type="text" class="form-control" id="last"&gt;
+    &lt;/div&gt;
+    &lt;div class="col-12"&gt;
+      &lt;label for="street" class="form-label"&gt;Street address&lt;/label&gt;
+      &lt;input type="text" class="form-control" id="street"&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/form&gt;</code></pre></div>
+    <p class="code-note">A row with two col-sm-6 fields puts the name fields side by side from small screens up, and a col-12 field always spans the full width below them.</p>
+    <h3 id="ch5-validation" data-toc>5.5 Validation styles</h3>
+<h4 id="ch5-validation--valid">5.5.1 Validation States</h4>
+    <p class="topic-desc">This section explains the validation classes that tint controls green or red and reveal feedback text. Adding is-valid or is-invalid to a control colours its border, and the sibling valid-feedback or invalid-feedback elements show messages. Using novalidate on the form lets Bootstrap’s visual states take over from the browser defaults.</p>
+    <div class="codeWrap"><pre><code>&lt;form class="row g-3 needs-validation" novalidate&gt;
+  &lt;div class="col-md-4"&gt;
+    &lt;label for="city" class="form-label"&gt;City&lt;/label&gt;
+    &lt;input type="text" class="form-control" id="city" required&gt;
+    &lt;div class="invalid-feedback"&gt;Please choose a city.&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="col-12"&gt;
+    &lt;button class="btn btn-primary" type="submit"&gt;Submit form&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+
+&lt;script&gt;
+(() =&gt; {
+  'use strict';
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form =&gt; {
+    form.addEventListener('submit', event =&gt; {
+      if (!form.checkValidity()) {        // ask the browser which fields fail
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated'); // then paint the invalid-feedback blocks
+    });
+  });
+})();
+&lt;/script&gt;</code></pre></div>
+    <p class="code-note">Controls grow .is-valid or .is-invalid styling when their wrapping form gains .was-validated, and this script adds that class after the browser’s own constraint checks run.</p>
+    <p>You can also force states directly with <code>is-valid</code> and <code>is-invalid</code> on controls, plus the accompanying <code>valid-feedback</code> or <code>invalid-feedback</code> block.</p>
+    <div class="ex"><h4 id="ch5-validation--exercises-5">Exercises 5</h4><ol>
+      <li>Build a checkout form with an input group for price and a floating-label email.</li>
+      <li>Add a switch, a select and two radios in a single grid form.</li>
+      <li>Wire validation so a required city shows its message on submit.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch6" data-toc>6 · Components I</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Components I</button><div class="ch-toc-list"><a href="#ch6-buttons">6.1 Buttons and button groups</a><a href="#ch6-badges">6.2 Badges and alerts</a><a href="#ch6-cards">6.3 Cards</a><a href="#ch6-accordion">6.4 Accordions and list groups</a></div></div>
+    <p class="topic-desc">This chapter covers the everyday components: buttons, badges, alerts, cards, accordions and list groups. You build each widget from standard markup plus one class, such as class btn for a button or card for a content container. These are the widgets that fill the layouts you built in Chapters 2 and 3.</p>
+    <p>Components are the second layer of Bootstrap: finished, accessible widgets you drop into the markup. This chapter covers the icons of everyday UI, from the humble button to the all-purpose card.</p>
+    <h3 id="ch6-buttons" data-toc>6.1 Buttons and button groups</h3>
+<h4 id="ch6-buttons--styles">6.1.1 Button Styles</h4>
+    <p class="topic-desc">This section shows the button variants, sizes, outline styles and grouping. Class btn pairs with variants like btn-primary and btn-outline-danger, while btn-lg and btn-sm control size. The btn-group wrapper joins several buttons into one control. Buttons are the most reused component, so their variants matter.</p>
+    <div class="codeWrap"><pre><code>&lt;button type="button" class="btn btn-primary"&gt;Primary&lt;/button&gt;
+&lt;button type="button" class="btn btn-outline-danger"&gt;Outlined danger&lt;/button&gt;
+&lt;button type="button" class="btn btn-secondary btn-sm"&gt;Small&lt;/button&gt;
+&lt;button type="button" class="btn btn-primary btn-lg" disabled&gt;Large, disabled&lt;/button&gt;
+&lt;a class="btn btn-success" href="#" role="button"&gt;Link styled as a button&lt;/a&gt;
+
+&lt;div class="btn-group" role="group" aria-label="Alignment choices"&gt;
+  &lt;button type="button" class="btn btn-outline-primary"&gt;Left&lt;/button&gt;
+  &lt;button type="button" class="btn btn-outline-primary active"&gt;Center&lt;/button&gt;
+  &lt;button type="button" class="btn btn-outline-primary"&gt;Right&lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">btn plus a color or outline variant picks the look, btn-sm and btn-lg set the size, and a btn-group merges several buttons into one segmented control.</p>
+    <p>Buttons come in <code>btn-primary</code>, <code>btn-secondary</code>, <code>btn-success</code>, <code>btn-danger</code>, <code>btn-warning</code>, <code>btn-info</code>, <code>btn-light</code> and <code>btn-dark</code>; every color also exists in an outline form.</p>
+    <h3 id="ch6-badges" data-toc>6.2 Badges and alerts</h3>
+<h4 id="ch6-badges--counts">6.2.1 Badge Counts</h4>
+    <p class="topic-desc">This section covers count and status badges, then the dismissible alert system. Class badge styles small labels, often inside another element or using bootstrap-defined colors, while alert combined with alert-dismissible builds dismissible contextual messages. Close them with a button carrying class btn-close, and use them for labels and contextual messages.</p>
+    <div class="codeWrap"><pre><code>&lt;button type="button" class="btn btn-primary position-relative"&gt;
+  Inbox
+  &lt;span class="badge text-bg-danger rounded-pill position-absolute top-0 start-100 translate-middle"&gt;3&lt;/span&gt;
+&lt;/button&gt;
+
+&lt;div class="alert alert-warning alert-dismissible fade show" role="alert"&gt;
+  &lt;strong&gt;Heads up!&lt;/strong&gt; Your trial ends in three days.
+  &lt;button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"&gt;&lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">A badge with text-bg-danger, rounded-pill and position utilities floats a count pill on a button corner, while the dismissible alert hides itself when its btn-close is clicked.</p>
+    <h3 id="ch6-cards" data-toc>6.3 Cards</h3>
+<h4 id="ch6-cards--options">6.3.1 Card Options</h4>
+    <p class="topic-desc">This section shows the card, the flexible content container, with images, bodies, lists and footers. A card is a composition of optional block sections such as card-header, card-body, list-group and card-footer. Card-img-top places an image, and nested utilities control spacing between sections.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- cards fill their column; size them with the grid, not inline styles --&gt;
+&lt;div class="card"&gt;
+  &lt;img src="photo.jpg" class="card-img-top" alt="Product photo"&gt;
+  &lt;div class="card-body"&gt;
+    &lt;h5 class="card-title"&gt;Card title&lt;/h5&gt;
+    &lt;p class="card-text"&gt;Some quick example text built on the card title.&lt;/p&gt;
+    &lt;a href="#" class="btn btn-primary"&gt;Go somewhere&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;ul class="list-group list-group-flush"&gt;
+    &lt;li class="list-group-item"&gt;An item&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;div class="card-footer text-muted"&gt;2 days ago&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">card-img-top, card-body, list-group-flush and card-footer stack in one seamless container, and wrapping cards in grid columns lays several out responsively.</p>
+    <h3 id="ch6-accordion" data-toc>6.4 Accordions and list groups</h3>
+<h4 id="ch6-accordion--toggle">6.4.1 Accordion Toggle</h4>
+    <p class="topic-desc">This section shows the accordion’s collapse structure and the versatile list group. An accordion stacks items whose collapsible bodies expand and collapse via data-bs-toggle and data-bs-parent attributes. The list-group class turns plain lists into styled groups, optionally with active or disabled items. Both are patterns you will recognise across countless interfaces.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="accordion" id="faq"&gt;
+  &lt;div class="accordion-item"&gt;
+    &lt;h2 class="accordion-header"&gt;
+      &lt;button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne" aria-expanded="true" aria-controls="faqOne"&gt;
+        How do I reset my password?
+      &lt;/button&gt;
+    &lt;/h2&gt;
+    &lt;div id="faqOne" class="accordion-collapse collapse show" data-bs-parent="#faq"&gt;
+      &lt;div class="accordion-body"&gt;Open the settings page and choose Reset.&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Each accordion item pairs a header button with a collapse body, and the data-bs-parent attribute links them so opening one closes the others.</p>
+    <div class="codeWrap"><pre><code>&lt;ul class="list-group"&gt;
+  &lt;li class="list-group-item active" aria-current="true"&gt;Current item&lt;/li&gt;
+  &lt;li class="list-group-item disabled" aria-disabled="true"&gt;Unavailable&lt;/li&gt;
+  &lt;li class="list-group-item d-flex justify-content-between align-items-center"&gt;
+    Inbox &lt;span class="badge text-bg-primary rounded-pill"&gt;12&lt;/span&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</code></pre></div>
+    <p class="code-note">list-group-item styles each row, active and disabled mark states, and a badge inside a d-flex item pins a count to the right edge.</p>
+    <div class="ex"><h4 id="ch6-accordion--exercises-6">Exercises 6</h4><ol>
+      <li>Compose a button group with an active and an outlined state.</li>
+      <li>Build a card with an image, a body, a flush list and a footer.</li>
+      <li>Make a two-item accordion where opening one closes the other.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch7" data-toc>7 · Components II</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Components II</button><div class="ch-toc-list"><a href="#ch7-navs">7.1 Navs and tabs</a><a href="#ch7-navbar">7.2 The navbar with responsive collapse</a><a href="#ch7-breadcrumb">7.3 Breadcrumbs, pagination and dropdowns</a><a href="#ch7-modal">7.4 Modals and offcanvas</a><a href="#ch7-more">7.5 Tooltips, popovers, toasts and carousel</a></div></div>
+    <p class="topic-desc">This chapter covers navigation and interactive widgets: navs, the navbar, pagination, dropdowns, modals, tooltips and more. Each component activates through data-bs-* attributes and the shared collapse and toggle behaviours come from the JavaScript bundle. This is where pages become applications.</p>
+    <p>This chapter finishes the component tour with the pieces that involve movement: collapsing menus, dialog boxes and transient notifications. Most need the JavaScript bundle from Chapter 1 to be present.</p>
+    <h3 id="ch7-navs" data-toc>7.1 Navs and tabs</h3>
+<h4 id="ch7-navs--justified">7.1.1 Justified Nav</h4>
+    <p class="topic-desc">This section shows the nav base class and its pill and tab variants. A plain list of links becomes navigation with class nav and one variant class such as nav-pills or nav-tabs. Add nav-link on each item, and for tab behaviour mark them with data-bs-toggle equal to tab so the bundle switches panes.</p>
+    <div class="codeWrap"><pre><code>&lt;ul class="nav nav-pills"&gt;
+  &lt;li class="nav-item"&gt;&lt;a class="nav-link active" aria-current="page" href="#"&gt;Active&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="nav-item"&gt;&lt;a class="nav-link" href="#"&gt;Link&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="nav-item"&gt;&lt;a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"&gt;Disabled&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ul class="nav nav-tabs"&gt;             &lt;!-- switch pills to tabs with one class --&gt;
+  &lt;li class="nav-item"&gt;&lt;a class="nav-link" href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="nav-item"&gt;&lt;a class="nav-link" href="#"&gt;Profile&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</code></pre></div>
+    <p class="code-note">nav supplies the baseline, nav-pills and nav-tabs add the visual treatment, and nav-link styles each entry with correct active and disabled states.</p>
+    <h3 id="ch7-navbar" data-toc>7.2 The navbar with responsive collapse</h3>
+<h4 id="ch7-navbar--collapse">7.2.1 Collapse Behavior</h4>
+    <p class="topic-desc">This section builds the classic responsive navbar whose menu collapses behind a hamburger button. The navbar class wraps brand, toggler and links, while navbar-expand-lg sets the breakpoint at which the menu expands. The collapse toggling is Bootstrap’s most used JavaScript behaviour, driven by data-bs-toggle and data-bs-target attributes.</p>
+    <div class="codeWrap"><pre><code>&lt;nav class="navbar navbar-expand-lg navbar-dark bg-dark"&gt;
+  &lt;div class="container-fluid"&gt;
+    &lt;a class="navbar-brand" href="#"&gt;Brand&lt;/a&gt;
+    &lt;button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation"&gt;
+      &lt;span class="navbar-toggler-icon"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;div class="collapse navbar-collapse" id="navMenu"&gt;
+      &lt;ul class="navbar-nav ms-auto"&gt;
+        &lt;li class="nav-item"&gt;&lt;a class="nav-link active" aria-current="page" href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+        &lt;li class="nav-item"&gt;&lt;a class="nav-link" href="#"&gt;Pricing&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/nav&gt;</code></pre></div>
+    <p class="code-note">navbar-expand-lg shows the full menu from large screens up and hides it behind the toggler below, which data-bs-toggle="collapse" wires up without any custom JavaScript.</p>
+    <p>The <code>navbar-dark</code> and <code>bg-dark</code> pair puts light text on a dark bar; swap to <code>navbar-light</code> with <code>bg-light</code> for the inverse.</p>
+    <h3 id="ch7-breadcrumb" data-toc>7.3 Breadcrumbs, pagination and dropdowns</h3>
+<h4 id="ch7-breadcrumb--dropdown">7.3.1 Dropdown Integration</h4>
+    <p class="topic-desc">This section covers the smaller navigation widgets: breadcrumb trails, pagination controls and dropdown menus. Class breadcrumb with breadcrumb-item marks the trail, pagination with page-item and page-link builds the pager, and dropdown with data-bs-toggle drives the menu. One class each activates these three patterns.</p>
+    <div class="codeWrap"><pre><code>&lt;nav aria-label="breadcrumb"&gt;
+  &lt;ol class="breadcrumb"&gt;
+    &lt;li class="breadcrumb-item"&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+    &lt;li class="breadcrumb-item active" aria-current="page"&gt;Settings&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/nav&gt;
+
+&lt;nav aria-label="Page navigation"&gt;
+  &lt;ul class="pagination"&gt;
+    &lt;li class="page-item"&gt;&lt;a class="page-link" href="#"&gt;Previous&lt;/a&gt;&lt;/li&gt;
+    &lt;li class="page-item active" aria-current="page"&gt;&lt;a class="page-link" href="#"&gt;1&lt;/a&gt;&lt;/li&gt;
+    &lt;li class="page-item"&gt;&lt;a class="page-link" href="#"&gt;2&lt;/a&gt;&lt;/li&gt;
+    &lt;li class="page-item"&gt;&lt;a class="page-link" href="#"&gt;Next&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+
+&lt;div class="dropdown"&gt;
+  &lt;button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"&gt;
+    Dropdown button
+  &lt;/button&gt;
+  &lt;ul class="dropdown-menu"&gt;
+    &lt;li&gt;&lt;a class="dropdown-item" href="#"&gt;Action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a class="dropdown-item" href="#"&gt;Another action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;hr class="dropdown-divider"&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a class="dropdown-item text-danger" href="#"&gt;Danger zone&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">breadcrumb and pagination are pure markup with active states, while the dropdown pairs a data-bs-toggle button with a dropdown-menu that the bundle opens and closes.</p>
+    <h3 id="ch7-modal" data-toc>7.4 Modals and offcanvas</h3>
+<h4 id="ch7-modal--access">7.4.1 Accessibility</h4>
+    <p class="topic-desc">This section shows the modal dialog and its off-canvas cousin. A modal centres a dialog over the page using classes modal, modal-dialog and modal-content, opened with data-bs-toggle and data-bs-target. Offcanvas slides a panel in from an edge instead, using the offcanvas and offcanvas-start classes plus the same toggle attributes.</p>
+    <div class="codeWrap"><pre><code>&lt;button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"&gt;
+  Launch demo modal
+&lt;/button&gt;
+
+&lt;div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true"&gt;
+  &lt;div class="modal-dialog modal-dialog-centered"&gt;
+    &lt;div class="modal-content"&gt;
+      &lt;div class="modal-header"&gt;
+        &lt;h1 class="modal-title fs-5" id="modalTitle"&gt;Modal title&lt;/h1&gt;
+        &lt;button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"&gt;&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-body"&gt;Content goes here.&lt;/div&gt;
+      &lt;div class="modal-footer"&gt;
+        &lt;button type="button" class="btn btn-secondary" data-bs-dismiss="modal"&gt;Close&lt;/button&gt;
+        &lt;button type="button" class="btn btn-primary"&gt;Save changes&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">The modal markup is a header, body and footer inside a dialog; tabindex="-1" keeps focus trapped while open, and data-bs-dismiss closes it from any button.</p>
+    <div class="warn"><p>Give every modal an <code>aria-labelledby</code> pointing at its title and keep <code>tabindex="-1"</code> on the dialog — those two attributes are the modal’s keyboard contract.</p></div>
+    <h3 id="ch7-more" data-toc>7.5 Tooltips, popovers, toasts and carousel</h3>
+<h4 id="ch7-more--effects">7.5.1 Effects and Timing</h4>
+    <p class="topic-desc">This section finishes the component tour with the opt-in overlays and the carousel. Tooltips and popovers need manual JavaScript initialisation because Popper must calculate their position, while toasts and the carousel work direct from data-bs-* attributes. All three follow the same data-driven activation pattern.</p>
+    <div class="codeWrap"><pre><code>&lt;button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-title="I am a tooltip"&gt;
+  Hover me
+&lt;/button&gt;
+
+&lt;div class="toast" role="alert" aria-live="assertive" aria-atomic="true"&gt;
+  &lt;div class="toast-header"&gt;
+    &lt;strong class="me-auto"&gt;Notification&lt;/strong&gt;
+    &lt;button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"&gt;&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="toast-body"&gt;Updates saved.&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div id="carouselExample" class="carousel slide" data-bs-ride="carousel"&gt;
+  &lt;div class="carousel-inner"&gt;
+    &lt;div class="carousel-item active"&gt;...&lt;/div&gt;
+    &lt;div class="carousel-item"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev"&gt;
+    &lt;span class="carousel-control-prev-icon" aria-hidden="true"&gt;&lt;/span&gt;
+    &lt;span class="visually-hidden"&gt;Previous&lt;/span&gt;
+  &lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">The toast announces itself through aria-live and dismisses with data-bs-dismiss, while the carousel autoplays from data-bs-ride and provides screen-reader-only navigation labels.</p>
+    <p>The tooltip and its sibling the popover do not activate from data attributes alone — each needs one line of JavaScript, covered in Chapter 9. Everything else in this snippet works out of the box.</p>
+    <div class="ex"><h4 id="ch7-more--exercises-7">Exercises 7</h4><ol>
+      <li>Build a responsive navbar with a collapsed menu and a right-aligned item.</li>
+      <li>Add a breadcrumb, a pagination control and a danger dropdown item.</li>
+      <li>Create a centered modal with close buttons in the header and footer.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch8" data-toc>8 · Helpers &amp; Utilities</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Helpers &amp; Utilities</button><div class="ch-toc-list"><a href="#ch8-spacing">8.1 Spacing and color utilities</a><a href="#ch8-borders">8.2 Borders, shadows and position</a><a href="#ch8-sizing">8.3 Sizing, overflow, opacity and z-index</a><a href="#ch8-stacks">8.4 Stacks, ratio and vertical alignment</a></div></div>
+    <p class="topic-desc">This chapter covers the utility toolkit: colors, borders, shadows, positioning, sizing and the newer helpers like stacks and ratio. Classes such as text-bg-primary, border, shadow-sm and position-absolute finish the layout layer. These utilities handle the finishing touches that grid and component classes do not.</p>
+    <p>Utility classes are the fine-grained levers of Bootstrap: one class per visual tweak. Once the grid and components are in place, utilities do the remaining 20% of styling without writing a single custom CSS rule.</p>
+    <h3 id="ch8-spacing" data-toc>8.1 Spacing and color utilities</h3>
+<h4 id="ch8-spacing--utilities">8.1.1 Utility Types</h4>
+    <p class="topic-desc">This section recaps the spacing scale and shows the color utilities for text and backgrounds. Margin and padding classes reuse the numbered scale from zero to five, while classes like text-primary, bg-primary and the combined text-bg-* set foreground and background color. Color classes respect the current color mode automatically.</p>
+    <div class="codeWrap"><pre><code>&lt;p class="text-primary"&gt;blue-tinted text&lt;/p&gt;
+&lt;p class="text-body-secondary"&gt;muted secondary copy&lt;/p&gt;
+&lt;p class="text-success mb-0"&gt;success green, no bottom margin&lt;/p&gt;
+
+&lt;div class="bg-primary text-white p-3 rounded"&gt;colored panel&lt;/div&gt;
+&lt;div class="bg-success-subtle text-success-emphasis p-3"&gt;soft tinted panel&lt;/div&gt;
+&lt;div class="bg-opacity-50 bg-dark text-white p-3"&gt;50% transparent background&lt;/div&gt;</code></pre></div>
+    <p class="code-note">text-* tints text, bg-* fills backgrounds, and the -subtle, -emphasis and bg-opacity-* modifiers tune strength for gentler results.</p>
+    <p>Color utilities come in pairs: <code>*-subtle</code> for soft backgrounds, <code>*-emphasis</code> for matching text, plus <code>link-*</code>, <code>border-*</code> and <code>bg-gradient</code> variants.</p>
+    <h3 id="ch8-borders" data-toc>8.2 Borders, shadows and position</h3>
+<h4 id="ch8-borders--shadows">8.2.1 Shadows and Positions</h4>
+    <p class="topic-desc">This section shows border, shadow and positioning utilities. Class border plus its modifier variants like border-top and border-0 control lines, shadow-sm and shadow-lg add depth, and start-0, top-0 and position-absolute place elements precisely. These add depth and position elements anywhere in the layout without custom CSS.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="border border-2 border-primary rounded-3"&gt;2px primary border&lt;/div&gt;
+&lt;div class="border-top border-danger"&gt;top border only&lt;/div&gt;
+&lt;div class="shadow-sm"&gt;small shadow&lt;/div&gt;
+&lt;div class="shadow-lg"&gt;large shadow&lt;/div&gt;
+
+&lt;div class="position-relative"&gt;
+  &lt;div class="position-absolute top-0 end-0"&gt;pinned top-right of the parent&lt;/div&gt;
+  &lt;div class="position-absolute bottom-0 start-0 translate-middle"&gt;half out of a corner&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Border utilities control side, width and color; shadows come in four strengths; and position-absolute plus top-, end-, bottom- and start- utilities pin elements to a corner of a relative parent.</p>
+    <h3 id="ch8-sizing" data-toc>8.3 Sizing, overflow, opacity and z-index</h3>
+<h4 id="ch8-sizing--aspect">8.3.1 Aspect Ratio</h4>
+    <p class="topic-desc">This section shows the width and height helpers plus overflow, opacity, z-index and visibility controls. Classes like w-50, h-100, opacity-50 and z-1 handle the fiddly numeric tweaks, with overflow classes controlling scroll behaviour. Each maps to a single CSS property for quick, predictable styling.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="w-75 mx-auto"&gt;75% wide, centered&lt;/div&gt;
+&lt;div class="h-50"&gt;50% of the parent height&lt;/div&gt;
+
+&lt;div class="overflow-auto"&gt;scrolls when content overflows&lt;/div&gt;
+&lt;div class="overflow-hidden"&gt;clips overflowing content&lt;/div&gt;
+
+&lt;div class="opacity-75"&gt;75% opaque&lt;/div&gt;
+&lt;div class="z-3 position-relative"&gt;stacked above z-1 and z-2 siblings&lt;/div&gt;
+&lt;div class="invisible"&gt;hidden but still occupies space&lt;/div&gt;</code></pre></div>
+    <p class="code-note">Sizing classes set width and height in percentage steps, overflow toggles scrolling or clipping, opacity runs 100 down to 0 in steps, and z-1 through z-3 raise elements above siblings.</p>
+    <h3 id="ch8-stacks" data-toc>8.4 Stacks, ratio and vertical alignment</h3>
+<h4 id="ch8-stacks--vertical">8.4.1 Vertical Alignment</h4>
+    <p class="topic-desc">This section introduces the vstack and hstack helpers, the ratio box and vertical alignment. Class vstack stacks children vertically and hstack horizontally, replacing much hand-written flexbox, while ratio creates aspect-ratio boxes such as ratio-16x9. Vertical alignment utilities align inline content to their container.</p>
+    <div class="codeWrap"><pre><code>&lt;div class="vstack gap-3"&gt;             &lt;!-- vertical flex stack with a 1rem gap --&gt;
+  &lt;div&gt;flex column item&lt;/div&gt;
+  &lt;div&gt;flex column item&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="hstack gap-3"&gt;              &lt;!-- horizontal flex stack with a gap --&gt;
+  &lt;div&gt;left&lt;/div&gt;
+  &lt;div class="ms-auto"&gt;pushed right&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="ratio ratio-16x9"&gt;          &lt;!-- fixed 16:9 responsive box --&gt;
+  &lt;iframe src="player.html" title="Video embed"&gt;&lt;/iframe&gt;
+&lt;/div&gt;</code></pre></div>
+    <p class="code-note">vstack and hstack are short names for common flex containers with a built-in gap, and ratio turns any child into a responsive box that keeps its aspect ratio.</p>
+    <div class="ex"><h4 id="ch8-stacks--exercises-8">Exercises 8</h4><ol>
+      <li>Style a status banner with <code>bg-success-subtle</code> and matching emphasis text.</li>
+      <li>Pin a small badge to the top-right of a relative card using position utilities.</li>
+      <li>Embed a 16:9 responsive box inside an <code>hstack</code> with a caption.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch9" data-toc>9 · JavaScript Behaviour</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · JavaScript Behaviour</button><div class="ch-toc-list"><a href="#ch9-data">9.1 data-bs-* attributes</a><a href="#ch9-api">9.2 The programmatic API</a><a href="#ch9-events">9.3 Events and lifecycle</a><a href="#ch9-optin">9.4 Tooltip and popover opt-in plus accessibility</a></div></div>
+    <p class="topic-desc">This chapter covers how Bootstrap’s JavaScript activates from data attributes and through objects and events. You will wire plugins with declarative data-bs-* attributes, then learn the programmatic constructor API to take control when needed. Every plugin follows the same lifecycle of creation, events and disposal.</p>
+    <p>Bootstrap’s JavaScript powers the collapses, dropdowns, modals and toasts of Chapters 6–7. It works two ways: declaratively through <code>data-bs-*</code> attributes, and programmatically through JavaScript objects.</p>
+    <h3 id="ch9-data" data-toc>9.1 data-bs-* attributes</h3>
+    <p class="topic-desc">This section explains the declarative API that boots plugins from markup alone. Attributes such as data-bs-toggle, data-bs-target and data-bs-dismiss activate components like modals and dropdowns with no JavaScript of your own. Wrapping components in a data-bs-toggle context means most projects never need anything more than these attributes.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- data-bs-toggle names the plugin, data-bs-target points at its subject --&gt;
+&lt;button type="button" data-bs-toggle="collapse" data-bs-target="#panel" aria-expanded="false" aria-controls="panel"&gt;
+  Open the panel
+&lt;/button&gt;
+&lt;div id="panel" class="collapse"&gt;...&lt;/div&gt;
+
+&lt;!-- plugin options arrive as further data-bs-* attributes --&gt;
+&lt;ul class="dropdown-menu" data-bs-offset="10,20"&gt;...&lt;/ul&gt;
+
+&lt;!-- disable attribute auto-initialisation to drive every plugin from JS --&gt;
+&lt;script src="assets/bootstrap.bundle.min.js" data-bs-no-conflict="true"&gt;&lt;/script&gt;</code></pre></div>
+    <p class="code-note">Every plugin reads its settings from data-bs-* attributes, and data-bs-no-conflict on the script tag opts out of auto-initialisation for manual control.</p>
+    <h3 id="ch9-api" data-toc>9.2 The programmatic API</h3>
+    <p class="topic-desc">This section shows how to instantiate and control plugins from JavaScript. Every plugin exposes a constructor, so you write new bootstrap.Modal with an element and an options object. Methods such as show, hide and toggle then control it, and dispose cleans up cleanly.</p>
+    <div class="codeWrap"><pre><code>&lt;div id="toastBox" class="toast"&gt;Body message&lt;/div&gt;
+
+const toastEl = document.getElementById('toastBox');
+const toast = new bootstrap.Toast(toastEl, { delay: 3000 });   // options, not attributes
+toast.show();              // opens, autohides after the delay
+toast.dispose();           // removes the instance and its listeners
+
+// plugins are reachable per element once created
+const modal = bootstrap.Modal.getOrCreateInstance('#modalExample');
+modal.show();</code></pre></div>
+    <p class="code-note">new bootstrap.Toast creates an instance with host-object options, show() opens it, dispose() tears it down, and getOrCreateInstance returns an existing instance without duplicating it.</p>
+    <h3 id="ch9-events" data-toc>9.3 Events and lifecycle</h3>
+    <p class="topic-desc">This section explains the plugin events that fire around every transition. Bootstrap emits events such as show, shown, hide and hidden before and after a component changes state. Listening with element.addEventListener lets you hook into moments like just before a modal opens so you can run your own logic.</p>
+    <div class="codeWrap"><pre><code>const modalEl = document.getElementById('modalExample');
+
+modalEl.addEventListener('show.bs.modal', () =&gt; {
+  console.log('opening — load content or reset state');
+});
+
+modalEl.addEventListener('shown.bs.modal', () =&gt; {
+  firstInput.focus();                            // safe to focus once fully visible
+});
+
+modalEl.addEventListener('hide.bs.modal', (event) =&gt; {
+  if (!saved) event.preventDefault();            // veto the close entirely
+});</code></pre></div>
+    <p class="code-note">Every plugin fires matching pairs of events (show/shown, hide/hidden), and calling preventDefault() on a hide event stops the transition from happening.</p>
+    <h3 id="ch9-optin" data-toc>9.4 Tooltip and popover opt-in plus accessibility</h3>
+    <p class="topic-desc">This section shows why tooltips and popovers need manual initialisation and the accessibility hooks they rely on. They defer because Popper must calculate their position, so you instantiate them with the JavaScript API instead of data attributes. Ensure the reference element has a tabindex when needed and rely on their built-in ARIA wiring to keep keyboard and screen-reader users in sync.</p>
+    <div class="codeWrap"><pre><code>// tooltips and popovers are NOT attribute-autoloaded: construct them in JS
+const triggers = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+const tooltipList = [...triggers].map(el =&gt; new bootstrap.Tooltip(el));
+
+// popovers use their own constructor with the same options object
+const popover = new bootstrap.Popover(document.querySelector('#popoverBtn'), {
+  container: 'body',   // avoid clipping by overflow-hidden ancestors
+  html: false          // keep HTML out of the title by default
+});
+
+// keep tooltips hover-free for keyboard users: focus triggers them too
+new bootstrap.Tooltip(el, { trigger: 'hover focus' });</code></pre></div>
+    <p class="code-note">Tooltips and popovers are built in JavaScript because Popper must position them; adding focus to the trigger keeps them reachable by keyboard users.</p>
+    <p>For accessible overlays: never nest interactive controls inside a tooltip, prefer real buttons over tooltips on <code>span</code> elements, and let the plugin’s built-in ARIA (<code>role="tooltip"</code> plus <code>describedby</code>) do the wiring.</p>
+    <div class="ex"><h4 id="ch9-optin--exercises-9">Exercises 9</h4><ol>
+      <li>Open a modal from a plain button using only data attributes.</li>
+      <li>Recreate the same modal programmatically and log its <code>shown.bs.modal</code> event.</li>
+      <li>Initialise every tooltip on a page and make them keyboard-triggerable.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch10" data-toc>10 · Customization</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Customization</button><div class="ch-toc-list"><a href="#ch10-cssvars">10.1 CSS variables</a><a href="#ch10-sass">10.2 Sass variables and maps</a><a href="#ch10-npm">10.3 Customizing with npm and compiling</a><a href="#ch10-modes">10.4 Color modes, RTL and reducing the bundle</a></div></div>
+    <p class="topic-desc">This chapter covers the three customization levels: CSS variables, Sass overrides and full compilation. You will theme Bootstrap by overriding custom properties, by editing Sass variables and maps, and by compiling a trimmed output. The chapter also covers dark mode, right-to-left support and reducing the final bundle size.</p>
+    <p>Out of the box Bootstrap is a finished system — but it is built to be reshaped. CSS variables handle runtime theming, Sass handles compile-time changes, and both feed into how you ship the result.</p>
+    <h3 id="ch10-cssvars" data-toc>10.1 CSS variables</h3>
+    <p class="topic-desc">This section shows how to override the CSS custom properties that every component reads. Root variables like the color scale and component-specific ones like btn-border-radius are overriden on a selector. Because these are runtime CSS variables, theming happens with no rebuild.</p>
+    <div class="codeWrap"><pre><code>/* root overrides in your own stylesheet — no rebuild needed */
+:root {
+  --bs-primary: #7c3aed;              /* every component reads these tokens */
+  --bs-body-bg: #faf7ff;
+  --bs-border-radius: 0.75rem;
+}
+
+/* variables are scoped, so a single component can restyle itself */
+.card-accent {
+  --bs-card-border-width: 0;
+  --bs-card-bg: #fff7ed;
+}</code></pre></div>
+    <p class="code-note">Overriding the :root tokens recolors the whole framework at runtime, and overriding them on a scoped class restyles just that component.</p>
+    <p>Every component exposes a documented block of variables like <code>--bs-card-*</code>; the inspector in devtools shows the full cascade on any element.</p>
+    <h3 id="ch10-sass" data-toc>10.2 Sass variables and maps</h3>
+    <p class="topic-desc">This section shows how to override variables and maps before compiling. You import custom Sass that sets variables, such as the theme colors or spacing scale, before importing Bootstrap’s source files. Sass decisions are baked into the generated CSS, so they suit deep, build-time changes.</p>
+    <div class="codeWrap"><pre><code>// scss/custom.scss — order matters
+@import "bootstrap/scss/functions";
+$primary: #7c3aed;                     // step 2: override variables
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/maps";
+$theme-colors: map-merge($theme-colors, (   // step 4: extend the maps
+  "brand": #0d9488
+));
+@import "bootstrap/scss/bootstrap";    // step 5: everything else</code></pre></div>
+    <p class="code-note">Overrides sit between the functions import and the variables import, map changes come after variables, and compiling bakes the new palette into the CSS.</p>
+    <p>New theme colors generate whole families automatically — <code>.text-brand</code>, <code>.bg-brand</code> and <code>.btn-brand</code> all appear once the map grows.</p>
+    <h3 id="ch10-npm" data-toc>10.3 Customizing with npm and compiling</h3>
+    <p class="topic-desc">This section shows the npm install and the compile step that turns your overrides into a production stylesheet. You install bootstrap as a dependency and compile your Sass entry file that imports the framework’s source. This is the fork in the road from CDN use to keeping project files in your own build.</p>
+    <div class="codeWrap"><pre><code>npm init -y
+npm install bootstrap     # pulls the compiled assets and the Sass source
+
+# compile the custom stylesheet twice: expanded for development, minified for production
+npx sass scss/custom.scss dist/bootstrap.css
+npx sass scss/custom.scss dist/bootstrap.min.css --style=compressed
+
+# sanity check: confirm the custom primary color made it into the output
+select-string -Pattern "#7c3aed" dist/bootstrap.css</code></pre></div>
+    <p class="code-note">npm install fetches Bootstrap’s source, and two sass runs produce expanded CSS for development and minified CSS for production, verified with a search for the custom color.</p>
+    <h3 id="ch10-modes" data-toc>10.4 Color modes, RTL and reducing the bundle</h3>
+    <p class="topic-desc">This section covers dark mode, right-to-left support and slimming the final files. Dark mode is enabled by adding the data-bs-theme attribute or class to the html element, RTL works by loading the RTL build, and unused plugins can be dropped from the JavaScript bundle. All three are structural choices you make once and benefit from forever.</p>
+    <div class="codeWrap"><pre><code>&lt;html lang="en" data-bs-theme="dark"&gt;    &lt;!-- dark mode: flip every component --&gt;
+
+// flip at runtime with one line and persist the choice
+document.documentElement.setAttribute('data-bs-theme',
+  localStorage.getItem('theme') || 'light');
+
+&lt;html lang="ar" dir="rtl"&gt;                 &lt;!-- RTL mirrors the entire layout --&gt;</code></pre></div>
+    <p class="code-note">data-bs-theme switches light and dark across all components, dir="rtl" mirrors the whole layout without markup changes, and a little local storage persists user choice.</p>
+    <p>For smaller builds, compile selective Sass instead of the full <code>bootstrap.scss</code>, turn off unused <code>$enable-*</code> flags, and import only the components you actually use.</p>
+    <div class="ex"><h4 id="ch10-modes--exercises-10">Exercises 10</h4><ol>
+      <li>Recolor a page by overriding three <code>--bs-*</code> variables in a scoped class.</li>
+      <li>Add a scheme name to the <code>$theme-colors</code> map and use its generated button class.</li>
+      <li>Compile a production stylesheet and keep only the components you need.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="ch11" data-toc>11 · Accessibility &amp; Best Practices</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Accessibility &amp; Best Practices</button><div class="ch-toc-list"><a href="#ch11-semantic">11.1 Semantic markup</a><a href="#ch11-focus">11.2 Focus states and keyboard support</a><a href="#ch11-aria">11.3 ARIA in components</a><a href="#ch11-contrast">11.4 Contrast and common misuse</a></div></div>
+    <p class="topic-desc">This chapter covers the accessibility contract Bootstrap components promise and the common ways projects break it. Components ship with keyboard support, focus rings and ARIA attributes, but only when you keep the required markup and attributes intact. Accessible markup is a habit, not a deadline checklist.</p>
+    <p>Bootstrap’s components ship with reasonable ARIA and keyboard behaviour for free — but only if you keep the right attributes in place. This chapter is about not breaking the defaults and knowing when to reach for more.</p>
+    <h3 id="ch11-semantic" data-toc>11.1 Semantic markup</h3>
+    <p class="topic-desc">This section shows how real elements and landmarks scaffold every component. Choose the right tag first, such as button for a button or nav for navigation, and classes then only change appearance. Semantic HTML keeps structure meaningful for screen readers and search engines alike.</p>
+    <div class="codeWrap"><pre><code>&lt;!-- semantic: an anchor, because it navigates --&gt;
+&lt;a class="btn btn-primary" href="/account"&gt;Go to account&lt;/a&gt;
+
+&lt;!-- semantic: a button, because it does something in-page --&gt;
+&lt;button type="button" class="btn btn-outline-secondary"&gt;Save draft&lt;/button&gt;
+
+&lt;!-- anti-pattern: a div staging as a button must rebuild keyboard and focus --&gt;
+&lt;div onclick="..." role="button" tabindex="0"&gt;bad idea&lt;/div&gt;</code></pre></div>
+    <p class="code-note">An anchor navigates, a button triggers in-page behaviour, and a div turned into a button must re-implement keyboard handling and focus that a native button gives you free.</p>
+    <h3 id="ch11-focus" data-toc>11.2 Focus states and keyboard support</h3>
+    <p class="topic-desc">This section explains how Bootstrap’s focus rings surface every tab stop. Focused elements show a visible outline supplied by focus ring styles, and the CSS variables behind them make restyling easy. Do not remove outlines, because keyboard users need them, restyle them instead.</p>
+    <div class="codeWrap"><pre><code>/* replace, never remove, the focus ring */
+.form-control:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+}
+
+/* keyboard-visible focus for any custom widget, using the modern hook */
+.focusable:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+}</code></pre></div>
+    <p class="code-note">Focus rings are accessibility progress indicators: restyle them with box-shadow or outline rather than hiding them, and use :focus-visible so only keyboard users see them.</p>
+    <p>Anything interactive must be reachable: any element with a click role needs <code>tabindex="0"</code> plus Enter and Space handling — again, a native <code>button</code> gives you all of that for free.</p>
+    <h3 id="ch11-aria" data-toc>11.3 ARIA in components</h3>
+    <p class="topic-desc">This section maps the ARIA attributes Bootstrap wires for you and the ones you must supply. Components like modals and toggles add attributes such as role or aria-expanded automatically, while you must provide aria-label on icon-only buttons or alt text on images. Getting these right keeps screen-reader users in sync with the visible state.</p>
+    <div class="codeWrap"><pre><code>&lt;div id="status" role="status" aria-live="polite" class="visually-hidden"&gt;&lt;/div&gt;
+
+function announce(msg) {
+  const region = document.getElementById('status');
+  region.textContent = msg;   // region stays visually hidden but is read aloud
+}
+
+announce('Your changes were saved.');</code></pre></div>
+    <p class="code-note">role="status" plus aria-live="polite" makes a visually-hidden region announce updates to assistive technology without interrupting the task.</p>
+    <table>
+      <tr><th>Component</th><th>You supply</th><th>Plugin maintains</th></tr>
+      <tr><td>Modal</td><td><code>aria-labelledby</code></td><td>Focus trap, <code>aria-hidden</code></td></tr>
+      <tr><td>Collapse / accordion</td><td><code>aria-controls</code></td><td><code>aria-expanded</code></td></tr>
+      <tr><td>Dropdown</td><td>none</td><td><code>aria-expanded</code>, menu roles</td></tr>
+      <tr><td>Carousel</td><td><code>aria-label</code> on controls, <code>alt</code> text</td><td><code>aria-live</code> structure</td></tr>
+      <tr><td>Live messages</td><td><code>role="alert"</code> or <code>aria-live</code></td><td>—</td></tr>
+    </table>
+    <h3 id="ch11-contrast" data-toc>11.4 Contrast and common misuse</h3>
+    <p class="topic-desc">This section finishes with color contrast and the recurring misuse patterns to avoid. Text and background color choices must keep enough contrast for readability, and common errors include overriding colors with the text- or bg- utilities without checking their ratio. These errors are the usual reason an accessible Bootstrap site fails an audit.</p>
+    <ul>
+      <li><strong>Muted gray on white</strong> — <code>text-muted</code> often fails WCAG AA for small text; prefer <code>text-secondary</code> or a custom darker value.</li>
+      <li><strong>Tooltip-only information</strong> — tooltips vanish for hover and some keyboard users; keep critical content in the page text.</li>
+      <li><strong>Carousels that autoplay</strong> — respect <code>prefers-reduced-motion</code> or drop <code>data-bs-ride</code>; moving content is a distraction for many users.</li>
+      <li><strong>Color alone as the signal</strong> — pair every color with an icon, a checkmark or text.</li>
+      <li><strong>Buttons that look like links</strong> — keep affordances honest so assistive users can predict what will happen.</li>
+    </ul>
+    <div class="ex"><h4 id="ch11-contrast--exercises-11">Exercises 11</h4><ol>
+      <li>Audit a page with a screen reader: tab through it and open every modal.</li>
+      <li>Replace two tooltip-only labels with visible, always-present text.</li>
+      <li>Make a carousel respect <code>prefers-reduced-motion</code> and stop autoplaying.</li>
+    </ol></div>
+  </section>
+
+  <section class="chapter">
+    <h2 id="appendix" data-toc>Appendix · Quick Reference &amp; Glossary</h2><div class="ch-toc"><button type="button" class="ch-toc-head" aria-expanded="true"><span class="arrow">▸</span>Contents · Appendix · Quick Reference &amp; Glossary</button><div class="ch-toc-list"><a href="#app-grid">A.1 Breakpoints and the grid</a><a href="#app-spacing">A.2 Spacing scale and key utilities</a><a href="#app-components">A.3 Common components at a glance</a><a href="#app-glossary">A.4 Glossary</a></div></div>
+    <p class="topic-desc">This appendix bundles the breakpoints, grid classes, spacing scale, common components and glossary into one skim-able reference. Look up the col and prefix classes, the spacing values from zero to five, and the attributes that activate each component. Open it whenever a class name escapes you.</p>
+    <h3 id="app-grid" data-toc>A.1 Breakpoints and the grid</h3>
+    <p class="topic-desc">This section lists the five breakpoints from sm to xxl and the core grid classes at a glance. The table pairs each prefix with its minimum viewport width, so you can see when col-md-6 or col-xl-4 applies. The prefix column is the one to memorize.</p>
+    <table>
+      <tr><th>Prefix</th><th>Min width</th><th>Grid classes</th><th>Container max</th></tr>
+      <tr><td>none</td><td>below 576px</td><td><code>col-*</code> (always active)</td><td>fluid</td></tr>
+      <tr><td><code>sm</code></td><td>576px</td><td><code>col-sm-*</code></td><td>540px</td></tr>
+      <tr><td><code>md</code></td><td>768px</td><td><code>col-md-*</code></td><td>720px</td></tr>
+      <tr><td><code>lg</code></td><td>992px</td><td><code>col-lg-*</code></td><td>960px</td></tr>
+      <tr><td><code>xl</code></td><td>1200px</td><td><code>col-xl-*</code></td><td>1140px</td></tr>
+      <tr><td><code>xxl</code></td><td>1400px</td><td><code>col-xxl-*</code></td><td>1320px</td></tr>
+    </table>
+    <ul>
+      <li>Columns span 1–12; totals above 12 wrap to the next row.</li>
+      <li>A typical responsive ladder: <code>col-12 col-md-6 col-lg-4</code>.</li>
+      <li>Auto columns: <code>col-md</code> shares equally, <code>col-md-auto</code> fits the content.</li>
+    </ul>
+    <h3 id="app-spacing" data-toc>A.2 Spacing scale and key utilities</h3>
+    <p class="topic-desc">This section shows the spacing scale values and the utility families. The chart lists margin and padding classes from zero to five alongside the auto value and the breakpoint variants. Spacing is the most typed part of Bootstrap, so pin the scale to memory.</p>
+    <table>
+      <tr><th>Step</th><th>Value</th><th>Example</th></tr>
+      <tr><td>0</td><td>0</td><td><code>mt-0</code></td></tr>
+      <tr><td>1</td><td>0.25rem</td><td><code>p-1</code></td></tr>
+      <tr><td>2</td><td>0.5rem</td><td><code>mx-2</code></td></tr>
+      <tr><td>3</td><td>1rem</td><td><code>my-3</code></td></tr>
+      <tr><td>4</td><td>1.5rem</td><td><code>ps-4</code></td></tr>
+      <tr><td>5</td><td>3rem</td><td><code>g-5</code></td></tr>
+      <tr><td>auto</td><td>margin only</td><td><code>mx-auto</code>, <code>ms-auto</code></td></tr>
+    </table>
+    <p>Other packs worth memorizing: <code>d-*</code> display, <code>d-flex</code>/<code>align-items-*</code>/<code>justify-content-*</code> flex, <code>w-*</code>/<code>h-*</code> sizing, <code>opacity-*</code>, <code>position-*</code>, <code>text-*</code> and <code>bg-*</code> — all available with breakpoint suffixes.</p>
+    <h3 id="app-components" data-toc>A.3 Common components at a glance</h3>
+    <p class="topic-desc">This section summarizes the components and the attributes that activate them. Each entry lists a component, its required markup pattern and the data-bs-* attribute that turns it on, such as data-bs-toggle for modals and dropdowns. Use the table as a quick reminder of how each widget is triggered.</p>
+    <table>
+      <tr><th>Component</th><th>Activates with</th><th>Key classes</th></tr>
+      <tr><td>Collapse / accordion</td><td><code>data-bs-toggle="collapse"</code></td><td><code>.collapse</code></td></tr>
+      <tr><td>Dropdown</td><td><code>data-bs-toggle="dropdown"</code></td><td><code>.dropdown-menu</code></td></tr>
+      <tr><td>Modal</td><td><code>data-bs-toggle="modal"</code></td><td><code>.modal-dialog</code></td></tr>
+      <tr><td>Offcanvas</td><td><code>data-bs-toggle="offcanvas"</code></td><td><code>.offcanvas</code></td></tr>
+      <tr><td>Toast</td><td><code>data-bs-toggle="toast"</code> or <code>show()</code></td><td><code>.toast</code></td></tr>
+      <tr><td>Carousel</td><td><code>data-bs-ride="carousel"</code></td><td><code>.carousel</code></td></tr>
+      <tr><td>Tooltip / popover</td><td><code>new bootstrap.Tooltip()</code></td><td><code>data-bs-toggle="tooltip"</code></td></tr>
+      <tr><td>Tabs / pills</td><td><code>data-bs-toggle="tab"</code></td><td><code>.nav-link</code></td></tr>
+    </table>
+    <h3 id="app-glossary" data-toc>A.4 Glossary</h3>
+    <p class="topic-desc">This section defines the terms used throughout the guide, from breakpoint and gutter to utility and customization. Each entry gives a plain-language definition so a class or word in the chapters never feels fuzzy. Skim it whenever you hit a term you have not seen before.</p>
+    <ul>
+      <li><strong>Breakpoint</strong> — the viewport widths (sm…xxl) that switch layout via min-width media queries.</li>
+      <li><strong>Container</strong> — the horizontal wrapper that centers rows and caps the page width.</li>
+      <li><strong>Gutter</strong> — the padding inside each column that becomes the space between columns.</li>
+      <li><strong>Responsive class</strong> — any utility with a breakpoint suffix, active from that width upward.</li>
+      <li><strong>Component</strong> — a finished, accessible widget (card, navbar, modal) you drop into markup.</li>
+      <li><strong>Plugin</strong> — the JavaScript behaviour engines behind toggles, collapses and toasts.</li>
+      <li><strong>Popper</strong> — the positioning library that places tooltips, popovers and dropdowns.</li>
+      <li><strong>Spacer</strong> — one step of the spacing scale; 0.25rem base values from 0 to 5.</li>
+      <li><strong>CSS variable</strong> — a <code>--bs-*</code> design token overrideable at runtime.</li>
+      <li><strong>Sass map</strong> — the compile-time collection of values (colors, spacers, gutters) that generates utilities.</li>
+    </ul>
+  </section>
+
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  <span class="to-top-txt">Back to top</span>
+</button>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>Bootstrap 5 — Components &amp; Layout Guide.</strong> One-page interactive textbook. Progress is saved in your browser (theme, last chapter). Open in any modern browser. No internet needed.</p>
+  </div>
+</footer>
+
+<script src="assets/shell.js" defer></script>
+</body>
+</html>

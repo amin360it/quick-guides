@@ -1,0 +1,12 @@
+const fs = require('fs');
+const s = fs.readFileSync('jquery.html', 'utf8');
+console.log('burger:', s.includes('id="burger"'));
+console.log('topnav:', s.includes('id="topnav"'));
+console.log('modeBtn:', s.includes('id="modeBtn"'));
+console.log('modePop:', s.includes('id="modePop"'));
+console.log('mode-wrap:', s.includes('class="mode-wrap"'));
+console.log('burger svg:', s.includes('M3 6h18'));
+console.log('data-theme:', s.includes('data-theme'));
+console.log('data-mode:', s.includes('data-mode'));
+console.log('am-band:', s.includes('am-band'));
+console.log('sidebar:', s.includes('id="sidebar"'));
